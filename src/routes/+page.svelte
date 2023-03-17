@@ -6,6 +6,7 @@
 	let isRecording = false;
 	let micIcon = '🎙️';
 	let clientAPIKey = '';
+	let outputText = '';
 
 	async function toggleRecording() {
 		isRecording = !isRecording;
@@ -39,6 +40,7 @@
 		});
 		const text = await response.text();
 		navigator.clipboard.writeText(text);
+		outputText = text;
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
@@ -62,11 +64,20 @@
 	<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
 	<input
 		class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
-		type="text"
-		placeholder="Enter OpenAI API Key"
-		bind:value={clientAPIKey}
+		placeholder="Output text will appear here..."
+		bind:value={outputText}
+		disabled
 	/>
+	<!-- <textarea
+		class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+		placeholder="Output text will appear here..."
+		bind:value={outputText}
+		rows="1"
+	/> -->
 	<p class="text-xs text-gray-600">
+		Click the microphone or press the spacebar to start recording.
+	</p>
+	<!-- <p class="text-xs text-gray-600">
 		You can find your OpenAI API key in your
 		<a
 			href="https://beta.openai.com/account/api-keys"
@@ -76,7 +87,7 @@
 		>
 			User Settings
 		</a>.
-	</p>
+	</p> -->
 
 	<div class="fixed bottom-4 right-4">
 		<a
