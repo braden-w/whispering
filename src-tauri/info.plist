@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Request microphone access for Recording</string>
+	<string>Request microphone access for recording</string>
 </dict>
 </plist>
