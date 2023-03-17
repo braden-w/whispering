@@ -41,6 +41,11 @@
 	});
 </script>
 
-<div class="flex items-center justify-center min-h-screen">
+<div class="flex flex-col items-center justify-center min-h-screen space-y-4">
 	<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
+	<input
+		class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+		type="text"
+		placeholder="Enter your text"
+	/>
 </div>
