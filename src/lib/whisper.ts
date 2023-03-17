@@ -1,7 +1,7 @@
 export async function sendAudioToWhisper(audioBlob: Blob): Promise<string> {
 	const { VITE_WHISPER_API_KEY } = import.meta.env;
 	const formData = new FormData();
-	formData.append('file', audioBlob);
+	formData.append('file', audioBlob, 'recording.wav');
 	formData.append('model', 'whisper-1');
 	formData.append('language', 'en');
 
@@ -13,7 +13,8 @@ export async function sendAudioToWhisper(audioBlob: Blob): Promise<string> {
 	const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
 		method: 'POST',
 		headers: {
-			Authorization: `Bearer ${VITE_WHISPER_API_KEY}`
+			Authorization: `Bearer ${VITE_WHISPER_API_KEY}`,
+			ContentType: 'multipart/form-data'
 		},
 		body: formData
 	});

@@ -14,7 +14,7 @@ export async function stopRecording(): Promise<Blob> {
 	return new Promise((resolve) => {
 		if (mediaRecorder) {
 			mediaRecorder.addEventListener('stop', () => {
-				const audioBlob = new Blob(recordedChunks, { type: 'audio/mp3' });
+				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
 				recordedChunks = [];
 				resolve(audioBlob);
 			});
