@@ -1,4 +1,5 @@
 <script>
+	import { writeText } from '@tauri-apps/api/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { sendAudioToWhisper } from '$lib/whisper';
 
@@ -12,9 +13,9 @@
 		if (isRecording) {
 			await startRecording();
 		} else {
+			await writeText('Tauri is awesome!');
 			const audioBlob = await stopRecording();
 			const text = await sendAudioToWhisper(audioBlob);
-			navigator.clipboard.writeText('Hello, World!');
 		}
 	}
 </script>
