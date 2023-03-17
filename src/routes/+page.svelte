@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { onDestroy, onMount } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
@@ -14,15 +15,28 @@
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
-			const response = await fetch('/api/whisper', {
-				method: 'POST',
-				body: audioBlob,
-				headers: {
-					'content-type': 'audio/wav'
+			const processRecording = async (audioBlob: Blob) => {
+				const response = await fetch('/api/whisper', {
+					method: 'POST',
+					body: audioBlob,
+					headers: {
+						'content-type': 'audio/wav'
+					}
+				});
+				const text = await response.text();
+				navigator.clipboard.writeText(text);
+			};
+			toast.promise(
+				processRecording(audioBlob),
+				{
+					loading: 'Processing Whisper...',
+					success: 'Copied to clipboard!',
+					error: 'Something went wrong.'
+				},
+				{
+					duration: 2000
 				}
-			});
-			const text = await response.text();
-			navigator.clipboard.writeText(text);
+			);
 		}
 	}
 
