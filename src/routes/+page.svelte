@@ -1,7 +1,5 @@
 <script>
-	// import { writeText } from '@tauri-apps/api/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder';
-	import { sendAudioToWhisper } from '$lib/whisper';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
@@ -13,9 +11,15 @@
 		if (isRecording) {
 			await startRecording();
 		} else {
-			// await writeText('Tauri is awesome!');
 			const audioBlob = await stopRecording();
-			const text = await sendAudioToWhisper(audioBlob);
+			const response = await fetch('/api/whisper', {
+				method: 'POST',
+				body: audioBlob,
+				headers: {
+					'content-type': 'audio/wav'
+				}
+			});
+			const text = await response.text();
 			navigator.clipboard.writeText(text);
 		}
 	}
