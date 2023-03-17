@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 	import { startRecording, stopRecording } from '$lib/recorder';
+	import { onDestroy, onMount } from 'svelte';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
@@ -23,6 +24,21 @@
 			navigator.clipboard.writeText(text);
 		}
 	}
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (event.code === 'Space') {
+			event.preventDefault(); // Prevent scrolling
+			toggleRecording();
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyDown);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeyDown);
+	});
 </script>
 
 <div class="flex items-center justify-center min-h-screen">
