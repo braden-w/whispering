@@ -15,17 +15,6 @@
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
-			const processRecording = async (audioBlob: Blob) => {
-				const response = await fetch('/api/whisper', {
-					method: 'POST',
-					body: audioBlob,
-					headers: {
-						'content-type': 'audio/wav'
-					}
-				});
-				const text = await response.text();
-				navigator.clipboard.writeText(text);
-			};
 			toast.promise(
 				processRecording(audioBlob),
 				{
@@ -38,6 +27,18 @@
 				}
 			);
 		}
+	}
+
+	async function processRecording(audioBlob: Blob) {
+		const response = await fetch('/api/whisper', {
+			method: 'POST',
+			body: audioBlob,
+			headers: {
+				'content-type': 'audio/wav'
+			}
+		});
+		const text = await response.text();
+		navigator.clipboard.writeText(text);
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
