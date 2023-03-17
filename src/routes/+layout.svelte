@@ -3,5 +3,9 @@
 	import '../app.css';
 </script>
 
+<svelte:head>
+	<title>Whispering</title>
+</svelte:head>
+
 <slot />
 <Toaster />
