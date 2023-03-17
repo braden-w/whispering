@@ -48,9 +48,21 @@
 	<input
 		class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
 		type="text"
-		placeholder="Enter your text"
+		placeholder="Enter OpenAI API Key"
 		bind:value={clientAPIKey}
 	/>
+	<p class="text-xs text-gray-600">
+		You can find your OpenAI API key in your
+		<a
+			href="https://beta.openai.com/account/api-keys"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="text-gray-600 hover:text-indigo-800 underline"
+		>
+			User Settings
+		</a>.
+	</p>
+
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"
