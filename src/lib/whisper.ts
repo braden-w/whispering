@@ -1,6 +1,7 @@
-import { WHISPER_API_KEY } from '$env/static/private';
-
-export async function sendAudioToWhisper(audioBlob: Blob): Promise<string> {
+export async function sendAudioToWhisper(
+	audioBlob: Blob,
+	WHISPER_API_KEY: string
+): Promise<string> {
 	const formData = new FormData();
 	formData.append('file', audioBlob, 'recording.wav');
 	formData.append('model', 'whisper-1');

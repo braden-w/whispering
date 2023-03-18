@@ -1,13 +1,14 @@
+import { WHISPER_API_KEY } from '$env/static/private';
+import { sendAudioToWhisper } from '$lib/whisper';
 import { error, text } from '@sveltejs/kit';
 import type { RequestHandler } from '../../whisper/$types';
-import { sendAudioToWhisper } from '$lib/whisper';
 
 export const POST = (async ({ request }) => {
 	try {
 		const wavBlob = new Blob([new Uint8Array(await request.arrayBuffer())], {
 			type: 'audio/wav'
 		});
-		const whisperText = await sendAudioToWhisper(wavBlob);
+		const whisperText = await sendAudioToWhisper(wavBlob, WHISPER_API_KEY);
 		return text(whisperText);
 	} catch (err) {
 		if (err instanceof Error) throw error(500, `Error processing audio: ${err.message}`);
