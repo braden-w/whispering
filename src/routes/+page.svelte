@@ -10,9 +10,7 @@
 	let outputText = '';
 	async function toggleRecording() {
 		if (!apiKey) {
-			toast.error('Please enter your OpenAI API key in the settings.', {
-				duration: 2000
-			});
+			toast.error('Please enter your OpenAI API key in the settings.');
 		}
 		isRecording = !isRecording;
 		micIcon = isRecording ? '🟥' : '🎙️';
@@ -94,6 +92,11 @@
 	</div>
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
+	</p>
+	<p class="text-xs text-gray-600">
+		<a href="/setup" class="text-gray-600 hover:text-indigo-900 underline">
+			Edit your OpenAI API Key.
+		</a>
 	</p>
 
 	<div class="fixed bottom-4 right-4">

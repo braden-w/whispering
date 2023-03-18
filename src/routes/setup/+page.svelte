@@ -50,7 +50,7 @@
 			href="https://beta.openai.com/account/api-keys"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="text-gray-600 hover:text-indigo-800 underline"
+			class="text-gray-600 hover:text-indigo-900 underline"
 		>
 			User Settings
 		</a>.
