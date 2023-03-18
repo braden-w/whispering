@@ -15,7 +15,7 @@
 	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
 	<div class="flex items-center space-x-2">
 		<input
-			class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+			class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-400 focus:ring-2 focus:ring-gray-200 focus:outline-none"
 			placeholder="API Key"
 			bind:value={inputApiKey}
 		/>

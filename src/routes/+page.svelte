@@ -71,7 +71,7 @@
 		<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
 		<div class="flex items-center space-x-2">
 			<input
-				class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+				class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-400 focus:ring-2 focus:ring-gray-200 focus:outline-none"
 				placeholder="Output text will appear here..."
 				bind:value={outputText}
 			/>
