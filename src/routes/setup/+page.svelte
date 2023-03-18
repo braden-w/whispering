@@ -1,12 +1,17 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
+	import toast from 'svelte-french-toast';
 
-	let inputApiKey = '';
+	let inputApiKey = $apiKey;
 
 	function submitApiKey() {
-		if (inputApiKey) {
+		if (!inputApiKey) {
+			toast.error('Please enter your OpenAI API key.');
+		} else {
 			localStorage.setItem('openai-api-key', inputApiKey);
 			apiKey.set(inputApiKey);
+			goto('/');
 		}
 	}
 </script>
