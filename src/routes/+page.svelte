@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { sendAudioToWhisper } from '$lib/whisper';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import ApiKeyPrompt from '../components/ApiKeyPrompt.svelte';
@@ -36,14 +37,7 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const response = await fetch('/api/whisper', {
-			method: 'POST',
-			body: audioBlob,
-			headers: {
-				'content-type': 'audio/wav'
-			}
-		});
-		const text = await response.text();
+		const text = await sendAudioToWhisper(audioBlob, $apiKey);
 		navigator.clipboard.writeText(text);
 		outputText = text;
 	}
@@ -70,10 +64,10 @@
 </script>
 
 <div class="flex flex-col items-center justify-center min-h-screen space-y-4">
-	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 	{#if !$apiKey}
 		<ApiKeyPrompt />
 	{:else}
+		<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 		<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
 		<div class="flex items-center space-x-2">
 			<input
@@ -103,7 +97,7 @@
 			</button>
 		</div>
 		<p class="text-xs text-gray-600">
-			Click the microphone or press the spacebar to start recording.
+			Click the microphone or press <kbd>space</kbd> to start recording.
 		</p>
 	{/if}
 
