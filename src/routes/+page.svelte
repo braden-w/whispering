@@ -5,7 +5,6 @@
 
 	let isRecording = false;
 	let micIcon = '🎙️';
-	let clientAPIKey = '';
 	let outputText = '';
 
 	async function toggleRecording() {
