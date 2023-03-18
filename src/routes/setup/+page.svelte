@@ -58,4 +58,7 @@
 			User Settings
 		</a>.
 	</p>
+	<p class="text-xs text-gray-600">
+		<a href="/" class="text-gray-600 hover:text-indigo-900 underline"> Go back </a>
+	</p>
 </div>
