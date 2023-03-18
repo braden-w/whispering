@@ -9,8 +9,9 @@
 	let micIcon = '🎙️';
 	let outputText = '';
 	async function toggleRecording() {
-		if (!apiKey) {
+		if (!$apiKey) {
 			toast.error('Please enter your OpenAI API key in the settings.');
+			return;
 		}
 		isRecording = !isRecording;
 		micIcon = isRecording ? '🟥' : '🎙️';
