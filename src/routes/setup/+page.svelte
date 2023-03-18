@@ -11,6 +11,7 @@
 		} else {
 			localStorage.setItem('openai-api-key', inputApiKey);
 			apiKey.set(inputApiKey);
+			toast.success('API key set!');
 			goto('/');
 		}
 	}
