@@ -45,7 +45,7 @@
 
 	function copyOutputText() {
 		navigator.clipboard.writeText(outputText);
-		toast.success('Copied to clipboard!', { duration: 2000 });
+		toast.success('Copied to clipboard!');
 	}
 
 	onMount(() => {
