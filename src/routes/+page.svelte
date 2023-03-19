@@ -25,7 +25,7 @@
 			toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
-				error: toast(SomethingWentWrongToast)
+				error: toast.error(SomethingWentWrongToast)
 			});
 		}
 	}
