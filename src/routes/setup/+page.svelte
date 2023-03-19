@@ -17,12 +17,12 @@
 	}
 </script>
 
-<div class="flex flex-col items-center justify-center min-h-screen space-y-4">
+<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
 	<form on:submit|preventDefault={submitApiKey}>
 		<div class="flex items-center space-x-2">
 			<input
-				class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-400 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				placeholder="API Key"
 				bind:value={inputApiKey}
 				type="text"
@@ -30,7 +30,7 @@
 				required
 			/>
 			<button
-				class="px-4 py-2 text-white bg-gray-600 border border-gray-600 rounded-md hover:bg-gray-700 focus:border-gray-700 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				type="submit"
 			>
 				<svg
@@ -39,7 +39,7 @@
 					viewBox="0 0 24 24"
 					stroke-width="1.5"
 					stroke="currentColor"
-					class="w-6 h-6"
+					class="h-6 w-6"
 				>
 					<path
 						stroke-linecap="round"
@@ -56,12 +56,12 @@
 			href="https://beta.openai.com/account/api-keys"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="text-gray-600 hover:text-indigo-900 underline"
+			class="text-gray-600 underline hover:text-indigo-900"
 		>
 			User Settings
 		</a>.
 	</p>
 	<p class="text-xs text-gray-600">
-		<a href="/" class="text-gray-600 hover:text-indigo-900 underline"> Go back </a>
+		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
 	</p>
 </div>
