@@ -4,13 +4,14 @@
 	import { sendAudioToWhisper } from '$lib/whisper';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
+	import PleaseEnterAPIKeyToast from '../lib/toasts/PleaseEnterAPIKeyToast.svelte';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
 	let outputText = '';
 	async function toggleRecording() {
 		if (!$apiKey) {
-			toast.error('Please enter your OpenAI API key in the settings.');
+			toast.error(PleaseEnterAPIKeyToast);
 			return;
 		}
 		isRecording = !isRecording;
