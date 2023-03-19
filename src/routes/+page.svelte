@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
+	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 	import { sendAudioToWhisper } from '$lib/whisper';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import PleaseEnterAPIKeyToast from '../lib/toasts/PleaseEnterAPIKeyToast.svelte';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
@@ -21,17 +22,11 @@
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
-			toast.promise(
-				processRecording(audioBlob),
-				{
-					loading: 'Processing Whisper...',
-					success: 'Copied to clipboard!',
-					error: 'Something went wrong.'
-				},
-				{
-					duration: 2000
-				}
-			);
+			toast.promise(processRecording(audioBlob), {
+				loading: 'Processing Whisper...',
+				success: 'Copied to clipboard!',
+				error: toast(SomethingWentWrongToast)
+			});
 		}
 	}
 
