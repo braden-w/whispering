@@ -7,7 +7,7 @@
 
 	function submitApiKey() {
 		if (!inputApiKey) {
-			toast.error('Please enter your OpenAI API key.');
+			toast.error('Please enter a valid OpenAI API key.');
 		} else {
 			localStorage.setItem('openai-api-key', inputApiKey);
 			apiKey.set(inputApiKey);
@@ -25,6 +25,9 @@
 				class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-400 focus:ring-2 focus:ring-gray-200 focus:outline-none"
 				placeholder="API Key"
 				bind:value={inputApiKey}
+				type="text"
+				autocomplete="off"
+				required
 			/>
 			<button
 				class="px-4 py-2 text-white bg-gray-600 border border-gray-600 rounded-md hover:bg-gray-700 focus:border-gray-700 focus:ring-2 focus:ring-gray-200 focus:outline-none"

@@ -59,11 +59,13 @@
 
 <div class="flex flex-col items-center justify-center min-h-screen space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-	<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
+	<button class="text-6xl focus:outline-none" on:click={toggleRecording} type="button">
+		{micIcon}
+	</button>
 	<div class="flex items-center space-x-2">
 		<input
 			class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-gray-400 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-			placeholder="Output text will appear here..."
+			placeholder="Transcribed text will appear here..."
 			bind:value={outputText}
 		/>
 
