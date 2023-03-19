@@ -7,14 +7,19 @@
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "whisper-desktop",
+		"productName": "Whispering",
 		"version": "0.1.0"
 	},
 	"tauri": {
 		"allowlist": {
-			"clipboard": {
-				"readText": true,
-				"writeText": true
+			"http": {
+				"all": true,
+				"request": true,
+				"scope": ["https://api.openai.com/v1/audio/transcriptions"]
+			},
+			"fs": {
+				"all": true,
+				"scope": ["$APPDATA/*", "$APPDATA/recording.wav", "*"]
 			}
 		},
 		"bundle": {
@@ -62,7 +67,8 @@
 				"height": 600,
 				"resizable": true,
 				"title": "Whispering",
-				"width": 800
+				"width": 800,
+				"alwaysOnTop": true
 			}
 		]
 	}
