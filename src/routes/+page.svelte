@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { startRecording, stopRecording } from '$lib/recorder';
+	import { apiKey } from '$lib/stores/apiKey';
+	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
+	import { sendAudioToWhisper } from '$lib/whisper';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	let isRecording = false;
 	let micIcon = '🎙️';
-	let clientAPIKey = '';
 	let outputText = '';
-
 	async function toggleRecording() {
+		if (!$apiKey) {
+			toast.error(PleaseEnterAPIKeyToast);
+			return;
+		}
 		isRecording = !isRecording;
 		micIcon = isRecording ? '🟥' : '🎙️';
 
@@ -16,29 +22,16 @@
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
-			toast.promise(
-				processRecording(audioBlob),
-				{
-					loading: 'Processing Whisper...',
-					success: 'Copied to clipboard!',
-					error: 'Something went wrong.'
-				},
-				{
-					duration: 2000
-				}
-			);
+			toast.promise(processRecording(audioBlob), {
+				loading: 'Processing Whisper...',
+				success: 'Copied to clipboard!',
+				error: () => SomethingWentWrongToast
+			});
 		}
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const response = await fetch('/api/whisper', {
-			method: 'POST',
-			body: audioBlob,
-			headers: {
-				'content-type': 'audio/wav'
-			}
-		});
-		const text = await response.text();
+		const text = await sendAudioToWhisper(audioBlob, $apiKey);
 		navigator.clipboard.writeText(text);
 		outputText = text;
 	}
@@ -52,7 +45,7 @@
 
 	function copyOutputText() {
 		navigator.clipboard.writeText(outputText);
-		toast.success('Copied to clipboard!', { duration: 2000 });
+		toast.success('Copied to clipboard!');
 	}
 
 	onMount(() => {
@@ -64,18 +57,20 @@
 	});
 </script>
 
-<div class="flex flex-col items-center justify-center min-h-screen space-y-4">
+<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-	<button class="text-6xl focus:outline-none" on:click={toggleRecording}>{micIcon}</button>
+	<button class="text-6xl focus:outline-none" on:click={toggleRecording} type="button">
+		{micIcon}
+	</button>
 	<div class="flex items-center space-x-2">
 		<input
-			class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
-			placeholder="Output text will appear here..."
+			class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			placeholder="Transcribed text will appear here..."
 			bind:value={outputText}
 		/>
 
 		<button
-			class="px-4 py-2 text-white bg-gray-600 border border-gray-600 rounded-md hover:bg-gray-700 focus:border-gray-700 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+			class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 			on:click={copyOutputText}
 		>
 			<svg
@@ -84,7 +79,7 @@
 				viewBox="0 0 24 24"
 				stroke-width="1.5"
 				stroke="currentColor"
-				class="w-6 h-6"
+				class="h-6 w-6"
 			>
 				<path
 					stroke-linecap="round"
@@ -94,36 +89,24 @@
 			</svg>
 		</button>
 	</div>
-	<!-- <textarea
-		class="w-64 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
-		placeholder="Output text will appear here..."
-		bind:value={outputText}
-		rows="1"
-	/> -->
 	<p class="text-xs text-gray-600">
-		Click the microphone or press the spacebar to start recording.
+		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<!-- <p class="text-xs text-gray-600">
-		You can find your OpenAI API key in your
-		<a
-			href="https://beta.openai.com/account/api-keys"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 hover:text-indigo-800 underline"
-		>
-			User Settings
-		</a>.
-	</p> -->
+	<p class="text-xs text-gray-600">
+		<a href="/setup" class="text-gray-600 underline hover:text-indigo-900">
+			Edit your OpenAI API Key.
+		</a>
+	</p>
 
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="text-gray-500 hover:text-gray-800 transition-colors duration-200"
+			class="text-gray-500 transition-colors duration-200 hover:text-gray-800"
 			title="View project on GitHub"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-8 h-8">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8">
 				<path
 					d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.6-.015 2.89-.015 3.29 0 .32.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
 				/>
