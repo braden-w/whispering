@@ -3,7 +3,7 @@
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { getTranscription } from '$lib/whisper';
+	import { getTranscriptionFromWhisperAPI } from '$lib/getTranscriptionFromWhisperAPI';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -31,7 +31,7 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const text = await getTranscription(audioBlob, $apiKey);
+		const text = await getTranscriptionFromWhisperAPI(audioBlob, $apiKey);
 		navigator.clipboard.writeText(text);
 		outputText = text;
 	}
