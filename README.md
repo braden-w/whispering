@@ -1,4 +1,5 @@
 # Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API
+![Whispering Screenshot](https://user-images.githubusercontent.com/13159333/226269562-50d96e2c-1ec3-40c6-9dd9-17a2984c91b3.png)
 
 Whispering is an open-source web app designed to streamline your voice-to-text experience, increasing your writing productivity and simplifying your workflow. By leveraging the OpenAI Whisperer API, Whispering allows you to record your voice, transcribe it instantly, and copy the resulting text directly to your clipboard for seamless pasting into your writing.
 
