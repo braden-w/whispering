@@ -1,7 +1,4 @@
-export async function sendAudioToWhisper(
-	audioBlob: Blob,
-	WHISPER_API_KEY: string
-): Promise<string> {
+export async function getTranscription(audioBlob: Blob, WHISPER_API_KEY: string): Promise<string> {
 	const wavFile = new File([audioBlob], 'recording.wav', {
 		type: 'audio/wav'
 	});
