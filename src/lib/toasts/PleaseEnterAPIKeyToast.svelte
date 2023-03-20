@@ -3,6 +3,6 @@
 		href="/setup"
 		class="text-gray-600 underline hover:text-indigo-900"
 	>
-		the settings
-	</a>.
+		the settings.
+	</a>
 </span>

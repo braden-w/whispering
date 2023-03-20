@@ -58,8 +58,8 @@
 			rel="noopener noreferrer"
 			class="text-gray-600 underline hover:text-indigo-900"
 		>
-			User Settings
-		</a>.
+			User Settings.
+		</a>
 	</p>
 	<p class="text-xs text-gray-600">
 		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
