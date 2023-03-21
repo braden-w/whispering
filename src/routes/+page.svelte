@@ -1,12 +1,28 @@
 <script lang="ts">
-	import { writeText } from '@tauri-apps/api/clipboard';
 	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
+	import { writeText } from '@tauri-apps/api/clipboard';
+	import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
+
+	let showShortcuts = false;
+	let currentShortcut = "CommandOrControl+Shift+'";
+
+	function onChangeShortcutClick() {
+		toast.promise(registerShortcut(currentShortcut, toggleRecording), {
+			loading: 'Registering shortcuts...',
+			success: 'Registered shortcuts!',
+			error: "Couldn't register shortcuts"
+		});
+	}
+	async function registerShortcut(currentShortcut: string, command: () => Promise<void>) {
+		await unregisterAll();
+		await register(currentShortcut, command);
+	}
 
 	let isRecording = false;
 	let micIcon = '🎙️';
@@ -76,41 +92,75 @@
 	<button class="text-6xl focus:outline-none" on:click={toggleRecording} type="button">
 		{micIcon}
 	</button>
-	<div class="flex items-center space-x-2">
-		<input
-			class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			placeholder="Transcribed text will appear here..."
-			bind:value={outputText}
-		/>
 
-		<button
-			class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			on:click={copyOutputText}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="1.5"
-				stroke="currentColor"
-				class="h-6 w-6"
+	<div>
+		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
+			Transcribed Text
+		</label>
+		<div class="flex items-center space-x-2">
+			<input
+				id="transcripted-text"
+				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				placeholder="Transcribed text will appear here..."
+				bind:value={outputText}
+			/>
+
+			<button
+				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				on:click={copyOutputText}
 			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
-				/>
-			</svg>
-		</button>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="h-6 w-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+					/>
+				</svg>
+			</button>
+		</div>
 	</div>
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
 	<p class="text-xs text-gray-600">
 		<a href="/setup" class="text-gray-600 underline hover:text-indigo-900">
-			Edit your OpenAI API Key.
+			Edit your OpenAI API Key
 		</a>
+		or
+		<button
+			type="button"
+			on:click={() => (showShortcuts = !showShortcuts)}
+			class="text-gray-600 underline hover:text-indigo-900"
+		>
+			change your keyboard shortcut
+		</button>.
 	</p>
+	{#if showShortcuts}
+		<div>
+			<label for="shortcut-input" class="sr-only mb-2 block text-gray-700">
+				New Keyboard Shortcut
+			</label>
+			<input
+				id="shortcut-input"
+				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				bind:value={currentShortcut}
+				placeholder="Enter new shortcut (e.g. CmdOrControl+Q)"
+			/>
+			<button
+				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				on:click={onChangeShortcutClick}
+			>
+				Change Shortcut
+			</button>
+		</div>
+	{/if}
 
 	<div class="fixed bottom-4 right-4">
 		<a
