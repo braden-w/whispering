@@ -12,14 +12,8 @@
 	},
 	"tauri": {
 		"allowlist": {
-			"http": {
-				"all": true,
-				"request": true,
-				"scope": ["https://api.openai.com/v1/audio/transcriptions"]
-			},
-			"fs": {
-				"all": true,
-				"scope": ["$APPDATA/*", "$APPDATA/recording.wav", "*"]
+			"clipboard": {
+				"writeText": true
 			}
 		},
 		"bundle": {
