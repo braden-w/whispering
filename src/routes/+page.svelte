@@ -41,7 +41,7 @@
 			method: 'POST',
 			body: audioBlob,
 			headers: {
-				'content-type': 'audio/wav'
+				// 'Content-Type': getMimeType() ?? 'audio/wav'
 			}
 		});
 		if (!response.ok) throw new Error('Error processing audio');

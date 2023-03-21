@@ -5,9 +5,7 @@ import { getTranscriptionFromWhisperAPI } from './whisperTranscription';
 
 export const POST = (async ({ request }) => {
 	try {
-		const wavBlob = new Blob([new Uint8Array(await request.arrayBuffer())], {
-			type: 'audio/wav'
-		});
+		const wavBlob = new Blob([new Uint8Array(await request.arrayBuffer())]);
 		const whisperText = await getTranscriptionFromWhisperAPI(wavBlob, WHISPER_API_KEY);
 		return text(whisperText);
 	} catch (err) {
