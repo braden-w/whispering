@@ -1,13 +1,9 @@
 export async function getTranscriptionFromWhisperAPI(
 	audioBlob: Blob,
-	WHISPER_API_KEY: string,
-	mimeType: string
+	WHISPER_API_KEY: string
 ): Promise<string> {
-	const extension = mimeType.match(/\/([a-z0-9]+)/i)?.[1];
-	const fileName = `recording.${extension}`;
-	const wavFile = new File([audioBlob], fileName, {
-		type: mimeType
-	});
+	const fileName = 'recording.wav';
+	const wavFile = new File([audioBlob], fileName);
 	const formData = new FormData();
 	formData.append('file', wavFile);
 	formData.append('model', 'whisper-1');
