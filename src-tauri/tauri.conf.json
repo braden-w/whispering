@@ -17,6 +17,9 @@
 			},
 			"globalShortcut": {
 				"all": true
+			},
+			"window": {
+				"setAlwaysOnTop": true
 			}
 		},
 		"bundle": {
@@ -64,8 +67,7 @@
 				"height": 600,
 				"resizable": true,
 				"title": "Whispering",
-				"width": 800,
-				"alwaysOnTop": true
+				"width": 800
 			}
 		]
 	}

@@ -6,6 +6,7 @@
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 	import { writeText } from '@tauri-apps/api/clipboard';
 	import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
+	import { appWindow } from '@tauri-apps/api/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -36,6 +37,7 @@
 		micIcon = isRecording ? '🟥' : '🎙️';
 
 		if (isRecording) {
+			await appWindow.setAlwaysOnTop(true);
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
@@ -44,6 +46,7 @@
 				success: 'Copied to clipboard!',
 				error: () => SomethingWentWrongToast
 			});
+			await appWindow.setAlwaysOnTop(false);
 		}
 	}
 
