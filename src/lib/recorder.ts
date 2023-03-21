@@ -1,26 +1,38 @@
-let mediaRecorder: MediaRecorder | null = null;
-let recordedChunks: Blob[] = [];
+import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
+
+let recorder: RecordRTC | null = null;
 
 export async function startRecording(): Promise<void> {
 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-	mediaRecorder = new MediaRecorder(stream);
-	mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-		recordedChunks.push(event.data);
-	});
-	mediaRecorder.start();
+
+	const options = {
+		type: 'audio',
+		mimeType: 'audio/wav',
+		recorderType: StereoAudioRecorder,
+		numberOfAudioChannels: 2,
+		checkForInactiveTracks: true,
+		bufferSize: 16384
+	} satisfies RecordRTC.Options;
+
+	recorder = new RecordRTC(stream, options);
+	recorder.startRecording();
 }
 
 export async function stopRecording(): Promise<Blob> {
-	return new Promise((resolve) => {
-		if (mediaRecorder) {
-			mediaRecorder.addEventListener('stop', () => {
-				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-				recordedChunks = [];
-				resolve(audioBlob);
+	return new Promise((resolve, reject) => {
+		if (recorder) {
+			recorder.stopRecording(() => {
+				if (recorder) {
+					const audioBlob = recorder.getBlob();
+					recorder.destroy();
+					recorder = null;
+					resolve(audioBlob);
+				} else {
+					reject(new Error('Recorder is not initialized.'));
+				}
 			});
-			mediaRecorder.stop();
 		} else {
-			throw new Error('MediaRecorder is not initialized.');
+			reject(new Error('Recorder is not initialized.'));
 		}
 	});
 }
