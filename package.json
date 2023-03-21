@@ -16,6 +16,7 @@
 		"@sveltejs/adapter-static": "1.0.0-next.50",
 		"@sveltejs/kit": "^1.5.0",
 		"@tauri-apps/cli": "^1.2.3",
+		"@types/recordrtc": "^5.6.10",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"autoprefixer": "^10.4.14",
@@ -37,6 +38,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-cloudflare": "^2.2.0",
 		"@tauri-apps/api": "^1.2.0",
+		"recordrtc": "^5.6.2",
 		"svelte-french-toast": "1.0.4-beta.0"
 	}
 }
