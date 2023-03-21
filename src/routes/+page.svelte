@@ -41,7 +41,7 @@
 			method: 'POST',
 			body: audioBlob,
 			headers: {
-				// 'Content-Type': getMimeType() ?? 'audio/wav'
+				"x-whisper-api-key": $apiKey
 			}
 		});
 		if (!response.ok) throw new Error('Error processing audio');
