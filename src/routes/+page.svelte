@@ -6,6 +6,7 @@
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 	import { writeText } from '@tauri-apps/api/clipboard';
 	import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
+	import { appWindow } from '@tauri-apps/api/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -36,6 +37,7 @@
 		micIcon = isRecording ? '🟥' : '🎙️';
 
 		if (isRecording) {
+			await appWindow.setAlwaysOnTop(true);
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
@@ -51,6 +53,7 @@
 		const text = await sendAudioToWhisperAPI(audioBlob);
 		await writeText(text);
 		outputText = text;
+		await appWindow.setAlwaysOnTop(false);
 	}
 
 	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
@@ -78,12 +81,14 @@
 		toast.success('Copied to clipboard!');
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		window.addEventListener('keydown', handleKeyDown);
+		await registerShortcut(currentShortcut, toggleRecording);
 	});
 
-	onDestroy(() => {
+	onDestroy(async () => {
 		window.removeEventListener('keydown', handleKeyDown);
+		await unregisterAll();
 	});
 </script>
 
