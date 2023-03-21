@@ -20,19 +20,16 @@ export async function startRecording(): Promise<void> {
 
 export async function stopRecording(): Promise<Blob> {
 	return new Promise((resolve, reject) => {
-		if (recorder) {
-			recorder.stopRecording(() => {
-				if (recorder) {
-					const audioBlob = recorder.getBlob();
-					recorder.destroy();
-					recorder = null;
-					resolve(audioBlob);
-				} else {
-					reject(new Error('Recorder is not initialized.'));
-				}
-			});
-		} else {
-			reject(new Error('Recorder is not initialized.'));
-		}
+		if (!recorder) throw new Error('Recorder is not initialized.');
+		recorder.stopRecording(() => {
+			if (!recorder) {
+				reject(new Error('Recorder is not initialized.'));
+				return;
+			}
+			const audioBlob = recorder.getBlob();
+			recorder.destroy();
+			recorder = null;
+			resolve(audioBlob);
+		});
 	});
 }
