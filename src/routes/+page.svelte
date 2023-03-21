@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
@@ -37,11 +38,11 @@
 
 	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
 		// Calls the endpoint defined in /api/whisper/+server.ts
-		const response = await fetch('/api/whisper', {
+		const response = await fetch(`${PUBLIC_BASE_URL}/api/whisper`, {
 			method: 'POST',
 			body: audioBlob,
 			headers: {
-				"x-whisper-api-key": $apiKey
+				'x-whisper-api-key': $apiKey
 			}
 		});
 		if (!response.ok) throw new Error('Error processing audio');
