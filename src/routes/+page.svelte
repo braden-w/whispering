@@ -3,7 +3,6 @@
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { getTranscriptionFromWhisperAPI } from '$lib/getTranscriptionFromWhisperAPI';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -31,9 +30,22 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const text = await getTranscriptionFromWhisperAPI(audioBlob, $apiKey);
+		const text = await sendAudioToWhisperAPI(audioBlob);
 		navigator.clipboard.writeText(text);
 		outputText = text;
+	}
+
+	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
+		// Calls the endpoint defined in /api/whisper/+server.ts
+		const response = await fetch('/api/whisper', {
+			method: 'POST',
+			body: audioBlob,
+			headers: {
+				'content-type': 'audio/wav'
+			}
+		});
+		if (!response.ok) throw new Error('Error processing audio');
+		return response.text();
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {

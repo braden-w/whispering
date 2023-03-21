@@ -1,7 +1,7 @@
 import { WHISPER_API_KEY } from '$env/static/private';
-import { getTranscriptionFromWhisperAPI } from '$lib/getTranscriptionFromWhisperAPI';
 import { error, text } from '@sveltejs/kit';
 import type { RequestHandler } from '../../whisper/$types';
+import { getTranscriptionFromWhisperAPI } from './whisperTranscription';
 
 export const POST = (async ({ request }) => {
 	try {
