@@ -13,15 +13,15 @@
 	let currentShortcut = "CommandOrControl+Shift+'";
 
 	function onChangeShortcutClick() {
-		toast.promise(registerShortcut(currentShortcut), {
+		toast.promise(registerShortcut(currentShortcut, toggleRecording), {
 			loading: 'Registering shortcuts...',
 			success: 'Registered shortcuts!',
 			error: "Couldn't register shortcuts"
 		});
 	}
-	async function registerShortcut(currentShortcut: string) {
+	async function registerShortcut(currentShortcut: string, command: () => Promise<void>) {
 		await unregisterAll();
-		await register(currentShortcut, toggleRecording);
+		await register(currentShortcut, command);
 	}
 
 	let isRecording = false;
