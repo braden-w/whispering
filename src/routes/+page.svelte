@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { writeText } from '@tauri-apps/api/clipboard';
 	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
@@ -32,7 +33,7 @@
 
 	async function processRecording(audioBlob: Blob) {
 		const text = await sendAudioToWhisperAPI(audioBlob);
-		navigator.clipboard.writeText(text);
+		await writeText(text);
 		outputText = text;
 	}
 
@@ -56,8 +57,8 @@
 		}
 	}
 
-	function copyOutputText() {
-		navigator.clipboard.writeText(outputText);
+	async function copyOutputText() {
+		await writeText(outputText);
 		toast.success('Copied to clipboard!');
 	}
 
