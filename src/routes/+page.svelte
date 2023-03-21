@@ -46,7 +46,6 @@
 				success: 'Copied to clipboard!',
 				error: () => SomethingWentWrongToast
 			});
-			await appWindow.setAlwaysOnTop(false);
 		}
 	}
 
@@ -54,6 +53,7 @@
 		const text = await sendAudioToWhisperAPI(audioBlob);
 		await writeText(text);
 		outputText = text;
+		await appWindow.setAlwaysOnTop(false);
 	}
 
 	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
@@ -81,12 +81,14 @@
 		toast.success('Copied to clipboard!');
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		window.addEventListener('keydown', handleKeyDown);
+		await registerShortcut(currentShortcut, toggleRecording);
 	});
 
-	onDestroy(() => {
+	onDestroy(async () => {
 		window.removeEventListener('keydown', handleKeyDown);
+		await unregisterAll();
 	});
 </script>
 
