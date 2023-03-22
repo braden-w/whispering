@@ -12,15 +12,12 @@ export async function startRecording(): Promise<void> {
 
 export async function stopRecording(): Promise<Blob> {
 	return new Promise((resolve) => {
-		if (mediaRecorder) {
-			mediaRecorder.addEventListener('stop', () => {
-				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-				recordedChunks = [];
-				resolve(audioBlob);
-			});
-			mediaRecorder.stop();
-		} else {
-			throw new Error('MediaRecorder is not initialized.');
-		}
+		if (!mediaRecorder) throw new Error('MediaRecorder is not initialized.');
+		mediaRecorder.addEventListener('stop', () => {
+			const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+			recordedChunks = [];
+			resolve(audioBlob);
+		});
+		mediaRecorder.stop();
 	});
 }
