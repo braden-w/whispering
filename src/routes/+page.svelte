@@ -6,7 +6,7 @@
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { appWindow } from '@tauri-apps/api/window';
+	import { setAlwaysOnTop } from '$lib/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -33,7 +33,7 @@
 		micIcon = isRecording ? '🟥' : '🎙️';
 
 		if (isRecording) {
-			await appWindow.setAlwaysOnTop(true);
+			await setAlwaysOnTop(true);
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
@@ -49,7 +49,7 @@
 		const text = await sendAudioToWhisperAPI(audioBlob);
 		await writeText(text);
 		outputText = text;
-		await appWindow.setAlwaysOnTop(false);
+		await setAlwaysOnTop(false);
 	}
 
 	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
