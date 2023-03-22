@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
+	import { writeText } from '$lib/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { writeText } from '@tauri-apps/api/clipboard';
 	import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 	import { appWindow } from '@tauri-apps/api/window';
 	import { onDestroy, onMount } from 'svelte';
