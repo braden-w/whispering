@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { writeText } from '$lib/clipboard';
+	import { writeText } from '$lib/system-apis/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder';
+	import { registerShortcut } from '$lib/system-apis/shorcuts';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
-	import { appWindow } from '@tauri-apps/api/window';
+	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -19,10 +19,6 @@
 			success: 'Registered shortcuts!',
 			error: "Couldn't register shortcuts"
 		});
-	}
-	async function registerShortcut(currentShortcut: string, command: () => Promise<void>) {
-		await unregisterAll();
-		await register(currentShortcut, command);
 	}
 
 	let isRecording = false;
@@ -37,7 +33,7 @@
 		micIcon = isRecording ? '🟥' : '🎙️';
 
 		if (isRecording) {
-			await appWindow.setAlwaysOnTop(true);
+			await setAlwaysOnTop(true);
 			await startRecording();
 		} else {
 			const audioBlob = await stopRecording();
@@ -53,7 +49,7 @@
 		const text = await sendAudioToWhisperAPI(audioBlob);
 		await writeText(text);
 		outputText = text;
-		await appWindow.setAlwaysOnTop(false);
+		await setAlwaysOnTop(false);
 	}
 
 	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
@@ -88,7 +84,10 @@
 
 	onDestroy(async () => {
 		window.removeEventListener('keydown', handleKeyDown);
-		await unregisterAll();
+		if (window.__TAURI__) {
+			const { unregisterAll } = await import('@tauri-apps/api/globalShortcut');
+			await unregisterAll();
+		}
 	});
 </script>
 
