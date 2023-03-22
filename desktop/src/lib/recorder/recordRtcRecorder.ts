@@ -1,3 +1,10 @@
+/**
+ * This is the primary implementation of the recorder module.
+ * It uses RecordRTC since it has better compatibility with Safari.
+ *
+ * For an alternative implementation, see {@link ./mediaRecorder.ts}.
+ */
+
 import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
 
 const options = {
