@@ -1,0 +1,20 @@
+[
+    {
+        "key": "Alt+;",
+        "inputEvents": [
+            {
+                "type": "keyDown",
+                "keyCode": "Space"
+            }
+        ]
+    },
+    {
+        "key": "Opt+;",
+        "inputEvents": [
+            {
+                "type": "keyDown",
+                "keyCode": "Space"
+            }
+        ]
+    }
+]
