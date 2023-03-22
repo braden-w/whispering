@@ -1,19 +1,18 @@
 import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
 
+const options = {
+	type: 'audio',
+	mimeType: 'audio/wav',
+	recorderType: StereoAudioRecorder,
+	numberOfAudioChannels: 2,
+	checkForInactiveTracks: true,
+	bufferSize: 16384
+} as RecordRTC.Options;
+
 let recorder: RecordRTC | null = null;
 
 export async function startRecording(): Promise<void> {
 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-	const options = {
-		type: 'audio',
-		mimeType: 'audio/wav',
-		recorderType: StereoAudioRecorder,
-		numberOfAudioChannels: 2,
-		checkForInactiveTracks: true,
-		bufferSize: 16384
-	} satisfies RecordRTC.Options;
-
 	recorder = new RecordRTC(stream, options);
 	recorder.startRecording();
 }
