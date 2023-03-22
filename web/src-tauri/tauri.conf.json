@@ -12,14 +12,14 @@
 	},
 	"tauri": {
 		"allowlist": {
-			"http": {
-				"all": true,
-				"request": true,
-				"scope": ["https://api.openai.com/v1/audio/transcriptions"]
+			"clipboard": {
+				"writeText": true
 			},
-			"fs": {
-				"all": true,
-				"scope": ["$APPDATA/*", "$APPDATA/recording.wav", "*"]
+			"globalShortcut": {
+				"all": true
+			},
+			"window": {
+				"setAlwaysOnTop": true
 			}
 		},
 		"bundle": {
@@ -67,8 +67,7 @@
 				"height": 600,
 				"resizable": true,
 				"title": "Whispering",
-				"width": 800,
-				"alwaysOnTop": true
+				"width": 800
 			}
 		]
 	}
