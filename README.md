@@ -12,6 +12,7 @@ Whispering is an open-source web app designed to streamline your voice-to-text e
 	- [Why Choose Whispering?](#why-choose-whispering)
 	- [Accessing Whispering Web App](#accessing-whispering-web-app)
 	- [Download DMG](#download-dmg)
+	- [Built With](#built-with)
 	- [Getting Started](#getting-started)
 	- [Contributing](#contributing)
 	- [License](#license)
@@ -40,6 +41,17 @@ To start using Whispering web app, click the button below:
 To download the Whispering DMG for macOS, click the button below:
 
 [![Download DMG](https://img.shields.io/badge/Download-DMG-green)](https://github.com/braden-w/whispering/releases)
+
+## Built With
+
+Whispering is built using the following technologies and libraries:
+
+- [Tauri](https://tauri.studio/en/docs/intro/): A framework for building lightweight, secure, and fast cross-platform applications with web technologies.
+- [SvelteKit](https://kit.svelte.dev/docs): A framework for building web applications and the Tauri frontend.
+- [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
+- [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
+- [RecordRTC](https://recordrtc.org/): A WebRTC JavaScript library for audio/video recording, screen capturing, and media streaming.
+- [Cloudflare Pages](https://developers.cloudflare.com/): A global cloud platform for deploying static pages.
 
 ## Getting Started
 
