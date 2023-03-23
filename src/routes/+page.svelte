@@ -179,6 +179,19 @@
 				</button>
 			</div>
 		</div>
+		<p class="text-xs text-gray-600">
+			Valid keyboard shortcuts can be found
+			<a
+				href="https://www.electronjs.org/docs/latest/api/accelerator#available-modifiers"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="View Electron Accelerator documentation"
+				aria-label="View Electron Accelerator documentation"
+			>
+				here
+			</a>.
+		</p>
 	{/if}
 	<div class="fixed bottom-4 right-4">
 		<a
