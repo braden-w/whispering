@@ -5,13 +5,18 @@
 
 	let inputApiKey = $apiKey;
 
+	// Function to submit the OpenAI API key to the browser's local storage
 	function submitApiKey() {
+		// Check if the API key input field is empty
 		if (!inputApiKey) {
+			// If it is empty, display an error message
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			localStorage.setItem('openai-api-key', inputApiKey);
+			// If it is not empty, set the API key to the value of the input field
 			apiKey.set(inputApiKey);
+			// Display a success message
 			toast.success('API key set!');
+			// Navigate to the main page
 			goto('/');
 		}
 	}
