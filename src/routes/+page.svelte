@@ -2,7 +2,7 @@
 	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { writeText } from '$lib/system-apis/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
-	import { registerShortcut } from '$lib/system-apis/shorcuts';
+	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
@@ -66,10 +66,9 @@
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
-		if (event.code === 'Space') {
-			event.preventDefault(); // Prevent scrolling
-			toggleRecording();
-		}
+		if (event.code !== 'Space') return;
+		event.preventDefault(); // Prevent scrolling
+		toggleRecording();
 	}
 
 	async function copyOutputText() {
@@ -78,18 +77,15 @@
 	}
 
 	onMount(async () => {
-		window.addEventListener('keydown', handleKeyDown);
 		await registerShortcut(currentShortcut, toggleRecording);
 	});
 
 	onDestroy(async () => {
-		window.removeEventListener('keydown', handleKeyDown);
-		if (window.__TAURI__) {
-			const { unregisterAll } = await import('@tauri-apps/api/globalShortcut');
-			await unregisterAll();
-		}
+		await unregisterAllShortcuts();
 	});
 </script>
+
+<svelte:window on:keydown={handleKeyDown} />
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
