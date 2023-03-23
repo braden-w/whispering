@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { writeText } from '$lib/system-apis/clipboard';
@@ -7,10 +6,12 @@
 	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
+	import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	// --- Recording Logic ---
+
 	let isRecording = false;
 	let micIcon = '🎙️';
 	let outputText = '';
@@ -36,23 +37,10 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const text = await sendAudioToWhisperAPI(audioBlob);
+		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
 		await writeText(text);
 		outputText = text;
 		await setAlwaysOnTop(false);
-	}
-
-	async function sendAudioToWhisperAPI(audioBlob: Blob): Promise<string> {
-		// Calls the endpoint defined in /api/whisper/+server.ts
-		const response = await fetch(`${PUBLIC_BASE_URL}/api/whisper`, {
-			method: 'POST',
-			body: audioBlob,
-			headers: {
-				'x-whisper-api-key': $apiKey
-			}
-		});
-		if (!response.ok) throw new Error('Error processing audio');
-		return response.text();
 	}
 
 	// --- Local Shorcuts ---
