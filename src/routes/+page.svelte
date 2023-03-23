@@ -89,7 +89,12 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-	<button class="text-6xl focus:outline-none" on:click={toggleRecording} type="button">
+	<button
+		class="text-6xl focus:outline-none"
+		on:click={toggleRecording}
+		type="button"
+		aria-label="Toggle recording"
+	>
 		{micIcon}
 	</button>
 
@@ -108,6 +113,7 @@
 			<button
 				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				on:click={copyOutputText}
+				aria-label="Copy transcribed text"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -138,6 +144,7 @@
 			type="button"
 			on:click={() => (showShortcuts = !showShortcuts)}
 			class="text-gray-600 underline hover:text-indigo-900"
+			aria-label="Change your keyboard shortcut"
 		>
 			change your keyboard shortcut
 		</button>.
@@ -158,6 +165,7 @@
 					type="button"
 					class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 					on:click={onChangeShortcutClick}
+					aria-label="Change keyboard shortcut"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +185,6 @@
 			</div>
 		</div>
 	{/if}
-
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"
@@ -185,6 +192,7 @@
 			rel="noopener noreferrer"
 			class="text-gray-500 transition-colors duration-200 hover:text-gray-800"
 			title="View project on GitHub"
+			aria-label="View project on GitHub"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8">
 				<path
