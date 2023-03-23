@@ -1,11 +1,25 @@
 # Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API
+
 ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png)
 
 Whispering is an open-source web app designed to streamline your voice-to-text experience, increasing your writing productivity and simplifying your workflow. By leveraging the OpenAI Whisperer API, Whispering allows you to record your voice, transcribe it instantly, and copy the resulting text directly to your clipboard for seamless pasting into your writing.
 
+## Table of Contents
+
+- [Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API](#whispering-the-lightweight-ergonomic-wrapper-for-openai-whisperer-api)
+	- [Table of Contents](#table-of-contents)
+	- [Demo](#demo)
+	- [Why Choose Whispering?](#why-choose-whispering)
+	- [Accessing Whispering Web App](#accessing-whispering-web-app)
+	- [Download DMG](#download-dmg)
+	- [Getting Started](#getting-started)
+	- [Contributing](#contributing)
+	- [License](#license)
+	- [Support and Feedback](#support-and-feedback)
+
 ## Demo
 
-https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4
+[https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4](https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4)
 
 ## Why Choose Whispering?
 
@@ -15,11 +29,19 @@ Whispering was born from the frustrations of a tedious dictation process that in
 - **Boost Productivity**: With fewer button clicks and context switching, Whispering increases your writing output, making it perfect for blog posts, essays, or writing prompts.
 - **Simplify Workflows**: Effortlessly record, stop, and paste transcribed text with just a few keystrokes.
 
+## Accessing Whispering Web App
+
+To start using Whispering web app, click the button below:
+
+[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
+
+## Download DMG
+
+To download the Whispering DMG for macOS, click the button below:
+
+[![Download DMG](https://img.shields.io/badge/Download-DMG-green)](https://github.com/braden-w/whispering/releases)
+
 ## Getting Started
-
-To start using Whispering, visit [https://whispering.bradenwong.com](https://whispering.bradenwong.com/).
-
-## Installation
 
 To set up the project on your local machine, follow these steps:
 
