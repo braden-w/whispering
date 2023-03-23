@@ -139,15 +139,17 @@
 		<a href="/setup" class="text-gray-600 underline hover:text-indigo-900">
 			Edit your OpenAI API Key
 		</a>
-		or
-		<button
-			type="button"
-			on:click={() => (showShortcuts = !showShortcuts)}
-			class="text-gray-600 underline hover:text-indigo-900"
-			aria-label="Change your keyboard shortcut"
-		>
-			change your keyboard shortcut
-		</button>.
+		{#if window.__TAURI__}
+			or
+			<button
+				type="button"
+				on:click={() => (showShortcuts = !showShortcuts)}
+				class="text-gray-600 underline hover:text-indigo-900"
+				aria-label="Change your keyboard shortcut"
+			>
+				change your keyboard shortcut
+			</button>.
+		{/if}
 	</p>
 	{#if showShortcuts}
 		<div>
