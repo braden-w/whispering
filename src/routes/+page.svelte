@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { writeText } from '$lib/system-apis/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
-	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { writeText } from '$lib/system-apis/clipboard';
+	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
+	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
