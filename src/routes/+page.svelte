@@ -76,13 +76,8 @@
 		toast.success('Copied to clipboard!');
 	}
 
-	onMount(async () => {
-		await registerShortcut(currentShortcut, toggleRecording);
-	});
-
-	onDestroy(async () => {
-		await unregisterAllShortcuts();
-	});
+	onMount(async () => await registerShortcut(currentShortcut, toggleRecording));
+	onDestroy(async () => await unregisterAllShortcuts());
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
