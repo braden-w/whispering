@@ -10,17 +10,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
-	let showShortcuts = false;
-	let currentShortcut = "CommandOrControl+Shift+'";
-
-	function onChangeShortcutClick() {
-		toast.promise(registerShortcut(currentShortcut, toggleRecording), {
-			loading: 'Registering shortcuts...',
-			success: 'Registered shortcuts!',
-			error: "Couldn't register shortcuts"
-		});
-	}
-
+	// --- Recording Logic ---
 	let isRecording = false;
 	let micIcon = '🎙️';
 	let outputText = '';
@@ -65,18 +55,38 @@
 		return response.text();
 	}
 
+	// --- Local Shorcuts ---
+
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
 		toggleRecording();
 	}
 
+	// --- Global Shortcuts ---
+
+	let showShortcuts = false;
+	const defaultGlobalShortcut = "CommandOrControl+Shift+'";
+	let currentGlobalShortcut = defaultGlobalShortcut;
+
+	function onChangeShortcutClick() {
+		toast.promise(registerShortcut(currentGlobalShortcut, toggleRecording), {
+			loading: 'Registering shortcuts...',
+			success: 'Registered shortcuts!',
+			error: "Couldn't register shortcuts"
+		});
+	}
+
+	// --- Copy Output Button ---
+
 	async function copyOutputText() {
 		await writeText(outputText);
 		toast.success('Copied to clipboard!');
 	}
 
-	onMount(async () => await registerShortcut(currentShortcut, toggleRecording));
+	// --- Store Logic ---
+
+	onMount(async () => await registerShortcut(currentGlobalShortcut, toggleRecording));
 	onDestroy(async () => await unregisterAllShortcuts());
 </script>
 
@@ -155,7 +165,7 @@
 				<input
 					id="shortcut-input"
 					class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-					bind:value={currentShortcut}
+					bind:value={currentGlobalShortcut}
 					placeholder="Enter new shortcut (e.g. CmdOrControl+Q)"
 				/>
 				<button
