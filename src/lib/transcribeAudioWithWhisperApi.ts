@@ -1,4 +1,4 @@
-export async function getTranscriptionFromWhisperAPI(
+export async function transcribeAudioWithWhisperApi(
 	audioBlob: Blob,
 	WHISPER_API_KEY: string
 ): Promise<string> {
