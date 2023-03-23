@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { writeText } from '$lib/system-apis/clipboard';
-	import { startRecording, stopRecording } from '$lib/recorder';
+	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
 	import { registerShortcut } from '$lib/system-apis/shorcuts';
 	import { apiKey } from '$lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
