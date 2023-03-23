@@ -38,7 +38,7 @@
 
 	async function processRecording(audioBlob: Blob) {
 		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
-		await writeText(text);
+		writeText(text);
 		outputText = text;
 		await setAlwaysOnTop(false);
 	}
