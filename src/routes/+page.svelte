@@ -128,6 +128,21 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
+	{#if !window.__TAURI__}
+		<p class="text-xs text-gray-600">
+			Install the
+			<a
+				href="https://github.com/braden-w/whispering/releases"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Download the desktop app"
+				aria-label="Download the desktop app"
+			>
+				desktop app
+			</a> for global shortcuts.
+		</p>
+	{/if}
 	<p class="text-xs text-gray-600">
 		<a href="/setup" class="text-gray-600 underline hover:text-indigo-900">
 			Edit your OpenAI API Key
