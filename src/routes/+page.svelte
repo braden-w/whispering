@@ -11,6 +11,7 @@
 	import toast from 'svelte-french-toast';
 
 	// --- Recording Logic ---
+	
 	let isRecording = false;
 	let micIcon = '🎙️';
 	let outputText = '';
