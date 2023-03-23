@@ -132,9 +132,7 @@
 		<p class="text-xs text-gray-600">
 			Install the
 			<a
-				href="https://github.com/braden-w/whispering/releases"
-				target="_blank"
-				rel="noopener noreferrer"
+				href="https://github.com/braden-w/whispering/releases/download/v2.0.0/Whispering-v1.0.0.dmg"
 				class="text-gray-600 underline hover:text-indigo-900"
 				title="Download the desktop app"
 				aria-label="Download the desktop app"
