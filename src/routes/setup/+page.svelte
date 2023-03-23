@@ -5,18 +5,15 @@
 
 	let inputApiKey = $apiKey;
 
-	// Function to submit the OpenAI API key to the browser's local storage
+	/** This function is called when the user submits the API key form.
+	 * It checks if the API key is valid and, if so, saves it to the store.
+	 */
 	function submitApiKey() {
-		// Check if the API key input field is empty
 		if (!inputApiKey) {
-			// If it is empty, display an error message
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			// If it is not empty, set the API key to the value of the input field
 			apiKey.set(inputApiKey);
-			// Display a success message
 			toast.success('API key set!');
-			// Navigate to the main page
 			goto('/');
 		}
 	}
