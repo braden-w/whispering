@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { writeText } from '$lib/system-apis/clipboard';
 	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
-	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { writeText } from '$lib/system-apis/clipboard';
+	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
+	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { setAlwaysOnTop } from '$lib/system-apis/window';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 
@@ -89,7 +89,12 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-	<button class="text-6xl focus:outline-none" on:click={toggleRecording} type="button">
+	<button
+		class="text-6xl focus:outline-none"
+		on:click={toggleRecording}
+		type="button"
+		aria-label="Toggle recording"
+	>
 		{micIcon}
 	</button>
 
@@ -108,6 +113,7 @@
 			<button
 				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				on:click={copyOutputText}
+				aria-label="Copy transcribed text"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -138,6 +144,7 @@
 			type="button"
 			on:click={() => (showShortcuts = !showShortcuts)}
 			class="text-gray-600 underline hover:text-indigo-900"
+			aria-label="Change your keyboard shortcut"
 		>
 			change your keyboard shortcut
 		</button>.
@@ -147,21 +154,37 @@
 			<label for="shortcut-input" class="sr-only mb-2 block text-gray-700">
 				New Keyboard Shortcut
 			</label>
-			<input
-				id="shortcut-input"
-				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-				bind:value={currentShortcut}
-				placeholder="Enter new shortcut (e.g. CmdOrControl+Q)"
-			/>
-			<button
-				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-				on:click={onChangeShortcutClick}
-			>
-				Change Shortcut
-			</button>
+			<div class="flex items-center space-x-2">
+				<input
+					id="shortcut-input"
+					class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+					bind:value={currentShortcut}
+					placeholder="Enter new shortcut (e.g. CmdOrControl+Q)"
+				/>
+				<button
+					type="button"
+					class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+					on:click={onChangeShortcutClick}
+					aria-label="Change keyboard shortcut"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+						/>
+					</svg>
+				</button>
+			</div>
 		</div>
 	{/if}
-
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"
@@ -169,6 +192,7 @@
 			rel="noopener noreferrer"
 			class="text-gray-500 transition-colors duration-200 hover:text-gray-800"
 			title="View project on GitHub"
+			aria-label="View project on GitHub"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8">
 				<path
