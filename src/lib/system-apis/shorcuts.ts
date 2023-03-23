@@ -20,6 +20,11 @@ export async function unregisterAllShortcuts() {
 	await unregisterAll();
 }
 
+/**
+ * Wraps registerFn, which registers a command to be executed when a specific
+ * keyboard shortcut is pressed, and adds a timeout. If the timeout is reached
+ * before the command is registered, a timeout error will be thrown.
+ */
 async function registerWithTimeout(
 	currentShortcut: string,
 	command: () => Promise<void>,
