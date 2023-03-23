@@ -61,7 +61,7 @@
 		toast.promise(registerShortcut(currentGlobalShortcut, toggleRecording), {
 			loading: 'Registering shortcuts...',
 			success: 'Registered shortcuts!',
-			error: "Couldn't register shortcuts"
+			error: "Couldn't register shortcut. The shortcut code must be a valid keyboard shortcut."
 		});
 	}
 
