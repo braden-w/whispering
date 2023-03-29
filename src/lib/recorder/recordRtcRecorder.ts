@@ -1,3 +1,5 @@
+import { writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
+
 /**
  * This is the primary implementation of the recorder module.
  * It uses RecordRTC since it has better compatibility with Safari.
@@ -11,7 +13,7 @@ const options = {
 	type: 'audio',
 	mimeType: 'audio/wav',
 	recorderType: StereoAudioRecorder,
-	numberOfAudioChannels: 1,
+	numberOfAudioChannels: 2,
 	checkForInactiveTracks: true,
 	bufferSize: 256,
 	sampleRate: 22050
@@ -34,9 +36,16 @@ export async function stopRecording(): Promise<Blob> {
 				return;
 			}
 			const audioBlob = recorder.getBlob();
+			saveAudioFile(audioBlob);
 			recorder.destroy();
 			recorder = null;
 			resolve(audioBlob);
 		});
 	});
+}
+
+async function saveAudioFile(blob: Blob) {
+	const buffer = await blob.arrayBuffer();
+	const uint8Array = new Uint8Array(buffer);
+	await writeBinaryFile('recorded_audio.wav', uint8Array, { dir: BaseDirectory.AppData });
 }
