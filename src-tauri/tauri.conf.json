@@ -23,6 +23,19 @@
 			},
 			"window": {
 				"setAlwaysOnTop": true
+			},
+			"fs": {
+				"all": false,
+				"copyFile": false,
+				"createDir": false,
+				"exists": false,
+				"readDir": false,
+				"readFile": false,
+				"removeDir": false,
+				"removeFile": false,
+				"renameFile": false,
+				"scope": ["$APPDATA/*"],
+				"writeFile": true
 			}
 		},
 		"bundle": {
@@ -40,7 +53,7 @@
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
-			"identifier": "com.bradenwong.com",
+			"identifier": "com.bradenwong.whispering",
 			"longDescription": "",
 			"macOS": {
 				"entitlements": null,
