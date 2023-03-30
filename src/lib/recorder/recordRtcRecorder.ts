@@ -1,5 +1,3 @@
-import { writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
-
 /**
  * This is the primary implementation of the recorder module.
  * It uses RecordRTC since it has better compatibility with Safari.
@@ -43,7 +41,10 @@ export async function stopRecording(): Promise<Blob> {
 }
 
 async function saveAudioFile(blob: Blob) {
+	if (!window.__TAURI__) return;
+	const { writeBinaryFile, BaseDirectory } = await import('@tauri-apps/api/fs');
 	const buffer = await blob.arrayBuffer();
 	const uint8Array = new Uint8Array(buffer);
-	await writeBinaryFile('recorded_audio.wav', uint8Array, { dir: BaseDirectory.AppData });
+	const filename = new Date().toISOString() + '.wav'; // get the current timestamp as ISO string
+	await writeBinaryFile(filename, uint8Array, { dir: BaseDirectory.AppData });
 }
