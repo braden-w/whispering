@@ -12,7 +12,8 @@ const options = {
 	mimeType: 'audio/wav',
 	recorderType: StereoAudioRecorder,
 	numberOfAudioChannels: 2,
-	checkForInactiveTracks: true
+	checkForInactiveTracks: true,
+	bufferSize: 256
 } as RecordRTC.Options;
 
 let recorder: RecordRTC | null = null;
