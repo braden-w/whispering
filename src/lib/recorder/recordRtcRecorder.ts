@@ -14,16 +14,14 @@ const options = {
 	mimeType: 'audio/wav',
 	recorderType: StereoAudioRecorder,
 	numberOfAudioChannels: 2,
-	checkForInactiveTracks: true,
-	bufferSize: 256,
-	sampleRate: 22050
+	checkForInactiveTracks: true
 } as RecordRTC.Options;
 
 let recorder: RecordRTC | null = null;
 
 export async function startRecording(): Promise<void> {
 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-	recorder = new RecordRTC(stream, options);
+	recorder = new RecordRTC(stream.clone(), options);
 	recorder.startRecording();
 }
 
