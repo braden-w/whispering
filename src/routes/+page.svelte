@@ -13,21 +13,21 @@
 	// --- Recording Logic ---
 
 	let isRecording = false;
-	let micIcon = '🎙️';
+	$: micIcon = isRecording ? '🟥' : '🎙️';
 	let outputText = '';
 	async function toggleRecording() {
 		if (!$apiKey) {
 			toast.error(PleaseEnterAPIKeyToast);
 			return;
 		}
-		isRecording = !isRecording;
-		micIcon = isRecording ? '🟥' : '🎙️';
 
-		if (isRecording) {
+		if (!isRecording) {
 			await setAlwaysOnTop(true);
 			await startRecording();
+			isRecording = !isRecording;
 		} else {
 			const audioBlob = await stopRecording();
+			isRecording = !isRecording;
 			toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
