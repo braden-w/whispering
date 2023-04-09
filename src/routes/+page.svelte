@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { startRecording, stopRecording } from '$lib/recorder/recordRtcRecorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { writeText } from '$lib/system-apis/clipboard';
 	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
@@ -20,6 +19,10 @@
 			toast.error(PleaseEnterAPIKeyToast);
 			return;
 		}
+
+		const { startRecording, stopRecording } = window.__TAURI__
+			? await import('$lib/recorder/recordRtcRecorder')
+			: await import('$lib/recorder/mediaRecorder');
 
 		if (!isRecording) {
 			await setAlwaysOnTop(true);
