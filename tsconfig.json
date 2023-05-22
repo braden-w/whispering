@@ -1,6 +1,4 @@
 {
-	"include": ["src/**/*"],
-	"exclude": ["functions/**/*"],
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
 		"allowJs": true,
