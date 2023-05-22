@@ -14,6 +14,8 @@
 	let isRecording = false;
 	$: micIcon = isRecording ? '🟥' : '🎙️';
 	let outputText = '';
+	let audioSrc: string;
+
 	async function toggleRecording() {
 		if (!$apiKey) {
 			toast.error(PleaseEnterAPIKeyToast);
@@ -30,6 +32,7 @@
 			isRecording = !isRecording;
 		} else {
 			const audioBlob = await stopRecording();
+			audioSrc = URL.createObjectURL(audioBlob);
 			isRecording = !isRecording;
 			toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
@@ -101,13 +104,13 @@
 		<div class="flex items-center space-x-2">
 			<input
 				id="transcripted-text"
-				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				class="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 transition-all duration-200 ease-in-out focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
 				bind:value={outputText}
 			/>
 
 			<button
-				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				class="rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-white transition-all duration-200 ease-in-out hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				on:click={copyOutputText}
 				aria-label="Copy transcribed text"
 			>
@@ -127,6 +130,7 @@
 				</svg>
 			</button>
 		</div>
+		<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
 	</div>
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
