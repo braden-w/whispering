@@ -18,8 +18,8 @@
 			"globalShortcut": {
 				"all": true
 			},
-			"shell": {
-				"open": true
+			"path": {
+				"all": true
 			},
 			"window": {
 				"setAlwaysOnTop": true
