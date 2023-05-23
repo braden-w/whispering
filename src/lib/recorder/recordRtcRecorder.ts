@@ -28,32 +28,36 @@ export async function startRecording(): Promise<void> {
 export async function stopRecording(): Promise<Blob> {
 	return new Promise((resolve, reject) => {
 		if (!recorder) throw new Error('Recorder is not initialized.');
-		recorder.stopRecording(() => {
+		recorder.stopRecording(async () => {
 			if (!recorder) {
 				reject(new Error('Recorder is not initialized.'));
 				return;
 			}
 			const audioBlob = recorder.getBlob();
-			saveAudioFile(audioBlob);
 			recorder.destroy();
 			recorder = null;
-			resolve(audioBlob);
+			const compressedBlob = await compressAudioBlob(audioBlob);
+			resolve(compressedBlob);
 		});
 	});
 }
 
-async function saveAudioFile(blob: Blob) {
-	if (!window.__TAURI__) return;
-	const { writeBinaryFile, BaseDirectory } = await import('@tauri-apps/api/fs');
-	const { invoke } = await import('@tauri-apps/api');
-	const { appDataDir } = await import('@tauri-apps/api/path');
+import { readBinaryFile, writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { invoke } from '@tauri-apps/api';
+import { appDataDir } from '@tauri-apps/api/path';
+
+async function compressAudioBlob(blob: Blob): Promise<Blob> {
 	const buffer = await blob.arrayBuffer();
 	const uint8Array = new Uint8Array(buffer);
 	const timestampIsoString = new Date().toISOString().replace(/[-:.]/g, '');
 	await writeBinaryFile(`${timestampIsoString}.wav`, uint8Array, { dir: BaseDirectory.AppData });
 	const appDataDirPath = await appDataDir();
-	const r = await invoke('convert_to_mp3', {
+	await invoke('convert_to_mp3', {
 		input: `${appDataDirPath}${timestampIsoString}.wav`,
 		output: `${appDataDirPath}${timestampIsoString}.mp3`
 	});
+	const mp3Buffer = await readBinaryFile(`${timestampIsoString}.mp3`, {
+		dir: BaseDirectory.AppData
+	});
+	return new Blob([mp3Buffer], { type: 'audio/mp3' });
 }
