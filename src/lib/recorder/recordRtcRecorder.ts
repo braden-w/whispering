@@ -46,7 +46,7 @@ export async function stopRecording(): Promise<Blob> {
 	});
 }
 
-import { readBinaryFile, writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { readBinaryFile, writeBinaryFile, BaseDirectory, removeFile } from '@tauri-apps/api/fs';
 import { invoke } from '@tauri-apps/api';
 import { appDataDir } from '@tauri-apps/api/path';
 
@@ -63,5 +63,17 @@ async function compressAudioBlob(blob: Blob): Promise<Blob> {
 	const mp3Buffer = await readBinaryFile(`${timestampIsoString}.mp3`, {
 		dir: BaseDirectory.AppData
 	});
-	return new Blob([mp3Buffer], { type: 'audio/mp3' });
+	const mp3Blob = new Blob([mp3Buffer], { type: 'audio/mp3' });
+	removeBothTempFiles(timestampIsoString);
+	return mp3Blob;
+}
+
+/** Removes both the wav and mp3 files from the app data directory. */
+async function removeBothTempFiles(fileName: string): Promise<void> {
+	try {
+		removeFile(`${fileName}.wav`, { dir: BaseDirectory.AppData });
+		removeFile(`${fileName}.mp3`, { dir: BaseDirectory.AppData });
+	} catch (error) {
+		console.error(error);
+	}
 }
