@@ -26,6 +26,7 @@
 			},
 			"fs": {
 				"readFile": true,
+				"removeFile": true,
 				"writeFile": true,
 				"scope": ["$APPDATA/*"]
 			}
