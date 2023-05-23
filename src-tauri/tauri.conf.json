@@ -33,7 +33,7 @@
 		},
 		"bundle": {
 			"active": true,
-			"category": "DeveloperTool",
+			"category": "Productivity",
 			"copyright": "Copyright © 2023",
 			"deb": {
 				"depends": []
