@@ -12,13 +12,10 @@ use std::process::Command;
 
 #[tauri::command]
 fn convert_to_mp3(input: &str, output: &str) -> Result<String, String> {
-    let status = Command::new("lame").arg(input).arg(output).status();
-
-    match status {
-        Ok(_) => Ok(output.into()),
-        Err(e) => {
-            eprintln!("Failed to execute the lame command: {}", e);
-            Err(format!("Failed to execute the lame command: {}", e).into())
-        }
-    }
+    Command::new("lame")
+        .arg(input)
+        .arg(output)
+        .status()
+        .map_err(|e| format!("Failed to execute the lame command: {}", e))
+        .map(|_| format!("Successfully converted {} to {}", input, output))
 }
