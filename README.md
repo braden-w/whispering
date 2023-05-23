@@ -11,7 +11,7 @@ Whispering is an open-source web and desktop app designed to streamline your voi
   - [Demo](#demo)
   - [Why Choose Whispering?](#why-choose-whispering)
   - [Accessing Whispering Web App](#accessing-whispering-web-app)
-  - [Download DMG](#download-dmg)
+  - [Download Desktop App](#download-desktop-app)
   - [Built With](#built-with)
   - [Getting Started](#getting-started)
   - [Contributing](#contributing)
@@ -36,11 +36,50 @@ To start using Whispering web app, click the button below:
 
 [![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
 
-## Download DMG
+## Download Desktop App
 
-To download the Whispering DMG for macOS, click the button below:
+To download the Whispering desktop app, click the button below:
 
 [![Download DMG](https://img.shields.io/badge/Download-DMG-green)](https://github.com/braden-w/whispering/releases)
+
+### Highly Recommended: Installing LAME
+
+Before proceeding with the installation of the DMG file, we highly recommend installing "lame" on your system. This program utilizes LAME for compressing audio files before uploading them to the OpenAI API, resulting in a significant reduction in processing time. By having LAME installed, you can enhance the efficiency and speed of audio file processing within the application.
+
+https://formulae.brew.sh/formula/lame
+
+#### Mac OS (using Homebrew)
+
+1. Open a Terminal window on your Mac.
+2. Install Homebrew if you have not already. You may do so by executing [the command found on its homepage](https://brew.sh). As of 2023, it is:
+
+```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+3. After Homebrew is installed, run the following command to install LAME:
+
+```shell
+brew install lame
+```
+
+#### Windows
+
+1. Visit the [LAME download page on Sourceforge](https://sourceforge.net/projects/lame/files/lame) and download the latest stable version of LAME for Windows.
+2. Once the download is complete, locate the downloaded executable file and double-click on it to start the installation process.
+
+#### Linux
+
+For Ubuntu/Debian-based distributions:
+
+1. Open a Terminal window.
+2. Execute the following command to install LAME:
+
+```shell
+sudo apt-get update && sudo apt-get install lame
+```
+
+For other distributions, consult your distribution's package manager or repository to find the appropriate command for installing LAME.
 
 ## Built With
 
