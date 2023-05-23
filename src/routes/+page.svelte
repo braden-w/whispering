@@ -22,9 +22,9 @@
 			return;
 		}
 
-		const { startRecording, stopRecording } = window.__TAURI__
-			? await import('$lib/recorder/recordRtcRecorder')
-			: await import('$lib/recorder/mediaRecorder');
+		const { startRecording, stopRecording } = /Chrome/.test(navigator.userAgent)
+			? await import('$lib/recorder/mediaRecorder')
+			: await import('$lib/recorder/recordRtcRecorder');
 
 		if (!isRecording) {
 			await setAlwaysOnTop(true);
