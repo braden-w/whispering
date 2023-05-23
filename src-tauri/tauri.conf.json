@@ -18,24 +18,16 @@
 			"globalShortcut": {
 				"all": true
 			},
-			"shell": {
-				"open": true
+			"path": {
+				"all": true
 			},
 			"window": {
 				"setAlwaysOnTop": true
 			},
 			"fs": {
-				"all": false,
-				"copyFile": false,
-				"createDir": false,
-				"exists": false,
-				"readDir": false,
-				"readFile": false,
-				"removeDir": false,
-				"removeFile": false,
-				"renameFile": false,
-				"scope": ["$APPDATA/*"],
-				"writeFile": true
+				"readFile": true,
+				"writeFile": true,
+				"scope": ["$APPDATA/*"]
 			}
 		},
 		"bundle": {
