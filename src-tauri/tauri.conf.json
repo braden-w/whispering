@@ -8,7 +8,7 @@
 	},
 	"package": {
 		"productName": "Whispering",
-		"version": "2.1.0"
+		"version": "3.0.0"
 	},
 	"tauri": {
 		"allowlist": {
@@ -34,7 +34,7 @@
 		"bundle": {
 			"active": true,
 			"category": "Productivity",
-			"copyright": "Copyright © 2023",
+			"copyright": "Copyright © 2023 Braden Wong",
 			"deb": {
 				"depends": []
 			},
@@ -49,7 +49,7 @@
 			"identifier": "com.bradenwong.whispering",
 			"longDescription": "",
 			"macOS": {
-				"entitlements": "../Entitlements.plist",
+				"entitlements": "./entitlements.plist",
 				"exceptionDomain": "",
 				"frameworks": [],
 				"providerShortName": null,
