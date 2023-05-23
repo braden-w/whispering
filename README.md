@@ -38,7 +38,8 @@ To start using Whispering web app, click the button below:
 
 To download the Whispering desktop app, click the button below:
 
-[![Download DMG](https://img.shields.io/badge/Download-DMG-green)](https://github.com/braden-w/whispering/releases)
+[![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
+
 
 ### Highly Recommended: Installing LAME
 
