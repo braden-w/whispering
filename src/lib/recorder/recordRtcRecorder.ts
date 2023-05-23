@@ -52,7 +52,7 @@ async function compressAudioBlob(blob: Blob): Promise<Blob> {
 	const timestampIsoString = new Date().toISOString().replace(/[-:.]/g, '');
 	await writeBinaryFile(`${timestampIsoString}.wav`, uint8Array, { dir: BaseDirectory.AppData });
 	const appDataDirPath = await appDataDir();
-	await invoke('convert_to_mp3', {
+	const path = await invoke('convert_to_mp3', {
 		input: `${appDataDirPath}${timestampIsoString}.wav`,
 		output: `${appDataDirPath}${timestampIsoString}.mp3`
 	});
