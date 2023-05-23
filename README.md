@@ -6,17 +6,15 @@ Whispering is an open-source web and desktop app designed to streamline your voi
 
 ## Table of Contents
 
-- [Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API](#whispering-the-lightweight-ergonomic-wrapper-for-openai-whisperer-api)
-  - [Table of Contents](#table-of-contents)
-  - [Demo](#demo)
-  - [Why Choose Whispering?](#why-choose-whispering)
-  - [Accessing Whispering Web App](#accessing-whispering-web-app)
-  - [Download Desktop App](#download-desktop-app)
-  - [Built With](#built-with)
-  - [Getting Started](#getting-started)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Support and Feedback](#support-and-feedback)
+- [Demo](#demo)
+- [Why Choose Whispering?](#why-choose-whispering)
+- [Accessing Whispering Web App](#accessing-whispering-web-app)
+- [Download Desktop App](#download-desktop-app)
+- [Built With](#built-with)
+- [Getting Started](#getting-started)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support and Feedback](#support-and-feedback)
 
 ## Demo
 
