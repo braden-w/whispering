@@ -60,7 +60,7 @@
 	// --- Global Shortcuts ---
 
 	let showShortcuts = false;
-	const defaultGlobalShortcut = "CommandOrControl+Shift+'";
+	const defaultGlobalShortcut = 'CommandOrControl+Shift+;';
 	let currentGlobalShortcut = defaultGlobalShortcut;
 
 	function onChangeShortcutClick() {
