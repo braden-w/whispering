@@ -2,21 +2,21 @@
 
 ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png)
 
-Whispering is an open-source web app designed to streamline your voice-to-text experience, increasing your writing productivity and simplifying your workflow. By leveraging the OpenAI Whisperer API, Whispering allows you to record your voice, transcribe it instantly, and copy the resulting text directly to your clipboard for seamless pasting into your writing.
+Whispering is an open-source web and desktop app designed to streamline your voice-to-text experience, increase your writing productivity, and simplifying your workflow. By leveraging the OpenAI Whisperer API, Whispering allows you to record your voice, transcribe it, and copy the resulting text directly to your clipboard for seamless pasting.
 
 ## Table of Contents
 
 - [Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API](#whispering-the-lightweight-ergonomic-wrapper-for-openai-whisperer-api)
-	- [Table of Contents](#table-of-contents)
-	- [Demo](#demo)
-	- [Why Choose Whispering?](#why-choose-whispering)
-	- [Accessing Whispering Web App](#accessing-whispering-web-app)
-	- [Download DMG](#download-dmg)
-	- [Built With](#built-with)
-	- [Getting Started](#getting-started)
-	- [Contributing](#contributing)
-	- [License](#license)
-	- [Support and Feedback](#support-and-feedback)
+  - [Table of Contents](#table-of-contents)
+  - [Demo](#demo)
+  - [Why Choose Whispering?](#why-choose-whispering)
+  - [Accessing Whispering Web App](#accessing-whispering-web-app)
+  - [Download DMG](#download-dmg)
+  - [Built With](#built-with)
+  - [Getting Started](#getting-started)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Support and Feedback](#support-and-feedback)
 
 ## Demo
 
@@ -26,7 +26,7 @@ Whispering is an open-source web app designed to streamline your voice-to-text e
 
 Whispering was born from the frustrations of a tedious dictation process that involved visiting the official OpenAI website, clicking multiple buttons for each recording, and manually copying and pasting transcriptions. With Whispering, you can enjoy the following benefits:
 
-- **Save Time**: Eliminate manual transcribing and excessive button clicks. Record, transcribe, and paste with just two clicks.
+- **Save Time**: Eliminate manual transcribing and excessive button clicks. Record, transcribe, and paste with just two clicks or two keystrokes.
 - **Boost Productivity**: With fewer button clicks and context switching, Whispering increases your writing output, making it perfect for blog posts, essays, or writing prompts.
 - **Simplify Workflows**: Effortlessly record, stop, and paste transcribed text with just a few keystrokes.
 
@@ -59,9 +59,9 @@ To set up the project on your local machine, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/braden-w/whispering.git`
 2. Change into the project directory: `cd whispering`
-3. Install the necessary dependencies: `npm install`
-4. Run the development server: `npm run dev`
-5. Open your browser and navigate to `http://localhost:3000`
+3. Install the necessary dependencies: `pnpm i`
+4. Run the development server: `pnpm tauri dev`
+5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
 
 ## Contributing
 
