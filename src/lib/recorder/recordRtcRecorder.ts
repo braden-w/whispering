@@ -36,8 +36,12 @@ export async function stopRecording(): Promise<Blob> {
 			const audioBlob = recorder.getBlob();
 			recorder.destroy();
 			recorder = null;
-			const compressedBlob = await compressAudioBlob(audioBlob);
-			resolve(compressedBlob);
+			try {
+				const compressedBlob = await compressAudioBlob(audioBlob);
+				resolve(compressedBlob);
+			} catch (error) {
+				resolve(audioBlob);
+			}
 		});
 	});
 }
