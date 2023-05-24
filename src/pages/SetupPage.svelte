@@ -1,10 +1,12 @@
-<script>
-  import { goto } from "~lib/stores/currentRoute"
-  import { apiKey, setApiKey } from "~lib/stores/apiKey"
+<script lang="ts">
   import toast from "svelte-french-toast/dist/core/toast"
-  import Anchor from "~lib/Anchor.svelte"
 
-  let inputApiKey = $apiKey
+  import Anchor from "~lib/Anchor.svelte"
+  import { getApiKey, setApiKey } from "~lib/stores/apiKey"
+  import { goto } from "~lib/stores/currentRoute"
+
+  let inputApiKey: string
+  getApiKey().then((key) => (inputApiKey = key))
 
   async function submitApiKey() {
     if (!inputApiKey) {
