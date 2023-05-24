@@ -1,3 +1,7 @@
+/**
+ * Writes text to the user's clipboard.
+ * @param text The text to write to the clipboard.
+ */
 export function writeText(text: string) {
   // Create a temporary textarea element
   const textarea = document.createElement("textarea")
