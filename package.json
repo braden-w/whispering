@@ -10,6 +10,7 @@
     "build": "plasmo build"
   },
   "dependencies": {
+    "@plasmohq/storage": "^1.6.0",
     "plasmo": "0.57.2",
     "svelte": "3.52.0",
     "svelte-french-toast": "1.0.4-beta.0",

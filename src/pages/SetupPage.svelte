@@ -1,17 +1,16 @@
 <script>
   import { goto } from "~lib/stores/currentRoute"
-  import { apiKey } from "~lib/stores/apiKey"
+  import { apiKey, setApiKey } from "~lib/stores/apiKey"
   import toast from "svelte-french-toast/dist/core/toast"
   import Anchor from "~lib/Anchor.svelte"
 
   let inputApiKey = $apiKey
 
-  function submitApiKey() {
+  async function submitApiKey() {
     if (!inputApiKey) {
       toast.error("Please enter a valid OpenAI API key.")
     } else {
-      localStorage.setItem("openai-api-key", inputApiKey)
-      apiKey.set(inputApiKey)
+      await setApiKey(inputApiKey)
       toast.success("API key set!")
       goto("/")
     }
