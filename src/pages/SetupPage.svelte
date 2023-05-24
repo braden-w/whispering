@@ -6,11 +6,11 @@
 
   let inputApiKey = $apiKey
 
-  function submitApiKey() {
+  async function submitApiKey() {
     if (!inputApiKey) {
       toast.error("Please enter a valid OpenAI API key.")
     } else {
-      setApiKey(inputApiKey)
+      await setApiKey(inputApiKey)
       toast.success("API key set!")
       goto("/")
     }

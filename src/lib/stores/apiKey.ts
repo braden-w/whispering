@@ -1,8 +1,13 @@
 import { writable } from "svelte/store"
 
-export const apiKey = writable(localStorage.getItem("openai-api-key") || "")
+import { Storage } from "@plasmohq/storage/dist"
+
+const storage = new Storage()
+
+export const apiKey = writable("")
+storage.get("openai-api-key").then((initialApiKey) => apiKey.set(initialApiKey))
 
 export async function setApiKey(inputApiKey: string) {
-  localStorage.setItem("openai-api-key", inputApiKey)
+  await storage.set("openai-api-key", inputApiKey)
   apiKey.set(inputApiKey)
 }
