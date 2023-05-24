@@ -2,12 +2,13 @@
   import "./style.css"
 
   import { onDestroy, onMount } from "svelte"
+  import Toaster from "svelte-french-toast/dist/components/Toaster.svelte"
+  import toast from "svelte-french-toast/dist/core/toast"
 
-  // import toast, { Toaster } from "svelte-french-toast"
   import { startRecording, stopRecording } from "./lib/recorder/mediaRecorder"
   import { apiKey } from "./lib/stores/apiKey"
-  // import PleaseEnterAPIKeyToast from "./lib/toasts/PleaseEnterAPIKeyToast.svelte"
-  // import SomethingWentWrongToast from "./lib/toasts/SomethingWentWrongToast.svelte"
+  import PleaseEnterAPIKeyToast from "./lib/toasts/PleaseEnterAPIKeyToast.svelte"
+  import SomethingWentWrongToast from "./lib/toasts/SomethingWentWrongToast.svelte"
   import { transcribeAudioWithWhisperApi } from "./lib/transcribeAudioWithWhisperApi"
 
   // --- Recording Logic ---
@@ -19,7 +20,7 @@
 
   async function toggleRecording() {
     if (!$apiKey) {
-      // toast.error(PleaseEnterAPIKeyToast)
+      toast.error(PleaseEnterAPIKeyToast)
       return
     }
 
@@ -30,11 +31,11 @@
       const audioBlob = await stopRecording()
       audioSrc = URL.createObjectURL(audioBlob)
       isRecording = !isRecording
-      // toast.promise(processRecording(audioBlob), {
-      //   loading: "Processing Whisper...",
-      //   success: "Copied to clipboard!",
-      //   error: () => SomethingWentWrongToast
-      // })
+      toast.promise(processRecording(audioBlob), {
+        loading: "Processing Whisper...",
+        success: "Copied to clipboard!",
+        error: () => SomethingWentWrongToast
+      })
     }
   }
 
@@ -71,7 +72,7 @@
 
   async function copyOutputText() {
     // await writeText(outputText)
-    // toast.success("Copied to clipboard!")
+    toast.success("Copied to clipboard!")
   }
 
   // --- Store Logic ---
@@ -216,5 +217,5 @@
       </svg>
     </a>
   </div>
-  <!-- <Toaster /> -->
+  <Toaster />
 </div>
