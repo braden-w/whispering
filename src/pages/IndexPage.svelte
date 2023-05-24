@@ -3,6 +3,7 @@
   import toast from "svelte-french-toast/dist/core/toast"
 
   import Anchor from "~lib/Anchor.svelte"
+  import { writeText } from "~lib/apis/clipboard"
   import { startRecording, stopRecording } from "~lib/recorder/mediaRecorder"
   import { apiKey } from "~lib/stores/apiKey"
   import PleaseEnterAPIKeyToast from "~lib/toasts/PleaseEnterAPIKeyToast.svelte"
@@ -39,7 +40,7 @@
 
   async function processRecording(audioBlob: Blob) {
     const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey)
-    // writeText(text)
+    writeText(text)
     outputText = text
   }
 
@@ -69,7 +70,7 @@
   // --- Copy Output Button ---
 
   async function copyOutputText() {
-    // await writeText(outputText)
+    await writeText(outputText)
     toast.success("Copied to clipboard!")
   }
 
