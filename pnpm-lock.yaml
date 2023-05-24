@@ -7,6 +7,9 @@ dependencies:
   svelte:
     specifier: 3.52.0
     version: 3.52.0
+  svelte-french-toast:
+    specifier: 1.0.4-beta.0
+    version: 1.0.4-beta.0(svelte@3.52.0)
   svelte-preprocess:
     specifier: 4.10.7
     version: 4.10.7(@babel/core@7.19.3)(postcss@8.4.23)(svelte@3.52.0)(typescript@4.8.4)
@@ -4078,6 +4081,15 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /svelte-french-toast@1.0.4-beta.0(svelte@3.52.0):
+    resolution: {integrity: sha512-PkYNukEQAPZyV5ei+JzeYEsbaXFSbJS8/SDTdC8giYa5Atxp2SRepFnPDWx6mu7rV53g886FNLktPMLwRljkpw==}
+    peerDependencies:
+      svelte: ^3.57.0
+    dependencies:
+      svelte: 3.52.0
+      svelte-writable-derived: 3.0.1(svelte@3.52.0)
+    dev: false
+
   /svelte-preprocess@4.10.7(@babel/core@7.19.3)(postcss@8.4.23)(svelte@3.52.0)(typescript@4.8.4):
     resolution: {integrity: sha512-sNPBnqYD6FnmdBrUmBCaqS00RyCsCpj2BG58A1JBswNF7b0OKviwxqVrOL/CKyJrLSClrSeqQv5BXNg2RUbPOw==}
     engines: {node: '>= 9.11.2'}
@@ -4129,6 +4141,14 @@ packages:
       strip-indent: 3.0.0
       svelte: 3.52.0
       typescript: 4.8.4
+    dev: false
+
+  /svelte-writable-derived@3.0.1(svelte@3.52.0):
+    resolution: {integrity: sha512-zBWCS5c3MA9o4NT/UJHP3KoPOhtmH2ZQ/QRK31w9LzLdPP7MNncUcBGIu4iH2RVt17iRfR6agm7nEqwNvsYuMw==}
+    peerDependencies:
+      svelte: ^3.2.1
+    dependencies:
+      svelte: 3.52.0
     dev: false
 
   /svelte@3.52.0:
