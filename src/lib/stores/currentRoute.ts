@@ -1,6 +1,6 @@
 import { writable } from "svelte/store"
 
-type Route = "/" | "/setup"
+export type Route = "/" | "/setup"
 
 export const currentRoute = writable<Route>("/")
 
