@@ -41,7 +41,7 @@ async function toggleRecording() {
     const audioBlob = await stopRecording()
     isRecording = !isRecording
     chrome.action.setIcon({ path: studioMicrophone })
-    const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey))
+    const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
     writeText(text)
   }
 }
