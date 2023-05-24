@@ -31,7 +31,18 @@
       "https://*/*"
     ],
     "permissions": [
-      "clipboardWrite"
-    ]
+      "clipboardWrite",
+      "commands"
+    ],
+    "commands": {
+      "toggle-recording": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+L",
+          "mac": "Command+Shift+L"
+        },
+        "description": "Toggle recording",
+        "global": true
+      }
+    }
   }
 }
