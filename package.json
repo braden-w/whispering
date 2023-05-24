@@ -29,6 +29,9 @@
   "manifest": {
     "host_permissions": [
       "https://*/*"
+    ],
+    "permissions": [
+      "clipboardWrite"
     ]
   }
 }
