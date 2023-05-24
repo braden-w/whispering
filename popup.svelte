@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "./style.css"
+
   export let count = 0
   let action: string = null
   function increment() {
