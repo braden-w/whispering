@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from "svelte"
   import toast from "svelte-french-toast/dist/core/toast"
 
-  import { goto } from "~lib/stores/currentRoute"
+  import Anchor from "~lib/Anchor.svelte"
 
   import { startRecording, stopRecording } from "../lib/recorder/mediaRecorder"
   import { apiKey } from "../lib/stores/apiKey"
@@ -141,11 +141,9 @@
     </p>
   {/if}
   <p class="text-xs text-gray-600">
-    <button
-      on:click={() => goto("/setup")}
-      class="text-gray-600 underline hover:text-indigo-900">
+    <Anchor href="/setup" class="text-gray-600 underline hover:text-indigo-900">
       Edit your OpenAI API Key
-    </button>
+    </Anchor>
     {#if window.__TAURI__}
       or
       <button

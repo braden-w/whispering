@@ -2,6 +2,7 @@
   import { goto } from "../lib/stores/currentRoute"
   import { apiKey } from "../lib/stores/apiKey"
   import toast from "svelte-french-toast/dist/core/toast"
+  import Anchor from "~lib/Anchor.svelte"
 
   let inputApiKey = $apiKey
 
@@ -57,8 +58,8 @@
     </a>
   </p>
   <p class="text-xs text-gray-600">
-    <a href="/" class="text-gray-600 underline hover:text-indigo-900">
+    <Anchor href="/" class="text-gray-600 underline hover:text-indigo-900">
       Go back
-    </a>
+    </Anchor>
   </p>
 </div>
