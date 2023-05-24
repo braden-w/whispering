@@ -37,11 +37,10 @@
     "commands": {
       "toggle-recording": {
         "suggested_key": {
-          "default": "Ctrl+Shift+L",
-          "mac": "Command+Shift+L"
+          "default": "Ctrl+Shift+I",
+          "mac": "Command+Shift+I"
         },
-        "description": "Toggle recording",
-        "global": true
+        "description": "Toggle recording"
       }
     }
   }
