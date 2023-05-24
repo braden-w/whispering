@@ -1,6 +1,6 @@
 <script>
-  import { goto } from "../lib/stores/currentRoute"
-  import { apiKey } from "../lib/stores/apiKey"
+  import { goto } from "~lib/stores/currentRoute"
+  import { apiKey } from "~lib/stores/apiKey"
   import toast from "svelte-french-toast/dist/core/toast"
   import Anchor from "~lib/Anchor.svelte"
 
