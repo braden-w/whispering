@@ -34,14 +34,14 @@ async function toggleRecording() {
   }
 
   if (!isRecording) {
-    // await startRecording()
+    await startRecording()
     isRecording = !isRecording
     chrome.action.setIcon({ path: octagonalSign })
   } else {
-    // const audioBlob = await stopRecording()
+    const audioBlob = await stopRecording()
     isRecording = !isRecording
     chrome.action.setIcon({ path: studioMicrophone })
-    // const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey))
-    // writeText(text)
+    const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey))
+    writeText(text)
   }
 }
