@@ -11,11 +11,12 @@ chrome.runtime.onMessage.addListener(async function (
   sender,
   sendResponse
 ) {
-  if (request.action === "startRecording") {
+  console.log("🚀 ~ file: content.ts:11 ~ request:", request)
+  if (request.name === "startRecording") {
     console.log("🚀 ~ file: content.ts:14 ~ startRecording:")
     await startRecording()
     sendResponse()
-  } else if (request.action === "stopRecording") {
+  } else if (request.name === "stopRecording") {
     console.log("🚀 ~ file: content.ts:18 ~ stopRecording:")
     const audioBlob = await stopRecording()
     // const apiKey = await getApiKey()
