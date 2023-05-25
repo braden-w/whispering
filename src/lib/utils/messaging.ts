@@ -9,6 +9,7 @@ export type Request =
 			action: 'openOptionsPage';
 	  };
 
+/** Sends a message to the background script, captured in {@link ~background/index.ts}. */
 export function sendMessageToBackground(request: Request) {
 	chrome.runtime.sendMessage(request);
 }
