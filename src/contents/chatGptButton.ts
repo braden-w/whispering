@@ -20,12 +20,12 @@ window.onload = function () {
 	if (textarea) {
 		const buttonHTML = /*html*/ `
 <button
-	id="plasmo-button"
+	id="whispering-microphone-button"
 	class="absolute p-1 rounded-md text-gray-500 bottom-1.5 md:bottom-2.5 hover:bg-gray-100 enabled:dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent right-1 md:right-2 disabled:opacity-40"
 	style="right: 2.25rem; @media (min-width: 768px) { right: 2.5rem; }"
 >
 	<svg
-		id="plasmo-icon"
+		id="whispering-microphone-svg"
 		stroke="currentColor"
 		fill="none"
 		stroke-width="2"
@@ -44,7 +44,7 @@ window.onload = function () {
 
 		textarea.insertAdjacentHTML('afterend', buttonHTML);
 
-		const button = document.querySelector('#plasmo-button');
+		const button = document.querySelector('#whispering-microphone-button');
 		if (!button) return;
 
 		let isRecording = false;
@@ -100,7 +100,7 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 function switchIcon(icon: Icon) {
 	sendMessageToBackground({ action: 'setIcon', icon });
 
-	const svg = document.querySelector('#plasmo-icon');
+	const svg = document.querySelector('#whispering-microphone-svg');
 	if (!svg) return;
 
 	svg.innerHTML = iconToSvgInnerHtml[icon];
