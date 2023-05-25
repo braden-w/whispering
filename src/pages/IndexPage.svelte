@@ -5,7 +5,7 @@
   import Anchor from "~lib/Anchor.svelte"
   import { writeText } from "~lib/apis/clipboard"
   import { startRecording, stopRecording } from "~lib/recorder/mediaRecorder"
-  import { apiKey } from "~lib/stores/apiKey"
+  import { getApiKey } from "~lib/stores/apiKey"
   import PleaseEnterAPIKeyToast from "~lib/toasts/PleaseEnterAPIKeyToast.svelte"
   import SomethingWentWrongToast from "~lib/toasts/SomethingWentWrongToast.svelte"
   import { transcribeAudioWithWhisperApi } from "~lib/transcribeAudioWithWhisperApi"
@@ -18,7 +18,8 @@
   let audioSrc: string
 
   async function toggleRecording() {
-    if (!$apiKey) {
+    const apiKey = await getApiKey()
+    if (!apiKey) {
       toast.error(PleaseEnterAPIKeyToast)
       return
     }
@@ -39,7 +40,8 @@
   }
 
   async function processRecording(audioBlob: Blob) {
-    const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey)
+    const apiKey = await getApiKey()
+    const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
     writeText(text)
     outputText = text
   }
