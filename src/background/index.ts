@@ -1,4 +1,4 @@
-import { setIcon } from './setIcon';
+import { type Icon, setIcon } from './setIcon';
 import { toggleRecording } from './toggleRecording';
 
 export {};
@@ -15,10 +15,6 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-chrome.runtime.onMessage.addListener(function (
-	request: { icon: 'studioMicrophone' | 'octagonalSign' | 'arrowsCounterclockwise' },
-	sender,
-	sendResponse
-) {
+chrome.runtime.onMessage.addListener(function (request: { icon: Icon }, sender, sendResponse) {
 	setIcon(request.icon);
 });
