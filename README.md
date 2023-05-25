@@ -40,7 +40,6 @@ To download the Whispering desktop app, click the button below:
 
 [![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
 
-
 ### Highly Recommended: Installing LAME
 
 Before proceeding with the installation of the DMG file, we highly recommend installing "lame" on your system. This program utilizes LAME for compressing audio files before uploading them to the OpenAI API, resulting in a significant reduction in processing time. By having LAME installed, you can enhance the efficiency and speed of audio file processing within the application.
