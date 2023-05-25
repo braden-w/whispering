@@ -104,6 +104,12 @@ function switchIcon(icon: Icon) {
 	if (!svg) return;
 
 	svg.innerHTML = iconToSvgInnerHtml[icon];
+
+	const button: HTMLButtonElement = document.querySelector('#whispering-microphone-button');
+	if (!button) return;
+
+	if (icon === 'arrowsCounterclockwise') button.disabled = true;
+	else button.disabled = false;
 }
 
 function openOptionsPage() {
