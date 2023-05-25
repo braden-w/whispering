@@ -121,6 +121,9 @@ function setChatgptTextareaContent(text) {
 	if (!textarea) return;
 
 	textarea.value = text;
+
+	const event = new Event('input', { bubbles: true });
+	textarea.dispatchEvent(event);
 }
 
 function setSvgInnerHtmlToIcon(icon: Icon) {
