@@ -62,13 +62,18 @@ window.onload = function () {
 
 				isRecording = true;
 			} else {
-				const audioBlob = await stopRecording();
-				switchIcon('arrowsCounterclockwise');
-				const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-				writeText(text);
-				setChatgptTextareaContent(text);
-				switchIcon('studioMicrophone');
-				isRecording = false;
+				try {
+					const audioBlob = await stopRecording();
+					switchIcon('arrowsCounterclockwise');
+					const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+					writeText(text);
+					setChatgptTextareaContent(text);
+				} catch (error) {
+					console.error('Error occurred during transcription:', error);
+				} finally {
+					switchIcon('studioMicrophone');
+					isRecording = false;
+				}
 			}
 		});
 	}
