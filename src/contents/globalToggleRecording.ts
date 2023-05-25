@@ -1,5 +1,5 @@
 import type { Icon } from '~background/setIcon';
-import { writeText } from '~lib/apis/clipboard';
+import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 			const audioBlob = await stopRecording();
 			switchIcon('arrowsCounterclockwise');
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-			writeText(text);
+			writeTextToClipboard(text);
 			switchIcon('studioMicrophone');
 			break;
 	}
