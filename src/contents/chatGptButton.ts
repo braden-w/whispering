@@ -27,14 +27,10 @@ window.onload = function () {
 		width="1em"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<path
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
-		/>
-	</svg>	
-		<line x1="22" y1="2" x2="11" y2="13"></line>
-		<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+		<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+		<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+		<line x1="12" y1="19" x2="12" y2="23"></line>
+		<line x1="8" y1="23" x2="16" y2="23"></line>
 	</svg>
 </button>
 `;
