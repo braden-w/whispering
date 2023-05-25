@@ -34,8 +34,7 @@
 		"permissions": [
 			"clipboardWrite",
 			"commands",
-			"tabs",
-			"action"
+			"tabs"
 		],
 		"commands": {
 			"toggle-recording": {
