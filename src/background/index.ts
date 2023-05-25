@@ -1,4 +1,6 @@
-import { type Icon, setIcon } from './setIcon';
+import type { Request } from '~lib/utils/messaging';
+
+import { setIcon } from './setIcon';
 import { toggleRecording } from './toggleRecording';
 
 export {};
@@ -15,14 +17,6 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-export type Request =
-	| {
-			action: 'setIcon';
-			icon: Icon;
-	  }
-	| {
-			action: 'openOptionsPage';
-	  };
 chrome.runtime.onMessage.addListener(function (request: Request, sender, sendResponse) {
 	switch (request.action) {
 		case 'setIcon':

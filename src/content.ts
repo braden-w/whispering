@@ -1,9 +1,9 @@
-import type { Request } from '~background/index';
 import type { Icon } from '~background/setIcon';
 import { writeText } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
+import { sendMessageToBackground } from '~lib/utils/messaging';
 
 export {};
 
@@ -36,13 +36,9 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 });
 
 function switchIcon(icon: Icon) {
-	sendMessage({ action: 'setIcon', icon });
+	sendMessageToBackground({ action: 'setIcon', icon });
 }
 
 function openOptionsPage() {
-	sendMessage({ action: 'openOptionsPage' });
-}
-
-function sendMessage(request: Request) {
-	chrome.runtime.sendMessage(request);
+	sendMessageToBackground({ action: 'openOptionsPage' });
 }
