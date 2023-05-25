@@ -7,8 +7,6 @@ import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
-console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
-
 export const config: PlasmoCSConfig = {
 	matches: ['https://chat.openai.com/*'],
 	all_frames: true
