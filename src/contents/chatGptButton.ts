@@ -18,8 +18,9 @@ window.onload = function () {
 	const textarea = document.querySelector('#prompt-textarea');
 
 	if (textarea) {
+		// We use a div instead of a button because when using a button, clicking the microphone somehow triggers the chat input to submit
 		const buttonHTML = /*html*/ `
-<button
+<div
 	id="whispering-microphone-button"
 	class="absolute p-1 rounded-md text-gray-500 bottom-1.5 md:bottom-2.5 hover:bg-gray-100 enabled:dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent right-1 md:right-2 disabled:opacity-40"
 	style="right: 2.25rem; @media (min-width: 768px) { right: 2.5rem; }"
@@ -39,7 +40,7 @@ window.onload = function () {
 	>
 		${iconToSvgInnerHtml.studioMicrophone}
 	</svg>
-</button>
+</div>
 `;
 
 		textarea.insertAdjacentHTML('afterend', buttonHTML);
