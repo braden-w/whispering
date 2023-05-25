@@ -112,7 +112,7 @@ function openOptionsPage() {
 
 function setChatgptTextareaContent(text) {
 	const textarea: HTMLTextAreaElement = document.querySelector('#prompt-textarea');
-	if (textarea) return;
+	if (!textarea) return;
 
 	textarea.value = text;
 }
