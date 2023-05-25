@@ -1,9 +1,9 @@
-import { writable } from "svelte/store"
+import { writable } from 'svelte/store';
 
-export type Route = "/" | "/setup"
+export type Route = '/' | '/setup';
 
-export const currentRoute = writable<Route>("/")
+export const currentRoute = writable<Route>('/');
 
 export function goto(route: Route) {
-  currentRoute.set(route)
+	currentRoute.set(route);
 }

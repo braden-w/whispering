@@ -1,16 +1,16 @@
-import { Storage } from "@plasmohq/storage/dist"
+import { Storage } from '@plasmohq/storage/dist';
 
-const storage = new Storage()
+const storage = new Storage();
 
 export async function getIsBackgroundRecording(): Promise<boolean> {
-  return !!(await storage.get<boolean | undefined>("is-background-recording"))
+	return !!(await storage.get<boolean | undefined>('is-background-recording'));
 }
 
 async function setIsBackgroundRecording(value: boolean) {
-  return await storage.set("is-background-recording", value)
+	return await storage.set('is-background-recording', value);
 }
 
 export async function toggleIsBackgroundRecording() {
-  const isRecording = await getIsBackgroundRecording()
-  await storage.set("is-background-recording", !isRecording)
+	const isRecording = await getIsBackgroundRecording();
+	await storage.set('is-background-recording', !isRecording);
 }
