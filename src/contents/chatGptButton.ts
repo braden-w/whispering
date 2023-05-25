@@ -1,5 +1,8 @@
 import type { PlasmoContentScript } from 'plasmo';
 
+import { startRecording } from '~lib/recorder/mediaRecorder';
+import { sendMessageToBackground } from '~lib/utils/messaging';
+
 console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
 
 export const config: PlasmoContentScript = {
@@ -13,10 +16,12 @@ window.onload = function () {
 	if (textarea) {
 		const buttonHTML = /*html*/ `
 <button
+	id="plasmo-button"
 	class="absolute p-1 rounded-md text-gray-500 bottom-1.5 md:bottom-2.5 hover:bg-gray-100 enabled:dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent right-1 md:right-2 disabled:opacity-40"
 	style="right: 2.25rem; @media (min-width: 768px) { right: 2.5rem; }"
 >
 	<svg
+		id="plasmo-icon"
 		stroke="currentColor"
 		fill="none"
 		stroke-width="2"
@@ -37,5 +42,23 @@ window.onload = function () {
 `;
 
 		textarea.insertAdjacentHTML('afterend', buttonHTML);
+
+		const button = document.querySelector('#plasmo-button');
+		const svg = document.querySelector('#plasmo-icon');
+
+		if (button) {
+			button.addEventListener('click', async () => {
+				await startRecording();
+				sendMessageToBackground({ action: 'setIcon', icon: 'octagonalSign' });
+
+				svg.innerHTML = `
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+					/>
+				`;
+			});
+		}
 	}
 };
