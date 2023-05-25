@@ -11,7 +11,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 	const apiKey = await getApiKey();
 	if (!apiKey) {
 		alert('Please set your API key in the extension options');
-		// Open the options page
 		openOptionsPage();
 		return;
 	}
