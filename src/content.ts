@@ -7,17 +7,21 @@ export {};
 console.log('🚀 ~ file: content.ts:7 ~ export');
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-	console.log('🚀 ~ file: content.ts:11 ~ request:', request);
 	if (request.name === 'startRecording') {
-		console.log('🚀 ~ file: content.ts:14 ~ startRecording:');
 		await startRecording();
-		sendResponse();
+		switchIcon('octagonalSign');
 	} else if (request.name === 'stopRecording') {
-		console.log('🚀 ~ file: content.ts:18 ~ stopRecording:');
 		const audioBlob = await stopRecording();
+		switchIcon('arrowsCounterclockwise');
 		const apiKey = await getApiKey();
 		const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
 		writeText(text);
-		sendResponse({ audioBlob });
+		switchIcon('studioMicrophone');
+		sendResponse({ text });
 	}
+	return true;
 });
+
+function switchIcon(icon: 'studioMicrophone' | 'octagonalSign' | 'arrowsCounterclockwise') {
+	chrome.runtime.sendMessage({ icon });
+}
