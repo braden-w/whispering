@@ -53,10 +53,14 @@ For using the Recording Button with Chat GPT, navigate to the Chat GPT web page.
 
 The Whispering Chrome extension is built using:
 
+## Built With
+
+The Whispering Chrome extension is built using:
+
+- [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
+- [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
+- [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework.
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/)
-- [React](https://reactjs.org/)
-- [Axios](https://github.com/axios/axios): For making HTTP requests to the Whisper API.
-- [webpack](https://webpack.js.org/): For bundling the extension's assets.
 
 ## Contributing
 
