@@ -1,9 +1,9 @@
 {
-	"name": "with-svelte",
-	"displayName": "With svelte",
-	"version": "0.0.0",
-	"description": "A basic Plasmo extension.",
-	"author": "lgvic",
+	"name": "whispering",
+	"displayName": "Transwhisper",
+	"version": "2.1.0",
+	"description": "Bring the power of Whisper transcriptions to ChatGPT and more!",
+	"author": "Braden Wong",
 	"packageManager": "pnpm@7.5.0",
 	"scripts": {
 		"dev": "plasmo dev",
