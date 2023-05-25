@@ -17,7 +17,7 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-chrome.runtime.onMessage.addListener(function (request: Request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request: Request) {
 	switch (request.action) {
 		case 'setIcon':
 			setIcon(request.icon);
