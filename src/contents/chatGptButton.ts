@@ -1,6 +1,9 @@
 import type { PlasmoContentScript } from 'plasmo';
 
-import { startRecording } from '~lib/recorder/mediaRecorder';
+import { writeText } from '~lib/apis/clipboard';
+import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
+import { getApiKey } from '~lib/stores/apiKey';
+import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
 console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
@@ -46,19 +49,41 @@ window.onload = function () {
 		const button = document.querySelector('#plasmo-button');
 		const svg = document.querySelector('#plasmo-icon');
 
+		let isRecording = false;
+
 		if (button) {
 			button.addEventListener('click', async () => {
-				await startRecording();
-				sendMessageToBackground({ action: 'setIcon', icon: 'octagonalSign' });
+				const apiKey = await getApiKey();
+				if (!apiKey) {
+					alert('Please set your API key in the extension options');
+					openOptionsPage();
+					return;
+				}
+				if (!isRecording) {
+					await startRecording();
+					sendMessageToBackground({ action: 'setIcon', icon: 'octagonalSign' });
 
-				svg.innerHTML = `
+					svg.innerHTML = `
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
 					/>
 				`;
+					isRecording = true;
+				} else {
+					const audioBlob = await stopRecording();
+					sendMessageToBackground({ action: 'setIcon', icon: 'arrowsCounterclockwise' });
+					const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+					writeText(text);
+					sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
+					isRecording = false;
+				}
 			});
 		}
 	}
 };
+
+function openOptionsPage() {
+	sendMessageToBackground({ action: 'openOptionsPage' });
+}
