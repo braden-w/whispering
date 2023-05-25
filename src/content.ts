@@ -16,17 +16,22 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 		return;
 	}
 
-	if (request.name === 'startRecording') {
-		await startRecording();
-		switchIcon('octagonalSign');
-	} else if (request.name === 'stopRecording') {
-		const audioBlob = await stopRecording();
-		switchIcon('arrowsCounterclockwise');
-		const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-		writeText(text);
-		switchIcon('studioMicrophone');
-		sendResponse({ text });
+	switch (request.name) {
+		case 'startRecording':
+			await startRecording();
+			switchIcon('octagonalSign');
+			break;
+
+		case 'stopRecording':
+			const audioBlob = await stopRecording();
+			switchIcon('arrowsCounterclockwise');
+			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+			writeText(text);
+			switchIcon('studioMicrophone');
+			sendResponse({ text });
+			break;
 	}
+
 	return true;
 });
 
