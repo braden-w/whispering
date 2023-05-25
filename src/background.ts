@@ -1,3 +1,4 @@
+import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 
@@ -20,17 +21,29 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
+chrome.runtime.onMessage.addListener(function (
+	request: { icon: 'studioMicrophone' | 'octagonalSign' | 'arrowsCounterclockwise' },
+	sender,
+	sendResponse
+) {
+	if (request.icon === 'studioMicrophone') {
+		chrome.action.setIcon({ path: studioMicrophone });
+	} else if (request.icon === 'octagonalSign') {
+		chrome.action.setIcon({ path: octagonalSign });
+	} else if (request.icon === 'arrowsCounterclockwise') {
+		chrome.action.setIcon({ path: arrowsCounterclockwise });
+	}
+});
+
 async function toggleRecording() {
 	let isRecording = await getIsBackgroundRecording();
 	console.log('🚀 ~ file: background.ts:19 ~ toggleRecording ~ isRecording:', isRecording);
 	if (!isRecording) {
 		const response = await sendActionToContentScript('startRecording');
-		chrome.action.setIcon({ path: octagonalSign });
 		await toggleIsBackgroundRecording();
 	} else {
 		const response = await sendActionToContentScript('stopRecording');
 		console.log('🚀 ~ file: background.ts:32 ~ toggleRecording ~ response:', response);
-		chrome.action.setIcon({ path: studioMicrophone });
 		await toggleIsBackgroundRecording();
 	}
 }
