@@ -80,4 +80,6 @@ The Whispering Chrome extension is released under the [MIT License](https://open
 
 ## Support and Feedback
 
-If you encounter issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/braden-w/whispering/issues). We appreciate your feedback and look forward to enhancing the Whispering Chrome
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/braden-w/whispering/issues). We appreciate your feedback!
+
+Thank you for using Whispering and happy writing!
