@@ -100,16 +100,10 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 function switchIcon(icon: Icon) {
 	sendMessageToBackground({ action: 'setIcon', icon });
 
-	const svg = document.querySelector('#whispering-microphone-svg');
-	if (!svg) return;
+	setSvgInnerHtmlToIcon(icon);
 
-	svg.innerHTML = iconToSvgInnerHtml[icon];
-
-	const button: HTMLButtonElement = document.querySelector('#whispering-microphone-button');
-	if (!button) return;
-
-	if (icon === 'arrowsCounterclockwise') button.disabled = true;
-	else button.disabled = false;
+	if (icon === 'arrowsCounterclockwise') setButtonIsDisabled(true);
+	else setButtonIsDisabled(false);
 }
 
 function openOptionsPage() {
@@ -121,4 +115,18 @@ function setChatgptTextareaContent(text) {
 	if (!textarea) return;
 
 	textarea.value = text;
+}
+
+function setSvgInnerHtmlToIcon(icon: Icon) {
+	const svg: SVGElement = document.querySelector('#whispering-microphone-svg');
+	if (!svg) return;
+
+	svg.innerHTML = iconToSvgInnerHtml[icon];
+}
+
+function setButtonIsDisabled(isDisabled: boolean) {
+	const button: HTMLButtonElement = document.querySelector('#whispering-microphone-button');
+	if (!button) return;
+
+	button.disabled = isDisabled;
 }
