@@ -3,7 +3,7 @@ import { writeText } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
-import { MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
+import { type MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	const apiKey = await getApiKey();
