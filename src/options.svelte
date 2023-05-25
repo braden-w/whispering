@@ -9,6 +9,8 @@
 
 	import { currentRoute } from './lib/stores/currentRoute';
 
+	currentRoute.set('/setup');
+
 	onMount(() => navigator.mediaDevices.getUserMedia({ audio: true }));
 </script>
 
