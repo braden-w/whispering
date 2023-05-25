@@ -1,4 +1,7 @@
-import { getIsRecording, toggleIsRecording } from "~lib/stores/isRecording"
+import {
+  getIsBackgroundRecording,
+  toggleIsBackgroundRecording
+} from "~lib/stores/isBackgroundRecording"
 
 export {}
 
@@ -15,17 +18,17 @@ chrome.commands.onCommand.addListener(async function (command) {
 })
 
 async function toggleRecording() {
-  let isRecording = await getIsRecording()
+  let isRecording = await getIsBackgroundRecording()
   console.log(
     "🚀 ~ file: background.ts:19 ~ toggleRecording ~ isRecording:",
     isRecording
   )
   if (!isRecording) {
     const response = await sendActionToContentScript("startRecording")
-    await toggleIsRecording()
+    await toggleIsBackgroundRecording()
   } else {
     const response = await sendActionToContentScript("stopRecording")
-    await toggleIsRecording()
+    await toggleIsBackgroundRecording()
   }
 }
 
