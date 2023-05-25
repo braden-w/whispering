@@ -13,3 +13,15 @@ export type Request =
 export function sendMessageToBackground(request: Request) {
 	chrome.runtime.sendMessage(request);
 }
+
+/** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
+export async function sendMessageToContentScript(actionName: 'startRecording' | 'stopRecording') {
+	const [tab] = await chrome.tabs.query({
+		active: true,
+		lastFocusedWindow: true
+	});
+	const response = await chrome.tabs.sendMessage(tab.id, {
+		name: actionName
+	});
+	return response;
+}
