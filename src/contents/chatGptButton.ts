@@ -3,7 +3,7 @@ import type { PlasmoContentScript } from 'plasmo';
 console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
 
 export const config: PlasmoContentScript = {
-	matches: ['https://chat.openai.com', 'https://chat.openai.com/*'],
+	matches: ['https://chat.openai.com/*'],
 	all_frames: true
 };
 
