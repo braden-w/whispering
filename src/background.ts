@@ -1,12 +1,4 @@
-import { sendToContentScript } from "@plasmohq/messaging"
-import { Storage } from "@plasmohq/storage/dist"
-
-import { writeText } from "~lib/apis/clipboard"
-import { startRecording, stopRecording } from "~lib/recorder/mediaRecorder"
-import { getApiKey } from "~lib/stores/apiKey"
-// import PleaseEnterAPIKeyToast from "~lib/toasts/PleaseEnterAPIKeyToast.svelte"
-// import SomethingWentWrongToast from "~lib/toasts/SomethingWentWrongToast.svelte"
-import { transcribeAudioWithWhisperApi } from "~lib/transcribeAudioWithWhisperApi"
+import { getIsRecording, toggleIsRecording } from "~lib/stores/isRecording"
 
 export {}
 
@@ -18,43 +10,22 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.commands.onCommand.addListener(async function (command) {
   if (command === "toggle-recording") {
-    const response = await sendActionToContentScript("startRecording")
-    console.log("🚀 ~ file: background.ts:22 ~ response:", response)
-    // toggleRecording()
+    await toggleRecording()
   }
 })
 
-let isRecording = false
-
 async function toggleRecording() {
-  const storage = new Storage()
-  const apiKey = await getApiKey()
-  // if (!apiKey) {
-  //   // toast.error(PleaseEnterAPIKeyToast)
-  //   return
-  // }
-
+  let isRecording = await getIsRecording()
+  console.log(
+    "🚀 ~ file: background.ts:19 ~ toggleRecording ~ isRecording:",
+    isRecording
+  )
   if (!isRecording) {
-    // sendToContentScript({
-    //   name: "startRecording",
-    //   body: { action: "startRecording" }
-    // })
-    // await sendActionToContentScript("startRecording")
-    isRecording = !isRecording
+    const response = await sendActionToContentScript("startRecording")
+    await toggleIsRecording()
   } else {
-    // sendToContentScript({
-    //   name: "stopRecording",
-    //   body: { action: "stopRecording" }
-    // })
-    // const { audioBlob } = await sendActionToContentScript("stopRecording")
-    // console.log(
-    //   "🚀 ~ file: background.ts:38 ~ toggleRecording ~ audioBlob:",
-    //   audioBlob
-    // )
-    // // const audioBlob = await stopRecording()
-    isRecording = !isRecording
-    // const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
-    // writeText(text)
+    const response = await sendActionToContentScript("stopRecording")
+    await toggleIsRecording()
   }
 }
 
