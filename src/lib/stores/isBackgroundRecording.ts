@@ -3,7 +3,7 @@ import { Storage } from "@plasmohq/storage/dist"
 const storage = new Storage()
 
 export async function getIsBackgroundRecording(): Promise<boolean> {
-  return await storage.get<boolean>("is-background-recording")
+  return !!(await storage.get<boolean | undefined>("is-background-recording"))
 }
 
 async function setIsBackgroundRecording(value: boolean) {
