@@ -69,6 +69,7 @@ window.onload = function () {
 				switchIcon('arrowsCounterclockwise');
 				const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
 				writeText(text);
+				setChatgptTextareaContent(text);
 				switchIcon('studioMicrophone');
 				isRecording = false;
 			}
@@ -108,4 +109,9 @@ function switchIcon(icon: Icon) {
 
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
+}
+
+function setChatgptTextareaContent(text) {
+	const textarea: HTMLTextAreaElement = document.querySelector('#prompt-textarea');
+	textarea.value = text;
 }
