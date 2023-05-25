@@ -15,7 +15,7 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-type Request =
+export type Request =
 	| {
 			action: 'setIcon';
 			icon: Icon;

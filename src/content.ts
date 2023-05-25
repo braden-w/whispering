@@ -1,3 +1,4 @@
+import type { Request } from '~background/index';
 import type { Icon } from '~background/setIcon';
 import { writeText } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
@@ -30,9 +31,13 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 });
 
 function switchIcon(icon: Icon) {
-	chrome.runtime.sendMessage({ action: 'setIcon', icon });
+	sendMessage({ action: 'setIcon', icon });
 }
 
 function openOptionsPage() {
-	chrome.runtime.sendMessage({ action: 'openOptionsPage' });
+	sendMessage({ action: 'openOptionsPage' });
+}
+
+function sendMessage(request: Request) {
+	chrome.runtime.sendMessage(request);
 }
