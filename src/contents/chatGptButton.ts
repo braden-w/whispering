@@ -48,32 +48,31 @@ window.onload = function () {
 		textarea.insertAdjacentHTML('afterend', buttonHTML);
 
 		const button = document.querySelector('#plasmo-button');
+		if (!button) return;
 
 		let isRecording = false;
 
-		if (button) {
-			button.addEventListener('click', async () => {
-				const apiKey = await getApiKey();
-				if (!apiKey) {
-					alert('Please set your API key in the extension options');
-					openOptionsPage();
-					return;
-				}
-				if (!isRecording) {
-					await startRecording();
-					switchIcon('octagonalSign');
+		button.addEventListener('click', async () => {
+			const apiKey = await getApiKey();
+			if (!apiKey) {
+				alert('Please set your API key in the extension options');
+				openOptionsPage();
+				return;
+			}
+			if (!isRecording) {
+				await startRecording();
+				switchIcon('octagonalSign');
 
-					isRecording = true;
-				} else {
-					const audioBlob = await stopRecording();
-					switchIcon('arrowsCounterclockwise');
-					const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-					writeText(text);
-					switchIcon('studioMicrophone');
-					isRecording = false;
-				}
-			});
-		}
+				isRecording = true;
+			} else {
+				const audioBlob = await stopRecording();
+				switchIcon('arrowsCounterclockwise');
+				const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+				writeText(text);
+				switchIcon('studioMicrophone');
+				isRecording = false;
+			}
+		});
 	}
 };
 
