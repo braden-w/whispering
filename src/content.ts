@@ -7,13 +7,20 @@ import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperAp
 export {};
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+	const apiKey = await getApiKey();
+	if (!apiKey) {
+		alert('Please set your API key in the extension options');
+		// Open the options page
+		openOptionsPage();
+		return;
+	}
+
 	if (request.name === 'startRecording') {
 		await startRecording();
 		switchIcon('octagonalSign');
 	} else if (request.name === 'stopRecording') {
 		const audioBlob = await stopRecording();
 		switchIcon('arrowsCounterclockwise');
-		const apiKey = await getApiKey();
 		const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
 		writeText(text);
 		switchIcon('studioMicrophone');
@@ -23,5 +30,9 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 });
 
 function switchIcon(icon: Icon) {
-	chrome.runtime.sendMessage({ icon });
+	chrome.runtime.sendMessage({ action: 'setIcon', icon });
+}
+
+function openOptionsPage() {
+	chrome.runtime.sendMessage({ action: 'openOptionsPage' });
 }
