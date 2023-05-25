@@ -1,4 +1,6 @@
 <script lang="ts">
+	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
+	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
 
@@ -26,10 +28,12 @@
 
 		if (!isRecording) {
 			await startRecording();
+			chrome.action.setIcon({ path: octagonalSign });
 			isRecording = !isRecording;
 		} else {
 			const audioBlob = await stopRecording();
 			audioSrc = URL.createObjectURL(audioBlob);
+			chrome.action.setIcon({ path: studioMicrophone });
 			isRecording = !isRecording;
 			toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
