@@ -7,17 +7,34 @@ import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
-console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
-
 export const config: PlasmoCSConfig = {
 	matches: ['https://chat.openai.com/*'],
 	all_frames: true
 };
 
+const observer = new MutationObserver((mutations) => {
+	mutations.forEach((mutation) => {
+		if (mutation.type === 'childList') {
+			injectButton();
+		}
+	});
+});
+
 window.onload = function () {
+	injectButton();
+
+	const config = { childList: true, subtree: true };
+	observer.observe(document.body, config); // adjust this to the element you want to observe
+};
+
+window.onunload = function () {
+	observer.disconnect();
+};
+
+function injectButton() {
 	const textarea = document.querySelector('#prompt-textarea');
 
-	if (textarea) {
+	if (textarea && !document.querySelector('#whispering-microphone-button')) {
 		// We use a div instead of a button because when using a button, clicking the microphone somehow triggers the chat input to submit
 		const buttonHTML = /*html*/ `
 <div
@@ -78,7 +95,7 @@ window.onload = function () {
 			}
 		});
 	}
-};
+}
 
 const iconToSvgInnerHtml: Record<Icon, string> = {
 	studioMicrophone: /*html*/ `
