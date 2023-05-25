@@ -5,8 +5,6 @@ import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
-export {};
-
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
 	const apiKey = await getApiKey();
 	if (!apiKey) {
