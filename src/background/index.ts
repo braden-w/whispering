@@ -15,6 +15,21 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-chrome.runtime.onMessage.addListener(function (request: { icon: Icon }, sender, sendResponse) {
-	setIcon(request.icon);
+type Request =
+	| {
+			action: 'setIcon';
+			icon: Icon;
+	  }
+	| {
+			action: 'openOptionsPage';
+	  };
+chrome.runtime.onMessage.addListener(function (request: Request, sender, sendResponse) {
+	switch (request.action) {
+		case 'setIcon':
+			setIcon(request.icon);
+			break;
+		case 'openOptionsPage':
+			chrome.runtime.openOptionsPage();
+			break;
+	}
 });
