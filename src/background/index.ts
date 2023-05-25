@@ -1,4 +1,4 @@
-import type { Request } from '~lib/utils/messaging';
+import type { MessageToBackgroundRequest } from '~lib/utils/messaging';
 
 import { setIcon } from './setIcon';
 import { toggleRecording } from './toggleRecording';
@@ -17,7 +17,7 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-chrome.runtime.onMessage.addListener(function (request: Request) {
+chrome.runtime.onMessage.addListener(function (request: MessageToBackgroundRequest) {
 	switch (request.action) {
 		case 'setIcon':
 			setIcon(request.icon);

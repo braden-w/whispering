@@ -1,6 +1,6 @@
 import type { Icon } from '~background/setIcon';
 
-export type Request =
+export type MessageToBackgroundRequest =
 	| {
 			action: 'setIcon';
 			icon: Icon;
@@ -10,18 +10,19 @@ export type Request =
 	  };
 
 /** Sends a message to the background script, captured in {@link ~background/index.ts}. */
-export function sendMessageToBackground(request: Request) {
+export function sendMessageToBackground(request: MessageToBackgroundRequest) {
 	chrome.runtime.sendMessage(request);
 }
 
+export type MessageToContentScriptRequest = {
+	name: 'startRecording' | 'stopRecording';
+};
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
-export async function sendMessageToContentScript(actionName: 'startRecording' | 'stopRecording') {
+export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
 	const [tab] = await chrome.tabs.query({
 		active: true,
 		lastFocusedWindow: true
 	});
-	const response = await chrome.tabs.sendMessage(tab.id, {
-		name: actionName
-	});
+	const response = await chrome.tabs.sendMessage(tab.id, message);
 	return response;
 }

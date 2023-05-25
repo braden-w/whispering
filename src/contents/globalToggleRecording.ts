@@ -3,9 +3,13 @@ import { writeText } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
-import { sendMessageToBackground } from '~lib/utils/messaging';
+import { MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (
+	request: MessageToContentScriptRequest,
+	sender,
+	sendResponse
+) {
 	const apiKey = await getApiKey();
 	if (!apiKey) {
 		alert('Please set your API key in the extension options');
