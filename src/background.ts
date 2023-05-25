@@ -16,12 +16,20 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
-let isRecording = false
-chrome.commands.onCommand.addListener(function (command) {
+chrome.commands.onCommand.addListener(async function (command) {
   if (command === "toggle-recording") {
-    toggleRecording()
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    })
+    const response = await chrome.tabs.sendMessage(tab.id, {
+      action: "toggleRecording"
+    })
+    // toggleRecording()
   }
 })
+
+let isRecording = false
 
 async function toggleRecording() {
   const storage = new Storage()
@@ -32,31 +40,38 @@ async function toggleRecording() {
   // }
 
   if (!isRecording) {
-    await sendActionToContentScript("startRecording")
+    // sendToContentScript({
+    //   name: "startRecording",
+    //   body: { action: "startRecording" }
+    // })
+    // await sendActionToContentScript("startRecording")
     isRecording = !isRecording
   } else {
-    const { audioBlob } = await sendActionToContentScript("stopRecording")
-    console.log(
-      "🚀 ~ file: background.ts:38 ~ toggleRecording ~ audioBlob:",
-      audioBlob
-    )
-    // const audioBlob = await stopRecording()
+    // sendToContentScript({
+    //   name: "stopRecording",
+    //   body: { action: "stopRecording" }
+    // })
+    // const { audioBlob } = await sendActionToContentScript("stopRecording")
+    // console.log(
+    //   "🚀 ~ file: background.ts:38 ~ toggleRecording ~ audioBlob:",
+    //   audioBlob
+    // )
+    // // const audioBlob = await stopRecording()
     isRecording = !isRecording
-    const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
-    writeText(text)
+    // const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
+    // writeText(text)
   }
 }
 
 async function sendActionToContentScript(
-  action: "startRecording" | "stopRecording"
+  actionName: "startRecording" | "stopRecording"
 ) {
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true
-  })
-  const response = await chrome.tabs.sendMessage(tab.id, {
-    action
-  })
+  // const [tab] = await chrome.tabs.query({
+  //   active: true,
+  //   lastFocusedWindow: true
+  // })
+  // const response = await sendToContentScript({ name: actionName })
+  const response = await chrome.runtime.sendMessage({ name: actionName })
   console.log("🚀 ~ file: background.ts:58 ~ response:", response)
   return response
 }
