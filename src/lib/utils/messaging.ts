@@ -10,8 +10,8 @@ export type MessageToBackgroundRequest =
 	  };
 
 /** Sends a message to the background script, captured in {@link ~background/index.ts}. */
-export function sendMessageToBackground(request: MessageToBackgroundRequest) {
-	chrome.runtime.sendMessage(request);
+export function sendMessageToBackground(message: MessageToBackgroundRequest) {
+	chrome.runtime.sendMessage(message);
 }
 
 export type MessageToContentScriptRequest = {

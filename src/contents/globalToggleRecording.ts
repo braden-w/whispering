@@ -6,7 +6,7 @@ import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperAp
 import { MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
 chrome.runtime.onMessage.addListener(async function (
-	request: MessageToContentScriptRequest,
+	message: MessageToContentScriptRequest,
 	sender,
 	sendResponse
 ) {
@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(async function (
 		return;
 	}
 
-	switch (request.name) {
+	switch (message.name) {
 		case 'startRecording':
 			await startRecording();
 			switchIcon('octagonalSign');

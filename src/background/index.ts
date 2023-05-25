@@ -17,10 +17,10 @@ chrome.commands.onCommand.addListener(async function (command) {
 	}
 });
 
-chrome.runtime.onMessage.addListener(function (request: MessageToBackgroundRequest) {
-	switch (request.action) {
+chrome.runtime.onMessage.addListener(function (message: MessageToBackgroundRequest) {
+	switch (message.action) {
 		case 'setIcon':
-			setIcon(request.icon);
+			setIcon(message.icon);
 			break;
 		case 'openOptionsPage':
 			chrome.runtime.openOptionsPage();
