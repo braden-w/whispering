@@ -1,8 +1,5 @@
-import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
-import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-
-import { toggleRecording } from './onCommand';
+import { setIcon } from './setIcon';
+import { toggleRecording } from './toggleRecording';
 
 export {};
 
@@ -23,11 +20,5 @@ chrome.runtime.onMessage.addListener(function (
 	sender,
 	sendResponse
 ) {
-	if (request.icon === 'studioMicrophone') {
-		chrome.action.setIcon({ path: studioMicrophone });
-	} else if (request.icon === 'octagonalSign') {
-		chrome.action.setIcon({ path: octagonalSign });
-	} else if (request.icon === 'arrowsCounterclockwise') {
-		chrome.action.setIcon({ path: arrowsCounterclockwise });
-	}
+	setIcon(request.icon);
 });
