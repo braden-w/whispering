@@ -4,7 +4,6 @@ import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 
 export {};
-console.log('🚀 ~ file: content.ts:7 ~ export');
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
 	if (request.name === 'startRecording') {
