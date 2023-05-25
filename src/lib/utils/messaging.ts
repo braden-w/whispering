@@ -23,6 +23,5 @@ export async function sendMessageToContentScript(message: MessageToContentScript
 		active: true,
 		lastFocusedWindow: true
 	});
-	const response = await chrome.tabs.sendMessage(tab.id, message);
-	return response;
+	chrome.tabs.sendMessage(tab.id, message);
 }

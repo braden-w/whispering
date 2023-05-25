@@ -5,11 +5,7 @@ import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
-chrome.runtime.onMessage.addListener(async function (
-	message: MessageToContentScriptRequest,
-	sender,
-	sendResponse
-) {
+chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	const apiKey = await getApiKey();
 	if (!apiKey) {
 		alert('Please set your API key in the extension options');
@@ -29,11 +25,8 @@ chrome.runtime.onMessage.addListener(async function (
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
 			writeText(text);
 			switchIcon('studioMicrophone');
-			sendResponse({ text });
 			break;
 	}
-
-	return true;
 });
 
 function switchIcon(icon: Icon) {
