@@ -18,13 +18,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.commands.onCommand.addListener(async function (command) {
   if (command === "toggle-recording") {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    })
-    const response = await chrome.tabs.sendMessage(tab.id, {
-      action: "toggleRecording"
-    })
+    const response = await sendActionToContentScript("startRecording")
+    console.log("🚀 ~ file: background.ts:22 ~ response:", response)
     // toggleRecording()
   }
 })
@@ -66,12 +61,12 @@ async function toggleRecording() {
 async function sendActionToContentScript(
   actionName: "startRecording" | "stopRecording"
 ) {
-  // const [tab] = await chrome.tabs.query({
-  //   active: true,
-  //   lastFocusedWindow: true
-  // })
-  // const response = await sendToContentScript({ name: actionName })
-  const response = await chrome.runtime.sendMessage({ name: actionName })
-  console.log("🚀 ~ file: background.ts:58 ~ response:", response)
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    lastFocusedWindow: true
+  })
+  const response = await chrome.tabs.sendMessage(tab.id, {
+    name: actionName
+  })
   return response
 }
