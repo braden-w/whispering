@@ -1,8 +1,11 @@
 /**
- * Writes text to the user's clipboard.
+ * Writes text to the user's clipboard without removing focus from the current input element.
  * @param text The text to write to the clipboard.
  */
 export function writeText(text: string) {
+	// Store the currently focused element
+	const previousFocus = document.activeElement as HTMLElement;
+
 	// Create a temporary textarea element
 	const textarea = document.createElement('textarea');
 
@@ -30,5 +33,10 @@ export function writeText(text: string) {
 	} finally {
 		// Clean up by removing the temporary textarea
 		document.body.removeChild(textarea);
+
+		// Restore focus to the previously focused element
+		if (previousFocus && typeof previousFocus.focus === 'function') {
+			previousFocus.focus();
+		}
 	}
 }
