@@ -19,9 +19,9 @@ chrome.runtime.onMessage.addListener(async function (
   } else if (request.name === "stopRecording") {
     console.log("🚀 ~ file: content.ts:18 ~ stopRecording:")
     const audioBlob = await stopRecording()
-    // const apiKey = await getApiKey()
-    // const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
-    // writeText(text)
+    const apiKey = await getApiKey()
+    const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey)
+    writeText(text)
     sendResponse({ audioBlob })
   }
 })

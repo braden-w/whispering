@@ -1,3 +1,6 @@
+import octagonalSign from "data-base64:~assets/octagonal_sign.png"
+import studioMicrophone from "data-base64:~assets/studio_microphone.png"
+
 import {
   getIsBackgroundRecording,
   toggleIsBackgroundRecording
@@ -25,9 +28,15 @@ async function toggleRecording() {
   )
   if (!isRecording) {
     const response = await sendActionToContentScript("startRecording")
+    chrome.action.setIcon({ path: octagonalSign })
     await toggleIsBackgroundRecording()
   } else {
     const response = await sendActionToContentScript("stopRecording")
+    console.log(
+      "🚀 ~ file: background.ts:32 ~ toggleRecording ~ response:",
+      response
+    )
+    chrome.action.setIcon({ path: studioMicrophone })
     await toggleIsBackgroundRecording()
   }
 }

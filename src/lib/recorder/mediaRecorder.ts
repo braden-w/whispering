@@ -4,8 +4,6 @@
  *
  * For the main implementation, see {@link ./recordRtcRecorder.ts}.
  */
-import octagonalSign from "data-base64:~assets/octagonal_sign.png"
-import studioMicrophone from "data-base64:~assets/studio_microphone.png"
 
 let mediaRecorder: MediaRecorder | null = null
 let recordedChunks: Blob[] = []
@@ -17,7 +15,6 @@ export async function startRecording(): Promise<void> {
     recordedChunks.push(event.data)
   })
   mediaRecorder.start()
-  chrome.action.setIcon({ path: octagonalSign })
 }
 
 export async function stopRecording(): Promise<Blob> {
@@ -29,7 +26,6 @@ export async function stopRecording(): Promise<Blob> {
       resolve(audioBlob)
     })
     mediaRecorder.stop()
-    chrome.action.setIcon({ path: studioMicrophone })
   })
 }
 
