@@ -1,4 +1,4 @@
-import type { PlasmoContentScript } from 'plasmo';
+import type { PlasmoCSConfig } from 'plasmo';
 
 import type { Icon } from '~background/setIcon';
 import { writeText } from '~lib/apis/clipboard';
@@ -9,7 +9,7 @@ import { sendMessageToBackground } from '~lib/utils/messaging';
 
 console.log('🚀 ~ file: chatGptButton.ts:2 ~ PlasmoContentScript:');
 
-export const config: PlasmoContentScript = {
+export const config: PlasmoCSConfig = {
 	matches: ['https://chat.openai.com/*'],
 	all_frames: true
 };
