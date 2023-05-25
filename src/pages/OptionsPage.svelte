@@ -22,7 +22,7 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
-	<h2 class="text-2xl text-gray-500">and accept microphone permission request</h2>
+	<h2 class="text-lg font-light text-gray-500">and grant microphone permission request</h2>
 	<form on:submit|preventDefault={submitApiKey}>
 		<div class="flex items-center space-x-2">
 			<input
