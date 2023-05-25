@@ -102,8 +102,10 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 
 function switchIcon(icon: Icon) {
 	sendMessageToBackground({ action: 'setIcon', icon });
+
 	const svg = document.querySelector('#plasmo-icon');
 	if (!svg) return;
+
 	svg.innerHTML = iconToSvgInnerHtml[icon];
 }
 
@@ -113,5 +115,7 @@ function openOptionsPage() {
 
 function setChatgptTextareaContent(text) {
 	const textarea: HTMLTextAreaElement = document.querySelector('#prompt-textarea');
+	if (textarea) return;
+
 	textarea.value = text;
 }
