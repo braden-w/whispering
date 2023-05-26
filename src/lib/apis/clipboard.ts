@@ -31,23 +31,58 @@ export function writeTextToClipboard(text: string) {
 }
 
 /**
- * Pastes the contents of the clipboard to the current input element.
+ * Insert the provided text at the cursor position in the currently active input element or append it
+ * to the non-input active element.
+ *
+ * @param text - The text to be inserted.
  */
-export function writeToCursor(text: string) {
-	const inputElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement;
+export function writeToCursor(text: string): void {
+	const activeElement = document.activeElement;
 
-	if (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA') {
-		const startPos = inputElement.selectionStart;
-		const endPos = inputElement.selectionEnd;
-		const inputValue = inputElement.value;
+	if (!activeElement) return;
 
-		inputElement.value =
-			inputValue.substring(0, startPos) + text + inputValue.substring(endPos, inputValue.length);
-
-		// Set the cursor position after the inserted text
-		inputElement.setSelectionRange(startPos + text.length, startPos + text.length);
+	if (isInputElement(activeElement)) {
+		handleInputElement(activeElement, text);
 	} else {
-		// For non-input elements, simply append the text
-		inputElement.innerHTML += text;
+		handleNonInputElement(activeElement, text);
 	}
+}
+
+/**
+ * Check if the given element is an input or textarea element.
+ *
+ * @param element - The HTML element to check.
+ * @returns True if the element is an input or textarea element, false otherwise.
+ */
+function isInputElement(element: Element): element is HTMLInputElement | HTMLTextAreaElement {
+	return element.tagName === 'INPUT' || element.tagName === 'TEXTAREA';
+}
+
+/**
+ * Handle the insertion of text for input and textarea elements.
+ *
+ * @param inputElement - The input element.
+ * @param text - The text to be inserted.
+ */
+function handleInputElement(
+	inputElement: HTMLInputElement | HTMLTextAreaElement,
+	text: string
+): void {
+	const startPos = inputElement.selectionStart ?? 0;
+	const endPos = inputElement.selectionEnd ?? 0;
+	const inputValue = inputElement.value;
+
+	inputElement.value = `${inputValue.slice(0, startPos)}${text}${inputValue.slice(endPos)}`;
+
+	inputElement.setSelectionRange(startPos + text.length, startPos + text.length);
+}
+
+/**
+ * Handle the appending of text for non-input and non-textarea elements.
+ *
+ * @param element - The non-input element.
+ * @param text - The text to be appended.
+ */
+function handleNonInputElement(element: Element, text: string): void {
+	element.innerHTML += text;
 }
