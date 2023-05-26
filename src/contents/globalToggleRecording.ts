@@ -1,9 +1,5 @@
 import type { Icon } from '~background/setIcon';
-import {
-	pasteFromClipboard,
-	writeTextToClipboard,
-	writeToCursor as writeTextToCursor
-} from '~lib/apis/clipboard';
+import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';

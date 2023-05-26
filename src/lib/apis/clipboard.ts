@@ -66,7 +66,7 @@ function restorePreviousFocus(element: HTMLElement | null): void {
  *
  * @param text - The text to be inserted.
  */
-export function writeToCursor(text: string): void {
+export function writeTextToCursor(text: string): void {
 	const activeElement = document.activeElement;
 
 	if (!activeElement) return;
