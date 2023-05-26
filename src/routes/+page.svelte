@@ -130,7 +130,9 @@
 				</svg>
 			</button>
 		</div>
-		<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+		{#if audioSrc}
+			<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+		{/if}
 	</div>
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
