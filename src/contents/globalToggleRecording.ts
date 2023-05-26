@@ -20,11 +20,16 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 			break;
 
 		case 'stopRecording':
-			const audioBlob = await stopRecording();
-			switchIcon('arrowsCounterclockwise');
-			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-			writeTextToClipboard(text);
-			switchIcon('studioMicrophone');
+			try {
+				const audioBlob = await stopRecording();
+				switchIcon('arrowsCounterclockwise');
+				const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+				writeTextToClipboard(text);
+			} catch (error) {
+				console.error('Error occurred during transcription:', error);
+			} finally {
+				switchIcon('studioMicrophone');
+			}
 			break;
 	}
 });
