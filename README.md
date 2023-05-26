@@ -72,7 +72,7 @@ The Whispering Chrome extension is built using:
 - [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
 - [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
 - [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework.
-- [Chrome API](https://developer.chrome.com/docs/extensions/reference/)
+- [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
 
 ## Contributing
 
