@@ -1,8 +1,8 @@
 {
 	"name": "whispering",
-	"displayName": "Transwhisper",
+	"displayName": "Whispering",
 	"version": "2.1.0",
-	"description": "Bring the power of Whisper transcriptions to ChatGPT and more!",
+	"description": "Seamlessly integrate voice-to-text transcriptons on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
 	"author": "Braden Wong",
 	"packageManager": "pnpm@7.5.0",
 	"scripts": {
