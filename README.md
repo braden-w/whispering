@@ -23,9 +23,24 @@ Whispering Chrome extension offers two key functionalities:
 
 ## Installation
 
+<!--
 To install the Whispering Chrome extension, click the badge below:
 
 [![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/whispering-chrome-extensi/your-extension-id)
+-->
+
+To install the Whispering Chrome extension, follow these steps:
+
+1. Visit the [GitHub release page](https://github.com/braden-w/whispering-extension/releases) and download the latest `Whispering_Extension_vX.Y.Z.zip` file.
+2. Extract the contents of the .zip file to a preferred location on your computer where you'd like to store the extension files.
+3. Open Google Chrome and navigate to the Extensions page by clicking on the three-dot menu in the top right corner, then select "More tools" > "Extensions" or enter `chrome://extensions/` in the address bar.
+4. On the Extensions page, enable the "Developer mode" toggle located in the top right corner.
+5. Click the "Load unpacked" button that appears after enabling Developer mode.
+6. In the file explorer dialog that opens, find and select the folder where you extracted the contents of the .zip file.
+7. Click "Open" or "Select Folder" (depending on your operating system), and the Whispering Extension will be installed in your browser.
+
+After completing these steps, you should see the Whispering Extension icon in your browser's toolbar, and you're ready to enjoy the voice-to-text functionality across any website.
+
 
 ## Getting Started with Development
 
