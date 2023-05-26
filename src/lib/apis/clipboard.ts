@@ -29,3 +29,25 @@ export function writeTextToClipboard(text: string) {
 		}
 	}
 }
+
+/**
+ * Pastes the contents of the clipboard to the current input element.
+ */
+export function writeToCursor(text: string) {
+	const inputElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement;
+
+	if (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA') {
+		const startPos = inputElement.selectionStart;
+		const endPos = inputElement.selectionEnd;
+		const inputValue = inputElement.value;
+
+		inputElement.value =
+			inputValue.substring(0, startPos) + text + inputValue.substring(endPos, inputValue.length);
+
+		// Set the cursor position after the inserted text
+		inputElement.setSelectionRange(startPos + text.length, startPos + text.length);
+	} else {
+		// For non-input elements, simply append the text
+		inputElement.innerHTML += text;
+	}
+}

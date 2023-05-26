@@ -1,5 +1,9 @@
 import type { Icon } from '~background/setIcon';
-import { writeTextToClipboard } from '~lib/apis/clipboard';
+import {
+	pasteFromClipboard,
+	writeTextToClipboard,
+	writeToCursor as writeTextToCursor
+} from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { getApiKey } from '~lib/stores/apiKey';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
@@ -25,6 +29,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 				switchIcon('arrowsCounterclockwise');
 				const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
 				writeTextToClipboard(text);
+				writeTextToCursor(text);
 			} catch (error) {
 				console.error('Error occurred during transcription:', error);
 			} finally {
