@@ -41,7 +41,6 @@ To install the Whispering Chrome extension, follow these steps:
 
 After completing these steps, you should see the Whispering Extension icon in your browser's toolbar, and you're ready to enjoy the voice-to-text functionality across any website.
 
-
 ## Getting Started with Development
 
 This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
@@ -65,10 +64,6 @@ This should create a production bundle for your extension, ready to be zipped an
 Once installed, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' button to record your voice, and then 'Stop Recording' when you're done. Your transcription will appear in the text box below.
 
 For using the Recording Button with Chat GPT, navigate to the Chat GPT web page. You'll see a new recording button in the chat interface. Click this button to start and stop recording, and the transcribed text will be automatically inserted into the chat input field.
-
-## Built With
-
-The Whispering Chrome extension is built using:
 
 ## Built With
 
