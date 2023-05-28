@@ -12,7 +12,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.commands.onCommand.addListener(async function (command) {
 	if (command === 'toggle-recording') {
-		sendMessageToContentScript({ name: 'toggle-recording' });
+		sendMessageToContentScript({ command: 'toggle-recording' });
 	}
 });
 

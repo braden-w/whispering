@@ -10,7 +10,7 @@ import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperAp
 import { type MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
-	if (message.name !== 'toggle-recording') return;
+	if (message.command !== 'toggle-recording') return;
 
 	const apiKey = await getApiKey();
 	if (!apiKey) {
