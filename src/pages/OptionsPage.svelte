@@ -49,13 +49,6 @@
 				</svg>
 			</button>
 		</div>
-		<label class="inline-flex items-center">
-			<input
-				type="checkbox"
-				class="form-checkbox text-indigo-600"
-				bind:checked={$options.copyToClipboard} />
-			<span class="ml-2 text-gray-700">Copy text to clipboard on successful transcription</span>
-		</label>
 	</form>
 	<p class="text-xs text-gray-600">
 		You can find your OpenAI API key in your
@@ -67,4 +60,10 @@
 			User Settings.
 		</a>
 	</p>
+	<div class="px-4 py-2 rounded-md shadow-md">
+		<label class="inline-flex items-center">
+			<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
+			<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
+		</label>
+	</div>
 </div>
