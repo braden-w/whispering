@@ -15,13 +15,13 @@ export const config: PlasmoCSConfig = {
 const observer = new MutationObserver((mutations) => {
 	mutations.forEach((mutation) => {
 		if (mutation.type === 'childList') {
-			injectButton();
+			injectMicrophoneButtonIntoTextarea();
 		}
 	});
 });
 
 window.onload = function () {
-	injectButton();
+	injectMicrophoneButtonIntoTextarea();
 
 	const config = { childList: true, subtree: true };
 	observer.observe(document.body, config); // adjust this to the element you want to observe
@@ -31,7 +31,7 @@ window.onunload = function () {
 	observer.disconnect();
 };
 
-function injectButton() {
+function injectMicrophoneButtonIntoTextarea() {
 	const textarea = document.querySelector('#prompt-textarea');
 
 	if (textarea && !document.querySelector('#whispering-microphone-button')) {
