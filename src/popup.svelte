@@ -9,7 +9,7 @@
 	import { currentRoute } from './lib/stores/currentRoute';
 </script>
 
-<div class="w-96 h-[28rem]">
+<div class="h-[28rem] w-96">
 	{#if $currentRoute === '/'}
 		<IndexPage />
 	{:else if $currentRoute === '/setup'}

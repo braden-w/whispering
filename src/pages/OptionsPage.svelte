@@ -71,7 +71,7 @@
 			viewBox="0 0 24 24"
 			stroke-width="1.5"
 			stroke="currentColor"
-			class="w-6 h-6">
+			class="h-6 w-6">
 			<path
 				stroke-linecap="round"
 				stroke-linejoin="round"
@@ -81,7 +81,7 @@
 	</button>
 
 	{#if showOptions}
-		<div class="px-4 flex flex-col space-y-2">
+		<div class="flex flex-col space-y-2 px-4">
 			<label class="inline-flex items-center">
 				<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
 				<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
