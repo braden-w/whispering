@@ -1,50 +1,13 @@
 import type { Icon } from '~background/setIcon';
-import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
-import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-import { getApiKey } from '~lib/stores/apiKey';
-import {
-	getIsBackgroundRecording,
-	toggleIsBackgroundRecording
-} from '~lib/stores/isBackgroundRecording';
-import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
+import { writeTextToCursor } from '~lib/apis/clipboard';
 import { type MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
 
+import { toggleRecording } from './toggleRecording';
+
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
-	if (message.command === 'toggle-recording') await toggleRecording();
+	if (message.command === 'toggle-recording')
+		await toggleRecording({
+			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setIcon', icon }),
+			onSuccess: (text: string) => writeTextToCursor(text)
+		});
 });
-
-async function toggleRecording() {
-	const apiKey = await getApiKey();
-	if (!apiKey) {
-		alert('Please set your API key in the extension options');
-		openOptionsPage();
-		return;
-	}
-
-	let isRecording = await getIsBackgroundRecording();
-	if (!isRecording) {
-		await startRecording();
-		switchIcon('octagonalSign');
-	} else {
-		try {
-			const audioBlob = await stopRecording();
-			switchIcon('arrowsCounterclockwise');
-			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
-			writeTextToClipboard(text);
-			writeTextToCursor(text);
-		} catch (error) {
-			console.error('Error occurred during transcription:', error);
-		} finally {
-			switchIcon('studioMicrophone');
-		}
-	}
-	await toggleIsBackgroundRecording();
-}
-
-function switchIcon(icon: Icon) {
-	sendMessageToBackground({ action: 'setIcon', icon });
-}
-
-function openOptionsPage() {
-	sendMessageToBackground({ action: 'openOptionsPage' });
-}

@@ -2,10 +2,9 @@ import type { PlasmoCSConfig } from 'plasmo';
 
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
-import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-import { getApiKey } from '~lib/stores/apiKey';
-import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
+
+import { toggleRecording } from './toggleRecording';
 
 export const config: PlasmoCSConfig = {
 	matches: ['https://chat.openai.com/*'],
@@ -68,31 +67,13 @@ function injectMicrophoneButtonIntoTextarea() {
 		let isRecording = false;
 
 		button.addEventListener('click', async () => {
-			const apiKey = await getApiKey();
-			if (!apiKey) {
-				alert('Please set your API key in the extension options');
-				openOptionsPage();
-				return;
-			}
-			if (!isRecording) {
-				await startRecording();
-				switchIcon('octagonalSign');
-
-				isRecording = true;
-			} else {
-				try {
-					const audioBlob = await stopRecording();
-					switchIcon('arrowsCounterclockwise');
-					const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+			toggleRecording({
+				onSuccess: (text) => {
 					writeTextToClipboard(text);
 					setChatgptTextareaContent(text);
-				} catch (error) {
-					console.error('Error occurred during transcription:', error);
-				} finally {
-					switchIcon('studioMicrophone');
-					isRecording = false;
-				}
-			}
+				},
+				switchIcon
+			});
 		});
 	}
 }
@@ -127,10 +108,6 @@ function switchIcon(icon: Icon) {
 
 	if (icon === 'arrowsCounterclockwise') setButtonIsDisabled(true);
 	else setButtonIsDisabled(false);
-}
-
-function openOptionsPage() {
-	sendMessageToBackground({ action: 'openOptionsPage' });
 }
 
 function setChatgptTextareaContent(text) {
