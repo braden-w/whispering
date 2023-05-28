@@ -105,6 +105,9 @@ function handleInputElement(
 	inputElement.value = `${inputValue.slice(0, startPos)}${text}${inputValue.slice(endPos)}`;
 
 	inputElement.setSelectionRange(startPos + text.length, startPos + text.length);
+
+	const event = new Event('input', { bubbles: true });
+	inputElement.dispatchEvent(event);
 }
 
 /**
