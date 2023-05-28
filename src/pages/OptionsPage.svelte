@@ -6,6 +6,7 @@
 	import { options } from '~lib/stores/options';
 
 	let apiKeyInput: HTMLInputElement;
+	let showOptions: boolean;
 
 	async function submitApiKey() {
 		if (!$apiKey) {
@@ -51,19 +52,40 @@
 		</div>
 	</form>
 	<p class="text-xs text-gray-600">
-		You can find your OpenAI API key in your
+		You can find your OpenAI API key
 		<a
 			href="https://beta.openai.com/account/api-keys"
 			target="_blank"
 			rel="noopener noreferrer"
 			class="text-gray-600 underline hover:text-indigo-900">
-			User Settings.
+			here.
 		</a>
 	</p>
-	<div class="px-4 py-2 rounded-md shadow-md">
-		<label class="inline-flex items-center">
-			<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
-			<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
-		</label>
-	</div>
+
+	<button
+		on:click={() => (showOptions = !showOptions)}
+		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="1.5"
+			stroke="currentColor"
+			class="w-6 h-6">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+		</svg>
+		<span>Settings</span>
+	</button>
+
+	{#if showOptions}
+		<div class="px-4 py-3 rounded-md shadow-md">
+			<label class="inline-flex items-center">
+				<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
+				<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
+			</label>
+		</div>
+	{/if}
 </div>
