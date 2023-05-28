@@ -49,12 +49,12 @@
 				</svg>
 			</button>
 		</div>
-		<label class="inline-flex items-center ml-4">
+		<label class="inline-flex items-center">
 			<input
 				type="checkbox"
 				class="form-checkbox text-indigo-600"
 				bind:checked={$options.copyToClipboard} />
-			<span class="ml-2 text-gray-700">Copy text to clipboard on success</span>
+			<span class="ml-2 text-gray-700">Copy text to clipboard on successful transcription</span>
 		</label>
 	</form>
 	<p class="text-xs text-gray-600">
