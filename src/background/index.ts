@@ -1,7 +1,7 @@
-import type { MessageToBackgroundRequest } from '~lib/utils/messaging';
+import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
+import { type MessageToBackgroundRequest, sendMessageToContentScript } from '~lib/utils/messaging';
 
 import { setIcon } from './setIcon';
-import { toggleRecording } from './toggleRecording';
 
 export {};
 
@@ -13,7 +13,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.commands.onCommand.addListener(async function (command) {
 	if (command === 'toggle-recording') {
-		await toggleRecording();
+		sendMessageToContentScript({ command: 'toggle-recording' });
 	}
 });
 
