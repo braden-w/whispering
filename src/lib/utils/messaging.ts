@@ -15,7 +15,7 @@ export function sendMessageToBackground(message: MessageToBackgroundRequest) {
 }
 
 export type MessageToContentScriptRequest = {
-	name: 'startRecording' | 'stopRecording';
+	name: 'toggle-recording';
 };
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
 export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
