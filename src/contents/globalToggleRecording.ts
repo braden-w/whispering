@@ -10,7 +10,7 @@ import { toggleRecording } from './toggleRecording';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
-	exclude_matches: ['https://chat.openai.com/*'],
+	exclude_matches: ['https://chat.openai.com/*']
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
