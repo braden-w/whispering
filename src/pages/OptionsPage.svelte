@@ -1,9 +1,12 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
 
 	import { apiKey } from '~lib/stores/apiKey';
+	import { options } from '~lib/stores/options';
 
-	let inputApiKey: string = $apiKey;
+	let inputApiKey: string;
+	let apiKeyInput: HTMLInputElement;
 
 	async function submitApiKey() {
 		if (!inputApiKey) {
@@ -15,6 +18,10 @@
 			setTimeout(() => window.close(), 300);
 		}
 	}
+	onMount(() => {
+		inputApiKey = $apiKey;
+		apiKeyInput.focus();
+	});
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
@@ -26,6 +33,7 @@
 				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				placeholder="API Key"
 				bind:value={inputApiKey}
+				bind:this={apiKeyInput}
 				type="text"
 				autocomplete="off"
 				required />
@@ -46,6 +54,13 @@
 				</svg>
 			</button>
 		</div>
+		<label class="inline-flex items-center ml-4">
+			<input
+				type="checkbox"
+				class="form-checkbox text-indigo-600"
+				bind:checked={$options.copyToClipboard} />
+			<span class="ml-2 text-gray-700">Copy text to clipboard on success</span>
+		</label>
 	</form>
 	<p class="text-xs text-gray-600">
 		You can find your OpenAI API key in your
