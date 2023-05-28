@@ -100,11 +100,12 @@ function handleInputElement(
 ): void {
 	const startPos = inputElement.selectionStart ?? 0;
 	const endPos = inputElement.selectionEnd ?? 0;
-	const inputValue = inputElement.value;
 
-	inputElement.value = `${inputValue.slice(0, startPos)}${text}${inputValue.slice(endPos)}`;
+	inputElement.focus();
+	inputElement.setSelectionRange(startPos, endPos);
 
-	inputElement.setSelectionRange(startPos + text.length, startPos + text.length);
+	// Use document.execCommand to insert the text, so it gets added to the undo stack
+	document.execCommand('insertText', false, text);
 
 	const event = new Event('input', { bubbles: true });
 	inputElement.dispatchEvent(event);
