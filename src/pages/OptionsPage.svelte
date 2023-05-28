@@ -81,7 +81,7 @@
 	</button>
 
 	{#if showOptions}
-		<div class="px-4 py-3 rounded-md shadow-md">
+		<div class="px-4 flex flex-col space-y-2">
 			<label class="inline-flex items-center">
 				<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
 				<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
