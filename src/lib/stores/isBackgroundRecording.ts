@@ -1,16 +1,32 @@
+import { get, writable } from 'svelte/store';
+
 import { Storage } from '@plasmohq/storage/dist';
 
-const storage = new Storage();
+export const isBackgroundRecording = createIsBackgroundRecordingStore();
 
-export async function getIsBackgroundRecording(): Promise<boolean> {
-	return !!(await storage.get<boolean | undefined>('is-background-recording'));
-}
+function createIsBackgroundRecordingStore() {
+	const storage = new Storage();
 
-async function setIsBackgroundRecording(value: boolean) {
-	return await storage.set('is-background-recording', value);
-}
+	const isBackgroundRecordingStore = writable(false);
+	const { subscribe, set, update } = isBackgroundRecordingStore;
+	storage.get<boolean | undefined>('is-background-recording').then((isRecording) => {
+		set(!!isRecording);
+	});
 
-export async function toggleIsBackgroundRecording() {
-	const isRecording = await getIsBackgroundRecording();
-	await storage.set('is-background-recording', !isRecording);
+	async function setIsBackgroundRecording(value: boolean) {
+		await storage.set('is-background-recording', value);
+		set(value);
+	}
+
+	async function toggleIsBackgroundRecording() {
+		const isRecording = get(isBackgroundRecording);
+		await setIsBackgroundRecording(!isRecording);
+	}
+
+	return {
+		subscribe,
+		set: setIsBackgroundRecording,
+		toggle: toggleIsBackgroundRecording,
+		update
+	};
 }

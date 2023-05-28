@@ -1,13 +1,12 @@
 <script lang="ts">
 	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
 	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
 
 	import Anchor from '~lib/Anchor.svelte';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-	import { getApiKey } from '~lib/stores/apiKey';
+	import { apiKey } from '~lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
 	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
@@ -20,8 +19,7 @@
 	let audioSrc: string;
 
 	async function toggleRecording() {
-		const apiKey = await getApiKey();
-		if (!apiKey) {
+		if (!$apiKey) {
 			toast.error(PleaseEnterAPIKeyToast);
 			return;
 		}
@@ -44,8 +42,7 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
-		const apiKey = await getApiKey();
-		const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
 		writeTextToClipboard(text);
 		outputText = text;
 	}
