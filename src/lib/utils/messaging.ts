@@ -16,7 +16,7 @@ export function sendMessageToBackground(message: MessageToBackgroundRequest) {
 
 export type MessageToContentScriptRequest = {
 	command: 'toggle-recording';
-};
+} | {command: 'switch-chatgpt-icon'; icon: Icon}
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
 export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
 	const [tab] = await chrome.tabs.query({

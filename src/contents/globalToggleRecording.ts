@@ -3,9 +3,15 @@ import { get } from 'svelte/store';
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
 import { options } from '~lib/stores/options';
-import { type MessageToContentScriptRequest, sendMessageToBackground } from '~lib/utils/messaging';
+import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
 
+import type { PlasmoCSConfig } from 'plasmo';
 import { toggleRecording } from './toggleRecording';
+
+export const config: PlasmoCSConfig = {
+	matches: ['<all_urls>'],
+	exclude_matches: ['https://chat.openai.com/*'],
+};
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	if (message.command === 'toggle-recording')

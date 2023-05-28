@@ -2,16 +2,29 @@ import type { PlasmoCSConfig } from 'plasmo';
 import { get } from 'svelte/store';
 
 import type { Icon } from '~background/setIcon';
-import { writeTextToClipboard } from '~lib/apis/clipboard';
+import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
 import { options } from '~lib/stores/options';
-import { sendMessageToBackground } from '~lib/utils/messaging';
+import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
 
 import { toggleRecording } from './toggleRecording';
 
 export const config: PlasmoCSConfig = {
-	matches: ['https://chat.openai.com/*'],
-	all_frames: true
+	matches: ['https://chat.openai.com/*']
 };
+
+chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
+	if (message.command === 'toggle-recording')
+		await toggleRecording({
+			switchIcon: (icon) => {
+				sendMessageToBackground({ action: 'setIcon', icon });
+				switchMicrophoneIcon(icon);
+			},
+			onSuccess: (text: string) => {
+				if (get(options).copyToClipboard) writeTextToClipboard(text);
+				writeTextToCursor(text);
+			}
+		});
+});
 
 const observer = new MutationObserver((mutations) => {
 	mutations.forEach((mutation) => {
@@ -74,7 +87,10 @@ function injectMicrophoneButtonIntoTextarea() {
 					if (get(options).copyToClipboard) writeTextToClipboard(text);
 					setChatgptTextareaContent(text);
 				},
-				switchIcon
+				switchIcon: (icon) => {
+					sendMessageToBackground({ action: 'setIcon', icon });
+					switchMicrophoneIcon(icon);
+				}
 			});
 		});
 	}
@@ -103,7 +119,7 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 	`
 };
 
-function switchIcon(icon: Icon) {
+function switchMicrophoneIcon(icon: Icon) {
 	sendMessageToBackground({ action: 'setIcon', icon });
 
 	setSvgInnerHtmlToIcon(icon);
