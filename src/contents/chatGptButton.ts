@@ -79,8 +79,6 @@ function injectMicrophoneButtonIntoTextarea() {
 		const button = document.querySelector('#whispering-microphone-button');
 		if (!button) return;
 
-		let isRecording = false;
-
 		button.addEventListener('click', async () => {
 			toggleRecording({
 				onSuccess: (text) => {
