@@ -1,18 +1,15 @@
 <script lang="ts">
 	import toast from 'svelte-french-toast/dist/core/toast';
 
-	import Anchor from '~lib/Anchor.svelte';
-	import { getApiKey, setApiKey } from '~lib/stores/apiKey';
-	import { goto } from '~lib/stores/currentRoute';
+	import { apiKey } from '~lib/stores/apiKey';
 
-	let inputApiKey: string;
-	getApiKey().then((key) => (inputApiKey = key));
+	let inputApiKey: string = $apiKey;
 
 	async function submitApiKey() {
 		if (!inputApiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			await setApiKey(inputApiKey);
+			$apiKey = inputApiKey;
 			toast.success('API key set!');
 			// Close the window after 1 second
 			setTimeout(() => window.close(), 300);

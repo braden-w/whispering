@@ -1,6 +1,8 @@
+import { get } from 'svelte/store';
+
 import type { Icon } from '~background/setIcon';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-import { getApiKey } from '~lib/stores/apiKey';
+import { apiKey } from '~lib/stores/apiKey';
 import {
 	getIsBackgroundRecording,
 	toggleIsBackgroundRecording
@@ -15,8 +17,8 @@ export async function toggleRecording({
 	switchIcon: (icon: Icon) => void;
 	onSuccess: (text: string) => void;
 }) {
-	const apiKey = await getApiKey();
-	if (!apiKey) {
+	const apiKeyValue = get(apiKey);
+	if (!apiKeyValue) {
 		alert('Please set your API key in the extension options');
 		openOptionsPage();
 		return;
@@ -30,7 +32,7 @@ export async function toggleRecording({
 		try {
 			const audioBlob = await stopRecording();
 			switchIcon('arrowsCounterclockwise');
-			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKey);
+			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKeyValue);
 			onSuccess(text);
 		} catch (error) {
 			console.error('Error occurred during transcription:', error);
