@@ -1,7 +1,9 @@
 import type { PlasmoCSConfig } from 'plasmo';
+import { get } from 'svelte/store';
 
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
+import { options } from '~lib/stores/options';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
 import { toggleRecording } from './toggleRecording';
@@ -69,7 +71,7 @@ function injectMicrophoneButtonIntoTextarea() {
 		button.addEventListener('click', async () => {
 			toggleRecording({
 				onSuccess: (text) => {
-					writeTextToClipboard(text);
+					if (get(options).copyToClipboard) writeTextToClipboard(text);
 					setChatgptTextareaContent(text);
 				},
 				switchIcon
