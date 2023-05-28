@@ -5,23 +5,18 @@
 	import { apiKey } from '~lib/stores/apiKey';
 	import { options } from '~lib/stores/options';
 
-	let inputApiKey: string;
 	let apiKeyInput: HTMLInputElement;
 
 	async function submitApiKey() {
-		if (!inputApiKey) {
+		if (!$apiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			$apiKey = inputApiKey;
 			toast.success('API key set!');
 			// Close the window after 1 second
 			setTimeout(() => window.close(), 300);
 		}
 	}
-	onMount(() => {
-		inputApiKey = $apiKey;
-		apiKeyInput.focus();
-	});
+	onMount(() => apiKeyInput.focus());
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
@@ -32,7 +27,7 @@
 			<input
 				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				placeholder="API Key"
-				bind:value={inputApiKey}
+				bind:value={$apiKey}
 				bind:this={apiKeyInput}
 				type="text"
 				autocomplete="off"
