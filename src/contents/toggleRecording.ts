@@ -3,10 +3,7 @@ import { get } from 'svelte/store';
 import type { Icon } from '~background/setIcon';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { apiKey } from '~lib/stores/apiKey';
-import {
-	getIsBackgroundRecording,
-	toggleIsBackgroundRecording
-} from '~lib/stores/isBackgroundRecording';
+import { isBackgroundRecording } from '~lib/stores/isBackgroundRecording';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
@@ -24,7 +21,7 @@ export async function toggleRecording({
 		return;
 	}
 
-	let isRecording = await getIsBackgroundRecording();
+	let isRecording = get(isBackgroundRecording);
 	if (!isRecording) {
 		await startRecording();
 		switchIcon('octagonalSign');
@@ -40,7 +37,7 @@ export async function toggleRecording({
 			switchIcon('studioMicrophone');
 		}
 	}
-	await toggleIsBackgroundRecording();
+	await isBackgroundRecording.toggle();
 }
 
 function openOptionsPage() {
