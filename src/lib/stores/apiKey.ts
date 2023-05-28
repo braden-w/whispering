@@ -4,9 +4,9 @@ import { Storage } from '@plasmohq/storage/dist';
 
 export const apiKey: Writable<string> = createApiKeyStore();
 
-const storage = new Storage();
-
 function createApiKeyStore() {
+	const storage = new Storage();
+
 	const { subscribe, set, update } = writable('');
 	storage.get('openai-api-key').then((apiKey) => {
 		set(apiKey || '');
