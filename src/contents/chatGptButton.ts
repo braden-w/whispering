@@ -19,10 +19,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 				sendMessageToBackground({ action: 'setIcon', icon });
 				switchMicrophoneIcon(icon);
 			},
-			onSuccess: (text: string) => {
-				if (get(options).copyToClipboard) writeTextToClipboard(text);
-				writeTextToCursor(text);
-			}
+			onSuccess: (text: string) => writeTextToCursor(text)
 		});
 });
 
@@ -81,10 +78,7 @@ function injectMicrophoneButtonIntoTextarea() {
 
 		button.addEventListener('click', async () => {
 			toggleRecording({
-				onSuccess: (text) => {
-					if (get(options).copyToClipboard) writeTextToClipboard(text);
-					setChatgptTextareaContent(text);
-				},
+				onSuccess: (text) => setChatgptTextareaContent(text),
 				switchIcon: (icon) => {
 					sendMessageToBackground({ action: 'setIcon', icon });
 					switchMicrophoneIcon(icon);

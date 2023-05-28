@@ -17,9 +17,6 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
 			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setIcon', icon }),
-			onSuccess: (text: string) => {
-				if (get(options).copyToClipboard) writeTextToClipboard(text);
-				writeTextToCursor(text);
-			}
+			onSuccess: (text: string) => writeTextToCursor(text)
 		});
 });
