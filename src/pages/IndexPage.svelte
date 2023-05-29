@@ -18,6 +18,7 @@
 	let audioSrc: string;
 
 	async function toggleRecording() {
+		await apiKey.init();
 		if (!$apiKey) {
 			toast.error(PleaseEnterAPIKeyToast);
 			return;
@@ -41,6 +42,7 @@
 	}
 
 	async function processRecording(audioBlob: Blob) {
+		await apiKey.init();
 		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
 		writeTextToClipboard(text);
 		outputText = text;

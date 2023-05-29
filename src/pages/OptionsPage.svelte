@@ -17,7 +17,10 @@
 			setTimeout(() => window.close(), 300);
 		}
 	}
-	onMount(() => apiKeyInput.focus());
+	onMount(() => {
+		apiKey.init();
+		apiKeyInput.focus();
+	});
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
