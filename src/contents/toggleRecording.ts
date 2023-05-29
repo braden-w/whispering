@@ -8,13 +8,16 @@ import { options } from '~lib/stores/options';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 
+type ToggleRecordingOptions = {
+	switchIcon: (icon: Icon) => void;
+	/** Called after text is successfully transcribed and (possibly) copied to clipboard */
+	onSuccessfulTranscription: (text: string) => void;
+};
+
 export async function toggleRecording({
 	switchIcon,
-	onSuccess
-}: {
-	switchIcon: (icon: Icon) => void;
-	onSuccess: (text: string) => void;
-}) {
+	onSuccessfulTranscription
+}: ToggleRecordingOptions): Promise<void> {
 	const apiKeyValue = get(apiKey);
 	if (!apiKeyValue) {
 		alert('Please set your API key in the extension options');
@@ -32,7 +35,7 @@ export async function toggleRecording({
 			switchIcon('arrowsCounterclockwise');
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKeyValue);
 			if (get(options).copyToClipboard) writeTextToClipboard(text);
-			onSuccess(text);
+			onSuccessfulTranscription(text);
 		} catch (error) {
 			console.error('Error occurred during transcription:', error);
 		} finally {
