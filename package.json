@@ -33,9 +33,7 @@
 			"https://*/*"
 		],
 		"permissions": [
-			"clipboardWrite",
-			"commands",
-			"tabs"
+			"clipboardWrite"
 		],
 		"commands": {
 			"toggle-recording": {
