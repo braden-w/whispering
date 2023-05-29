@@ -18,7 +18,7 @@ chrome.commands.onCommand.addListener(async function (command) {
 
 chrome.runtime.onMessage.addListener(function (message: MessageToBackgroundRequest) {
 	switch (message.action) {
-		case 'setIcon':
+		case 'setExtensionIcon':
 			setIcon(message.icon);
 			break;
 		case 'openOptionsPage':

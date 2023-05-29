@@ -13,7 +13,7 @@ export const config: PlasmoCSConfig = {
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
-			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setIcon', icon }),
+			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setExtensionIcon', icon }),
 			onSuccess: (text: string) => writeTextToCursor(text)
 		});
 });

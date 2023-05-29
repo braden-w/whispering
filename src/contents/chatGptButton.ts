@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
 			switchIcon: (icon) => {
-				sendMessageToBackground({ action: 'setIcon', icon });
+				sendMessageToBackground({ action: 'setExtensionIcon', icon });
 				switchMicrophoneButtonIcon(icon);
 			},
 			onSuccess: (text: string) => writeTextToCursor(text)
@@ -77,7 +77,7 @@ function injectMicrophoneButtonIntoTextarea() {
 			toggleRecording({
 				onSuccess: (text) => setChatgptTextareaContent(text),
 				switchIcon: (icon) => {
-					sendMessageToBackground({ action: 'setIcon', icon });
+					sendMessageToBackground({ action: 'setExtensionIcon', icon });
 					switchMicrophoneButtonIcon(icon);
 				}
 			});
@@ -109,7 +109,7 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 };
 
 function switchMicrophoneButtonIcon(icon: Icon) {
-	sendMessageToBackground({ action: 'setIcon', icon });
+	sendMessageToBackground({ action: 'setExtensionIcon', icon });
 
 	setSvgInnerHtmlToIcon(icon);
 

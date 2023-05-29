@@ -2,7 +2,7 @@ import type { Icon } from '~background/setIcon';
 
 export type MessageToBackgroundRequest =
 	| {
-			action: 'setIcon';
+			action: 'setExtensionIcon';
 			icon: Icon;
 	  }
 	| {
@@ -14,9 +14,11 @@ export function sendMessageToBackground(message: MessageToBackgroundRequest) {
 	chrome.runtime.sendMessage(message);
 }
 
-export type MessageToContentScriptRequest = {
-	command: 'toggle-recording';
-} | {command: 'switch-chatgpt-icon'; icon: Icon}
+export type MessageToContentScriptRequest =
+	| {
+			command: 'toggle-recording';
+	  }
+	| { command: 'switch-chatgpt-icon'; icon: Icon };
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
 export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
 	const [tab] = await chrome.tabs.query({
