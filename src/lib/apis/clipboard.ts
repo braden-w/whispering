@@ -68,8 +68,7 @@ function restorePreviousFocus(element: HTMLElement | null): void {
  */
 export function writeTextToCursor(text: string): void {
 	const activeElement = document.activeElement;
-
-	if (!activeElement) return;
+	if (!isHTMLElement(activeElement)) return;
 
 	if (isInputElement(activeElement)) {
 		handleInputElement(activeElement, text);
@@ -78,13 +77,17 @@ export function writeTextToCursor(text: string): void {
 	}
 }
 
+function isHTMLElement(element: unknown): element is HTMLElement {
+	return element instanceof HTMLElement;
+}
+
 /**
  * Check if the given element is an input or textarea element.
  *
  * @param element - The HTML element to check.
  * @returns True if the element is an input or textarea element, false otherwise.
  */
-function isInputElement(element: Element): element is HTMLInputElement | HTMLTextAreaElement {
+function isInputElement(element: HTMLElement): element is HTMLInputElement | HTMLTextAreaElement {
 	return element.tagName === 'INPUT' || element.tagName === 'TEXTAREA';
 }
 
@@ -117,6 +120,7 @@ function handleInputElement(
  * @param element - The non-input element.
  * @param text - The text to be appended.
  */
-function handleNonInputElement(element: Element, text: string): void {
+function handleNonInputElement(element: HTMLElement, text: string): void {
+	if (!element.isContentEditable) return;
 	element.innerHTML += text;
 }
