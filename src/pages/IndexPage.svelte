@@ -73,7 +73,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 	<button
-		class="transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110"
+		class="drop-shadow-png transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110"
 		on:click={toggleRecording}
 		type="button"
 		aria-label="Toggle recording">
@@ -160,3 +160,9 @@
 		</a>
 	</div>
 </div>
+
+<style>
+	.drop-shadow-png {
+		filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+	}
+</style>
