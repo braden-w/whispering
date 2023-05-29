@@ -10,6 +10,7 @@
 	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
 	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
+	import { sendMessageToBackground } from '~lib/utils/messaging';
 
 	// --- Recording Logic ---
 
@@ -60,6 +61,10 @@
 	async function copyOutputText() {
 		await writeTextToClipboard(outputText);
 		toast.success('Copied to clipboard!');
+	}
+
+	function openOptionsPage() {
+		chrome.runtime.openOptionsPage();
 	}
 </script>
 
@@ -123,11 +128,23 @@
 			</a> for global shortcuts.
 		</p>
 	{/if}
-	<p class="text-xs text-gray-600">
-		<Anchor href="/setup" class="text-gray-600 underline hover:text-indigo-900">
-			Edit your OpenAI API Key
-		</Anchor>
-	</p>
+	<button
+		on:click={openOptionsPage}
+		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="1.5"
+			stroke="currentColor"
+			class="h-6 w-6">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+		</svg>
+		<span>Settings</span>
+	</button>
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"
