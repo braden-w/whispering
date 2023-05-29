@@ -116,18 +116,16 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	{#if !window.__TAURI__}
-		<p class="text-xs text-gray-600">
-			Install the
-			<a
-				href="https://github.com/braden-w/whispering/releases"
-				class="text-gray-600 underline hover:text-indigo-900"
-				title="Download the desktop app"
-				aria-label="Download the desktop app">
-				desktop app
-			</a> for global shortcuts.
-		</p>
-	{/if}
+	<p class="text-xs text-gray-600">
+		Install the
+		<a
+			href="https://github.com/braden-w/whispering/releases"
+			class="text-gray-600 underline hover:text-indigo-900"
+			title="Download the desktop app"
+			aria-label="Download the desktop app">
+			desktop app
+		</a> for global shortcuts.
+	</p>
 	<button
 		on:click={openOptionsPage}
 		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
