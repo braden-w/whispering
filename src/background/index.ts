@@ -1,5 +1,4 @@
-import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
-import { type MessageToBackgroundRequest, sendMessageToContentScript } from '~lib/utils/messaging';
+import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
 
 import { setIcon } from './setIcon';
 

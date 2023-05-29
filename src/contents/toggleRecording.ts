@@ -1,5 +1,4 @@
 import { get } from 'svelte/store';
-
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
