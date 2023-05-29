@@ -34,7 +34,7 @@ export async function toggleRecording({
 			const audioBlob = await stopRecording();
 			switchIcon('arrowsCounterclockwise');
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKeyValue);
-			if (get(options).copyToClipboard) writeTextToClipboard(text);
+			writeTextToClipboardIfEnabled(text);
 			onSuccessfulTranscription(text);
 		} catch (error) {
 			console.error('Error occurred during transcription:', error);
@@ -47,4 +47,11 @@ export async function toggleRecording({
 
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
+}
+
+async function writeTextToClipboardIfEnabled(text: string) {
+	await options.init();
+	const { copyToClipboard } = get(options);
+	if (!copyToClipboard) return;
+	writeTextToClipboard(text);
 }
