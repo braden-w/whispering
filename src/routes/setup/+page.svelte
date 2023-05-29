@@ -50,14 +50,14 @@
 		</div>
 	</form>
 	<p class="text-xs text-gray-600">
-		You can find your OpenAI API key in your
+		You can find your OpenAI API key
 		<a
-			href="https://beta.openai.com/account/api-keys"
+			href="https://platform.openai.com/account/api-keys"
 			target="_blank"
 			rel="noopener noreferrer"
 			class="text-gray-600 underline hover:text-indigo-900"
 		>
-			User Settings.
+			here.
 		</a>
 	</p>
 	<p class="text-xs text-gray-600">
