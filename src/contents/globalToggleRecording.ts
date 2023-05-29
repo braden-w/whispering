@@ -1,25 +1,19 @@
-import { get } from 'svelte/store';
-
+import type { PlasmoCSConfig } from 'plasmo';
 import type { Icon } from '~background/setIcon';
-import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
-import { options } from '~lib/stores/options';
+import { writeTextToCursor } from '~lib/apis/clipboard';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
 
-import type { PlasmoCSConfig } from 'plasmo';
 import { toggleRecording } from './toggleRecording';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
-	exclude_matches: ['https://chat.openai.com/*'],
+	exclude_matches: ['https://chat.openai.com/*']
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
-			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setIcon', icon }),
-			onSuccess: (text: string) => {
-				if (get(options).copyToClipboard) writeTextToClipboard(text);
-				writeTextToCursor(text);
-			}
+			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setExtensionIcon', icon }),
+			onSuccessfulTranscription: (text: string) => writeTextToCursor(text)
 		});
 });

@@ -1,9 +1,6 @@
 import type { PlasmoCSConfig } from 'plasmo';
-import { get } from 'svelte/store';
-
 import type { Icon } from '~background/setIcon';
-import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
-import { options } from '~lib/stores/options';
+import { writeTextToCursor } from '~lib/apis/clipboard';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
 
 import { toggleRecording } from './toggleRecording';
@@ -16,13 +13,10 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
 			switchIcon: (icon) => {
-				sendMessageToBackground({ action: 'setIcon', icon });
-				switchMicrophoneIcon(icon);
+				sendMessageToBackground({ action: 'setExtensionIcon', icon });
+				switchMicrophoneButtonIcon(icon);
 			},
-			onSuccess: (text: string) => {
-				if (get(options).copyToClipboard) writeTextToClipboard(text);
-				writeTextToCursor(text);
-			}
+			onSuccessfulTranscription: (text: string) => writeTextToCursor(text)
 		});
 });
 
@@ -81,13 +75,10 @@ function injectMicrophoneButtonIntoTextarea() {
 
 		button.addEventListener('click', async () => {
 			toggleRecording({
-				onSuccess: (text) => {
-					if (get(options).copyToClipboard) writeTextToClipboard(text);
-					setChatgptTextareaContent(text);
-				},
+				onSuccessfulTranscription: (text) => setChatgptTextareaContent(text),
 				switchIcon: (icon) => {
-					sendMessageToBackground({ action: 'setIcon', icon });
-					switchMicrophoneIcon(icon);
+					sendMessageToBackground({ action: 'setExtensionIcon', icon });
+					switchMicrophoneButtonIcon(icon);
 				}
 			});
 		});
@@ -117,8 +108,8 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 	`
 };
 
-function switchMicrophoneIcon(icon: Icon) {
-	sendMessageToBackground({ action: 'setIcon', icon });
+function switchMicrophoneButtonIcon(icon: Icon) {
+	sendMessageToBackground({ action: 'setExtensionIcon', icon });
 
 	setSvgInnerHtmlToIcon(icon);
 

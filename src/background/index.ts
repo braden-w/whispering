@@ -1,5 +1,4 @@
-import { writeTextToClipboard, writeTextToCursor } from '~lib/apis/clipboard';
-import { type MessageToBackgroundRequest, sendMessageToContentScript } from '~lib/utils/messaging';
+import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
 
 import { setIcon } from './setIcon';
 
@@ -19,7 +18,7 @@ chrome.commands.onCommand.addListener(async function (command) {
 
 chrome.runtime.onMessage.addListener(function (message: MessageToBackgroundRequest) {
 	switch (message.action) {
-		case 'setIcon':
+		case 'setExtensionIcon':
 			setIcon(message.icon);
 			break;
 		case 'openOptionsPage':
