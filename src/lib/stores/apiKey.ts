@@ -2,15 +2,17 @@ import { writable, type Writable } from 'svelte/store';
 
 import { Storage } from '@plasmohq/storage/dist';
 
-export const apiKey: Writable<string> = createApiKeyStore();
+export const apiKey= createApiKeyStore();
 
 function createApiKeyStore() {
+	const initialApiKey = '';
+	const { subscribe, set, update } = writable(initialApiKey);
 	const storage = new Storage();
 
-	const { subscribe, set, update } = writable('');
-	storage.get('openai-api-key').then((apiKey) => {
-		set(apiKey || '');
-	});
+	async function init() {
+		const apiKeyFromStorage = await storage.get('openai-api-key');
+		set(apiKeyFromStorage || initialApiKey);
+	}
 
 	async function updateApiKey(apiKey: string) {
 		await storage.set('openai-api-key', apiKey);
@@ -19,6 +21,7 @@ function createApiKeyStore() {
 
 	return {
 		subscribe,
+		init,
 		set: updateApiKey,
 		update
 	};

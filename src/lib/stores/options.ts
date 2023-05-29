@@ -8,9 +8,8 @@ type Options = { copyToClipboard: boolean };
 
 function createApiKeyStore() {
 	const initialOptions: Options = { copyToClipboard: true };
-	const storage = new Storage();
-
 	const { subscribe, set, update } = writable(initialOptions);
+	const storage = new Storage();
 
 	async function init() {
 		const optionsFromStorage = await storage.get<Options>('options');

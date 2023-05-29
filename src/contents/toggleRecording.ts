@@ -18,6 +18,7 @@ export async function toggleRecording({
 	switchIcon,
 	onSuccessfulTranscription
 }: ToggleRecordingOptions): Promise<void> {
+	await apiKey.init();
 	const apiKeyValue = get(apiKey);
 	if (!apiKeyValue) {
 		alert('Please set your API key in the extension options');
