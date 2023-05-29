@@ -68,7 +68,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 	<button
-		class="text-6xl focus:outline-none"
+		class="transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110"
 		on:click={toggleRecording}
 		type="button"
 		aria-label="Toggle recording">
