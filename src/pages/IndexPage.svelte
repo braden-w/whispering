@@ -3,14 +3,12 @@
 	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 	import toast from 'svelte-french-toast/dist/core/toast';
 
-	import Anchor from '~lib/Anchor.svelte';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 	import { apiKey } from '~lib/stores/apiKey';
 	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
 	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
-	import { sendMessageToBackground } from '~lib/utils/messaging';
 
 	// --- Recording Logic ---
 

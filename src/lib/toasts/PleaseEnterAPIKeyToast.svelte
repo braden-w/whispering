@@ -1,11 +1,13 @@
 <script lang="ts">
-	import Anchor from '~lib/Anchor.svelte';
+	function openOptionsPage() {
+		chrome.runtime.openOptionsPage();
+	}
 </script>
 
 <span>
-	First, please enter your OpenAI API key in <Anchor
-		href="/setup"
+	First, please enter your OpenAI API key in <button
+		on:click={openOptionsPage}
 		class="text-gray-600 underline hover:text-indigo-900">
 		the settings.
-	</Anchor>
+	</button>
 </span>
