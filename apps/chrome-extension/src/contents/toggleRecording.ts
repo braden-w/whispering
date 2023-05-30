@@ -26,7 +26,7 @@ export async function toggleRecording({
 		return;
 	}
 
-	let isRecording = get(isBackgroundRecording);
+	const isRecording = get(isBackgroundRecording);
 	if (!isRecording) {
 		await startRecording();
 		switchIcon('octagonalSign');
