@@ -14,13 +14,15 @@
 		"plasmo": "^0.73.2",
 		"svelte": "^3.59.1",
 		"svelte-french-toast": "^1.0.4-beta.0",
-		"svelte-preprocess": "^5.0.3"
+		"svelte-preprocess": "^5.0.3",
+		"ui": "^1.0.0"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.237",
 		"@types/node": "^20.2.4",
 		"autoprefixer": "^10.4.14",
 		"eslint-config-custom": "^1.0.0",
+		"tailwind-config": "^1.0.0",
 		"postcss": "^8.4.23",
 		"tailwindcss": "^3.3.2",
 		"typescript": "^5.0.4"
