@@ -48,7 +48,7 @@
 		outputText = text;
 	}
 
-	// --- Local Shorcuts ---
+	// --- Local Shortcuts ---
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
