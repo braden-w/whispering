@@ -3,8 +3,6 @@
 	"singleQuote": true,
 	"trailingComma": "none",
 	"printWidth": 100,
-	"bracketSpacing": true,
-	"bracketSameLine": true,
 	"plugins": ["prettier-plugin-svelte"],
 	"pluginSearchDirs": ["."],
 	"overrides": [
@@ -14,6 +12,5 @@
 				"parser": "svelte"
 			}
 		}
-	],
-	"organizeImportsSkipDestructiveCodeActions": true
+	]
 }
