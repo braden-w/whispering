@@ -11,6 +11,7 @@
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from 'ui/components';
 	import { ClipboardIcon } from 'ui/icons';
+	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
 
 	// --- Recording Logic ---
 
@@ -129,6 +130,13 @@
 			</a> for global shortcuts.
 		</p>
 	{/if}
+	<a
+		href="/setup"
+		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+	>
+		<AdjustmentsHorizontalIcon />
+		<span>Settings</span>
+	</a>
 	<p class="text-xs text-gray-600">
 		<a href="/setup" class="text-gray-600 underline hover:text-indigo-900">
 			Edit your OpenAI API Key
