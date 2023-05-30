@@ -39,6 +39,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-cloudflare": "^2.2.0",
 		"@tauri-apps/api": "^1.2.0",
+		"audio-recorder-polyfill": "^0.4.1",
 		"recordrtc": "^5.6.2",
 		"svelte-french-toast": "1.0.4-beta.0"
 	}

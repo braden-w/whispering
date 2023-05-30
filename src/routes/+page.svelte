@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { startRecording, stopRecording } from '$lib/recorder/mediaRecorder';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { writeText } from '$lib/system-apis/clipboard';
 	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
@@ -21,10 +22,6 @@
 			toast.error(PleaseEnterAPIKeyToast);
 			return;
 		}
-
-		const { startRecording, stopRecording } = /Chrome/.test(navigator.userAgent)
-			? await import('$lib/recorder/mediaRecorder')
-			: await import('$lib/recorder/recordRtcRecorder');
 
 		if (!isRecording) {
 			await setAlwaysOnTop(true);
