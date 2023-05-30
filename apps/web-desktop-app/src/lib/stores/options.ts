@@ -10,7 +10,7 @@ type Options = {
 function createOptionsStore() {
 	const initialOptions: Options = {
 		copyToClipboard: true,
-		currentGlobalShortcut: 'CommandOrControl+Shift+X'
+		currentGlobalShortcut: 'CommandOrControl+Shift+;'
 	};
 	const optionsFromStorage = getOptionsFromStorage();
 	const { subscribe, set, update } = writable(optionsFromStorage || initialOptions);

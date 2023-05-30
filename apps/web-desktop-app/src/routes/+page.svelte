@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import { audioSrc, isBackgroundRecording, outputText } from '$lib/stores/isBackgroundRecording';
+	import { audioSrc, isRecording, outputText } from '$lib/stores/isRecording';
 	import { options } from '$lib/stores/options';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
@@ -36,7 +36,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 
-	<ToggleRecordingIcon isRecording={$isBackgroundRecording} on:click={toggleRecording} />
+	<ToggleRecordingIcon isRecording={$isRecording} on:click={toggleRecording} />
 
 	<div>
 		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">

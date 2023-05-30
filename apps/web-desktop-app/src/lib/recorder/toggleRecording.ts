@@ -1,13 +1,13 @@
 import { apiKey } from '$lib/stores/apiKey';
+import { audioSrc, isRecording, outputText } from '$lib/stores/isRecording';
+import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 import { setAlwaysOnTop } from '$lib/system-apis/window';
-import toast from 'svelte-french-toast';
-import { get } from 'svelte/store';
-import { startRecording, stopRecording } from './mediaRecorder';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
-import { writeTextToClipboard } from '$lib/system-apis/clipboard';
-import { audioSrc, isBackgroundRecording, outputText } from '$lib/stores/isBackgroundRecording';
+import toast from 'svelte-french-toast';
+import { get } from 'svelte/store';
+import { startRecording, stopRecording } from './mediaRecorder';
 
 export async function toggleRecording() {
 	const apiKeyValue = get(apiKey);
@@ -16,8 +16,8 @@ export async function toggleRecording() {
 		return;
 	}
 
-	const isRecording = get(isBackgroundRecording);
-	if (!isRecording) {
+	const isRecordingValue = get(isRecording);
+	if (!isRecordingValue) {
 		await setAlwaysOnTop(true);
 		await startRecording();
 	} else {
@@ -35,7 +35,7 @@ export async function toggleRecording() {
 			await setAlwaysOnTop(false);
 		}
 	}
-	await isBackgroundRecording.toggle();
+	await isRecording.toggle();
 }
 
 async function processRecording(audioBlob: Blob) {
