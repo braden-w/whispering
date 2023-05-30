@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { apiKey, setApiKey } from '$lib/stores/apiKey';
+	import { apiKey } from '$lib/stores/apiKey';
 	import toast from 'svelte-french-toast';
 	import { PaperAirplaneIcon } from 'ui/icons';
 
@@ -10,7 +10,7 @@
 		if (!inputApiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			setApiKey(inputApiKey);
+			apiKey.set(inputApiKey);
 			toast.success('API key set!');
 			goto('/');
 		}
