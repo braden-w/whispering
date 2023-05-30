@@ -2,7 +2,7 @@
 	"name": "whispering",
 	"displayName": "Whispering",
 	"version": "2.1.0",
-	"description": "Seamlessly integrate voice-to-text transcriptons on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
+	"description": "Seamlessly integrate voice-to-text transcriptions on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
 	"author": "Braden Wong",
 	"packageManager": "pnpm@7.5.0",
 	"scripts": {
@@ -17,14 +17,11 @@
 		"svelte-preprocess": "^5.0.3"
 	},
 	"devDependencies": {
-		"@plasmohq/prettier-plugin-sort-imports": "^3.6.4",
 		"@types/chrome": "^0.0.237",
 		"@types/node": "^20.2.4",
 		"autoprefixer": "^10.4.14",
+		"eslint-config-custom": "workspace:*",
 		"postcss": "^8.4.23",
-		"prettier": "^2.8.8",
-		"prettier-plugin-svelte": "^2.10.0",
-		"prettier-plugin-tailwindcss": "^0.3.0",
 		"tailwindcss": "^3.3.2",
 		"typescript": "^5.0.4"
 	},

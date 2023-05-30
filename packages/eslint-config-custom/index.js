@@ -2,7 +2,6 @@ module.exports = {
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
-		'plugin:astro/recommended',
 		'plugin:svelte/recommended',
 		'turbo',
 		'plugin:prettier/recommended'
