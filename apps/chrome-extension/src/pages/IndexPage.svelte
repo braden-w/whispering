@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { ToggleRecordingIcon } from 'ui/components';
 	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
 	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 	import toast from 'svelte-french-toast/dist/core/toast';
+	import { ToggleRecordingIcon } from 'ui/components';
 	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
