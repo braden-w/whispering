@@ -1,16 +1,12 @@
-/**
- * This implementation uses the native mediaRecorder api.
- * Unfortunately, it didn't reliably work with Safari or Tauri.
- *
- * For the main implementation, see {@link ./recordRtcRecorder.ts}.
- */
+import AudioRecorder from 'audio-recorder-polyfill';
 
 let mediaRecorder: MediaRecorder | null = null;
 let recordedChunks: Blob[] = [];
 
 export async function startRecording(): Promise<void> {
 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-	mediaRecorder = new MediaRecorder(stream);
+	mediaRecorder = new AudioRecorder(stream);
+	if (!mediaRecorder) throw new Error('MediaRecorder is not initialized.');
 	mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 		recordedChunks.push(event.data);
 	});
