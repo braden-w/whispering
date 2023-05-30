@@ -1,10 +1,3 @@
-/**
- * This implementation uses the native mediaRecorder api.
- * Unfortunately, it didn't reliably work with Safari or Tauri.
- *
- * For the main implementation, see {@link ./recordRtcRecorder.ts}.
- */
-
 let mediaRecorder: MediaRecorder | null = null;
 let recordedChunks: Blob[] = [];
 
