@@ -43,6 +43,9 @@ importers:
       svelte-preprocess:
         specifier: ^5.0.3
         version: 5.0.3(@babel/core@7.22.1)(postcss@8.4.23)(svelte@3.59.1)(typescript@5.0.4)
+      ui:
+        specifier: ^1.0.0
+        version: link:../../packages/ui
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.237
@@ -80,6 +83,9 @@ importers:
       svelte-french-toast:
         specifier: ^1.0.4-beta.0
         version: 1.0.4-beta.0(svelte@3.59.1)
+      ui:
+        specifier: ^1.0.0
+        version: link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^2.0.0
@@ -144,6 +150,15 @@ importers:
       eslint-plugin-svelte:
         specifier: latest
         version: 2.29.0(eslint@8.40.0)(svelte@3.59.1)
+
+  packages/ui:
+    devDependencies:
+      eslint-config-custom:
+        specifier: ^1.0.0
+        version: link:../eslint-config-custom
+      svelte:
+        specifier: ^3.59.1
+        version: 3.59.1
 
 packages:
 

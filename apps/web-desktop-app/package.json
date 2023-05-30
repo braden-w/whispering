@@ -32,6 +32,7 @@
 		"@sveltejs/adapter-cloudflare": "^2.2.0",
 		"@tauri-apps/api": "^1.2.0",
 		"audio-recorder-polyfill": "^0.4.1",
-		"svelte-french-toast": "^1.0.4-beta.0"
+		"svelte-french-toast": "^1.0.4-beta.0",
+		"ui": "^1.0.0"
 	}
 }
