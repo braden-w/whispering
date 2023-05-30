@@ -14,7 +14,7 @@
 		"lint": "turbo run lint"
 	},
 	"packageManager": "pnpm@7.15.0",
-	"devDependencies": {
+	"dependencies": {
 		"@manypkg/cli": "latest",
 		"eslint": "^8.40.0",
 		"eslint-config-custom": "1.0.0",

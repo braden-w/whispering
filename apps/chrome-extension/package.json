@@ -20,7 +20,7 @@
 		"@types/chrome": "^0.0.237",
 		"@types/node": "^20.2.4",
 		"autoprefixer": "^10.4.14",
-		"eslint-config-custom": "workspace:*",
+		"eslint-config-custom": "^1.0.0",
 		"postcss": "^8.4.23",
 		"tailwindcss": "^3.3.2",
 		"typescript": "^5.0.4"

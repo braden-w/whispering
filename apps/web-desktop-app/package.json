@@ -19,13 +19,13 @@
 		"@tauri-apps/cli": "^1.2.3",
 		"@types/recordrtc": "^5.6.10",
 		"autoprefixer": "^10.4.14",
-		"eslint-config-custom": "workspace:*",
-		"postcss": "^8.4.21",
-		"svelte": "^3.54.0",
+		"eslint-config-custom": "^1.0.0",
+		"postcss": "^8.4.23",
+		"svelte": "^3.59.1",
 		"svelte-check": "^3.0.1",
-		"tailwindcss": "^3.2.7",
+		"tailwindcss": "^3.3.2",
 		"tslib": "^2.4.1",
-		"typescript": "^4.9.5",
+		"typescript": "^5.0.4",
 		"vite": "^4.0.0"
 	},
 	"type": "module",
@@ -34,6 +34,6 @@
 		"@tauri-apps/api": "^1.2.0",
 		"audio-recorder-polyfill": "^0.4.1",
 		"recordrtc": "^5.6.2",
-		"svelte-french-toast": "1.0.4-beta.0"
+		"svelte-french-toast": "^1.0.4-beta.0"
 	}
 }
