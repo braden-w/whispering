@@ -1,0 +1,17 @@
+{
+	"name": "ui",
+	"version": "1.0.0",
+	"description": "Shared components for use Whispering web app, desktop app, and chrome extension",
+	"license": "MIT",
+	"type": "module",
+	"svelte": "index.ts",
+	"module": "index.ts",
+	"scripts": {
+		"lint": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
+		"format": "prettier --write --ignore-path=../../.prettierignore ."
+	},
+	"devDependencies": {
+		"eslint-config-custom": "^1.0.0",
+		"svelte": "^3.59.1"
+	}
+}
