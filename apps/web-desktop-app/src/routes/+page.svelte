@@ -1,53 +1,14 @@
 <script lang="ts">
-	import { startRecording, stopRecording } from '$lib/recorder/mediaRecorder';
-	import { apiKey } from '$lib/stores/apiKey';
+	import { toggleRecording } from '$lib/recorder/toggleRecording';
+	import { audioSrc, isBackgroundRecording, outputText } from '$lib/stores/isBackgroundRecording';
 	import { options } from '$lib/stores/options';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
-	import { setAlwaysOnTop } from '$lib/system-apis/window';
-	import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
-	import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-	import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from 'ui/components';
 	import { ClipboardIcon } from 'ui/icons';
 	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
-
-	// --- Recording Logic ---
-
-	let isRecording = false;
-	let outputText = '';
-	let audioSrc: string;
-
-	async function toggleRecording() {
-		if (!$apiKey) {
-			toast.error(PleaseEnterAPIKeyToast);
-			return;
-		}
-
-		if (!isRecording) {
-			await setAlwaysOnTop(true);
-			await startRecording();
-			isRecording = !isRecording;
-		} else {
-			const audioBlob = await stopRecording();
-			audioSrc = URL.createObjectURL(audioBlob);
-			isRecording = !isRecording;
-			toast.promise(processRecording(audioBlob), {
-				loading: 'Processing Whisper...',
-				success: 'Copied to clipboard!',
-				error: () => SomethingWentWrongToast
-			});
-		}
-	}
-
-	async function processRecording(audioBlob: Blob) {
-		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
-		writeTextToClipboard(text);
-		outputText = text;
-		await setAlwaysOnTop(false);
-	}
 
 	// --- Local Shorcuts ---
 
@@ -60,7 +21,7 @@
 	// --- Copy Output Button ---
 
 	async function copyOutputText() {
-		await writeTextToClipboard(outputText);
+		await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
 
@@ -75,7 +36,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 
-	<ToggleRecordingIcon {isRecording} on:click={toggleRecording} />
+	<ToggleRecordingIcon isRecording={$isBackgroundRecording} on:click={toggleRecording} />
 
 	<div>
 		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
@@ -86,7 +47,7 @@
 				id="transcripted-text"
 				class="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 transition-all duration-200 ease-in-out focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
-				bind:value={outputText}
+				bind:value={$outputText}
 			/>
 
 			<button
@@ -97,8 +58,8 @@
 				<ClipboardIcon />
 			</button>
 		</div>
-		{#if audioSrc}
-			<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+		{#if $audioSrc}
+			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if}
 	</div>
 	<p class="text-xs text-gray-600">
