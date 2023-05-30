@@ -1,25 +1,25 @@
 {
-  "name": "optim",
-  "version": "1.0.0",
-  "private": true,
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "",
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "format": "prettier --write .",
-    "postinstall": "manypkg check",
-    "lint": "turbo run lint"
-  },
-  "dependencies": {
-    "@manypkg/cli": "latest",
-    "eslint": "^8.40.0",
-    "eslint-config-custom": "1.0.0",
-    "prettier": "^2.8.8",
-    "prettier-plugin-svelte": "^2.10.0",
-    "turbo": "latest"
-  },
-  "packageManager": "pnpm@7.15.0"
+	"name": "optim",
+	"version": "1.0.0",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"license": "ISC",
+	"author": "",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"format": "prettier --write .",
+		"postinstall": "manypkg check",
+		"lint": "turbo run lint"
+	},
+	"dependencies": {
+		"@manypkg/cli": "latest",
+		"eslint": "^8.40.0",
+		"eslint-config-custom": "1.0.0",
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.0",
+		"turbo": "latest"
+	},
+	"packageManager": "pnpm@7.15.0"
 }

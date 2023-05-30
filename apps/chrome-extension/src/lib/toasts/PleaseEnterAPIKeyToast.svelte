@@ -7,7 +7,8 @@
 <span>
 	First, please enter your OpenAI API key in <button
 		on:click={openOptionsPage}
-		class="text-gray-600 underline hover:text-indigo-900">
+		class="text-gray-600 underline hover:text-indigo-900"
+	>
 		the settings.
 	</button>
 </span>

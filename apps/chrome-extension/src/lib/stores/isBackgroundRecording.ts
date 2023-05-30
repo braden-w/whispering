@@ -1,6 +1,5 @@
-import { get, writable } from 'svelte/store';
-
 import { Storage } from '@plasmohq/storage/dist';
+import { get, writable } from 'svelte/store';
 
 export const isBackgroundRecording = createIsBackgroundRecordingStore();
 

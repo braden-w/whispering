@@ -1,6 +1,5 @@
-import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
-
 import { setIcon } from './setIcon';
+import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
 
 export {};
 

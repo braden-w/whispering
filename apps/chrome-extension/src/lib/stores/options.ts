@@ -1,6 +1,5 @@
-import { writable, type Writable } from 'svelte/store';
-
 import { Storage } from '@plasmohq/storage/dist';
+import { writable } from 'svelte/store';
 
 export const options = createApiKeyStore();
 
