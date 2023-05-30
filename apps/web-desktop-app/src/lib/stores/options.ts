@@ -2,10 +2,16 @@ import { writable } from 'svelte/store';
 
 export const options = createOptionsStore();
 
-type Options = { copyToClipboard: boolean };
+type Options = {
+	copyToClipboard: boolean;
+	currentGlobalShortcut: string;
+};
 
 function createOptionsStore() {
-	const initialOptions: Options = { copyToClipboard: true };
+	const initialOptions: Options = {
+		copyToClipboard: true,
+		currentGlobalShortcut: 'CommandOrControl+Shift+X'
+	};
 	const optionsFromStorage = getOptionsFromStorage();
 	const { subscribe, set, update } = writable(optionsFromStorage || initialOptions);
 
