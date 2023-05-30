@@ -8,17 +8,18 @@
 	let apiKeyInput: HTMLInputElement;
 	let showOptions: boolean;
 
+	const closeWindowAfterMs = (ms: number) => setTimeout(() => window.close(), ms);
+
 	async function submitApiKey() {
 		if (!$apiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
 			toast.success('API key set!');
-			// Close the window after 1 second
-			setTimeout(() => window.close(), 300);
+			closeWindowAfterMs(300);
 		}
 	}
+
 	onMount(() => {
-		apiKey.init();
 		apiKeyInput.focus();
 	});
 </script>

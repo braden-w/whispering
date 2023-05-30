@@ -1,11 +1,11 @@
 import { Storage } from '@plasmohq/storage/dist';
 import { writable } from 'svelte/store';
 
-export const options = createApiKeyStore();
+export const options = createOptionsStore();
 
 type Options = { copyToClipboard: boolean };
 
-function createApiKeyStore() {
+function createOptionsStore() {
 	const initialOptions: Options = { copyToClipboard: true };
 	const { subscribe, set, update } = writable(initialOptions);
 	const storage = new Storage();

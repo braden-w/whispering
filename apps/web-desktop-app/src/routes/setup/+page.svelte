@@ -1,20 +1,25 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { options } from '$lib/stores/options';
+	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import { PaperAirplaneIcon } from 'ui/icons';
+	import { AdjustmentsVerticalIcon, PaperAirplaneIcon } from 'ui/icons';
 
-	let inputApiKey = $apiKey;
+	let apiKeyInput: HTMLInputElement;
+	let showOptions: boolean;
 
 	function submitApiKey() {
-		if (!inputApiKey) {
+		if (!$apiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
-			apiKey.set(inputApiKey);
 			toast.success('API key set!');
 			goto('/');
 		}
 	}
+	onMount(() => {
+		apiKeyInput.focus();
+	});
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
@@ -24,7 +29,8 @@
 			<input
 				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				placeholder="API Key"
-				bind:value={inputApiKey}
+				bind:value={$apiKey}
+				bind:this={apiKeyInput}
 				type="text"
 				autocomplete="off"
 				required
@@ -48,6 +54,27 @@
 			here.
 		</a>
 	</p>
+
+	<button
+		on:click={() => (showOptions = !showOptions)}
+		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+		type="button"
+		aria-haspopup="true"
+		aria-expanded={showOptions}
+	>
+		<AdjustmentsVerticalIcon />
+		<span>Advanced</span>
+	</button>
+
+	{#if showOptions}
+		<div class="flex flex-col space-y-2 px-4">
+			<label class="inline-flex items-center">
+				<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
+				<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
+			</label>
+		</div>
+	{/if}
+
 	<p class="text-xs text-gray-600">
 		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
 	</p>
