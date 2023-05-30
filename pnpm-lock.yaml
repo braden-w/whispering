@@ -54,7 +54,7 @@ importers:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.23)
       eslint-config-custom:
-        specifier: 1.0.0
+        specifier: ^1.0.0
         version: link:../../packages/eslint-config-custom
       postcss:
         specifier: ^8.4.23
@@ -77,16 +77,10 @@ importers:
       audio-recorder-polyfill:
         specifier: ^0.4.1
         version: 0.4.1
-      recordrtc:
-        specifier: ^5.6.2
-        version: 5.6.2
       svelte-french-toast:
         specifier: ^1.0.4-beta.0
         version: 1.0.4-beta.0(svelte@3.59.1)
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: ^4.20230321.0
-        version: 4.20230321.0
       '@sveltejs/adapter-auto':
         specifier: ^2.0.0
         version: 2.0.0(@sveltejs/kit@1.5.0)
@@ -99,14 +93,11 @@ importers:
       '@tauri-apps/cli':
         specifier: ^1.2.3
         version: 1.2.3
-      '@types/recordrtc':
-        specifier: ^5.6.10
-        version: 5.6.10
       autoprefixer:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.23)
       eslint-config-custom:
-        specifier: 1.0.0
+        specifier: ^1.0.0
         version: link:../../packages/eslint-config-custom
       postcss:
         specifier: ^8.4.23
@@ -351,6 +342,7 @@ packages:
 
   /@cloudflare/workers-types@4.20230321.0:
     resolution: {integrity: sha512-zyRFz9AUS0tbg3/kJ+3zxvp9fl/O9yOJlChih/o86hhOqRMcZVbWefYAvFPidRvYUHM5YTG1wjU1bF9FFckRVg==}
+    dev: false
 
   /@esbuild/android-arm64@0.16.17:
     resolution: {integrity: sha512-MIGl6p5sc3RDTLLkYL1MyL8BMRN4tLMRCn+yRJJmEDvYZ2M7tmAf80hx1kbNEUX2KJ50RRtxZ4JHLvCfuB6kBg==}
@@ -2779,10 +2771,6 @@ packages:
 
   /@types/pug@2.0.6:
     resolution: {integrity: sha512-SnHmG9wN1UVmagJOnyo/qkk0Z7gejYxOYYmaAwr5u2yFYfsupN3sg10kyzN8Hep/2zbHxCnsumxOoRIRMBwKCg==}
-
-  /@types/recordrtc@5.6.10:
-    resolution: {integrity: sha512-IuJZgrnlsLgtD1mmGPM4v8HnqLuYZGt+YKUbJPhtDcI9DyOMNFSb4xeYn/Uwc2rJwoeHZ1YX4jpWCDnhoAbMPg==}
-    dev: true
 
   /@types/responselike@1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
@@ -5968,10 +5956,6 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
-
-  /recordrtc@5.6.2:
-    resolution: {integrity: sha512-1QNKKNtl7+KcwD1lyOgP3ZlbiJ1d0HtXnypUy7yq49xEERxk31PHvE9RCciDrulPCY7WJ+oz0R9hpNxgsIurGQ==}
-    dev: false
 
   /regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}

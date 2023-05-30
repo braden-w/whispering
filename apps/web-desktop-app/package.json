@@ -12,12 +12,10 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230321.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-static": "1.0.0-next.50",
 		"@sveltejs/kit": "^1.5.0",
 		"@tauri-apps/cli": "^1.2.3",
-		"@types/recordrtc": "^5.6.10",
 		"autoprefixer": "^10.4.14",
 		"eslint-config-custom": "^1.0.0",
 		"postcss": "^8.4.23",
@@ -33,7 +31,6 @@
 		"@sveltejs/adapter-cloudflare": "^2.2.0",
 		"@tauri-apps/api": "^1.2.0",
 		"audio-recorder-polyfill": "^0.4.1",
-		"recordrtc": "^5.6.2",
 		"svelte-french-toast": "^1.0.4-beta.0"
 	}
 }
