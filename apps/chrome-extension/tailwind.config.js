@@ -1,8 +1,5 @@
-/** @type {import('tailwindcss').Config} */
+import sharedConfig from 'tailwind-config/tailwind.config.js';
+
 module.exports = {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
-	theme: {
-		extend: {}
-	},
-	plugins: []
+	presets: [sharedConfig]
 };

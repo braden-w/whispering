@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ToggleRecordingIcon } from 'ui/components';
 	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
 	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 	import toast from 'svelte-french-toast/dist/core/toast';
@@ -13,7 +14,6 @@
 	// --- Recording Logic ---
 
 	let isRecording = false;
-	$: micIcon = isRecording ? '🟥' : '🎙️';
 	let outputText = '';
 	let audioSrc: string;
 
@@ -72,14 +72,8 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-	<button
-		class="drop-shadow-png transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110"
-		on:click={toggleRecording}
-		type="button"
-		aria-label="Toggle recording"
-	>
-		{micIcon}
-	</button>
+
+	<ToggleRecordingIcon {isRecording} on:click={toggleRecording} />
 
 	<div>
 		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
@@ -143,9 +137,3 @@
 		</a>
 	</div>
 </div>
-
-<style>
-	.drop-shadow-png {
-		filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
-	}
-</style>

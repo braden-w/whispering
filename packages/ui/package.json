@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"eslint-config-custom": "^1.0.0",
+		"tailwind-config": "^1.0.0",
 		"svelte": "^3.59.1"
 	}
 }
