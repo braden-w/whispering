@@ -16,15 +16,17 @@ export async function toggleRecording() {
 		return;
 	}
 
-	if (get(recordingState) === 'idle') {
+	const recordingStateValue = get(recordingState);
+	if (recordingStateValue === 'idle') {
 		await setAlwaysOnTop(true);
 		await startRecording();
+		recordingState.set('recording');
 	} else {
 		try {
 			const audioBlob = await stopRecording();
 			audioSrc.set(URL.createObjectURL(audioBlob));
 			recordingState.set('transcribing');
-			toast.promise(processRecording(audioBlob), {
+			await toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
 				error: () => SomethingWentWrongToast

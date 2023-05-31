@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { audioSrc, recordingState, outputText } from '$lib/stores/recordingState';
-	import { options } from '$lib/stores/options';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
-	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
-	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from 'ui/components';
 	import { ClipboardIcon } from 'ui/icons';
 	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
-
-	// --- Local Shorcuts ---
+	import KeyIcon from 'ui/icons/KeyIcon.svelte';
+	import KeyboardIcon from 'ui/icons/KeyboardIcon.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -18,17 +15,10 @@
 		toggleRecording();
 	}
 
-	// --- Copy Output Button ---
-
 	async function copyOutputText() {
 		await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
-
-	// --- Store Logic ---
-
-	onMount(async () => await registerShortcut($options.currentGlobalShortcut, toggleRecording));
-	onDestroy(async () => await unregisterAllShortcuts());
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -65,38 +55,53 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	{#if !window.__TAURI__}
-		<p class="text-xs text-gray-600">
-			Install the
+	<p class="text-xs text-gray-600">
+		Check out the
+		<a
+			href="https://github.com/braden-w/whispering/releases"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="text-gray-600 underline hover:text-indigo-900"
+			title="Check out the Chrome Extension"
+			aria-label="Check out the Chrome Extension"
+		>
+			extension
+		</a>
+		{#if !window.__TAURI__}
+			and
 			<a
 				href="https://github.com/braden-w/whispering/releases"
 				class="text-gray-600 underline hover:text-indigo-900"
-				title="Download the desktop app"
-				aria-label="Download the desktop app"
+				title="Check out the desktop app"
+				aria-label="Check out the desktop app"
 			>
 				desktop app
-			</a> for global shortcuts.
-		</p>
-	{/if}
-	<a
-		href="/setup"
-		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-	>
-		<AdjustmentsHorizontalIcon />
-		<span>Settings</span>
-	</a>
-	<p class="text-xs text-gray-600">
-		{#if window.__TAURI__}
-			or
-			<button
-				type="button"
-				class="text-gray-600 underline hover:text-indigo-900"
-				aria-label="Change your keyboard shortcut"
-			>
-				change your keyboard shortcut
-			</button>.
+			</a> for shortcuts.
 		{/if}
 	</p>
+	<div class="flex">
+		<a
+			href="/settings"
+			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			aria-label="Settings"
+		>
+			<AdjustmentsHorizontalIcon />
+		</a>
+		<a
+			href="/key"
+			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			aria-label="API Key"
+		>
+			<KeyIcon />
+		</a>
+		<a
+			href="/shortcut"
+			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			aria-label="Keyboard Shortcuts"
+		>
+			<KeyboardIcon />
+		</a>
+	</div>
 
 	<div class="fixed bottom-4 right-4">
 		<a
