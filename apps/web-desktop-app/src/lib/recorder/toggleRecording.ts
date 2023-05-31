@@ -16,7 +16,8 @@ export async function toggleRecording() {
 		return;
 	}
 
-	if (get(recordingState) === 'idle') {
+	const recordingStateValue = get(recordingState);
+	if (recordingStateValue === 'idle') {
 		await setAlwaysOnTop(true);
 		await startRecording();
 	} else {

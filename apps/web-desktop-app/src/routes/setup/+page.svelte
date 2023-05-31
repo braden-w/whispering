@@ -88,14 +88,6 @@
 			</label>
 		</div>
 
-		<button
-			type="button"
-			on:click={() => (showShortcuts = !showShortcuts)}
-			class="text-gray-600 underline hover:text-indigo-900"
-			aria-label="Change your keyboard shortcut"
-		>
-			change your keyboard shortcut
-		</button>
 		{#if showShortcuts}
 			<div>
 				<label for="shortcut-input" class="sr-only mb-2 block text-gray-700">
