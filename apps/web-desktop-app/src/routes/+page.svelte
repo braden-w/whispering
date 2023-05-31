@@ -93,7 +93,7 @@
 	</p>
 	<div class="flex">
 		<a
-			href="/key"
+			href="/settings"
 			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
 			aria-label="Settings"
 		>
