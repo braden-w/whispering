@@ -27,7 +27,6 @@ export async function toggleRecording({
 	}
 
 	if (get(recordingState) === 'idle') {
-		console.log('🚀 ~ file: toggleRecording.ts:30 ~ get(recordingState):', get(recordingState));
 		await startRecording();
 		switchIcon('redLargeSquare');
 		await recordingState.set('recording');

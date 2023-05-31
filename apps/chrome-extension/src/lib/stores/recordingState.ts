@@ -15,7 +15,7 @@ function createRecordingStateStore() {
 		set(recordingStateFromStorage || initialRecordingState);
 	}
 
-	async function setIsRecording(value: RecordingState) {
+	async function setRecordingState(value: RecordingState) {
 		await storage.set('recording-state', value);
 		set(value);
 	}
@@ -23,7 +23,7 @@ function createRecordingStateStore() {
 	return {
 		init,
 		subscribe,
-		set: setIsRecording,
+		set: setRecordingState,
 		update
 	};
 }
