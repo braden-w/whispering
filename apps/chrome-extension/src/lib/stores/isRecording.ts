@@ -1,9 +1,9 @@
 import { Storage } from '@plasmohq/storage/dist';
 import { get, writable } from 'svelte/store';
 
-export const isRecording = createisRecordingStore();
+export const isRecording = createIsRecordingStore();
 
-function createisRecordingStore() {
+function createIsRecordingStore() {
 	const initialIsRecording = false;
 	const isRecordingStore = writable(initialIsRecording);
 	const { subscribe, set, update } = isRecordingStore;
@@ -16,21 +16,21 @@ function createisRecordingStore() {
 		set(!!isRecordingFromStorage || initialIsRecording);
 	}
 
-	async function setisRecording(value: boolean) {
+	async function setIsRecording(value: boolean) {
 		await storage.set('is-background-recording', value);
 		set(value);
 	}
 
-	async function toggleisRecording() {
+	async function toggleIsRecording() {
 		const isRecording = get(isRecordingStore);
-		await setisRecording(!isRecording);
+		await setIsRecording(!isRecording);
 	}
 
 	return {
 		init,
 		subscribe,
-		set: setisRecording,
-		toggle: toggleisRecording,
+		set: setIsRecording,
+		toggle: toggleIsRecording,
 		update
 	};
 }

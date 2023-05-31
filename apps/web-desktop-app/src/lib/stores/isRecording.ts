@@ -1,12 +1,12 @@
 import { get, writable } from 'svelte/store';
 
-export const isRecording = createisRecordingStore();
+export const isRecording = createIsRecordingStore();
 
-function createisRecordingStore() {
+function createIsRecordingStore() {
 	const isRecordingStore = writable(false);
 	const { subscribe, set, update } = isRecordingStore;
 
-	async function toggleisRecording() {
+	async function toggleIsRecording() {
 		const isRecording = get(isRecordingStore);
 		await set(!isRecording);
 	}
@@ -14,7 +14,7 @@ function createisRecordingStore() {
 	return {
 		subscribe,
 		set,
-		toggle: toggleisRecording,
+		toggle: toggleIsRecording,
 		update
 	};
 }
