@@ -2,7 +2,7 @@
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { audioSrc, recordingState, outputText } from '$lib/stores/recordingState';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
-	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
+	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shortcuts';
 	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from 'ui/components';
@@ -11,7 +11,7 @@
 	import KeyIcon from 'ui/icons/KeyIcon.svelte';
 	import KeyboardIcon from 'ui/icons/KeyboardIcon.svelte';
 
-	// --- Local Shorcuts ---
+	// --- Local Shortcuts ---
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;

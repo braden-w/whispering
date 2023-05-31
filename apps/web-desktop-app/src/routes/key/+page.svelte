@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { options } from '$lib/stores/options';
-	import { registerShortcut } from '$lib/system-apis/shorcuts';
+	import { registerShortcut } from '$lib/system-apis/shortcuts';
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import { AdjustmentsVerticalIcon, PaperAirplaneIcon } from 'ui/icons';

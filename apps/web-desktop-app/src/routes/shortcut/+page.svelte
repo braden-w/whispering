@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { options } from '$lib/stores/options';
-	import { registerShortcut } from '$lib/system-apis/shorcuts';
+	import { registerShortcut } from '$lib/system-apis/shortcuts';
 	import toast from 'svelte-french-toast';
 
 	function onChangeShortcutClick() {
