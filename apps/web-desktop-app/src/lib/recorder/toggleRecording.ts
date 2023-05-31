@@ -26,7 +26,7 @@ export async function toggleRecording() {
 			const audioBlob = await stopRecording();
 			audioSrc.set(URL.createObjectURL(audioBlob));
 			recordingState.set('transcribing');
-			toast.promise(processRecording(audioBlob), {
+			await toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
 				error: () => SomethingWentWrongToast
