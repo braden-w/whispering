@@ -1,26 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import { apiKey } from '$lib/stores/apiKey';
 	import { options } from '$lib/stores/options';
 	import { registerShortcut } from '$lib/system-apis/shorcuts';
 	import toast from 'svelte-french-toast';
-	import { AdjustmentsVerticalIcon, PaperAirplaneIcon } from 'ui/icons';
-
-	let showOptions: boolean;
-
-	function submitApiKey() {
-		if (!$apiKey) {
-			toast.error('Please enter a valid OpenAI API key.');
-		} else {
-			toast.success('API key set!');
-			goto('/');
-		}
-	}
-
-	// --- Global Shortcuts ---
-
-	let showShortcuts = false;
 
 	function onChangeShortcutClick() {
 		toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {

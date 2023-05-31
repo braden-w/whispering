@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { audioSrc, recordingState, outputText } from '$lib/stores/recordingState';
-	import { options } from '$lib/stores/options';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
 	import { onDestroy, onMount } from 'svelte';
@@ -26,11 +25,6 @@
 		await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
-
-	// --- Store Logic ---
-
-	onMount(async () => await registerShortcut($options.currentGlobalShortcut, toggleRecording));
-	onDestroy(async () => await unregisterAllShortcuts());
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
