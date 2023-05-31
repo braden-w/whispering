@@ -5,6 +5,7 @@ import { setAlwaysOnTop } from '$lib/system-apis/window';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
+import { invoke } from '@tauri-apps/api/tauri';
 import toast from 'svelte-french-toast';
 import { get } from 'svelte/store';
 import { startRecording, stopRecording } from './mediaRecorder';
@@ -42,6 +43,7 @@ export async function toggleRecording() {
 
 async function processRecording(audioBlob: Blob) {
 	const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey));
-	writeTextToClipboard(text);
+	await writeTextToClipboard(text);
 	outputText.set(text);
+	invoke('paste');
 }
