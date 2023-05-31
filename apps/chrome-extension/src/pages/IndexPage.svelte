@@ -82,6 +82,8 @@
 		Install the
 		<a
 			href="https://github.com/braden-w/whispering/releases"
+			target="_blank"
+			rel="noopener noreferrer"
 			class="text-gray-600 underline hover:text-indigo-900"
 			title="Download the desktop app"
 			aria-label="Download the desktop app"
