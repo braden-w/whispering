@@ -1,19 +1,11 @@
 <script lang="ts">
-	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
-	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 	import { Storage } from '@plasmohq/storage/dist';
-	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
-	import { get } from 'svelte/store';
 	import { ToggleRecordingIcon } from 'ui/components';
 	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
-	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 	import { audioSrc, outputText } from '~lib/stores/apiKey';
 	import { recordingState } from '~lib/stores/recordingState';
-	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
-	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
-	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 	import { sendMessageToContentScript } from '~lib/utils/messaging';
 
 	// --- Recording Logic ---
