@@ -20,6 +20,7 @@ export async function toggleRecording() {
 	if (recordingStateValue === 'idle') {
 		await setAlwaysOnTop(true);
 		await startRecording();
+		recordingState.set('recording');
 	} else {
 		try {
 			const audioBlob = await stopRecording();
