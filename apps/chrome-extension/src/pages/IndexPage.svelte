@@ -10,7 +10,7 @@
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 	import { audioSrc, outputText } from '~lib/stores/apiKey';
-	import { isRecording } from '~lib/stores/isRecording';
+	import { recordingState } from '~lib/stores/recordingState';
 	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
 	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
@@ -54,12 +54,12 @@
 		chrome.runtime.openOptionsPage();
 	}
 
-	isRecording.init();
+	recordingState.init();
 	audioSrc.init();
 	outputText.init();
 	const storage = new Storage();
 	storage.watch({
-		'is-recording': () => isRecording.init(),
+		'recording-state': () => recordingState.init(),
 		'audio-src': () => audioSrc.init(),
 		'output-text': () => outputText.init()
 	});
@@ -70,7 +70,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 
-	<ToggleRecordingIcon isRecording={$isRecording} on:click={toggleRecording} />
+	<ToggleRecordingIcon recordingState={$recordingState} on:click={toggleRecording} />
 
 	<div>
 		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">

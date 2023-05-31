@@ -3,7 +3,7 @@ import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { apiKey, audioSrc, outputText } from '~lib/stores/apiKey';
-import { isRecording } from '~lib/stores/isRecording';
+import { recordingState } from '~lib/stores/recordingState';
 import { options } from '~lib/stores/options';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
@@ -26,16 +26,17 @@ export async function toggleRecording({
 		return;
 	}
 
-	await isRecording.toggle();
-	const isRecordingValue = get(isRecording);
-	if (!isRecordingValue) {
+	if (get(recordingState) === 'idle') {
+		console.log('🚀 ~ file: toggleRecording.ts:30 ~ get(recordingState):', get(recordingState));
 		await startRecording();
 		switchIcon('octagonalSign');
+		await recordingState.set('recording');
 	} else {
 		try {
 			const audioBlob = await stopRecording();
 			audioSrc.set(URL.createObjectURL(audioBlob));
 			switchIcon('arrowsCounterclockwise');
+			await recordingState.set('transcribing');
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKeyValue);
 			writeTextToClipboardIfEnabled(text);
 			outputText.set(text);
@@ -44,6 +45,7 @@ export async function toggleRecording({
 			console.error('Error occurred during transcription:', error);
 		} finally {
 			switchIcon('studioMicrophone');
+			await recordingState.set('idle');
 		}
 	}
 }
