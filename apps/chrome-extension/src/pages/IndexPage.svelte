@@ -1,6 +1,7 @@
 <script lang="ts">
 	import octagonalSign from 'data-base64:~assets/octagonal_sign.png';
 	import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
+	import { Storage } from '@plasmohq/storage/dist';
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
 	import { get } from 'svelte/store';
@@ -8,61 +9,44 @@
 	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-	import { apiKey } from '~lib/stores/apiKey';
+	import { audioSrc, outputText } from '~lib/stores/apiKey';
 	import { isRecording } from '~lib/stores/isRecording';
 	import PleaseEnterAPIKeyToast from '~lib/toasts/PleaseEnterAPIKeyToast.svelte';
 	import SomethingWentWrongToast from '~lib/toasts/SomethingWentWrongToast.svelte';
 	import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
+	import { sendMessageToContentScript } from '~lib/utils/messaging';
 
 	// --- Recording Logic ---
 
-	let outputText = '';
-	let audioSrc: string;
-
 	async function toggleRecording() {
-		await apiKey.init();
-		if (!$apiKey) {
-			toast.error(PleaseEnterAPIKeyToast);
-			return;
-		}
-
-		await isRecording.init();
-		if (!get(isRecording)) {
-			await startRecording();
-			chrome.action.setIcon({ path: octagonalSign });
-			isRecording.toggle();
-		} else {
-			const audioBlob = await stopRecording();
-			audioSrc = URL.createObjectURL(audioBlob);
-			chrome.action.setIcon({ path: studioMicrophone });
-			isRecording.toggle();
-			toast.promise(processRecording(audioBlob), {
-				loading: 'Processing Whisper...',
-				success: 'Copied to clipboard!',
-				error: () => SomethingWentWrongToast
-			});
-		}
+		sendMessageToContentScript({ command: 'toggle-recording' });
+		// 	toast.promise(processRecording(audioBlob), {
+		// 		loading: 'Processing Whisper...',
+		// 		success: 'Copied to clipboard!',
+		// 		error: () => SomethingWentWrongToast
+		// 	});
+		// }
 	}
 
-	async function processRecording(audioBlob: Blob) {
-		await apiKey.init();
-		const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
-		writeTextToClipboard(text);
-		outputText = text;
-	}
+	// async function processRecording(audioBlob: Blob) {
+	// 	await apiKey.init();
+	// 	const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
+	// 	writeTextToClipboard(text);
+	// 	outputText = text;
+	// }
 
 	// --- Local Shortcuts ---
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		toggleRecording();
+		sendMessageToContentScript({ command: 'toggle-recording' });
 	}
 
 	// --- Copy Output Button ---
 
 	async function copyOutputText() {
-		await writeTextToClipboard(outputText);
+		writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
 
@@ -70,7 +54,15 @@
 		chrome.runtime.openOptionsPage();
 	}
 
-	onMount(async () => await isRecording.init());
+	isRecording.init();
+	audioSrc.init();
+	outputText.init();
+	const storage = new Storage();
+	storage.watch({
+		'is-recording': () => isRecording.init(),
+		'audio-src': () => audioSrc.init(),
+		'output-text': () => outputText.init()
+	});
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -89,7 +81,7 @@
 				id="transcripted-text"
 				class="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 transition-all duration-200 ease-in-out focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
-				bind:value={outputText}
+				bind:value={$outputText}
 			/>
 
 			<button
@@ -101,7 +93,7 @@
 			</button>
 		</div>
 		{#if audioSrc}
-			<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if}
 	</div>
 	<p class="text-xs text-gray-600">

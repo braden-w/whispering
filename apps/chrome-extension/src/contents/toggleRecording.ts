@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-import { apiKey } from '~lib/stores/apiKey';
+import { apiKey, audioSrc, outputText } from '~lib/stores/apiKey';
 import { isRecording } from '~lib/stores/isRecording';
 import { options } from '~lib/stores/options';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
@@ -26,6 +26,7 @@ export async function toggleRecording({
 		return;
 	}
 
+	await isRecording.toggle();
 	const isRecordingValue = get(isRecording);
 	if (!isRecordingValue) {
 		await startRecording();
@@ -33,9 +34,11 @@ export async function toggleRecording({
 	} else {
 		try {
 			const audioBlob = await stopRecording();
+			audioSrc.set(URL.createObjectURL(audioBlob));
 			switchIcon('arrowsCounterclockwise');
 			const text = await transcribeAudioWithWhisperApi(audioBlob, apiKeyValue);
 			writeTextToClipboardIfEnabled(text);
+			outputText.set(text);
 			onSuccessfulTranscription(text);
 		} catch (error) {
 			console.error('Error occurred during transcription:', error);
@@ -43,7 +46,6 @@ export async function toggleRecording({
 			switchIcon('studioMicrophone');
 		}
 	}
-	await isRecording.toggle();
 }
 
 function openOptionsPage() {
