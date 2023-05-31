@@ -20,27 +20,14 @@
 
 	async function toggleRecording() {
 		sendMessageToContentScript({ command: 'toggle-recording' });
-		// 	toast.promise(processRecording(audioBlob), {
-		// 		loading: 'Processing Whisper...',
-		// 		success: 'Copied to clipboard!',
-		// 		error: () => SomethingWentWrongToast
-		// 	});
-		// }
 	}
-
-	// async function processRecording(audioBlob: Blob) {
-	// 	await apiKey.init();
-	// 	const text = await transcribeAudioWithWhisperApi(audioBlob, $apiKey);
-	// 	writeTextToClipboard(text);
-	// 	outputText = text;
-	// }
 
 	// --- Local Shortcuts ---
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		sendMessageToContentScript({ command: 'toggle-recording' });
+		toggleRecording();
 	}
 
 	// --- Copy Output Button ---
@@ -92,7 +79,7 @@
 				<ClipboardIcon />
 			</button>
 		</div>
-		{#if audioSrc}
+		{#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if}
 	</div>
