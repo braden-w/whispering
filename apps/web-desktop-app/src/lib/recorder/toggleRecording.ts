@@ -35,7 +35,7 @@ export async function toggleRecording() {
 			await setAlwaysOnTop(false);
 		}
 	}
-	await isRecording.toggle();
+	isRecording.toggle();
 }
 
 async function processRecording(audioBlob: Blob) {
