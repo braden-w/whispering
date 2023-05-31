@@ -1,13 +1,13 @@
 <script lang="ts">
-	import {toggleRecording} from '$lib/recorder/toggleRecording';
-	import {audioSrc, isRecording, outputText} from '$lib/stores/isRecording';
-	import {options} from '$lib/stores/options';
-	import {writeTextToClipboard} from '$lib/system-apis/clipboard';
-	import {registerShortcut, unregisterAllShortcuts} from '$lib/system-apis/shorcuts';
-	import {onDestroy, onMount} from 'svelte';
+	import { toggleRecording } from '$lib/recorder/toggleRecording';
+	import { audioSrc, recordingState, outputText } from '$lib/stores/recordingState';
+	import { options } from '$lib/stores/options';
+	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
+	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
+	import { onDestroy, onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import {ToggleRecordingIcon} from 'ui/components';
-	import {ClipboardIcon} from 'ui/icons';
+	import { ToggleRecordingIcon } from 'ui/components';
+	import { ClipboardIcon } from 'ui/icons';
 	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
 
 	// --- Local Shorcuts ---
@@ -36,7 +36,7 @@
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
 
-	<ToggleRecordingIcon isRecording={$isRecording} on:click={toggleRecording} />
+	<ToggleRecordingIcon recordingState={$recordingState} on:click={toggleRecording} />
 
 	<div>
 		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
