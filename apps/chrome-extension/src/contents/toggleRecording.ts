@@ -3,7 +3,7 @@ import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
 import { apiKey } from '~lib/stores/apiKey';
-import { isBackgroundRecording } from '~lib/stores/isBackgroundRecording';
+import { isRecording } from '~lib/stores/isRecording';
 import { options } from '~lib/stores/options';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
@@ -26,8 +26,8 @@ export async function toggleRecording({
 		return;
 	}
 
-	const isRecording = get(isBackgroundRecording);
-	if (!isRecording) {
+	const isRecordingValue = get(isRecording);
+	if (!isRecordingValue) {
 		await startRecording();
 		switchIcon('octagonalSign');
 	} else {
@@ -43,7 +43,7 @@ export async function toggleRecording({
 			switchIcon('studioMicrophone');
 		}
 	}
-	await isBackgroundRecording.toggle();
+	await isRecording.toggle();
 }
 
 function openOptionsPage() {

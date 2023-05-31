@@ -1,8 +1,20 @@
 import { writable } from 'svelte/store';
 
-export const apiKey = writable(localStorage.getItem('openai-api-key') || '');
+export const apiKey = createApiKeyStore();
 
-export function setApiKey(inputApiKey: string) {
-	localStorage.setItem('openai-api-key', inputApiKey);
-	apiKey.set(inputApiKey);
+function createApiKeyStore() {
+	const initialApiKey = '';
+	const apiKeyFromStorage = localStorage.getItem('openai-api-key');
+	const { subscribe, set, update } = writable(apiKeyFromStorage || initialApiKey);
+
+	async function setApiKey(apiKey: string) {
+		localStorage.setItem('openai-api-key', apiKey);
+		set(apiKey);
+	}
+
+	return {
+		subscribe,
+		set: setApiKey,
+		update
+	};
 }

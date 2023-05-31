@@ -13,7 +13,7 @@ function createApiKeyStore() {
 		set(apiKeyFromStorage || initialApiKey);
 	}
 
-	async function updateApiKey(apiKey: string) {
+	async function setApiKey(apiKey: string) {
 		await storage.set('openai-api-key', apiKey);
 		set(apiKey);
 	}
@@ -21,7 +21,7 @@ function createApiKeyStore() {
 	return {
 		subscribe,
 		init,
-		set: updateApiKey,
+		set: setApiKey,
 		update
 	};
 }
