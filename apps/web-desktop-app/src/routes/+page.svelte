@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import { audioSrc, isRecording, outputText } from '$lib/stores/isRecording';
-	import { options } from '$lib/stores/options';
-	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
-	import { registerShortcut, unregisterAllShortcuts } from '$lib/system-apis/shorcuts';
-	import { onDestroy, onMount } from 'svelte';
+	import {toggleRecording} from '$lib/recorder/toggleRecording';
+	import {audioSrc, isRecording, outputText} from '$lib/stores/isRecording';
+	import {options} from '$lib/stores/options';
+	import {writeTextToClipboard} from '$lib/system-apis/clipboard';
+	import {registerShortcut, unregisterAllShortcuts} from '$lib/system-apis/shorcuts';
+	import {onDestroy, onMount} from 'svelte';
 	import toast from 'svelte-french-toast';
-	import { ToggleRecordingIcon } from 'ui/components';
-	import { ClipboardIcon } from 'ui/icons';
+	import {ToggleRecordingIcon} from 'ui/components';
+	import {ClipboardIcon} from 'ui/icons';
 	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
 
 	// --- Local Shorcuts ---

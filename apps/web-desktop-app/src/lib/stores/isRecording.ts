@@ -6,9 +6,9 @@ function createIsRecordingStore() {
 	const isRecordingStore = writable(false);
 	const { subscribe, set, update } = isRecordingStore;
 
-	async function toggleIsRecording() {
+	function toggleIsRecording() {
 		const isRecording = get(isRecordingStore);
-		await set(!isRecording);
+		set(!isRecording);
 	}
 
 	return {

@@ -1,6 +1,11 @@
 <script lang="ts">
-	export let isRecording = false;
-	$: icon = isRecording ? '🟥' : '🎙️';
+	const recordingStateToIcon = {
+		idle: '🎙️',
+		recording: '🟥',
+		transcribing: '🔄'
+	};
+	export let recordingState;
+	$: icon = recordingStateToIcon[recordingState];
 </script>
 
 <button
