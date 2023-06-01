@@ -4,10 +4,7 @@
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from 'ui/components';
-	import { ClipboardIcon } from 'ui/icons';
-	import AdjustmentsHorizontalIcon from 'ui/icons/AdjustmentsHorizontalIcon.svelte';
-	import KeyIcon from 'ui/icons/KeyIcon.svelte';
-	import KeyboardIcon from 'ui/icons/KeyboardIcon.svelte';
+	import { AdjustmentsHorizontalIcon, ClipboardIcon, KeyIcon, KeyboardIcon } from 'ui/icons';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
