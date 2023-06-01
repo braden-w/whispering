@@ -2,9 +2,9 @@ import { get } from 'svelte/store';
 import type { Icon } from '~background/setIcon';
 import { writeTextToClipboard } from '~lib/apis/clipboard';
 import { startRecording, stopRecording } from '~lib/recorder/mediaRecorder';
-import { apiKey, audioSrc, outputText } from '~lib/stores/apiKey';
+import { apiKey } from '~lib/stores/apiKey';
 import { options } from '~lib/stores/options';
-import { recordingState } from '~lib/stores/recordingState';
+import { audioSrc, outputText, recordingState } from '~lib/stores/recordingState';
 import { transcribeAudioWithWhisperApi } from '~lib/transcribeAudioWithWhisperApi';
 import { sendMessageToBackground } from '~lib/utils/messaging';
 

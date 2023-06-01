@@ -1,15 +1,17 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { options } from '$lib/stores/options';
 	import { registerShortcut } from '$lib/system-apis/shortcuts';
 	import toast from 'svelte-french-toast';
 
-	function onChangeShortcutClick() {
-		toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {
+	async function onChangeShortcutClick() {
+		await toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {
 			loading: 'Registering shortcuts...',
 			success: 'Registered shortcuts!',
 			error: "Couldn't register shortcut. The shortcut code must be a valid keyboard shortcut."
 		});
+		goto('/');
 	}
 </script>
 
