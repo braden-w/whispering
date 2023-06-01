@@ -7,7 +7,7 @@ export function createStoreSyncedWithStorage<T>({
 	key: string;
 	initialValue: T;
 }) {
-	const valueFromStorage = getValueFromStorage<T>(key);
+	const valueFromStorage = getValueFromStorage<T>({ key, defaultValue: initialValue });
 	const { subscribe, set, update } = writable<T>(valueFromStorage || initialValue);
 
 	function setValue(value: T) {
@@ -22,11 +22,22 @@ export function createStoreSyncedWithStorage<T>({
 	};
 }
 
-function getValueFromStorage<T>(key: string): T | undefined {
+function getValueFromStorage<T>({
+	key,
+	defaultValue
+}: {
+	key: string;
+	defaultValue: T;
+}): T | undefined {
 	const optionsFromStorage = localStorage.getItem(key);
 	if (!optionsFromStorage) return;
-	const parsedOptionsFromStorage = JSON.parse(optionsFromStorage);
-	return parsedOptionsFromStorage as T;
+	try {
+		const parsedOptionsFromStorage = JSON.parse(optionsFromStorage);
+		return parsedOptionsFromStorage as T;
+	} catch (error) {
+		console.error('Error parsing JSON:', error);
+		return defaultValue;
+	}
 }
 
 function setValueToStorage<T>(key: string, value: T) {
