@@ -1,5 +1,5 @@
-import { createStore } from './createStore';
+import { createStoreSyncedWithStorage } from './createStore';
 
-export const apiKey = createStore('openai-api-key', '');
-export const outputText = createStore('output-text', '');
-export const audioSrc = createStore('audio-src', '');
+export const apiKey = createStoreSyncedWithStorage({ key: 'openai-api-key', initialValue: '' });
+export const outputText = createStoreSyncedWithStorage({ key: 'output-text', initialValue: '' });
+export const audioSrc = createStoreSyncedWithStorage({ key: 'audio-src', initialValue: '' });

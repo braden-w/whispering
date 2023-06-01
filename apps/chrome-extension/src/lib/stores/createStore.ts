@@ -1,7 +1,13 @@
 import { writable } from 'svelte/store';
 import { Storage } from '@plasmohq/storage/dist';
 
-export function createStore<T>(key: string, initialValue: T) {
+export function createStoreSyncedWithStorage<T>({
+	key,
+	initialValue
+}: {
+	key: string;
+	initialValue: T;
+}) {
 	const { subscribe, set, update } = writable<T>(initialValue);
 	const storage = new Storage();
 

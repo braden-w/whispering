@@ -1,5 +1,8 @@
-import { createStore } from './createStore';
+import { createStoreSyncedWithStorage } from './createStore';
 
 type RecordingState = 'idle' | 'recording' | 'transcribing';
 const initialRecordingState: RecordingState = 'idle';
-export const recordingState = createStore('recording-state', initialRecordingState);
+export const recordingState = createStoreSyncedWithStorage({
+	key: 'recording-state',
+	initialValue: initialRecordingState
+});
