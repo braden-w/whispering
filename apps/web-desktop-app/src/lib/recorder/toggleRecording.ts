@@ -1,11 +1,10 @@
 import { apiKey } from '$lib/stores/apiKey';
 import { audioSrc, outputText, recordingState } from '$lib/stores/recordingState';
-import { writeTextToClipboard } from '$lib/system-apis/clipboard';
+import { pasteTextFromClipboard, writeTextToClipboard } from '$lib/system-apis/clipboard';
 import { setAlwaysOnTop } from '$lib/system-apis/window';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
-import { invoke } from '@tauri-apps/api/tauri';
 import toast from 'svelte-french-toast';
 import { get } from 'svelte/store';
 import { startRecording, stopRecording } from './mediaRecorder';
@@ -43,7 +42,7 @@ export async function toggleRecording() {
 
 async function processRecording(audioBlob: Blob) {
 	const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey));
-	await writeTextToClipboard(text);
 	outputText.set(text);
-	invoke('paste');
+	await writeTextToClipboard(text);
+	await pasteTextFromClipboard();
 }

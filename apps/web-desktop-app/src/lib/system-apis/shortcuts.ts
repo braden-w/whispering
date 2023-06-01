@@ -8,7 +8,7 @@ export async function registerShortcut(currentShortcut: string, command: () => P
 	if (!window.__TAURI__) return;
 	const { register, unregisterAll } = await import('@tauri-apps/api/globalShortcut');
 	await unregisterAll();
-	await registerWithTimeout(currentShortcut, command, register, 1000);
+	await registerWithTimeout({ currentShortcut, command, registerFn: register, timeout: 1000 });
 }
 
 /**
@@ -25,12 +25,17 @@ export async function unregisterAllShortcuts() {
  * keyboard shortcut is pressed, and adds a timeout. If the timeout is reached
  * before the command is registered, a timeout error will be thrown.
  */
-async function registerWithTimeout(
-	currentShortcut: string,
-	command: () => Promise<void>,
-	registerFn: (shortcut: string, command: () => Promise<void>) => Promise<void>,
-	timeout: number
-) {
+async function registerWithTimeout({
+	currentShortcut,
+	command,
+	registerFn,
+	timeout
+}: {
+	currentShortcut: string;
+	command: () => Promise<void>;
+	registerFn: (shortcut: string, command: () => Promise<void>) => Promise<void>;
+	timeout: number;
+}) {
 	const timeoutPromise = new Promise<void>((_, reject) => {
 		setTimeout(() => {
 			reject(new Error(`Timeout: operation took more than ${timeout} milliseconds`));
