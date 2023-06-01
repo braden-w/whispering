@@ -4,8 +4,7 @@
 	import { ToggleRecordingIcon } from 'ui/components';
 	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
-	import { audioSrc, outputText } from '~lib/stores/apiKey';
-	import { recordingState } from '~lib/stores/recordingState';
+	import { audioSrc, outputText, recordingState } from '~lib/stores/recordingState';
 	import { sendMessageToContentScript } from '~lib/utils/messaging';
 
 	// --- Recording Logic ---
