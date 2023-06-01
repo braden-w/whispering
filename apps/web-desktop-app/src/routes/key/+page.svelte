@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
-	import { options } from '$lib/stores/options';
-	import { registerShortcut } from '$lib/system-apis/shortcuts';
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
-	import { AdjustmentsVerticalIcon, PaperAirplaneIcon } from 'ui/icons';
+	import { PaperAirplaneIcon } from 'ui/icons';
 
 	let apiKeyInput: HTMLInputElement;
-	let showOptions: boolean;
 
 	function submitApiKey() {
 		if (!$apiKey) {
@@ -17,18 +14,6 @@
 			toast.success('API key set!');
 			goto('/');
 		}
-	}
-
-	// --- Global Shortcuts ---
-
-	let showShortcuts = false;
-
-	function onChangeShortcutClick() {
-		toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {
-			loading: 'Registering shortcuts...',
-			success: 'Registered shortcuts!',
-			error: "Couldn't register shortcut. The shortcut code must be a valid keyboard shortcut."
-		});
 	}
 
 	onMount(() => {
