@@ -54,17 +54,39 @@
 	</p>
 	<p class="text-xs text-gray-600">
 		Check out the
-		<a
-			href="https://github.com/braden-w/whispering/releases"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 underline hover:text-indigo-900"
-			title="Check out the Chrome Extension"
-			aria-label="Check out the Chrome Extension"
-		>
-			extension
-		</a>
-		{#if !window.__TAURI__}
+		{#if window.__TAURI__}
+			<a
+				href="https://github.com/braden-w/whispering/releases"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</a>
+			and
+			<a
+				href="https://whispering.bradenwong.com"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Check out the website"
+				aria-label="Check out the website"
+			>
+				website
+			</a> for more.
+		{:else}
+			<a
+				href="https://github.com/braden-w/whispering/releases"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</a>
 			and
 			<a
 				href="https://github.com/braden-w/whispering/releases"
