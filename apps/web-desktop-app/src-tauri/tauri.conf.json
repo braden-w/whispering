@@ -23,12 +23,6 @@
 			},
 			"window": {
 				"setAlwaysOnTop": true
-			},
-			"fs": {
-				"readFile": true,
-				"removeFile": true,
-				"writeFile": true,
-				"scope": ["$APPDATA/*"]
 			}
 		},
 		"bundle": {
