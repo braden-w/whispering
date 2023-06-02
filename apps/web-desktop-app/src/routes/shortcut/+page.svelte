@@ -75,7 +75,7 @@
 				href="https://chrome.google.com/webstore/detail/your-extension-id"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-800"
+				class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-500"
 			>
 				<svg
 					class="h-4 w-4 mr-1"
@@ -185,7 +185,7 @@
 				href="https://github.com/your-repo/your-project/releases"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-gray-600 hover:bg-gray-800"
+				class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-gray-600 hover:bg-gray-500"
 			>
 				<svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 					<path
