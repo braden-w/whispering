@@ -77,7 +77,7 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<p class="text-xs text-gray-600">
+	<p class="text-xs text-gray-500 font-light">
 		Check out the
 		<a
 			href="https://github.com/braden-w/whispering/releases"

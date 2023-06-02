@@ -53,7 +53,7 @@
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
 	{#if !window.__TAURI__}
-		<p class="text-xs text-gray-600">
+		<p class="text-xs text-gray-500 font-light">
 			Check out the
 			<a
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
