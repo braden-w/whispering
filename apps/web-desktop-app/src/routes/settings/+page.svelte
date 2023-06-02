@@ -8,18 +8,17 @@
 	<div class="flex flex-col space-y-2 px-4">
 		<label class="inline-flex items-center">
 			<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
-			<span class="ml-2 text-gray-600">Copy text to clipboard on successful transcription</span>
+			<span class="ml-2 text-gray-600 font-light">
+				Copy text to clipboard on successful transcription
+			</span>
 		</label>
-	</div>
-
-	<div class="flex flex-col space-y-2 px-4">
 		<label class="inline-flex items-center">
 			<input
 				type="checkbox"
 				class="text-indigo-600"
 				bind:checked={$options.pasteContentsOnSuccess}
 			/>
-			<span class="ml-2 text-gray-600">
+			<span class="ml-2 text-gray-600 font-light">
 				Paste contents from clipboard after successful transcription
 			</span>
 		</label>
