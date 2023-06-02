@@ -78,7 +78,7 @@
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
 	<p class="text-xs text-gray-600">
-		Install the
+		Check out the
 		<a
 			href="https://github.com/braden-w/whispering/releases"
 			target="_blank"
