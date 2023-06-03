@@ -4,6 +4,10 @@ Whispering is an open-source project designed to streamline your voice-to-text e
 
 ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png)
 
+[![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/oilbfihknpdbpfkcncojikmooipnlglo)
+[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
+[![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
+
 ## Table of Contents
 
 - [Features](#features)
