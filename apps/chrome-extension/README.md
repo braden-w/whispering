@@ -2,7 +2,7 @@
 
 The Whispering Chrome extension is a powerful tool that enhances your voice-to-text experience on the web. It provides seamless access to the OpenAI Whisper API for voice transcription and adds a convenient recording button for Chat GPT. Streamline your online voice transcription workflow with this handy extension.
 
-<img src="./images/demo_2.gif" width="300">
+<img src="../../images/demo_2.gif" width="300">
 
 ## Table of Contents
 
