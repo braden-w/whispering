@@ -23,11 +23,22 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
+	<h2 class="text-lg text-gray-500 font-light">
+		You can find your OpenAI API key
+		<a
+			href="https://platform.openai.com/account/api-keys"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="text-gray-600 underline hover:text-indigo-900"
+		>
+			here.
+		</a>
+	</h2>
 	<form on:submit|preventDefault={submitApiKey}>
 		<div class="flex items-center space-x-2">
 			<input
 				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-				placeholder="API Key"
+				placeholder="Your OpenAI API Key"
 				bind:value={$apiKey}
 				bind:this={apiKeyInput}
 				type="text"
@@ -42,17 +53,6 @@
 			</button>
 		</div>
 	</form>
-	<p class="text-xs text-gray-500 font-light">
-		You can find your OpenAI API key
-		<a
-			href="https://platform.openai.com/account/api-keys"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 underline hover:text-indigo-900"
-		>
-			here.
-		</a>
-	</p>
 
 	<p class="text-xs text-gray-600">
 		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
