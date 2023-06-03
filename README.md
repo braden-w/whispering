@@ -1,14 +1,24 @@
-# Whispering: The Lightweight Ergonomic Wrapper for OpenAI Whisperer API
+<p align="center">
+  <a href="https://whispering.bradenwong.com">
+    <img width="180" src="./apps/web-desktop-app/static/studio_microphone.png" alt="Whispering">
+  </a>
+  <h1 align="center">Whispering</h1>
+  <p align="center">Ergonomic Wrapper for OpenAI's Whisper (Browser Extension, Web, and Desktop App)</p>
+</p>
 
-Whispering is an open-source project designed to streamline your voice-to-text experience, increase your writing productivity, and simplify your workflow. By leveraging the OpenAI Whisperer API, Whispering enables you to record your voice, transcribe it, and copy the resulting text directly to your clipboard for seamless pasting.
+---
 
-![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png)
+Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
+
+It adds a microphone icon on the ChatGPT website and a global keyboard shortcut that enables you to record your voice, transcribe it, and seamlessly paste it.
+
+<!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
 
 [![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/oilbfihknpdbpfkcncojikmooipnlglo)
 [![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
 [![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
 
-## Table of Contents
+<!-- ## Table of Contents
 
 - [Features](#features)
 - [Whispering Web and Desktop App](#whispering-web-and-desktop-app)
@@ -25,7 +35,7 @@ Whispering is an open-source project designed to streamline your voice-to-text e
   - [Getting Started with Development](#getting-started-with-development)
 - [Contributing](#contributing)
 - [License](#license)
-- [Support and Feedback](#support-and-feedback)
+- [Support and Feedback](#support-and-feedback) -->
 
 ## Features
 
