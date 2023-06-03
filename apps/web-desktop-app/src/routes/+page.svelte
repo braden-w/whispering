@@ -52,19 +52,19 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<p class="text-xs text-gray-600">
-		Check out the
-		<a
-			href="https://github.com/braden-w/whispering/releases"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 underline hover:text-indigo-900"
-			title="Check out the Chrome Extension"
-			aria-label="Check out the Chrome Extension"
-		>
-			extension
-		</a>
-		{#if !window.__TAURI__}
+	{#if !window.__TAURI__}
+		<p class="text-xs text-gray-500 font-light">
+			Check out the
+			<a
+				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</a>
 			and
 			<a
 				href="https://github.com/braden-w/whispering/releases"
@@ -72,10 +72,26 @@
 				title="Check out the desktop app"
 				aria-label="Check out the desktop app"
 			>
-				desktop app
+				app
 			</a> for shortcuts.
-		{/if}
-	</p>
+		</p>
+	{:else}
+		<p class="text-xs text-gray-600">
+			Check out the
+			<a
+				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-gray-600 underline hover:text-indigo-900"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</a>
+
+			for browser integration.
+		</p>
+	{/if}
 	<div class="flex">
 		<a
 			href="/settings"

@@ -2,7 +2,7 @@
 	import { Storage } from '@plasmohq/storage/dist';
 	import toast from 'svelte-french-toast/dist/core/toast';
 	import { ToggleRecordingIcon } from 'ui/components';
-	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
+	import { AdjustmentsHorizontalIcon, ClipboardIcon, KeyboardIcon } from 'ui/icons';
 	import { writeTextToClipboard } from '~lib/apis/clipboard';
 	import { audioSrc, outputText, recordingState } from '~lib/stores/recordingState';
 	import { sendMessageToContentScript } from '~lib/utils/messaging';
@@ -77,8 +77,8 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<p class="text-xs text-gray-600">
-		Install the
+	<p class="text-xs text-gray-500 font-light">
+		Check out the
 		<a
 			href="https://github.com/braden-w/whispering/releases"
 			target="_blank"
@@ -90,13 +90,15 @@
 			desktop app
 		</a> for global shortcuts.
 	</p>
+
 	<button
 		on:click={openOptionsPage}
-		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+		class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
 	>
 		<AdjustmentsHorizontalIcon />
 		<span>Settings</span>
 	</button>
+
 	<div class="fixed bottom-4 right-4">
 		<a
 			href="https://github.com/braden-w/whisper-desktop"

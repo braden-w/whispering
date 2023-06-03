@@ -42,7 +42,7 @@
 			</button>
 		</div>
 	</form>
-	<p class="text-xs text-gray-600">
+	<p class="text-xs text-gray-500 font-light">
 		You can find your OpenAI API key
 		<a
 			href="https://platform.openai.com/account/api-keys"

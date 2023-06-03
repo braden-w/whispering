@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
-	import { AdjustmentsVerticalIcon, PaperAirplaneIcon } from 'ui/icons';
+	import { AdjustmentsVerticalIcon, KeyboardIcon, PaperAirplaneIcon } from 'ui/icons';
 	import { apiKey } from '~lib/stores/apiKey';
 	import { options } from '~lib/stores/options';
 
@@ -17,6 +17,10 @@
 			toast.success('API key set!');
 			closeWindowAfterMs(300);
 		}
+	}
+
+	function openExtensionsShortcutsPage() {
+		chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 	}
 
 	apiKey.init();
@@ -48,7 +52,7 @@
 			</button>
 		</div>
 	</form>
-	<p class="text-xs text-gray-600">
+	<p class="text-xs text-gray-500 font-light">
 		You can find your OpenAI API key
 		<a
 			href="https://platform.openai.com/account/api-keys"
@@ -60,16 +64,28 @@
 		</a>
 	</p>
 
-	<button
-		on:click={() => (showOptions = !showOptions)}
-		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-		type="button"
-		aria-haspopup="true"
-		aria-expanded={showOptions}
-	>
-		<AdjustmentsVerticalIcon />
-		<span>Advanced</span>
-	</button>
+	<div class="flex space-x-2">
+		<button
+			on:click={() => (showOptions = !showOptions)}
+			class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			type="button"
+			aria-label="Show advanced options"
+			aria-haspopup="true"
+			aria-expanded={showOptions}
+		>
+			<AdjustmentsVerticalIcon />
+			<span>Advanced</span>
+		</button>
+		<button
+			on:click={openExtensionsShortcutsPage}
+			class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			type="button"
+			aria-label="Edit keyboard shortcut"
+		>
+			<KeyboardIcon />
+			<span>Keyboard Shortcut</span>
+		</button>
+	</div>
 
 	{#if showOptions}
 		<div class="flex flex-col space-y-2 px-4">
