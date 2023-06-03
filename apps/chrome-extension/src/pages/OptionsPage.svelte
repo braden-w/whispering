@@ -62,8 +62,9 @@
 
 	<button
 		on:click={() => (showOptions = !showOptions)}
-		class="inline-flex items-center space-x-2 rounded-md border px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+		class="shadow-sm border border-gray-100 inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
 		type="button"
+		aria-label="Show advanced options"
 		aria-haspopup="true"
 		aria-expanded={showOptions}
 	>
