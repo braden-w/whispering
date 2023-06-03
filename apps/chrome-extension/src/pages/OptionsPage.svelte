@@ -74,7 +74,7 @@
 			aria-expanded={showOptions}
 		>
 			<AdjustmentsVerticalIcon />
-			<span>Advanced Options</span>
+			<span>Advanced</span>
 		</button>
 		<button
 			on:click={openExtensionsShortcutsPage}
@@ -83,7 +83,7 @@
 			aria-label="Edit keyboard shortcut"
 		>
 			<KeyboardIcon />
-			<span>Edit Keyboard Shortcut</span>
+			<span>Edit Shortcut</span>
 		</button>
 	</div>
 
