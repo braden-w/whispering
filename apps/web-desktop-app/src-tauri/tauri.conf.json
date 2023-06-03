@@ -21,6 +21,9 @@
 			"path": {
 				"all": true
 			},
+			"shell": {
+				"open": true
+			},
 			"window": {
 				"setAlwaysOnTop": true
 			}
