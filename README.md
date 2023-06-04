@@ -3,13 +3,50 @@
     <img width="180" src="./apps/web-desktop-app/static/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
-  <p align="center">Ergonomic Wrapper for OpenAI's Whisper (Browser Extension, Web, and Desktop App)</p>
+  <p align="center"><em>Seamless speech-to-text at your fingertips, powered by OpenAI</em></p>
 </p>
 
+<p align="center">
+  <a href="LICENSE" target="_blank">
+    <img alt="MIT License" src="https://img.shields.io/github/license/braden-w/whispering.svg?style=flat-square" />
+  </a>
 
-[![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/oilbfihknpdbpfkcncojikmooipnlglo)
+  <!-- TypeScript Badge -->
+  <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
+
+  <!-- Rust Badge -->
+  <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
+
+  <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
+    <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
+  </a>
+
+<!--   <a href="https://addons.mozilla.org/en-US/firefox/addon/whispering/" target="_blank">
+    <img alt="Firefox" src="https://img.shields.io/amo/stars/whispering?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
+  </a>
+ -->
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
+  </a>
+
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
+  </a>
+
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
+  </a>
+</p>
+
+[![Chrome Extension](https://img.shields.io/chrome-web-store/v/oilbfihknpdbpfkcncojikmooipnlglo.svg?style=flat-square&label=Chrome%20Extension&logo=google-chrome&logoColor=white&color=4285F4)](https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo)
+
+[![Web App](https://img.shields.io/badge/Web%20App-Check%20it%20out-brightgreen)](https://whispering.bradenwong.com/)
+
 [![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
 [![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
+
+[![Desktop App](https://img.shields.io/badge/Desktop%20App-Download%20Now-brightgreen.svg)](https://github.com/braden-w/whispering/releases)
+
 ---
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
@@ -50,7 +87,6 @@ Whispering is an open-source project designed to streamline your voice-to-text e
 ## Demo
 
 [https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4](https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4)
-
 
 ## Installation
 
