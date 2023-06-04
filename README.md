@@ -37,6 +37,7 @@
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
 </p>
+
 ---
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
