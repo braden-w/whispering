@@ -19,6 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up project folder
+        run: |
+          cd apps/web-desktop-app
+
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
