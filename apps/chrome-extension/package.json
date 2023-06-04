@@ -1,7 +1,7 @@
 {
 	"name": "whispering",
 	"displayName": "Whispering",
-	"version": "2.1.0",
+	"version": "3.2.0",
 	"description": "Seamlessly integrate voice-to-text transcriptions on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
 	"author": "Braden Wong",
 	"packageManager": "pnpm@7.5.0",

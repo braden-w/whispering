@@ -9,7 +9,7 @@
 </script>
 
 <button
-	class="drop-shadow-png transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110"
+	class="drop-shadow-png transform text-6xl md:text-7xl transition-transform duration-200 ease-in-out hover:scale-110"
 	on:click
 	type="button"
 	aria-label="Toggle recording"
