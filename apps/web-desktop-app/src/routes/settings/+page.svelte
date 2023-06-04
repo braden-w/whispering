@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { options } from '$lib/stores/options';
+	import { invoke } from '@tauri-apps/api/tauri';
+	$: if ($options.pasteContentsOnSuccess) invoke('paste');
 </script>
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
@@ -19,7 +21,7 @@
 				bind:checked={$options.pasteContentsOnSuccess}
 			/>
 			<span class="ml-2 text-gray-600 font-light">
-				Paste contents from clipboard after successful transcription
+				Paste contents from clipboard after successful transcription (experimental)
 			</span>
 		</label>
 	</div>

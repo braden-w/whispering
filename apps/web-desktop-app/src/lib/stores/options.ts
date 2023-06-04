@@ -8,7 +8,7 @@ type Options = {
 
 const initialOptions: Options = {
 	copyToClipboard: true,
-	pasteContentsOnSuccess: true,
+	pasteContentsOnSuccess: false,
 	currentGlobalShortcut: 'CommandOrControl+Shift+;'
 };
 
