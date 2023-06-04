@@ -37,16 +37,6 @@
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
 </p>
-
-[![Chrome Extension](https://img.shields.io/chrome-web-store/v/oilbfihknpdbpfkcncojikmooipnlglo.svg?style=flat-square&label=Chrome%20Extension&logo=google-chrome&logoColor=white&color=4285F4)](https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo)
-
-[![Web App](https://img.shields.io/badge/Web%20App-Check%20it%20out-brightgreen)](https://whispering.bradenwong.com/)
-
-[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
-[![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
-
-[![Desktop App](https://img.shields.io/badge/Desktop%20App-Download%20Now-brightgreen.svg)](https://github.com/braden-w/whispering/releases)
-
 ---
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
