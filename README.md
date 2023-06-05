@@ -49,30 +49,14 @@ Whispering enables you to bring seamless speech-to-text capabilities to your wor
 Whispering offers two key functionalities:
 
 1. **Recording Button for ChatGPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
+
+![ChatGPT Banner](./images/chat_box.jpg)
+
 2. **Keyboard shortcut**: Access Whisper's speech-to-text anywhere with a single keyboard shortcut, enabling seamless transcription in any website.
 
 After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
 
 <!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
-
-<!-- ## Table of Contents
-
-- [Features](#features)
-- [Whispering Web and Desktop App](#whispering-web-and-desktop-app)
-  - [Demo](#demo)
-  - [Accessing Whispering Web App](#accessing-whispering-web-app)
-  - [Download Desktop App](#download-desktop-app)
-  - [Built With](#built-with-web-desktop-app)
-  - [Getting Started](#getting-started-web-desktop-app)
-- [Whispering Chrome Extension](#whispering-chrome-extension)
-  - [Description](#description)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Built With](#built-with-chrome-extension)
-  - [Getting Started with Development](#getting-started-with-development)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support and Feedback](#support-and-feedback) -->
 
 ## Demo
 
