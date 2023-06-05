@@ -42,17 +42,21 @@
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
 
-- **Save time** by eliminating manual transcribing and excessive button clicks
-- **Boost productivity** with less context switching
-- **Type faster** with effortless recording, stopping, and pasting of transcribed text
-
 ## Features
 
-- **Seamless pasting:** After transcription is completed, it is automatically copied into your clipboard and pasted.
-- **Text-to-speech for ChatGPT:** The extension adds a handy recording button within the Chat GPT interface, enabling you to record your voice and generate transcriptions directly within the chat.
-- **Global keyboard shortcut**: Access the Whisper API from anywhere
-  - Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> to start recording on any website using the Chrome Extension.
-  - Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording globally using the Desktop App.
+Whispering offers two key functionalities:
+
+1. **Recording Button for Chat GPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
+2. **Keyboard shortcut**: Access Whisper's speech-to-text anywhere with a single keyboard shortcut
+
+- Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> to start recording from any website using the Chrome Extension
+- Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording globally using the Desktop App
+
+After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
+
+## Why Whispering?
+
+Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.Instead, effortless record and paste your transcription.
 
 <!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
 
@@ -85,7 +89,15 @@ Whispering is an open-source project designed to streamline your voice-to-text e
 
 You can install the Chrome Extension from the Chrome web store here:
 
-[![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/oilbfihknpdbpfkcncojikmooipnlglo)
+  <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
+    <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
+  </a>
+
+Once installed, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' microphone button to record your voice, and then 'Stop Recording' square button when you're done. Your transcription will appear in the text box below.
+
+To access the ChatGPT feature, navigate to the ChatGPT web page. You'll see a new recording button in the chat interface. Click this button to start and stop recording, and the transcribed text will be automatically inserted into the chat input field.
+
+To access the shortcut feature, press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> to start recording from any website. The transcription will be automatically copied into your clipboard and paste into the current input field.
 
 ### Web App
 
@@ -95,15 +107,23 @@ To start using the Whispering web app, click the button below:
 
 ### Download Desktop App
 
-To download the Whispering desktop app, click the button below:
+To download the Whispering desktop app, you can access the latest release here:
 
-[![Download Desktop App](https://img.shields.io/badge/Download-Desktop%20App-blue)](https://github.com/braden-w/whispering/releases)
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
+  </a>
 
-## Whispering Web and Desktop App
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
+  </a>
 
-The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/chrome-extension`.
+  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+    <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
+  </a>
 
-### Built With
+## Built With
+
+#### Web and Desktop
 
 Whispering web and desktop app is built using the following technologies and libraries:
 
@@ -113,7 +133,16 @@ Whispering web and desktop app is built using the following technologies and lib
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Cloudflare Pages](https://developers.cloudflare.com/): A global cloud platform for deploying static pages.
 
-### Getting Started (Web and Desktop App)
+#### Extension
+
+The Whispering Chrome extension is built using:
+
+- [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
+- [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
+- [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework.
+- [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
+
+## Development
 
 To set up the project on your local machine, follow these steps:
 
@@ -123,63 +152,7 @@ To set up the project on your local machine, follow these steps:
 4. Run the development server: `pnpm dev`
 5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
 
-## Whispering Chrome Extension
-
-The Whispering Chrome extension can be found under `apps/chrome-extension`.
-
-### Description
-
-Whispering Chrome extension offers two key functionalities:
-
-- **Access Whisper API**: This feature allows you to access the Whisper API from any webpage, thus enabling easy voice transcription without disrupting your browsing context.
-- **Recording Button for Chat GPT**: The extension adds a handy recording button within the Chat GPT interface, enabling you to record your voice and generate transcriptions directly within the chat.
-
-### Installation
-
-To install the Whispering Chrome extension, follow these steps:
-
-1. Visit the [GitHub release page](https://github.com/braden-w/whispering-extension/releases) and download the latest `Whispering_Extension_vX.Y.Z.zip` file.
-2. Extract the contents of the .zip file to a preferred location on your computer where you'd like to store the extension files.
-3. Open Google Chrome and navigate to the Extensions page by clicking on the three-dot menu in the top right corner, then select "More tools" > "Extensions" or enter `chrome://extensions/` in the address bar.
-4. On the Extensions page, enable the "Developer mode" toggle located in the top right corner.
-5. Click the "Load unpacked" button that appears after enabling Developer mode.
-6. In the file explorer dialog that opens, find and select the folder where you extracted the contents of the .zip file.
-7. Click "Open" or "Select Folder" (depending on your operating system), and the Whispering Extension will be installed in your browser.
-
-After completing these steps, you should see the Whispering Extension icon in your browser's toolbar, and you're ready to enjoy the voice-to-text functionality across any website.
-
-### Usage
-
-Once installed, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' button to record your voice, and then 'Stop Recording' when you're done. Your transcription will appear in the text box below.
-
-For using the Recording Button with Chat GPT, navigate to the Chat GPT web page. You'll see a new recording button in the chat interface. Click this button to start and stop recording, and the transcribed text will be automatically inserted into the chat input field.
-
-### Built With (Chrome Extension)
-
-The Whispering Chrome extension is built using:
-
-- [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
-- [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
-- [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework.
-- [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
-
-### Getting Started with Development
-
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
-
-First, run the development server:
-
-```bash
-pnpm dev
-```
-
-To make a production build, run the following:
-
-```bash
-pnpm build
-```
-
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/chrome-extension`.
 
 ## Contributing
 
