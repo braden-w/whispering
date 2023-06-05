@@ -50,7 +50,7 @@ Whispering offers two key functionalities:
 
 1. **Recording Button for ChatGPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
 
-![ChatGPT Banner](./images/chat_box.jpg)
+![ChatGPT Box](./images/chat_box.jpg)
 
 2. **Keyboard shortcut**: Access Whisper's speech-to-text anywhere with a single keyboard shortcut, enabling seamless transcription in any website.
 
@@ -60,7 +60,7 @@ After transcription is completed, it is automatically copied into your clipboard
 
 ## Demo
 
-https://github.com/braden-w/whispering/assets/13159333/572e60b5-a06e-45ed-af38-6ab5f7f039dc
+https://github.com/braden-w/whispering/assets/13159333/e9d72422-a743-468f-858d-4ecde0dfe238
 
 ## Installation
 
