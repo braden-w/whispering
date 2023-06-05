@@ -100,7 +100,7 @@ To download the Whispering desktop app:
 
 1. Go to the [latest releases page](https://github.com/braden-w/whispering/releases) and download the corresponding installation file `.msi` file for Windows and `.dmg` for MacOS.
 2. Double click the downloaded file to install it.
-3. For Windows, if prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation.
+3. For Windows, if prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation (I was unable to sign the app due to my lack of a Windows laptop for development, but the app is safe to use).
 4. Ready to use!
 
 ## Usage
@@ -141,7 +141,8 @@ The Whispering Chrome extension is built using:
 
 - [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
 - [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
-- [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework.
+- [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
+- [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
 
 ## Development
