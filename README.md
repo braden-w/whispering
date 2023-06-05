@@ -42,16 +42,16 @@
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
 
+Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.
+
+## Features
+
 Whispering offers two key functionalities:
 
-1. **Recording Button for Chat GPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
+1. **Recording Button for ChatGPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
 2. **Keyboard shortcut**: Access Whisper's speech-to-text anywhere with a single keyboard shortcut
 
 After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
-
-## Why Whispering?
-
-Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.Instead, effortless record and paste your transcription.
 
 <!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
 
@@ -76,7 +76,7 @@ Whispering enables you to bring seamless speech-to-text capabilities to your wor
 
 ## Demo
 
-[https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4](https://user-images.githubusercontent.com/13159333/227335178-7d926d84-f752-4cbd-84af-0b2dcc483c66.mp4)
+https://github.com/braden-w/whispering/assets/13159333/572e60b5-a06e-45ed-af38-6ab5f7f039dc
 
 ## Installation
 
@@ -84,9 +84,11 @@ Whispering enables you to bring seamless speech-to-text capabilities to your wor
 
 You can install the Chrome Extension from the Chrome web store here:
 
-  <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
-    <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
-  </a>
+
+<a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
+  <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
+</a>
+
 
 Once installed, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' microphone button to record your voice, and then 'Stop Recording' square button when you're done. Your transcription will appear in the text box below.
 
