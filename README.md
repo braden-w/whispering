@@ -84,11 +84,9 @@ https://github.com/braden-w/whispering/assets/13159333/572e60b5-a06e-45ed-af38-6
 
 You can install the Chrome Extension from the Chrome web store here:
 
-
 <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
   <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
 </a>
-
 
 Once installed, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' microphone button to record your voice, and then 'Stop Recording' square button when you're done. Your transcription will appear in the text box below.
 
@@ -104,19 +102,12 @@ To start using the Whispering web app, click the button below:
 
 ### Download Desktop App
 
-To download the Whispering desktop app, you can access the latest release here:
+To download the Whispering desktop app:
 
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
-    <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
-  </a>
-
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
-    <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
-  </a>
-
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
-    <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
-  </a>
+1. Go to the [latest releases page](https://github.com/braden-w/whispering/releases) and download the corresponding installation file `.msi` file for Windows and `.dmg` for MacOS.
+2. Double click the downloaded file to install it.
+3. For Windows, if prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation.
+4. Ready to use!
 
 Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording from anywhere on your desktop. The application will come into focus while recording, and will minimize when you stop recording. The transcription will be automatically copied into your clipboard and can be configured to automatically paste.
 
