@@ -42,15 +42,10 @@
 
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
 
-## Features
-
 Whispering offers two key functionalities:
 
 1. **Recording Button for Chat GPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
 2. **Keyboard shortcut**: Access Whisper's speech-to-text anywhere with a single keyboard shortcut
-
-- Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> to start recording from any website using the Chrome Extension
-- Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording globally using the Desktop App
 
 After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
 
@@ -120,6 +115,8 @@ To download the Whispering desktop app, you can access the latest release here:
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
+
+Press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording from anywhere on your desktop. The application will come into focus while recording, and will minimize when you stop recording. The transcription will be automatically copied into your clipboard and can be configured to automatically paste.
 
 ## Built With
 
