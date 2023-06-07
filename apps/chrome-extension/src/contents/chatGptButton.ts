@@ -46,7 +46,7 @@ function injectMicrophoneButtonIntoTextarea() {
 		const buttonHTML = /*html*/ `
 <div
 	id="whispering-microphone-button"
-	class= "absolute p-1 rounded-md bottom-[10px] md:bottom-3 md:p-2 dark:hover:bg-gray-900 dark:disabled:hover:bg-transparent disabled:text-gray-400 enabled:bg-brand-purple text-white transition-colors disabled:opacity-40"
+	class= "absolute p-1 rounded-md bottom-[10px] md:bottom-3 md:p-2 hover:bg-gray-100 dark:hover:bg-gray-900 dark:disabled:hover:bg-transparent disabled:text-gray-400 enabled:bg-brand-purple text-gray-500 dark:text-white transition-colors disabled:opacity-40"
 	style="right: 3.0rem; @media (min-width: 768px) { right: 3.5rem; }"
 >
 	<svg
