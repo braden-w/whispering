@@ -29,7 +29,7 @@ importers:
         specifier: latest
         version: 1.9.9
 
-  apps/chrome-extension:
+  apps/browser-extension:
     dependencies:
       '@plasmohq/storage':
         specifier: ^1.6.0

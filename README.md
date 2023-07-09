@@ -139,7 +139,23 @@ To set up the project on your local machine, follow these steps:
 4. Run the development server: `pnpm dev`
 5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
 
-The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/chrome-extension`.
+The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/browser-extension`.
+
+## Build Instructions
+
+### Chrome
+
+1. `cd apps/browser-extension`
+2. `pnpm i`
+3. `pnpm plasmo build --zip`
+4. Output should be found in `apps/browser-extension/build`
+
+### Firefox
+
+1. `cd apps/browser-extension`
+2. `pnpm i`
+3. `pnpm plasmo build --target=firefox-mv2 --zip`
+4. Output should be found in `apps/browser-extension/build`
 
 ## Contributing
 
