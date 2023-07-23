@@ -2,7 +2,7 @@ let mediaRecorder: MediaRecorder | null = null;
 let recordedChunks: Blob[] = [];
 
 export async function startRecording(): Promise<void> {
-	const stream = await getMicrophonePermissions();
+	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 	mediaRecorder = new MediaRecorder(stream);
 	mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 		recordedChunks.push(event.data);
@@ -16,16 +16,9 @@ export async function stopRecording(): Promise<Blob> {
 		mediaRecorder.addEventListener('stop', () => {
 			const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
 			recordedChunks = [];
+			mediaRecorder.stream.getTracks().forEach((track) => track.stop());
 			resolve(audioBlob);
 		});
 		mediaRecorder.stop();
 	});
-}
-
-async function getMicrophonePermissions() {
-	try {
-		return await navigator.mediaDevices.getUserMedia({ audio: true });
-	} catch (error) {
-		chrome.runtime.openOptionsPage();
-	}
 }
