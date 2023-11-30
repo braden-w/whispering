@@ -7,16 +7,22 @@
 </p>
 
 <p align="center">
+  <!-- Development Status Banner -->
+  <img src="https://img.shields.io/badge/Development%20Status-On%20Hold%20(Back%20in%20School)-yellow?style=flat-square">
+  <!-- Wait for Svelte 5 -->
+  <img src="https://img.shields.io/badge/Upcoming-Svelte%205%20Integration-blue?style=flat-square">
+</p>
+
+<p align="center">
+  <!-- License Badge -->
   <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/github/license/braden-w/whispering.svg?style=flat-square" />
   </a>
-
-  <!-- TypeScript Badge -->
+  <!-- Badges for Technologies -->
   <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
-
-  <!-- Rust Badge -->
   <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 
+  <!-- Platform Support Badges -->
   <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
     <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
   </a>
@@ -40,9 +46,23 @@
 
 ---
 
+## Project Overview
+
 Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
 
 Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.
+
+### Current Development Status
+
+🚧 **On Hold:** Currently, development is paused due to academic commitments.
+
+👀 **Awaiting Svelte 5:** Planning to implement changes with the new Svelte 5 API once released.
+
+### Future Plans
+
+🔜 **More Details on Contribution:** Detailed contribution guidelines will be provided after the resumption of development.
+
+---
 
 ## Features
 
