@@ -46,14 +46,6 @@ function createRecordings() {
 		addRecording: (recording: Recording) => {
 			update((recordings) => [...recordings, recording]);
 		},
-		editRecording: (id: string, recording: Recording) => {
-			update((recordings) => {
-				const index = recordings.findIndex((recording) => recording.id === id);
-				if (index === -1) return recordings;
-				recordings[index] = recording;
-				return recordings;
-			});
-		},
 		deleteRecording: (id: string) => {
 			update((recordings) => recordings.filter((recording) => recording.id !== id));
 		},
