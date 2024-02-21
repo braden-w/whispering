@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { Menubar as MenubarPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils";
-	import { Circle } from "lucide-svelte";
+	import { Menubar as MenubarPrimitive } from 'bits-ui';
+	import { cn } from '../../../utils';
+	import { Circle } from 'lucide-svelte';
 
 	type $$Props = MenubarPrimitive.RadioItemProps;
 	type $$Events = MenubarPrimitive.RadioItemEvents;
 
-	let className: $$Props["class"] = undefined;
-	export let value: $$Props["value"];
+	let className: $$Props['class'] = undefined;
+	export let value: $$Props['value'];
 	export { className as class };
 </script>
 
 <MenubarPrimitive.RadioItem
 	{value}
 	class={cn(
-		"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50",
+		'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 		className
 	)}
 	{...$$restProps}

@@ -1,17 +1,17 @@
-import type { VariantProps } from "tailwind-variants";
-import type { toggleVariants } from "$lib/components/ui/toggle";
-import { getContext, setContext } from "svelte";
-import Root from "./toggle-group.svelte";
-import Item from "./toggle-group-item.svelte";
+import type { VariantProps } from 'tailwind-variants';
+import type { toggleVariants } from '$lib/components/ui/toggle';
+import { getContext, setContext } from 'svelte';
+import Root from './toggle-group.svelte';
+import Item from './toggle-group-item.svelte';
 
 export type ToggleVariants = VariantProps<typeof toggleVariants>;
 
 export function setToggleGroupCtx(props: ToggleVariants) {
-	setContext("toggleGroup", props);
+	setContext('toggleGroup', props);
 }
 
 export function getToggleGroupCtx() {
-	return getContext<ToggleVariants>("toggleGroup");
+	return getContext<ToggleVariants>('toggleGroup');
 }
 
 export {
@@ -19,5 +19,5 @@ export {
 	Item,
 	//
 	Root as ToggleGroup,
-	Item as ToggleGroupItem,
+	Item as ToggleGroupItem
 };

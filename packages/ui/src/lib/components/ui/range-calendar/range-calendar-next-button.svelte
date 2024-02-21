@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { RangeCalendar as RangeCalendarPrimitive } from "bits-ui";
-	import { ChevronRight } from "lucide-svelte";
-	import { buttonVariants } from "$lib/components/ui/button";
-	import { cn } from "$lib/utils";
+	import { RangeCalendar as RangeCalendarPrimitive } from 'bits-ui';
+	import { ChevronRight } from 'lucide-svelte';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import { cn } from '../../../utils';
 
 	type $$Props = RangeCalendarPrimitive.NextButtonProps;
 	type $$Events = RangeCalendarPrimitive.NextButtonEvents;
 
-	let className: $$Props["class"] = undefined;
+	let className: $$Props['class'] = undefined;
 	export { className as class };
 </script>
 
 <RangeCalendarPrimitive.NextButton
 	on:click
 	class={cn(
-		buttonVariants({ variant: "outline" }),
-		"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+		buttonVariants({ variant: 'outline' }),
+		'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
 		className
 	)}
 	{...$$restProps}
