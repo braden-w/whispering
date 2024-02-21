@@ -37,14 +37,13 @@
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
-		class="drop-shadow-png m-6 transform text-7xl hover:scale-110 focus:scale-110"
+		class="drop-shadow-png min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
 		on:click={toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
 		{icon}
 	</Button>
-
 	<div>
 		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
 		<div class="flex items-center space-x-2">
