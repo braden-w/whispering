@@ -1,6 +1,6 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
+import type { Config } from 'tailwindcss';
 
-/** @type {import('tailwindcss').Config} */
 const config = {
 	darkMode: ['class'],
 	content: ['./src/**/*.{html,js,svelte,ts}'],
@@ -59,6 +59,6 @@ const config = {
 			}
 		}
 	}
-};
+} satisfies Config;
 
 export default config;
