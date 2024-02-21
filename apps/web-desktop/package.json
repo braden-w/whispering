@@ -1,0 +1,39 @@
+{
+	"name": "whisper-desktop",
+	"version": "3.4.1",
+	"private": true,
+	"scripts": {
+		"dev": "tauri dev",
+		"start": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --plugin-search-dir . --check . && eslint .",
+		"format": "prettier --plugin-search-dir . --write ."
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-static": "1.0.0-next.50",
+		"@sveltejs/kit": "^1.5.0",
+		"@tauri-apps/cli": "^1.2.3",
+		"autoprefixer": "^10.4.14",
+		"eslint-config-custom": "0.0.0",
+		"postcss": "^8.4.23",
+		"svelte": "^3.59.1",
+		"svelte-check": "^3.0.1",
+		"tailwind-config": "0.0.0",
+		"tailwindcss": "^3.3.2",
+		"tslib": "^2.4.1",
+		"typescript": "^5.0.4",
+		"vite": "^4.0.0"
+	},
+	"type": "module",
+	"dependencies": {
+		"@sveltejs/adapter-cloudflare": "^2.2.0",
+		"@tauri-apps/api": "^1.2.0",
+		"audio-recorder-polyfill": "^0.4.1",
+		"svelte-french-toast": "^1.0.4-beta.0",
+		"ui": "0.0.0"
+	}
+}
