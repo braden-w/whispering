@@ -36,14 +36,14 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
-	<button
-		class="drop-shadow-png transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110 md:text-7xl"
+	<Button
+		class="drop-shadow-png transform text-6xl hover:scale-110 focus:scale-110 md:text-7xl"
 		on:click
-		type="button"
 		aria-label="Toggle recording"
+		variant="ghost"
 	>
 		{icon}
-	</button>
+	</Button>
 	<!-- <ToggleRecordingIcon recordingState={$recorder} on:click={toggleRecording} /> -->
 
 	<div>
