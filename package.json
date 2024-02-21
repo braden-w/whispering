@@ -10,7 +10,6 @@
 		"build": "turbo run build",
 		"dev": "turbo run dev",
 		"format": "prettier --write .",
-		"postinstall": "manypkg check",
 		"lint": "turbo run lint"
 	},
 	"packageManager": "pnpm@7.15.0",
