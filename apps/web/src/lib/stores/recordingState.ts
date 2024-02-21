@@ -175,7 +175,7 @@ function createRecorder({
 			deleteRecording: (id: string) =>
 				Effect.gen(function* (_) {
 					yield* _(deleteRecordingFromRecordingsDb(id));
-					recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
+					recordings.deleteRecording(id);
 				}),
 			transcribeRecording: (id: string) =>
 				Effect.gen(function* (_) {
