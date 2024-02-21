@@ -39,7 +39,7 @@ function createRecorder({
 	onStopRecording,
 	saveRecordingToSrc,
 	onSaveRecordingToSrc,
-  addRecordingToRecordingsDb
+	addRecordingToRecordingsDb
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -93,6 +93,17 @@ function createRecorder({
 					GetApiKeyError: onGetApiKeyError
 				})
 			)
+		},
+		recordings: {
+			...recordings,
+			editRecording: (id: string, recording: Recording) => {
+				recordings.update((recordings) => {
+					const index = recordings.findIndex((recording) => recording.id === id);
+					if (index === -1) return recordings;
+					recordings[index] = recording;
+					return recordings;
+				});
+			}
 		}
 	};
 }
