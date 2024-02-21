@@ -59,6 +59,7 @@
 	</p>
 	<div class="flex items-center gap-2">
 		<Button
+			href="https://github.com/braden-w/whisperi"
 			target="_blank"
 			rel="noopener noreferrer"
 			title="View project on GitHub"
