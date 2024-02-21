@@ -19,7 +19,7 @@ type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 /**
  * The state of the recording, which can be one of 'TRANSCRIBING' or 'DONE'.
  */
-type RecordingState = 'TRANSCRIBING' | 'DONE';
+type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
 type Recording = {
 	id: string;
@@ -27,7 +27,7 @@ type Recording = {
 	subtitle: string;
 	transcription: string;
 	src: string;
-  state: RecordingState;
+	state: RecordingState;
 };
 
 class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
@@ -102,7 +102,8 @@ function createRecorder({
 							title: new Date().toLocaleString(),
 							subtitle: '',
 							transcription: '',
-							src
+							src,
+							state: 'UNPROCESSED'
 						};
 						yield* _(addRecordingToRecordingsDb(recording));
 						recordings.update((recordings) => [...recordings, recording]);
@@ -151,6 +152,7 @@ function createRecorder({
 						const index = recordings.findIndex((recording) => recording.id === id);
 						if (index === -1) return recordings;
 						recordings[index].transcription = text;
+						recordings[index].state = 'DONE';
 						return recordings;
 					});
 				})
