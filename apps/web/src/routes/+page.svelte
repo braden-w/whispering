@@ -58,17 +58,6 @@
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
 	<div class="flex items-center gap-2">
-		<Button
-			href="https://github.com/braden-w/whispering"
-			target="_blank"
-			rel="noopener noreferrer"
-			title="View project on GitHub"
-			aria-label="View project on GitHub"
-			size="icon"
-			variant="ghost"
-		>
-			<GithubIcon class="h-4 w-4" />
-		</Button>
 		<small class="text-muted-foreground text-sm font-light">
 			Check out the
 			<Button
@@ -93,8 +82,19 @@
 				app
 			</Button> for shortcuts.
 		</small>
+		<Button
+			href="https://github.com/braden-w/whispering"
+			target="_blank"
+			rel="noopener noreferrer"
+			title="View project on GitHub"
+			aria-label="View project on GitHub"
+			size="icon"
+			variant="ghost"
+		>
+			<GithubIcon class="h-4 w-4" />
+		</Button>
 	</div>
-	<div class="flex">
+	<div class="flex gap-2">
 		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 			<AdjustmentsHorizontalIcon />
 		</Button>
