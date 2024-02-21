@@ -18,6 +18,14 @@ type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
  */
 type RecordingState = 'TRANSCRIBING' | 'DONE';
 
+type Recording = {
+	id: string;
+	title: string;
+	subtitle: string;
+	transcription: string;
+	src: string;
+};
+
 class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
 
 function createRecorder({
@@ -42,6 +50,7 @@ function createRecorder({
 	onSaveRecordingToSrc: Effect.Effect<void>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
+	const recordings = writable<Recording[]>([]);
 	return {
 		recorder: {
 			...recorderState,
@@ -60,6 +69,10 @@ function createRecorder({
 						yield* _(onStopRecording);
 						const src = yield* _(saveRecordingToSrc(audioBlob));
 						yield* _(onSaveRecordingToSrc);
+						recordings.update((recordings) => [
+							...recordings,
+							{ src, title: new Date().toLocaleString(), transcription: '' }
+						]);
 						recorder.set('IDLE');
 						break;
 					}
