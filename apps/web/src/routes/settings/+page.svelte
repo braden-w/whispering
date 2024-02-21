@@ -1,32 +1,42 @@
 <script lang="ts">
 	import { options } from '$lib/stores/options';
-	import { invoke } from '@tauri-apps/api/tauri';
-	$: if ($options.pasteContentsOnSuccess) invoke('paste');
+	import { Button } from '@repo/ui/components/button';
+	import * as Card from '@repo/ui/components/card';
+	import { Checkbox } from '@repo/ui/components/checkbox';
+	import { Label } from '@repo/ui/components/label';
 </script>
 
-<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
-	<h1 class="text-4xl font-semibold text-gray-700">Settings</h1>
-
-	<div class="flex flex-col space-y-2 px-4">
-		<label class="inline-flex items-center">
-			<input type="checkbox" class="text-indigo-600" bind:checked={$options.copyToClipboard} />
-			<span class="ml-2 text-gray-600 font-light">
-				Copy text to clipboard on successful transcription
-			</span>
-		</label>
-		<label class="inline-flex items-center">
-			<input
-				type="checkbox"
-				class="text-indigo-600"
-				bind:checked={$options.pasteContentsOnSuccess}
-			/>
-			<span class="ml-2 text-gray-600 font-light">
-				Paste contents from clipboard after successful transcription (experimental)
-			</span>
-		</label>
-	</div>
-
-	<p class="text-xs text-gray-600">
-		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
-	</p>
+<div class="flex h-screen items-center justify-center">
+	<Card.Root>
+		<Card.Header>
+			<Card.Title tag="h1">Settings</Card.Title>
+			<Card.Description>Customize your Whispering experience</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex flex-col gap-4">
+			<div class="flex gap-2">
+				<Checkbox
+					bind:checked={$options.copyToClipboard}
+					id="copy-to-clipboard"
+					aria-labelledby="copy-to-clipboard-label"
+				/>
+				<Label
+					id="copy-to-clipboard-label"
+					for="copy-to-clipboard"
+					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+				>
+					Copy text to clipboard on successful transcription
+				</Label>
+			</div>
+			<div class="flex gap-2">
+				<Checkbox bind:checked={$options.pasteContentsOnSuccess} id="paste-contents-on-success" />
+				<Label
+					for="paste-contents-on-success"
+					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+				>
+					Paste contents from clipboard after successful transcription (experimental)
+				</Label>
+			</div>
+			<Button href="/" variant="link">Go back</Button>
+		</Card.Content>
+	</Card.Root>
 </div>
