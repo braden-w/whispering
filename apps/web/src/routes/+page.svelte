@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
+	import Sun from '~icons/lucide/sun';
+	import Moon from '~icons/lucide/moon';
 	import { audioSrc, outputText, recorder, type RecorderState } from '$lib/stores/recordingState';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import toast from 'svelte-french-toast';
+	import { toast, toggleMode } from '@repo/ui/components/sonner';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -49,7 +51,7 @@
 		<div class="flex items-center space-x-2">
 			<Input
 				id="transcripted-text"
-				class="w-64 focus-visible:border-blue-300"
+				class="focus-visible:border-secondary w-64"
 				placeholder="Transcribed text will appear here..."
 				bind:value={$outputText}
 			/>
@@ -119,6 +121,15 @@
 			variant="ghost"
 		>
 			<GithubIcon class="h-4 w-4" />
+		</Button>
+		<Button on:click={toggleMode} variant="outline" size="icon">
+			<Sun
+				class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+			/>
+			<Moon
+				class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+			/>
+			<span class="sr-only">Toggle theme</span>
 		</Button>
 	</div>
 </div>
