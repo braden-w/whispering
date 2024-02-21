@@ -134,7 +134,7 @@ function createRecorder({
 					case 'IDLE': {
 						yield* _(startRecording);
 						yield* _(onStartRecording);
-						recorder.set('RECORDING');
+						recorderState.set('RECORDING');
 						break;
 					}
 					case 'RECORDING': {
@@ -151,8 +151,8 @@ function createRecorder({
 							state: 'UNPROCESSED'
 						};
 						yield* _(addRecordingToRecordingsDb(newRecording));
-						recordings.update((recordings) => [...recordings, newRecording]);
-						recorder.set('IDLE');
+						recordings.addRecording(newRecording);
+						recorderState.set('IDLE');
 						break;
 					}
 					case 'SAVING': {
