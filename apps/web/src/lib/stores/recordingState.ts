@@ -79,6 +79,14 @@ function createRecorder({
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
+	function setMatchingRecordingState(id: string, state: RecordingState) {
+		recordings.update((recordings) => {
+			const index = recordings.findIndex((recording) => recording.id === id);
+			if (index === -1) return recordings;
+			recordings[index].state = state;
+			return recordings;
+		});
+	}
 	return {
 		recorder: {
 			...recorderState,
@@ -141,18 +149,13 @@ function createRecorder({
 				Effect.gen(function* (_) {
 					const $apiKey = get(apiKey);
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
-					recordings.update((recordings) => {
-						const index = recordings.findIndex((recording) => recording.id === id);
-						if (index === -1) return recordings;
-						recordings[index].state = 'TRANSCRIBING';
-						return recordings;
-					});
+					setMatchingRecordingState(id, 'TRANSCRIBING');
 					const text = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+					setMatchingRecordingState(id, 'DONE');
 					recordings.update((recordings) => {
 						const index = recordings.findIndex((recording) => recording.id === id);
 						if (index === -1) return recordings;
 						recordings[index].transcription = text;
-						recordings[index].state = 'DONE';
 						return recordings;
 					});
 				})
