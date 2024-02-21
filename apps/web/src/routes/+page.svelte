@@ -55,68 +55,38 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	{#if !window.__TAURI__}
-		<p class="text-xs font-light text-gray-500">
-			Check out the
-			<a
-				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="text-gray-600 underline hover:text-indigo-900"
-				title="Check out the Chrome Extension"
-				aria-label="Check out the Chrome Extension"
-			>
-				extension
-			</a>
-			and
-			<a
-				href="https://github.com/braden-w/whispering/releases"
-				class="text-gray-600 underline hover:text-indigo-900"
-				title="Check out the desktop app"
-				aria-label="Check out the desktop app"
-			>
-				app
-			</a> for shortcuts.
-		</p>
-	{:else}
-		<p class="text-xs text-gray-600">
-			Check out the
-			<a
-				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="text-gray-600 underline hover:text-indigo-900"
-				title="Check out the Chrome Extension"
-				aria-label="Check out the Chrome Extension"
-			>
-				extension
-			</a>
-
-			for browser integration.
-		</p>
-	{/if}
+	<p class="text-xs font-light text-gray-500">
+		Check out the
+		<Button
+			href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+			target="_blank"
+			rel="noopener noreferrer"
+			variant="link"
+			title="Check out the Chrome Extension"
+			aria-label="Check out the Chrome Extension"
+		>
+			extension
+		</Button>
+		and
+		<Button
+			href="https://github.com/braden-w/whispering/releases"
+			variant="link"
+			title="Check out the desktop app"
+			aria-label="Check out the desktop app"
+		>
+			app
+		</Button> for shortcuts.
+	</p>
 	<div class="flex">
-		<a
-			href="/settings"
-			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			aria-label="Settings"
-		>
+		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 			<AdjustmentsHorizontalIcon />
-		</a>
-		<a
-			href="/key"
-			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			aria-label="API Key"
-		>
+		</Button>
+		<Button href="/key" aria-label="API Key" variant="ghost" size="icon">
 			<KeyIcon />
-		</a>
-		<a
-			href="/shortcut"
-			class="inline-flex items-center rounded-md px-3 py-1 text-gray-600 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			aria-label="Keyboard Shortcuts"
-		>
+		</Button>
+		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="ghost" size="icon">
 			<KeyboardIcon />
-		</a>
+		</Button>
 	</div>
 
 	<div class="fixed bottom-4 right-4">
