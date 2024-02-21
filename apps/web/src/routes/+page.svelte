@@ -38,13 +38,12 @@
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
 		class="drop-shadow-png m-6 transform text-7xl hover:scale-110 focus:scale-110"
-		on:click
+		on:click={toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
 		{icon}
 	</Button>
-	<!-- <ToggleRecordingIcon recordingState={$recorder} on:click={toggleRecording} /> -->
 
 	<div>
 		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
