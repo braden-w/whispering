@@ -6,10 +6,10 @@
 	"module": "index.ts",
 	"main": "index.ts",
 	"exports": {
-		".": {
-			"types": "./index.ts",
-			"svelte": "./index.ts"
-		}
+		"./app.pcss": "./src/app.pcss",
+		"./tailwind.config": "./tailwind.config.ts",
+		"./lib/*": "./src/lib/*.ts",
+		"./components/*": "./src/components/*.tsx"
 	},
 	"dependencies": {
 		"@internationalized/date": "^3.5.2",
