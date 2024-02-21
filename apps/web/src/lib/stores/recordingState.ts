@@ -21,7 +21,7 @@ type RecordingState = 'TRANSCRIBING' | 'DONE';
 class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
 
 function createRecorder({
-	initial = 'IDLE',
+	initialState = 'IDLE',
 	getApiKey,
 	onGetApiKeyError,
 	startRecording,
@@ -29,7 +29,7 @@ function createRecorder({
 	stopRecording,
 	onStopRecording
 }: {
-	initial?: RecorderState;
+	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
 	onGetApiKeyError: (error: GetApiKeyError) => Effect.Effect<void>;
 	startRecording: Effect.Effect<void>;
@@ -37,7 +37,7 @@ function createRecorder({
 	stopRecording: (apiKey: string) => Effect.Effect<Blob>;
 	onStopRecording: Effect.Effect<void>;
 }) {
-	const recordingState = writable<RecorderState>(initial);
+	const recordingState = writable<RecorderState>(initialState);
 	return {
 		recorder: {
 			...recordingState,
