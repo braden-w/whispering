@@ -115,6 +115,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      audio-recorder-polyfill:
+        specifier: ^0.4.1
+        version: 0.4.1
       svelte-french-toast:
         specifier: ^1.0.4-beta.0
         version: 1.0.4-beta.0(svelte@4.2.7)

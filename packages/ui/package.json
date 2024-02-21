@@ -12,7 +12,8 @@
 		"./components/*": "./src/lib/components/ui/*/index.ts",
 		"./utils": "./src/lib/utils.ts",
 		"./tailwind.config": "./tailwind.config.ts",
-		"./postcss.config": "./postcss.config.js"
+		"./postcss.config": "./postcss.config.js",
+		"./app.pcss": "./src/app.pcss"
 	},
 	"dependencies": {
 		"@internationalized/date": "^3.5.2",
