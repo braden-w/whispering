@@ -52,17 +52,17 @@
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if}
 	</div>
-	<p class="text-xs text-gray-600">
+	<p class="text-sm leading-none">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<p class="text-xs font-light text-gray-500">
+	<small class="text-muted-foreground text-sm font-light">
 		Check out the
 		<Button
 			href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 			target="_blank"
 			rel="noopener noreferrer"
 			variant="link"
-			size="sm"
+			class="px-0.5"
 			title="Check out the Chrome Extension"
 			aria-label="Check out the Chrome Extension"
 		>
@@ -72,13 +72,13 @@
 		<Button
 			href="https://github.com/braden-w/whispering/releases"
 			variant="link"
-			size="sm"
+			class="px-0.5"
 			title="Check out the desktop app"
 			aria-label="Check out the desktop app"
 		>
 			app
 		</Button> for shortcuts.
-	</p>
+	</small>
 	<div class="flex">
 		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 			<AdjustmentsHorizontalIcon />
