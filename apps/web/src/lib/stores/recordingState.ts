@@ -28,6 +28,13 @@ type Recording = {
 };
 
 class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
+class AddRecordingToRecordingsDbError extends Data.TaggedError('AddRecordingToRecordingsDbError') {}
+class EditRecordingInRecordingsDbError extends Data.TaggedError(
+	'EditRecordingInRecordingsDbError'
+) {}
+class DeleteRecordingFromRecordingsDbError extends Data.TaggedError(
+	'DeleteRecordingFromRecordingsDbError'
+) {}
 
 function createRecorder({
 	initialState = 'IDLE',
@@ -52,9 +59,16 @@ function createRecorder({
 	onStopRecording: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc: Effect.Effect<void>;
-	addRecordingToRecordingsDb: (recording: Recording) => Effect.Effect<void>;
-	editRecordingInRecordingsDb: (id: string, recording: Recording) => Effect.Effect<void>;
-	deleteRecordingFromRecordingsDb: (id: string) => Effect.Effect<void>;
+	addRecordingToRecordingsDb: (
+		recording: Recording
+	) => Effect.Effect<void, AddRecordingToRecordingsDbError>;
+	editRecordingInRecordingsDb: (
+		id: string,
+		recording: Recording
+	) => Effect.Effect<void, EditRecordingInRecordingsDbError>;
+	deleteRecordingFromRecordingsDb: (
+		id: string
+	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
