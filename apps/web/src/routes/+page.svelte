@@ -49,7 +49,7 @@
 		<div class="flex items-center space-x-2">
 			<Input
 				id="transcripted-text"
-				class="w-64 border focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+				class="w-64 focus:border-blue-300 focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
 				bind:value={$outputText}
 			/>
