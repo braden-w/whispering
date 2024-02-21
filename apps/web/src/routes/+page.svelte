@@ -34,10 +34,10 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="flex min-h-screen flex-col items-center justify-center gap-8">
+<div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
-		class="drop-shadow-png transform text-6xl hover:scale-110 focus:scale-110 md:text-7xl"
+		class="drop-shadow-png m-6 transform text-6xl hover:scale-110 focus:scale-110 md:text-7xl"
 		on:click
 		aria-label="Toggle recording"
 		variant="ghost"
