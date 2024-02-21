@@ -3,13 +3,11 @@
 	"version": "0.0.0",
 	"description": "Shared components for use Whispering web app, desktop app, and Chrome extension",
 	"type": "module",
-	"module": "index.ts",
-	"main": "index.ts",
 	"exports": {
 		"./app.pcss": "./src/app.pcss",
 		"./tailwind.config": "./tailwind.config.ts",
 		"./lib/*": "./src/lib/*.ts",
-		"./components/*": "./src/components/*.tsx"
+		"./utils": "./src/lib/utils.ts"
 	},
 	"dependencies": {
 		"@internationalized/date": "^3.5.2",
