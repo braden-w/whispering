@@ -15,7 +15,7 @@
 		"svelte": "^3.59.1",
 		"svelte-french-toast": "^1.0.4-beta.0",
 		"svelte-preprocess": "^5.0.3",
-		"ui": "workspace:*"
+		"@repo/ui": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.237",
@@ -23,7 +23,6 @@
 		"autoprefixer": "^10.4.14",
 		"eslint-config-custom": "workspace:*",
 		"postcss": "^8.4.23",
-		"tailwind-config": "workspace:*",
 		"tailwindcss": "^3.3.2",
 		"typescript": "^5.0.4"
 	},

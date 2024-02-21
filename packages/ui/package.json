@@ -1,23 +1,20 @@
 {
-	"name": "ui",
+	"name": "@repo/ui",
 	"version": "0.0.0",
-	"description": "Shared components for use Whispering web app, desktop app, and chrome extension",
-	"license": "MIT",
+	"description": "Shared components for use Whispering web app, desktop app, and Chrome extension",
 	"type": "module",
-	"svelte": "index.ts",
 	"module": "index.ts",
-	"scripts": {
-		"lint": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
-		"format": "prettier --write --ignore-path=../../.prettierignore ."
-	},
-	"devDependencies": {
-		"eslint-config-custom": "0.0.0",
-		"svelte": "^3.59.1",
-		"tailwind-config": "0.0.0"
+	"main": "index.ts",
+	"exports": {
+		".": {
+			"types": "./index.ts",
+			"svelte": "./index.ts"
+		}
 	},
 	"dependencies": {
 		"clsx": "^2.1.0",
 		"lucide-svelte": "^0.335.0",
+		"svelte": "^4.2.11",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.2.0"
 	}
