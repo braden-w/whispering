@@ -8,6 +8,8 @@ import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import toast from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
+import { id } from 'effect/Fiber';
+import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -25,6 +27,7 @@ type Recording = {
 	subtitle: string;
 	transcription: string;
 	src: string;
+  state: RecordingState;
 };
 
 class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
@@ -46,9 +49,11 @@ function createRecorder({
 	onStopRecording,
 	saveRecordingToSrc,
 	onSaveRecordingToSrc,
+	getRecordingAsBlob,
 	addRecordingToRecordingsDb,
 	editRecordingInRecordingsDb,
-	deleteRecordingFromRecordingsDb
+	deleteRecordingFromRecordingsDb,
+	transcribeAudioWithWhisperApi
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -59,6 +64,7 @@ function createRecorder({
 	onStopRecording: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc: Effect.Effect<void>;
+	getRecordingAsBlob: (id: string) => Effect.Effect<Blob>;
 	addRecordingToRecordingsDb: (
 		recording: Recording
 	) => Effect.Effect<void, AddRecordingToRecordingsDbError>;
@@ -69,6 +75,7 @@ function createRecorder({
 	deleteRecordingFromRecordingsDb: (
 		id: string
 	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
+	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
@@ -128,6 +135,24 @@ function createRecorder({
 				Effect.gen(function* (_) {
 					yield* _(deleteRecordingFromRecordingsDb(id));
 					recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
+				}),
+			transcribeRecording: (id: string) =>
+				Effect.gen(function* (_) {
+					const $apiKey = get(apiKey);
+					const recordingBlob = yield* _(getRecordingAsBlob(id));
+					recordings.update((recordings) => {
+						const index = recordings.findIndex((recording) => recording.id === id);
+						if (index === -1) return recordings;
+						recordings[index].state = 'TRANSCRIBING';
+						return recordings;
+					});
+					const text = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+					recordings.update((recordings) => {
+						const index = recordings.findIndex((recording) => recording.id === id);
+						if (index === -1) return recordings;
+						recordings[index].transcription = text;
+						return recordings;
+					});
 				})
 		}
 	};
