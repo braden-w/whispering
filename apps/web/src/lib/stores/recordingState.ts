@@ -1,4 +1,5 @@
 import { Data, Effect } from 'effect';
+import { nanoid } from 'nanoid';
 import type { startRecording } from '$lib/recorder/mediaRecorder';
 import { apiKey } from '$lib/stores/apiKey';
 import { audioSrc, recorder } from '$lib/stores/recorderState';
@@ -37,7 +38,8 @@ function createRecorder({
 	stopRecording,
 	onStopRecording,
 	saveRecordingToSrc,
-	onSaveRecordingToSrc
+	onSaveRecordingToSrc,
+  addRecordingToRecordingsDb
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -48,6 +50,7 @@ function createRecorder({
 	onStopRecording: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc: Effect.Effect<void>;
+	addRecordingToRecordingsDb: (recording: Recording) => Effect.Effect<void>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
@@ -69,10 +72,15 @@ function createRecorder({
 						yield* _(onStopRecording);
 						const src = yield* _(saveRecordingToSrc(audioBlob));
 						yield* _(onSaveRecordingToSrc);
-						recordings.update((recordings) => [
-							...recordings,
-							{ src, title: new Date().toLocaleString(), transcription: '' }
-						]);
+						const recording: Recording = {
+							id: nanoid(),
+							title: new Date().toLocaleString(),
+							subtitle: '',
+							transcription: '',
+							src
+						};
+						yield* _(addRecordingToRecordingsDb(recording));
+						recordings.update((recordings) => [...recordings, recording]);
 						recorder.set('IDLE');
 						break;
 					}

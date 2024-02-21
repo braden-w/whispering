@@ -27,6 +27,7 @@
 		"@repo/ui": "workspace:*",
 		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^2.4.0",
+		"nanoid": "^5.0.6",
 		"svelte-french-toast": "^1.0.4-beta.0"
 	}
 }
