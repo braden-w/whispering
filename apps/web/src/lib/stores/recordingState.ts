@@ -48,16 +48,23 @@ function createRecorder({
 			toggleRecording: Effect.gen(function* (_) {
 				const apiKey = yield* _(getApiKey);
 				const recordingStateValue = get(recorder);
-				if (recordingStateValue === 'IDLE') {
-					yield* _(startRecording);
-					yield* _(onStartRecording);
-					recorder.set('RECORDING');
-				} else {
-					const audioBlob = yield* _(stopRecording(apiKey));
-					yield* _(saveRecording(audioBlob));
-					recorder.set('SAVING');
-					yield* _(onStopRecording);
-					recorder.set('IDLE');
+				switch (recordingStateValue) {
+					case 'IDLE': {
+						yield* _(startRecording);
+						yield* _(onStartRecording);
+						recorder.set('RECORDING');
+						break;
+					}
+					case 'RECORDING': {
+						const audioBlob = yield* _(stopRecording(apiKey));
+						yield* _(saveRecording(audioBlob));
+						yield* _(onStopRecording);
+						recorder.set('IDLE');
+						break;
+					}
+					case 'SAVING': {
+						break;
+					}
 				}
 			}).pipe(
 				Effect.catchTags({
