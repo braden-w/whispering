@@ -40,14 +40,14 @@ class DeleteRecordingFromRecordingsDbError extends Data.TaggedError(
 ) {}
 
 function createRecordings() {
-	const recordings = writable<Recording[]>([]);
+	const { subscribe, update } = writable<Recording[]>([]);
 	return {
-		...recordings,
+		subscribe,
 		addRecording: (recording: Recording) => {
-			recordings.update((recordings) => [...recordings, recording]);
+			update((recordings) => [...recordings, recording]);
 		},
 		editRecording: (id: string, recording: Recording) => {
-			recordings.update((recordings) => {
+			update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
 				recordings[index] = recording;
@@ -55,10 +55,10 @@ function createRecordings() {
 			});
 		},
 		deleteRecording: (id: string) => {
-			recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
+			update((recordings) => recordings.filter((recording) => recording.id !== id));
 		},
 		setRecording: (id: string, recording: Recording) => {
-			recordings.update((recordings) => {
+			update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
 				recordings[index] = recording;
@@ -66,7 +66,7 @@ function createRecordings() {
 			});
 		},
 		setRecordingState: (id: string, state: RecordingState) => {
-			recordings.update((recordings) => {
+			update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
 				recordings[index].state = state;
@@ -74,7 +74,7 @@ function createRecordings() {
 			});
 		},
 		setRecordingTranscription: (id: string, transcription: string) => {
-			recordings.update((recordings) => {
+			update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
 				recordings[index].transcription = transcription;
