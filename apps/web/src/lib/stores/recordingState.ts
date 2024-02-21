@@ -1,7 +1,10 @@
-import { apiKey } from '$lib/stores/apiKey';
-import { recorder } from '$lib/stores/recordingState';
-import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { Data, Effect } from 'effect';
+import type { startRecording } from '$lib/recorder/mediaRecorder';
+import { apiKey } from '$lib/stores/apiKey';
+import { audioSrc, recorder } from '$lib/stores/recorderState';
+import { setAlwaysOnTop } from '$lib/system-apis/window';
+import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import toast from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 
@@ -38,10 +41,10 @@ function createRecorder({
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc: Effect.Effect<void>;
 }) {
-	const recordingState = writable<RecorderState>(initialState);
+	const recorderState = writable<RecorderState>(initialState);
 	return {
 		recorder: {
-			...recordingState,
+			...recorderState,
 			toggleRecording: Effect.gen(function* (_) {
 				const apiKey = yield* _(getApiKey);
 				const recordingStateValue = get(recorder);
@@ -74,10 +77,10 @@ function createRecorder({
 }
 
 function createRecording() {
-	const recordingState = writable<RecordingState>('TRANSCRIBING');
+	const recorderState = writable<RecordingState>('TRANSCRIBING');
 	return {
 		recording: {
-			...recordingState,
+			...recorderState,
 			processRecording: async (audioBlob: Blob) => {
 				const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey));
 				outputText.set(text);
