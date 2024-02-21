@@ -6,7 +6,7 @@
 	import { Label } from '@repo/ui/components/label';
 </script>
 
-<div class="flex h-screen items-center justify-center">
+<div class="flex min-h-screen items-center justify-center">
 	<Card.Root>
 		<Card.Header>
 			<Card.Title tag="h1">Settings</Card.Title>
