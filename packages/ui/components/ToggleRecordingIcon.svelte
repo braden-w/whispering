@@ -1,10 +1,12 @@
 <script lang="ts">
+	const RECORDING_STATES = ['IDLE', 'RECORDING', 'TRANSCRIBING'] as const;
+	type RecordingState = (typeof RECORDING_STATES)[number];
 	const recordingStateToIcon = {
-		idle: '🎙️',
-		recording: '🟥',
-		transcribing: '🔄'
-	} as const;
-	export let recordingState: keyof typeof recordingStateToIcon = 'idle';
+		IDLE: '🎙️',
+		RECORDING: '🟥',
+		TRANSCRIBING: '🔄'
+	} satisfies Record<RecordingState, string>;
+	export let recordingState: RecordingState = 'IDLE';
 	$: icon = recordingStateToIcon[recordingState];
 </script>
 
