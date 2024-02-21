@@ -68,7 +68,7 @@
 	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2">
-		<p class="text-sm leading-none">
+		<p class="text-foreground/75 text-sm">
 			Click the microphone or press <kbd
 				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
 			>
