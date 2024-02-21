@@ -17,15 +17,15 @@ export async function toggleRecording() {
 	}
 
 	const recordingStateValue = get(recordingState);
-	if (recordingStateValue === 'idle') {
+	if (recordingStateValue === 'IDLE') {
 		await setAlwaysOnTop(true);
 		await startRecording();
-		recordingState.set('recording');
+		recordingState.set('RECORDING');
 	} else {
 		try {
 			const audioBlob = await stopRecording();
 			audioSrc.set(URL.createObjectURL(audioBlob));
-			recordingState.set('transcribing');
+			recordingState.set('TRANSCRIBING');
 			await toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
@@ -35,7 +35,7 @@ export async function toggleRecording() {
 			console.error('Error occurred during transcription:', error);
 		} finally {
 			await setAlwaysOnTop(false);
-			recordingState.set('idle');
+			recordingState.set('IDLE');
 		}
 	}
 }
