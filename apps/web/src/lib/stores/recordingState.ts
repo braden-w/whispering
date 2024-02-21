@@ -103,6 +103,9 @@ function createRecorder({
 					recordings[index] = recording;
 					return recordings;
 				});
+			},
+			deleteRecording: (id: string) => {
+				recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
 			}
 		}
 	};
