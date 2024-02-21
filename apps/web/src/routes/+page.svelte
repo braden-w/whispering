@@ -4,7 +4,16 @@
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import toast from 'svelte-french-toast';
 	import { ToggleRecordingIcon } from '@repo/ui/legacy/components';
-	import { AdjustmentsHorizontalIcon, ClipboardIcon, KeyIcon, KeyboardIcon } from '@repo/ui/legacy/icons';
+	import { Input } from '@repo/ui/components/input';
+	import { Button } from '@repo/ui/components/button';
+
+	import {
+		AdjustmentsHorizontalIcon,
+		ClipboardIcon,
+		KeyIcon,
+		KeyboardIcon
+	} from '@repo/ui/legacy/icons';
+	import { Label } from '@repo/ui/components/label';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -20,30 +29,27 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
-	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-
+<div class="flex min-h-screen flex-col items-center justify-center gap-4">
+	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<ToggleRecordingIcon recordingState={$recordingState} on:click={toggleRecording} />
 
 	<div>
-		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
-			Transcribed Text
-		</label>
+		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
 		<div class="flex items-center space-x-2">
-			<input
+			<Input
 				id="transcripted-text"
 				class="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 transition-all duration-200 ease-in-out focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
 				bind:value={$outputText}
 			/>
 
-			<button
+			<Button
 				class="rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-white transition-all duration-200 ease-in-out hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				on:click={copyOutputText}
 				aria-label="Copy transcribed text"
 			>
 				<ClipboardIcon />
-			</button>
+			</Button>
 		</div>
 		{#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
@@ -53,7 +59,7 @@
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
 	{#if !window.__TAURI__}
-		<p class="text-xs text-gray-500 font-light">
+		<p class="text-xs font-light text-gray-500">
 			Check out the
 			<a
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
