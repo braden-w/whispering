@@ -53,7 +53,6 @@
 				placeholder="Transcribed text will appear here..."
 				bind:value={$outputText}
 			/>
-
 			<Button
 				class="rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-white transition-all duration-200 ease-in-out hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
 				on:click={copyOutputText}
