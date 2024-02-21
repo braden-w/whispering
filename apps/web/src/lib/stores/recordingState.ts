@@ -87,6 +87,14 @@ function createRecorder({
 			return recordings;
 		});
 	}
+	function setMatchingRecordingTranscription(id: string, transcription: string) {
+		recordings.update((recordings) => {
+			const index = recordings.findIndex((recording) => recording.id === id);
+			if (index === -1) return recordings;
+			recordings[index].transcription = transcription;
+			return recordings;
+		});
+	}
 	return {
 		recorder: {
 			...recorderState,
@@ -150,14 +158,9 @@ function createRecorder({
 					const $apiKey = get(apiKey);
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
 					setMatchingRecordingState(id, 'TRANSCRIBING');
-					const text = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+					const t = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
 					setMatchingRecordingState(id, 'DONE');
-					recordings.update((recordings) => {
-						const index = recordings.findIndex((recording) => recording.id === id);
-						if (index === -1) return recordings;
-						recordings[index].transcription = text;
-						return recordings;
-					});
+					setMatchingRecordingTranscription(id, t);
 				})
 		}
 	};
