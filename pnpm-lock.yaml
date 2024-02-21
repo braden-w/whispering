@@ -118,6 +118,9 @@ importers:
       audio-recorder-polyfill:
         specifier: ^0.4.1
         version: 0.4.1
+      effect:
+        specifier: ^2.4.0
+        version: 2.4.0
       svelte-french-toast:
         specifier: ^1.0.4-beta.0
         version: 1.0.4-beta.0(svelte@4.2.7)
@@ -4452,6 +4455,10 @@ packages:
   /dotenv@7.0.0:
     resolution: {integrity: sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==}
     engines: {node: '>=6'}
+    dev: false
+
+  /effect@2.4.0:
+    resolution: {integrity: sha512-HAtFVAbAGYDzfGbrSrX1gzMzXym15zk1+ps72X8W1wdZY0vxq+u23w8u9DhAZjiJPHT4W9ZYL7QWQqpP4t+dSg==}
     dev: false
 
   /electron-to-chromium@1.4.413:

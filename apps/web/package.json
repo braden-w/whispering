@@ -26,6 +26,7 @@
 	"dependencies": {
 		"@repo/ui": "workspace:*",
 		"audio-recorder-polyfill": "^0.4.1",
+		"effect": "^2.4.0",
 		"svelte-french-toast": "^1.0.4-beta.0"
 	}
 }
