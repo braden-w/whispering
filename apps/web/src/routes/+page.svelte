@@ -55,7 +55,11 @@
 	</div>
 
 	<p class="text-sm leading-none">
-		Click the microphone or press <kbd>space</kbd> to start recording.
+		Click the microphone or press <kbd
+			class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+		>
+			space
+		</kbd> to start recording.
 	</p>
 	<div class="flex items-center gap-2">
 		<small class="text-muted-foreground text-sm font-light">
