@@ -39,6 +39,51 @@ class DeleteRecordingFromRecordingsDbError extends Data.TaggedError(
 	'DeleteRecordingFromRecordingsDbError'
 ) {}
 
+function createRecordings() {
+	const recordings = writable<Recording[]>([]);
+	return {
+		...recordings,
+		addRecording: (recording: Recording) => {
+			recordings.update((recordings) => [...recordings, recording]);
+		},
+		editRecording: (id: string, recording: Recording) => {
+			recordings.update((recordings) => {
+				const index = recordings.findIndex((recording) => recording.id === id);
+				if (index === -1) return recordings;
+				recordings[index] = recording;
+				return recordings;
+			});
+		},
+		deleteRecording: (id: string) => {
+			recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
+		},
+		setMatchingRecording: (id: string, recording: Recording) => {
+			recordings.update((recordings) => {
+				const index = recordings.findIndex((recording) => recording.id === id);
+				if (index === -1) return recordings;
+				recordings[index] = recording;
+				return recordings;
+			});
+		},
+		setMatchingRecordingState: (id: string, state: RecordingState) => {
+			recordings.update((recordings) => {
+				const index = recordings.findIndex((recording) => recording.id === id);
+				if (index === -1) return recordings;
+				recordings[index].state = state;
+				return recordings;
+			});
+		},
+		setMatchingRecordingTranscription: (id: string, transcription: string) => {
+			recordings.update((recordings) => {
+				const index = recordings.findIndex((recording) => recording.id === id);
+				if (index === -1) return recordings;
+				recordings[index].transcription = transcription;
+				return recordings;
+			});
+		}
+	};
+}
+
 function createRecorder({
 	initialState = 'IDLE',
 	getApiKey,
@@ -78,31 +123,7 @@ function createRecorder({
 	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
-	const recordings = writable<Recording[]>([]);
-	function setMatchingRecording(id: string, recording: Recording) {
-		recordings.update((recordings) => {
-			const index = recordings.findIndex((recording) => recording.id === id);
-			if (index === -1) return recordings;
-			recordings[index] = recording;
-			return recordings;
-		});
-	}
-	function setMatchingRecordingState(id: string, state: RecordingState) {
-		recordings.update((recordings) => {
-			const index = recordings.findIndex((recording) => recording.id === id);
-			if (index === -1) return recordings;
-			recordings[index].state = state;
-			return recordings;
-		});
-	}
-	function setMatchingRecordingTranscription(id: string, transcription: string) {
-		recordings.update((recordings) => {
-			const index = recordings.findIndex((recording) => recording.id === id);
-			if (index === -1) return recordings;
-			recordings[index].transcription = transcription;
-			return recordings;
-		});
-	}
+	const recordings = createRecordings();
 	return {
 		recorder: {
 			...recorderState,
@@ -149,7 +170,7 @@ function createRecorder({
 			editRecording: (id: string, recording: Recording) =>
 				Effect.gen(function* (_) {
 					yield* _(editRecordingInRecordingsDb(id, recording));
-					setMatchingRecording(id, recording);
+					recordings.setMatchingRecording(id, recording);
 				}),
 			deleteRecording: (id: string) =>
 				Effect.gen(function* (_) {
@@ -160,10 +181,10 @@ function createRecorder({
 				Effect.gen(function* (_) {
 					const $apiKey = get(apiKey);
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
-					setMatchingRecordingState(id, 'TRANSCRIBING');
+					recordings.setMatchingRecordingState(id, 'TRANSCRIBING');
 					const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
-					setMatchingRecordingState(id, 'DONE');
-					setMatchingRecordingTranscription(id, transcription);
+					recordings.setMatchingRecordingState(id, 'DONE');
+					recordings.setMatchingRecordingTranscription(id, transcription);
 				})
 		}
 	};
