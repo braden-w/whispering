@@ -8,7 +8,6 @@
 			"types": "./index.d.ts"
 		},
 		"./legacy/components": "./components/index.ts",
-		"./legacy/icons": "./icons/index.ts",
 		"./components/*": "./src/lib/components/ui/*/index.ts",
 		"./utils": "./src/lib/utils.ts",
 		"./tailwind.config": "./tailwind.config.ts",
