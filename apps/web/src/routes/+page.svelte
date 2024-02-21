@@ -69,14 +69,14 @@
 		{/if}
 	</div>
 
-	<p class="text-sm leading-none">
-		Click the microphone or press <kbd
-			class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-		>
-			space
-		</kbd> to start recording.
-	</p>
-	<div class="flex items-center gap-2">
+	<div class="flex flex-col items-center justify-center gap-2">
+		<p class="text-sm leading-none">
+			Click the microphone or press <kbd
+				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+			>
+				space
+			</kbd> to start recording.
+		</p>
 		<small class="text-muted-foreground text-sm font-light">
 			Check out the
 			<Button
@@ -101,17 +101,6 @@
 				app
 			</Button> for shortcuts.
 		</small>
-		<Button
-			href="https://github.com/braden-w/whispering"
-			target="_blank"
-			rel="noopener noreferrer"
-			title="View project on GitHub"
-			aria-label="View project on GitHub"
-			size="icon"
-			variant="ghost"
-		>
-			<GithubIcon class="h-4 w-4" />
-		</Button>
 	</div>
 	<div class="flex gap-2">
 		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
@@ -122,6 +111,17 @@
 		</Button>
 		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="ghost" size="icon">
 			<KeyboardIcon />
+		</Button>
+		<Button
+			href="https://github.com/braden-w/whispering"
+			target="_blank"
+			rel="noopener noreferrer"
+			title="View project on GitHub"
+			aria-label="View project on GitHub"
+			size="icon"
+			variant="ghost"
+		>
+			<GithubIcon class="h-4 w-4" />
 		</Button>
 	</div>
 </div>
