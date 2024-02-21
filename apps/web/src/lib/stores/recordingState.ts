@@ -158,9 +158,9 @@ function createRecorder({
 					const $apiKey = get(apiKey);
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
 					setMatchingRecordingState(id, 'TRANSCRIBING');
-					const t = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+					const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
 					setMatchingRecordingState(id, 'DONE');
-					setMatchingRecordingTranscription(id, t);
+					setMatchingRecordingTranscription(id, transcription);
 				})
 		}
 	};
