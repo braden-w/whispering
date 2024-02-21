@@ -57,7 +57,7 @@ function createRecordings() {
 		deleteRecording: (id: string) => {
 			recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
 		},
-		setMatchingRecording: (id: string, recording: Recording) => {
+		setRecording: (id: string, recording: Recording) => {
 			recordings.update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
@@ -65,7 +65,7 @@ function createRecordings() {
 				return recordings;
 			});
 		},
-		setMatchingRecordingState: (id: string, state: RecordingState) => {
+		setRecordingState: (id: string, state: RecordingState) => {
 			recordings.update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
@@ -73,7 +73,7 @@ function createRecordings() {
 				return recordings;
 			});
 		},
-		setMatchingRecordingTranscription: (id: string, transcription: string) => {
+		setRecordingTranscription: (id: string, transcription: string) => {
 			recordings.update((recordings) => {
 				const index = recordings.findIndex((recording) => recording.id === id);
 				if (index === -1) return recordings;
@@ -170,7 +170,7 @@ function createRecorder({
 			editRecording: (id: string, recording: Recording) =>
 				Effect.gen(function* (_) {
 					yield* _(editRecordingInRecordingsDb(id, recording));
-					recordings.setMatchingRecording(id, recording);
+					recordings.setRecording(id, recording);
 				}),
 			deleteRecording: (id: string) =>
 				Effect.gen(function* (_) {
@@ -181,10 +181,10 @@ function createRecorder({
 				Effect.gen(function* (_) {
 					const $apiKey = get(apiKey);
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
-					recordings.setMatchingRecordingState(id, 'TRANSCRIBING');
+					recordings.setRecordingState(id, 'TRANSCRIBING');
 					const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
-					recordings.setMatchingRecordingState(id, 'DONE');
-					recordings.setMatchingRecordingTranscription(id, transcription);
+					recordings.setRecordingState(id, 'DONE');
+					recordings.setRecordingTranscription(id, transcription);
 				})
 		}
 	};
