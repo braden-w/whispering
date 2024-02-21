@@ -62,6 +62,7 @@
 			target="_blank"
 			rel="noopener noreferrer"
 			variant="link"
+			size="sm"
 			title="Check out the Chrome Extension"
 			aria-label="Check out the Chrome Extension"
 		>
@@ -71,6 +72,7 @@
 		<Button
 			href="https://github.com/braden-w/whispering/releases"
 			variant="link"
+			size="sm"
 			title="Check out the desktop app"
 			aria-label="Check out the desktop app"
 		>
