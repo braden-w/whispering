@@ -27,7 +27,9 @@ function createRecorder({
 	startRecording,
 	onStartRecording,
 	stopRecording,
-	onStopRecording
+	onStopRecording,
+	saveRecording,
+	onSaveRecording
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -36,6 +38,8 @@ function createRecorder({
 	onStartRecording: Effect.Effect<void>;
 	stopRecording: (apiKey: string) => Effect.Effect<Blob>;
 	onStopRecording: Effect.Effect<void>;
+	saveRecording: (audioBlob: Blob) => Effect.Effect<void>;
+	onSaveRecording: Effect.Effect<void>;
 }) {
 	const recordingState = writable<RecorderState>(initialState);
 	return {
@@ -50,7 +54,7 @@ function createRecorder({
 					recorder.set('RECORDING');
 				} else {
 					const audioBlob = yield* _(stopRecording(apiKey));
-					audioSrc.set(URL.createObjectURL(audioBlob));
+					yield* _(saveRecording(audioBlob));
 					recorder.set('SAVING');
 					yield* _(onStopRecording);
 					recorder.set('IDLE');
