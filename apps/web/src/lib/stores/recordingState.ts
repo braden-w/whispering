@@ -79,6 +79,14 @@ function createRecorder({
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
+	function setMatchingRecording(id: string, recording: Recording) {
+		recordings.update((recordings) => {
+			const index = recordings.findIndex((recording) => recording.id === id);
+			if (index === -1) return recordings;
+			recordings[index] = recording;
+			return recordings;
+		});
+	}
 	function setMatchingRecordingState(id: string, state: RecordingState) {
 		recordings.update((recordings) => {
 			const index = recordings.findIndex((recording) => recording.id === id);
@@ -141,12 +149,7 @@ function createRecorder({
 			editRecording: (id: string, recording: Recording) =>
 				Effect.gen(function* (_) {
 					yield* _(editRecordingInRecordingsDb(id, recording));
-					recordings.update((recordings) => {
-						const index = recordings.findIndex((recording) => recording.id === id);
-						if (index === -1) return recordings;
-						recordings[index] = recording;
-						return recordings;
-					});
+					setMatchingRecording(id, recording);
 				}),
 			deleteRecording: (id: string) =>
 				Effect.gen(function* (_) {
