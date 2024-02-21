@@ -1,10 +1,7 @@
-import { Data, Effect } from 'effect';
-import type { startRecording } from '$lib/recorder/mediaRecorder';
 import { apiKey } from '$lib/stores/apiKey';
-import { audioSrc, recorder } from '$lib/stores/recordingState';
-import { setAlwaysOnTop } from '$lib/system-apis/window';
-import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+import { recorder } from '$lib/stores/recordingState';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
+import { Data, Effect } from 'effect';
 import toast from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 
@@ -28,8 +25,8 @@ function createRecorder({
 	onStartRecording,
 	stopRecording,
 	onStopRecording,
-	saveRecording,
-	onSaveRecording
+	saveRecordingToSrc,
+	onSaveRecordingToSrc
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -38,8 +35,8 @@ function createRecorder({
 	onStartRecording: Effect.Effect<void>;
 	stopRecording: (apiKey: string) => Effect.Effect<Blob>;
 	onStopRecording: Effect.Effect<void>;
-	saveRecording: (audioBlob: Blob) => Effect.Effect<void>;
-	onSaveRecording: Effect.Effect<void>;
+	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
+	onSaveRecordingToSrc: Effect.Effect<void>;
 }) {
 	const recordingState = writable<RecorderState>(initialState);
 	return {
@@ -57,8 +54,9 @@ function createRecorder({
 					}
 					case 'RECORDING': {
 						const audioBlob = yield* _(stopRecording(apiKey));
-						yield* _(saveRecording(audioBlob));
 						yield* _(onStopRecording);
+						const src = yield* _(saveRecordingToSrc(audioBlob));
+						yield* _(onSaveRecordingToSrc);
 						recorder.set('IDLE');
 						break;
 					}
