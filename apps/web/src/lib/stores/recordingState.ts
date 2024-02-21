@@ -121,7 +121,7 @@ function createRecorder({
 						yield* _(onStopRecording);
 						const src = yield* _(saveRecordingToSrc(audioBlob));
 						yield* _(onSaveRecordingToSrc);
-						const recording: Recording = {
+						const newRecording: Recording = {
 							id: nanoid(),
 							title: new Date().toLocaleString(),
 							subtitle: '',
@@ -129,8 +129,8 @@ function createRecorder({
 							src,
 							state: 'UNPROCESSED'
 						};
-						yield* _(addRecordingToRecordingsDb(recording));
-						recordings.update((recordings) => [...recordings, recording]);
+						yield* _(addRecordingToRecordingsDb(newRecording));
+						recordings.update((recordings) => [...recordings, newRecording]);
 						recorder.set('IDLE');
 						break;
 					}
