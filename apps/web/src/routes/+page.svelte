@@ -49,12 +49,12 @@
 		<div class="flex items-center space-x-2">
 			<Input
 				id="transcripted-text"
-				class="w-64 rounded-lg border focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+				class="w-64 border focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
 				placeholder="Transcribed text will appear here..."
 				bind:value={$outputText}
 			/>
 			<Button
-				class="rounded-lg border border-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+				class="border-primary border px-4 py-2"
 				on:click={copyOutputText}
 				aria-label="Copy transcribed text"
 			>
