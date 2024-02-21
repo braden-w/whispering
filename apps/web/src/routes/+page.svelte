@@ -1,17 +1,24 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import { audioSrc, outputText, recorder } from '$lib/stores/recordingState';
+	import { audioSrc, outputText, recorder, type RecorderState } from '$lib/stores/recordingState';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import { ToggleRecordingIcon } from '@repo/ui/legacy/components';
 	import toast from 'svelte-french-toast';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import KeyIcon from '~icons/heroicons/key';
 	import GithubIcon from '~icons/mdi/github';
+
+	let recordingState: RecorderState = 'IDLE';
+	const recordingStateToIcon = {
+		IDLE: '🎙️',
+		RECORDING: '🟥',
+		SAVING: '🔄'
+	} satisfies Record<RecorderState, string>;
+	$: icon = recordingStateToIcon[recordingState];
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -29,7 +36,15 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
-	<ToggleRecordingIcon recordingState={$recorder} on:click={toggleRecording} />
+	<button
+		class="drop-shadow-png transform text-6xl transition-transform duration-200 ease-in-out hover:scale-110 md:text-7xl"
+		on:click
+		type="button"
+		aria-label="Toggle recording"
+	>
+		{icon}
+	</button>
+	<!-- <ToggleRecordingIcon recordingState={$recorder} on:click={toggleRecording} /> -->
 
 	<div>
 		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
@@ -110,3 +125,9 @@
 		</Button>
 	</div>
 </div>
+
+<style>
+	.drop-shadow-png {
+		filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+	}
+</style>
