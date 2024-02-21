@@ -39,7 +39,9 @@ function createRecorder({
 	onStopRecording,
 	saveRecordingToSrc,
 	onSaveRecordingToSrc,
-	addRecordingToRecordingsDb
+	addRecordingToRecordingsDb,
+	editRecordingInRecordingsDb,
+	deleteRecordingFromRecordingsDb
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -51,6 +53,8 @@ function createRecorder({
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc: Effect.Effect<void>;
 	addRecordingToRecordingsDb: (recording: Recording) => Effect.Effect<void>;
+	editRecordingInRecordingsDb: (id: string, recording: Recording) => Effect.Effect<void>;
+	deleteRecordingFromRecordingsDb: (id: string) => Effect.Effect<void>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = writable<Recording[]>([]);
@@ -96,17 +100,21 @@ function createRecorder({
 		},
 		recordings: {
 			...recordings,
-			editRecording: (id: string, recording: Recording) => {
-				recordings.update((recordings) => {
-					const index = recordings.findIndex((recording) => recording.id === id);
-					if (index === -1) return recordings;
-					recordings[index] = recording;
-					return recordings;
-				});
-			},
-			deleteRecording: (id: string) => {
-				recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
-			}
+			editRecording: (id: string, recording: Recording) =>
+				Effect.gen(function* (_) {
+					yield* _(editRecordingInRecordingsDb(id, recording));
+					recordings.update((recordings) => {
+						const index = recordings.findIndex((recording) => recording.id === id);
+						if (index === -1) return recordings;
+						recordings[index] = recording;
+						return recordings;
+					});
+				}),
+			deleteRecording: (id: string) =>
+				Effect.gen(function* (_) {
+					yield* _(deleteRecordingFromRecordingsDb(id));
+					recordings.update((recordings) => recordings.filter((recording) => recording.id !== id));
+				})
 		}
 	};
 }
