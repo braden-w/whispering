@@ -14,5 +14,11 @@
 		"eslint-config-custom": "0.0.0",
 		"svelte": "^3.59.1",
 		"tailwind-config": "0.0.0"
+	},
+	"dependencies": {
+		"clsx": "^2.1.0",
+		"lucide-svelte": "^0.335.0",
+		"tailwind-merge": "^2.2.1",
+		"tailwind-variants": "^0.2.0"
 	}
 }
