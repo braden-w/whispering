@@ -11,6 +11,7 @@
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import KeyIcon from '~icons/heroicons/key';
+	import GithubIcon from '~icons/mdi/github';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -52,33 +53,46 @@
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if}
 	</div>
+
 	<p class="text-sm leading-none">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<small class="text-muted-foreground text-sm font-light">
-		Check out the
+	<div class="flex items-center gap-2">
 		<Button
-			href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 			target="_blank"
 			rel="noopener noreferrer"
-			variant="link"
-			class="px-0.5"
-			title="Check out the Chrome Extension"
-			aria-label="Check out the Chrome Extension"
+			title="View project on GitHub"
+			aria-label="View project on GitHub"
+			size="icon"
+			variant="ghost"
 		>
-			extension
+			<GithubIcon class="h-4 w-4" />
 		</Button>
-		and
-		<Button
-			href="https://github.com/braden-w/whispering/releases"
-			variant="link"
-			class="px-0.5"
-			title="Check out the desktop app"
-			aria-label="Check out the desktop app"
-		>
-			app
-		</Button> for shortcuts.
-	</small>
+		<small class="text-muted-foreground text-sm font-light">
+			Check out the
+			<Button
+				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+				target="_blank"
+				rel="noopener noreferrer"
+				variant="link"
+				class="px-0.5"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</Button>
+			and
+			<Button
+				href="https://github.com/braden-w/whispering/releases"
+				variant="link"
+				class="px-0.5"
+				title="Check out the desktop app"
+				aria-label="Check out the desktop app"
+			>
+				app
+			</Button> for shortcuts.
+		</small>
+	</div>
 	<div class="flex">
 		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 			<AdjustmentsHorizontalIcon />
@@ -89,22 +103,5 @@
 		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="ghost" size="icon">
 			<KeyboardIcon />
 		</Button>
-	</div>
-
-	<div class="fixed bottom-4 right-4">
-		<a
-			href="https://github.com/braden-w/whisper-desktop"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-500 transition-colors duration-200 hover:text-gray-800"
-			title="View project on GitHub"
-			aria-label="View project on GitHub"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8">
-				<path
-					d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.6-.015 2.89-.015 3.29 0 .32.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-				/>
-			</svg>
-		</a>
 	</div>
 </div>
