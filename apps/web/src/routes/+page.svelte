@@ -78,60 +78,54 @@
 			🎙️
 		{/if}
 	</Button>
-	<div>
-		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
-		<div class="flex items-center gap-2">
-			<Input
-				id="transcripted-text"
-				class="w-64"
-				placeholder="Transcribed text will appear here..."
-			/>
-			<Button
-				class="border-primary border px-4 py-2"
-				on:click={copyOutputText}
-				aria-label="Copy transcribed text"
-			>
-				<ClipboardIcon />
-			</Button>
-		</div>
-		<div class="rounded-md border">
-			<Table.Root {...$tableAttrs}>
-				<Table.Header>
-					{#each $headerRows as headerRow}
-						<Subscribe rowAttrs={headerRow.attrs()}>
-							<Table.Row>
-								{#each headerRow.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-										<Table.Head {...attrs}>
-											<Render of={cell.render()} />
-										</Table.Head>
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						</Subscribe>
-					{/each}
-				</Table.Header>
-				<Table.Body {...$tableBodyAttrs}>
-					{#each $pageRows as row (row.id)}
-						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<Table.Row {...rowAttrs}>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs>
-										<Table.Cell {...attrs}>
-											<Render of={cell.render()} />
-										</Table.Cell>
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						</Subscribe>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		</div>
-		<!-- {#if $audioSrc}
+	<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
+	<div class="flex items-center gap-2">
+		<Input id="transcripted-text" class="w-64" placeholder="Transcribed text will appear here..." />
+		<Button
+			class="border-primary border px-4 py-2"
+			on:click={copyOutputText}
+			aria-label="Copy transcribed text"
+		>
+			<ClipboardIcon />
+		</Button>
+	</div>
+	<div class="rounded-md border">
+		<Table.Root {...$tableAttrs}>
+			<Table.Header>
+				{#each $headerRows as headerRow}
+					<Subscribe rowAttrs={headerRow.attrs()}>
+						<Table.Row>
+							{#each headerRow.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+									<Table.Head {...attrs}>
+										<Render of={cell.render()} />
+									</Table.Head>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Header>
+			<Table.Body {...$tableBodyAttrs}>
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						<Table.Row {...rowAttrs}>
+							{#each row.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs>
+									<Table.Cell {...attrs}>
+										<Render of={cell.render()} />
+									</Table.Cell>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+	<!-- {#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if} -->
-	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2 text-center">
 		<p class="text-foreground/75 text-sm leading-6">
