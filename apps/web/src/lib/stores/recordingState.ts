@@ -1,25 +1,17 @@
+import { apiKey } from '$lib/stores/apiKey';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import type { startRecording } from '$lib/recorder/mediaRecorder';
-import { apiKey } from '$lib/stores/apiKey';
-import { audioSrc, recorder } from '$lib/stores/recorderState';
-import { setAlwaysOnTop } from '$lib/system-apis/window';
-import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
-import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-import toast from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
-import { id } from 'effect/Fiber';
-import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
-type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
+export type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 /**
  * The state of the recording, which can be one of 'TRANSCRIBING' or 'DONE'.
  */
-type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+export type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
 type Recording = {
 	id: string;
@@ -90,7 +82,8 @@ function createRecorder({
 	addRecordingToRecordingsDb,
 	editRecordingInRecordingsDb,
 	deleteRecordingFromRecordingsDb,
-	transcribeAudioWithWhisperApi
+	transcribeAudioWithWhisperApi,
+	onTranscribeRecording
 }: {
 	initialState?: RecorderState;
 	getApiKey: Effect.Effect<string, GetApiKeyError>;
@@ -113,6 +106,7 @@ function createRecorder({
 		id: string
 	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
 	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
+	onTranscribeRecording: (transcription: string) => Effect.Effect<void>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = createRecordings();
@@ -175,6 +169,7 @@ function createRecorder({
 					const recordingBlob = yield* _(getRecordingAsBlob(id));
 					recordings.setRecordingState(id, 'TRANSCRIBING');
 					const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+					yield* _(onTranscribeRecording(transcription));
 					recordings.setRecordingState(id, 'DONE');
 					recordings.setRecordingTranscription(id, transcription);
 				})
@@ -182,26 +177,18 @@ function createRecorder({
 	};
 }
 
-function createRecording() {
-	const recorderState = writable<RecordingState>('TRANSCRIBING');
-	return {
-		recording: {
-			...recorderState,
-			processRecording: async (audioBlob: Blob) => {
-				const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey));
-				outputText.set(text);
-				await writeTextToClipboard(text);
-				await pasteTextFromClipboard();
-			}
-		}
-	};
+function onTranscribeRecording(transcription: string) {
+	outputText.set(transcription);
+	// await writeTextToClipboard(text);
+	// await pasteTextFromClipboard();
 }
-await toast.promise(processRecording(audioBlob), {
-	loading: 'Processing Whisper...',
-	success: 'Copied to clipboard!',
-	error: () => SomethingWentWrongToast
-});
 
-export const { recorder } = createRecorder();
+// await toast.promise(processRecording(audioBlob), {
+// 	loading: 'Processing Whisper...',
+// 	success: 'Copied to clipboard!',
+// 	error: () => SomethingWentWrongToast
+// });
+
+export const { recorder } = createRecorder({});
 export const outputText = writable('');
 export const audioSrc = writable('');
