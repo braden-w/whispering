@@ -121,6 +121,12 @@ const createRecorder = ({
 				new Promise<Blob>((resolve) => {
 					mediaRecorder.addEventListener('stop', () => {
 						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+						// Play the audio
+						const audioUrl = URL.createObjectURL(audioBlob);
+						const audio = new Audio(audioUrl);
+						// reset audio chunks
+						recordedChunks.length = 0;
+						audio.play();
 						resolve(audioBlob);
 					});
 					// mediaRecorder.stream.getTracks().forEach((i) => i.stop());
