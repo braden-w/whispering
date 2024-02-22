@@ -3,7 +3,7 @@
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
 	import { options } from '$lib/stores/options';
 	import { registerShortcut } from '$lib/system-apis/shortcuts';
-	import toast from 'svelte-french-toast';
+	import toast from '@repo/ui/components/sonner';
 
 	async function onChangeShortcutClick() {
 		await toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {
@@ -75,10 +75,10 @@
 				href="https://chrome.google.com/webstore/detail/your-extension-id"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-500"
+				class="inline-flex items-center rounded-full border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500"
 			>
 				<svg
-					class="h-4 w-4 mr-1"
+					class="mr-1 h-4 w-4"
 					version="1.1"
 					id="Livello_1"
 					xmlns:x="&ns_extend;"
@@ -185,9 +185,9 @@
 				href="https://github.com/your-repo/your-project/releases"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gray-600 hover:bg-gray-500"
+				class="inline-flex items-center rounded-full border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-500"
 			>
-				<svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+				<svg class="mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 					<path
 						fill-rule="evenodd"
 						d="M8.22 2.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 2.754zm-1.763-.707c.659-1.234 2.427-1.234 3.0860l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 2.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { toast } from '@repo/ui/components/sonner';
 	import { onMount } from 'svelte';
-	import toast from 'svelte-french-toast';
 	import PaperAirplaneIcon from '~icons/heroicons/paper-airplane';
 
 	let apiKeyInput: HTMLInputElement;
