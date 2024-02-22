@@ -1,9 +1,13 @@
+import { openDB, deleteDB, wrap, unwrap } from 'idb';
 import { apiKey } from '$lib/stores/apiKey';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 
+const DB_NAME = 'RecordingDB' as const;
+const DB_VERSION = 1 as const;
+const RECORDING_STORE = 'recordings' as const;
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
@@ -23,8 +27,12 @@ type Recording = {
 	state: RecordingState;
 };
 
-class GetApiKeyError extends Data.TaggedError('GetApiKeyError') {}
-class AddRecordingToRecordingsDbError extends Data.TaggedError('AddRecordingToRecordingsDbError') {}
+class GetRecordingAsBlobError extends Data.TaggedError('GetRecordingAsBlobError')<{
+	origError: unknown;
+}> {}
+class AddRecordingToRecordingsDbError extends Data.TaggedError('AddRecordingToRecordingsDbError')<{
+	origError: unknown;
+}> {}
 class EditRecordingInRecordingsDbError extends Data.TaggedError(
 	'EditRecordingInRecordingsDbError'
 ) {}
@@ -90,7 +98,7 @@ const createRecorder = ({
 	onStopRecording?: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc?: Effect.Effect<void>;
-	getRecordingAsBlob: (id: string) => Effect.Effect<Blob>;
+	getRecordingAsBlob: (id: string) => Effect.Effect<Blob, GetRecordingAsBlobError>;
 	addRecordingToRecordingsDb: (
 		recording: Recording
 	) => Effect.Effect<void, AddRecordingToRecordingsDbError>;
@@ -115,7 +123,6 @@ const createRecorder = ({
 		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 			recordedChunks.push(event.data);
 		});
-
 		const stopRecording = Effect.tryPromise({
 			try: () =>
 				new Promise<Blob>((resolve) => {
@@ -223,13 +230,57 @@ const getMediaStream = Effect.tryPromise({
 // 	error: () => SomethingWentWrongToast
 // });
 
+// async getRecording(id: string): Promise<Recording | undefined> {
+//     const db = await this.getDB();
+//     const tx = db.transaction(RECORDING_STORE, 'readonly');
+//     const store = tx.objectStore(RECORDING_STORE);
+//     return store.get(id);
+// }
+
+// async updateRecording(recording: Recording): Promise<void> {
+//     const db = await this.getDB();
+//     const tx = db.transaction(RECORDING_STORE, 'readwrite');
+//     const store = tx.objectStore(RECORDING_STORE);
+//     store.put(recording);
+//     return tx.complete;
+// }
+
+// async deleteRecording(id: string): Promise<void> {
+//     const db = await this.getDB();
+//     const tx = db.transaction(RECORDING_STORE, 'readwrite');
+//     const store = tx.objectStore(RECORDING_STORE);
+//     store.delete(id);
+//     return tx.complete;
+// }
+
 export const { recorder } = await createRecorder({
 	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob)),
-	addRecordingToRecordingsDb: (recording) => Effect.logInfo('Recording added to recordings db'),
+	addRecordingToRecordingsDb: (recording) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB(DB_NAME, DB_VERSION);
+				const tx = db.transaction(RECORDING_STORE, 'readwrite');
+				const store = tx.objectStore(RECORDING_STORE);
+				store.add(recording);
+				await tx.done;
+			},
+			catch: (error) => new AddRecordingToRecordingsDbError({ origError: error })
+		}),
 	editRecordingInRecordingsDb: (id, recording) =>
 		Effect.logInfo('Recording added to recordings db'),
 	deleteRecordingFromRecordingsDb: (id) => Effect.logInfo('Recording added to recordings db'),
-	getRecordingAsBlob: (id) => Effect.logInfo('Recording added to recordings db'),
+	getRecordingAsBlob: (id) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB(DB_NAME, DB_VERSION);
+				const tx = db.transaction(RECORDING_STORE, 'readonly');
+				const store = tx.objectStore(RECORDING_STORE);
+				const recording = await store.get(id);
+				if (!recording) throw new Error(`Recording with id ${id} not found`);
+				return fetch(recording.src).then((res) => res.blob());
+			},
+			catch: (error) => new GetRecordingAsBlobError({ origError: error })
+		}),
 	transcribeAudioWithWhisperApi: (audioBlob, apiKey) =>
 		Effect.logInfo('Recording added to recordings db')
 }).pipe(Effect.catchAll(Effect.logError), Effect.runPromise);
