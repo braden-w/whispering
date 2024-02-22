@@ -28,8 +28,9 @@
 	<Card.Root>
 		<Card.Header>
 			<Card.Title tag="h1">Enter OpenAI API Key</Card.Title>
-			<Card.Description
-				>You can find your OpenAPI key <Button
+			<Card.Description>
+				You can find your OpenAPI key
+				<Button
 					href="https://platform.openai.com/api-keys"
 					target="_blank"
 					rel="noopener noreferrer"
@@ -40,8 +41,8 @@
 				</Button>
 			</Card.Description>
 		</Card.Header>
-		<Card.Content class="flex flex-col gap-4"
-			><form class="flex gap-2" on:submit|preventDefault={submitApiKey}>
+		<Card.Content class="flex flex-col gap-4">
+			<form class="flex gap-2" on:submit|preventDefault={submitApiKey}>
 				<Input
 					class="w-64"
 					placeholder="Your OpenAI API Key"
