@@ -1,4 +1,16 @@
-import { Effect, Data } from 'effect';
+import { Effect } from 'effect';
+import { Context, Data } from 'effect';
+
+export class TranscriptionService extends Context.Tag('TranscriptionService')<
+	TranscriptionService,
+	{
+		readonly transcribe: (blob: Blob) => Effect.Effect<string, TranscribeError>;
+	}
+>() {}
+
+class TranscribeError extends Data.TaggedError('TranscribeError')<{
+	origError: unknown;
+}> {}
 
 export const transcribeAudioWithWhisperApi = (audioBlob: Blob, WHISPER_API_KEY: string) =>
 	Effect.gen(function* (_) {
