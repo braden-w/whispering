@@ -29,6 +29,7 @@ export class RecordingsDb extends Context.Tag('RecordingsDb')<
 			recording: Recording
 		) => Effect.Effect<void, EditRecordingError>;
 		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
+		readonly transcribeRecording: (id: string) => Effect.Effect<void, TranscribeRecordingError>;
 	}
 >() {}
 
@@ -49,5 +50,9 @@ export class EditRecordingError extends Data.TaggedError('EditRecordingError')<{
 }> {}
 
 export class DeleteRecordingError extends Data.TaggedError('DeleteRecordingError')<{
+	origError: unknown;
+}> {}
+
+export class TranscribeRecordingError extends Data.TaggedError('TranscribeRecordingError')<{
 	origError: unknown;
 }> {}
