@@ -1,23 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import * as Card from '@repo/ui/components/card';
-	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import DesktopIcon from '~icons/lucide/laptop';
-	import ChromeWebstoreIcon from '~icons/logos/chrome-web-store';
-	import { options } from '$lib/stores/options';
-	import { registerShortcut } from '$lib/system-apis/shortcuts';
-	import { toast } from '@repo/ui/components/sonner';
 	import { Button } from '@repo/ui/components/button';
-	import { Input } from '@repo/ui/components/input';
-
-	async function onChangeShortcutClick() {
-		await toast.promise(registerShortcut($options.currentGlobalShortcut, toggleRecording), {
-			loading: 'Registering shortcuts...',
-			success: 'Registered shortcuts!',
-			error: "Couldn't register shortcut. The shortcut code must be a valid keyboard shortcut."
-		});
-		goto('/');
-	}
+	import ChromeWebstoreIcon from '~icons/logos/chrome-web-store';
+	import DesktopIcon from '~icons/lucide/laptop';
 </script>
 
 <div class="flex min-h-screen items-center justify-center">
