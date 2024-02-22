@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { Input } from '@repo/ui/components/input';
 	import { toast } from '@repo/ui/components/sonner';
 	import { onMount } from 'svelte';
 	import PaperAirplaneIcon from '~icons/heroicons/paper-airplane';
@@ -36,8 +37,8 @@
 	</h2>
 	<form on:submit|preventDefault={submitApiKey}>
 		<div class="flex items-center space-x-2">
-			<input
-				class="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			<Input
+				class="w-64"
 				placeholder="Your OpenAI API Key"
 				bind:value={$apiKey}
 				bind:this={apiKeyInput}
