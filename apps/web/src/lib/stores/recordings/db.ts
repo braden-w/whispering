@@ -15,7 +15,7 @@ const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 1 as const;
 const RECORDING_STORE = 'recordings' as const;
 
-interface RecordingDb extends DBSchema {
+interface RecordingsDbSchema extends DBSchema {
 	recordings: {
 		key: Recording['id'];
 		value: Recording;
@@ -26,7 +26,7 @@ export const indexDb: Context.Tag.Service<RecordingsDb> = {
 	addRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION, {
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 					upgrade(db) {
 						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
 						if (!isRecordingStoreObjectStoreExists) {
@@ -41,7 +41,7 @@ export const indexDb: Context.Tag.Service<RecordingsDb> = {
 	editRecording: (id, recording) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
 				await db.put(RECORDING_STORE, recording);
 			},
 			catch: (error) => new EditRecordingError({ origError: error })
@@ -49,14 +49,14 @@ export const indexDb: Context.Tag.Service<RecordingsDb> = {
 	deleteRecording: (id) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
 				await db.delete(RECORDING_STORE, id);
 			},
 			catch: (error) => new DeleteRecordingError({ origError: error })
 		}),
 	getAllRecordings: Effect.tryPromise({
 		try: async () => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+			const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
 			return db.getAll(RECORDING_STORE);
 		},
 		catch: (error) => new GetAllRecordingsError({ origError: error })
@@ -64,7 +64,7 @@ export const indexDb: Context.Tag.Service<RecordingsDb> = {
 	getRecording: (id) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
 				return db.get(RECORDING_STORE, id);
 			},
 			catch: (error) => new GetRecordingError({ origError: error })
