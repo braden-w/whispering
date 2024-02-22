@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RenderBlobAsAudio from './RenderBlobAsAudio.svelte';
 	import { recorder, recordings } from '$lib/stores/recordingState';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
@@ -6,7 +7,7 @@
 	import { toast, toggleMode } from '@repo/ui/components/sonner';
 	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
-	import { Render, Subscribe, createTable } from 'svelte-headless-table';
+	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -41,6 +42,11 @@
 		table.column({
 			accessor: 'subtitle',
 			header: 'Subtitle'
+		}),
+		table.column({
+			accessor: 'blob',
+			header: 'Blob',
+			cell: ({ value: blob }) => createRender(RenderBlobAsAudio, { blob })
 		}),
 		table.column({
 			accessor: 'transcription',
