@@ -8,7 +8,9 @@ function isString(input: unknown): input is string {
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const whisperTranscriptionService: Context.Tag.Service<TranscriptionService> = {
+export const createWhisperTranscriptionService: (
+	whisperApiKey: string
+) => Context.Tag.Service<TranscriptionService> = (whisperApiKey) => ( {
 	transcribe: (audioBlob) =>
 		Effect.gen(function* (_) {
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
@@ -25,7 +27,7 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 					try: () =>
 						fetch('https://api.openai.com/v1/audio/transcriptions', {
 							method: 'POST',
-							headers: { Authorization: `Bearer ${WHISPER_API_KEY}` },
+							headers: { Authorization: `Bearer ${whisperApiKey}` },
 							body: formData
 						}).then((res) => res.json()),
 					catch: (error) => new WhisperFetchError({ origError: error })
@@ -35,8 +37,8 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 				return yield* _(new TranscriptionIsNotStringError());
 			}
 			return data.text;
-		})
-};
+		});
+} );
 
 class WhisperFileTooLarge extends TranscriptionError {
 	constructor(fileSizeMb: number, maxFileSizeMb: number) {
