@@ -170,6 +170,21 @@ function createRecorder({
 	};
 }
 
+class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<{
+	origError: unknown;
+}> {}
+
+class MediaRecorderNotInitializedError extends Data.TaggedError(
+	'MediaRecorderNotInitializedError'
+) {}
+
+const getMediaStream = Effect.tryPromise({
+	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+	catch: (error) => new GetNavigatorMediaError({ origError: error })
+});
+
+
+
 function onTranscribeRecording(transcription: string) {
 	outputText.set(transcription);
 	// await writeTextToClipboard(text);
@@ -182,6 +197,8 @@ function onTranscribeRecording(transcription: string) {
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder } = createRecorder({});
+export const { recorder } = createRecorder({
+
+});
 export const outputText = writable('');
 export const audioSrc = writable('');
