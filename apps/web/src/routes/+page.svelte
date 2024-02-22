@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import Sun from '~icons/lucide/sun';
-	import Moon from '~icons/lucide/moon';
-	import { audioSrc, outputText, recorder, type RecorderState } from '$lib/stores/recordingState';
+	import { audioSrc, outputText, recorder } from '$lib/stores/recordingState';
 	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
@@ -12,9 +10,9 @@
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import KeyIcon from '~icons/heroicons/key';
+	import Moon from '~icons/lucide/moon';
+	import Sun from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
-
-	let recordingState: RecorderState = 'IDLE';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -39,9 +37,9 @@
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
-		{#if recordingState === 'RECORDING'}
+		{#if $recorder === 'RECORDING'}
 			🟥
-		{:else if recordingState === 'SAVING'}
+		{:else if $recorder === 'SAVING'}
 			🔄
 		{:else}
 			🎙️
