@@ -14,7 +14,7 @@ export type Recording = {
 	title: string;
 	subtitle: string;
 	transcription: string;
-	src: string;
+	blob: Blob;
 	state: RecordingState;
 };
 
@@ -29,12 +29,6 @@ export class RecordingsDb extends Context.Tag('RecordingsDb')<
 			recording: Recording
 		) => Effect.Effect<void, EditRecordingError>;
 		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
-		readonly recordingIdToBlob: (
-			id: string
-		) => Effect.Effect<
-			Blob,
-			RecordingIdToBlobError | GetRecordingError | RecordingIdToBlobError | RecordingNotFound
-		>;
 	}
 >() {}
 

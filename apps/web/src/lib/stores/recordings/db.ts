@@ -1,14 +1,13 @@
+import type { RecordingsDb } from '@repo/recorder';
 import {
 	AddRecordingError,
 	DeleteRecordingError,
 	EditRecordingError,
 	GetAllRecordingsError,
 	GetRecordingError,
-	RecordingsDb,
-	type Recording,
-	RecordingIdToBlobError,
-	RecordingNotFound
+	type Recording
 } from '@repo/recorder';
+import type { Context } from 'effect';
 import { Effect } from 'effect';
 import { openDB, type DBSchema } from 'idb';
 
@@ -23,16 +22,7 @@ interface RecordingDb extends DBSchema {
 	};
 }
 
-const getRecording = (id: string) =>
-	Effect.tryPromise({
-		try: async () => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			return db.get(RECORDING_STORE, id);
-		},
-		catch: (error) => new GetRecordingError({ origError: error })
-	});
-
-const runnable = Effect.provideService(program, RecordingsDb, {
+const indexDb: Context.Tag.Service<RecordingsDb> = {
 	addRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {
@@ -64,16 +54,12 @@ const runnable = Effect.provideService(program, RecordingsDb, {
 		},
 		catch: (error) => new GetAllRecordingsError({ origError: error })
 	}),
-	getRecording,
-	recordingIdToBlob: (id) =>
-		Effect.gen(function* (_) {
-			const record = yield* _(getRecording(id));
-			if (!record) return yield* _(new RecordingNotFound({ id }));
-			return yield* _(
-				Effect.tryPromise({
-					try: () => fetch(record.src).then((res) => res.blob()),
-					catch: (error) => new RecordingIdToBlobError({ origError: error })
-				})
-			);
+	getRecording: (id) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				return db.get(RECORDING_STORE, id);
+			},
+			catch: (error) => new GetRecordingError({ origError: error })
 		})
-});
+};
