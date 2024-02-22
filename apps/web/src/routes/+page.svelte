@@ -70,7 +70,7 @@
 	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2 text-center">
-		<p class="text-foreground/75 text-sm">
+		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press <kbd
 				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
 			>
@@ -81,7 +81,7 @@
 			Check out the <Button
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 				variant="link"
-				class="px-0.5"
+				class="px-0.5 py-0 h-fit"
 				target="_blank"
 				rel="noopener noreferrer"
 				title="Check out the Chrome Extension"
@@ -91,7 +91,7 @@
 			</Button> and <Button
 				href="https://github.com/braden-w/whispering/releases"
 				variant="link"
-				class="px-0.5"
+				class="px-0.5 py-0 h-fit"
 				target="_blank"
 				rel="noopener noreferrer"
 				title="Check out the desktop app"
