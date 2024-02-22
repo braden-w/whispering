@@ -9,6 +9,8 @@ class MediaRecorderNotInitializedError extends Data.TaggedError(
 	'MediaRecorderNotInitializedError'
 ) {}
 
+class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
+
 const getMediaStream = Effect.tryPromise({
 	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
 	catch: (error) => new GetNavigatorMediaError({ origError: error })
@@ -26,18 +28,7 @@ export const startRecording = () =>
 				recordedChunks.push(event.data);
 			});
 		}
-		if (mediaRecorder.state === 'inactive') {
-			mediaRecorder.start();
-		} else {
-			// Handle error or existing recording state
-		}
-
-		const stream = yield* _(getMediaStream);
-		mediaRecorder = new AudioRecorder(stream);
-		if (!mediaRecorder) return yield* _(new MediaRecorderNotInitializedError());
-		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-			recordedChunks.push(event.data);
-		});
+		if (mediaRecorder.state !== 'inactive') return yield* _(new MediaRecorderNotInactiveError());
 		mediaRecorder.start();
 	});
 
