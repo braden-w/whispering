@@ -223,6 +223,6 @@ function onTranscribeRecording(transcription: string) {
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder } = createRecorder({});
+export const { recorder } = await createRecorder({}).pipe(Effect.catchTags({}), Effect.runPromise);
 export const outputText = writable('');
 export const audioSrc = writable('');
