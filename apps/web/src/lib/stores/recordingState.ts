@@ -22,7 +22,7 @@ const createRecorder = ({
 }) =>
 	Effect.gen(function* (_) {
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
-		const recordings = createRecordings();
+		const recordings = yield* _(createRecordings());
 
 		const recordedChunks: Blob[] = [];
 
