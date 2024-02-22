@@ -22,19 +22,12 @@ const createRecorder = ({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped'),
 	saveRecordingToSrc,
-	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src'),
-	getRecordingAsBlob,
-	transcribeAudioWithWhisperApi,
-	onTranscribeRecording = (transcription: string) =>
-		Effect.logInfo(`Transcription: ${transcription}`)
+	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src')
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc?: Effect.Effect<void>;
-	getRecordingAsBlob: (id: string) => Effect.Effect<Blob, GetRecordingAsBlobError>;
-	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
-	onTranscribeRecording?: (transcription: string) => Effect.Effect<void>;
 }) =>
 	Effect.gen(function* (_) {
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
