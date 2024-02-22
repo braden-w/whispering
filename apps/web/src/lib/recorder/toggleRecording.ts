@@ -1,11 +1,11 @@
 import { apiKey } from '$lib/stores/apiKey';
-import { audioSrc, outputText, recordingState } from '$lib/stores/recordingState';
+import { audioSrc, outputText, recorder } from '$lib/stores/recordingState';
 import { pasteTextFromClipboard, writeTextToClipboard } from '$lib/system-apis/clipboard';
 import { setAlwaysOnTop } from '$lib/system-apis/window';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
-import toast from 'svelte-french-toast';
+import { toast } from '@repo/ui/components/sonner';
 import { get } from 'svelte/store';
 import { startRecording, stopRecording } from './mediaRecorder';
 
@@ -16,16 +16,16 @@ export async function toggleRecording() {
 		return;
 	}
 
-	const recordingStateValue = get(recordingState);
+	const recordingStateValue = get(recorder);
 	if (recordingStateValue === 'IDLE') {
 		await setAlwaysOnTop(true);
 		await startRecording();
-		recordingState.set('RECORDING');
+		recorder.set('RECORDING');
 	} else {
 		try {
 			const audioBlob = await stopRecording();
 			audioSrc.set(URL.createObjectURL(audioBlob));
-			recordingState.set('TRANSCRIBING');
+			recorder.set('TRANSCRIBING');
 			await toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
 				success: 'Copied to clipboard!',
@@ -35,7 +35,7 @@ export async function toggleRecording() {
 			console.error('Error occurred during transcription:', error);
 		} finally {
 			await setAlwaysOnTop(false);
-			recordingState.set('IDLE');
+			recorder.set('IDLE');
 		}
 	}
 }
