@@ -143,27 +143,5 @@ const getMediaStream = Effect.tryPromise({
 // }
 
 export const { recorder } = await createRecorder({
-	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob)),
-	addRecordingToRecordingsDb: (recording) =>
-		Effect.tryPromise({
-			try: async () => {},
-			catch: (error) => new AddRecordingToRecordingsDbError({ origError: error })
-		}),
-	editRecordingInRecordingsDb: (id, recording) =>
-		Effect.logInfo('Recording added to recordings db'),
-	deleteRecordingFromRecordingsDb: (id) => Effect.logInfo('Recording added to recordings db'),
-	getRecordingAsBlob: (id) =>
-		Effect.tryPromise({
-			try: async () => {
-				const db = await openDB(DB_NAME, DB_VERSION);
-				const tx = db.transaction(RECORDING_STORE, 'readonly');
-				const store = tx.objectStore(RECORDING_STORE);
-				const recording = await store.get(id);
-				if (!recording) throw new Error(`Recording with id ${id} not found`);
-				return fetch(recording.src).then((res) => res.blob());
-			},
-			catch: (error) => new GetRecordingAsBlobError({ origError: error })
-		}),
-	transcribeAudioWithWhisperApi: (audioBlob, apiKey) =>
-		Effect.logInfo('Recording added to recordings db')
+	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob))
 }).pipe(Effect.catchAll(Effect.logError), Effect.runPromise);
