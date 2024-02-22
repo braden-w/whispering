@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores/recordingState';
+	import { recorder, recordings } from '$lib/stores/recordingState';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -16,7 +16,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		recorder.toggleRecording.pipe(Effect.runPromise);
+		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
 	}
 
 	async function copyOutputText() {
@@ -32,7 +32,7 @@
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
 		class="drop-shadow-png min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
-		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise)}
+		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
@@ -60,6 +60,7 @@
 				<ClipboardIcon />
 			</Button>
 		</div>
+		{JSON.stringify($recordings)}
 		<!-- {#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if} -->
