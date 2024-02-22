@@ -120,15 +120,18 @@ const createRecorder = ({
 			recordedChunks.push(event.data);
 		});
 
-		const stopRecording = () =>
-			new Promise<Blob>((resolve) => {
-				mediaRecorder.onstop = () => {
-					const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-					resolve(audioBlob);
-				};
-				mediaRecorder.stream.getTracks().forEach((i) => i.stop());
-				mediaRecorder.stop();
-			});
+		const stopRecording = Effect.tryPromise({
+			try: () =>
+				new Promise<Blob>((resolve) => {
+					mediaRecorder.onstop = () => {
+						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+						resolve(audioBlob);
+					};
+					mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+					mediaRecorder.stop();
+				}),
+			catch: (error) => new StopMediaRecorderError({ origError: error })
+		});
 
 		return {
 			recorder: {
@@ -202,6 +205,10 @@ const createRecorder = ({
 	});
 
 class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<{
+	origError: unknown;
+}> {}
+
+class StopMediaRecorderError extends Data.TaggedError('StopMediaRecorderError')<{
 	origError: unknown;
 }> {}
 
