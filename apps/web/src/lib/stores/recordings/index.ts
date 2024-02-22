@@ -42,10 +42,10 @@ export function createRecordings() {
 				const recordingsDb = yield* _(RecordingsDb);
 				const recording = yield* _(recordingsDb.getRecording(id));
 				if (!recording) return yield* _(new RecordingNotFound({ id }));
-				editRecording(id, { ...recording, state: 'TRANSCRIBING' });
+				yield* _(editRecording(id, { ...recording, state: 'TRANSCRIBING' }));
 				const transcription = yield* _(transcribeAudioWithWhisperApi(recording.blob, $apiKey));
-				editRecording(id, { ...recording, state: 'DONE' });
-				yield* _(recordingsDb.editRecording(id, { ...recording, transcription }));
+				yield* _(editRecording(id, { ...recording, state: 'DONE' }));
+				yield* _(editRecording(id, { ...recording, transcription }));
 			})
 	};
 }
