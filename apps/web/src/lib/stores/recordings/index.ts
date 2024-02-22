@@ -1,4 +1,4 @@
-import { RecordingsDb, type Recording } from '@repo/recorder';
+import { RecordingsDb, type Recording, RecordingNotFound } from '@repo/recorder';
 import { Data, Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
@@ -40,6 +40,7 @@ export function createRecordings() {
 				const $apiKey = get(apiKey);
 				const recordingsDb = yield* _(RecordingsDb);
 				const recording = yield* _(recordingsDb.getRecording(id));
+				if (!recording) return yield* _(new RecordingNotFound({ id }));
 				const blob = yield* _(recordingsDb.recordingIdToBlob(id));
 				const transcription = yield* _(transcribeAudioWithWhisperApi(blob, $apiKey));
 				yield* _(recordingsDb.editRecording(id, { ...recording, transcription }));
