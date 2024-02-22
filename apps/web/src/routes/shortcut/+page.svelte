@@ -5,11 +5,11 @@
 </script>
 
 <div class="flex min-h-screen items-center justify-center">
-	<section class="container flex flex-col items-center gap-4 px-4 text-center md:px-6">
+	<section class="container flex flex-col items-center gap-4 text-center">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
 			Change Your Keyboard Shortcut
 		</h1>
-		<p class="text-muted-foreground text-xl">
+		<p class="text-muted-foreground lg:text-xl">
 			You can access keyboard shortcuts on the extension and desktop app.
 		</p>
 		<div class="flex flex-col gap-2 md:flex-row">
