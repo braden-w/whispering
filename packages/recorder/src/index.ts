@@ -18,8 +18,8 @@ export type Recording = {
 	state: RecordingState;
 };
 
-export class RecordingsDb extends Context.Tag('RecordingsDb')<
-	RecordingsDb,
+export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
+	RecordingsDbService,
 	{
 		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
 		readonly getRecording: (id: string) => Effect.Effect<Recording | undefined, GetRecordingError>;

@@ -1,4 +1,4 @@
-import type { RecordingsDb } from '@repo/recorder';
+import type { RecordingsDbService } from '@repo/recorder';
 import {
 	AddRecordingError,
 	DeleteRecordingError,
@@ -22,7 +22,7 @@ interface RecordingsDbSchema extends DBSchema {
 	};
 }
 
-export const indexDb: Context.Tag.Service<RecordingsDb> = {
+export const indexDb: Context.Tag.Service<RecordingsDbService> = {
 	addRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {

@@ -1,4 +1,4 @@
-import { RecordingsDb, type Recording } from '@repo/recorder';
+import { RecordingsDbService, type Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
@@ -112,6 +112,6 @@ const getMediaStream = Effect.tryPromise({
 // });
 
 export const { recorder, recordings } = await createRecorder({}).pipe(
-	Effect.provideService(RecordingsDb, indexDb),
+	Effect.provideService(RecordingsDbService, indexDb),
 	Effect.runPromise
 );
