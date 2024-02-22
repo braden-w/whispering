@@ -1,6 +1,8 @@
 <script lang="ts">
+	import * as Card from '@repo/ui/components/card';
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
+	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { toast } from '@repo/ui/components/sonner';
 	import { onMount } from 'svelte';
@@ -22,38 +24,41 @@
 	});
 </script>
 
-<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
-	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
-	<h2 class="text-lg font-light text-gray-500">
-		You can find your OpenAI API key
-		<a
-			href="https://platform.openai.com/account/api-keys"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 underline hover:text-indigo-900"
-		>
-			here.
-		</a>
-	</h2>
-	<form class="flex" on:submit|preventDefault={submitApiKey}>
-		<Input
-			class="w-64"
-			placeholder="Your OpenAI API Key"
-			bind:value={$apiKey}
-			bind:this={apiKeyInput}
-			type="text"
-			autocomplete="off"
-			required
-		/>
-		<button
-			class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-			type="submit"
-		>
-			<PaperAirplaneIcon />
-		</button>
-	</form>
-
-	<p class="text-xs text-gray-600">
-		<a href="/" class="text-gray-600 underline hover:text-indigo-900"> Go back </a>
-	</p>
+<div class="flex min-h-screen items-center justify-center">
+	<Card.Root>
+		<Card.Header>
+			<Card.Title tag="h1">Enter OpenAI API Key</Card.Title>
+			<Card.Description
+				>You can find your OpenAPI key <Button
+					href="https://platform.openai.com/account/api-keys"
+					target="_blank"
+					rel="noopener noreferrer"
+					variant="link"
+					class="px-0"
+				>
+					here.
+				</Button>
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex flex-col gap-4"
+			><form class="flex gap-2" on:submit|preventDefault={submitApiKey}>
+				<Input
+					class="w-64"
+					placeholder="Your OpenAI API Key"
+					bind:value={$apiKey}
+					bind:this={apiKeyInput}
+					type="text"
+					autocomplete="off"
+					required
+				/>
+				<button
+					class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+					type="submit"
+				>
+					<PaperAirplaneIcon />
+				</button>
+			</form>
+			<Button href="/" variant="link">Go back</Button>
+		</Card.Content>
+	</Card.Root>
 </div>
