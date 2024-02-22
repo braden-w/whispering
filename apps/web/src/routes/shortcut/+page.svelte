@@ -31,7 +31,15 @@
 			</p>
 
 			<div class="flex flex-col gap-2 md:flex-row">
-				<Button size="lg" variant="default" href="https://github.com/braden-w/whispering/releases">
+				<Button
+					size="lg"
+					variant="default"
+					href="https://github.com/braden-w/whispering/releases"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Check out the Chrome Extension"
+					aria-label="Check out the Chrome Extension"
+				>
 					<DesktopIcon class="mr-2 h-6 w-6" />
 					Download for Desktop
 				</Button>
@@ -39,6 +47,10 @@
 					size="lg"
 					variant="outline"
 					href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Check out the desktop app"
+					aria-label="Check out the desktop app"
 				>
 					<ChromeWebstoreIcon class="mr-2 h-6 w-6" />
 					Get Chrome Extension

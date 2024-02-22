@@ -80,10 +80,10 @@
 			Check out the
 			<Button
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
-				target="_blank"
-				rel="noopener noreferrer"
 				variant="link"
 				class="px-0.5"
+				target="_blank"
+				rel="noopener noreferrer"
 				title="Check out the Chrome Extension"
 				aria-label="Check out the Chrome Extension"
 			>
@@ -94,6 +94,8 @@
 				href="https://github.com/braden-w/whispering/releases"
 				variant="link"
 				class="px-0.5"
+				target="_blank"
+				rel="noopener noreferrer"
 				title="Check out the desktop app"
 				aria-label="Check out the desktop app"
 			>
