@@ -1,4 +1,3 @@
-import { apiKey } from '$lib/stores/apiKey';
 import type { Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
