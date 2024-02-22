@@ -6,7 +6,8 @@ import {
 	GetRecordingError,
 	RecordingsDb,
 	type Recording,
-	RecordingIdToBlobError
+	RecordingIdToBlobError,
+	RecordingNotFound
 } from '@repo/recorder';
 import { Effect } from 'effect';
 import { openDB, type DBSchema } from 'idb';
@@ -21,6 +22,15 @@ interface RecordingDb extends DBSchema {
 		value: Recording;
 	};
 }
+
+const getRecording = (id: string) =>
+	Effect.tryPromise({
+		try: async () => {
+			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+			return db.get(RECORDING_STORE, id);
+		},
+		catch: (error) => new GetRecordingError({ origError: error })
+	});
 
 const runnable = Effect.provideService(program, RecordingsDb, {
 	addRecording: (recording) =>
@@ -54,22 +64,16 @@ const runnable = Effect.provideService(program, RecordingsDb, {
 		},
 		catch: (error) => new GetAllRecordingsError({ origError: error })
 	}),
-	getRecording: (id) =>
-		Effect.tryPromise({
-			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-				return db.get(RECORDING_STORE, id);
-			},
-			catch: (error) => new GetRecordingError({ origError: error })
-		}),
+	getRecording,
 	recordingIdToBlob: (id) =>
-		Effect.tryPromise({
-			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-				const record = await db.get(RECORDING_STORE, id);
-				if (!record) throw new Error(`No recording with id ${id}`);
-				return fetch(record.src).then((res) => res.blob());
-			},
-			catch: (error) => new RecordingIdToBlobError({ origError: error })
+		Effect.gen(function* (_) {
+			const record = yield* _(getRecording(id));
+			if (!record) return yield* _(new RecordingNotFound({ id }));
+			return yield* _(
+				Effect.tryPromise({
+					try: () => fetch(record.src).then((res) => res.blob()),
+					catch: (error) => new RecordingIdToBlobError({ origError: error })
+				})
+			);
 		})
 });
