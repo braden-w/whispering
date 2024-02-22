@@ -1,21 +1,24 @@
 import { apiKey } from '$lib/stores/apiKey';
+import type { Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
+import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
+import { createRecordings } from './recordings';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
-export type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
+type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 class GetRecordingAsBlobError extends Data.TaggedError('GetRecordingAsBlobError')<{
 	origError: unknown;
 }> {}
 class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
 
+const INITIAL_STATE = 'IDLE';
 const createRecorder = ({
-	initialState = 'IDLE',
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped'),
 	saveRecordingToSrc,
@@ -28,7 +31,6 @@ const createRecorder = ({
 	onTranscribeRecording = (transcription: string) =>
 		Effect.logInfo(`Transcription: ${transcription}`)
 }: {
-	initialState?: RecorderState;
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
@@ -48,7 +50,7 @@ const createRecorder = ({
 	onTranscribeRecording?: (transcription: string) => Effect.Effect<void>;
 }) =>
 	Effect.gen(function* (_) {
-		const recorderState = writable<RecorderState>(initialState);
+		const recorderState = writable<RecorderState>(INITIAL_STATE);
 		const recordings = createRecordings();
 
 		const recordedChunks: Blob[] = [];
