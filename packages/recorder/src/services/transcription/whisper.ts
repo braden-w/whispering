@@ -47,8 +47,11 @@ class WhisperFileTooLarge extends TranscriptionError {
 }
 
 class WhisperFetchError extends TranscriptionError {
-	constructor(origError: unknown) {
-		super({ origError });
+	constructor(fetchError: unknown) {
+		super({
+			message: 'Failed to fetch transcription from Whisper API',
+			origError: fetchError
+		});
 	}
 }
 
