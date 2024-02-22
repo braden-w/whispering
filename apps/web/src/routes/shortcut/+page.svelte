@@ -29,8 +29,16 @@
 			</p>
 
 			<div class="flex flex-col gap-2 md:flex-row">
-				<Button size="lg" variant="default" href="#">Download for Desktop</Button>
-				<Button size="lg" variant="outline" href="#">Get Chrome Extension</Button>
+				<Button size="lg" variant="default" href="https://github.com/braden-w/whispering/releases">
+					Download for Desktop
+				</Button>
+				<Button
+					size="lg"
+					variant="outline"
+					href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+				>
+					Get Chrome Extension
+				</Button>
 			</div>
 			<Button href="/" variant="link">Go back</Button>
 		</div>
