@@ -70,30 +70,27 @@ function createRecordings() {
 
 function createRecorder({
 	initialState = 'IDLE',
-	getApiKey,
-	onGetApiKeyError,
 	startRecording,
-	onStartRecording,
+	onStartRecording = Effect.logInfo('Recording started'),
 	stopRecording,
-	onStopRecording,
+	onStopRecording = Effect.logInfo('Recording stopped'),
 	saveRecordingToSrc,
-	onSaveRecordingToSrc,
+	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src'),
 	getRecordingAsBlob,
 	addRecordingToRecordingsDb,
 	editRecordingInRecordingsDb,
 	deleteRecordingFromRecordingsDb,
 	transcribeAudioWithWhisperApi,
-	onTranscribeRecording
+	onTranscribeRecording = (transcription: string) =>
+		Effect.logInfo(`Transcription: ${transcription}`)
 }: {
 	initialState?: RecorderState;
-	getApiKey: Effect.Effect<string, GetApiKeyError>;
-	onGetApiKeyError: (error: GetApiKeyError) => Effect.Effect<void>;
 	startRecording: Effect.Effect<void>;
-	onStartRecording: Effect.Effect<void>;
+	onStartRecording?: Effect.Effect<void>;
 	stopRecording: (apiKey: string) => Effect.Effect<Blob>;
-	onStopRecording: Effect.Effect<void>;
+	onStopRecording?: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
-	onSaveRecordingToSrc: Effect.Effect<void>;
+	onSaveRecordingToSrc?: Effect.Effect<void>;
 	getRecordingAsBlob: (id: string) => Effect.Effect<Blob>;
 	addRecordingToRecordingsDb: (
 		recording: Recording
@@ -106,7 +103,7 @@ function createRecorder({
 		id: string
 	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
 	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
-	onTranscribeRecording: (transcription: string) => Effect.Effect<void>;
+	onTranscribeRecording?: (transcription: string) => Effect.Effect<void>;
 }) {
 	const recorderState = writable<RecorderState>(initialState);
 	const recordings = createRecordings();
@@ -114,7 +111,7 @@ function createRecorder({
 		recorder: {
 			...recorderState,
 			toggleRecording: Effect.gen(function* (_) {
-				const apiKey = yield* _(getApiKey);
+				const $apiKey = get(apiKey);
 				const recordingStateValue = get(recorder);
 				switch (recordingStateValue) {
 					case 'IDLE': {
@@ -124,7 +121,7 @@ function createRecorder({
 						break;
 					}
 					case 'RECORDING': {
-						const audioBlob = yield* _(stopRecording(apiKey));
+						const audioBlob = yield* _(stopRecording($apiKey));
 						yield* _(onStopRecording);
 						const src = yield* _(saveRecordingToSrc(audioBlob));
 						yield* _(onSaveRecordingToSrc);
@@ -145,11 +142,7 @@ function createRecorder({
 						break;
 					}
 				}
-			}).pipe(
-				Effect.catchTags({
-					GetApiKeyError: onGetApiKeyError
-				})
-			)
+			}).pipe(Effect.catchTags({}))
 		},
 		recordings: {
 			...recordings,
