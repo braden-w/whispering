@@ -5,10 +5,6 @@ class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<
 	origError: unknown;
 }> {}
 
-class MediaRecorderNotInitializedError extends Data.TaggedError(
-	'MediaRecorderNotInitializedError'
-) {}
-
 class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
 
 const getMediaStream = Effect.tryPromise({
@@ -16,30 +12,21 @@ const getMediaStream = Effect.tryPromise({
 	catch: (error) => new GetNavigatorMediaError({ origError: error })
 });
 
-let mediaRecorder: MediaRecorder | null = null;
-let recordedChunks: Blob[] = [];
-
-export const startRecording = () =>
+export const useRecording = ({ handleBlob }: { handleBlob: (blob: Blob) => void }) =>
 	Effect.gen(function* (_) {
-		if (!mediaRecorder) {
-			const stream = yield* _(getMediaStream);
-			mediaRecorder = new MediaRecorder(stream);
-			mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-				recordedChunks.push(event.data);
-			});
-		}
+		const recordedChunks: Blob[] = [];
+		const stream = yield* _(getMediaStream);
+		const mediaRecorder = new AudioRecorder(stream);
+		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+			recordedChunks.push(event.data);
+		});
 		if (mediaRecorder.state !== 'inactive') return yield* _(new MediaRecorderNotInactiveError());
 		mediaRecorder.start();
-	});
-
-export async function stopRecording(): Promise<Blob> {
-	return new Promise((resolve) => {
-		if (!mediaRecorder) throw new Error('MediaRecorder is not initialized.');
-		mediaRecorder.addEventListener('stop', () => {
+		mediaRecorder.onstop = () => {
 			const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-			recordedChunks = [];
-			resolve(audioBlob);
-		});
-		mediaRecorder.stop();
+			handleBlob(audioBlob);
+		};
+		return {
+			stopRecording: Effect.sync(() => mediaRecorder.stop())
+		};
 	});
-}
