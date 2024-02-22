@@ -1,0 +1,9 @@
+{
+	"name": "@repo/recorder",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"typescript": "latest"
+	}
+}
