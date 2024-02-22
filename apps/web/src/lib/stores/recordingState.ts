@@ -73,9 +73,7 @@ class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotIn
 
 const createRecorder = ({
 	initialState = 'IDLE',
-	startRecording,
 	onStartRecording = Effect.logInfo('Recording started'),
-	stopRecording,
 	onStopRecording = Effect.logInfo('Recording stopped'),
 	saveRecordingToSrc,
 	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src'),
@@ -88,9 +86,7 @@ const createRecorder = ({
 		Effect.logInfo(`Transcription: ${transcription}`)
 }: {
 	initialState?: RecorderState;
-	startRecording: Effect.Effect<void>;
 	onStartRecording?: Effect.Effect<void>;
-	stopRecording: (apiKey: string) => Effect.Effect<Blob>;
 	onStopRecording?: Effect.Effect<void>;
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc?: Effect.Effect<void>;
@@ -141,7 +137,6 @@ const createRecorder = ({
 					const recordingStateValue = get(recorder);
 					switch (recordingStateValue) {
 						case 'IDLE': {
-							yield* _(startRecording);
 							if (mediaRecorder.state !== 'inactive')
 								return yield* _(new MediaRecorderNotInactiveError());
 							mediaRecorder.start();
