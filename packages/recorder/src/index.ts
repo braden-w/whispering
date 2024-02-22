@@ -52,10 +52,6 @@ export class DeleteRecordingError extends Data.TaggedError('DeleteRecordingError
 	origError: unknown;
 }> {}
 
-export class RecordingIdToBlobError extends Data.TaggedError('RecordingIdToBlobError')<{
-	origError: unknown;
-}> {}
-
 export class RecordingNotFound extends Data.TaggedError('RecordingNotFound')<{
 	id: string;
 }> {}
