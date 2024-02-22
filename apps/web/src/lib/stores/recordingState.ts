@@ -109,30 +109,7 @@ const getMediaStream = Effect.tryPromise({
 // 	error: () => SomethingWentWrongToast
 // });
 
-// async getRecording(id: string): Promise<Recording | undefined> {
-//     const db = await this.getDB();
-//     const tx = db.transaction(RECORDING_STORE, 'readonly');
-//     const store = tx.objectStore(RECORDING_STORE);
-//     return store.get(id);
-// }
-
-// async updateRecording(recording: Recording): Promise<void> {
-//     const db = await this.getDB();
-//     const tx = db.transaction(RECORDING_STORE, 'readwrite');
-//     const store = tx.objectStore(RECORDING_STORE);
-//     store.put(recording);
-//     return tx.complete;
-// }
-
-// async deleteRecording(id: string): Promise<void> {
-//     const db = await this.getDB();
-//     const tx = db.transaction(RECORDING_STORE, 'readwrite');
-//     const store = tx.objectStore(RECORDING_STORE);
-//     store.delete(id);
-//     return tx.complete;
-// }
-
-export const { recorder } = await createRecorder({}).pipe(
-	Effect.catchAll(Effect.logError),
+export const { recorder, recordings } = await createRecorder({}).pipe(
+	// Effect.catchAll(Effect.logError),
 	Effect.runPromise
 );
