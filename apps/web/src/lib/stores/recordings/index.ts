@@ -1,6 +1,7 @@
 import { RecordingsDb, type Recording } from '@repo/recorder';
 import { Data, Effect } from 'effect';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
+import { apiKey } from '../apiKey';
 
 export function createRecordings() {
 	const { subscribe, set, update } = writable<Recording[]>([]);
@@ -36,10 +37,11 @@ export function createRecordings() {
 			}),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
+				const $apiKey = get(apiKey);
 				const recordingsDb = yield* _(RecordingsDb);
 				const recording = yield* _(recordingsDb.getRecording(id));
 				const blob = yield* _(recordingsDb.recordingIdToBlob(id));
-				const transcription = yield* _(transcribeAudioWithWhisperApi(blob, apiKey));
+				const transcription = yield* _(transcribeAudioWithWhisperApi(blob, $apiKey));
 				yield* _(recordingsDb.editRecording(id, { ...recording, transcription }));
 			})
 	};
