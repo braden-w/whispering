@@ -1,82 +1,17 @@
-import { openDB, deleteDB, wrap, unwrap } from 'idb';
 import { apiKey } from '$lib/stores/apiKey';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 
-const DB_NAME = 'RecordingDB' as const;
-const DB_VERSION = 1 as const;
-const RECORDING_STORE = 'recordings' as const;
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
 export type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
-/**
- * The state of the recording, which can be one of 'TRANSCRIBING' or 'DONE'.
- */
-export type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
-
-type Recording = {
-	id: string;
-	title: string;
-	subtitle: string;
-	transcription: string;
-	src: string;
-	state: RecordingState;
-};
-
 class GetRecordingAsBlobError extends Data.TaggedError('GetRecordingAsBlobError')<{
 	origError: unknown;
 }> {}
-class AddRecordingToRecordingsDbError extends Data.TaggedError('AddRecordingToRecordingsDbError')<{
-	origError: unknown;
-}> {}
-class EditRecordingInRecordingsDbError extends Data.TaggedError(
-	'EditRecordingInRecordingsDbError'
-) {}
-class DeleteRecordingFromRecordingsDbError extends Data.TaggedError(
-	'DeleteRecordingFromRecordingsDbError'
-) {}
-
-function createRecordings() {
-	const { subscribe, update } = writable<Recording[]>([]);
-	return {
-		subscribe,
-		addRecording: (recording: Recording) => {
-			update((recordings) => [...recordings, recording]);
-		},
-		deleteRecording: (id: string) => {
-			update((recordings) => recordings.filter((recording) => recording.id !== id));
-		},
-		setRecording: (id: string, recording: Recording) => {
-			update((recordings) => {
-				const index = recordings.findIndex((recording) => recording.id === id);
-				if (index === -1) return recordings;
-				recordings[index] = recording;
-				return recordings;
-			});
-		},
-		setRecordingState: (id: string, state: RecordingState) => {
-			update((recordings) => {
-				const index = recordings.findIndex((recording) => recording.id === id);
-				if (index === -1) return recordings;
-				recordings[index].state = state;
-				return recordings;
-			});
-		},
-		setRecordingTranscription: (id: string, transcription: string) => {
-			update((recordings) => {
-				const index = recordings.findIndex((recording) => recording.id === id);
-				if (index === -1) return recordings;
-				recordings[index].transcription = transcription;
-				return recordings;
-			});
-		}
-	};
-}
-
 class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
 
 const createRecorder = ({
@@ -257,13 +192,7 @@ export const { recorder } = await createRecorder({
 	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob)),
 	addRecordingToRecordingsDb: (recording) =>
 		Effect.tryPromise({
-			try: async () => {
-				const db = await openDB(DB_NAME, DB_VERSION);
-				const tx = db.transaction(RECORDING_STORE, 'readwrite');
-				const store = tx.objectStore(RECORDING_STORE);
-				store.add(recording);
-				await tx.done;
-			},
+			try: async () => {},
 			catch: (error) => new AddRecordingToRecordingsDbError({ origError: error })
 		}),
 	editRecordingInRecordingsDb: (id, recording) =>
