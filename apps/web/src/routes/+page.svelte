@@ -15,12 +15,6 @@
 	import GithubIcon from '~icons/mdi/github';
 
 	let recordingState: RecorderState = 'IDLE';
-	const recordingStateToIcon = {
-		IDLE: '🎙️',
-		RECORDING: '🟥',
-		SAVING: '🔄'
-	} satisfies Record<RecorderState, string>;
-	$: icon = recordingStateToIcon[recordingState];
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -45,7 +39,13 @@
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
-		{icon}
+		{#if recordingState === 'RECORDING'}
+			🟥
+		{:else if recordingState === 'SAVING'}
+			🔄
+		{:else}
+			🎙️
+		{/if}
 	</Button>
 	<div>
 		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
@@ -81,7 +81,7 @@
 			Check out the <Button
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 				variant="link"
-				class="px-0.5 py-0 h-fit"
+				class="h-fit px-0.5 py-0"
 				target="_blank"
 				rel="noopener noreferrer"
 				title="Check out the Chrome Extension"
@@ -91,7 +91,7 @@
 			</Button> and <Button
 				href="https://github.com/braden-w/whispering/releases"
 				variant="link"
-				class="px-0.5 py-0 h-fit"
+				class="h-fit px-0.5 py-0"
 				target="_blank"
 				rel="noopener noreferrer"
 				title="Check out the desktop app"
