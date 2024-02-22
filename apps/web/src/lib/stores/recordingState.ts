@@ -1,7 +1,6 @@
 import type { Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
-import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { createRecordings } from './recordings';
@@ -11,9 +10,6 @@ import { createRecordings } from './recordings';
  */
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
-class GetRecordingAsBlobError extends Data.TaggedError('GetRecordingAsBlobError')<{
-	origError: unknown;
-}> {}
 class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
 
 const INITIAL_STATE = 'IDLE';
