@@ -22,12 +22,19 @@ interface RecordingDb extends DBSchema {
 	};
 }
 
-const indexDb: Context.Tag.Service<RecordingsDb> = {
+export const indexDb: Context.Tag.Service<RecordingsDb> = {
 	addRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-				await db.add(RECORDING_STORE, recording, recording.id);
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION, {
+					upgrade(db) {
+						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+						if (!isRecordingStoreObjectStoreExists) {
+							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+						}
+					}
+				});
+				await db.add(RECORDING_STORE, recording);
 			},
 			catch: (error) => new AddRecordingError({ origError: error })
 		}),
