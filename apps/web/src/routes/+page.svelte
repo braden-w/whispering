@@ -1,20 +1,23 @@
 <script lang="ts">
-	import RenderBlobAsAudio from './RenderBlobAsAudio.svelte';
 	import { recorder, recordings } from '$lib/stores/recordingState';
 	import { Button } from '@repo/ui/components/button';
+	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { toast, toggleMode } from '@repo/ui/components/sonner';
 	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
+	import { addHiddenColumns } from 'svelte-headless-table/plugins';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
+	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import KeyIcon from '~icons/heroicons/key';
 	import Moon from '~icons/lucide/moon';
 	import Sun from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
+	import RenderBlobAsAudio from './RenderBlobAsAudio.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -28,7 +31,9 @@
 		toast.success('Copied to clipboard!');
 	}
 
-	const table = createTable(recordings);
+	const table = createTable(recordings, {
+		hide: addHiddenColumns()
+	});
 
 	const columns = table.createColumns([
 		table.column({
@@ -57,7 +62,11 @@
 			header: 'State'
 		})
 	]);
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = table.createViewModel(columns);
+	const { headerRows, pageRows, flatColumns, tableAttrs, tableBodyAttrs } =
+		table.createViewModel(columns);
+
+	const ids = flatColumns.map((c) => c.id);
+	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -90,6 +99,23 @@
 		</Button>
 	</div>
 	<div class="rounded-md border">
+		<div class="flex items-center py-4">
+			<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger asChild let:builder>
+					<Button variant="outline" class="ml-auto" builders={[builder]}>
+						Columns <ChevronDown class="ml-2 h-4 w-4" />
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					{#each flatColumns as col}
+						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+							{col.header}
+						</DropdownMenu.CheckboxItem>
+					{/each}
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</div>
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
 				{#each $headerRows as headerRow}
