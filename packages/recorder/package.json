@@ -1,9 +1,11 @@
 {
 	"name": "@repo/recorder",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./whisper": "./src/whisper.ts"
 	},
 	"dependencies": {
+		"effect": "^2.4.0",
 		"typescript": "latest"
 	}
 }
