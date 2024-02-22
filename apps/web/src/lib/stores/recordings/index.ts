@@ -1,8 +1,5 @@
 import { RecordingNotFound, RecordingsDbService, type Recording } from '@repo/recorder';
-import {
-	TranscriptionService,
-	transcribeAudioWithWhisperApi
-} from '@repo/recorder/services/transcription';
+import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
@@ -41,13 +38,11 @@ export const createRecordings = () =>
 				}),
 			transcribeRecording: (id: string) =>
 				Effect.gen(function* (_) {
-					const $apiKey = get(apiKey);
 					const recording = yield* _(recordingsDb.getRecording(id));
 					if (!recording) return yield* _(new RecordingNotFound({ id }));
 					yield* _(editRecording(id, { ...recording, state: 'TRANSCRIBING' }));
 					const transcriptionService = yield* _(TranscriptionService);
 					const transcription = yield* _(transcriptionService.transcribe(recording.blob));
-					// const transcription = yield* _(transcribeAudioWithWhisperApi(recording.blob, $apiKey));
 					yield* _(editRecording(id, { ...recording, state: 'DONE' }));
 					yield* _(editRecording(id, { ...recording, transcription }));
 				})
