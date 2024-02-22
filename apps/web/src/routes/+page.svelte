@@ -48,7 +48,7 @@
 	</Button>
 	<div>
 		<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
-		<div class="flex items-center space-x-2">
+		<div class="flex items-center gap-2">
 			<Input
 				id="transcripted-text"
 				class="w-64"
