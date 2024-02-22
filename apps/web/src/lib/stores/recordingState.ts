@@ -150,12 +150,7 @@ const createRecorder = ({
 							break;
 						}
 						case 'RECORDING': {
-							const audioBlob = yield* _(
-								Effect.tryPromise({
-									try: () => stopRecording(),
-									catch: (error) => new GetNavigatorMediaError({ origError: error })
-								})
-							);
+							const audioBlob = yield* _(stopRecording);
 							yield* _(onStopRecording);
 							const src = yield* _(saveRecordingToSrc(audioBlob));
 							yield* _(onSaveRecordingToSrc);
