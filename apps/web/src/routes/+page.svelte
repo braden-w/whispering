@@ -102,13 +102,13 @@
 		</small>
 	</div>
 	<div class="flex gap-2">
-		<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
+		<Button href="/settings" aria-label="Settings" variant="secondary" size="icon">
 			<AdjustmentsHorizontalIcon />
 		</Button>
-		<Button href="/key" aria-label="API Key" variant="ghost" size="icon">
+		<Button href="/key" aria-label="API Key" variant="secondary" size="icon">
 			<KeyIcon />
 		</Button>
-		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="ghost" size="icon">
+		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="secondary" size="icon">
 			<KeyboardIcon />
 		</Button>
 		<Button
@@ -118,11 +118,11 @@
 			title="View project on GitHub"
 			aria-label="View project on GitHub"
 			size="icon"
-			variant="ghost"
+			variant="secondary"
 		>
 			<GithubIcon class="h-4 w-4" />
 		</Button>
-		<Button on:click={toggleMode} variant="ghost" size="icon">
+		<Button on:click={toggleMode} variant="secondary" size="icon">
 			<Sun
 				class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 			/>
