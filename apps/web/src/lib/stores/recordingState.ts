@@ -39,7 +39,7 @@ const createRecorder = ({
 						recordedChunks.length = 0;
 						resolve(audioBlob);
 					});
-					// mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+					mediaRecorder.stream.getTracks().forEach((i) => i.stop());
 					mediaRecorder.stop();
 				}),
 			catch: (error) => new StopMediaRecorderError({ origError: error })
@@ -61,6 +61,7 @@ const createRecorder = ({
 						}
 						case 'RECORDING': {
 							const audioBlob = yield* _(stopRecording);
+							console.log('🚀 ~ toggleRecording:Effect.gen ~ audioBlob:', audioBlob);
 							yield* _(onStopRecording);
 							const newRecording: Recording = {
 								id: nanoid(),
@@ -70,7 +71,7 @@ const createRecorder = ({
 								blob: audioBlob,
 								state: 'UNPROCESSED'
 							};
-							recordings.addRecording(newRecording);
+							yield* _(recordings.addRecording(newRecording));
 							recorderState.set('IDLE');
 							break;
 						}
@@ -78,7 +79,7 @@ const createRecorder = ({
 							break;
 						}
 					}
-				}).pipe(Effect.catchTags({}))
+				})
 			},
 			recordings
 		};
