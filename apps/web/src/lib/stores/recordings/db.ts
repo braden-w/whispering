@@ -1,5 +1,13 @@
+import {
+	AddRecordingError,
+	DeleteRecordingError,
+	EditRecordingError,
+	GetAllRecordingsError,
+	GetRecordingError,
+	RecordingsDb,
+	type Recording
+} from '@repo/recorder';
 import { Effect } from 'effect';
-import { AddRecordingError, RecordingsDb, type Recording } from '@repo/recorder';
 import { openDB, type DBSchema } from 'idb';
 
 const DB_NAME = 'RecordingDB' as const;
@@ -8,58 +16,49 @@ const RECORDING_STORE = 'recordings' as const;
 
 interface RecordingDb extends DBSchema {
 	recordings: {
-		key: string;
+		key: Recording['id'];
 		value: Recording;
 	};
 }
 
 const runnable = Effect.provideService(program, RecordingsDb, {
-	addRecording: Effect.tryPromise({
-		try: async (recording) => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			const tx = db.transaction(RECORDING_STORE, 'readwrite');
-			const store = tx.objectStore(RECORDING_STORE);
-			store.add(recording);
-			await tx.done;
-		},
-		catch: (error) => new AddRecordingError({ origError: error })
-	}),
-	editRecording: Effect.tryPromise({
-		try: async (id, recording) => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			const tx = db.transaction(RECORDING_STORE, 'readwrite');
-			const store = tx.objectStore(RECORDING_STORE);
-			store.put(recording, id);
-			await tx.done;
-		},
-		catch: (error) => new AddRecordingError({ origError: error })
-	}),
-	deleteRecording: Effect.tryPromise({
-		try: async (id) => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			const tx = db.transaction(RECORDING_STORE, 'readwrite');
-			const store = tx.objectStore(RECORDING_STORE);
-			store.delete(id);
-			await tx.done;
-		},
-		catch: (error) => new AddRecordingError({ origError: error })
-	}),
-	getRecording: Effect.tryPromise({
-		try: async (id) => {
-			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			const tx = db.transaction(RECORDING_STORE, 'readonly');
-			const store = tx.objectStore(RECORDING_STORE);
-			return store.get(id);
-		},
-		catch: (error) => new AddRecordingError({ origError: error })
-	}),
+	addRecording: (recording) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				await db.add(RECORDING_STORE, recording, recording.id);
+			},
+			catch: (error) => new AddRecordingError({ origError: error })
+		}),
+	editRecording: (id, recording) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				await db.put(RECORDING_STORE, recording, id);
+			},
+			catch: (error) => new EditRecordingError({ origError: error })
+		}),
+	deleteRecording: (id) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				await db.delete(RECORDING_STORE, id);
+			},
+			catch: (error) => new DeleteRecordingError({ origError: error })
+		}),
 	getAllRecordings: Effect.tryPromise({
 		try: async () => {
 			const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-			const tx = db.transaction(RECORDING_STORE, 'readonly');
-			const store = tx.objectStore(RECORDING_STORE);
-			return store.getAll();
+			return db.getAll(RECORDING_STORE);
 		},
-		catch: (error) => new AddRecordingError({ origError: error })
-	})
+		catch: (error) => new GetAllRecordingsError({ origError: error })
+	}),
+	getRecording: (id) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				return db.get(RECORDING_STORE, id);
+			},
+			catch: (error) => new GetRecordingError({ origError: error })
+		})
 });
