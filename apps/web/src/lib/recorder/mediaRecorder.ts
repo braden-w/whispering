@@ -19,6 +19,19 @@ let recordedChunks: Blob[] = [];
 
 export const startRecording = () =>
 	Effect.gen(function* (_) {
+		if (!mediaRecorder) {
+			const stream = yield* _(getMediaStream);
+			mediaRecorder = new MediaRecorder(stream);
+			mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+				recordedChunks.push(event.data);
+			});
+		}
+		if (mediaRecorder.state === 'inactive') {
+			mediaRecorder.start();
+		} else {
+			// Handle error or existing recording state
+		}
+
 		const stream = yield* _(getMediaStream);
 		mediaRecorder = new AudioRecorder(stream);
 		if (!mediaRecorder) return yield* _(new MediaRecorderNotInitializedError());
