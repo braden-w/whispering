@@ -4,7 +4,9 @@
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { toast, toggleMode } from '@repo/ui/components/sonner';
+	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
+	import { Render, Subscribe, createTable } from 'svelte-headless-table';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -24,6 +26,32 @@
 		// await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
+
+	const table = createTable(recordings);
+
+	const columns = table.createColumns([
+		table.column({
+			accessor: 'id',
+			header: 'ID'
+		}),
+		table.column({
+			accessor: 'title',
+			header: 'Title'
+		}),
+		table.column({
+			accessor: 'subtitle',
+			header: 'Subtitle'
+		}),
+		table.column({
+			accessor: 'transcription',
+			header: 'Transcription'
+		}),
+		table.column({
+			accessor: 'state',
+			header: 'State'
+		})
+	]);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = table.createViewModel(columns);
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -60,7 +88,40 @@
 				<ClipboardIcon />
 			</Button>
 		</div>
-		{JSON.stringify($recordings)}
+		<div class="rounded-md border">
+			<Table.Root {...$tableAttrs}>
+				<Table.Header>
+					{#each $headerRows as headerRow}
+						<Subscribe rowAttrs={headerRow.attrs()}>
+							<Table.Row>
+								{#each headerRow.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+										<Table.Head {...attrs}>
+											<Render of={cell.render()} />
+										</Table.Head>
+									</Subscribe>
+								{/each}
+							</Table.Row>
+						</Subscribe>
+					{/each}
+				</Table.Header>
+				<Table.Body {...$tableBodyAttrs}>
+					{#each $pageRows as row (row.id)}
+						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+							<Table.Row {...rowAttrs}>
+								{#each row.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} let:attrs>
+										<Table.Cell {...attrs}>
+											<Render of={cell.render()} />
+										</Table.Cell>
+									</Subscribe>
+								{/each}
+							</Table.Row>
+						</Subscribe>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</div>
 		<!-- {#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if} -->
