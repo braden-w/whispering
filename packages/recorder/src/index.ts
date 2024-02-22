@@ -18,7 +18,7 @@ export type Recording = {
 	state: RecordingState;
 };
 
-export class RecordingsDb extends Context.Tag('Random')<
+export class RecordingsDb extends Context.Tag('RecordingsDb')<
 	RecordingsDb,
 	{
 		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
