@@ -19,14 +19,10 @@ class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotIn
 const INITIAL_STATE = 'IDLE';
 const createRecorder = ({
 	onStartRecording = Effect.logInfo('Recording started'),
-	onStopRecording = Effect.logInfo('Recording stopped'),
-	saveRecordingToSrc,
-	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src')
+	onStopRecording = Effect.logInfo('Recording stopped')
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
-	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
-	onSaveRecordingToSrc?: Effect.Effect<void>;
 }) =>
 	Effect.gen(function* (_) {
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
@@ -70,14 +66,12 @@ const createRecorder = ({
 						case 'RECORDING': {
 							const audioBlob = yield* _(stopRecording);
 							yield* _(onStopRecording);
-							const src = yield* _(saveRecordingToSrc(audioBlob));
-							yield* _(onSaveRecordingToSrc);
 							const newRecording: Recording = {
 								id: nanoid(),
 								title: new Date().toLocaleString(),
 								subtitle: '',
 								transcription: '',
-								src,
+								blob: audioBlob,
 								state: 'UNPROCESSED'
 							};
 							recordings.addRecording(newRecording);
@@ -142,6 +136,7 @@ const getMediaStream = Effect.tryPromise({
 //     return tx.complete;
 // }
 
-export const { recorder } = await createRecorder({
-	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob))
-}).pipe(Effect.catchAll(Effect.logError), Effect.runPromise);
+export const { recorder } = await createRecorder({}).pipe(
+	Effect.catchAll(Effect.logError),
+	Effect.runPromise
+);
