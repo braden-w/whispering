@@ -32,7 +32,7 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	}
 >() {}
 
-export class GetAllRecordingsError extends Data.TaggedError('GetRecordingsError')<{
+export class GetAllRecordingsError extends Data.TaggedError('GetAllRecordingsError')<{
 	origError: unknown;
 }> {}
 
