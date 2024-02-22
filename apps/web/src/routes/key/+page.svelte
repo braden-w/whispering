@@ -30,7 +30,7 @@
 			<Card.Title tag="h1">Enter OpenAI API Key</Card.Title>
 			<Card.Description
 				>You can find your OpenAPI key <Button
-					href="https://platform.openai.com/account/api-keys"
+					href="https://platform.openai.com/api-keys"
 					target="_blank"
 					rel="noopener noreferrer"
 					variant="link"
