@@ -5,7 +5,8 @@ import {
 	GetAllRecordingsError,
 	GetRecordingError,
 	RecordingsDb,
-	type Recording
+	type Recording,
+	RecordingIdToBlobError
 } from '@repo/recorder';
 import { Effect } from 'effect';
 import { openDB, type DBSchema } from 'idb';
@@ -60,5 +61,15 @@ const runnable = Effect.provideService(program, RecordingsDb, {
 				return db.get(RECORDING_STORE, id);
 			},
 			catch: (error) => new GetRecordingError({ origError: error })
+		}),
+	recordingIdToBlob: (id) =>
+		Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
+				const record = await db.get(RECORDING_STORE, id);
+				if (!record) throw new Error(`No recording with id ${id}`);
+				return fetch(record.src).then((res) => res.blob());
+			},
+			catch: (error) => new RecordingIdToBlobError({ origError: error })
 		})
 });
