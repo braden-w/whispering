@@ -1,5 +1,5 @@
 import type { Context } from 'effect';
-import { Data, Effect } from 'effect';
+import { Effect } from 'effect';
 import { TranscriptionError, type TranscriptionService } from '.';
 
 function isString(input: unknown): input is string {
