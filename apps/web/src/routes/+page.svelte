@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { toggleRecording } from '$lib/recorder/toggleRecording';
-	import { audioSrc, outputText, recorder } from '$lib/stores/recordingState';
-	import { writeTextToClipboard } from '$lib/system-apis/clipboard';
+	import { recorder } from '$lib/stores/recordingState';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { toast, toggleMode } from '@repo/ui/components/sonner';
+	import { Effect } from 'effect';
 	import KeyboardIcon from '~icons/fa6-regular/keyboard';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -17,12 +16,12 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		toggleRecording();
+		recorder.toggleRecording.pipe(Effect.runPromise);
 	}
 
 	async function copyOutputText() {
-		if (!$outputText) return;
-		await writeTextToClipboard($outputText);
+		// if (!$outputText) return;
+		// await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
 </script>
@@ -33,7 +32,7 @@
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
 		class="drop-shadow-png min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
-		on:click={toggleRecording}
+		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise)}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
@@ -52,7 +51,6 @@
 				id="transcripted-text"
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
-				bind:value={$outputText}
 			/>
 			<Button
 				class="border-primary border px-4 py-2"
@@ -62,9 +60,9 @@
 				<ClipboardIcon />
 			</Button>
 		</div>
-		{#if $audioSrc}
+		<!-- {#if $audioSrc}
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
-		{/if}
+		{/if} -->
 	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2 text-center">
