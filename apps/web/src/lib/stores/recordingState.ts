@@ -111,7 +111,7 @@ const createRecorder = ({
 		const recordedChunks: Blob[] = [];
 
 		const stream = yield* _(getMediaStream);
-		const mediaRecorder = new MediaRecorder(stream);
+		const mediaRecorder = new AudioRecorder(stream);
 		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 			recordedChunks.push(event.data);
 		});
@@ -119,11 +119,11 @@ const createRecorder = ({
 		const stopRecording = Effect.tryPromise({
 			try: () =>
 				new Promise<Blob>((resolve) => {
-					mediaRecorder.onstop = () => {
+					mediaRecorder.addEventListener('stop', () => {
 						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
 						resolve(audioBlob);
-					};
-					mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+					});
+					// mediaRecorder.stream.getTracks().forEach((i) => i.stop());
 					mediaRecorder.stop();
 				}),
 			catch: (error) => new StopMediaRecorderError({ origError: error })
@@ -133,9 +133,8 @@ const createRecorder = ({
 			recorder: {
 				...recorderState,
 				toggleRecording: Effect.gen(function* (_) {
-					const $apiKey = get(apiKey);
-					const recordingStateValue = get(recorder);
-					switch (recordingStateValue) {
+					const $recorderState = get(recorderState);
+					switch ($recorderState) {
 						case 'IDLE': {
 							if (mediaRecorder.state !== 'inactive')
 								return yield* _(new MediaRecorderNotInactiveError());
@@ -211,11 +210,11 @@ const getMediaStream = Effect.tryPromise({
 	catch: (error) => new GetNavigatorMediaError({ origError: error })
 });
 
-function onTranscribeRecording(transcription: string) {
-	outputText.set(transcription);
-	// await writeTextToClipboard(text);
-	// await pasteTextFromClipboard();
-}
+// function onTranscribeRecording(transcription: string) {
+// 	outputText.set(transcription);
+// 	// await writeTextToClipboard(text);
+// 	// await pasteTextFromClipboard();
+// }
 
 // await toast.promise(processRecording(audioBlob), {
 // 	loading: 'Processing Whisper...',
@@ -223,6 +222,13 @@ function onTranscribeRecording(transcription: string) {
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder } = await createRecorder({}).pipe(Effect.catchTags({}), Effect.runPromise);
-export const outputText = writable('');
-export const audioSrc = writable('');
+export const { recorder } = await createRecorder({
+	saveRecordingToSrc: (audioBlob) => Effect.sync(() => URL.createObjectURL(audioBlob)),
+	addRecordingToRecordingsDb: (recording) => Effect.logInfo('Recording added to recordings db'),
+	editRecordingInRecordingsDb: (id, recording) =>
+		Effect.logInfo('Recording added to recordings db'),
+	deleteRecordingFromRecordingsDb: (id) => Effect.logInfo('Recording added to recordings db'),
+	getRecordingAsBlob: (id) => Effect.logInfo('Recording added to recordings db'),
+	transcribeAudioWithWhisperApi: (audioBlob, apiKey) =>
+		Effect.logInfo('Recording added to recordings db')
+}).pipe(Effect.catchAll(Effect.logError), Effect.runPromise);
