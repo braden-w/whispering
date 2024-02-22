@@ -56,7 +56,7 @@
 					<PaperAirplaneIcon />
 				</Button>
 			</form>
-			<Button href="/" variant="link">Go back</Button>
+			<Button href="/" variant="secondary">Go back</Button>
 		</Card.Content>
 	</Card.Root>
 </div>
