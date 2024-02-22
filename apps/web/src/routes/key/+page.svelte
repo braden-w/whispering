@@ -1,14 +1,11 @@
 <script lang="ts">
-	import * as Card from '@repo/ui/components/card';
 	import { goto } from '$app/navigation';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { Button } from '@repo/ui/components/button';
+	import * as Card from '@repo/ui/components/card';
 	import { Input } from '@repo/ui/components/input';
 	import { toast } from '@repo/ui/components/sonner';
-	import { onMount } from 'svelte';
 	import PaperAirplaneIcon from '~icons/heroicons/paper-airplane';
-
-	let apiKeyInput: HTMLInputElement;
 
 	function submitApiKey() {
 		if (!$apiKey) {
@@ -18,10 +15,6 @@
 			goto('/');
 		}
 	}
-
-	onMount(() => {
-		apiKeyInput.focus();
-	});
 </script>
 
 <div class="flex min-h-screen items-center justify-center">
@@ -47,7 +40,6 @@
 					class="w-64"
 					placeholder="Your OpenAI API Key"
 					bind:value={$apiKey}
-					bind:this={apiKeyInput}
 					type="text"
 					autocomplete="off"
 					required
