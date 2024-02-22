@@ -8,37 +8,36 @@ function isString(input: unknown): input is string {
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const createWhisperTranscriptionService: (
-	whisperApiKey: string
-) => Context.Tag.Service<TranscriptionService> = (whisperApiKey) => ( {
-	transcribe: (audioBlob) =>
-		Effect.gen(function* (_) {
-			const blobSizeInMb = audioBlob.size / (1024 * 1024);
-			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-				return yield* _(new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB));
-			}
-			const fileName = 'recording.wav';
-			const wavFile = new File([audioBlob], fileName);
-			const formData = new FormData();
-			formData.append('file', wavFile);
-			formData.append('model', 'whisper-1');
-			const data = yield* _(
-				Effect.tryPromise({
-					try: () =>
-						fetch('https://api.openai.com/v1/audio/transcriptions', {
-							method: 'POST',
-							headers: { Authorization: `Bearer ${whisperApiKey}` },
-							body: formData
-						}).then((res) => res.json()),
-					catch: (error) => new WhisperFetchError({ origError: error })
-				})
-			);
-			if (!isString(data.text)) {
-				return yield* _(new TranscriptionIsNotStringError());
-			}
-			return data.text;
-		});
-} );
+export const createWhisperTranscriptionService = (whisperApiKey: string) =>
+	({
+		transcribe: (audioBlob) =>
+			Effect.gen(function* (_) {
+				const blobSizeInMb = audioBlob.size / (1024 * 1024);
+				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
+					return yield* _(new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB));
+				}
+				const fileName = 'recording.wav';
+				const wavFile = new File([audioBlob], fileName);
+				const formData = new FormData();
+				formData.append('file', wavFile);
+				formData.append('model', 'whisper-1');
+				const data = yield* _(
+					Effect.tryPromise({
+						try: () =>
+							fetch('https://api.openai.com/v1/audio/transcriptions', {
+								method: 'POST',
+								headers: { Authorization: `Bearer ${whisperApiKey}` },
+								body: formData
+							}).then((res) => res.json()),
+						catch: (error) => new WhisperFetchError({ origError: error })
+					})
+				);
+				if (!isString(data.text)) {
+					return yield* _(new TranscriptionIsNotStringError());
+				}
+				return data.text;
+			})
+	} satisfies Context.Tag.Service<TranscriptionService>);
 
 class WhisperFileTooLarge extends TranscriptionError {
 	constructor(fileSizeMb: number, maxFileSizeMb: number) {
