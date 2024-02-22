@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import * as Card from '@repo/ui/components/card';
 	import { toggleRecording } from '$lib/recorder/toggleRecording';
+	import DesktopIcon from '~icons/lucide/laptop';
+	import ChromeWebstoreIcon from '~icons/logos/chrome-web-store';
 	import { options } from '$lib/stores/options';
 	import { registerShortcut } from '$lib/system-apis/shortcuts';
 	import { toast } from '@repo/ui/components/sonner';
@@ -30,6 +32,7 @@
 
 			<div class="flex flex-col gap-2 md:flex-row">
 				<Button size="lg" variant="default" href="https://github.com/braden-w/whispering/releases">
+					<DesktopIcon class="mr-2 h-6 w-6" />
 					Download for Desktop
 				</Button>
 				<Button
@@ -37,6 +40,7 @@
 					variant="outline"
 					href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 				>
+					<ChromeWebstoreIcon class="mr-2 h-6 w-6" />
 					Get Chrome Extension
 				</Button>
 			</div>
