@@ -1,6 +1,13 @@
 import { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
+export class CreateTranscriptionService extends Context.Tag('CreateTranscriptionService')<
+	CreateTranscriptionService,
+	{
+		readonly createTranscriptionService: () => Effect.Effect<TranscriptionService>;
+	}
+>() {}
+
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
 	{
