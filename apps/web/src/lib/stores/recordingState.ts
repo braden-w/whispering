@@ -98,19 +98,7 @@ const createRecorder = ({
 					}
 				}).pipe(Effect.catchTags({}))
 			},
-			recordings: {
-				...recordings,
-				transcribeRecording: (id: string) =>
-					Effect.gen(function* (_) {
-						const $apiKey = get(apiKey);
-						const recordingBlob = yield* _(getRecordingAsBlob(id));
-						recordings.setRecordingState(id, 'TRANSCRIBING');
-						const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
-						yield* _(onTranscribeRecording(transcription));
-						recordings.setRecordingState(id, 'DONE');
-						recordings.setRecordingTranscription(id, transcription);
-					})
-			}
+			recordings
 		};
 	});
 
