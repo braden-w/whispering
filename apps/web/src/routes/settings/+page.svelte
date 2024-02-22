@@ -6,8 +6,8 @@
 	import { Label } from '@repo/ui/components/label';
 </script>
 
-<div class="flex min-h-screen items-center justify-center">
-	<Card.Root>
+<div class="container flex min-h-screen items-center justify-center">
+	<Card.Root class="max-w-sm">
 		<Card.Header>
 			<Card.Title tag="h1">Settings</Card.Title>
 			<Card.Description>Customize your Whispering experience</Card.Description>

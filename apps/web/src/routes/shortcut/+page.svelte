@@ -4,7 +4,7 @@
 	import DesktopIcon from '~icons/lucide/laptop';
 </script>
 
-<div class="flex min-h-screen items-center justify-center">
+<div class="container flex min-h-screen items-center justify-center">
 	<section class="container flex flex-col items-center gap-4 text-center">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
 			Change Your Keyboard Shortcut

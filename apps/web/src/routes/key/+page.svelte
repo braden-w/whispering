@@ -17,8 +17,8 @@
 	}
 </script>
 
-<div class="flex min-h-screen items-center justify-center">
-	<Card.Root>
+<div class="container flex min-h-screen items-center justify-center">
+	<Card.Root class="max-w-sm">
 		<Card.Header>
 			<Card.Title tag="h1">Enter OpenAI API Key</Card.Title>
 			<Card.Description>
