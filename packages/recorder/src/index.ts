@@ -29,7 +29,12 @@ export class RecordingsDb extends Context.Tag('RecordingsDb')<
 			recording: Recording
 		) => Effect.Effect<void, EditRecordingError>;
 		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
-		readonly recordingIdToBlob: (id: string) => Effect.Effect<Blob, RecordingIdToBlobError>;
+		readonly recordingIdToBlob: (
+			id: string
+		) => Effect.Effect<
+			Blob,
+			RecordingIdToBlobError | GetRecordingError | RecordingIdToBlobError | RecordingNotFound
+		>;
 	}
 >() {}
 
