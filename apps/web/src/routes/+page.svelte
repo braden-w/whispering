@@ -36,7 +36,7 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="flex min-h-screen flex-col items-center justify-center gap-4">
+<div class="container flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
 		class="drop-shadow-png min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
