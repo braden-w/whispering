@@ -24,9 +24,6 @@ const createRecorder = ({
 	saveRecordingToSrc,
 	onSaveRecordingToSrc = Effect.logInfo('Recording saved to src'),
 	getRecordingAsBlob,
-	addRecordingToRecordingsDb,
-	editRecordingInRecordingsDb,
-	deleteRecordingFromRecordingsDb,
 	transcribeAudioWithWhisperApi,
 	onTranscribeRecording = (transcription: string) =>
 		Effect.logInfo(`Transcription: ${transcription}`)
@@ -36,16 +33,6 @@ const createRecorder = ({
 	saveRecordingToSrc: (audioBlob: Blob) => Effect.Effect<string>;
 	onSaveRecordingToSrc?: Effect.Effect<void>;
 	getRecordingAsBlob: (id: string) => Effect.Effect<Blob, GetRecordingAsBlobError>;
-	addRecordingToRecordingsDb: (
-		recording: Recording
-	) => Effect.Effect<void, AddRecordingToRecordingsDbError>;
-	editRecordingInRecordingsDb: (
-		id: string,
-		recording: Recording
-	) => Effect.Effect<void, EditRecordingInRecordingsDbError>;
-	deleteRecordingFromRecordingsDb: (
-		id: string
-	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
 	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
 	onTranscribeRecording?: (transcription: string) => Effect.Effect<void>;
 }) =>
@@ -101,7 +88,6 @@ const createRecorder = ({
 								src,
 								state: 'UNPROCESSED'
 							};
-							yield* _(addRecordingToRecordingsDb(newRecording));
 							recordings.addRecording(newRecording);
 							recorderState.set('IDLE');
 							break;
@@ -114,16 +100,6 @@ const createRecorder = ({
 			},
 			recordings: {
 				...recordings,
-				editRecording: (id: string, recording: Recording) =>
-					Effect.gen(function* (_) {
-						yield* _(editRecordingInRecordingsDb(id, recording));
-						recordings.setRecording(id, recording);
-					}),
-				deleteRecording: (id: string) =>
-					Effect.gen(function* (_) {
-						yield* _(deleteRecordingFromRecordingsDb(id));
-						recordings.deleteRecording(id);
-					}),
 				transcribeRecording: (id: string) =>
 					Effect.gen(function* (_) {
 						const $apiKey = get(apiKey);
