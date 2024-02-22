@@ -52,12 +52,9 @@
 					autocomplete="off"
 					required
 				/>
-				<button
-					class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-					type="submit"
-				>
+				<Button type="submit">
 					<PaperAirplaneIcon />
-				</button>
+				</Button>
 			</form>
 			<Button href="/" variant="link">Go back</Button>
 		</Card.Content>
