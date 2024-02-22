@@ -42,7 +42,7 @@ export const indexDb: Context.Tag.Service<RecordingsDb> = {
 		Effect.tryPromise({
 			try: async () => {
 				const db = await openDB<RecordingDb>(DB_NAME, DB_VERSION);
-				await db.put(RECORDING_STORE, recording, id);
+				await db.put(RECORDING_STORE, recording);
 			},
 			catch: (error) => new EditRecordingError({ origError: error })
 		}),
