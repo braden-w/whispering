@@ -8,17 +8,10 @@ class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<
 	origError: unknown;
 }> {}
 
-const getMediaStream = Effect.tryPromise(() =>
-	navigator.mediaDevices.getUserMedia({ audio: true })
-);
-
-// const getMediaStream: Effect.Effect<MediaStream, GetNavigatorMediaError> = Effect.tryPromise({
-// 	try: async () => {
-// 		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-// 		return stream
-// 	},
-// 	error: (error) => new GetNavigatorMediaError({ origError: error })
-// });
+const getMediaStream = Effect.tryPromise({
+	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+	catch: (error) => new GetNavigatorMediaError({ origError: error })
+});
 
 export async function startRecording(): Promise<void> {
 	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
