@@ -32,7 +32,7 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 				})
 			);
 			if (!isString(data.text)) {
-				return yield* _(new TranscriptionIsNotStringError({ transcription: data.text }));
+				return yield* _(new TranscriptionIsNotStringError());
 			}
 			return data.text;
 		})
@@ -56,7 +56,9 @@ class WhisperFetchError extends TranscriptionError {
 }
 
 class TranscriptionIsNotStringError extends TranscriptionError {
-	constructor(transcription: unknown) {
-		super({ origError: transcription });
+	constructor() {
+		super({
+			message: 'Transcrition from Whisper API is invalid or not a string'
+		});
 	}
 }
