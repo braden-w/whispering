@@ -69,7 +69,7 @@
 		{/if}
 	</div>
 
-	<div class="flex flex-col items-center justify-center gap-2">
+	<div class="flex flex-col items-center justify-center gap-2 text-center">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press <kbd
 				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
@@ -77,9 +77,8 @@
 				space
 			</kbd> to start recording.
 		</p>
-		<small class="text-muted-foreground text-sm font-light">
-			Check out the
-			<Button
+		<p class="text-muted-foreground text-sm font-light">
+			Check out the <Button
 				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
 				variant="link"
 				class="px-0.5"
@@ -89,9 +88,7 @@
 				aria-label="Check out the Chrome Extension"
 			>
 				extension
-			</Button>
-			and
-			<Button
+			</Button> and <Button
 				href="https://github.com/braden-w/whispering/releases"
 				variant="link"
 				class="px-0.5"
@@ -102,7 +99,7 @@
 			>
 				app
 			</Button> for shortcuts.
-		</small>
+		</p>
 	</div>
 	<div class="flex gap-2">
 		<Button href="/settings" aria-label="Settings" variant="secondary" size="icon">
