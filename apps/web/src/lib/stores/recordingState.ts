@@ -1,4 +1,5 @@
 import { apiKey } from '$lib/stores/apiKey';
+import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
@@ -68,7 +69,9 @@ function createRecordings() {
 	};
 }
 
-function createRecorder({
+class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
+
+const createRecorder = ({
 	initialState = 'IDLE',
 	startRecording,
 	onStartRecording = Effect.logInfo('Recording started'),
@@ -104,71 +107,99 @@ function createRecorder({
 	) => Effect.Effect<void, DeleteRecordingFromRecordingsDbError>;
 	transcribeAudioWithWhisperApi: (audioBlob: Blob, apiKey: string) => Effect.Effect<string>;
 	onTranscribeRecording?: (transcription: string) => Effect.Effect<void>;
-}) {
-	const recorderState = writable<RecorderState>(initialState);
-	const recordings = createRecordings();
-	return {
-		recorder: {
-			...recorderState,
-			toggleRecording: Effect.gen(function* (_) {
-				const $apiKey = get(apiKey);
-				const recordingStateValue = get(recorder);
-				switch (recordingStateValue) {
-					case 'IDLE': {
-						yield* _(startRecording);
-						yield* _(onStartRecording);
-						recorderState.set('RECORDING');
-						break;
-					}
-					case 'RECORDING': {
-						const audioBlob = yield* _(stopRecording($apiKey));
-						yield* _(onStopRecording);
-						const src = yield* _(saveRecordingToSrc(audioBlob));
-						yield* _(onSaveRecordingToSrc);
-						const newRecording: Recording = {
-							id: nanoid(),
-							title: new Date().toLocaleString(),
-							subtitle: '',
-							transcription: '',
-							src,
-							state: 'UNPROCESSED'
-						};
-						yield* _(addRecordingToRecordingsDb(newRecording));
-						recordings.addRecording(newRecording);
-						recorderState.set('IDLE');
-						break;
-					}
-					case 'SAVING': {
-						break;
-					}
-				}
-			}).pipe(Effect.catchTags({}))
-		},
-		recordings: {
-			...recordings,
-			editRecording: (id: string, recording: Recording) =>
-				Effect.gen(function* (_) {
-					yield* _(editRecordingInRecordingsDb(id, recording));
-					recordings.setRecording(id, recording);
-				}),
-			deleteRecording: (id: string) =>
-				Effect.gen(function* (_) {
-					yield* _(deleteRecordingFromRecordingsDb(id));
-					recordings.deleteRecording(id);
-				}),
-			transcribeRecording: (id: string) =>
-				Effect.gen(function* (_) {
+}) =>
+	Effect.gen(function* (_) {
+		const recorderState = writable<RecorderState>(initialState);
+		const recordings = createRecordings();
+
+		const recordedChunks: Blob[] = [];
+
+		const stream = yield* _(getMediaStream);
+		const mediaRecorder = new MediaRecorder(stream);
+		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+			recordedChunks.push(event.data);
+		});
+
+		const stopRecording = () =>
+			new Promise<Blob>((resolve) => {
+				mediaRecorder.onstop = () => {
+					const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+					resolve(audioBlob);
+				};
+				mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+				mediaRecorder.stop();
+			});
+
+		return {
+			recorder: {
+				...recorderState,
+				toggleRecording: Effect.gen(function* (_) {
 					const $apiKey = get(apiKey);
-					const recordingBlob = yield* _(getRecordingAsBlob(id));
-					recordings.setRecordingState(id, 'TRANSCRIBING');
-					const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
-					yield* _(onTranscribeRecording(transcription));
-					recordings.setRecordingState(id, 'DONE');
-					recordings.setRecordingTranscription(id, transcription);
-				})
-		}
-	};
-}
+					const recordingStateValue = get(recorder);
+					switch (recordingStateValue) {
+						case 'IDLE': {
+							yield* _(startRecording);
+							if (mediaRecorder.state !== 'inactive')
+								return yield* _(new MediaRecorderNotInactiveError());
+							mediaRecorder.start();
+							yield* _(onStartRecording);
+							recorderState.set('RECORDING');
+							break;
+						}
+						case 'RECORDING': {
+							const audioBlob = yield* _(
+								Effect.tryPromise({
+									try: () => stopRecording(),
+									catch: (error) => new GetNavigatorMediaError({ origError: error })
+								})
+							);
+							yield* _(onStopRecording);
+							const src = yield* _(saveRecordingToSrc(audioBlob));
+							yield* _(onSaveRecordingToSrc);
+							const newRecording: Recording = {
+								id: nanoid(),
+								title: new Date().toLocaleString(),
+								subtitle: '',
+								transcription: '',
+								src,
+								state: 'UNPROCESSED'
+							};
+							yield* _(addRecordingToRecordingsDb(newRecording));
+							recordings.addRecording(newRecording);
+							recorderState.set('IDLE');
+							break;
+						}
+						case 'SAVING': {
+							break;
+						}
+					}
+				}).pipe(Effect.catchTags({}))
+			},
+			recordings: {
+				...recordings,
+				editRecording: (id: string, recording: Recording) =>
+					Effect.gen(function* (_) {
+						yield* _(editRecordingInRecordingsDb(id, recording));
+						recordings.setRecording(id, recording);
+					}),
+				deleteRecording: (id: string) =>
+					Effect.gen(function* (_) {
+						yield* _(deleteRecordingFromRecordingsDb(id));
+						recordings.deleteRecording(id);
+					}),
+				transcribeRecording: (id: string) =>
+					Effect.gen(function* (_) {
+						const $apiKey = get(apiKey);
+						const recordingBlob = yield* _(getRecordingAsBlob(id));
+						recordings.setRecordingState(id, 'TRANSCRIBING');
+						const transcription = yield* _(transcribeAudioWithWhisperApi(recordingBlob, $apiKey));
+						yield* _(onTranscribeRecording(transcription));
+						recordings.setRecordingState(id, 'DONE');
+						recordings.setRecordingTranscription(id, transcription);
+					})
+			}
+		};
+	});
 
 class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<{
 	origError: unknown;
@@ -183,8 +214,6 @@ const getMediaStream = Effect.tryPromise({
 	catch: (error) => new GetNavigatorMediaError({ origError: error })
 });
 
-
-
 function onTranscribeRecording(transcription: string) {
 	outputText.set(transcription);
 	// await writeTextToClipboard(text);
@@ -197,8 +226,6 @@ function onTranscribeRecording(transcription: string) {
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder } = createRecorder({
-
-});
+export const { recorder } = createRecorder({});
 export const outputText = writable('');
 export const audioSrc = writable('');
