@@ -8,7 +8,7 @@ export const startRecording = () =>
 	Effect.gen(function* (_) {
 		const stream = yield* _(getMediaStream);
 		mediaRecorder = new AudioRecorder(stream);
-		if (!mediaRecorder) return Effect.fail(new MediaRecorderNotInitializedError());
+		if (!mediaRecorder) yield* _(new MediaRecorderNotInitializedError());
 		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 			recordedChunks.push(event.data);
 		});
