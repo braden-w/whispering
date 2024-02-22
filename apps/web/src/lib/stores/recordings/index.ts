@@ -1,8 +1,7 @@
 import { RecordingNotFound, RecordingsDbService, type Recording } from '@repo/recorder';
 import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
-import { get, writable } from 'svelte/store';
-import { apiKey } from '../apiKey';
+import { writable } from 'svelte/store';
 
 export const createRecordings = () =>
 	Effect.gen(function* (_) {
