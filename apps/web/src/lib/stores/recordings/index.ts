@@ -1,5 +1,8 @@
 import { RecordingNotFound, RecordingsDbService, type Recording } from '@repo/recorder';
-import { TranscriptionService, transcribeAudioWithWhisperApi } from '@repo/recorder/whisper';
+import {
+	TranscriptionService,
+	transcribeAudioWithWhisperApi
+} from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
