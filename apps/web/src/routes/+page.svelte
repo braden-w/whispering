@@ -29,6 +29,7 @@
 	}
 
 	async function copyOutputText() {
+		if (!$outputText) return;
 		await writeTextToClipboard($outputText);
 		toast.success('Copied to clipboard!');
 	}
