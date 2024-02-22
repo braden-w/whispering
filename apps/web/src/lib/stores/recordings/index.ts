@@ -1,6 +1,6 @@
-import { RecordingsDb, type Recording, RecordingNotFound } from '@repo/recorder';
+import { RecordingNotFound, RecordingsDb, type Recording } from '@repo/recorder';
 import { transcribeAudioWithWhisperApi } from '@repo/recorder/whisper';
-import { Data, Effect } from 'effect';
+import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
 
@@ -26,9 +26,11 @@ export function createRecordings() {
 		}),
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
+				console.log('🚀 ~ addRecording ~ recording:', recording);
 				const recordingsDb = yield* _(RecordingsDb);
 				yield* _(recordingsDb.addRecording(recording));
 				update((recordings) => [...recordings, recording]);
+				console.log('🚀 ~ addRecording ~ recording:', recording);
 			}),
 		editRecording,
 		deleteRecording: (id: string) =>
