@@ -21,15 +21,18 @@ export type Recording = {
 export class RecordingsDb extends Context.Tag('Random')<
 	RecordingsDb,
 	{
-		readonly getAllRecordings: Effect.Effect<Recording[], GetRecordingsError>;
-		readonly getRecording: Effect.Effect<string, Recording | undefined, GetRecordingError>;
-		readonly addRecording: Effect.Effect<Recording, AddRecordingError>;
-		readonly editRecording: Effect.Effect<Recording, EditRecordingError>;
-		readonly deleteRecording: Effect.Effect<string, DeleteRecordingError>;
+		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
+		readonly getRecording: (id: string) => Effect.Effect<Recording | undefined, GetRecordingError>;
+		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
+		readonly editRecording: (
+			id: string,
+			recording: Recording
+		) => Effect.Effect<void, EditRecordingError>;
+		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
 	}
 >() {}
 
-export class GetRecordingsError extends Data.TaggedError('GetRecordingsError')<{
+export class GetAllRecordingsError extends Data.TaggedError('GetRecordingsError')<{
 	origError: unknown;
 }> {}
 
