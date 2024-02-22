@@ -41,7 +41,14 @@ export const indexDb: Context.Tag.Service<RecordingsDbService> = {
 	editRecording: (id, recording) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+					upgrade(db) {
+						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+						if (!isRecordingStoreObjectStoreExists) {
+							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+						}
+					}
+				});
 				await db.put(RECORDING_STORE, recording);
 			},
 			catch: (error) => new EditRecordingError({ origError: error })
@@ -49,14 +56,28 @@ export const indexDb: Context.Tag.Service<RecordingsDbService> = {
 	deleteRecording: (id) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+					upgrade(db) {
+						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+						if (!isRecordingStoreObjectStoreExists) {
+							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+						}
+					}
+				});
 				await db.delete(RECORDING_STORE, id);
 			},
 			catch: (error) => new DeleteRecordingError({ origError: error })
 		}),
 	getAllRecordings: Effect.tryPromise({
 		try: async () => {
-			const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
+			const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+				upgrade(db) {
+					const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+					if (!isRecordingStoreObjectStoreExists) {
+						db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+					}
+				}
+			});
 			return db.getAll(RECORDING_STORE);
 		},
 		catch: (error) => new GetAllRecordingsError({ origError: error })
@@ -64,7 +85,14 @@ export const indexDb: Context.Tag.Service<RecordingsDbService> = {
 	getRecording: (id) =>
 		Effect.tryPromise({
 			try: async () => {
-				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION);
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+					upgrade(db) {
+						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+						if (!isRecordingStoreObjectStoreExists) {
+							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+						}
+					}
+				});
 				return db.get(RECORDING_STORE, id);
 			},
 			catch: (error) => new GetRecordingError({ origError: error })
