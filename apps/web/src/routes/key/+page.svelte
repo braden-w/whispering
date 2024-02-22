@@ -35,24 +35,22 @@
 			here.
 		</a>
 	</h2>
-	<form on:submit|preventDefault={submitApiKey}>
-		<div class="flex items-center space-x-2">
-			<Input
-				class="w-64"
-				placeholder="Your OpenAI API Key"
-				bind:value={$apiKey}
-				bind:this={apiKeyInput}
-				type="text"
-				autocomplete="off"
-				required
-			/>
-			<button
-				class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-				type="submit"
-			>
-				<PaperAirplaneIcon />
-			</button>
-		</div>
+	<form class="flex" on:submit|preventDefault={submitApiKey}>
+		<Input
+			class="w-64"
+			placeholder="Your OpenAI API Key"
+			bind:value={$apiKey}
+			bind:this={apiKeyInput}
+			type="text"
+			autocomplete="off"
+			required
+		/>
+		<button
+			class="rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
+			type="submit"
+		>
+			<PaperAirplaneIcon />
+		</button>
 	</form>
 
 	<p class="text-xs text-gray-600">
