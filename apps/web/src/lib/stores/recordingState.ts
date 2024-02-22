@@ -103,10 +103,6 @@ class StopMediaRecorderError extends Data.TaggedError('StopMediaRecorderError')<
 	origError: unknown;
 }> {}
 
-class MediaRecorderNotInitializedError extends Data.TaggedError(
-	'MediaRecorderNotInitializedError'
-) {}
-
 const getMediaStream = Effect.tryPromise({
 	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
 	catch: (error) => new GetNavigatorMediaError({ origError: error })
