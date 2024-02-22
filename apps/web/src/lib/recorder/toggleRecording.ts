@@ -1,5 +1,5 @@
 import { apiKey } from '$lib/stores/apiKey';
-import { audioSrc, outputText, recorder } from '$lib/stores/recordingState';
+import { recorder } from '$lib/stores/recordingState';
 import { pasteTextFromClipboard, writeTextToClipboard } from '$lib/system-apis/clipboard';
 import { setAlwaysOnTop } from '$lib/system-apis/window';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
@@ -7,7 +7,6 @@ import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte'
 import { transcribeAudioWithWhisperApi } from '$lib/transcribeAudioWithWhisperApi';
 import { toast } from '@repo/ui/components/sonner';
 import { get } from 'svelte/store';
-import { startRecording, stopRecording } from './mediaRecorder';
 
 export async function toggleRecording() {
 	const apiKeyValue = get(apiKey);
@@ -24,7 +23,7 @@ export async function toggleRecording() {
 	} else {
 		try {
 			const audioBlob = await stopRecording();
-			audioSrc.set(URL.createObjectURL(audioBlob));
+			// audioSrc.set(URL.createObjectURL(audioBlob));
 			recorder.set('TRANSCRIBING');
 			await toast.promise(processRecording(audioBlob), {
 				loading: 'Processing Whisper...',
@@ -42,7 +41,7 @@ export async function toggleRecording() {
 
 async function processRecording(audioBlob: Blob) {
 	const text = await transcribeAudioWithWhisperApi(audioBlob, get(apiKey));
-	outputText.set(text);
+	// outputText.set(text);
 	await writeTextToClipboard(text);
 	await pasteTextFromClipboard();
 }
