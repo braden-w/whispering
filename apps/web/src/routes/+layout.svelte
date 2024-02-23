@@ -1,4 +1,5 @@
 <script lang="ts">
+	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import { ModeWatcher, Toaster, toggleMode } from '@repo/ui/components/sonner';
@@ -16,16 +17,16 @@
 
 <div class="relative flex min-h-screen flex-col">
 	<header
-		class="border-border/4 bg-background/95 supports-[backdrop-filter]:bg-background/6t0 sticky top-0 z-50 border-b shadow-sm backdrop-blur"
+		class="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur"
 	>
-		<div class="flex h-[50px] items-center justify-between px-4 md:px-6">
+		<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
 			<div class="flex items-center gap-2 text-lg font-semibold">
 				<span class="font-bold">whispering</span>
 				<span aria-hidden="true" role="img"> 🎙️ </span>
 			</div>
 			<div class="flex items-center gap-4">
-				<Button size="icon" variant="ghost">
-					<SettingsIcon class="h-5 w-5" />
+				<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
+					<AdjustmentsHorizontalIcon />
 					<span class="sr-only">Settings</span>
 				</Button>
 				<Button on:click={toggleMode} size="icon" variant="ghost">
