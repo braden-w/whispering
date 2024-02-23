@@ -17,7 +17,7 @@
 	import Moon from '~icons/lucide/moon';
 	import Sun from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
-	import RenderBlobAsAudio from './RenderBlobAsAudio.svelte';
+	import RenderAudioUrl from './RenderAudioUrl.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -51,7 +51,10 @@
 		table.column({
 			accessor: 'blob',
 			header: 'Blob',
-			cell: ({ value: blob }) => createRender(RenderBlobAsAudio, { blob })
+			cell: ({ value: audioBlob }) => {
+				const audioUrl = URL.createObjectURL(audioBlob);
+				return createRender(RenderAudioUrl, { audioUrl });
+			}
 		}),
 		table.column({
 			accessor: 'transcription',
