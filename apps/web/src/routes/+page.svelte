@@ -101,7 +101,7 @@
 		</p>
 	</div>
 	<Button
-		class="transform p-12 text-8xl hover:scale-110 focus:scale-110"
+		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
 		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
 		aria-label="Toggle recording"
 		variant="ghost"
