@@ -61,7 +61,7 @@ const createApplicationState = ({
 
 		return {
 			recorder: {
-				...recorderState,
+				subscribe: recorderState.subscribe,
 				toggleRecording: Effect.gen(function* (_) {
 					const $recorderState = get(recorderState);
 					switch ($recorderState) {
