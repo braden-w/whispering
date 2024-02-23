@@ -2,7 +2,7 @@
 	"name": "@repo/recorder",
 	"exports": {
 		".": "./src/index.ts",
-		"./whisper": "./src/whisper.ts"
+		"./services/*": "./src/services/*/index.ts"
 	},
 	"dependencies": {
 		"effect": "^2.4.0",
