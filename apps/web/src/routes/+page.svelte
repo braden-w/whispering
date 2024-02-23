@@ -53,14 +53,14 @@
 			accessor: 'subtitle',
 			header: 'Subtitle'
 		}),
-		// table.column({
-		// 	accessor: ({ id }) => id,
-		// 	header: 'Blob',
-		// 	cell: ({ value: id }) => {
-		// 		const audioUrl = recordingIdToAudioUrl[id];
-		// 		return createRender(RenderAudioUrl, { audioUrl });
-		// 	}
-		// }),
+		table.column({
+			accessor: ({ blob }) => blob,
+			header: 'Blob',
+			cell: ({ value: blob }) => {
+				const audioUrl = URL.createObjectURL(blob);
+				return createRender(RenderAudioUrl, { audioUrl });
+			}
+		}),
 		table.column({
 			accessor: 'transcription',
 			header: 'Transcription'
