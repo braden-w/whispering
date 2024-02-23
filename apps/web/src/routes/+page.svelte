@@ -23,17 +23,14 @@
 		const latestRecording = $recordings[$recordings.length - 1];
 		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
 	});
-	let outputText: string;
 
-	recordings.subscribe((newRecordings) => {
-		const latestRecording = newRecordings[newRecordings.length - 1];
-		if (latestRecording) {
-			outputText = latestRecording.transcription;
-		}
+	const outputText = derived(recordings, ($recordings) => {
+		const latestRecording = $recordings[$recordings.length - 1];
+		return latestRecording ? latestRecording.transcription : '';
 	});
 
 	async function copyOutputText() {
-		if (!outputText) return;
+		if (!$outputText) return;
 		// await writeTextToClipboard(outputText);
 		toast.success('Copied to clipboard!');
 	}
@@ -124,7 +121,7 @@
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
 				readonly
-				bind:value={outputText}
+				value={$outputText}
 			/>
 			<Button
 				class="border-primary border px-4 py-2"
