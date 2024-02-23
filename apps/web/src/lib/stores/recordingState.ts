@@ -25,31 +25,41 @@ const createRecorder = ({
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
 		const recordings = yield* _(createRecordings());
 
-		const recordedChunks: Blob[] = [];
-
 		let stream: MediaStream;
 		let mediaRecorder: MediaRecorder;
+		const recordedChunks: Blob[] = [];
 
-		const onDataAvailable = (event: BlobEvent) => {
-			recordedChunks.push(event.data);
-		};
 		const startRecording = Effect.gen(function* (_) {
 			stream = yield* _(getMediaStream);
+			recordedChunks.length = 0;
 			mediaRecorder = new AudioRecorder(stream);
-			mediaRecorder.addEventListener('dataavailable', onDataAvailable);
+			mediaRecorder.addEventListener(
+				'dataavailable',
+				(event: BlobEvent) => {
+					if (!event.data.size) return;
+					recordedChunks.push(event.data);
+				},
+				{ once: true }
+			);
 			mediaRecorder.start();
+			// if (mediaRecorder && mediaRecorder.state !== 'inactive')
+			// 	return yield* _(new MediaRecorderNotInactiveError());
 		});
 		const stopRecording = Effect.tryPromise({
 			try: () =>
 				new Promise<Blob>((resolve) => {
-					mediaRecorder.addEventListener('stop', () => {
-						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-						recordedChunks.length = 0;
-						resolve(audioBlob);
-					});
-					// Remove event listeners
-					mediaRecorder.removeEventListener('dataavailable', onDataAvailable);
-					mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+					mediaRecorder.addEventListener(
+						'stop',
+						() => {
+							const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+							recordedChunks.length = 0;
+							resolve(audioBlob);
+							stream.getTracks().forEach((track) => track.stop());
+						},
+						{ once: true }
+					);
+					// mediaRecorder.stream.getTracks().forEach((i) => i.stop());
+					// stream.getTracks().forEach((i) => i.stop());
 					mediaRecorder.stop();
 				}),
 			catch: (error) => new StopMediaRecorderError({ origError: error })
@@ -62,8 +72,6 @@ const createRecorder = ({
 					const $recorderState = get(recorderState);
 					switch ($recorderState) {
 						case 'IDLE': {
-							if (mediaRecorder.state !== 'inactive')
-								return yield* _(new MediaRecorderNotInactiveError());
 							yield* _(startRecording);
 							yield* _(onStartRecording);
 							recorderState.set('RECORDING');
