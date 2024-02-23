@@ -25,7 +25,7 @@
 				<span aria-hidden="true" role="img"> 🎙️ </span>
 				<span class="font-bold">whispering</span>
 			</div>
-			<div class="flex items-center gap-4">
+			<nav class="flex items-center">
 				<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 					<AdjustmentsHorizontalIcon />
 					<span class="sr-only">Settings</span>
@@ -50,7 +50,7 @@
 					/>
 					<span class="sr-only">Toggle dark mode</span>
 				</Button>
-			</div>
+			</nav>
 		</div>
 	</header>
 	<main class="flex flex-1 items-center justify-center p-4">
