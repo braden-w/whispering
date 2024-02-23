@@ -21,10 +21,10 @@
 		class="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur"
 	>
 		<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
-			<div class="flex items-center gap-2 text-lg font-semibold">
+			<a class="flex items-center gap-2" href="/">
 				<span aria-hidden="true" role="img"> 🎙️ </span>
 				<span class="font-bold">whispering</span>
-			</div>
+			</a>
 			<nav class="flex items-center">
 				<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 					<AdjustmentsHorizontalIcon />
