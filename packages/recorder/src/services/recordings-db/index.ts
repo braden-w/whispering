@@ -18,17 +18,6 @@ export type Recording = {
 	state: RecordingState;
 };
 
-export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
-	RecordingsDbService,
-	{
-		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
-		readonly getRecording: (id: string) => Effect.Effect<Recording | undefined, GetRecordingError>;
-		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
-		readonly editRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
-		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
-	}
->() {}
-
 export class GetAllRecordingsError extends Data.TaggedError('GetAllRecordingsError')<{
 	message: string;
 	origError: unknown;
@@ -53,3 +42,14 @@ export class DeleteRecordingError extends Data.TaggedError('DeleteRecordingError
 	message: string;
 	origError: unknown;
 }> {}
+
+export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
+	RecordingsDbService,
+	{
+		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
+		readonly getRecording: (id: string) => Effect.Effect<Recording | undefined, GetRecordingError>;
+		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
+		readonly editRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
+		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
+	}
+>() {}
