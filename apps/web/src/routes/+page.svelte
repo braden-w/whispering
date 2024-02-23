@@ -25,9 +25,20 @@
 		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
 	}
 
+	let audioSrc: string;
+	let outputText: string;
+
+	recordings.subscribe((newRecordings) => {
+		const latestRecording = newRecordings[newRecordings.length - 1];
+		if (latestRecording) {
+			audioSrc = URL.createObjectURL(latestRecording.blob);
+			outputText = latestRecording.transcription;
+		}
+	});
+
 	async function copyOutputText() {
-		// if (!$outputText) return;
-		// await writeTextToClipboard($outputText);
+		if (!outputText) return;
+		// await writeTextToClipboard(outputText);
 		toast.success('Copied to clipboard!');
 	}
 
@@ -120,6 +131,7 @@
 				id="transcripted-text"
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
+				bind:value={outputText}
 			/>
 			<Button
 				class="border-primary border px-4 py-2"
@@ -186,9 +198,9 @@
 			</div>
 		</Collapsible.Content>
 	</Collapsible.Root>
-	<!-- {#if $audioSrc}
-			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
-		{/if} -->
+	{#if audioSrc}
+		<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+	{/if}
 
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p class="text-foreground/75 text-sm leading-6">
