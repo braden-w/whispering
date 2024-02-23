@@ -118,26 +118,27 @@
 	</Button>
 	<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
 
-	<div class="flex items-center gap-2">
-		<Input
-			id="transcripted-text"
-			class="w-64"
-			placeholder="Transcribed text will appear here..."
-			bind:value={outputText}
-		/>
-		<Button
-			class="border-primary border px-4 py-2"
-			on:click={copyOutputText}
-			aria-label="Copy transcribed text"
-		>
-			<ClipboardIcon />
-		</Button>
-		<Button href="/recordings" variant="outline">Recordings</Button>
+	<div class="flex max-w-7xl flex-col gap-2">
+		<div class="flex items-center gap-2">
+			<Input
+				id="transcripted-text"
+				class="w-64"
+				placeholder="Transcribed text will appear here..."
+				bind:value={outputText}
+			/>
+			<Button
+				class="border-primary border px-4 py-2"
+				on:click={copyOutputText}
+				aria-label="Copy transcribed text"
+			>
+				<ClipboardIcon />
+			</Button>
+			<!-- <Button href="/recordings" variant="outline">Recordings</Button> -->
+		</div>
+		{#if $latestAudioSrc}
+			<audio src={$latestAudioSrc} controls class="h-8 w-full" />
+		{/if}
 	</div>
-
-	{#if $latestAudioSrc}
-		<audio src={$latestAudioSrc} controls class="mt-2 h-8 w-full" />
-	{/if}
 
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p class="text-foreground/75 text-sm leading-6">
