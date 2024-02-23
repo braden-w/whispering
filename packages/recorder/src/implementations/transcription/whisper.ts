@@ -22,7 +22,7 @@ class WhisperFetchError extends TranscriptionError {
 class TranscriptionIsNotStringError extends TranscriptionError {
 	constructor() {
 		super({
-			message: 'T from Whisper API is invalid or not a string'
+			message: 'Transcription from Whisper API is invalid or not a string'
 		});
 	}
 }
