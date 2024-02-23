@@ -234,9 +234,6 @@
 		</p>
 	</div>
 	<div class="flex gap-2">
-		<Button href="/settings" aria-label="Settings" variant="secondary" size="icon">
-			<AdjustmentsHorizontalIcon />
-		</Button>
 		<Button href="/key" aria-label="API Key" variant="secondary" size="icon">
 			<KeyIcon />
 		</Button>
