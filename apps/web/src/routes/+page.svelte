@@ -120,8 +120,8 @@
 			<ClipboardIcon />
 		</Button>
 	</div>
-	<div class="rounded-md border">
-		<div class="flex items-center py-4">
+	<div class="rounded-md border p-6">
+		<div class="flex items-center">
 			<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
