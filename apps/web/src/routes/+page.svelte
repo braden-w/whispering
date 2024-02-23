@@ -116,7 +116,7 @@
 			{/if}
 		</span>
 	</Button>
-	<div class="flex max-w-7xl flex-col gap-2">
+	<div class="flex max-w-7xl flex-col gap-3">
 		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 		<div class="flex items-center gap-2">
 			<Input
