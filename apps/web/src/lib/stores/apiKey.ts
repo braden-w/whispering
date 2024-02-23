@@ -1,6 +1,4 @@
-import { createStoreSyncedWithStorage } from './createStore';
+import storedWritable from '@efstajas/svelte-stored-writable';
+import { z } from 'zod';
 
-export const apiKey = createStoreSyncedWithStorage<string>({
-	key: 'openai-api-key',
-	initialValue: ''
-});
+export const apiKey = storedWritable('openai-api-key', z.string(), '');
