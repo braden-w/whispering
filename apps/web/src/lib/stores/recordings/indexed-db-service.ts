@@ -22,7 +22,7 @@ interface RecordingsDbSchema extends DBSchema {
 	};
 }
 
-export const indexDbService: Context.Tag.Service<RecordingsDbService> = {
+export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 	addRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {

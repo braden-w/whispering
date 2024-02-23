@@ -4,7 +4,7 @@ import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { createRecordings } from './recordings';
-import { indexDb } from './recordings/db';
+import { indexedDbService } from './recordings/indexed-db-service';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -119,7 +119,7 @@ const getMediaStream = Effect.tryPromise({
 // });
 
 export const recordings = createRecordings
-	.pipe(Effect.provideService(RecordingsDbService, indexDb))
+	.pipe(Effect.provideService(RecordingsDbService, indexedDbService))
 	.pipe(Effect.runSync);
 
 export const recorder = createRecorder({ recordings });
