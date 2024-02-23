@@ -69,8 +69,13 @@
 			header: 'State'
 		})
 	]);
-	const { headerRows, pageRows, flatColumns, tableAttrs, tableBodyAttrs } =
+	const { headerRows, pageRows, flatColumns, pluginStates, tableAttrs, tableBodyAttrs } =
 		table.createViewModel(columns);
+
+	const { hiddenColumnIds } = pluginStates.hide;
+	$: $hiddenColumnIds = Object.entries(hideForId)
+		.filter(([, hide]) => !hide)
+		.map(([id]) => id);
 
 	const ids = flatColumns.map((c) => c.id);
 	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
