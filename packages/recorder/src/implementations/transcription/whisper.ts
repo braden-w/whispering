@@ -1,6 +1,31 @@
 import type { Context } from 'effect';
 import { Effect } from 'effect';
-import { TranscriptionError, type TranscriptionService } from '.';
+import { TranscriptionError, type TranscriptionService } from '../../services/transcription';
+
+class WhisperFileTooLarge extends TranscriptionError {
+	constructor(fileSizeMb: number, maxFileSizeMb: number) {
+		super({
+			message: `The file size (${fileSizeMb}MB) is too large. Please upload a file smaller than ${maxFileSizeMb}MB.`
+		});
+	}
+}
+
+class WhisperFetchError extends TranscriptionError {
+	constructor(fetchError: unknown) {
+		super({
+			message: 'Failed to fetch transcription from Whisper API',
+			origError: fetchError
+		});
+	}
+}
+
+class TranscriptionIsNotStringError extends TranscriptionError {
+	constructor() {
+		super({
+			message: 'Transcrition from Whisper API is invalid or not a string'
+		});
+	}
+}
 
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
@@ -37,28 +62,3 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 			return data.text;
 		})
 };
-
-class WhisperFileTooLarge extends TranscriptionError {
-	constructor(fileSizeMb: number, maxFileSizeMb: number) {
-		super({
-			message: `The file size (${fileSizeMb}MB) is too large. Please upload a file smaller than ${maxFileSizeMb}MB.`
-		});
-	}
-}
-
-class WhisperFetchError extends TranscriptionError {
-	constructor(fetchError: unknown) {
-		super({
-			message: 'Failed to fetch transcription from Whisper API',
-			origError: fetchError
-		});
-	}
-}
-
-class TranscriptionIsNotStringError extends TranscriptionError {
-	constructor() {
-		super({
-			message: 'Transcrition from Whisper API is invalid or not a string'
-		});
-	}
-}

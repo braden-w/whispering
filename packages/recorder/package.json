@@ -2,7 +2,8 @@
 	"name": "@repo/recorder",
 	"exports": {
 		".": "./src/index.ts",
-		"./services/*": "./src/services/*/index.ts"
+		"./services/*": "./src/services/*/index.ts",
+		"./implementations/*": "./src/implementations/*"
 	},
 	"dependencies": {
 		"effect": "^2.4.0",
