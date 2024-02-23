@@ -1,9 +1,11 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
+import type { Context } from 'effect';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import { recordingsStateService } from './recordings';
+import type { RecordingsStateService } from './recordings';
+import { createRecordings } from './recordings';
 import { indexDb } from './recordings/db';
 
 /**
@@ -12,89 +14,86 @@ import { indexDb } from './recordings/db';
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 const INITIAL_STATE = 'IDLE';
-const createApplicationState = ({
+function createApplicationState({
 	onStartRecording = Effect.logInfo('Recording started'),
-	onStopRecording = Effect.logInfo('Recording stopped')
+	onStopRecording = Effect.logInfo('Recording stopped'),
+	recordings
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
-}) =>
-	Effect.gen(function* (_) {
-		const recorderState = writable<RecorderState>(INITIAL_STATE);
-		const recordings = yield* _(recordingsStateService);
+	recordings: Context.Tag.Service<RecordingsStateService>;
+}) {
+	const recorderState = writable<RecorderState>(INITIAL_STATE);
 
-		let stream: MediaStream;
-		let mediaRecorder: MediaRecorder;
-		const recordedChunks: Blob[] = [];
+	let stream: MediaStream;
+	let mediaRecorder: MediaRecorder;
+	const recordedChunks: Blob[] = [];
 
-		const startRecording = Effect.gen(function* (_) {
-			stream = yield* _(getMediaStream);
-			recordedChunks.length = 0;
-			mediaRecorder = new AudioRecorder(stream);
-			mediaRecorder.addEventListener(
-				'dataavailable',
-				(event: BlobEvent) => {
-					if (!event.data.size) return;
-					recordedChunks.push(event.data);
-				},
-				{ once: true }
-			);
-			mediaRecorder.start();
-		});
-		const stopRecording = Effect.tryPromise({
-			try: () =>
-				new Promise<Blob>((resolve) => {
-					mediaRecorder.addEventListener(
-						'stop',
-						() => {
-							const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-							recordedChunks.length = 0;
-							resolve(audioBlob);
-							stream.getTracks().forEach((track) => track.stop());
-						},
-						{ once: true }
-					);
-					mediaRecorder.stop();
-				}),
-			catch: (error) => new StopMediaRecorderError({ origError: error })
-		});
-
-		return {
-			recorder: {
-				subscribe: recorderState.subscribe,
-				toggleRecording: Effect.gen(function* (_) {
-					const $recorderState = get(recorderState);
-					switch ($recorderState) {
-						case 'IDLE': {
-							yield* _(startRecording);
-							yield* _(onStartRecording);
-							recorderState.set('RECORDING');
-							break;
-						}
-						case 'RECORDING': {
-							const audioBlob = yield* _(stopRecording);
-							yield* _(onStopRecording);
-							const newRecording: Recording = {
-								id: nanoid(),
-								title: new Date().toLocaleString(),
-								subtitle: '',
-								transcription: '',
-								blob: audioBlob,
-								state: 'UNPROCESSED'
-							};
-							yield* _(recordings.addRecording(newRecording));
-							recorderState.set('IDLE');
-							break;
-						}
-						case 'SAVING': {
-							break;
-						}
-					}
-				})
+	const startRecording = Effect.gen(function* (_) {
+		stream = yield* _(getMediaStream);
+		recordedChunks.length = 0;
+		mediaRecorder = new AudioRecorder(stream);
+		mediaRecorder.addEventListener(
+			'dataavailable',
+			(event: BlobEvent) => {
+				if (!event.data.size) return;
+				recordedChunks.push(event.data);
 			},
-			recordings
-		};
+			{ once: true }
+		);
+		mediaRecorder.start();
 	});
+	const stopRecording = Effect.tryPromise({
+		try: () =>
+			new Promise<Blob>((resolve) => {
+				mediaRecorder.addEventListener(
+					'stop',
+					() => {
+						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+						recordedChunks.length = 0;
+						resolve(audioBlob);
+						stream.getTracks().forEach((track) => track.stop());
+					},
+					{ once: true }
+				);
+				mediaRecorder.stop();
+			}),
+		catch: (error) => new StopMediaRecorderError({ origError: error })
+	});
+
+	return {
+		subscribe: recorderState.subscribe,
+		toggleRecording: Effect.gen(function* (_) {
+			const $recorderState = get(recorderState);
+			switch ($recorderState) {
+				case 'IDLE': {
+					yield* _(startRecording);
+					yield* _(onStartRecording);
+					recorderState.set('RECORDING');
+					break;
+				}
+				case 'RECORDING': {
+					const audioBlob = yield* _(stopRecording);
+					yield* _(onStopRecording);
+					const newRecording: Recording = {
+						id: nanoid(),
+						title: new Date().toLocaleString(),
+						subtitle: '',
+						transcription: '',
+						blob: audioBlob,
+						state: 'UNPROCESSED'
+					};
+					yield* _(recordings.addRecording(newRecording));
+					recorderState.set('IDLE');
+					break;
+				}
+				case 'SAVING': {
+					break;
+				}
+			}
+		})
+	};
+}
 
 class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<{
 	origError: unknown;
@@ -121,7 +120,8 @@ const getMediaStream = Effect.tryPromise({
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder, recordings } = await createApplicationState({}).pipe(
-	Effect.provideService(RecordingsDbService, indexDb),
-	Effect.runPromise
-);
+export const recordings = await createRecordings
+	.pipe(Effect.provideService(RecordingsDbService, indexDb))
+	.pipe(Effect.runPromise);
+
+export const recorder = createApplicationState({ recordings });

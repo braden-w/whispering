@@ -11,7 +11,7 @@ import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Context, Data, Effect } from 'effect';
 import { writable, type Readable } from 'svelte/store';
 
-class RecordingsStateService extends Context.Tag('RecordingsStateService')<
+export class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 	RecordingsStateService,
 	{
 		readonly subscribe: Readable<Recording[]>['subscribe'];
@@ -32,7 +32,7 @@ class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 	}
 >() {}
 
-export const recordingsStateService = Effect.gen(function* (_) {
+export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const { subscribe, set, update } = writable<Recording[]>(yield* _(recordingsDb.getAllRecordings));
 	const editRecording = (recording: Recording) =>
