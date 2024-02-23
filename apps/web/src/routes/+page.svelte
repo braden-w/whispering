@@ -123,6 +123,7 @@
 				id="transcribed-text"
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
+				readonly
 				bind:value={outputText}
 			/>
 			<Button
