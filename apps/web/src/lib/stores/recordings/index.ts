@@ -9,3 +9,5 @@ export const recordings = createRecordings
 	.pipe(Effect.provideService(RecordingsDbService, indexedDbService))
 	.pipe(Effect.provideService(TranscriptionService, whisperTranscriptionService))
 	.pipe(Effect.runSync);
+
+recordings.sync.pipe(Effect.runPromise);
