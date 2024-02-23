@@ -1,12 +1,14 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
-import type { Context } from 'effect';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import type { RecordingsStateService } from './recordings';
 import { createRecordings } from './recordings';
 import { indexDb } from './recordings/db';
+
+export const recordings = createRecordings
+	.pipe(Effect.provideService(RecordingsDbService, indexDb))
+	.pipe(Effect.runSync);
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -14,14 +16,14 @@ import { indexDb } from './recordings/db';
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 const INITIAL_STATE = 'IDLE';
-function createApplicationState({
+function createRecorder({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped'),
 	recordings
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
-	recordings: Context.Tag.Service<RecordingsStateService>;
+	recordings: Effect.Effect.Success<typeof createRecordings>;
 }) {
 	const recorderState = writable<RecorderState>(INITIAL_STATE);
 
@@ -119,9 +121,4 @@ const getMediaStream = Effect.tryPromise({
 // 	success: 'Copied to clipboard!',
 // 	error: () => SomethingWentWrongToast
 // });
-
-export const recordings = createRecordings
-	.pipe(Effect.provideService(RecordingsDbService, indexDb))
-	.pipe(Effect.runSync);
-
-export const recorder = createApplicationState({ recordings });
+export const recorder = createRecorder({});
