@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RowActions from './RowActions.svelte';
 	import { recorder, recordings } from '$lib/stores/recordingState';
 	import { Button } from '@repo/ui/components/button';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
@@ -67,6 +68,13 @@
 		table.column({
 			accessor: 'state',
 			header: 'State'
+		}),
+		table.column({
+			accessor: ({ id }) => id,
+			header: 'Actions',
+			cell: ({ value: id }) => {
+				return createRender(RowActions, { id });
+			}
 		})
 	]);
 	const { headerRows, pageRows, flatColumns, pluginStates, tableAttrs, tableBodyAttrs } =
