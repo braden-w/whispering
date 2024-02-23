@@ -86,7 +86,7 @@
 		.map(([id]) => id);
 
 	const ids = flatColumns.map((c) => c.id);
-	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
+	let hideForId: Record<string, boolean> = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
