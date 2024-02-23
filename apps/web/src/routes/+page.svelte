@@ -116,12 +116,11 @@
 			{/if}
 		</span>
 	</Button>
-	<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
-
 	<div class="flex max-w-7xl flex-col gap-2">
+		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 		<div class="flex items-center gap-2">
 			<Input
-				id="transcripted-text"
+				id="transcribed-text"
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
 				bind:value={outputText}
