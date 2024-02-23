@@ -1,12 +1,6 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
-/**
- * A recording
- * 1. Begins in an 'UNPROCESSED' state
- * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
- * 3. Finally is marked as 'DONE' when the transcription is complete.
- */
 type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
 export type Recording = {
@@ -15,6 +9,12 @@ export type Recording = {
 	subtitle: string;
 	transcription: string;
 	blob: Blob;
+	/**
+	 * A recording
+	 * 1. Begins in an 'UNPROCESSED' state
+	 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
+	 * 3. Finally is marked as 'DONE' when the transcription is complete.
+	 */
 	state: RecordingState;
 };
 
