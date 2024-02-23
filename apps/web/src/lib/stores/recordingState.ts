@@ -27,10 +27,17 @@ const createRecorder = ({
 
 		const recordedChunks: Blob[] = [];
 
-		const stream = yield* _(getMediaStream);
-		const mediaRecorder = new AudioRecorder(stream);
-		mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+		let stream: MediaStream;
+		let mediaRecorder: MediaRecorder;
+
+		const onDataAvailable = (event: BlobEvent) => {
 			recordedChunks.push(event.data);
+		};
+		const startRecording = Effect.gen(function* (_) {
+			stream = yield* _(getMediaStream);
+			mediaRecorder = new AudioRecorder(stream);
+			mediaRecorder.addEventListener('dataavailable', onDataAvailable);
+			mediaRecorder.start();
 		});
 		const stopRecording = Effect.tryPromise({
 			try: () =>
@@ -40,6 +47,8 @@ const createRecorder = ({
 						recordedChunks.length = 0;
 						resolve(audioBlob);
 					});
+					// Remove event listeners
+					mediaRecorder.removeEventListener('dataavailable', onDataAvailable);
 					mediaRecorder.stream.getTracks().forEach((i) => i.stop());
 					mediaRecorder.stop();
 				}),
@@ -55,14 +64,13 @@ const createRecorder = ({
 						case 'IDLE': {
 							if (mediaRecorder.state !== 'inactive')
 								return yield* _(new MediaRecorderNotInactiveError());
-							mediaRecorder.start();
+							yield* _(startRecording);
 							yield* _(onStartRecording);
 							recorderState.set('RECORDING');
 							break;
 						}
 						case 'RECORDING': {
 							const audioBlob = yield* _(stopRecording);
-							console.log('🚀 ~ toggleRecording:Effect.gen ~ audioBlob:', audioBlob);
 							yield* _(onStopRecording);
 							const newRecording: Recording = {
 								id: nanoid(),
