@@ -54,8 +54,6 @@ const createApplicationState = ({
 						},
 						{ once: true }
 					);
-					// mediaRecorder.stream.getTracks().forEach((i) => i.stop());
-					// stream.getTracks().forEach((i) => i.stop());
 					mediaRecorder.stop();
 				}),
 			catch: (error) => new StopMediaRecorderError({ origError: error })
