@@ -18,6 +18,7 @@
 	import KeyIcon from '~icons/heroicons/key';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
+	import { derived } from 'svelte/store';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -25,13 +26,15 @@
 		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
 	}
 
-	let audioSrc: string;
+	const latestAudioSrc = derived(recordings, ($recordings) => {
+		const latestRecording = $recordings[$recordings.length - 1];
+		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
+	});
 	let outputText: string;
 
 	recordings.subscribe((newRecordings) => {
 		const latestRecording = newRecordings[newRecordings.length - 1];
 		if (latestRecording) {
-			audioSrc = URL.createObjectURL(latestRecording.blob);
 			outputText = latestRecording.transcription;
 		}
 	});
@@ -198,8 +201,8 @@
 			</div>
 		</Collapsible.Content>
 	</Collapsible.Root>
-	{#if audioSrc}
-		<audio src={audioSrc} controls class="mt-2 h-8 w-full" />
+	{#if $latestAudioSrc}
+		<audio src={$latestAudioSrc} controls class="mt-2 h-8 w-full" />
 	{/if}
 
 	<div class="flex flex-col items-center justify-center gap-2">
