@@ -1,10 +1,10 @@
-import { RecordingsDbService, type Recording } from '@repo/recorder';
+import { type Recording } from '@repo/recorder';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import { createRecordings } from './recordings';
-import { indexedDbService } from './recordings/indexed-db-service';
+import { recordings } from './recordings';
+import type { createRecordings } from './recordings/create-recordings';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -117,9 +117,5 @@ const getMediaStream = Effect.tryPromise({
 // 	success: 'Copied to clipboard!',
 // 	error: () => SomethingWentWrongToast
 // });
-
-export const recordings = createRecordings
-	.pipe(Effect.provideService(RecordingsDbService, indexedDbService))
-	.pipe(Effect.runSync);
 
 export const recorder = createRecorder({ recordings });
