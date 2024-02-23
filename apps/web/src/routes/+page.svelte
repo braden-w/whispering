@@ -45,10 +45,6 @@
 		toast.success('Copied to clipboard!');
 	}
 
-	// $: recordingIdToAudioUrl = Object.fromEntries(
-	// 	$recordings.map((recording) => [recording.id, URL.createObjectURL(recording.blob)])
-	// );
-
 	const table = createTable(recordings, {
 		hide: addHiddenColumns()
 	});
