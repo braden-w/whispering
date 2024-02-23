@@ -40,7 +40,9 @@ export const createRecordings = Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
 				if (!recording) return yield* _(new TranscriptionRecordingNotFoundError({ id }));
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
-				const transcription = yield* _(transcriptionService.transcribe(recording.blob));
+				const transcription = yield* _(
+					transcriptionService.transcribe(recording.blob, { apiKey: '' })
+				);
 				yield* _(editRecording({ ...recording, state: 'DONE' }));
 				yield* _(editRecording({ ...recording, transcription }));
 			})
