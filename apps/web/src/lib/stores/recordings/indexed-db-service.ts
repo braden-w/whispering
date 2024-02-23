@@ -1,4 +1,4 @@
-import type { RecordingsDbService } from '@repo/recorder';
+import type { RecordingsDbService } from '@repo/recorder/services/recordings-db';
 import {
 	AddRecordingError,
 	DeleteRecordingError,
@@ -6,7 +6,7 @@ import {
 	GetAllRecordingsError,
 	GetRecordingError,
 	type Recording
-} from '@repo/recorder';
+} from '@repo/recorder/services/recordings-db';
 import type { Context } from 'effect';
 import { Effect } from 'effect';
 import { openDB, type DBSchema } from 'idb';

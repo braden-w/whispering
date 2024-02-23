@@ -1,4 +1,4 @@
-import { RecordingsDbService, type Recording } from '@repo/recorder';
+import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Data, Effect } from 'effect';
 import { get, writable } from 'svelte/store';

@@ -1,4 +1,4 @@
-import { RecordingsDbService } from '@repo/recorder';
+import { RecordingsDbService } from '@repo/recorder/services/recordings-db';
 import { Effect } from 'effect';
 import { createRecordings } from './create-recordings';
 import { indexedDbService } from './indexed-db-service';

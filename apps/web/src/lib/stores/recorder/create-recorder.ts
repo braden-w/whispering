@@ -1,4 +1,4 @@
-import { type Recording } from '@repo/recorder';
+import type { Recording } from '@repo/recorder/services/recordings-db';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
