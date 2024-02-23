@@ -11,10 +11,8 @@ import { indexDb } from './recordings/db';
  */
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
-class MediaRecorderNotInactiveError extends Data.TaggedError('MediaRecorderNotInactiveError') {}
-
 const INITIAL_STATE = 'IDLE';
-const createRecorder = ({
+const createApplicationState = ({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped')
 }: {
@@ -42,8 +40,6 @@ const createRecorder = ({
 				{ once: true }
 			);
 			mediaRecorder.start();
-			// if (mediaRecorder && mediaRecorder.state !== 'inactive')
-			// 	return yield* _(new MediaRecorderNotInactiveError());
 		});
 		const stopRecording = Effect.tryPromise({
 			try: () =>
@@ -127,7 +123,7 @@ const getMediaStream = Effect.tryPromise({
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const { recorder, recordings } = await createRecorder({}).pipe(
+export const { recorder, recordings } = await createApplicationState({}).pipe(
 	Effect.provideService(RecordingsDbService, indexDb),
 	Effect.runPromise
 );
