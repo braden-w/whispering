@@ -6,7 +6,7 @@
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import { toast, toggleMode } from '@repo/ui/components/sonner';
+	import { toast } from '@repo/ui/components/sonner';
 	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
@@ -16,8 +16,6 @@
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import KeyIcon from '~icons/heroicons/key';
-	import Moon from '~icons/lucide/moon';
-	import Sun from '~icons/lucide/sun';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 
