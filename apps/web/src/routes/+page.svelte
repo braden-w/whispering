@@ -93,10 +93,14 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="container flex min-h-screen flex-col items-center justify-center gap-4">
-	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Start recording</h1>
+<div class="container flex min-h-screen flex-col items-center justify-center gap-4 text-center">
+	<!-- <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Start recording</h1> -->
+	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
+	<p class="text-muted-foreground">
+		Click the record button to start. Allow access to your microphone.
+	</p>
 	<Button
-		class="min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
+		class="transform p-12 text-8xl hover:scale-110 focus:scale-110"
 		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
 		aria-label="Toggle recording"
 		variant="ghost"
@@ -188,7 +192,7 @@
 			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
 		{/if} -->
 
-	<div class="flex flex-col items-center justify-center gap-2 text-center">
+	<div class="flex flex-col items-center justify-center gap-2">
 		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press <kbd
 				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
