@@ -18,6 +18,7 @@
 		"postcss": "^8.4.23",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
+		"svelte-headless-table": "^0.18.2",
 		"tailwindcss": "^3.3.2",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
@@ -26,9 +27,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@repo/recorder": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^2.4.0",
+		"idb": "^8.0.0",
 		"nanoid": "^5.0.6"
 	}
 }
