@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Collapsible from '@repo/ui/components/collapsible';
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
+	import * as Collapsible from '@repo/ui/components/collapsible';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -18,7 +18,6 @@
 	import KeyIcon from '~icons/heroicons/key';
 	import Moon from '~icons/lucide/moon';
 	import Sun from '~icons/lucide/sun';
-	import GithubIcon from '~icons/mdi/github';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 
@@ -233,26 +232,6 @@
 		</Button>
 		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="secondary" size="icon">
 			<KeyboardIcon />
-		</Button>
-		<Button
-			href="https://github.com/braden-w/whispering"
-			target="_blank"
-			rel="noopener noreferrer"
-			title="View project on GitHub"
-			aria-label="View project on GitHub"
-			size="icon"
-			variant="secondary"
-		>
-			<GithubIcon class="h-4 w-4" />
-		</Button>
-		<Button on:click={toggleMode} variant="secondary" size="icon">
-			<Sun
-				class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-			/>
-			<Moon
-				class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-			/>
-			<span class="sr-only">Toggle theme</span>
 		</Button>
 	</div>
 </div>

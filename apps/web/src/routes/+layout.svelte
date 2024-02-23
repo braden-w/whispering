@@ -1,4 +1,5 @@
 <script lang="ts">
+	import GithubIcon from '~icons/mdi/github';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
@@ -28,6 +29,17 @@
 				<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
 					<AdjustmentsHorizontalIcon />
 					<span class="sr-only">Settings</span>
+				</Button>
+				<Button
+					href="https://github.com/braden-w/whispering"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="View project on GitHub"
+					aria-label="View project on GitHub"
+					size="icon"
+					variant="ghost"
+				>
+					<GithubIcon class="h-4 w-4" />
 				</Button>
 				<Button on:click={toggleMode} size="icon" variant="ghost">
 					<SunIcon
