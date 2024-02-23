@@ -93,7 +93,7 @@
 <svelte:window on:keydown={handleKeyDown} />
 
 <div class="container flex min-h-screen flex-col items-center justify-center gap-4">
-	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
+	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Start recording</h1>
 	<Button
 		class="min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
 		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
