@@ -7,7 +7,7 @@ import { Context, Data } from 'effect';
  * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
  * 3. Finally is marked as 'DONE' when the transcription is complete.
  */
-export type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
 export type Recording = {
 	id: string;
