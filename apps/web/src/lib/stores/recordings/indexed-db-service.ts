@@ -36,7 +36,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 				});
 				await db.add(RECORDING_STORE, recording);
 			},
-			catch: (error) => new AddRecordingError({ origError: error })
+			catch: (error) =>
+				new AddRecordingError({
+					origError: error,
+					message: `Error adding recording to indexedDB: ${error}`
+				})
 		}),
 	editRecording: (recording) =>
 		Effect.tryPromise({
@@ -51,7 +55,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 				});
 				await db.put(RECORDING_STORE, recording);
 			},
-			catch: (error) => new EditRecordingError({ origError: error })
+			catch: (error) =>
+				new EditRecordingError({
+					origError: error,
+					message: `Error editing recording in indexedDB: ${error}`
+				})
 		}),
 	deleteRecording: (id) =>
 		Effect.tryPromise({
@@ -66,7 +74,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 				});
 				await db.delete(RECORDING_STORE, id);
 			},
-			catch: (error) => new DeleteRecordingError({ origError: error })
+			catch: (error) =>
+				new DeleteRecordingError({
+					origError: error,
+					message: `Error deleting recording from indexedDB: ${error}`
+				})
 		}),
 	getAllRecordings: Effect.tryPromise({
 		try: async () => {
@@ -80,7 +92,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 			});
 			return db.getAll(RECORDING_STORE);
 		},
-		catch: (error) => new GetAllRecordingsError({ origError: error })
+		catch: (error) =>
+			new GetAllRecordingsError({
+				origError: error,
+				message: `Error getting all recordings from indexedDB: ${error}`
+			})
 	}),
 	getRecording: (id) =>
 		Effect.tryPromise({
@@ -95,6 +111,10 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 				});
 				return db.get(RECORDING_STORE, id);
 			},
-			catch: (error) => new GetRecordingError({ origError: error })
+			catch: (error) =>
+				new GetRecordingError({
+					origError: error,
+					message: `Error getting recording from indexedDB: ${error}`
+				})
 		})
 };

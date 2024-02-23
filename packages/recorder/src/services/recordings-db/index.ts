@@ -30,25 +30,26 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 >() {}
 
 export class GetAllRecordingsError extends Data.TaggedError('GetAllRecordingsError')<{
+	message: string;
 	origError: unknown;
 }> {}
 
 export class GetRecordingError extends Data.TaggedError('GetRecordingError')<{
+	message: string;
 	origError: unknown;
 }> {}
 
 export class AddRecordingError extends Data.TaggedError('AddRecordingError')<{
+	message: string;
 	origError: unknown;
 }> {}
 
 export class EditRecordingError extends Data.TaggedError('EditRecordingError')<{
+	message: string;
 	origError: unknown;
 }> {}
 
 export class DeleteRecordingError extends Data.TaggedError('DeleteRecordingError')<{
+	message: string;
 	origError: unknown;
-}> {}
-
-export class RecordingNotFound extends Data.TaggedError('RecordingNotFound')<{
-	id: string;
 }> {}
