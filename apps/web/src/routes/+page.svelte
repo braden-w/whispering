@@ -31,6 +31,10 @@
 		toast.success('Copied to clipboard!');
 	}
 
+	// $: recordingIdToAudioUrl = Object.fromEntries(
+	// 	$recordings.map((recording) => [recording.id, URL.createObjectURL(recording.blob)])
+	// );
+
 	const table = createTable(recordings, {
 		hide: addHiddenColumns()
 	});
@@ -48,14 +52,14 @@
 			accessor: 'subtitle',
 			header: 'Subtitle'
 		}),
-		table.column({
-			accessor: 'blob',
-			header: 'Blob',
-			cell: ({ value: audioBlob }) => {
-				const audioUrl = URL.createObjectURL(audioBlob);
-				return createRender(RenderAudioUrl, { audioUrl });
-			}
-		}),
+		// table.column({
+		// 	accessor: ({ id }) => id,
+		// 	header: 'Blob',
+		// 	cell: ({ value: id }) => {
+		// 		const audioUrl = recordingIdToAudioUrl[id];
+		// 		return createRender(RenderAudioUrl, { audioUrl });
+		// 	}
+		// }),
 		table.column({
 			accessor: 'transcription',
 			header: 'Transcription'
@@ -77,18 +81,20 @@
 <div class="container flex min-h-screen flex-col items-center justify-center gap-4">
 	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Whispering</h1>
 	<Button
-		class="drop-shadow-png min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
+		class="min-h-fit min-w-fit transform p-10 text-7xl hover:scale-110 focus:scale-110"
 		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
-		{#if $recorder === 'RECORDING'}
-			🟥
-		{:else if $recorder === 'SAVING'}
-			🔄
-		{:else}
-			🎙️
-		{/if}
+		<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
+			{#if $recorder === 'RECORDING'}
+				🟥
+			{:else if $recorder === 'SAVING'}
+				🔄
+			{:else}
+				🎙️
+			{/if}
+		</span>
 	</Button>
 	<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
 	<div class="flex items-center gap-2">
@@ -220,9 +226,3 @@
 		</Button>
 	</div>
 </div>
-
-<style>
-	.drop-shadow-png {
-		filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
-	}
-</style>
