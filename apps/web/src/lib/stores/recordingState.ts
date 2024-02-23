@@ -6,10 +6,6 @@ import { get, writable } from 'svelte/store';
 import { createRecordings } from './recordings';
 import { indexDb } from './recordings/db';
 
-export const recordings = createRecordings
-	.pipe(Effect.provideService(RecordingsDbService, indexDb))
-	.pipe(Effect.runSync);
-
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
@@ -121,4 +117,9 @@ const getMediaStream = Effect.tryPromise({
 // 	success: 'Copied to clipboard!',
 // 	error: () => SomethingWentWrongToast
 // });
-export const recorder = createRecorder({});
+
+export const recordings = createRecordings
+	.pipe(Effect.provideService(RecordingsDbService, indexDb))
+	.pipe(Effect.runSync);
+
+export const recorder = createRecorder({ recordings });
