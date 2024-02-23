@@ -3,8 +3,7 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import { recordings } from './recordings';
-import type { createRecordings } from './recordings/create-recordings';
+import type { createRecordings } from '../recordings/create-recordings';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -12,7 +11,8 @@ import type { createRecordings } from './recordings/create-recordings';
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 const INITIAL_STATE = 'IDLE';
-function createRecorder({
+
+export function createRecorder({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped'),
 	recordings
@@ -117,5 +117,3 @@ const getMediaStream = Effect.tryPromise({
 // 	success: 'Copied to clipboard!',
 // 	error: () => SomethingWentWrongToast
 // });
-
-export const recorder = createRecorder({ recordings });
