@@ -141,11 +141,14 @@
 
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p class="text-foreground/75 text-sm leading-6">
-			Click the microphone or press <kbd
-				class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-			>
-				space
-			</kbd> to start recording.
+			Click the microphone or press
+			<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
+				<kbd
+					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+				>
+					space
+				</kbd>
+			</Button> to start recording.
 		</p>
 		<p class="text-muted-foreground text-sm font-light">
 			Check out the <Button
