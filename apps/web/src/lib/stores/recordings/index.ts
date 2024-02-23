@@ -34,8 +34,7 @@ class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 
 export const recordingsStateService = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
-	const allRecordings = yield* _(recordingsDb.getAllRecordings);
-	const { subscribe, set, update } = writable<Recording[]>(allRecordings);
+	const { subscribe, set, update } = writable<Recording[]>(yield* _(recordingsDb.getAllRecordings));
 	const editRecording = (id: string, recording: Recording) =>
 		Effect.gen(function* (_) {
 			yield* _(recordingsDb.editRecording(id, recording));
