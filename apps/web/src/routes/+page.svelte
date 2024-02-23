@@ -1,6 +1,6 @@
 <script lang="ts">
-	import RowActions from './RowActions.svelte';
-	import { recorder, recordings } from '$lib/stores/recordingState';
+	import { recorder } from '$lib/stores/recorder';
+	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
@@ -19,6 +19,7 @@
 	import Sun from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
+	import RowActions from './RowActions.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
