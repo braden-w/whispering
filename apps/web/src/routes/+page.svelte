@@ -94,7 +94,7 @@
 	<div class="flex flex-col gap-4">
 		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
-			Click the record button to start. Allow access to your microphone.
+			Click the 🎙 button to start. Allow access to your microphone.
 		</p>
 	</div>
 	<Button
