@@ -1,36 +1,7 @@
-import type {
-	AddRecordingError,
-	DeleteRecordingError,
-	EditRecordingError,
-	GetAllRecordingsError,
-	GetRecordingError
-} from '@repo/recorder';
 import { RecordingsDbService, type Recording } from '@repo/recorder';
-import type { TranscriptionError } from '@repo/recorder/services/transcription';
 import { TranscriptionService } from '@repo/recorder/services/transcription';
-import { Context, Data, Effect } from 'effect';
-import { writable, type Readable } from 'svelte/store';
-
-export class RecordingsStateService extends Context.Tag('RecordingsStateService')<
-	RecordingsStateService,
-	{
-		readonly subscribe: Readable<Recording[]>['subscribe'];
-		readonly sync: Effect.Effect<void, GetAllRecordingsError>;
-		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
-		readonly editRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
-		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
-		readonly transcribeRecording: (
-			id: string
-		) => Effect.Effect<
-			void,
-			| EditRecordingError
-			| GetRecordingError
-			| TranscriptionRecordingNotFoundError
-			| TranscriptionError,
-			TranscriptionService
-		>;
-	}
->() {}
+import { Data, Effect } from 'effect';
+import { writable } from 'svelte/store';
 
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
@@ -73,7 +44,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				yield* _(editRecording({ ...recording, state: 'DONE' }));
 				yield* _(editRecording({ ...recording, transcription }));
 			})
-	} satisfies Context.Tag.Service<RecordingsStateService>;
+	};
 });
 
 class TranscriptionRecordingNotFoundError extends Data.TaggedError('RecordingNotFound')<{
