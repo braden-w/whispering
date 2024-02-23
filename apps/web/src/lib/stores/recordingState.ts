@@ -120,8 +120,8 @@ const getMediaStream = Effect.tryPromise({
 // 	error: () => SomethingWentWrongToast
 // });
 
-export const recordings = await createRecordings
+export const recordings = createRecordings
 	.pipe(Effect.provideService(RecordingsDbService, indexDb))
-	.pipe(Effect.runPromise);
+	.pipe(Effect.runSync);
 
 export const recorder = createApplicationState({ recordings });
