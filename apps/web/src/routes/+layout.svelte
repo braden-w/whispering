@@ -22,8 +22,8 @@
 	>
 		<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
 			<div class="flex items-center gap-2 text-lg font-semibold">
-				<span class="font-bold">whispering</span>
 				<span aria-hidden="true" role="img"> 🎙️ </span>
+				<span class="font-bold">whispering</span>
 			</div>
 			<div class="flex items-center gap-4">
 				<Button href="/settings" aria-label="Settings" variant="ghost" size="icon">
