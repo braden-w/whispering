@@ -121,6 +121,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@efstajas/svelte-stored-writable':
+        specifier: ^0.2.0
+        version: 0.2.0
       '@repo/recorder':
         specifier: workspace:*
         version: link:../../packages/recorder
@@ -139,6 +142,9 @@ importers:
       nanoid:
         specifier: ^5.0.6
         version: 5.0.6
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
     devDependencies:
       '@iconify/json':
         specifier: ^2.2.185
@@ -553,6 +559,13 @@ packages:
 
   /@cloudflare/workers-types@4.20230321.0:
     resolution: {integrity: sha512-zyRFz9AUS0tbg3/kJ+3zxvp9fl/O9yOJlChih/o86hhOqRMcZVbWefYAvFPidRvYUHM5YTG1wjU1bF9FFckRVg==}
+    dev: false
+
+  /@efstajas/svelte-stored-writable@0.2.0:
+    resolution: {integrity: sha512-z04mzHHe8HNgteQRJqbfq/omTEFCl+BHMLt1P0Mu1PcnNvnT5fhGTRG0oBd1D8HkRxu4Do+pQO5YrrdIwKluRg==}
+    dependencies:
+      svelte: 3.59.1
+      zod: 3.22.4
     dev: false
 
   /@esbuild/aix-ppc64@0.19.12:
