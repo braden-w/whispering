@@ -5,6 +5,7 @@ import { writable } from 'svelte/store';
 
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
+	const transcriptionService = yield* _(TranscriptionService);
 	const { subscribe, set, update } = writable<Recording[]>([]);
 	const editRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
@@ -39,7 +40,6 @@ export const createRecordings = Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
 				if (!recording) return yield* _(new TranscriptionRecordingNotFoundError({ id }));
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
-				const transcriptionService = yield* _(TranscriptionService);
 				const transcription = yield* _(transcriptionService.transcribe(recording.blob));
 				yield* _(editRecording({ ...recording, state: 'DONE' }));
 				yield* _(editRecording({ ...recording, transcription }));
