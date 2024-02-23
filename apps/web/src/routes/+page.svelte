@@ -2,23 +2,16 @@
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
-	import * as Collapsible from '@repo/ui/components/collapsible';
-	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { toast } from '@repo/ui/components/sonner';
-	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
-	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
+	import { createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns } from 'svelte-headless-table/plugins';
-	import KeyboardIcon from '~icons/fa6-regular/keyboard';
-	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
-	import ChevronDown from '~icons/heroicons/chevron-down';
+	import { derived } from 'svelte/store';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
-	import KeyIcon from '~icons/heroicons/key';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
-	import { derived } from 'svelte/store';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -124,79 +117,24 @@
 		</span>
 	</Button>
 	<Label for="transcripted-text" class="sr-only mb-2 block">Transcribed Text</Label>
-	<Collapsible.Root>
-		<div class="flex items-center gap-2">
-			<Input
-				id="transcripted-text"
-				class="w-64"
-				placeholder="Transcribed text will appear here..."
-				bind:value={outputText}
-			/>
-			<Button
-				class="border-primary border px-4 py-2"
-				on:click={copyOutputText}
-				aria-label="Copy transcribed text"
-			>
-				<ClipboardIcon />
-			</Button>
-			<Collapsible.Trigger asChild let:builder>
-				<Button builders={[builder]} variant="outline">Recordings</Button>
-			</Collapsible.Trigger>
-		</div>
-		<Collapsible.Content>
-			<div class="rounded-md border p-6">
-				<div class="flex items-center">
-					<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder>
-							<Button variant="outline" class="ml-auto" builders={[builder]}>
-								Columns <ChevronDown class="ml-2 h-4 w-4" />
-							</Button>
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content>
-							{#each flatColumns as col}
-								<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-									{col.header}
-								</DropdownMenu.CheckboxItem>
-							{/each}
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
-				</div>
-				<Table.Root {...$tableAttrs}>
-					<Table.Header>
-						{#each $headerRows as headerRow}
-							<Subscribe rowAttrs={headerRow.attrs()}>
-								<Table.Row>
-									{#each headerRow.cells as cell (cell.id)}
-										<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-											<Table.Head {...attrs}>
-												<Render of={cell.render()} />
-											</Table.Head>
-										</Subscribe>
-									{/each}
-								</Table.Row>
-							</Subscribe>
-						{/each}
-					</Table.Header>
-					<Table.Body {...$tableBodyAttrs}>
-						{#each $pageRows as row (row.id)}
-							<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-								<Table.Row {...rowAttrs}>
-									{#each row.cells as cell (cell.id)}
-										<Subscribe attrs={cell.attrs()} let:attrs>
-											<Table.Cell {...attrs}>
-												<Render of={cell.render()} />
-											</Table.Cell>
-										</Subscribe>
-									{/each}
-								</Table.Row>
-							</Subscribe>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			</div>
-		</Collapsible.Content>
-	</Collapsible.Root>
+
+	<div class="flex items-center gap-2">
+		<Input
+			id="transcripted-text"
+			class="w-64"
+			placeholder="Transcribed text will appear here..."
+			bind:value={outputText}
+		/>
+		<Button
+			class="border-primary border px-4 py-2"
+			on:click={copyOutputText}
+			aria-label="Copy transcribed text"
+		>
+			<ClipboardIcon />
+		</Button>
+		<Button href="/recordings" variant="outline">Recordings</Button>
+	</div>
+
 	{#if $latestAudioSrc}
 		<audio src={$latestAudioSrc} controls class="mt-2 h-8 w-full" />
 	{/if}
@@ -233,12 +171,12 @@
 			</Button> for shortcuts.
 		</p>
 	</div>
-	<div class="flex gap-2">
+	<!-- <div class="flex gap-2">
 		<Button href="/key" aria-label="API Key" variant="secondary" size="icon">
 			<KeyIcon />
 		</Button>
 		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="secondary" size="icon">
 			<KeyboardIcon />
 		</Button>
-	</div>
+	</div> -->
 </div>
