@@ -5,10 +5,10 @@ import type {
 	GetAllRecordingsError,
 	GetRecordingError
 } from '@repo/recorder';
-import { RecordingNotFound, RecordingsDbService, type Recording } from '@repo/recorder';
+import { RecordingsDbService, type Recording } from '@repo/recorder';
 import type { TranscriptionError } from '@repo/recorder/services/transcription';
 import { TranscriptionService } from '@repo/recorder/services/transcription';
-import { Context, Effect } from 'effect';
+import { Context, Data, Effect } from 'effect';
 import { writable, type Readable } from 'svelte/store';
 
 class RecordingsStateService extends Context.Tag('RecordingsStateService')<
@@ -23,7 +23,10 @@ class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 			id: string
 		) => Effect.Effect<
 			void,
-			EditRecordingError | GetRecordingError | RecordingNotFound | TranscriptionError,
+			| EditRecordingError
+			| GetRecordingError
+			| TranscriptionRecordingNotFoundError
+			| TranscriptionError,
 			TranscriptionService
 		>;
 	}
@@ -63,7 +66,7 @@ export const recordingsStateService = Effect.gen(function* (_) {
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
-				if (!recording) return yield* _(new RecordingNotFound({ id }));
+				if (!recording) return yield* _(new TranscriptionRecordingNotFoundError({ id }));
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
 				const transcriptionService = yield* _(TranscriptionService);
 				const transcription = yield* _(transcriptionService.transcribe(recording.blob));
@@ -72,3 +75,7 @@ export const recordingsStateService = Effect.gen(function* (_) {
 			})
 	} satisfies Context.Tag.Service<RecordingsStateService>;
 });
+
+class TranscriptionRecordingNotFoundError extends Data.TaggedError('RecordingNotFound')<{
+	id: string;
+}> {}
