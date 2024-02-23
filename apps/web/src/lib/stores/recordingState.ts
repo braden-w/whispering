@@ -3,7 +3,7 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import { createRecordings } from './recordings';
+import { recordingsStateService } from './recordings';
 import { indexDb } from './recordings/db';
 
 /**
@@ -21,7 +21,7 @@ const createApplicationState = ({
 }) =>
 	Effect.gen(function* (_) {
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
-		const recordings = yield* _(createRecordings());
+		const recordings = yield* _(recordingsStateService);
 
 		let stream: MediaStream;
 		let mediaRecorder: MediaRecorder;

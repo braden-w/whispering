@@ -38,7 +38,7 @@ export const indexDb: Context.Tag.Service<RecordingsDbService> = {
 			},
 			catch: (error) => new AddRecordingError({ origError: error })
 		}),
-	editRecording: (id, recording) =>
+	editRecording: (recording) =>
 		Effect.tryPromise({
 			try: async () => {
 				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {

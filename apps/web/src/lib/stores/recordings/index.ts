@@ -17,10 +17,7 @@ class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 		readonly subscribe: Readable<Recording[]>['subscribe'];
 		readonly sync: Effect.Effect<void, GetAllRecordingsError>;
 		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
-		readonly editRecording: (
-			id: string,
-			recording: Recording
-		) => Effect.Effect<void, EditRecordingError>;
+		readonly editRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
 		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
 		readonly transcribeRecording: (
 			id: string
@@ -35,11 +32,11 @@ class RecordingsStateService extends Context.Tag('RecordingsStateService')<
 export const recordingsStateService = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const { subscribe, set, update } = writable<Recording[]>(yield* _(recordingsDb.getAllRecordings));
-	const editRecording = (id: string, recording: Recording) =>
+	const editRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
-			yield* _(recordingsDb.editRecording(id, recording));
+			yield* _(recordingsDb.editRecording(recording));
 			update((recordings) => {
-				const index = recordings.findIndex((recording) => recording.id === id);
+				const index = recordings.findIndex((r) => r.id === recording.id);
 				if (index === -1) return recordings;
 				recordings[index] = recording;
 				return recordings;
@@ -67,11 +64,11 @@ export const recordingsStateService = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
 				if (!recording) return yield* _(new RecordingNotFound({ id }));
-				yield* _(editRecording(id, { ...recording, state: 'TRANSCRIBING' }));
+				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
 				const transcriptionService = yield* _(TranscriptionService);
 				const transcription = yield* _(transcriptionService.transcribe(recording.blob));
-				yield* _(editRecording(id, { ...recording, state: 'DONE' }));
-				yield* _(editRecording(id, { ...recording, transcription }));
+				yield* _(editRecording({ ...recording, state: 'DONE' }));
+				yield* _(editRecording({ ...recording, transcription }));
 			})
 	} satisfies Context.Tag.Service<RecordingsStateService>;
 });
