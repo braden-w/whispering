@@ -2,18 +2,13 @@
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
-	import type { Recording } from '@repo/recorder/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { toast } from '@repo/ui/components/sonner';
 	import { Effect } from 'effect';
-	import { createRender, createTable } from 'svelte-headless-table';
-	import { addHiddenColumns } from 'svelte-headless-table/plugins';
 	import { derived } from 'svelte/store';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
-	import RenderAudioUrl from './RenderAudioUrl.svelte';
-	import RowActions from './RowActions.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -44,58 +39,6 @@
 			yield* _(clipboard.setClipboardText($latestRecording.transcription));
 			toast.success('Copied to clipboard!');
 		}).pipe(Effect.runPromise);
-
-	const table = createTable(recordings, {
-		hide: addHiddenColumns()
-	});
-
-	const columns = table.createColumns([
-		table.column({
-			accessor: 'id',
-			header: 'ID'
-		}),
-		table.column({
-			accessor: 'title',
-			header: 'Title'
-		}),
-		table.column({
-			accessor: 'subtitle',
-			header: 'Subtitle'
-		}),
-		table.column({
-			accessor: ({ blob }) => blob,
-			header: 'Blob',
-			cell: ({ value: blob }) => {
-				const audioUrl = URL.createObjectURL(blob);
-				return createRender(RenderAudioUrl, { audioUrl });
-			}
-		}),
-		table.column({
-			accessor: 'transcription',
-			header: 'Transcription'
-		}),
-		table.column({
-			accessor: 'state',
-			header: 'State'
-		}),
-		table.column({
-			accessor: ({ id }) => id,
-			header: 'Actions',
-			cell: ({ value: id }) => {
-				return createRender(RowActions, { id });
-			}
-		})
-	]);
-	const { headerRows, pageRows, flatColumns, pluginStates, tableAttrs, tableBodyAttrs } =
-		table.createViewModel(columns);
-
-	const { hiddenColumnIds } = pluginStates.hide;
-	$: $hiddenColumnIds = Object.entries(hideForId)
-		.filter(([, hide]) => !hide)
-		.map(([id]) => id);
-
-	const ids = flatColumns.map((c) => c.id);
-	let hideForId: Record<string, boolean> = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
