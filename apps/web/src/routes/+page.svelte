@@ -38,11 +38,11 @@
 		return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
 	});
 
-	async function copyOutputText() {
+	const copyOutputText = Effect.gen(function* (_) {
 		if (!$latestRecording.transcription) return;
-		await clipboard.setClipboardText($latestRecording.transcription).pipe(Effect.runPromise);
+		yield* _(clipboard.setClipboardText($latestRecording.transcription));
 		toast.success('Copied to clipboard!');
-	}
+	}).pipe(Effect.runPromise);
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns()
