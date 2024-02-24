@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Skeleton } from '@repo/ui/components/skeleton';
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
@@ -13,7 +12,6 @@
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
-	import { Recording } from '@repo/recorder/services/recordings-db';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
