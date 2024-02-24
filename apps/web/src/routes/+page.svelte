@@ -13,6 +13,7 @@
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
+	import { Recording } from '@repo/recorder/services/recordings-db';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -25,17 +26,16 @@
 		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
 	});
 
+	const PLACEHOLDER_RECORDING: Recording = {
+		title: '',
+		subtitle: '',
+		blob: new Blob(),
+		transcription: '',
+		id: '',
+		state: 'UNPROCESSED'
+	};
 	const latestRecording = derived(recordings, ($recordings) => {
-		return (
-			$recordings[$recordings.length - 1] ?? {
-				blob: new Blob(),
-				transcription: '',
-				id: '',
-				state: '',
-				subtitle: '',
-				title: ''
-			}
-		);
+		return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
 	});
 
 	async function copyOutputText() {
