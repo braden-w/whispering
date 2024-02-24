@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { options } from '$lib/stores/options';
+	import { settings } from '$lib/stores/settings';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
 	import { Checkbox } from '@repo/ui/components/checkbox';
@@ -15,7 +15,7 @@
 		<Card.Content class="flex flex-col gap-4">
 			<div class="flex gap-2">
 				<Checkbox
-					bind:checked={$options.copyToClipboard}
+					bind:checked={$settings.copyToClipboard}
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard-label"
 				/>
@@ -28,7 +28,7 @@
 				</Label>
 			</div>
 			<div class="flex gap-2">
-				<Checkbox bind:checked={$options.pasteContentsOnSuccess} id="paste-contents-on-success" />
+				<Checkbox bind:checked={$settings.pasteContentsOnSuccess} id="paste-contents-on-success" />
 				<Label
 					for="paste-contents-on-success"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

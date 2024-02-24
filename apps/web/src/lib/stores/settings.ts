@@ -1,18 +1,18 @@
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 
-const optionsSchema = z.object({
+const settingsSchema = z.object({
 	copyToClipboard: z.boolean(),
 	pasteContentsOnSuccess: z.boolean(),
 	currentGlobalShortcut: z.string()
 });
 
-type Options = z.infer<typeof optionsSchema>;
+type Settings = z.infer<typeof settingsSchema>;
 
-const DEFAULT_OPTIONS: Options = {
+const SETTINGS_OPTIONS: Settings = {
 	copyToClipboard: true,
 	pasteContentsOnSuccess: false,
 	currentGlobalShortcut: 'CommandOrControl+Shift+;'
 };
 
-export const options = storedWritable('options', optionsSchema, DEFAULT_OPTIONS);
+export const settings = storedWritable('options', settingsSchema, SETTINGS_OPTIONS);
