@@ -7,17 +7,9 @@
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
 	import { onNavigate } from '$app/navigation';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 
-	onNavigate((navigation) => {
-		if (!document.startViewTransition) return;
-
-		return new Promise((resolve) => {
-			document.startViewTransition(async () => {
-				resolve();
-				await navigation.complete;
-			});
-		});
-	});
+	setupViewTransition();
 
 	// onMount(async () => await registerShortcut($options.currentGlobalShortcut, toggleRecording));
 	// onDestroy(async () => await unregisterAllShortcuts());
