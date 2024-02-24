@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Skeleton } from '@repo/ui/components/skeleton';
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
@@ -24,14 +25,22 @@
 		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
 	});
 
-	const outputText = derived(recordings, ($recordings) => {
-		const latestRecording = $recordings[$recordings.length - 1];
-		return latestRecording ? latestRecording.transcription : '';
+	const latestRecording = derived(recordings, ($recordings) => {
+		return (
+			$recordings[$recordings.length - 1] ?? {
+				blob: new Blob(),
+				transcription: '',
+				id: '',
+				state: '',
+				subtitle: '',
+				title: ''
+			}
+		);
 	});
 
 	async function copyOutputText() {
-		if (!$outputText) return;
-		// await writeTextToClipboard(outputText);
+		if (!$latestRecording.transcription) return;
+		// await writeTextToClipboard(latestRecording.transcription);
 		toast.success('Copied to clipboard!');
 	}
 
@@ -126,7 +135,7 @@
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
 				readonly
-				value={$outputText}
+				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcription}
 			/>
 			<Button
 				class="border-primary border px-4 py-2"
