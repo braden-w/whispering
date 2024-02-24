@@ -1,9 +1,8 @@
 import type { Recording } from '@repo/recorder/services/recordings-db';
 import AudioRecorder from 'audio-recorder-polyfill';
-import { Data, Effect } from 'effect';
+import { Cause, Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
-import type { createRecordings } from '../recordings/create-recordings';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -15,11 +14,11 @@ const INITIAL_STATE = 'IDLE';
 export function createRecorder({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped'),
-	recordings
+	onSuccessfulRecording
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
-	recordings: Effect.Effect.Success<typeof createRecordings>;
+	onSuccessfulRecording: (recording: Recording) => Effect.Effect<void, Cause.YieldableError>;
 }) {
 	const recorderState = writable<RecorderState>(INITIAL_STATE);
 
@@ -81,7 +80,7 @@ export function createRecorder({
 						blob: audioBlob,
 						state: 'UNPROCESSED'
 					};
-					yield* _(recordings.addRecording(newRecording));
+					yield* _(onSuccessfulRecording(newRecording));
 					recorderState.set('IDLE');
 					break;
 				}
