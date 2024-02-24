@@ -30,6 +30,7 @@
 <div class="relative flex min-h-screen flex-col">
 	<header
 		class="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur"
+		style="view-transition-name: header"
 	>
 		<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
 			<a class="flex items-center gap-2" href="/">
@@ -93,5 +94,13 @@
 	:root::view-transition-new(root) {
 		animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
 			300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+	}
+
+	:root::view-transition-old(header) {
+		animation: none;
+	}
+
+	:root::view-transition-new(header) {
+		animation: none;
 	}
 </style>
