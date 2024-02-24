@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { recordings } from '$lib/stores/recordings';
+	import { addSortBy } from 'svelte-headless-table/plugins';
 	import { Button } from '@repo/ui/components/button';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns } from 'svelte-headless-table/plugins';
+	import ArrowUpDown from '~icons/lucide/arrow-up-down';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 
 	const table = createTable(recordings, {
-		hide: addHiddenColumns()
+		hide: addHiddenColumns(),
+		sort: addSortBy()
 	});
 
 	const columns = table.createColumns([
@@ -95,9 +98,12 @@
 					<Subscribe rowAttrs={headerRow.attrs()}>
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
-										<Render of={cell.render()} />
+										<Button variant="ghost" on:click={props.sort.toggle}>
+											<Render of={cell.render()} />
+											<ArrowUpDown class={'ml-2 h-4 w-4'} />
+										</Button>
 									</Table.Head>
 								</Subscribe>
 							{/each}
