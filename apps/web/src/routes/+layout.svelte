@@ -6,7 +6,18 @@
 	import { ModeWatcher, Toaster, toggleMode } from '@repo/ui/components/sonner';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
-	import SettingsIcon from '~icons/mdi/settings';
+	import { onNavigate } from '$app/navigation';
+
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 
 	// onMount(async () => await registerShortcut($options.currentGlobalShortcut, toggleRecording));
 	// onDestroy(async () => await unregisterAllShortcuts());
