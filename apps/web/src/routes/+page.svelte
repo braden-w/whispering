@@ -2,6 +2,7 @@
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
+	import type { Recording } from '@repo/recorder/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
