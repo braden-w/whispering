@@ -1,6 +1,7 @@
 import type { Recording } from '@repo/recorder/services/recordings-db';
 import AudioRecorder from 'audio-recorder-polyfill';
-import { Cause, Data, Effect } from 'effect';
+import type { Cause} from 'effect';
+import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 
