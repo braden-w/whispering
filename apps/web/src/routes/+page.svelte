@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
+	import { clipboard } from '$lib/system-apis/clipboard';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -38,7 +39,7 @@
 
 	async function copyOutputText() {
 		if (!$latestRecording.transcription) return;
-		// await writeTextToClipboard(latestRecording.transcription);
+		await clipboard.setClipboardText($latestRecording.transcription).pipe(Effect.runPromise);
 		toast.success('Copied to clipboard!');
 	}
 
