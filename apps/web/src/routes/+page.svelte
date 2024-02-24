@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
@@ -78,6 +79,10 @@
 				id="transcribed-text"
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: $latestRecording.id,
+					propertyName: 'transcribedText'
+				})}"
 				readonly
 				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcribedText}
 			/>

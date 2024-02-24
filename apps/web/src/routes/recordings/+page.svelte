@@ -57,11 +57,11 @@
 			header: 'Subtitle'
 		}),
 		table.column({
-			accessor: ({ blob }) => blob,
+			accessor: ({ id, blob }) => ({ id, blob }),
 			header: 'Blob',
-			cell: ({ value: blob }) => {
+			cell: ({ value: { id, blob } }) => {
 				const audioUrl = URL.createObjectURL(blob);
-				return createRender(RenderAudioUrl, { audioUrl });
+				return createRender(RenderAudioUrl, { recordingId: id, audioUrl });
 			}
 		}),
 		table.column({
