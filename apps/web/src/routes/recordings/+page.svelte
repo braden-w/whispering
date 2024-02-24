@@ -29,7 +29,7 @@
 	recordings.subscribe((newRecordings) => {
 		const latestRecording = newRecordings[newRecordings.length - 1];
 		if (latestRecording) {
-			outputText = latestRecording.transcription;
+			outputText = latestRecording.transcribedText;
 		}
 	});
 
@@ -65,8 +65,8 @@
 			}
 		}),
 		table.column({
-			accessor: 'transcription',
-			header: 'Transcription'
+			accessor: 'transcribedText',
+			header: 'Transcribed Text'
 		}),
 		table.column({
 			accessor: 'state',

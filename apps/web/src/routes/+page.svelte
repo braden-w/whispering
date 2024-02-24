@@ -21,7 +21,7 @@
 		title: '',
 		subtitle: '',
 		blob: undefined,
-		transcription: '',
+		transcribedText: '',
 		state: 'UNPROCESSED'
 	} as const;
 
@@ -35,8 +35,8 @@
 
 	const copyOutputText = () =>
 		Effect.gen(function* (_) {
-			if (!$latestRecording.transcription) return;
-			yield* _(clipboard.setClipboardText($latestRecording.transcription));
+			if (!$latestRecording.transcribedText) return;
+			yield* _(clipboard.setClipboardText($latestRecording.transcribedText));
 			toast.success('Copied to clipboard!');
 		}).pipe(Effect.runPromise);
 </script>
@@ -79,7 +79,7 @@
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
 				readonly
-				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcription}
+				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcribedText}
 			/>
 			<Button
 				class="border-primary border px-4 py-2"

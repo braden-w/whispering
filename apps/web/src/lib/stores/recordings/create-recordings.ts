@@ -53,10 +53,10 @@ export const createRecordings = Effect.gen(function* (_) {
 					);
 				}
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
-				const transcription = yield* _(
+				const transcribedText = yield* _(
 					transcriptionService.transcribe(recording.blob, { apiKey: get(apiKey) })
 				);
-				yield* _(editRecording({ ...recording, transcription, state: 'DONE' }));
+				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
 			})
 	};
 });
