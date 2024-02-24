@@ -38,7 +38,7 @@
 	);
 
 	const latestAudioSrc = derived(latestRecording, ($latestRecording) => {
-		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : '';
+		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : undefined;
 	});
 
 	const copyOutputText = () =>
