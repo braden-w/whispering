@@ -92,7 +92,12 @@
 
 <div class="flex flex-col items-center justify-center gap-6 text-center">
 	<div class="flex flex-col gap-4">
-		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
+		<h1
+			class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl"
+			style="view-transiion-name: recording"
+		>
+			Start recording
+		</h1>
 		<p class="text-muted-foreground">
 			Click the 🎙 button to start. Allow access to your microphone.
 		</p>
@@ -130,7 +135,6 @@
 			>
 				<ClipboardIcon />
 			</Button>
-			<!-- <Button href="/recordings" variant="outline">Recordings</Button> -->
 		</div>
 		{#if $latestAudioSrc}
 			<audio src={$latestAudioSrc} controls class="h-8 w-full" />
@@ -138,6 +142,7 @@
 	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2">
+		<Button href="/recordings" variant="outline">See all recordings</Button>
 		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press
 			<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
