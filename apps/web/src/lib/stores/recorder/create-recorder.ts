@@ -1,6 +1,6 @@
 import type { Recording } from '@repo/recorder/services/recordings-db';
 import AudioRecorder from 'audio-recorder-polyfill';
-import type { Cause} from 'effect';
+import type { Cause } from 'effect';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
@@ -81,8 +81,8 @@ export function createRecorder({
 						blob: audioBlob,
 						state: 'UNPROCESSED'
 					};
-					yield* _(onSuccessfulRecording(newRecording));
 					recorderState.set('IDLE');
+					yield* _(onSuccessfulRecording(newRecording));
 					break;
 				}
 				case 'SAVING': {
