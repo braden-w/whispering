@@ -71,7 +71,7 @@
 
 <div class="flex flex-col gap-2">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
-		<span style="view-transition-name: title-recording">Recording</span>s
+		<span style="view-transition-name: title-recording">Recordings</span>
 	</h1>
 	<p class="text-muted-foreground">Your latest recordings</p>
 	<div class="rounded-md border p-6">
