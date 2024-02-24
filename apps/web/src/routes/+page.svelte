@@ -47,7 +47,7 @@
 	<div class="flex flex-col gap-4">
 		<h1
 			class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl"
-			style="view-transiion-name: recording"
+			style="view-transition-name: recording"
 		>
 			Start recording
 		</h1>
