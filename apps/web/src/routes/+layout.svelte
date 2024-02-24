@@ -66,7 +66,11 @@
 <ModeWatcher />
 
 <style>
-	@keyframes slide-to-left {
+	:global(::view-transition-new(root)) {
+		animation-duration: 150ms;
+	}
+
+	/* @keyframes slide-to-left {
 		to {
 			transform: translateX(-100%);
 		}
@@ -94,5 +98,5 @@
 
 	:root::view-transition-new(header) {
 		animation: none;
-	}
+	} */
 </style>
