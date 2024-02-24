@@ -21,28 +21,32 @@
 		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
 	}
 
-	const latestAudioSrc = derived(recordings, ($recordings) => {
-		const latestRecording = $recordings[$recordings.length - 1];
-		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
-	});
-
-	const PLACEHOLDER_RECORDING: Recording = {
+	const PLACEHOLDER_RECORDING = {
+		id: '',
 		title: '',
 		subtitle: '',
-		blob: new Blob(),
+		blob: undefined,
 		transcription: '',
-		id: '',
 		state: 'UNPROCESSED'
-	};
-	const latestRecording = derived(recordings, ($recordings) => {
-		return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
+	} as const;
+
+	const latestRecording = derived(
+		recordings,
+		($recordings): Recording & { blob: Blob | undefined } => {
+			return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
+		}
+	);
+
+	const latestAudioSrc = derived(latestRecording, ($latestRecording) => {
+		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : '';
 	});
 
-	const copyOutputText = Effect.gen(function* (_) {
-		if (!$latestRecording.transcription) return;
-		yield* _(clipboard.setClipboardText($latestRecording.transcription));
-		toast.success('Copied to clipboard!');
-	}).pipe(Effect.runPromise);
+	const copyOutputText = () =>
+		Effect.gen(function* (_) {
+			if (!$latestRecording.transcription) return;
+			yield* _(clipboard.setClipboardText($latestRecording.transcription));
+			toast.success('Copied to clipboard!');
+		}).pipe(Effect.runPromise);
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns()
