@@ -30,12 +30,9 @@
 		state: 'UNPROCESSED'
 	} as const;
 
-	const latestRecording = derived(
-		recordings,
-		($recordings): Recording & { blob: Blob | undefined } => {
-			return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
-		}
-	);
+	const latestRecording = derived(recordings, ($recordings) => {
+		return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
+	});
 
 	const latestAudioSrc = derived(latestRecording, ($latestRecording) => {
 		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : undefined;
