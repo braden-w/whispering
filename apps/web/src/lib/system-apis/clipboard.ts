@@ -1,14 +1,24 @@
-import { settings } from '$lib/stores/settings';
-import { get } from 'svelte/store';
+import type { ClipboardService } from '@repo/recorder/services/clipboard';
+import { ClipboardError } from '@repo/recorder/services/clipboard';
+import { Effect, type Context } from 'effect';
 
-/**
- * Writes text to the user's clipboard.
- * @param text The text to write to the clipboard.
- */
-export async function writeTextToClipboard(text: string): Promise<void> {
-	return await navigator.clipboard.writeText(text);
-}
-
-export async function pasteTextFromClipboard() {
-	return;
-}
+export const clipboardService: Context.Tag.Service<ClipboardService> = {
+	getClipboard: Effect.tryPromise({
+		try: () => navigator.clipboard.readText(),
+		catch: (error) =>
+			new ClipboardError({ message: 'Failed to read from clipboard', origError: error })
+	}),
+	setClipboard: (text) =>
+		Effect.tryPromise({
+			try: () => navigator.clipboard.writeText(text),
+			catch: (error) =>
+				new ClipboardError({ message: 'Failed to write to clipboard', origError: error })
+		}),
+	pasteTextFromClipboard: Effect.try({
+		try: () => {
+			return;
+		},
+		catch: (error) =>
+			new ClipboardError({ message: 'Failed to paste from clipboard', origError: error })
+	})
+};
