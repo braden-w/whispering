@@ -95,7 +95,15 @@
 			</Button>
 		</div>
 		{#if $latestAudioSrc}
-			<audio src={$latestAudioSrc} controls class="h-8 w-full" />
+			<audio
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: $latestRecording.id,
+					propertyName: 'blob'
+				})}"
+				src={$latestAudioSrc}
+				controls
+				class="h-8 w-full"
+			/>
 		{/if}
 	</div>
 
