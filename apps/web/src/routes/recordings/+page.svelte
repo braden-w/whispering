@@ -1,43 +1,14 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
-	import { toast } from '@repo/ui/components/sonner';
 	import * as Table from '@repo/ui/components/table';
-	import { Effect } from 'effect';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns } from 'svelte-headless-table/plugins';
-	import { derived } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
-
-	function handleKeyDown(event: KeyboardEvent) {
-		if (event.code !== 'Space') return;
-		event.preventDefault(); // Prevent scrolling
-		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
-	}
-
-	const latestAudioSrc = derived(recordings, ($recordings) => {
-		const latestRecording = $recordings[$recordings.length - 1];
-		return latestRecording ? URL.createObjectURL(latestRecording.blob) : '';
-	});
-	let outputText: string;
-
-	recordings.subscribe((newRecordings) => {
-		const latestRecording = newRecordings[newRecordings.length - 1];
-		if (latestRecording) {
-			outputText = latestRecording.transcribedText;
-		}
-	});
-
-	async function copyOutputText() {
-		if (!outputText) return;
-		// await writeTextToClipboard(outputText);
-		toast.success('Copied to clipboard!');
-	}
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns()
