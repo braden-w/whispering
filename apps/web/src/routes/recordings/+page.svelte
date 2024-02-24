@@ -92,54 +92,58 @@
 	let hideForId: Record<string, boolean> = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
-<div class="rounded-md border p-6">
-	<div class="flex items-center">
-		<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button variant="outline" class="ml-auto" builders={[builder]}>
-					Columns <ChevronDown class="ml-2 h-4 w-4" />
-				</Button>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-				{#each flatColumns as col}
-					<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-						{col.header}
-					</DropdownMenu.CheckboxItem>
+<div class="flex flex-col gap-2">
+	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
+	<p class="text-muted-foreground">Your latest recordings</p>
+	<div class="rounded-md border p-6">
+		<div class="flex items-center">
+			<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger asChild let:builder>
+					<Button variant="outline" class="ml-auto" builders={[builder]}>
+						Columns <ChevronDown class="ml-2 h-4 w-4" />
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					{#each flatColumns as col}
+						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+							{col.header}
+						</DropdownMenu.CheckboxItem>
+					{/each}
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</div>
+		<Table.Root {...$tableAttrs}>
+			<Table.Header>
+				{#each $headerRows as headerRow}
+					<Subscribe rowAttrs={headerRow.attrs()}>
+						<Table.Row>
+							{#each headerRow.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+									<Table.Head {...attrs}>
+										<Render of={cell.render()} />
+									</Table.Head>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
 				{/each}
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+			</Table.Header>
+			<Table.Body {...$tableBodyAttrs}>
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						<Table.Row {...rowAttrs}>
+							{#each row.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs>
+									<Table.Cell {...attrs}>
+										<Render of={cell.render()} />
+									</Table.Cell>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Body>
+		</Table.Root>
 	</div>
-	<Table.Root {...$tableAttrs}>
-		<Table.Header>
-			{#each $headerRows as headerRow}
-				<Subscribe rowAttrs={headerRow.attrs()}>
-					<Table.Row>
-						{#each headerRow.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-								<Table.Head {...attrs}>
-									<Render of={cell.render()} />
-								</Table.Head>
-							</Subscribe>
-						{/each}
-					</Table.Row>
-				</Subscribe>
-			{/each}
-		</Table.Header>
-		<Table.Body {...$tableBodyAttrs}>
-			{#each $pageRows as row (row.id)}
-				<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-					<Table.Row {...rowAttrs}>
-						{#each row.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs>
-								<Table.Cell {...attrs}>
-									<Render of={cell.render()} />
-								</Table.Cell>
-							</Subscribe>
-						{/each}
-					</Table.Row>
-				</Subscribe>
-			{/each}
-		</Table.Body>
-	</Table.Root>
 </div>
