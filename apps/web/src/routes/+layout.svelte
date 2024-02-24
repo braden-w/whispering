@@ -75,13 +75,13 @@
 <style>
 	@keyframes slide-to-left {
 		to {
-			transform: translateX(-30px);
+			transform: translateX(-100px);
 		}
 	}
 
 	@keyframes slide-from-right {
 		from {
-			transform: translateX(30px);
+			transform: translateX(100px);
 		}
 	}
 
