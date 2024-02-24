@@ -11,8 +11,8 @@
 	import { addHiddenColumns } from 'svelte-headless-table/plugins';
 	import { derived } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
-	import RenderAudioUrl from '../RenderAudioUrl.svelte';
-	import RowActions from '../RowActions.svelte';
+	import RenderAudioUrl from './RenderAudioUrl.svelte';
+	import RowActions from './RowActions.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
