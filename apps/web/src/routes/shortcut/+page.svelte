@@ -10,7 +10,7 @@
 			Change Your Keyboard Shortcut
 		</h1>
 		<p class="text-muted-foreground lg:text-xl">
-			You can access keyboard shortcuts on the extension and desktop app.
+			You can access global keyboard shortcuts on the extension and desktop app.
 		</p>
 		<div class="flex flex-col gap-2 md:flex-row">
 			<Button
