@@ -18,30 +18,40 @@ export type Recording = {
 	state: RecordingState;
 };
 
-export class GetAllRecordingsError extends Data.TaggedError('GetAllRecordingsError')<{
+export class RecordingDbError extends Data.TaggedError('RecordingDbError')<{
 	message: string;
 	origError: unknown;
 }> {}
 
-export class GetRecordingError extends Data.TaggedError('GetRecordingError')<{
-	message: string;
-	origError: unknown;
-}> {}
+export class GetAllRecordingsError extends RecordingDbError {
+	constructor(message: string, origError: unknown) {
+		super({ message, origError });
+	}
+}
 
-export class AddRecordingError extends Data.TaggedError('AddRecordingError')<{
-	message: string;
-	origError: unknown;
-}> {}
+export class GetRecordingError extends RecordingDbError {
+	constructor(message: string, origError: unknown) {
+		super({ message, origError });
+	}
+}
 
-export class EditRecordingError extends Data.TaggedError('EditRecordingError')<{
-	message: string;
-	origError: unknown;
-}> {}
+export class AddRecordingError extends RecordingDbError {
+	constructor(message: string, origError: unknown) {
+		super({ message, origError });
+	}
+}
 
-export class DeleteRecordingError extends Data.TaggedError('DeleteRecordingError')<{
-	message: string;
-	origError: unknown;
-}> {}
+export class EditRecordingError extends RecordingDbError {
+	constructor(message: string, origError: unknown) {
+		super({ message, origError });
+	}
+}
+
+export class DeleteRecordingError extends RecordingDbError {
+	constructor(message: string, origError: unknown) {
+		super({ message, origError });
+	}
+}
 
 export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	RecordingsDbService,
