@@ -35,6 +35,9 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 					}
 				});
 				await db.add(RECORDING_STORE, recording);
+				return {
+					message: `Successfully added recording with id ${recording.id} to indexedDB`
+				};
 			},
 			catch: (error) =>
 				new AddRecordingError({
@@ -54,6 +57,9 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 					}
 				});
 				await db.put(RECORDING_STORE, recording);
+				return {
+					message: `Successfully edited recording with id ${recording.id} in indexedDB`
+				};
 			},
 			catch: (error) =>
 				new EditRecordingError({
@@ -73,6 +79,9 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 					}
 				});
 				await db.delete(RECORDING_STORE, id);
+				return {
+					message: `Successfully deleted recording with id ${id} from indexedDB`
+				};
 			},
 			catch: (error) =>
 				new DeleteRecordingError({
@@ -90,7 +99,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 					}
 				}
 			});
-			return db.getAll(RECORDING_STORE);
+			const recordings = await db.getAll(RECORDING_STORE);
+			return {
+				message: `Successfully retrieved ${recordings.length} recordings from indexedDB`,
+				result: recordings
+			};
 		},
 		catch: (error) =>
 			new GetAllRecordingsError({
@@ -109,7 +122,11 @@ export const indexedDbService: Context.Tag.Service<RecordingsDbService> = {
 						}
 					}
 				});
-				return db.get(RECORDING_STORE, id);
+				const recording = await db.get(RECORDING_STORE, id);
+				return {
+					message: `Successfully retrieved recording with id ${id} from indexedDB`,
+					result: recording
+				};
 			},
 			catch: (error) =>
 				new GetRecordingError({
