@@ -1,47 +1,45 @@
 <script lang="ts">
-	import { selectedAudioInputDeviceId, recorder } from '$lib/stores/recorder';
+	import { apiKey } from '$lib/stores/apiKey';
+	import { recorder, selectedAudioInputDeviceId } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
-	import { Checkbox } from '@repo/ui/components/checkbox';
+	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import * as Select from '@repo/ui/components/select';
+	import { Switch } from '@repo/ui/components/switch';
 
 	const mediaDevicesPromise = recorder.getAudioInputDevices();
 </script>
 
 <div class="container flex min-h-screen items-center justify-center">
-	<Card.Root class="max-w-sm">
+	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title tag="h1">Settings</Card.Title>
+			<Card.Title>Settings</Card.Title>
 			<Card.Description>Customize your Whispering experience</Card.Description>
 		</Card.Header>
-		<Card.Content class="flex flex-col gap-4">
-			<div class="flex gap-2">
-				<Checkbox
-					bind:checked={$settings.copyToClipboard}
+		<Card.Content class="space-y-6">
+			<div class="flex items-center gap-2">
+				<Switch
 					id="copy-to-clipboard"
-					aria-labelledby="copy-to-clipboard-label"
+					aria-labelledby="copy-to-clipboard"
+					bind:checked={$settings.copyToClipboard}
 				/>
-				<Label
-					id="copy-to-clipboard-label"
-					for="copy-to-clipboard"
-					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-				>
-					Copy text to clipboard on successful transcription
+				<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
+					id="paste-from-clipboard"
+					aria-labelledby="paste-from-clipboard"
+					bind:checked={$settings.pasteContentsOnSuccess}
+				/>
+				<Label for="paste-from-clipboard">
+					Paste contents from clipboard after successful transcription
+					<span class="text-sm font-normal text-gray-500 dark:text-gray-400">(experimental)</span>
 				</Label>
 			</div>
-			<div class="flex gap-2">
-				<Checkbox bind:checked={$settings.pasteContentsOnSuccess} id="paste-contents-on-success" />
-				<Label
-					for="paste-contents-on-success"
-					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-				>
-					Paste contents from clipboard after successful transcription (experimental)
-				</Label>
-			</div>
-			<div class="flex flex-col gap-2">
-				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="recording-device">Recording Device</Label>
 				{#await mediaDevicesPromise}
 					<p>Loading...</p>
 				{:then mediaDevices}
@@ -68,14 +66,26 @@
 								</Select.Item>
 							{/each}
 						</Select.Content>
-						<Select.Input name="device" />
+						<Select.Input name="recording-device" />
 					</Select.Root>
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
 				{/await}
 			</div>
-			<Button href="/" variant="link">Go back</Button>
-			<Button href="/key" variant="link">Edit key</Button>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="api-key">API Key</Label>
+				<Input
+					id="api-key"
+					placeholder="Your OpenAI API Key"
+					bind:value={$apiKey}
+					type="text"
+					autocomplete="off"
+				/>
+			</div>
 		</Card.Content>
+		<Card.Footer>
+			<Button size="sm">Save</Button>
+			<Button href="/key" variant="link">Edit key</Button>
+		</Card.Footer>
 	</Card.Root>
 </div>
