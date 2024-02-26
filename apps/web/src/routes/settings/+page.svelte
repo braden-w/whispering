@@ -50,29 +50,22 @@
 					}}
 				>
 					<Select.Trigger class="w-full">
-						{#await mediaDevicesPromise}
-							<Select.Value placeholder="Device" />
-						{:then mediaDevices}
-							<Select.Value
-								placeholder={mediaDevices.find(
-									(device) => device.deviceId === $selectedAudioInputDeviceId
-								)?.label}
-							/>
-						{:catch error}
-							<p>Error: {error.message}</p>
-						{/await}
+						<Select.Value placeholder="Select a device" />
 					</Select.Trigger>
 					<Select.Content>
 						{#await mediaDevicesPromise}
 							<p>Loading...</p>
 						{:then mediaDevices}
 							{#each mediaDevices as device}
-								<Select.Item value={device.deviceId}>{device.label}</Select.Item>
+								<Select.Item value={device.deviceId} label={device.label}>
+									{device.label}
+								</Select.Item>
 							{/each}
 						{:catch error}
 							<p>Error: {error.message}</p>
 						{/await}
 					</Select.Content>
+					<Select.Input name="device" />
 				</Select.Root>
 			</div>
 			<Button href="/" variant="link">Go back</Button>
