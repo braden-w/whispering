@@ -11,7 +11,7 @@
 	import { Effect } from 'effect';
 	import { derived } from 'svelte/store';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
-	import NavItems from './NavItems.svelte';
+	import NavItems from '../NavItems.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
