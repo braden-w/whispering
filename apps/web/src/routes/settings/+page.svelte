@@ -40,10 +40,10 @@
 					Paste contents from clipboard after successful transcription (experimental)
 				</Label>
 			</div>
-			<div class="flex gap-2">
+			<div class="flex flex-col gap-2">
 				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
 				<Select.Root selected={{ value: $selectedAudioInputDeviceId }}>
-					<Select.Trigger class="w-[180px]">
+					<Select.Trigger class="w-full">
 						<Select.Value placeholder="Device" />
 					</Select.Trigger>
 					<Select.Content>
