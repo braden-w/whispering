@@ -45,8 +45,18 @@
 				{#await mediaDevicesPromise}
 					<p>Loading...</p>
 				{:then mediaDevices}
+					{@const items = mediaDevices.map((device) => ({
+						value: device.deviceId,
+						label: device.label
+					}))}
+					{@const selected = items.find((item) => item.value === $selectedAudioInputDeviceId)}
 					<Select.Root
-						items={mediaDevices.map((device) => ({ value: device.deviceId, label: device.label }))}
+						{items}
+						{selected}
+						onSelectedChange={(selected) => {
+							if (!selected) return;
+							selectedAudioInputDeviceId.set(selected.value);
+						}}
 					>
 						<Select.Trigger class="w-full">
 							<Select.Value placeholder="Select a device" />
