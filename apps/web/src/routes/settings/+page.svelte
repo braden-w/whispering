@@ -42,7 +42,7 @@
 			</div>
 			<div class="flex gap-2">
 				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
-				<Select.Root selected={selectedAudioInputDeviceId}>
+				<Select.Root selected={{ value: $selectedAudioInputDeviceId }}>
 					<Select.Trigger class="w-[180px]">
 						<Select.Value placeholder="Device" />
 					</Select.Trigger>
