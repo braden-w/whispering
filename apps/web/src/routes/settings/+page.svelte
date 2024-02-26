@@ -41,7 +41,11 @@
 			<div class="grid gap-2">
 				<Label class="text-sm" for="recording-device">Recording Device</Label>
 				{#await mediaDevicesPromise}
-					<p>Loading...</p>
+					<Select.Root disabled>
+						<Select.Trigger class="w-full">
+							<Select.Value placeholder="Loading devices..." />
+						</Select.Trigger>
+					</Select.Root>
 				{:then mediaDevices}
 					{@const items = mediaDevices.map((device) => ({
 						value: device.deviceId,
