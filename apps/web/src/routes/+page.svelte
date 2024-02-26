@@ -3,7 +3,6 @@
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
-	import { toggleRecording } from '$lib/toggle-recording';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -15,7 +14,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error);
+		recorder.toggleRecording();
 	}
 
 	const PLACEHOLDER_RECORDING = {
@@ -56,7 +55,7 @@
 	</div>
 	<Button
 		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		on:click={toggleRecording}
+		on:click={recorder.toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
