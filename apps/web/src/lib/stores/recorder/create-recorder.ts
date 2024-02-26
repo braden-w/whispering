@@ -4,6 +4,7 @@ import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { recordings } from '../recordings';
+import { toast } from '@repo/ui/components/sonner';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -57,7 +58,23 @@ export const createRecorder = ({
 							break;
 						}
 					}
-				}).pipe(Effect.catchTags({}), Effect.runPromise)
+				}).pipe(
+					Effect.catchTags({
+						RecorderError: (error) => {
+							toast.error(error.message);
+							return Effect.succeed(error.message);
+						},
+						RecordingDbError: (error) => {
+							toast.error(error.message);
+							return Effect.succeed(error.message);
+						},
+						TranscribeError: (error) => {
+							toast.error(error.message);
+							return Effect.succeed(error.message);
+						}
+					}),
+					Effect.runPromise
+				)
 		};
 	});
 
