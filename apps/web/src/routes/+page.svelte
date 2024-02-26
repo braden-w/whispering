@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
-	import { recorder } from '$lib/stores/recorder';
+	import { recorder, recorderState } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
 	import { Button } from '@repo/ui/components/button';
@@ -60,9 +60,9 @@
 		variant="ghost"
 	>
 		<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
-			{#if $recorder === 'RECORDING'}
+			{#if $recorderState === 'RECORDING'}
 				🟥
-			{:else if $recorder === 'SAVING'}
+			{:else if $recorderState === 'SAVING'}
 				🔄
 			{:else}
 				🎙️
