@@ -25,29 +25,33 @@ let stream: MediaStream;
 let mediaRecorder: MediaRecorder;
 const recordedChunks: Blob[] = [];
 
-const getMediaStream = Effect.tryPromise({
-	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
-	catch: (error) =>
-		new GetNavigatorMediaError({
-			message: 'Error getting media stream',
-			origError: error
-		})
-});
+const getMediaStream = (recordingDeviceId: string) =>
+	Effect.tryPromise({
+		try: () =>
+			navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: recordingDeviceId } } }),
+		catch: (error) =>
+			new GetNavigatorMediaError({
+				message: 'Error getting media stream',
+				origError: error
+			})
+	});
+
 export const webRecorderService: Context.Tag.Service<RecorderService> = {
-	startRecording: Effect.gen(function* (_) {
-		stream = yield* _(getMediaStream);
-		recordedChunks.length = 0;
-		mediaRecorder = new AudioRecorder(stream);
-		mediaRecorder.addEventListener(
-			'dataavailable',
-			(event: BlobEvent) => {
-				if (!event.data.size) return;
-				recordedChunks.push(event.data);
-			},
-			{ once: true }
-		);
-		mediaRecorder.start();
-	}),
+	startRecording: (recordingDeviceId) =>
+		Effect.gen(function* (_) {
+			stream = yield* _(getMediaStream(recordingDeviceId));
+			recordedChunks.length = 0;
+			mediaRecorder = new AudioRecorder(stream);
+			mediaRecorder.addEventListener(
+				'dataavailable',
+				(event: BlobEvent) => {
+					if (!event.data.size) return;
+					recordedChunks.push(event.data);
+				},
+				{ once: true }
+			);
+			mediaRecorder.start();
+		}),
 	stopRecording: Effect.tryPromise({
 		try: () =>
 			new Promise<Blob>((resolve) => {
