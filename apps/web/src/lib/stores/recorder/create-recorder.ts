@@ -13,13 +13,7 @@ type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 const INITIAL_STATE = 'IDLE';
 
-export const createRecorder = ({
-	onStartRecording = Effect.logInfo('Recording started'),
-	onStopRecording = Effect.logInfo('Recording stopped')
-}: {
-	onStartRecording?: Effect.Effect<void>;
-	onStopRecording?: Effect.Effect<void>;
-}) =>
+export const createRecorder = () =>
 	Effect.gen(function* (_) {
 		const recorderService = yield* _(RecorderService);
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
@@ -32,13 +26,13 @@ export const createRecorder = ({
 					switch ($recorderState) {
 						case 'IDLE': {
 							yield* _(recorderService.startRecording);
-							yield* _(onStartRecording);
+							yield* _(Effect.logInfo('Recording started'));
 							recorderState.set('RECORDING');
 							break;
 						}
 						case 'RECORDING': {
 							const audioBlob = yield* _(recorderService.stopRecording);
-							yield* _(onStopRecording);
+							yield* _(Effect.logInfo('Recording stopped'));
 							const newRecording: Recording = {
 								id: nanoid(),
 								title: new Date().toLocaleString(),
