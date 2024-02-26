@@ -28,6 +28,7 @@ export const createRecorder = () =>
 
 		return {
 			subscribe: recorderState.subscribe,
+			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(Effect.runPromise),
 			refreshDefaultAudioInput: () =>
 				Effect.gen(function* (_) {
 					const $selectedAudioInput = get(selectedAudioInputDeviceId);
