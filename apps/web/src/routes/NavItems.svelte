@@ -10,11 +10,16 @@
 </script>
 
 <nav class="flex items-center">
-	<Button href="/recordings" variant="ghost" size="icon">
+	<Button
+		href="/recordings"
+		variant="ghost"
+		size="icon"
+		style="view-transition-name: nav-recordings"
+	>
 		<ListIcon aria-hidden="true" />
 		<span class="sr-only">Settings</span>
 	</Button>
-	<Button href="/settings" variant="ghost" size="icon">
+	<Button href="/settings" variant="ghost" size="icon" style="view-transition-name: nav-settings">
 		<AdjustmentsHorizontalIcon aria-hidden="true" />
 		<span class="sr-only">Settings</span>
 	</Button>
@@ -25,11 +30,12 @@
 		title="View project on GitHub"
 		variant="ghost"
 		size="icon"
+		style="view-transition-name: nav-github"
 	>
 		<GithubIcon class="h-4 w-4" aria-hidden="true" />
 		<span class="sr-only">View project on GitHub</span>
 	</Button>
-	<Button on:click={toggleMode} variant="ghost" size="icon">
+	<Button on:click={toggleMode} variant="ghost" size="icon" style="view-transition-name: nav-mode">
 		<SunIcon
 			class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 		/>
