@@ -2,7 +2,7 @@ import { RecordingsDbService, type Recording } from '@repo/recorder/services/rec
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
-import { apiKey } from '../apiKey';
+import { settings } from '../settings';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	constructor({ message }: { message: string }) {
@@ -53,7 +53,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				}
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, { apiKey: get(apiKey) })
+					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
 			})

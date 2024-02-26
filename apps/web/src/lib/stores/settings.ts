@@ -4,15 +4,17 @@ import { z } from 'zod';
 const settingsSchema = z.object({
 	copyToClipboard: z.boolean(),
 	pasteContentsOnSuccess: z.boolean(),
-	currentGlobalShortcut: z.string()
+	currentGlobalShortcut: z.string(),
+	apiKey: z.string()
 });
 
 type Settings = z.infer<typeof settingsSchema>;
 
-const SETTINGS_OPTIONS: Settings = {
+const SETTINGS_DEFAULT: Settings = {
 	copyToClipboard: true,
 	pasteContentsOnSuccess: false,
-	currentGlobalShortcut: 'CommandOrControl+Shift+;'
+	currentGlobalShortcut: 'CommandOrControl+Shift+;',
+	apiKey: ''
 };
 
-export const settings = storedWritable('options', settingsSchema, SETTINGS_OPTIONS);
+export const settings = storedWritable('whispering-settings', settingsSchema, SETTINGS_DEFAULT);

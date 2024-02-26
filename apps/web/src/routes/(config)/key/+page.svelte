@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { apiKey } from '$lib/stores/apiKey';
+	import { settings } from '$lib/stores/settings';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
 	import { Input } from '@repo/ui/components/input';
@@ -8,7 +8,7 @@
 	import PaperAirplaneIcon from '~icons/heroicons/paper-airplane';
 
 	function submitApiKey() {
-		if (!$apiKey) {
+		if (!$settings.apiKey) {
 			toast.error('Please enter a valid OpenAI API key.');
 		} else {
 			toast.success('API key set!');
@@ -39,7 +39,7 @@
 				<Input
 					class="w-64"
 					placeholder="Your OpenAI API Key"
-					bind:value={$apiKey}
+					bind:value={$settings.apiKey}
 					type="text"
 					autocomplete="off"
 				/>

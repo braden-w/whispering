@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { apiKey } from '$lib/stores/apiKey';
 	import { recorder, selectedAudioInputDeviceId } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings';
 	import { Button } from '@repo/ui/components/button';
@@ -81,7 +80,7 @@
 				<Input
 					id="api-key"
 					placeholder="Your OpenAI API Key"
-					bind:value={$apiKey}
+					bind:value={$settings.apiKey}
 					type="text"
 					autocomplete="off"
 				/>
