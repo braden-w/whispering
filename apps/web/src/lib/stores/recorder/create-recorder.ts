@@ -26,15 +26,17 @@ export const createRecorder = () =>
 			''
 		);
 
-		const $selectedAudioInput = get(selectedAudioInputDeviceId);
-		const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
-		if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
-			const firstAudioInput = audioInputDevices[0].deviceId;
-			selectedAudioInputDeviceId.set(firstAudioInput);
-		}
-
 		return {
 			subscribe: recorderState.subscribe,
+			refreshDefaultAudioInput: () =>
+				Effect.gen(function* (_) {
+					const $selectedAudioInput = get(selectedAudioInputDeviceId);
+					const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
+					if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
+						const firstAudioInput = audioInputDevices[0].deviceId;
+						selectedAudioInputDeviceId.set(firstAudioInput);
+					}
+				}).pipe(Effect.runPromise),
 			toggleRecording: () =>
 				Effect.gen(function* (_) {
 					const $recorderState = get(recorderState);
