@@ -56,7 +56,7 @@ export const createRecorder = ({
 						break;
 					}
 				}
-			})
+			}).pipe(Effect.catchTags({}), Effect.runPromise)
 		};
 	});
 
