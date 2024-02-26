@@ -1,0 +1,15 @@
+import type { Effect } from 'effect';
+import { Context, Data } from 'effect';
+
+export class RecorderError extends Data.TaggedError('RecorderError')<{
+	message: string;
+	origError?: unknown;
+}> {}
+
+export class RecorderService extends Context.Tag('RecorderService')<
+	RecorderService,
+	{
+		readonly startRecording: Effect.Effect<void, RecorderError>;
+		readonly stopRecording: Effect.Effect<Blob, RecorderError>;
+	}
+>() {}
