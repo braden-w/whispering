@@ -12,7 +12,7 @@
 	const mediaDevicesPromise = recorder.getAudioInputDevices();
 </script>
 
-<div class="container flex min-h-screen items-center justify-center">
+<div class="container flex items-center justify-center">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title>Settings</Card.Title>
