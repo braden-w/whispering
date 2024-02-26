@@ -44,7 +44,7 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="flex flex-col items-center justify-center gap-6 text-center">
+<div class="flex flex-col items-center justify-center gap-4 text-center">
 	<div class="flex flex-col gap-4">
 		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
 			Start <span style="view-transition-name: title-recording">recording</span>
@@ -69,7 +69,7 @@
 			{/if}
 		</span>
 	</Button>
-	<div class="flex max-w-7xl flex-col gap-3">
+	<div class="flex flex-col gap-2">
 		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 		<div class="flex items-center gap-2">
 			<Input
