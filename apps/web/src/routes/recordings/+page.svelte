@@ -69,7 +69,7 @@
 	let hideForId: Record<string, boolean> = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="container flex flex-col gap-2">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
 		<span style="view-transition-name: title-recording">Recordings</span>
 	</h1>
