@@ -1,6 +1,6 @@
 import type { Recording } from '@repo/recorder/services/recordings-db';
-import AudioRecorder from 'audio-recorder-polyfill';
-import { Data, Effect } from 'effect';
+import { RecorderService } from '@repo/recorder/services/recorder';
+import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { recordings } from '../recordings';
@@ -12,100 +12,53 @@ type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
 const INITIAL_STATE = 'IDLE';
 
-export function createRecorder({
+export const createRecorder = ({
 	onStartRecording = Effect.logInfo('Recording started'),
 	onStopRecording = Effect.logInfo('Recording stopped')
 }: {
 	onStartRecording?: Effect.Effect<void>;
 	onStopRecording?: Effect.Effect<void>;
-}) {
-	const recorderState = writable<RecorderState>(INITIAL_STATE);
+}) =>
+	Effect.gen(function* (_) {
+		const recorderService = yield* _(RecorderService);
+		const recorderState = writable<RecorderState>(INITIAL_STATE);
 
-	let stream: MediaStream;
-	let mediaRecorder: MediaRecorder;
-	const recordedChunks: Blob[] = [];
+		return {
+			subscribe: recorderState.subscribe,
+			toggleRecording: Effect.gen(function* (_) {
+				const $recorderState = get(recorderState);
+				switch ($recorderState) {
+					case 'IDLE': {
+						yield* _(recorderService.startRecording);
+						yield* _(onStartRecording);
+						recorderState.set('RECORDING');
+						break;
+					}
+					case 'RECORDING': {
+						const audioBlob = yield* _(recorderService.stopRecording);
+						yield* _(onStopRecording);
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: new Date().toLocaleString(),
+							subtitle: '',
+							transcribedText: '',
+							blob: audioBlob,
+							state: 'UNPROCESSED'
+						};
+						recorderState.set('IDLE');
+						//  TODO: Extract to onSuccessfulRecording
+						yield* _(recordings.addRecording(newRecording));
+						yield* _(recordings.transcribeRecording(newRecording.id));
 
-	const startRecording = Effect.gen(function* (_) {
-		stream = yield* _(getMediaStream);
-		recordedChunks.length = 0;
-		mediaRecorder = new AudioRecorder(stream);
-		mediaRecorder.addEventListener(
-			'dataavailable',
-			(event: BlobEvent) => {
-				if (!event.data.size) return;
-				recordedChunks.push(event.data);
-			},
-			{ once: true }
-		);
-		mediaRecorder.start();
+						break;
+					}
+					case 'SAVING': {
+						break;
+					}
+				}
+			})
+		};
 	});
-	const stopRecording = Effect.tryPromise({
-		try: () =>
-			new Promise<Blob>((resolve) => {
-				mediaRecorder.addEventListener(
-					'stop',
-					() => {
-						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-						recordedChunks.length = 0;
-						resolve(audioBlob);
-						stream.getTracks().forEach((track) => track.stop());
-					},
-					{ once: true }
-				);
-				mediaRecorder.stop();
-			}),
-		catch: (error) => new StopMediaRecorderError({ origError: error })
-	});
-
-	return {
-		subscribe: recorderState.subscribe,
-		toggleRecording: Effect.gen(function* (_) {
-			const $recorderState = get(recorderState);
-			switch ($recorderState) {
-				case 'IDLE': {
-					yield* _(startRecording);
-					yield* _(onStartRecording);
-					recorderState.set('RECORDING');
-					break;
-				}
-				case 'RECORDING': {
-					const audioBlob = yield* _(stopRecording);
-					yield* _(onStopRecording);
-					const newRecording: Recording = {
-						id: nanoid(),
-						title: new Date().toLocaleString(),
-						subtitle: '',
-						transcribedText: '',
-						blob: audioBlob,
-						state: 'UNPROCESSED'
-					};
-					recorderState.set('IDLE');
-					//  TODO: Extract to onSuccessfulRecording
-					yield* _(recordings.addRecording(newRecording));
-					yield* _(recordings.transcribeRecording(newRecording.id));
-
-					break;
-				}
-				case 'SAVING': {
-					break;
-				}
-			}
-		})
-	};
-}
-
-class GetNavigatorMediaError extends Data.TaggedError('GetNavigatorMediaError')<{
-	origError: unknown;
-}> {}
-
-class StopMediaRecorderError extends Data.TaggedError('StopMediaRecorderError')<{
-	origError: unknown;
-}> {}
-
-const getMediaStream = Effect.tryPromise({
-	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
-	catch: (error) => new GetNavigatorMediaError({ origError: error })
-});
 
 // function onTranscribeRecording(transcription: string) {
 // 	outputText.set(transcription);
