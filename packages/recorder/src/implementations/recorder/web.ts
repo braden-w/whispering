@@ -8,6 +8,14 @@ let stream: MediaStream;
 let mediaRecorder: MediaRecorder;
 const recordedChunks: Blob[] = [];
 
+const getMediaStream = Effect.tryPromise({
+	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+	catch: (error) =>
+		new GetNavigatorMediaError({
+			message: 'Error getting media stream',
+			origError: error
+		})
+});
 export const webRecorderService: Context.Tag.Service<RecorderService> = {
 	startRecording: Effect.gen(function* (_) {
 		stream = yield* _(getMediaStream);
@@ -45,12 +53,3 @@ export const webRecorderService: Context.Tag.Service<RecorderService> = {
 			})
 	})
 };
-
-const getMediaStream = Effect.tryPromise({
-	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
-	catch: (error) =>
-		new GetNavigatorMediaError({
-			message: 'Error getting media stream',
-			origError: error
-		})
-});
