@@ -273,6 +273,9 @@ importers:
 
   packages/recorder:
     dependencies:
+      audio-recorder-polyfill:
+        specifier: ^0.4.1
+        version: 0.4.1
       effect:
         specifier: ^2.4.0
         version: 2.4.0
