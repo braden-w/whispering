@@ -48,9 +48,7 @@
 
 <div class="flex flex-col items-center justify-center gap-4 text-center">
 	<div class="flex flex-col gap-4">
-		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
-			Start <span style="view-transition-name: title-recording">recording</span>
-		</h1>
+		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
 			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow access
 			to your microphone.
