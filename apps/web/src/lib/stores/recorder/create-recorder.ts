@@ -42,10 +42,8 @@ export const createRecorder = () =>
 								state: 'UNPROCESSED'
 							};
 							recorderState.set('IDLE');
-							//  TODO: Extract to onSuccessfulRecording
 							yield* _(recordings.addRecording(newRecording));
 							yield* _(recordings.transcribeRecording(newRecording.id));
-
 							break;
 						}
 						case 'SAVING': {
