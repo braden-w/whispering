@@ -25,38 +25,39 @@ export const createRecorder = ({
 
 		return {
 			subscribe: recorderState.subscribe,
-			toggleRecording: Effect.gen(function* (_) {
-				const $recorderState = get(recorderState);
-				switch ($recorderState) {
-					case 'IDLE': {
-						yield* _(recorderService.startRecording);
-						yield* _(onStartRecording);
-						recorderState.set('RECORDING');
-						break;
-					}
-					case 'RECORDING': {
-						const audioBlob = yield* _(recorderService.stopRecording);
-						yield* _(onStopRecording);
-						const newRecording: Recording = {
-							id: nanoid(),
-							title: new Date().toLocaleString(),
-							subtitle: '',
-							transcribedText: '',
-							blob: audioBlob,
-							state: 'UNPROCESSED'
-						};
-						recorderState.set('IDLE');
-						//  TODO: Extract to onSuccessfulRecording
-						yield* _(recordings.addRecording(newRecording));
-						yield* _(recordings.transcribeRecording(newRecording.id));
+			toggleRecording: () =>
+				Effect.gen(function* (_) {
+					const $recorderState = get(recorderState);
+					switch ($recorderState) {
+						case 'IDLE': {
+							yield* _(recorderService.startRecording);
+							yield* _(onStartRecording);
+							recorderState.set('RECORDING');
+							break;
+						}
+						case 'RECORDING': {
+							const audioBlob = yield* _(recorderService.stopRecording);
+							yield* _(onStopRecording);
+							const newRecording: Recording = {
+								id: nanoid(),
+								title: new Date().toLocaleString(),
+								subtitle: '',
+								transcribedText: '',
+								blob: audioBlob,
+								state: 'UNPROCESSED'
+							};
+							recorderState.set('IDLE');
+							//  TODO: Extract to onSuccessfulRecording
+							yield* _(recordings.addRecording(newRecording));
+							yield* _(recordings.transcribeRecording(newRecording.id));
 
-						break;
+							break;
+						}
+						case 'SAVING': {
+							break;
+						}
 					}
-					case 'SAVING': {
-						break;
-					}
-				}
-			}).pipe(Effect.catchTags({}), Effect.runPromise)
+				}).pipe(Effect.catchTags({}), Effect.runPromise)
 		};
 	});
 
