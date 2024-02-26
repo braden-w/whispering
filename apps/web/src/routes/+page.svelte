@@ -105,7 +105,10 @@
 	</div>
 
 	<div class="flex flex-col items-center justify-center gap-2">
-		<Button href="/recordings" variant="outline">See all recordings</Button>
+		<div class="flex gap-2">
+			<Button href="/recordings" variant="outline">See all recordings</Button>
+			<Button href="/settings" variant="outline">Settings</Button>
+		</div>
 		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press
 			<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
