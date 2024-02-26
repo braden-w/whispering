@@ -3,7 +3,6 @@ import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Data, Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
-import { toast } from '@repo/ui/components/sonner';
 
 class TranscriptionRecordingNotFoundError extends Data.TaggedError('RecordingNotFound')<{
 	id: string;
