@@ -35,7 +35,7 @@
 				/>
 				<Label for="paste-from-clipboard">
 					Paste contents from clipboard after successful transcription
-					<span class="text-sm font-normal text-gray-500 dark:text-gray-400">(experimental)</span>
+					<span class="text-muted-foreground">(experimental)</span>
 				</Label>
 			</div>
 			<div class="grid gap-2">
