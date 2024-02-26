@@ -13,3 +13,15 @@ export class RecorderService extends Context.Tag('RecorderService')<
 		readonly stopRecording: Effect.Effect<Blob, RecorderError>;
 	}
 >() {}
+
+export class GetNavigatorMediaError extends RecorderError {
+	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		super({ message, origError });
+	}
+}
+
+export class StopMediaRecorderError extends RecorderError {
+	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		super({ message, origError });
+	}
+}
