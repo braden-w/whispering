@@ -5,6 +5,7 @@
 		"./implementations/*": "./src/implementations/*"
 	},
 	"dependencies": {
+		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^2.4.0",
 		"typescript": "latest"
 	}
