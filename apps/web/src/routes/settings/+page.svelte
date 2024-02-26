@@ -62,7 +62,7 @@
 								</Select.Item>
 							{/each}
 						{:catch error}
-							<p>Error: {error.message}</p>
+							<p>Error with listing media devices: {error.message}</p>
 						{/await}
 					</Select.Content>
 					<Select.Input name="device" />
