@@ -44,7 +44,17 @@
 				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
 				<Select.Root selected={{ value: $selectedAudioInputDeviceId }}>
 					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Device" />
+						{#await mediaDevicesPromise}
+							<Select.Value placeholder="Device" />
+						{:then mediaDevices}
+							<Select.Value
+								placeholder={mediaDevices.find(
+									(device) => device.deviceId === $selectedAudioInputDeviceId
+								)?.label}
+							/>
+						{:catch error}
+							<p>Error: {error.message}</p>
+						{/await}
 					</Select.Trigger>
 					<Select.Content>
 						{#await mediaDevicesPromise}
