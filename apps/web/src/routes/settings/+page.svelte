@@ -42,31 +42,27 @@
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
-				<Select.Root
-					selected={{ value: $selectedAudioInputDeviceId }}
-					onSelectedChange={(selected) => {
-						if (!selected) return;
-						selectedAudioInputDeviceId.set(selected.value);
-					}}
-				>
-					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Select a device" />
-					</Select.Trigger>
-					<Select.Content>
-						{#await mediaDevicesPromise}
-							<p>Loading...</p>
-						{:then mediaDevices}
+				{#await mediaDevicesPromise}
+					<p>Loading...</p>
+				{:then mediaDevices}
+					<Select.Root
+						items={mediaDevices.map((device) => ({ value: device.deviceId, label: device.label }))}
+					>
+						<Select.Trigger class="w-full">
+							<Select.Value placeholder="Select a device" />
+						</Select.Trigger>
+						<Select.Content>
 							{#each mediaDevices as device}
 								<Select.Item value={device.deviceId} label={device.label}>
 									{device.label}
 								</Select.Item>
 							{/each}
-						{:catch error}
-							<p>Error with listing media devices: {error.message}</p>
-						{/await}
-					</Select.Content>
-					<Select.Input name="device" />
-				</Select.Root>
+						</Select.Content>
+						<Select.Input name="device" />
+					</Select.Root>
+				{:catch error}
+					<p>Error with listing media devices: {error.message}</p>
+				{/await}
 			</div>
 			<Button href="/" variant="link">Go back</Button>
 			<Button href="/key" variant="link">Edit key</Button>
