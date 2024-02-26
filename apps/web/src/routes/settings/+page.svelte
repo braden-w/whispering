@@ -84,8 +84,7 @@
 			</div>
 		</Card.Content>
 		<Card.Footer>
-			<Button size="sm">Save</Button>
-			<Button href="/key" variant="link">Edit key</Button>
+			<Button href="/" class="w-full" variant="secondary">Go Back</Button>
 		</Card.Footer>
 	</Card.Root>
 </div>
