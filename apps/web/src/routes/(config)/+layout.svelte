@@ -8,7 +8,7 @@
 >
 	<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
 		<a class="flex items-center gap-2" href="/">
-			<span aria-hidden="true" role="img"> 🎙️ </span>
+			<span aria-hidden="true" role="img" style="view-transition-name: microphone-icon"> 🎙️ </span>
 			<span class="text-lg font-bold">whispering</span>
 		</a>
 		<NavItems />

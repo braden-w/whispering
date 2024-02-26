@@ -52,7 +52,8 @@
 			Start <span style="view-transition-name: title-recording">recording</span>
 		</h1>
 		<p class="text-muted-foreground">
-			Click the 🎙 button to start. Allow access to your microphone.
+			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow access
+			to your microphone.
 		</p>
 	</div>
 	<Button
