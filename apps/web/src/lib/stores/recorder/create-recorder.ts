@@ -20,17 +20,18 @@ export const createRecorder = () =>
 		const recorderService = yield* _(RecorderService);
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
 
-		const selectedAudioInput = storedWritable('selected-audio-input', z.string(), '');
-		const $selectedAudioInput = get(selectedAudioInput);
+		const selectedAudioInputDeviceId = storedWritable(
+			'selected-audio-input-device-id',
+			z.string(),
+			''
+		);
+
+		const $selectedAudioInput = get(selectedAudioInputDeviceId);
 		const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
 		if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
 			const firstAudioInput = audioInputDevices[0].deviceId;
-			selectedAudioInput.set(firstAudioInput);
+			selectedAudioInputDeviceId.set(firstAudioInput);
 		}
-
-		// return await navigator.mediaDevices.getUserMedia({
-		// 	audio: { deviceId: { exact: selectedDeviceId } }
-		// });
 
 		return {
 			subscribe: recorderState.subscribe,
