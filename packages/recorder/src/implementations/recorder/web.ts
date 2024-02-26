@@ -1,25 +1,56 @@
+import AudioRecorder from 'audio-recorder-polyfill';
 import type { Context } from 'effect';
 import { Effect } from 'effect';
-import type { ClipboardService } from '../../services/clipboard';
-import { ClipboardError } from '../../services/clipboard';
+import type { RecorderService } from '../../services/recorder';
+import { GetNavigatorMediaError, StopMediaRecorderError } from '../../services/recorder';
 
-export const clipboardService: Context.Tag.Service<ClipboardService> = {
-	getClipboardText: Effect.tryPromise({
-		try: () => navigator.clipboard.readText(),
-		catch: (error) =>
-			new ClipboardError({ message: 'Failed to read from clipboard', origError: error })
+let stream: MediaStream;
+let mediaRecorder: MediaRecorder;
+const recordedChunks: Blob[] = [];
+
+export const webRecorderService: Context.Tag.Service<RecorderService> = {
+	startRecording: Effect.gen(function* (_) {
+		stream = yield* _(getMediaStream);
+		recordedChunks.length = 0;
+		mediaRecorder = new AudioRecorder(stream);
+		mediaRecorder.addEventListener(
+			'dataavailable',
+			(event: BlobEvent) => {
+				if (!event.data.size) return;
+				recordedChunks.push(event.data);
+			},
+			{ once: true }
+		);
+		mediaRecorder.start();
 	}),
-	setClipboardText: (text) =>
-		Effect.tryPromise({
-			try: () => navigator.clipboard.writeText(text),
-			catch: (error) =>
-				new ClipboardError({ message: 'Failed to write to clipboard', origError: error })
-		}),
-	pasteTextFromClipboard: Effect.try({
-		try: () => {
-			return;
-		},
+	stopRecording: Effect.tryPromise({
+		try: () =>
+			new Promise<Blob>((resolve) => {
+				mediaRecorder.addEventListener(
+					'stop',
+					() => {
+						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+						recordedChunks.length = 0;
+						resolve(audioBlob);
+						stream.getTracks().forEach((track) => track.stop());
+					},
+					{ once: true }
+				);
+				mediaRecorder.stop();
+			}),
 		catch: (error) =>
-			new ClipboardError({ message: 'Failed to paste from clipboard', origError: error })
+			new StopMediaRecorderError({
+				message: 'Error stopping media recorder and getting audio blob',
+				origError: error
+			})
 	})
 };
+
+const getMediaStream = Effect.tryPromise({
+	try: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+	catch: (error) =>
+		new GetNavigatorMediaError({
+			message: 'Error getting media stream',
+			origError: error
+		})
+});
