@@ -42,7 +42,13 @@
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label for="device" class="text-sm font-medium leading-none">Recording Device</Label>
-				<Select.Root selected={{ value: $selectedAudioInputDeviceId }}>
+				<Select.Root
+					selected={{ value: $selectedAudioInputDeviceId }}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						selectedAudioInputDeviceId.set(selected.value);
+					}}
+				>
 					<Select.Trigger class="w-full">
 						{#await mediaDevicesPromise}
 							<Select.Value placeholder="Device" />
