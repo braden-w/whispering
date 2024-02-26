@@ -37,6 +37,7 @@
 				</Label>
 			</div>
 			<Button href="/" variant="link">Go back</Button>
+			<Button href="/key" variant="link">Edit key</Button>
 		</Card.Content>
 	</Card.Root>
 </div>

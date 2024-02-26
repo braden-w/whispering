@@ -42,7 +42,6 @@
 					bind:value={$apiKey}
 					type="text"
 					autocomplete="off"
-					required
 				/>
 				<Button type="submit">
 					<PaperAirplaneIcon />
