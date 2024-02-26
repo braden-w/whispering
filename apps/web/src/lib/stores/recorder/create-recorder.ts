@@ -1,10 +1,12 @@
-import type { Recording } from '@repo/recorder/services/recordings-db';
+import storedWritable from '@efstajas/svelte-stored-writable';
 import { RecorderService } from '@repo/recorder/services/recorder';
+import type { Recording } from '@repo/recorder/services/recordings-db';
+import { toast } from '@repo/ui/components/sonner';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
+import { z } from 'zod';
 import { recordings } from '../recordings';
-import { toast } from '@repo/ui/components/sonner';
 
 /**
  * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -17,6 +19,18 @@ export const createRecorder = () =>
 	Effect.gen(function* (_) {
 		const recorderService = yield* _(RecorderService);
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
+
+		const selectedAudioInput = storedWritable('selected-audio-input', z.string(), '');
+		const $selectedAudioInput = get(selectedAudioInput);
+		const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
+		if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
+			const firstAudioInput = audioInputDevices[0].deviceId;
+			selectedAudioInput.set(firstAudioInput);
+		}
+
+		// return await navigator.mediaDevices.getUserMedia({
+		// 	audio: { deviceId: { exact: selectedDeviceId } }
+		// });
 
 		return {
 			subscribe: recorderState.subscribe,

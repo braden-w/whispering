@@ -1,8 +1,25 @@
 import AudioRecorder from 'audio-recorder-polyfill';
 import type { Context } from 'effect';
 import { Effect } from 'effect';
-import type { RecorderService } from '../../services/recorder';
-import { GetNavigatorMediaError, StopMediaRecorderError } from '../../services/recorder';
+import { RecorderError, type RecorderService } from '../../services/recorder';
+
+class GetNavigatorMediaError extends RecorderError {
+	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		super({ message, origError });
+	}
+}
+
+class StopMediaRecorderError extends RecorderError {
+	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		super({ message, origError });
+	}
+}
+
+class EnumerateRecordingDevicesError extends RecorderError {
+	constructor({ message, origError }: { message: string; origError?: unknown }) {
+		super({ message, origError });
+	}
+}
 
 let stream: MediaStream;
 let mediaRecorder: MediaRecorder;
@@ -49,6 +66,18 @@ export const webRecorderService: Context.Tag.Service<RecorderService> = {
 		catch: (error) =>
 			new StopMediaRecorderError({
 				message: 'Error stopping media recorder and getting audio blob',
+				origError: error
+			})
+	}),
+	enumerateRecordingDevices: Effect.tryPromise({
+		try: async () => {
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+			return audioInputDevices;
+		},
+		catch: (error) =>
+			new EnumerateRecordingDevicesError({
+				message: 'Error enumerating recording devices',
 				origError: error
 			})
 	})
