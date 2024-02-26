@@ -77,7 +77,7 @@ export function createRecorder({
 						id: nanoid(),
 						title: new Date().toLocaleString(),
 						subtitle: '',
-						transcription: '',
+						transcribedText: '',
 						blob: audioBlob,
 						state: 'UNPROCESSED'
 					};
