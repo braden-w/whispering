@@ -3,6 +3,7 @@
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import { clipboard } from '$lib/system-apis/clipboard';
+	import { toggleRecording } from '$lib/toggle-recording';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -55,7 +56,7 @@
 	</div>
 	<Button
 		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise).catch(console.error)}
+		on:click={toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
