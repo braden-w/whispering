@@ -27,8 +27,9 @@ export const createRecorder = () =>
 		);
 
 		return {
-			subscribe: recorderState.subscribe,
-			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(Effect.runPromise),
+			recorderState,
+			selectedAudioInputDeviceId,
+			getAudioInputDevices: () => recorderService.enumerateRecordingDevices.pipe(Effect.runPromise),
 			refreshDefaultAudioInput: () =>
 				Effect.gen(function* (_) {
 					const $selectedAudioInput = get(selectedAudioInputDeviceId);
@@ -40,9 +41,9 @@ export const createRecorder = () =>
 				}).pipe(Effect.runPromise),
 			toggleRecording: () =>
 				Effect.gen(function* (_) {
-					const $recorderState = get(recorderState);
+					const $recorderStateState = get(recorderState);
 					const $selectedAudioInput = get(selectedAudioInputDeviceId);
-					switch ($recorderState) {
+					switch ($recorderStateState) {
 						case 'IDLE': {
 							yield* _(recorderService.startRecording($selectedAudioInput));
 							yield* _(Effect.logInfo('Recording started'));
