@@ -1,13 +1,14 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
-import { TranscriptionService } from '@repo/recorder/services/transcription';
-import { Data, Effect } from 'effect';
+import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
+import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { apiKey } from '../apiKey';
 
-class TranscriptionRecordingNotFoundError extends Data.TaggedError('RecordingNotFound')<{
-	id: string;
-	message: string;
-}> {}
+class TranscriptionRecordingNotFoundError extends TranscriptionError {
+	constructor({ message }: { message: string }) {
+		super({ message });
+	}
+}
 
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
@@ -46,7 +47,6 @@ export const createRecordings = Effect.gen(function* (_) {
 				if (!recording) {
 					return yield* _(
 						new TranscriptionRecordingNotFoundError({
-							id,
 							message: `Recording with id ${id} not found`
 						})
 					);
