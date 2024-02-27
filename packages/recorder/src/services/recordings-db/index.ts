@@ -7,6 +7,7 @@ export type Recording = {
 	id: string;
 	title: string;
 	subtitle: string;
+	timestamp: string;
 	transcribedText: string;
 	blob: Blob;
 	/**

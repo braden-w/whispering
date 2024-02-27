@@ -63,8 +63,9 @@ export const createRecorder = () =>
 						yield* _(Effect.logInfo('Recording stopped'));
 						const newRecording: Recording = {
 							id: nanoid(),
-							title: new Date().toLocaleString(),
+							title: '',
 							subtitle: '',
+							timestamp: new Date().toISOString(),
 							transcribedText: '',
 							blob: audioBlob,
 							state: 'UNPROCESSED'

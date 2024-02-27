@@ -31,6 +31,10 @@
 			header: 'Subtitle'
 		}),
 		table.column({
+			accessor: 'timestamp',
+			header: 'Timestamp'
+		}),
+		table.column({
 			accessor: ({ id, blob }) => ({ id, blob }),
 			header: 'Blob',
 			cell: ({ value: { id, blob } }) => {
