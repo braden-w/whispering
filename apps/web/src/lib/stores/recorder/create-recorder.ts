@@ -32,7 +32,7 @@ export const createRecorder = () =>
 			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
-					return Effect.succeed(error);
+					return Effect.succeed([] as MediaDeviceInfo[]);
 				})
 			),
 			refreshDefaultAudioInput: Effect.gen(function* (_) {
