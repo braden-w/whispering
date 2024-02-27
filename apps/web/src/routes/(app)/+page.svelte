@@ -91,9 +91,9 @@
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				on:click={copyOutputText}
-				aria-label="Copy transcribed text"
 			>
 				<ClipboardIcon />
+				<span class="sr-only">Copy transcribed text</span>
 			</Button>
 		</div>
 		{#if $latestAudioSrc}
@@ -145,12 +145,4 @@
 			</Button> for shortcuts.
 		</p>
 	</div>
-	<!-- <div class="flex gap-2">
-		<Button href="/key" aria-label="API Key" variant="secondary" size="icon">
-			<KeyIcon />
-		</Button>
-		<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="secondary" size="icon">
-			<KeyboardIcon />
-		</Button>
-	</div> -->
 </div>
