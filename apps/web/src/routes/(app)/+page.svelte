@@ -44,6 +44,10 @@
 		}).pipe(Effect.runPromise);
 </script>
 
+<svelte:head>
+	<title>Whispering</title>
+</svelte:head>
+
 <svelte:window on:keydown={handleKeyDown} />
 
 <div class="flex flex-col items-center justify-center gap-4 text-center">

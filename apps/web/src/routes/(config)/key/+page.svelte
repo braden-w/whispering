@@ -17,6 +17,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>API Key</title>
+</svelte:head>
+
 <div class="container flex min-h-screen items-center justify-center">
 	<Card.Root class="max-w-sm">
 		<Card.Header>

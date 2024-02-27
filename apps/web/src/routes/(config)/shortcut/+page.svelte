@@ -4,6 +4,10 @@
 	import DesktopIcon from '~icons/lucide/laptop';
 </script>
 
+<svelte:head>
+	<title>Change Keyboard Shortcut</title>
+</svelte:head>
+
 <div class="flex items-center justify-center">
 	<section class="container flex flex-col items-center gap-4 text-center">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">

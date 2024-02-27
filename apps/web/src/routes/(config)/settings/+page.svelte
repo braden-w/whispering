@@ -11,6 +11,10 @@
 	const mediaDevicesPromise = recorder.getAudioInputDevices();
 </script>
 
+<svelte:head>
+	<title>Settings</title>
+</svelte:head>
+
 <div class="container flex items-center justify-center">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
