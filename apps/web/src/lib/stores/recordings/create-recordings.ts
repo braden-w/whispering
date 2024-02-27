@@ -1,7 +1,7 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
 import { toast } from '@repo/ui/components/sonner';
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
 
@@ -10,6 +10,8 @@ class TranscriptionRecordingNotFoundError extends TranscriptionError {
 		super({ message });
 	}
 }
+
+class InvalidApiKeyError extends Data.TaggedError('InvalidApiKeyError') {}
 
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
@@ -68,8 +70,12 @@ export const createRecordings = Effect.gen(function* (_) {
 					);
 				}
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
+				const apiKey = get(settings).apiKey;
+				if (!apiKey || !apiKey.startsWith('sk-')) {
+					return yield* _(new InvalidApiKeyError());
+				}
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
+					transcriptionService.transcribe(recording.blob, { apiKey })
 				);
 				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
 			}).pipe(
