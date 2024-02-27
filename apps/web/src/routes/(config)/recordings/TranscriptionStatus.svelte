@@ -10,14 +10,17 @@
 
 {#if state === 'UNPROCESSED'}
 	<Tooltip.Root>
-		<Tooltip.Trigger>️<PlayIcon /></Tooltip.Trigger>
+		<Tooltip.Trigger>️<PlayIcon aria-hidden="true" /></Tooltip.Trigger>
 		<Tooltip.Content>
-			<p>Recording has not been processed. Press the <RepeatIcon /> icon to transcribe it.</p>
+			<p>
+				Recording has not been processed. Press the <RepeatIcon aria-label="Transcribe" /> icon to transcribe
+				it.
+			</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
 {:else if state === 'TRANSCRIBING'}
 	<Tooltip.Root>
-		<Tooltip.Trigger><RepeatIcon /></Tooltip.Trigger>
+		<Tooltip.Trigger><RepeatIcon aria-hidden="true" /></Tooltip.Trigger>
 		<Tooltip.Content>
 			<p>Transcribing</p>
 		</Tooltip.Content>
@@ -25,7 +28,7 @@
 {:else if state === 'DONE'}
 	<Tooltip.Root>
 		<Tooltip.Trigger>
-			<ProcessedIcon />
+			<ProcessedIcon aria-hidden="true" />
 		</Tooltip.Trigger>
 		<Tooltip.Content>Recording is done transcribing</Tooltip.Content>
 	</Tooltip.Root>
