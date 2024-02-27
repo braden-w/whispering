@@ -29,69 +29,61 @@ export const createRecorder = () =>
 		return {
 			recorderState,
 			selectedAudioInputDeviceId,
-			getAudioInputDevices: () =>
-				recorderService.enumerateRecordingDevices
-					.pipe(
-						Effect.catchAll((error) => {
-							toast.error(error.message);
-							return Effect.succeed(error);
-						})
-					)
-					.pipe(Effect.runPromise),
-			refreshDefaultAudioInput: () =>
-				Effect.gen(function* (_) {
-					const $selectedAudioInput = get(selectedAudioInputDeviceId);
-					const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
-					if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
-						const firstAudioInput = audioInputDevices[0].deviceId;
-						selectedAudioInputDeviceId.set(firstAudioInput);
-					}
+			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
 				})
-					.pipe(
-						Effect.catchAll((error) => {
-							toast.error(error.message);
-							return Effect.succeed(error);
-						})
-					)
-					.pipe(Effect.runPromise),
-			toggleRecording: () =>
-				Effect.gen(function* (_) {
-					const $recorderState = get(recorderState);
-					const $selectedAudioInput = get(selectedAudioInputDeviceId);
-					switch ($recorderState) {
-						case 'IDLE': {
-							yield* _(recorderService.startRecording($selectedAudioInput));
-							yield* _(Effect.logInfo('Recording started'));
-							recorderState.set('RECORDING');
-							break;
-						}
-						case 'RECORDING': {
-							const audioBlob = yield* _(recorderService.stopRecording);
-							yield* _(Effect.logInfo('Recording stopped'));
-							const newRecording: Recording = {
-								id: nanoid(),
-								title: new Date().toLocaleString(),
-								subtitle: '',
-								transcribedText: '',
-								blob: audioBlob,
-								state: 'UNPROCESSED'
-							};
-							recorderState.set('IDLE');
-							yield* _(recordings.addRecording(newRecording));
-							yield* _(recordings.transcribeRecording(newRecording.id));
-							break;
-						}
-						case 'SAVING': {
-							break;
-						}
+			),
+			refreshDefaultAudioInput: Effect.gen(function* (_) {
+				const $selectedAudioInput = get(selectedAudioInputDeviceId);
+				const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
+				if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
+					const firstAudioInput = audioInputDevices[0].deviceId;
+					selectedAudioInputDeviceId.set(firstAudioInput);
+				}
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
+				})
+			),
+			toggleRecording: Effect.gen(function* (_) {
+				const $recorderState = get(recorderState);
+				const $selectedAudioInput = get(selectedAudioInputDeviceId);
+				switch ($recorderState) {
+					case 'IDLE': {
+						yield* _(recorderService.startRecording($selectedAudioInput));
+						yield* _(Effect.logInfo('Recording started'));
+						recorderState.set('RECORDING');
+						break;
 					}
-				}).pipe(
-					Effect.catchAll((error) => {
-						toast.error(error.message);
-						return Effect.succeed(error);
-					}),
-					Effect.runPromise
-				)
+					case 'RECORDING': {
+						const audioBlob = yield* _(recorderService.stopRecording);
+						yield* _(Effect.logInfo('Recording stopped'));
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: new Date().toLocaleString(),
+							subtitle: '',
+							transcribedText: '',
+							blob: audioBlob,
+							state: 'UNPROCESSED'
+						};
+						recorderState.set('IDLE');
+						yield* _(recordings.addRecording(newRecording));
+						yield* _(recordings.transcribeRecording(newRecording.id));
+						break;
+					}
+					case 'SAVING': {
+						break;
+					}
+				}
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
+				})
+			)
 		};
 	});
 

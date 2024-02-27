@@ -8,4 +8,4 @@ export const { recorderState, selectedAudioInputDeviceId, ...recorder } = create
 	Effect.runSync
 );
 
-recorder.refreshDefaultAudioInput();
+recorder.refreshDefaultAudioInput.pipe(Effect.runPromise);

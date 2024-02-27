@@ -7,8 +7,9 @@
 	import { Label } from '@repo/ui/components/label';
 	import * as Select from '@repo/ui/components/select';
 	import { Switch } from '@repo/ui/components/switch';
+	import { Effect } from 'effect';
 
-	const mediaDevicesPromise = recorder.getAudioInputDevices();
+	const mediaDevicesPromise = recorder.getAudioInputDevices.pipe(Effect.runPromise);
 </script>
 
 <svelte:head>
