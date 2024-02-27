@@ -162,41 +162,43 @@
 				type="text"
 				bind:value={$filterValue}
 			/>
-			<Button
-				variant="outline"
-				size="icon"
-				on:click={() => {
-					Promise.all(
-						$selectedRecordings.map((recording) => {
-							recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
-						})
-					);
-				}}
-			>
-				{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'TRANSCRIBING')}
-					<LoadingTranscriptionIcon />
-				{:else}
-					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'UNPROCESSED')}
-						<StartTranscriptionIcon />
+			{#if $selectedRecordings.length > 0}
+				<Button
+					variant="outline"
+					size="icon"
+					on:click={() => {
+						Promise.all(
+							$selectedRecordings.map((recording) => {
+								recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
+							})
+						);
+					}}
+				>
+					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'TRANSCRIBING')}
+						<LoadingTranscriptionIcon />
+					{:else}
+						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'UNPROCESSED')}
+							<StartTranscriptionIcon />
+						{/if}
+						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'DONE')}
+							<RetryTranscriptionIcon />
+						{/if}
 					{/if}
-					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'DONE')}
-						<RetryTranscriptionIcon />
-					{/if}
-				{/if}
-			</Button>
-			<Button
-				variant="outline"
-				size="icon"
-				on:click={() => {
-					Promise.all(
-						$selectedRecordings.map((recording) => {
-							recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
-						})
-					);
-				}}
-			>
-				<TrashIcon />
-			</Button>
+				</Button>
+				<Button
+					variant="outline"
+					size="icon"
+					on:click={() => {
+						Promise.all(
+							$selectedRecordings.map((recording) => {
+								recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							})
+						);
+					}}
+				>
+					<TrashIcon />
+				</Button>
+			{/if}
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" class="ml-auto" builders={[builder]}>
