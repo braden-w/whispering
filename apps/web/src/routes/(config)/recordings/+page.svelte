@@ -222,8 +222,8 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
-										{#if props.sort.disabled}
-											<Render of={cell.render()} />
+										{#if props.sort.disabled && cell.id === 'id'}
+											<div class="px-1"><Render of={cell.render()} /></div>
 										{:else}
 											<Button
 												variant="ghost"
