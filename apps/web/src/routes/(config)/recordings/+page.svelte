@@ -5,16 +5,23 @@
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
-	import { addTableFilter, addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
+	import {
+		addTableFilter,
+		addHiddenColumns,
+		addSortBy,
+		addSelectedRows
+	} from 'svelte-headless-table/plugins';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ArrowUpDown from '~icons/lucide/arrow-up-down';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import DataTableCheckbox from './DataTableCheckbox.svelte';
 	import TranscriptionStatus from './TranscriptionStatus.svelte';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
+		select: addSelectedRows(),
 		sort: addSortBy(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
@@ -24,7 +31,20 @@
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'id',
-			header: 'ID',
+			header: (_, { pluginStates }) => {
+				const { allPageRowsSelected } = pluginStates.select;
+				return createRender(DataTableCheckbox, {
+					checked: allPageRowsSelected
+				});
+			},
+			cell: ({ row }, { pluginStates }) => {
+				const { getRowState } = pluginStates.select;
+				const { isSelected } = getRowState(row);
+
+				return createRender(DataTableCheckbox, {
+					checked: isSelected
+				});
+			},
 			plugins: {
 				filter: {
 					exclude: true
@@ -126,7 +146,7 @@
 						<Table.Row>
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head {...attrs}>
+									<Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
 										<Button variant="ghost" on:click={props.sort.toggle}>
 											<Render of={cell.render()} />
 											<ArrowUpDown class={'ml-2 h-4 w-4'} />
