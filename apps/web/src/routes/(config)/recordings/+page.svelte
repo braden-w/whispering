@@ -13,6 +13,8 @@
 	} from 'svelte-headless-table/plugins';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ArrowUpDown from '~icons/lucide/arrow-up-down';
+	import ArrowDown from '~icons/lucide/arrow-down';
+	import ArrowUp from '~icons/lucide/arrow-up';
 	import DataTableCheckbox from './DataTableCheckbox.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -54,6 +56,9 @@
 			plugins: {
 				filter: {
 					exclude: true
+				},
+				sort: {
+					disable: true
 				}
 			}
 		}),
@@ -152,10 +157,20 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
-										<Button variant="ghost" on:click={props.sort.toggle}>
+										{#if props.sort.disabled}
 											<Render of={cell.render()} />
-											<ArrowUpDown class={'ml-2 h-4 w-4'} />
-										</Button>
+										{:else}
+											<Button variant="ghost" on:click={props.sort.toggle}>
+												<Render of={cell.render()} />
+												{#if props.sort.order === 'desc'}
+													<ArrowDown class="ml-2 h-4 w-4" />
+												{:else if props.sort.order === 'asc'}
+													<ArrowUp class="ml-2 h-4 w-4" />
+												{:else}
+													<ArrowUpDown class="ml-2 h-4 w-4" />
+												{/if}
+											</Button>
+										{/if}
 									</Table.Head>
 								</Subscribe>
 							{/each}
