@@ -74,12 +74,14 @@
 
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
+
+	const ids = flatColumns.map((c) => c.id);
+	let hideForId: Record<string, boolean> = Object.fromEntries(
+		ids.map((id) => [id, id === 'id' ? false : true])
+	);
 	$: $hiddenColumnIds = Object.entries(hideForId)
 		.filter(([, hide]) => !hide)
 		.map(([id]) => id);
-
-	const ids = flatColumns.map((c) => c.id);
-	let hideForId: Record<string, boolean> = Object.fromEntries(ids.map((id) => [id, true]));
 </script>
 
 <svelte:head>
