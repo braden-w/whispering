@@ -1,5 +1,6 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
+import { toast } from '@repo/ui/components/sonner';
 import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
@@ -56,6 +57,11 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
-			})
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
+				})
+			)
 	};
 });

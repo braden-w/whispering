@@ -15,8 +15,7 @@
 			builders={[builder]}
 			variant="ghost"
 			size="icon"
-			on:click={() =>
-				recordings.transcribeRecording(id).pipe(Effect.runPromise).catch(console.error)}
+			on:click={() => recordings.transcribeRecording(id).pipe(Effect.runPromise)}
 		>
 			<TranscriptionIcon />
 		</Button>
@@ -32,7 +31,7 @@
 			builders={[builder]}
 			variant="ghost"
 			size="icon"
-			on:click={() => recordings.deleteRecording(id).pipe(Effect.runPromise).catch(console.error)}
+			on:click={() => recordings.deleteRecording(id).pipe(Effect.runPromise)}
 		>
 			<TrashIcon />
 		</Button>
