@@ -4,9 +4,6 @@
 	import { setupViewTransition } from 'sveltekit-view-transition';
 
 	setupViewTransition();
-
-	// onMount(async () => await registerShortcut($options.currentGlobalShortcut, toggleRecording));
-	// onDestroy(async () => await unregisterAllShortcuts());
 </script>
 
 <svelte:head>
