@@ -1,10 +1,10 @@
 <script lang="ts">
-	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
+	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { Effect } from 'effect';
 	import TrashIcon from '~icons/heroicons/trash';
-	import TranscriptionIcon from '~icons/material-symbols/mdi-transcribe';
+	import TranscriptionIcon from '~icons/lucide/repeat';
 
 	export let id: string;
 </script>
