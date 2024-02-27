@@ -20,6 +20,7 @@
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import { Effect } from 'effect';
+	import { derived, get } from 'svelte/store';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -152,14 +153,8 @@
 				on:click={() => {
 					Promise.all(
 						Object.keys($selectedDataIds).map((id) => {
-							const correspondingRecordingId = $pageRows
-								.find((row) => row.id === id)
-								?.cells.find((cell) => cell.id === 'id')
-								?.state?.console.log(
-									'🚀 ~ Object.keys ~ correspondingRecordingId:',
-									correspondingRecordingId
-								);
-							recordings.deleteRecording(correspondingRecordingId).pipe(Effect.runPromise);
+							const correspondingRecording = $recordings[Number(id)];
+							recordings.deleteRecording(correspondingRecording.id).pipe(Effect.runPromise);
 						})
 					);
 				}}
