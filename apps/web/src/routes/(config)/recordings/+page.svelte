@@ -62,10 +62,10 @@
 			header: 'State'
 		}),
 		table.column({
-			accessor: ({ id }) => id,
+			accessor: (recording) => recording,
 			header: 'Actions',
-			cell: ({ value: id }) => {
-				return createRender(RowActions, { id });
+			cell: ({ value: recording }) => {
+				return createRender(RowActions, { recording });
 			}
 		})
 	]);
