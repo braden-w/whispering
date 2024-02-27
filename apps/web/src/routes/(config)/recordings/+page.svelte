@@ -21,7 +21,14 @@
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
 		select: addSelectedRows(),
-		sort: addSortBy(),
+		sort: addSortBy({
+			initialSortKeys: [
+				{
+					id: 'timestamp',
+					order: 'desc'
+				}
+			]
+		}),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
 		})
