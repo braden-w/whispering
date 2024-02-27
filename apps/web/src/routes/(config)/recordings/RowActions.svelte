@@ -53,43 +53,49 @@
 					Make changes to your recording here. Click save when you're done.
 				</Dialog.Description>
 			</Dialog.Header>
-			<div class="grid gap-4 py-4">
+			<form
+				class="grid gap-4 py-4"
+				on:submit={(e) => {
+					e.preventDefault();
+					recordings.editRecording(recording).pipe(Effect.runPromise);
+				}}
+			>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="id" class="text-right">ID</Label>
-					<Input id="id" value={recording.id} class="col-span-3" disabled />
+					<Input id="id" bind:value={recording.id} class="col-span-3" disabled />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="title" class="text-right">Title</Label>
-					<Input id="title" value={recording.title} class="col-span-3" />
+					<Input id="title" bind:value={recording.title} class="col-span-3" />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="subtitle" class="text-right">Subtitle</Label>
-					<Input id="subtitle" value={recording.subtitle} class="col-span-3" />
+					<Input id="subtitle" bind:value={recording.subtitle} class="col-span-3" />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="timestamp" class="text-right">Timestamp</Label>
-					<Input id="timestamp" value={recording.timestamp} class="col-span-3" />
+					<Input id="timestamp" bind:value={recording.timestamp} class="col-span-3" />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="transcribedText" class="text-right">Transcribed Text</Label>
-					<Input id="transcribedText" value={recording.transcribedText} class="col-span-3" />
+					<Input id="transcribedText" bind:value={recording.transcribedText} class="col-span-3" />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="blob" class="text-right">Blob</Label>
 					<audio
 						src={recording.blob ? URL.createObjectURL(recording.blob) : ''}
 						controls
-						class="w-full col-span-3 mt-2 h-8"
+						class="col-span-3 mt-2 h-8 w-full"
 					/>
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="transcriptionStatus" class="text-right">Transcription Status</Label>
-					<Input id="transcriptionStatus" value={recording.state} class="col-span-3" />
+					<Input id="transcriptionStatus" bind:value={recording.state} class="col-span-3" />
 				</div>
 				<Dialog.Footer>
 					<Button type="submit">Save changes</Button>
 				</Dialog.Footer>
-			</div>
+			</form>
 		</Dialog.Content>
 	</Dialog.Root>
 	<Tooltip.Root>
