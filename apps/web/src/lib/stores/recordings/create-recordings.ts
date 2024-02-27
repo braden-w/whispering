@@ -30,18 +30,33 @@ export const createRecordings = Effect.gen(function* (_) {
 		sync: Effect.gen(function* (_) {
 			const recordings = yield* _(recordingsDb.getAllRecordings);
 			set(recordings);
-		}),
+		}).pipe(
+			Effect.catchAll((error) => {
+				toast.error(error.message);
+				return Effect.succeed(error);
+			})
+		),
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
 				update((recordings) => [...recordings, recording]);
-			}),
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
+				})
+			),
 		editRecording,
 		deleteRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.deleteRecording(id));
 				update((recordings) => recordings.filter((recording) => recording.id !== id));
-			}),
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(error);
+				})
+			),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
