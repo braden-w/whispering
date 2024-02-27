@@ -3,7 +3,11 @@
 </script>
 
 <span>
-	Something went wrong. Please verify that your <Button href="/key" variant="link" class="px-0.5 py-0">
+	Something went wrong. Please verify that your <Button
+		href="/key"
+		variant="link"
+		class="h-fit px-0 py-0"
+	>
 		API Key in settings
 	</Button> is correct.
 </span>
