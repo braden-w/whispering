@@ -69,11 +69,11 @@ export const createRecordings = Effect.gen(function* (_) {
 						})
 					);
 				}
-				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
+				yield* _(editRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
-				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
+				yield* _(editRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {
