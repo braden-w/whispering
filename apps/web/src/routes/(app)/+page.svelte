@@ -2,12 +2,11 @@
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recorder, recorderState } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
-	import { clipboard } from '$lib/system-apis/clipboard';
+	import { copyRecordingText } from '$lib/system-apis/clipboard';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import { toast } from '@repo/ui/components/sonner';
 	import { Effect } from 'effect';
 	import { derived } from 'svelte/store';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -36,12 +35,9 @@
 		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : undefined;
 	});
 
-	const copyOutputText = () =>
-		Effect.gen(function* (_) {
-			if (!$latestRecording.transcribedText) return;
-			yield* _(clipboard.setClipboardText($latestRecording.transcribedText));
-			toast.success('Copied to clipboard!');
-		}).pipe(Effect.runPromise);
+	const copyOutputText = () => {
+		copyRecordingText($latestRecording);
+	};
 </script>
 
 <svelte:head>

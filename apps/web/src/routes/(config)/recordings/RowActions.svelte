@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { recordings } from '$lib/stores/recordings';
+	import { copyRecordingText } from '$lib/system-apis/clipboard';
 	import type { Recording } from '@repo/recorder/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { Effect } from 'effect';
+	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import EditIcon from '~icons/heroicons/pencil';
 	import TrashIcon from '~icons/heroicons/trash';
 	import TranscriptionIcon from '~icons/lucide/repeat';
@@ -40,6 +42,21 @@
 		</Tooltip.Trigger>
 		<Tooltip.Content>
 			<p>Edit Recording</p>
+		</Tooltip.Content>
+	</Tooltip.Root>
+	<Tooltip.Root>
+		<Tooltip.Trigger asChild let:builder>
+			<Button
+				builders={[builder]}
+				variant="ghost"
+				size="icon"
+				on:click={() => copyRecordingText(recording)}
+			>
+				<ClipboardIcon />
+			</Button>
+		</Tooltip.Trigger>
+		<Tooltip.Content>
+			<p>Copy Transcript</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
 	<Tooltip.Root>
