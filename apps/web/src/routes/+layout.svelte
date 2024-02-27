@@ -2,7 +2,6 @@
 	import '@repo/ui/app.pcss';
 	import { ModeWatcher, Toaster } from '@repo/ui/components/sonner';
 	import { setupViewTransition } from 'sveltekit-view-transition';
-	import NavItems from './NavItems.svelte';
 
 	setupViewTransition();
 
