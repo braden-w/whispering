@@ -36,6 +36,11 @@ const getMediaStream = (recordingDeviceId: string) =>
 			})
 	});
 
+const resetRecorder = () => {
+	recordedChunks.length = 0;
+	stream.getTracks().forEach((track) => track.stop());
+};
+
 export const webRecorderService: Context.Tag.Service<RecorderService> = {
 	startRecording: (recordingDeviceId) =>
 		Effect.gen(function* (_) {
@@ -59,9 +64,8 @@ export const webRecorderService: Context.Tag.Service<RecorderService> = {
 					'stop',
 					() => {
 						const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-						recordedChunks.length = 0;
 						resolve(audioBlob);
-						stream.getTracks().forEach((track) => track.stop());
+						resetRecorder();
 					},
 					{ once: true }
 				);
@@ -72,7 +76,12 @@ export const webRecorderService: Context.Tag.Service<RecorderService> = {
 				message: 'Error stopping media recorder and getting audio blob',
 				origError: error
 			})
-	}),
+	}).pipe(
+		Effect.catchAll((error) => {
+			resetRecorder();
+			return error;
+		})
+	),
 	enumerateRecordingDevices: Effect.tryPromise({
 		try: async () => {
 			const devices = await navigator.mediaDevices.enumerateDevices();
