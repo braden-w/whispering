@@ -19,6 +19,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { Effect } from 'effect';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -38,7 +39,7 @@
 
 	const columns = table.createColumns([
 		table.column({
-			id: 'ID',
+			id: 'id',
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
@@ -134,6 +135,22 @@
 				type="text"
 				bind:value={$filterValue}
 			/>
+			<Button
+				variant="outline"
+				on:click={() => {
+					Promise.all(
+						Object.keys($selectedDataIds).map((id) => {
+							const correspondingRecordingId = $pageRows
+								.find((row) => row.id === id)
+								?.cells.find((cell) => cell.id === 'id')?.state?.
+							console.log('🚀 ~ Object.keys ~ correspondingRecordingId:', correspondingRecordingId);
+							recordings.deleteRecording(correspondingRecordingId).pipe(Effect.runPromise);
+						})
+					);
+				}}
+			>
+				Clear
+			</Button>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" class="ml-auto" builders={[builder]}>
