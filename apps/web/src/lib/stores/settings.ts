@@ -1,4 +1,4 @@
-import storedWritable from '@efstajas/svelte-stored-writable';
+import storedWritable from 'svelte-persisted-writable';
 import { z } from 'zod';
 
 const settingsSchema = z.object({

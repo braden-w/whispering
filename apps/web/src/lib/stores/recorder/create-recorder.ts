@@ -1,4 +1,4 @@
-import storedWritable from '@efstajas/svelte-stored-writable';
+import storedWritable from 'svelte-persisted-writable';
 import { RecorderService } from '@repo/recorder/services/recorder';
 import type { Recording } from '@repo/recorder/services/recordings-db';
 import { toast } from '@repo/ui/components/sonner';

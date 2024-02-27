@@ -121,9 +121,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@efstajas/svelte-stored-writable':
-        specifier: ^0.2.0
-        version: 0.2.0
       '@repo/recorder':
         specifier: workspace:*
         version: link:../../packages/recorder
@@ -142,6 +139,9 @@ importers:
       nanoid:
         specifier: ^5.0.6
         version: 5.0.6
+      svelte-persisted-writable:
+        specifier: ^1.0.0
+        version: 1.0.0
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -565,13 +565,6 @@ packages:
 
   /@cloudflare/workers-types@4.20230321.0:
     resolution: {integrity: sha512-zyRFz9AUS0tbg3/kJ+3zxvp9fl/O9yOJlChih/o86hhOqRMcZVbWefYAvFPidRvYUHM5YTG1wjU1bF9FFckRVg==}
-    dev: false
-
-  /@efstajas/svelte-stored-writable@0.2.0:
-    resolution: {integrity: sha512-z04mzHHe8HNgteQRJqbfq/omTEFCl+BHMLt1P0Mu1PcnNvnT5fhGTRG0oBd1D8HkRxu4Do+pQO5YrrdIwKluRg==}
-    dependencies:
-      svelte: 3.59.1
-      zod: 3.22.4
     dev: false
 
   /@esbuild/aix-ppc64@0.19.12:
@@ -7460,6 +7453,13 @@ packages:
     dependencies:
       svelte: 4.2.7
     dev: true
+
+  /svelte-persisted-writable@1.0.0:
+    resolution: {integrity: sha512-Px6xnD7pL9bXE3nMYGy9jIY8eUxHopHP/o4W1IUMQVifWABas52zNhvUkc1M8URcHK0FabrDRxDH+5KrLR89Ng==}
+    dependencies:
+      svelte: 3.59.1
+      zod: 3.22.4
+    dev: false
 
   /svelte-preprocess@5.0.3(@babel/core@7.22.1)(postcss@8.4.23)(svelte@3.59.1)(typescript@5.0.4):
     resolution: {integrity: sha512-GrHF1rusdJVbOZOwgPWtpqmaexkydznKzy5qIC2FabgpFyKN57bjMUUUqPRfbBXK5igiEWn1uO/DXsa2vJ5VHA==}
