@@ -5,7 +5,7 @@
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
-	import { addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
+	import { addTableFilter, addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ArrowUpDown from '~icons/lucide/arrow-up-down';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
@@ -14,13 +14,21 @@
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
-		sort: addSortBy()
+		sort: addSortBy(),
+		filter: addTableFilter({
+			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
+		})
 	});
 
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'id',
-			header: 'ID'
+			header: 'ID',
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
 		}),
 		table.column({
 			accessor: 'title',
@@ -64,6 +72,7 @@
 	const { headerRows, pageRows, flatColumns, pluginStates, tableAttrs, tableBodyAttrs } =
 		table.createViewModel(columns);
 
+	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
 	$: $hiddenColumnIds = Object.entries(hideForId)
 		.filter(([, hide]) => !hide)
@@ -82,7 +91,12 @@
 	<p class="text-muted-foreground">Your latest recordings</p>
 	<div class="rounded-md border p-6">
 		<div class="flex items-center">
-			<Input class="max-w-sm" placeholder="Filter emails..." type="text" />
+			<Input
+				class="max-w-sm"
+				placeholder="Filter recordings..."
+				type="text"
+				bind:value={$filterValue}
+			/>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button variant="outline" class="ml-auto" builders={[builder]}>
