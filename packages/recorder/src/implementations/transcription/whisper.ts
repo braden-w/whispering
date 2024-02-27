@@ -11,10 +11,18 @@ class WhisperFileTooLarge extends TranscriptionError {
 }
 
 class WhisperFetchError extends TranscriptionError {
-	constructor(fetchError: unknown) {
+	constructor({ fetchError }: { fetchError: unknown }) {
 		super({
 			message: 'Failed to fetch transcription from Whisper API',
 			origError: fetchError
+		});
+	}
+}
+
+class WhisperServerError extends TranscriptionError {
+	constructor({ message, code, type }: { message: string; code?: string; type?: string }) {
+		super({
+			message: `Server error from Whisper API: ${message}`
 		});
 	}
 }
@@ -53,9 +61,18 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 							headers: { Authorization: `Bearer ${apiKey}` },
 							body: formData
 						}).then((res) => res.json()),
-					catch: (error) => new WhisperFetchError({ origError: error })
+					catch: (error) => new WhisperFetchError({ fetchError: error })
 				})
 			);
+			if (data.error.message) {
+				return yield* _(
+					new WhisperServerError({
+						message: data.error.message,
+						code: data.error.code,
+						type: data.error.type
+					})
+				);
+			}
 			if (!isString(data.text)) {
 				return yield* _(new TranscriptionIsNotStringError());
 			}
