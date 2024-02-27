@@ -21,6 +21,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { derived } from 'svelte/store';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -122,6 +123,16 @@
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
 	const { selectedDataIds } = pluginStates.select;
+	const selectedRecordings = derived(
+		[selectedDataIds, recordings],
+		([$selectedDataIds, $recordings]) => {
+			return Object.keys($selectedDataIds).map((id) => {
+				/** The id is a string, but its number form is the position of the recording in the array */
+				const position = Number(id);
+				return $recordings[position];
+			});
+		}
+	);
 
 	const DEFAULT_HIDDEN_COLUMN = [] as const;
 	const ids = flatColumns.map((c) => c.id);
@@ -152,11 +163,8 @@
 				variant="outline"
 				on:click={() => {
 					Promise.all(
-						Object.keys($selectedDataIds).map((id) => {
-							/** The id is a string, but its number form is the position of the recording in the array */
-							const position = Number(id);
-							const correspondingRecording = $recordings[position];
-							recordings.deleteRecording(correspondingRecording.id).pipe(Effect.runPromise);
+						$selectedRecordings.map((recording) => {
+							recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 						})
 					);
 				}}
