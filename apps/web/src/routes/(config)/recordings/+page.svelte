@@ -144,7 +144,7 @@
 						<Table.Row {...rowAttrs}>
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
-									<Table.Cell {...attrs}>
+									<Table.Cell {...attrs} class="text-center">
 										<Render of={cell.render()} />
 									</Table.Cell>
 								</Subscribe>
