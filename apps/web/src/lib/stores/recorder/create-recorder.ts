@@ -1,4 +1,4 @@
-import storedWritable from 'svelte-persisted-writable';
+import persistedWritable from 'svelte-persisted-writable';
 import { RecorderService } from '@repo/recorder/services/recorder';
 import type { Recording } from '@repo/recorder/services/recordings-db';
 import { toast } from '@repo/ui/components/sonner';
@@ -20,11 +20,11 @@ export const createRecorder = () =>
 		const recorderService = yield* _(RecorderService);
 		const recorderState = writable<RecorderState>(INITIAL_STATE);
 
-		const selectedAudioInputDeviceId = storedWritable(
-			'selected-audio-input-device-id',
-			z.string(),
-			''
-		);
+		const selectedAudioInputDeviceId = persistedWritable({
+			key: 'selected-audio-input-device-id',
+			schema: z.string(),
+			initialValue: ''
+		});
 
 		return {
 			recorderState,

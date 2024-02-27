@@ -1,4 +1,4 @@
-import storedWritable from 'svelte-persisted-writable';
+import persistedWritable from 'svelte-persisted-writable';
 import { z } from 'zod';
 
 const settingsSchema = z.object({
@@ -17,4 +17,8 @@ const SETTINGS_DEFAULT: Settings = {
 	apiKey: ''
 };
 
-export const settings = storedWritable('whispering-settings', settingsSchema, SETTINGS_DEFAULT);
+export const settings = persistedWritable({
+	key: 'whispering-settings',
+	schema: settingsSchema,
+	initialValue: SETTINGS_DEFAULT
+});
