@@ -7,6 +7,7 @@ import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
+import TranscriptionComplete from '$lib/toasts/TranscriptionComplete.svelte';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -72,7 +73,22 @@ export const createRecorder = () =>
 						};
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));
-						yield* _(recordings.transcribeRecording(newRecording.id));
+						yield* _(
+							Effect.promise(
+								() =>
+									new Promise((resolve) => {
+										const promise = recordings
+											.transcribeRecording(newRecording.id)
+											.pipe(Effect.runPromise);
+										toast.promise(promise, {
+											loading: 'Transcribing recording...',
+											success: () => TranscriptionComplete,
+											error: 'Failed to transcribe recording'
+										});
+										resolve(promise);
+									})
+							)
+						);
 						break;
 					}
 					case 'SAVING': {
