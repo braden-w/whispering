@@ -152,7 +152,7 @@
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings</p>
 	<div class="rounded-md border p-6">
-		<div class="flex items-center">
+		<div class="flex items-center gap-2">
 			<Input
 				class="max-w-sm"
 				placeholder="Filter recordings..."
@@ -161,6 +161,20 @@
 			/>
 			<Button
 				variant="outline"
+				size="icon"
+				on:click={() => {
+					Promise.all(
+						$selectedRecordings.map((recording) => {
+							recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+						})
+					);
+				}}
+			>
+				<TrashIcon />
+			</Button>
+			<Button
+				variant="outline"
+				size="icon"
 				on:click={() => {
 					Promise.all(
 						$selectedRecordings.map((recording) => {
