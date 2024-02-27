@@ -1,7 +1,7 @@
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
 import { toast } from '@repo/ui/components/sonner';
-import { Data, Effect } from 'effect';
+import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
 
