@@ -89,7 +89,7 @@
 				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcribedText}
 			/>
 			<Button
-				class="border-primary border px-4 py-2"
+				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				on:click={copyOutputText}
 				aria-label="Copy transcribed text"
 			>
