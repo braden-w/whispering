@@ -5,10 +5,10 @@
 	import PlayIcon from '~icons/heroicons/play';
 	import ProcessedIcon from '~icons/heroicons/check-circle';
 
-	export let state: Recording['state'];
+	export let transcriptionStatus: Recording['transcriptionStatus'];
 </script>
 
-{#if state === 'UNPROCESSED'}
+{#if transcriptionStatus === 'UNPROCESSED'}
 	<Tooltip.Root>
 		<Tooltip.Trigger>️<PlayIcon aria-hidden="true" /></Tooltip.Trigger>
 		<Tooltip.Content>
@@ -18,14 +18,14 @@
 			</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
-{:else if state === 'TRANSCRIBING'}
+{:else if transcriptionStatus === 'TRANSCRIBING'}
 	<Tooltip.Root>
 		<Tooltip.Trigger><RepeatIcon aria-hidden="true" /></Tooltip.Trigger>
 		<Tooltip.Content>
 			<p>Transcribing</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
-{:else if state === 'DONE'}
+{:else if transcriptionStatus === 'DONE'}
 	<Tooltip.Root>
 		<Tooltip.Trigger>
 			<ProcessedIcon aria-hidden="true" />

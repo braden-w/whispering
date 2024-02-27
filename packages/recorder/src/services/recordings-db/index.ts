@@ -1,7 +1,7 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
-type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
 export type Recording = {
 	id: string;
@@ -16,7 +16,7 @@ export type Recording = {
 	 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
 	 * 3. Finally is marked as 'DONE' when the transcription is complete.
 	 */
-	state: RecordingState;
+	transcriptionStatus: TranscriptionStatus;
 };
 
 export class RecordingDbError extends Data.TaggedError('RecordingDbError')<{

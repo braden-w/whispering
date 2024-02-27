@@ -24,7 +24,7 @@
 		subtitle: '',
 		blob: undefined,
 		transcribedText: '',
-		state: 'UNPROCESSED'
+		transcriptionStatus: 'UNPROCESSED'
 	} as const;
 
 	const latestRecording = derived(recordings, ($recordings) => {
@@ -82,7 +82,9 @@
 					propertyName: 'transcribedText'
 				})}"
 				readonly
-				value={$latestRecording.state === 'TRANSCRIBING' ? '...' : $latestRecording.transcribedText}
+				value={$latestRecording.transcriptionStatus === 'TRANSCRIBING'
+					? '...'
+					: $latestRecording.transcribedText}
 			/>
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"

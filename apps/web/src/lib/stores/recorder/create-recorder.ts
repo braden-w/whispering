@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { recordings } from '../recordings';
 
 /**
- * The state of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
+ * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
@@ -68,7 +68,7 @@ export const createRecorder = () =>
 							timestamp: new Date().toISOString(),
 							transcribedText: '',
 							blob: audioBlob,
-							state: 'UNPROCESSED'
+							transcriptionStatus: 'UNPROCESSED'
 						};
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));

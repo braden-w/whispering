@@ -90,7 +90,11 @@
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="transcriptionStatus" class="text-right">Transcription Status</Label>
-					<Input id="transcriptionStatus" bind:value={recording.state} class="col-span-3" />
+					<Input
+						id="transcriptionStatus"
+						bind:value={recording.transcriptionStatus}
+						class="col-span-3"
+					/>
 				</div>
 				<Dialog.Footer>
 					<Button type="submit">Save changes</Button>

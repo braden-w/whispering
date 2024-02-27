@@ -84,10 +84,10 @@
 			}
 		}),
 		table.column({
-			accessor: ({ state }) => state,
+			accessor: ({ transcriptionStatus }) => transcriptionStatus,
 			header: 'State',
-			cell: ({ value: state }) => {
-				return createRender(TranscriptionStatus, { state });
+			cell: ({ value: transcriptionStatus }) => {
+				return createRender(TranscriptionStatus, { transcriptionStatus });
 			}
 		}),
 		table.column({
