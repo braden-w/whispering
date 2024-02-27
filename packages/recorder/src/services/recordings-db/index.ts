@@ -1,6 +1,5 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
-import { Brand } from 'effect';
 
 type RecordingState = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
