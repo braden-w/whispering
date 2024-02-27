@@ -35,6 +35,14 @@ class TranscriptionIsNotStringError extends TranscriptionError {
 	}
 }
 
+class PleaseEnterApiKeyError extends TranscriptionError {
+	constructor() {
+		super({
+			message: 'First, please enter your OpenAI API key in the settings.'
+		});
+	}
+}
+
 class InvalidApiKeyError extends TranscriptionError {
 	constructor() {
 		super({
@@ -52,7 +60,10 @@ const MAX_FILE_SIZE_MB = 25 as const;
 export const whisperTranscriptionService: Context.Tag.Service<TranscriptionService> = {
 	transcribe: (audioBlob, { apiKey }: { apiKey: string }) =>
 		Effect.gen(function* (_) {
-			if (!apiKey || !apiKey.startsWith('sk-')) {
+			if (!apiKey) {
+				return yield* _(new PleaseEnterApiKeyError());
+			}
+			if (!apiKey.startsWith('sk-')) {
 				return yield* _(new InvalidApiKeyError());
 			}
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
