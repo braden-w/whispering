@@ -84,13 +84,6 @@
 			}
 		}),
 		table.column({
-			accessor: ({ transcriptionStatus }) => transcriptionStatus,
-			header: 'Transcription Status',
-			cell: ({ value: transcriptionStatus }) => {
-				return createRender(TranscriptionStatus, { transcriptionStatus });
-			}
-		}),
-		table.column({
 			accessor: (recording) => recording,
 			header: 'Actions',
 			cell: ({ value: recording }) => {

@@ -10,9 +10,11 @@
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { Effect } from 'effect';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
+	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import EditIcon from '~icons/heroicons/pencil';
 	import TrashIcon from '~icons/heroicons/trash';
-	import TranscriptionIcon from '~icons/lucide/repeat';
+	import StartTranscriptionIcon from '~icons/lucide/play';
+	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 
 	export let recording: Recording;
 </script>
@@ -26,7 +28,13 @@
 				size="icon"
 				on:click={() => recordings.transcribeRecording(recording.id).pipe(Effect.runPromise)}
 			>
-				<TranscriptionIcon />
+				{#if recording.transcriptionStatus === 'UNPROCESSED'}
+					<StartTranscriptionIcon />
+				{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
+					<LoadingTranscriptionIcon />
+				{:else}
+					<RetryTranscriptionIcon />
+				{/if}
 			</Button>
 		</Tooltip.Trigger>
 		<Tooltip.Content>
