@@ -17,7 +17,7 @@ export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
 	const { subscribe, set, update } = writable<Recording[]>([]);
-	const editRecording = (recording: Recording) =>
+	const setRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
 			yield* _(recordingsDb.editRecording(recording));
 			update((recordings) => {
@@ -35,7 +35,7 @@ export const createRecordings = Effect.gen(function* (_) {
 		}).pipe(
 			Effect.catchAll((error) => {
 				toast.error(error.message);
-				return Effect.succeed(error);
+				return Effect.succeed(undefined);
 			})
 		),
 		addRecording: (recording: Recording) =>
@@ -46,10 +46,19 @@ export const createRecordings = Effect.gen(function* (_) {
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
-					return Effect.succeed(error);
+					return Effect.succeed(undefined);
 				})
 			),
-		editRecording,
+		editRecording: (recording: Recording) =>
+			Effect.gen(function* (_) {
+				yield* _(setRecording(recording));
+				toast.success('Recording updated');
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				})
+			),
 		deleteRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.deleteRecording(id));
@@ -58,7 +67,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
-					return Effect.succeed(error);
+					return Effect.succeed(undefined);
 				})
 			),
 		transcribeRecording: (id: string) =>
@@ -71,11 +80,11 @@ export const createRecordings = Effect.gen(function* (_) {
 						})
 					);
 				}
-				yield* _(editRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
+				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
-				yield* _(editRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				toast.success('Transcription complete!');
 			}).pipe(
 				Effect.catchTags({
