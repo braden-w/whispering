@@ -11,6 +11,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import TranscriptionStatus from './TranscriptionStatus.svelte';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -58,8 +59,11 @@
 			}
 		}),
 		table.column({
-			accessor: 'state',
-			header: 'State'
+			accessor: ({ state }) => state,
+			header: 'State',
+			cell: ({ value: state }) => {
+				return createRender(TranscriptionStatus, { state });
+			}
 		}),
 		table.column({
 			accessor: (recording) => recording,
