@@ -4,6 +4,8 @@ import { toast } from '@repo/ui/components/sonner';
 import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
+import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	constructor({ message }: { message: string }) {
@@ -73,9 +75,14 @@ export const createRecordings = Effect.gen(function* (_) {
 				);
 				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
 			}).pipe(
-				Effect.catchAll((error) => {
-					toast.error(error.message);
-					return Effect.succeed(error);
+				Effect.catchTags({
+					PleaseEnterApiKeyError: () => {
+						toast.error(PleaseEnterAPIKeyToast);
+					}
+				}),
+				Effect.catchAll(() => {
+					toast.error(SomethingWentWrongToast);
+					return Effect.succeed(undefined);
 				})
 			)
 	};
