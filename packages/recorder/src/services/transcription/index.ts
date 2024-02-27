@@ -1,7 +1,7 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
-export class TranscriptionError extends Data.TaggedError('TranscribeError')<{
+export class TranscriptionError extends Data.TaggedError('TranscriptionError')<{
 	message: string;
 	origError?: unknown;
 }> {}
