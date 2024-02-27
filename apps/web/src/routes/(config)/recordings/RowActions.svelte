@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { recordings } from '$lib/stores/recordings';
+	import type { Recording } from '@repo/recorder/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { Effect } from 'effect';
+	import EditIcon from '~icons/heroicons/pencil';
 	import TrashIcon from '~icons/heroicons/trash';
 	import TranscriptionIcon from '~icons/lucide/repeat';
-	import EditIcon from '~icons/heroicons/pencil';
 
-	export let id: string;
+	export let recording: Recording;
 </script>
 
 <div class="flex items-center">
@@ -17,7 +18,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => recordings.transcribeRecording(id).pipe(Effect.runPromise)}
+				on:click={() => recordings.transcribeRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				<TranscriptionIcon />
 			</Button>
@@ -32,7 +33,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => recordings.deleteRecording(id).pipe(Effect.runPromise)}
+				on:click={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				<EditIcon />
 			</Button>
@@ -47,7 +48,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => recordings.deleteRecording(id).pipe(Effect.runPromise)}
+				on:click={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				<TrashIcon />
 			</Button>
