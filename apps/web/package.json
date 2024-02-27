@@ -32,7 +32,7 @@
 		"@repo/ui": "workspace:*",
 		"effect": "^2.4.0",
 		"nanoid": "^5.0.6",
-		"svelte-persisted-writable": "^1.0.1",
+		"svelte-persisted-writable": "git+https://github.com/braden-w/svelte-persisted-writable.git",
 		"zod": "^3.22.4"
 	}
 }
