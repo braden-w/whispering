@@ -54,14 +54,12 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<div class="grid gap-4 py-4">
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label class="text-right">Name</Label>
-					<Input id="name" value="Pedro Duarte" class="col-span-3" />
-				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label class="text-right">Username</Label>
-					<Input id="username" value="@peduarte" class="col-span-3" />
-				</div>
+				{#each Object.entries(recording) as [key, value]}
+					<div class="grid grid-cols-4 items-center gap-4">
+						<Label for={key} class="text-right">{key}</Label>
+						<Input id={key} {value} class="col-span-3" />
+					</div>
+				{/each}
 			</div>
 			<Dialog.Footer>
 				<Button type="submit">Save changes</Button>
