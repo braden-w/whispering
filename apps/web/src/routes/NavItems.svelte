@@ -4,7 +4,7 @@
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { toggleMode } from '@repo/ui/components/sonner';
 	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
-	import ListIcon from '~icons/lucide/list';
+	import ListIcon from '~icons/solar/playlist-outline';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
