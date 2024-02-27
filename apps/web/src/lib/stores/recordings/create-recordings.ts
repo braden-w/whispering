@@ -42,6 +42,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
 				update((recordings) => [...recordings, recording]);
+				toast.success('Recording added');
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
@@ -53,6 +54,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.deleteRecording(id));
 				update((recordings) => recordings.filter((recording) => recording.id !== id));
+				toast.success('Recording deleted');
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
@@ -74,6 +76,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(editRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				toast.success('Transcription complete!');
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {
