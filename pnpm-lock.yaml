@@ -279,6 +279,9 @@ importers:
       effect:
         specifier: ^2.4.0
         version: 2.4.0
+      idb:
+        specifier: ^8.0.0
+        version: 8.0.0
       typescript:
         specifier: latest
         version: 5.3.3

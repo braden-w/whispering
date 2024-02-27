@@ -1,9 +1,9 @@
+import { indexedDbService } from '@repo/recorder/implementations/recordings-db/indexed-db.ts';
+import { whisperTranscriptionService } from '@repo/recorder/implementations/transcription/whisper.ts';
 import { RecordingsDbService } from '@repo/recorder/services/recordings-db';
+import { TranscriptionService } from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
 import { createRecordings } from './create-recordings';
-import { indexedDbService } from './indexed-db-service';
-import { TranscriptionService } from '@repo/recorder/services/transcription';
-import { whisperTranscriptionService } from '@repo/recorder/implementations/transcription/whisper.ts';
 
 export const recordings = createRecordings.pipe(
 	Effect.provideService(RecordingsDbService, indexedDbService),

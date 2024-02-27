@@ -1,15 +1,14 @@
-import type { RecordingsDbService } from '@repo/recorder/services/recordings-db';
+import type { Context } from 'effect';
+import { Effect } from 'effect';
+import { openDB, type DBSchema } from 'idb';
+import type { Recording, RecordingsDbService } from '../../services/recordings-db';
 import {
 	AddRecordingError,
 	DeleteRecordingError,
 	EditRecordingError,
 	GetAllRecordingsError,
-	GetRecordingError,
-	type Recording
-} from '@repo/recorder/services/recordings-db';
-import type { Context } from 'effect';
-import { Effect } from 'effect';
-import { openDB, type DBSchema } from 'idb';
+	GetRecordingError
+} from '../../services/recordings-db';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 1 as const;
