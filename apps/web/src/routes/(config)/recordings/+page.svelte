@@ -6,18 +6,17 @@
 	import * as Table from '@repo/ui/components/table';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
-		addTableFilter,
 		addHiddenColumns,
+		addSelectedRows,
 		addSortBy,
-		addSelectedRows
+		addTableFilter
 	} from 'svelte-headless-table/plugins';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import ArrowUpDown from '~icons/lucide/arrow-up-down';
+	import DataTableCheckbox from './DataTableCheckbox.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import DataTableCheckbox from './DataTableCheckbox.svelte';
-	import TranscriptionStatus from './TranscriptionStatus.svelte';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
