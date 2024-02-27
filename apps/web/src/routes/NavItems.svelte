@@ -14,6 +14,7 @@
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button
+				builders={[builder]}
 				href="/recordings"
 				variant="ghost"
 				size="icon"
