@@ -78,6 +78,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {
 						toast.error(PleaseEnterAPIKeyToast);
+						Effect.succeed(undefined);
 					}
 				}),
 				Effect.catchAll(() => {
