@@ -3,7 +3,7 @@
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { toggleMode } from '@repo/ui/components/sonner';
-	import AdjustmentsHorizontalIcon from '~icons/heroicons/adjustments-horizontal';
+	import AdjustmentsVerticalIcon from '~icons/heroicons/adjustments-vertical';
 	import ListIcon from '~icons/solar/playlist-outline';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
@@ -37,7 +37,7 @@
 				size="icon"
 				style="view-transition-name: nav-settings"
 			>
-				<AdjustmentsHorizontalIcon aria-hidden="true" />
+				<AdjustmentsVerticalIcon aria-hidden="true" />
 				<span class="sr-only">Settings</span>
 			</Button>
 		</Tooltip.Trigger>
