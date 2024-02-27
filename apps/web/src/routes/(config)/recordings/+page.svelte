@@ -75,10 +75,10 @@
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
 
-	const defaultHiddenColumns = ['id'];
+	const DEFAULT_HIDDEN_COLUMN = ['id'] as const;
 	const ids = flatColumns.map((c) => c.id);
 	let hideForId: Record<string, boolean> = Object.fromEntries(
-		ids.map((id) => [id, defaultHiddenColumns.includes(id) ? false : true])
+		ids.map((id) => [id, DEFAULT_HIDDEN_COLUMN.includes(id) ? false : true])
 	);
 	$: $hiddenColumnIds = Object.entries(hideForId)
 		.filter(([, hide]) => !hide)
