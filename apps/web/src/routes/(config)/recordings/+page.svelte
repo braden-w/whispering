@@ -153,7 +153,9 @@
 				on:click={() => {
 					Promise.all(
 						Object.keys($selectedDataIds).map((id) => {
-							const correspondingRecording = $recordings[Number(id)];
+							/** The id is a string, but its number form is the position of the recording in the array */
+							const position = Number(id);
+							const correspondingRecording = $recordings[position];
 							recordings.deleteRecording(correspondingRecording.id).pipe(Effect.runPromise);
 						})
 					);
