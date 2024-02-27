@@ -30,9 +30,7 @@
 	"dependencies": {
 		"@repo/recorder": "workspace:*",
 		"@repo/ui": "workspace:*",
-		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^2.4.0",
-		"idb": "^8.0.0",
 		"nanoid": "^5.0.6",
 		"svelte-persisted-writable": "^1.0.0",
 		"zod": "^3.22.4"

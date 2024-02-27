@@ -127,15 +127,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      audio-recorder-polyfill:
-        specifier: ^0.4.1
-        version: 0.4.1
       effect:
         specifier: ^2.4.0
         version: 2.4.0
-      idb:
-        specifier: ^8.0.0
-        version: 8.0.0
       nanoid:
         specifier: ^5.0.6
         version: 5.0.6
