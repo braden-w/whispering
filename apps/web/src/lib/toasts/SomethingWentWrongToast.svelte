@@ -1,8 +1,9 @@
+<script lang="ts">
+	import { Button } from '@repo/ui/components/button';
+</script>
+
 <span>
-	Something went wrong. Please verify that your <a
-		href="/key"
-		class="text-gray-600 underline hover:text-indigo-900"
-	>
+	Something went wrong. Please verify that your <Button href="/key" variant="link">
 		API Key in settings
-	</a> is correct.
+	</Button> is correct.
 </span>

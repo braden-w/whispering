@@ -1,8 +1,9 @@
+<script lang="ts">
+	import { Button } from '@repo/ui/components/button';
+</script>
+
 <span>
-	First, please enter your OpenAI API key in <a
-		href="/key"
-		class="text-gray-600 underline hover:text-indigo-900"
+	First, please enter your OpenAI API key in <Button href="/key" variant="link"
+		>the settings.</Button
 	>
-		the settings.
-	</a>
 </span>
