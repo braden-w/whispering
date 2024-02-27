@@ -160,12 +160,18 @@
 										{#if props.sort.disabled}
 											<Render of={cell.render()} />
 										{:else}
-											<Button variant="ghost" on:click={props.sort.toggle}>
+											<Button
+												variant="ghost"
+												on:click={(e) => {
+													props.sort.toggle(e);
+													props.sort.order = props.sort.order;
+												}}
+											>
 												<Render of={cell.render()} />
-												{#if props.sort.order === 'desc'}
-													<ArrowDown class="ml-2 h-4 w-4" />
-												{:else if props.sort.order === 'asc'}
+												{#if props.sort.order === 'asc'}
 													<ArrowUp class="ml-2 h-4 w-4" />
+												{:else if props.sort.order === 'desc'}
+													<ArrowDown class="ml-2 h-4 w-4" />
 												{:else}
 													<ArrowUpDown class="ml-2 h-4 w-4" />
 												{/if}
