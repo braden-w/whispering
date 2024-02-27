@@ -12,16 +12,19 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
+	import { derived } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
+	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
 	import ArrowDown from '~icons/lucide/arrow-down';
 	import ArrowUp from '~icons/lucide/arrow-up';
 	import ArrowUpDown from '~icons/lucide/arrow-up-down';
+	import StartTranscriptionIcon from '~icons/lucide/play';
+	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 	import DataTableCheckbox from './DataTableCheckbox.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { derived } from 'svelte/store';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -165,12 +168,21 @@
 				on:click={() => {
 					Promise.all(
 						$selectedRecordings.map((recording) => {
-							recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
 						})
 					);
 				}}
 			>
-				<TrashIcon />
+				{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'TRANSCRIBING')}
+					<LoadingTranscriptionIcon />
+				{:else}
+					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'UNPROCESSED')}
+						<StartTranscriptionIcon />
+					{/if}
+					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'DONE')}
+						<RetryTranscriptionIcon />
+					{/if}
+				{/if}
 			</Button>
 			<Button
 				variant="outline"
