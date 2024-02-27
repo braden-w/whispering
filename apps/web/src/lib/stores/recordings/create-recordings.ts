@@ -43,7 +43,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
 				update((recordings) => [...recordings, recording]);
-				toast.success('Recording added');
+				toast.success('Recording added!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
@@ -53,7 +53,7 @@ export const createRecordings = Effect.gen(function* (_) {
 		editRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(setRecording(recording));
-				toast.success('Recording updated');
+				toast.success('Recording updated!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
@@ -64,7 +64,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.deleteRecording(id));
 				update((recordings) => recordings.filter((recording) => recording.id !== id));
-				toast.success('Recording deleted');
+				toast.success('Recording deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
