@@ -77,10 +77,10 @@
 
 	const DEFAULT_HIDDEN_COLUMN = ['id'] as const;
 	const ids = flatColumns.map((c) => c.id);
-	let hideForId: Record<string, boolean> = Object.fromEntries(
+	let idToIsVisible: Record<string, boolean> = Object.fromEntries(
 		ids.map((id) => [id, DEFAULT_HIDDEN_COLUMN.includes(id) ? false : true])
 	);
-	$: $hiddenColumnIds = Object.entries(hideForId)
+	$: $hiddenColumnIds = Object.entries(idToIsVisible)
 		.filter(([, hide]) => !hide)
 		.map(([id]) => id);
 </script>
@@ -108,7 +108,7 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					{#each flatColumns as col}
-						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+						<DropdownMenu.CheckboxItem bind:checked={idToIsVisible[col.id]}>
 							{col.header}
 						</DropdownMenu.CheckboxItem>
 					{/each}
