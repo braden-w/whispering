@@ -39,7 +39,6 @@
 
 	const columns = table.createColumns([
 		table.column({
-			id: 'id',
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
@@ -103,8 +102,14 @@
 			}
 		})
 	]);
-	const { headerRows, pageRows, flatColumns, pluginStates, tableAttrs, tableBodyAttrs } =
-		table.createViewModel(columns);
+	const {
+		headerRows,
+		pageRows,
+		flatColumns: [selectColumn, ...flatColumns],
+		pluginStates,
+		tableAttrs,
+		tableBodyAttrs
+	} = table.createViewModel(columns);
 
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
@@ -142,8 +147,11 @@
 						Object.keys($selectedDataIds).map((id) => {
 							const correspondingRecordingId = $pageRows
 								.find((row) => row.id === id)
-								?.cells.find((cell) => cell.id === 'id')?.state?.
-							console.log('🚀 ~ Object.keys ~ correspondingRecordingId:', correspondingRecordingId);
+								?.cells.find((cell) => cell.id === 'id')
+								?.state?.console.log(
+									'🚀 ~ Object.keys ~ correspondingRecordingId:',
+									correspondingRecordingId
+								);
 							recordings.deleteRecording(correspondingRecordingId).pipe(Effect.runPromise);
 						})
 					);
