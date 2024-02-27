@@ -14,5 +14,5 @@
 	<slot />
 </div>
 
-<Toaster richColors expand />
+<Toaster expand />
 <ModeWatcher />
