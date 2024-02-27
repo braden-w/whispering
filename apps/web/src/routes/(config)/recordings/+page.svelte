@@ -4,6 +4,7 @@
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
+	import { Effect } from 'effect';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
 		addHiddenColumns,
@@ -12,15 +13,14 @@
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
 	import ChevronDown from '~icons/heroicons/chevron-down';
-	import ArrowUpDown from '~icons/lucide/arrow-up-down';
+	import TrashIcon from '~icons/heroicons/trash';
 	import ArrowDown from '~icons/lucide/arrow-down';
 	import ArrowUp from '~icons/lucide/arrow-up';
+	import ArrowUpDown from '~icons/lucide/arrow-up-down';
 	import DataTableCheckbox from './DataTableCheckbox.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { Effect } from 'effect';
-	import { derived, get } from 'svelte/store';
 
 	const table = createTable(recordings, {
 		hide: addHiddenColumns(),
@@ -161,7 +161,7 @@
 					);
 				}}
 			>
-				Clear
+				<TrashIcon />
 			</Button>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
