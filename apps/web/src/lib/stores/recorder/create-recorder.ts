@@ -29,7 +29,15 @@ export const createRecorder = () =>
 		return {
 			recorderState,
 			selectedAudioInputDeviceId,
-			getAudioInputDevices: () => recorderService.enumerateRecordingDevices.pipe(Effect.runPromise),
+			getAudioInputDevices: () =>
+				recorderService.enumerateRecordingDevices
+					.pipe(
+						Effect.catchAll((error) => {
+							toast.error(error.message);
+							return Effect.succeed(error);
+						})
+					)
+					.pipe(Effect.runPromise),
 			refreshDefaultAudioInput: () =>
 				Effect.gen(function* (_) {
 					const $selectedAudioInput = get(selectedAudioInputDeviceId);
@@ -38,7 +46,14 @@ export const createRecorder = () =>
 						const firstAudioInput = audioInputDevices[0].deviceId;
 						selectedAudioInputDeviceId.set(firstAudioInput);
 					}
-				}).pipe(Effect.runPromise),
+				})
+					.pipe(
+						Effect.catchAll((error) => {
+							toast.error(error.message);
+							return Effect.succeed(error);
+						})
+					)
+					.pipe(Effect.runPromise),
 			toggleRecording: () =>
 				Effect.gen(function* (_) {
 					const $recorderState = get(recorderState);
@@ -71,19 +86,9 @@ export const createRecorder = () =>
 						}
 					}
 				}).pipe(
-					Effect.catchTags({
-						RecorderError: (error) => {
-							toast.error(error.message);
-							return Effect.succeed(error.message);
-						},
-						RecordingDbError: (error) => {
-							toast.error(error.message);
-							return Effect.succeed(error.message);
-						},
-						TranscribeError: (error) => {
-							toast.error(error.message);
-							return Effect.succeed(error.message);
-						}
+					Effect.catchAll((error) => {
+						toast.error(error.message);
+						return Effect.succeed(error);
 					}),
 					Effect.runPromise
 				)
