@@ -1,5 +1,5 @@
 import type { Context } from 'effect';
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
 import { TranscriptionError, type TranscriptionService } from '../../services/transcription';
 
 class WhisperFileTooLarge extends TranscriptionError {
@@ -35,6 +35,14 @@ class TranscriptionIsNotStringError extends TranscriptionError {
 	}
 }
 
+class InvalidApiKeyError extends TranscriptionError {
+	constructor() {
+		super({
+			message: 'Invalid API key for Whisper API'
+		});
+	}
+}
+
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
 }
@@ -44,6 +52,9 @@ const MAX_FILE_SIZE_MB = 25 as const;
 export const whisperTranscriptionService: Context.Tag.Service<TranscriptionService> = {
 	transcribe: (audioBlob, { apiKey }: { apiKey: string }) =>
 		Effect.gen(function* (_) {
+			if (!apiKey || !apiKey.startsWith('sk-')) {
+				return yield* _(new InvalidApiKeyError());
+			}
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return yield* _(new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB));

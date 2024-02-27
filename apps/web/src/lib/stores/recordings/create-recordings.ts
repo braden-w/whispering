@@ -11,8 +11,6 @@ class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	}
 }
 
-class InvalidApiKeyError extends Data.TaggedError('InvalidApiKeyError') {}
-
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
@@ -70,12 +68,8 @@ export const createRecordings = Effect.gen(function* (_) {
 					);
 				}
 				yield* _(editRecording({ ...recording, state: 'TRANSCRIBING' }));
-				const apiKey = get(settings).apiKey;
-				if (!apiKey || !apiKey.startsWith('sk-')) {
-					return yield* _(new InvalidApiKeyError());
-				}
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, { apiKey })
+					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(editRecording({ ...recording, transcribedText, state: 'DONE' }));
 			}).pipe(
