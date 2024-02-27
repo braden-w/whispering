@@ -5,6 +5,7 @@ import { Effect } from 'effect';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
 import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+import TranscriptionComplete from '$lib/toasts/TranscriptionComplete.svelte';
 import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
@@ -85,7 +86,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
-				toast.success('Transcription complete!');
+				toast.success(TranscriptionComplete);
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {
