@@ -4,7 +4,7 @@
 	import { Button } from '@repo/ui/components/button';
 	import { Effect } from 'effect';
 	import TrashIcon from '~icons/heroicons/trash';
-	import TranscriptionIcon from '~icons/material-symbols/speech-to-text';
+	import TranscriptionIcon from '~icons/material-symbols/mdi-transcribe';
 
 	export let id: string;
 </script>
