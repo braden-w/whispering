@@ -98,6 +98,7 @@
 
 	const { filterValue } = pluginStates.filter;
 	const { hiddenColumnIds } = pluginStates.hide;
+	const { selectedDataIds } = pluginStates.select;
 
 	const DEFAULT_HIDDEN_COLUMN = [] as const;
 	const ids = flatColumns.map((c) => c.id);
@@ -161,12 +162,18 @@
 			<Table.Body {...$tableBodyAttrs}>
 				{#each $pageRows as row (row.id)}
 					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs}>
+						<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
-									<Table.Cell {...attrs} class="text-center">
-										<Render of={cell.render()} />
-									</Table.Cell>
+									{#if cell.id === 'id'}
+										<Table.Cell {...attrs} class="text-left">
+											<Render of={cell.render()} />
+										</Table.Cell>
+									{:else}
+										<Table.Cell {...attrs} class="text-center">
+											<Render of={cell.render()} />
+										</Table.Cell>
+									{/if}
 								</Subscribe>
 							{/each}
 						</Table.Row>
