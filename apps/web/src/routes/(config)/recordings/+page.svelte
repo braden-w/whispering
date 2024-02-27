@@ -90,7 +90,14 @@
 			},
 			plugins: {
 				filter: {
-					getFilterValue: ({ transcribedText }) => transcribedText
+					getFilterValue: ({ transcribedText }) => {
+						return transcribedText;
+					}
+				},
+				sort: {
+					getSortValue: ({ transcribedText }) => {
+						return transcribedText;
+					}
 				}
 			}
 		}),
