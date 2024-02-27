@@ -38,6 +38,7 @@
 
 	const columns = table.createColumns([
 		table.column({
+			id: 'ID',
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
@@ -48,7 +49,6 @@
 			cell: ({ row }, { pluginStates }) => {
 				const { getRowState } = pluginStates.select;
 				const { isSelected } = getRowState(row);
-
 				return createRender(DataTableCheckbox, {
 					checked: isSelected
 				});
