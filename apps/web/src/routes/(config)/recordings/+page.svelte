@@ -85,7 +85,7 @@
 		}),
 		table.column({
 			accessor: ({ transcriptionStatus }) => transcriptionStatus,
-			header: 'State',
+			header: 'Transcription Status',
 			cell: ({ value: transcriptionStatus }) => {
 				return createRender(TranscriptionStatus, { transcriptionStatus });
 			}
