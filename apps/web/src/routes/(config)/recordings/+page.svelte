@@ -76,6 +76,11 @@
 			header: 'Transcribed Text',
 			cell: ({ value: { id, transcribedText } }) => {
 				return createRender(TranscribedText, { recordingId: id, transcribedText });
+			},
+			plugins: {
+				filter: {
+					getFilterValue: ({ transcribedText }) => transcribedText
+				}
 			}
 		}),
 		table.column({
