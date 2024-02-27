@@ -45,7 +45,7 @@ export const createRecorder = () =>
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
-					return Effect.succeed(error);
+					return Effect.succeed(undefined);
 				})
 			),
 			toggleRecording: Effect.gen(function* (_) {
@@ -81,7 +81,7 @@ export const createRecorder = () =>
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
-					return Effect.succeed(error);
+					return Effect.succeed(undefined);
 				})
 			)
 		};
