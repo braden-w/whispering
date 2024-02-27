@@ -1,6 +1,11 @@
 import type { Context } from 'effect';
-import { Data, Effect } from 'effect';
-import { TranscriptionError, type TranscriptionService } from '../../services/transcription';
+import { Effect } from 'effect';
+import {
+	InvalidApiKeyError,
+	PleaseEnterApiKeyError,
+	TranscriptionError,
+	type TranscriptionService
+} from '../../services/transcription';
 
 class WhisperFileTooLarge extends TranscriptionError {
 	constructor(fileSizeMb: number, maxFileSizeMb: number) {
@@ -31,22 +36,6 @@ class TranscriptionIsNotStringError extends TranscriptionError {
 	constructor() {
 		super({
 			message: 'Transcription from Whisper API is invalid or not a string'
-		});
-	}
-}
-
-class PleaseEnterApiKeyError extends TranscriptionError {
-	constructor() {
-		super({
-			message: 'First, please enter your OpenAI API key in the settings.'
-		});
-	}
-}
-
-class InvalidApiKeyError extends TranscriptionError {
-	constructor() {
-		super({
-			message: 'Invalid API key for Whisper API'
 		});
 	}
 }
@@ -86,7 +75,7 @@ export const whisperTranscriptionService: Context.Tag.Service<TranscriptionServi
 					catch: (error) => new WhisperFetchError({ fetchError: error })
 				})
 			);
-			if (data.error.message) {
+			if (data?.error?.message) {
 				return yield* _(
 					new WhisperServerError({
 						message: data.error.message,
