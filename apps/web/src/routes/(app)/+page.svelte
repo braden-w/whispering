@@ -87,6 +87,10 @@
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				on:click={copyOutputText}
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: $latestRecording.id,
+					propertyName: 'transcribedText'
+				})}-copy-button"
 			>
 				<ClipboardIcon />
 				<span class="sr-only">Copy transcribed text</span>

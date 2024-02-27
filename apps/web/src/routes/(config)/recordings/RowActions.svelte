@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recordings } from '$lib/stores/recordings';
 	import { copyRecordingText } from '$lib/system-apis/clipboard';
 	import type { Recording } from '@repo/recorder/services/recordings-db';
@@ -51,6 +52,10 @@
 				variant="ghost"
 				size="icon"
 				on:click={() => copyRecordingText(recording)}
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: recording.id,
+					propertyName: 'transcribedText'
+				})}-copy-button"
 			>
 				<ClipboardIcon />
 			</Button>
