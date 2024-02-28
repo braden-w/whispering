@@ -2,12 +2,12 @@
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
-	import { toggleMode } from '@repo/ui/components/sonner';
+	import { toggleMode } from 'mode-watcher';
 	import AdjustmentsVerticalIcon from '~icons/heroicons/adjustments-vertical';
-	import ListIcon from '~icons/solar/playlist-outline';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
+	import ListIcon from '~icons/solar/playlist-outline';
 </script>
 
 <nav class="flex items-center">
