@@ -28,11 +28,13 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@epicenterhq/svelte-persisted-writable": "^1.0.1",
 		"@repo/recorder": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"effect": "^2.4.0",
+		"mode-watcher": "^0.2.1",
 		"nanoid": "^5.0.6",
-		"svelte-persisted-writable": "workspace:*",
+		"svelte-french-toast": "^1.0.4-beta.0",
 		"zod": "^3.22.4"
 	}
 }

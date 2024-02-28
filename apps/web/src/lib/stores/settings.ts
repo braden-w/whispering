@@ -1,4 +1,4 @@
-import persistedWritable from 'svelte-persisted-writable';
+import persistedWritable from '@epicenterhq/svelte-persisted-writable';
 import { z } from 'zod';
 
 const settingsSchema = z.object({

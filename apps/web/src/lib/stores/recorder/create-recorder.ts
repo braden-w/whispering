@@ -1,8 +1,8 @@
-import persistedWritable from 'svelte-persisted-writable';
+import persistedWritable from '@epicenterhq/svelte-persisted-writable';
 import { RecorderService } from '@repo/recorder/services/recorder';
 import type { Recording } from '@repo/recorder/services/recordings-db';
-import { toast } from '@repo/ui/components/sonner';
-import { Effect } from 'effect';
+import { toast } from 'svelte-french-toast';
+import { Effect, pipe } from 'effect';
 import { nanoid } from 'nanoid';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
@@ -74,19 +74,16 @@ export const createRecorder = () =>
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));
 						yield* _(
-							Effect.promise(
-								() =>
-									new Promise((resolve) => {
-										const promise = recordings
-											.transcribeRecording(newRecording.id)
-											.pipe(Effect.runPromise);
+							Effect.sync(() =>
+								pipe(
+									recordings.transcribeRecording(newRecording.id).pipe(Effect.runPromise),
+									(promise) =>
 										toast.promise(promise, {
 											loading: 'Transcribing recording...',
 											success: () => TranscriptionComplete,
 											error: 'Failed to transcribe recording'
-										});
-										resolve(promise);
-									})
+										})
+								)
 							)
 						);
 						break;
