@@ -1,12 +1,11 @@
+import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
+import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
-import { toast } from '@repo/ui/components/sonner';
 import { Effect } from 'effect';
+import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
-import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
-import TranscriptionComplete from '$lib/toasts/TranscriptionComplete.svelte';
-import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	constructor({ message }: { message: string }) {
@@ -35,6 +34,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			set(recordings);
 		}).pipe(
 			Effect.catchAll((error) => {
+				console.error(error);
 				toast.error(error.message);
 				return Effect.succeed(undefined);
 			})
@@ -43,9 +43,9 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
 				update((recordings) => [...recordings, recording]);
-				toast.success('Recording added!');
 			}).pipe(
 				Effect.catchAll((error) => {
+					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
 				})
@@ -56,6 +56,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				toast.success('Recording updated!');
 			}).pipe(
 				Effect.catchAll((error) => {
+					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
 				})
@@ -67,6 +68,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				toast.success('Recording deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
+					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
 				})
@@ -86,7 +88,6 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
-				toast.success(TranscriptionComplete);
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {
@@ -94,7 +95,8 @@ export const createRecordings = Effect.gen(function* (_) {
 						return Effect.succeed(undefined);
 					}
 				}),
-				Effect.catchAll(() => {
+				Effect.catchAll((error) => {
+					console.error(error);
 					toast.error(SomethingWentWrongToast);
 					return Effect.succeed(undefined);
 				})

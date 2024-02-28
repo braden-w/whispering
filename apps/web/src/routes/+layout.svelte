@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '@repo/ui/app.pcss';
-	import { ModeWatcher, Toaster } from '@repo/ui/components/sonner';
+	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from 'svelte-french-toast';
 	import { setupViewTransition } from 'sveltekit-view-transition';
 
 	setupViewTransition();
@@ -14,5 +15,5 @@
 	<slot />
 </div>
 
-<Toaster expand />
+<Toaster position="bottom-right" />
 <ModeWatcher />

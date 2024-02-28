@@ -4,7 +4,7 @@
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
 	import { Input } from '@repo/ui/components/input';
-	import { toast } from '@repo/ui/components/sonner';
+	import { toast } from 'svelte-french-toast';
 	import PaperAirplaneIcon from '~icons/heroicons/paper-airplane';
 
 	function submitApiKey() {

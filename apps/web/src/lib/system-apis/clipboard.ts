@@ -1,7 +1,7 @@
 import { clipboardService } from '@repo/recorder/implementations/clipboard/web.ts';
 import { ClipboardService } from '@repo/recorder/services/clipboard';
 import type { Recording } from '@repo/recorder/services/recordings-db';
-import { toast } from '@repo/ui/components/sonner';
+import { toast } from 'svelte-french-toast';
 import { Effect } from 'effect';
 
 export const clipboard = ClipboardService.pipe(
