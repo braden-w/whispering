@@ -10,16 +10,10 @@
 	import ListIcon from '~icons/solar/playlist-outline';
 </script>
 
-<nav class="flex items-center">
+<nav class="flex items-center" style="view-transition-name: nav">
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				href="/recordings"
-				variant="ghost"
-				size="icon"
-				style="view-transition-name: nav-recordings"
-			>
+			<Button builders={[builder]} href="/recordings" variant="ghost" size="icon">
 				<ListIcon aria-hidden="true" />
 				<span class="sr-only">Settings</span>
 			</Button>
@@ -30,13 +24,7 @@
 	</Tooltip.Root>
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				href="/settings"
-				variant="ghost"
-				size="icon"
-				style="view-transition-name: nav-settings"
-			>
+			<Button builders={[builder]} href="/settings" variant="ghost" size="icon">
 				<AdjustmentsVerticalIcon aria-hidden="true" />
 				<span class="sr-only">Settings</span>
 			</Button>
@@ -54,7 +42,6 @@
 				rel="noopener noreferrer"
 				variant="ghost"
 				size="icon"
-				style="view-transition-name: nav-github"
 			>
 				<GithubIcon class="h-4 w-4" aria-hidden="true" />
 				<span class="sr-only">View project on GitHub</span>
@@ -66,13 +53,7 @@
 	</Tooltip.Root>
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				on:click={toggleMode}
-				variant="ghost"
-				size="icon"
-				style="view-transition-name: nav-mode"
-			>
+			<Button builders={[builder]} on:click={toggleMode} variant="ghost" size="icon">
 				<SunIcon
 					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 				/>
