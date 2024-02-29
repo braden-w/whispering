@@ -15,10 +15,13 @@
 	import TrashIcon from '~icons/heroicons/trash';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
+	import Loader2 from '~icons/lucide/loader-2';
 
 	export let recording: Recording;
 
 	let isDialogOpen = false;
+	let isDeleting = false;
+	let isSaving = false;
 </script>
 
 <div class="flex items-center">
@@ -67,7 +70,9 @@
 				class="grid gap-4 py-4"
 				on:submit={async (e) => {
 					e.preventDefault();
+					isSaving = true;
 					await recordings.editRecording(recording).pipe(Effect.runPromise);
+					isSaving = false;
 					isDialogOpen = false;
 				}}
 			>
@@ -102,14 +107,24 @@
 				<Dialog.Footer>
 					<Button
 						on:click={async () => {
+							isDeleting = true;
 							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							isDeleting = false;
 							isDialogOpen = false;
 						}}
 						variant="destructive"
 					>
+						{#if isDeleting}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{/if}
 						Delete
 					</Button>
-					<Button type="submit">Save</Button>
+					<Button type="submit">
+						{#if isSaving}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{/if}
+						Save
+					</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
