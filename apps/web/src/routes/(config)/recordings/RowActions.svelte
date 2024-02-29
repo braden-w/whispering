@@ -105,6 +105,7 @@
 							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							isDialogOpen = false;
 						}}
+						variant="destructive"
 					>
 						Delete
 					</Button>
