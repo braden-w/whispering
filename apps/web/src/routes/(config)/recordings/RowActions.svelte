@@ -77,10 +77,6 @@
 				}}
 			>
 				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="id" class="text-right">ID</Label>
-					<Input id="id" bind:value={recording.id} class="col-span-3" disabled />
-				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="title" class="text-right">Title</Label>
 					<Input id="title" bind:value={recording.title} class="col-span-3" />
 				</div>
