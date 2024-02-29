@@ -96,14 +96,6 @@
 						class="col-span-3 mt-2 h-8 w-full"
 					/>
 				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="transcriptionStatus" class="text-right">Transcription Status</Label>
-					<Input
-						id="transcriptionStatus"
-						bind:value={recording.transcriptionStatus}
-						class="col-span-3"
-					/>
-				</div>
 				<Dialog.Footer>
 					<Button type="submit">Save changes</Button>
 				</Dialog.Footer>
