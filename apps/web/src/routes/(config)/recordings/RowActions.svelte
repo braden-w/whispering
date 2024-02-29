@@ -17,6 +17,8 @@
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 
 	export let recording: Recording;
+
+	let isDialogOpen = false;
 </script>
 
 <div class="flex items-center">
@@ -41,7 +43,7 @@
 			<p>Transcribe Recording</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
-	<Dialog.Root>
+	<Dialog.Root bind:open={isDialogOpen}>
 		<Dialog.Trigger>
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild let:builder>
@@ -63,9 +65,10 @@
 			</Dialog.Header>
 			<form
 				class="grid gap-4 py-4"
-				on:submit={(e) => {
+				on:submit={async (e) => {
 					e.preventDefault();
-					recordings.editRecording(recording).pipe(Effect.runPromise);
+					await recordings.editRecording(recording).pipe(Effect.runPromise);
+					isDialogOpen = false;
 				}}
 			>
 				<div class="grid grid-cols-4 items-center gap-4">
@@ -97,7 +100,15 @@
 					/>
 				</div>
 				<Dialog.Footer>
-					<Button type="submit">Save changes</Button>
+					<Button
+						on:click={async () => {
+							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							isDialogOpen = false;
+						}}
+					>
+						Delete
+					</Button>
+					<Button type="submit">Save</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
