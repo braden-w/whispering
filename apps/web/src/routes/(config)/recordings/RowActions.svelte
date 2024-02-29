@@ -109,13 +109,14 @@
 							isDialogOpen = false;
 						}}
 						variant="destructive"
+						disabled={isDeleting}
 					>
 						{#if isDeleting}
 							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 						{/if}
 						Delete
 					</Button>
-					<Button type="submit">
+					<Button type="submit" disabled={isSaving}>
 						{#if isSaving}
 							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 						{/if}
