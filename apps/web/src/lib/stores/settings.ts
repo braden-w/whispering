@@ -2,8 +2,8 @@ import persistedWritable from '@epicenterhq/svelte-persisted-writable';
 import { z } from 'zod';
 
 const settingsSchema = z.object({
-	copyToClipboard: z.boolean(),
-	pasteContentsOnSuccess: z.boolean(),
+	isCopyToClipboardEnabled: z.boolean(),
+	isPasteContentsOnSuccessEnabled: z.boolean(),
 	currentGlobalShortcut: z.string(),
 	apiKey: z.string()
 });
@@ -11,8 +11,8 @@ const settingsSchema = z.object({
 type Settings = z.infer<typeof settingsSchema>;
 
 const SETTINGS_DEFAULT: Settings = {
-	copyToClipboard: true,
-	pasteContentsOnSuccess: false,
+	isCopyToClipboardEnabled: true,
+	isPasteContentsOnSuccessEnabled: false,
 	currentGlobalShortcut: 'CommandOrControl+Shift+;',
 	apiKey: ''
 };

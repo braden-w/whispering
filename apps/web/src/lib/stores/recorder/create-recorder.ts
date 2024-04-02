@@ -83,9 +83,9 @@ export const createRecorder = () =>
 							const clipboardService = yield* _(ClipboardService);
 							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
 							const $settings = get(settings);
-							if ($settings.copyToClipboard && transcription)
+							if ($settings.isCopyToClipboardEnabled && transcription)
 								yield* _(clipboardService.setClipboardText(transcription));
-							if ($settings.pasteContentsOnSuccess && transcription)
+							if ($settings.isPasteContentsOnSuccessEnabled && transcription)
 								yield* _(clipboardService.pasteTextFromClipboard);
 						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
 						toast.promise(transcribeAndCopyPromise, {

@@ -27,7 +27,7 @@
 				<Switch
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
-					bind:checked={$settings.copyToClipboard}
+					bind:checked={$settings.isCopyToClipboardEnabled}
 				/>
 				<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
 			</div>
@@ -35,7 +35,7 @@
 				<Switch
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
-					bind:checked={$settings.pasteContentsOnSuccess}
+					bind:checked={$settings.isPasteContentsOnSuccessEnabled}
 				/>
 				<Label for="paste-from-clipboard">
 					Paste contents from clipboard after successful transcription
