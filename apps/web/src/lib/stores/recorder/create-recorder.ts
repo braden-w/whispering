@@ -37,10 +37,13 @@ export const createRecorder = () =>
 				})
 			),
 			refreshDefaultAudioInput: Effect.gen(function* (_) {
+				const recordingDevices = yield* _(recorderService.enumerateRecordingDevices);
 				const $selectedAudioInput = get(selectedAudioInputDeviceId);
-				const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
-				if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
-					const firstAudioInput = audioInputDevices[0].deviceId;
+				const isSelectedExists = recordingDevices.some(
+					({ deviceId }) => deviceId === $selectedAudioInput
+				);
+				if (!isSelectedExists) {
+					const firstAudioInput = recordingDevices[0].deviceId;
 					selectedAudioInputDeviceId.set(firstAudioInput);
 				}
 			}).pipe(
