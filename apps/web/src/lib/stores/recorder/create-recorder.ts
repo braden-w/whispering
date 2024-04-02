@@ -85,6 +85,8 @@ export const createRecorder = () =>
 							const $settings = get(settings);
 							if ($settings.copyToClipboard && transcription)
 								yield* _(clipboardService.setClipboardText(transcription));
+							if ($settings.pasteContentsOnSuccess && transcription)
+								yield* _(clipboardService.pasteTextFromClipboard);
 						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
 						toast.promise(transcribeAndCopyPromise, {
 							loading: 'Transcribing recording...',
