@@ -12,7 +12,7 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
-	import { derived } from 'svelte/store';
+	import { derived, writable } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
@@ -47,8 +47,9 @@
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
+				const isNoRows = $recordings.length === 0;
 				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
+					checked: isNoRows ? writable(false) : allPageRowsSelected
 				});
 			},
 			cell: ({ row }, { pluginStates }) => {
