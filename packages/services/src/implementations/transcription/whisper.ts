@@ -46,10 +46,72 @@ function isString(input: unknown): input is string {
 const MAX_FILE_SIZE_MB = 25 as const;
 const FILE_NAME = 'recording.wav';
 
+/** Supported languages pulled from OpenAI Website: https://platform.openai.com/docs/guides/speech-to-text/supported-languages */
+const SUPPORTED_LANGUAGES = [
+	'Afrikaans',
+	'Arabic',
+	'Armenian',
+	'Azerbaijani',
+	'Belarusian',
+	'Bosnian',
+	'Bulgarian',
+	'Catalan',
+	'Chinese',
+	'Croatian',
+	'Czech',
+	'Danish',
+	'Dutch',
+	'English',
+	'Estonian',
+	'Finnish',
+	'French',
+	'Galician',
+	'German',
+	'Greek',
+	'Hebrew',
+	'Hindi',
+	'Hungarian',
+	'Icelandic',
+	'Indonesian',
+	'Italian',
+	'Japanese',
+	'Kannada',
+	'Kazakh',
+	'Korean',
+	'Latvian',
+	'Lithuanian',
+	'Macedonian',
+	'Malay',
+	'Marathi',
+	'Maori',
+	'Nepali',
+	'Norwegian',
+	'Persian',
+	'Polish',
+	'Portuguese',
+	'Romanian',
+	'Russian',
+	'Serbian',
+	'Slovak',
+	'Slovenian',
+	'Spanish',
+	'Swahili',
+	'Swedish',
+	'Tagalog',
+	'Tamil',
+	'Thai',
+	'Turkish',
+	'Ukrainian',
+	'Urdu',
+	'Vietnamese',
+	'Welsh'
+] as const;
+
 export const TranscriptionServiceLiveWhisper = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
-		transcribe: (audioBlob, { apiKey }: { apiKey: string }) =>
+		getSupportedOutputLanguages: Effect.succeed(SUPPORTED_LANGUAGES),
+		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
 			Effect.gen(function* (_) {
 				if (!apiKey) {
 					return yield* _(new PleaseEnterApiKeyError());
