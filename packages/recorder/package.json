@@ -1,7 +1,7 @@
 {
 	"name": "@repo/recorder",
 	"exports": {
-		"./services/*": "./src/services/*/index.ts",
+		"./services/*": "./src/services/*.ts",
 		"./implementations/*": "./src/implementations/*"
 	},
 	"dependencies": {
