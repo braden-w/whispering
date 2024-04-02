@@ -26,7 +26,7 @@ class WhisperFetchError extends TranscriptionError {
 class WhisperServerError extends TranscriptionError {
 	constructor({ message, code, type }: { message: string; code?: string; type?: string }) {
 		super({
-			message: `Server error from Whisper API: ${message}`
+			message: `Server error from Whisper API: ${message}\nCode: ${code}\nType: ${type}`
 		});
 	}
 }
