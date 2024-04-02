@@ -1,9 +1,9 @@
 import { TranscriptionComplete } from '$lib/toasts';
 import persistedWritable from '@epicenterhq/svelte-persisted-writable';
-import { ClipboardServiceLive } from '@repo/recorder/implementations/clipboard/web.js';
-import { ClipboardService } from '@repo/recorder/services/clipboard';
-import { RecorderService } from '@repo/recorder/services/recorder';
-import type { Recording } from '@repo/recorder/services/recordings-db';
+import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
+import { ClipboardService } from '@repo/services/services/clipboard';
+import { RecorderService } from '@repo/services/services/recorder';
+import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-french-toast';

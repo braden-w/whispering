@@ -1,6 +1,6 @@
 import { PleaseEnterAPIKeyToast, SomethingWentWrongToast } from '$lib/toasts';
-import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
-import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
+import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
+import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
 import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';

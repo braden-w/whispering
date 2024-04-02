@@ -1,6 +1,6 @@
-import { ClipboardServiceLive } from '@repo/recorder/implementations/clipboard/web.js';
-import { ClipboardService } from '@repo/recorder/services/clipboard';
-import type { Recording } from '@repo/recorder/services/recordings-db';
+import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
+import { ClipboardService } from '@repo/services/services/clipboard';
+import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
 import { toast } from 'svelte-french-toast';
 

@@ -133,9 +133,9 @@ importers:
       '@epicenterhq/svelte-persisted-writable':
         specifier: ^1.0.5
         version: 1.0.5(postcss@8.4.35)(typescript@5.3.3)
-      '@repo/recorder':
+      '@repo/services':
         specifier: workspace:*
-        version: link:../../packages/recorder
+        version: link:../../packages/services
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -277,7 +277,7 @@ importers:
         specifier: latest
         version: 2.34.0(eslint@8.57.0)(svelte@4.2.12)
 
-  packages/recorder:
+  packages/services:
     dependencies:
       audio-recorder-polyfill:
         specifier: ^0.4.1

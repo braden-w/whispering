@@ -1,5 +1,5 @@
 {
-	"name": "@repo/recorder",
+	"name": "@repo/services",
 	"exports": {
 		"./services/*": "./src/services/*.ts",
 		"./implementations/*": "./src/implementations/*"

@@ -28,7 +28,7 @@
 	"type": "module",
 	"dependencies": {
 		"@epicenterhq/svelte-persisted-writable": "^1.0.5",
-		"@repo/recorder": "workspace:*",
+		"@repo/services": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"effect": "^2.4.0",
 		"mode-watcher": "^0.2.1",

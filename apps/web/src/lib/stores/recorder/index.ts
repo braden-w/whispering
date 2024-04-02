@@ -1,4 +1,4 @@
-import { RecorderServiceLiveWeb } from '@repo/recorder/implementations/recorder/web.ts';
+import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder/web.ts';
 import { Effect } from 'effect';
 import { createRecorder } from './create-recorder';
 
