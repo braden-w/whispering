@@ -1,5 +1,4 @@
-import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
-import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
+import { PleaseEnterAPIKeyToast, SomethingWentWrongToast } from '$lib/toasts';
 import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
 import { Effect } from 'effect';
