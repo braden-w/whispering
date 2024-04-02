@@ -79,25 +79,18 @@ export const createRecorder = () =>
 						};
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));
-						yield* _(
-							Effect.sync(() =>
-								pipe(
-									Effect.gen(function* (_) {
-										const clipboardService = yield* _(ClipboardService);
-										const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
-										const $settings = get(settings);
-										if ($settings.copyToClipboard && transcription)
-											yield* _(clipboardService.setClipboardText(transcription));
-									}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise),
-									(promise) =>
-										toast.promise(promise, {
-											loading: 'Transcribing recording...',
-											success: () => TranscriptionComplete,
-											error: 'Failed to transcribe recording'
-										})
-								)
-							)
-						);
+						const transcribeAndCopyPromise = Effect.gen(function* (_) {
+							const clipboardService = yield* _(ClipboardService);
+							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
+							const $settings = get(settings);
+							if ($settings.copyToClipboard && transcription)
+								yield* _(clipboardService.setClipboardText(transcription));
+						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
+						toast.promise(transcribeAndCopyPromise, {
+							loading: 'Transcribing recording...',
+							success: () => TranscriptionComplete,
+							error: 'Failed to transcribe recording'
+						});
 						break;
 					}
 					case 'SAVING': {
