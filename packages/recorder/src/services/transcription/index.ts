@@ -6,12 +6,16 @@ export class TranscriptionError extends Data.TaggedError('TranscriptionError')<{
 	origError?: unknown;
 }> {}
 
+export class PleaseEnterApiKeyError extends Data.TaggedError('PleaseEnterApiKeyError') {}
+
+export class InvalidApiKeyError extends Data.TaggedError('InvalidApiKeyError') {}
+
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
 	{
 		readonly transcribe: (
 			blob: Blob,
 			options: { apiKey: string }
-		) => Effect.Effect<string, TranscriptionError>;
+		) => Effect.Effect<string, TranscriptionError | PleaseEnterApiKeyError | InvalidApiKeyError>;
 	}
 >() {}
