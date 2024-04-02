@@ -8,6 +8,9 @@ import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
+import { settings } from '../settings';
+import { ClipboardService } from '@repo/recorder/services/clipboard';
+import { ClipboardServiceLive } from '@repo/recorder/implementations/clipboard/web.js';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -79,7 +82,13 @@ export const createRecorder = () =>
 						yield* _(
 							Effect.sync(() =>
 								pipe(
-									recordings.transcribeRecording(newRecording.id).pipe(Effect.runPromise),
+									Effect.gen(function* (_) {
+										const clipboardService = yield* _(ClipboardService);
+										const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
+										const $settings = get(settings);
+										if ($settings.copyToClipboard && transcription)
+											yield* _(clipboardService.setClipboardText(transcription));
+									}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise),
 									(promise) =>
 										toast.promise(promise, {
 											loading: 'Transcribing recording...',
