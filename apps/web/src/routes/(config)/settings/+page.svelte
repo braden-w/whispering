@@ -9,7 +9,7 @@
 	import { Switch } from '@repo/ui/components/switch';
 	import { Effect } from 'effect';
 
-	const mediaDevicesPromise = recorder.getAudioInputDevices.pipe(Effect.runPromise);
+	const getMediaDevicesPromise = recorder.getAudioInputDevices.pipe(Effect.runPromise);
 </script>
 
 <svelte:head>
@@ -44,7 +44,7 @@
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="recording-device">Recording Device</Label>
-				{#await mediaDevicesPromise}
+				{#await getMediaDevicesPromise}
 					<Select.Root disabled>
 						<Select.Trigger class="w-full">
 							<Select.Value placeholder="Loading devices..." />
