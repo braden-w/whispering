@@ -60,12 +60,8 @@
 				});
 			},
 			plugins: {
-				filter: {
-					exclude: true
-				},
-				sort: {
-					disable: true
-				}
+				filter: { exclude: true },
+				sort: { disable: true }
 			}
 		}),
 		table.column({
