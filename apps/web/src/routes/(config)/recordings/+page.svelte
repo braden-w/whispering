@@ -12,7 +12,7 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
-	import { derived } from 'svelte/store';
+	import { derived, writable } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
@@ -47,8 +47,9 @@
 			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
+				const isNoRows = $recordings.length === 0;
 				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
+					checked: isNoRows ? writable(false) : allPageRowsSelected
 				});
 			},
 			cell: ({ row }, { pluginStates }) => {
@@ -59,12 +60,8 @@
 				});
 			},
 			plugins: {
-				filter: {
-					exclude: true
-				},
-				sort: {
-					disable: true
-				}
+				filter: { exclude: true },
+				sort: { disable: true }
 			}
 		}),
 		table.column({
@@ -130,7 +127,7 @@
 		[selectedDataIds, recordings],
 		([$selectedDataIds, $recordings]) => {
 			return Object.keys($selectedDataIds).map((id) => {
-				/** The id is a string, but its number form is the position of the recording in the array */
+				/** The id is a string, but Number(id) is the position of the recording in the array */
 				const position = Number(id);
 				return $recordings[position];
 			});
@@ -174,15 +171,12 @@
 						);
 					}}
 				>
-					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'TRANSCRIBING')}
+					{#if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
 						<LoadingTranscriptionIcon />
+					{:else if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'DONE')}
+						<RetryTranscriptionIcon />
 					{:else}
-						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'UNPROCESSED')}
-							<StartTranscriptionIcon />
-						{/if}
-						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'DONE')}
-							<RetryTranscriptionIcon />
-						{/if}
+						<StartTranscriptionIcon />
 					{/if}
 				</Button>
 				<Button

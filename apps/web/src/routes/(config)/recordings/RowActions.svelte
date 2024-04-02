@@ -2,7 +2,7 @@
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recordings } from '$lib/stores/recordings';
 	import { copyRecordingText } from '$lib/system-apis/clipboard';
-	import type { Recording } from '@repo/recorder/services/recordings-db';
+	import type { Recording } from '@repo/services/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';

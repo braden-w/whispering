@@ -1,7 +1,6 @@
-import PleaseEnterAPIKeyToast from '$lib/toasts/PleaseEnterAPIKeyToast.svelte';
-import SomethingWentWrongToast from '$lib/toasts/SomethingWentWrongToast.svelte';
-import { RecordingsDbService, type Recording } from '@repo/recorder/services/recordings-db';
-import { TranscriptionError, TranscriptionService } from '@repo/recorder/services/transcription';
+import { PleaseEnterAPIKeyToast, SomethingWentWrongToast } from '$lib/toasts';
+import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
+import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
 import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
@@ -88,6 +87,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				return transcribedText;
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {

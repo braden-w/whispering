@@ -1,20 +1,23 @@
+import { TranscriptionComplete } from '$lib/toasts';
 import persistedWritable from '@epicenterhq/svelte-persisted-writable';
-import { RecorderService } from '@repo/recorder/services/recorder';
-import type { Recording } from '@repo/recorder/services/recordings-db';
-import { toast } from 'svelte-french-toast';
-import { Effect, pipe } from 'effect';
+import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
+import { ClipboardService } from '@repo/services/services/clipboard';
+import { RecorderService } from '@repo/services/services/recorder';
+import type { Recording } from '@repo/services/services/recordings-db';
+import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
+import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
-import TranscriptionComplete from '$lib/toasts/TranscriptionComplete.svelte';
+import { settings } from '../settings';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
-const INITIAL_STATE = 'IDLE';
+const INITIAL_STATE = 'IDLE' satisfies RecorderState;
 
 export const createRecorder = () =>
 	Effect.gen(function* (_) {
@@ -37,10 +40,13 @@ export const createRecorder = () =>
 				})
 			),
 			refreshDefaultAudioInput: Effect.gen(function* (_) {
+				const recordingDevices = yield* _(recorderService.enumerateRecordingDevices);
 				const $selectedAudioInput = get(selectedAudioInputDeviceId);
-				const audioInputDevices = yield* _(recorderService.enumerateRecordingDevices);
-				if (!audioInputDevices.some((device) => device.deviceId === $selectedAudioInput)) {
-					const firstAudioInput = audioInputDevices[0].deviceId;
+				const isSelectedExists = recordingDevices.some(
+					({ deviceId }) => deviceId === $selectedAudioInput
+				);
+				if (!isSelectedExists) {
+					const firstAudioInput = recordingDevices[0].deviceId;
 					selectedAudioInputDeviceId.set(firstAudioInput);
 				}
 			}).pipe(
@@ -73,19 +79,20 @@ export const createRecorder = () =>
 						};
 						recorderState.set('IDLE');
 						yield* _(recordings.addRecording(newRecording));
-						yield* _(
-							Effect.sync(() =>
-								pipe(
-									recordings.transcribeRecording(newRecording.id).pipe(Effect.runPromise),
-									(promise) =>
-										toast.promise(promise, {
-											loading: 'Transcribing recording...',
-											success: () => TranscriptionComplete,
-											error: 'Failed to transcribe recording'
-										})
-								)
-							)
-						);
+						const transcribeAndCopyPromise = Effect.gen(function* (_) {
+							const clipboardService = yield* _(ClipboardService);
+							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
+							const $settings = get(settings);
+							if ($settings.copyToClipboard && transcription)
+								yield* _(clipboardService.setClipboardText(transcription));
+							if ($settings.pasteContentsOnSuccess && transcription)
+								yield* _(clipboardService.pasteTextFromClipboard);
+						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
+						toast.promise(transcribeAndCopyPromise, {
+							loading: 'Transcribing recording...',
+							success: () => TranscriptionComplete,
+							error: 'Failed to transcribe recording'
+						});
 						break;
 					}
 					case 'SAVING': {
@@ -100,15 +107,3 @@ export const createRecorder = () =>
 			)
 		};
 	});
-
-// function onTranscribeRecording(transcription: string) {
-// 	outputText.set(transcription);
-// 	// await writeTextToClipboard(text);
-// 	// await pasteTextFromClipboard();
-// }
-
-// await toast.promise(processRecording(audioBlob), {
-// 	loading: 'Processing Whisper...',
-// 	success: 'Copied to clipboard!',
-// 	error: () => SomethingWentWrongToast
-// });
