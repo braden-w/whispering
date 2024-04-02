@@ -14,7 +14,7 @@ import { recordings } from '../recordings';
  */
 type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
 
-const INITIAL_STATE = 'IDLE';
+const INITIAL_STATE = 'IDLE' satisfies RecorderState;
 
 export const createRecorder = () =>
 	Effect.gen(function* (_) {
