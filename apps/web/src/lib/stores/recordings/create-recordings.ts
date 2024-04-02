@@ -87,6 +87,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				return transcribedText;
 			}).pipe(
 				Effect.catchTags({
 					PleaseEnterApiKeyError: () => {

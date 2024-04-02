@@ -1,16 +1,16 @@
 import { TranscriptionComplete } from '$lib/toasts';
 import persistedWritable from '@epicenterhq/svelte-persisted-writable';
+import { ClipboardServiceLive } from '@repo/recorder/implementations/clipboard/web.js';
+import { ClipboardService } from '@repo/recorder/services/clipboard';
 import { RecorderService } from '@repo/recorder/services/recorder';
 import type { Recording } from '@repo/recorder/services/recordings-db';
-import { Effect, pipe } from 'effect';
+import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-french-toast';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
 import { settings } from '../settings';
-import { ClipboardService } from '@repo/recorder/services/clipboard';
-import { ClipboardServiceLive } from '@repo/recorder/implementations/clipboard/web.js';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -107,15 +107,3 @@ export const createRecorder = () =>
 			)
 		};
 	});
-
-// function onTranscribeRecording(transcription: string) {
-// 	outputText.set(transcription);
-// 	// await writeTextToClipboard(text);
-// 	// await pasteTextFromClipboard();
-// }
-
-// await toast.promise(processRecording(audioBlob), {
-// 	loading: 'Processing Whisper...',
-// 	success: 'Copied to clipboard!',
-// 	error: () => SomethingWentWrongToast
-// });
