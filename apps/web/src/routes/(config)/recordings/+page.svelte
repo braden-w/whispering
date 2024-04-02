@@ -130,7 +130,7 @@
 		[selectedDataIds, recordings],
 		([$selectedDataIds, $recordings]) => {
 			return Object.keys($selectedDataIds).map((id) => {
-				/** The id is a string, but its number form is the position of the recording in the array */
+				/** The id is a string, but Number(id) is the position of the recording in the array */
 				const position = Number(id);
 				return $recordings[position];
 			});
@@ -174,15 +174,12 @@
 						);
 					}}
 				>
-					{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'TRANSCRIBING')}
+					{#if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
 						<LoadingTranscriptionIcon />
+					{:else if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'DONE')}
+						<RetryTranscriptionIcon />
 					{:else}
-						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'UNPROCESSED')}
-							<StartTranscriptionIcon />
-						{/if}
-						{#if $selectedRecordings.some((recording) => recording.transcriptionStatus === 'DONE')}
-							<RetryTranscriptionIcon />
-						{/if}
+						<StartTranscriptionIcon />
 					{/if}
 				</Button>
 				<Button
