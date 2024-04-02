@@ -44,6 +44,7 @@ function isString(input: unknown): input is string {
 }
 
 const MAX_FILE_SIZE_MB = 25 as const;
+const FILE_NAME = 'recording.wav';
 
 export const TranscriptionServiceLiveWhisper = Layer.succeed(
 	TranscriptionService,
@@ -60,8 +61,7 @@ export const TranscriptionServiceLiveWhisper = Layer.succeed(
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 					return yield* _(new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB));
 				}
-				const fileName = 'recording.wav';
-				const wavFile = new File([audioBlob], fileName);
+				const wavFile = new File([audioBlob], FILE_NAME);
 				const formData = new FormData();
 				formData.append('file', wavFile);
 				formData.append('model', 'whisper-1');
