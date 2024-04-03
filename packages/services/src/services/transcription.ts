@@ -13,7 +13,7 @@ export class InvalidApiKeyError extends Data.TaggedError('InvalidApiKeyError') {
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
 	{
-		readonly getSupportedOutputLanguages: Effect.Effect<readonly string[]>;
+		readonly getSupportedLanguages: Effect.Effect<readonly string[]>;
 		readonly transcribe: (
 			blob: Blob,
 			options: { apiKey: string; outputLanguage: string }
