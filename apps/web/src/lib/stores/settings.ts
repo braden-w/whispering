@@ -6,7 +6,7 @@ const settingsSchema = z.object({
 	isPasteContentsOnSuccessEnabled: z.boolean(),
 	currentGlobalShortcut: z.string(),
 	apiKey: z.string(),
-	outputLanguage: z.union([z.string(), z.null()])
+	outputLanguage: z.string()
 });
 
 type Settings = z.infer<typeof settingsSchema>;
