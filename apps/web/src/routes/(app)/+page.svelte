@@ -2,7 +2,6 @@
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recorder, recorderState } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
-	import { copyRecordingText } from '$lib/system-apis/clipboard';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
@@ -35,9 +34,8 @@
 		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : undefined;
 	});
 
-	const copyOutputText = () => {
-		copyRecordingText($latestRecording);
-	};
+	const copyRecordingTextFromLatestRecording = () =>
+		recordings.copyRecordingText($latestRecording).pipe(Effect.runPromise);
 </script>
 
 <svelte:head>
@@ -88,7 +86,7 @@
 			/>
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				on:click={copyOutputText}
+				on:click={copyRecordingTextFromLatestRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: $latestRecording.id,
 					propertyName: 'transcribedText'
