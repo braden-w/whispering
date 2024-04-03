@@ -93,8 +93,6 @@
 				{/await}
 			</div>
 			<div class="grid gap-2">
-				items={JSON.stringify(supportedLanguagesOptions)}
-				selected={selectedLanguageOption}
 				<Label class="text-sm" for="output-language">Output Language</Label>
 				<Select.Root
 					items={supportedLanguagesOptions}
