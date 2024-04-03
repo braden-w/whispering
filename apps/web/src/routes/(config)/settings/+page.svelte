@@ -113,7 +113,7 @@
 					<Select.Trigger class="w-full">
 						<Select.Value placeholder="Select a device" />
 					</Select.Trigger>
-					<Select.Content>
+					<Select.Content class="max-h-96 overflow-auto">
 						{#each supportedLanguagesOptions as supportedLanguagesOption}
 							<Select.Item
 								value={supportedLanguagesOption.value}
