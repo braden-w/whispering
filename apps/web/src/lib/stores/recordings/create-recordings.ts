@@ -1,4 +1,3 @@
-import { PleaseEnterAPIKeyToast, SomethingWentWrongToast } from '$lib/toasts';
 import { ClipboardService } from '@repo/services/services/clipboard';
 import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
@@ -90,19 +89,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
-			}).pipe(
-				Effect.catchTags({
-					PleaseEnterApiKeyError: () => {
-						toast.error(PleaseEnterAPIKeyToast);
-						return Effect.succeed(undefined);
-					}
-				}),
-				Effect.catchAll((error) => {
-					console.error(error);
-					toast.error(SomethingWentWrongToast);
-					return Effect.succeed(undefined);
-				})
-			),
+			}),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				if (!recording.transcribedText) return;

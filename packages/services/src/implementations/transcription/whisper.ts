@@ -127,6 +127,7 @@ export const TranscriptionServiceLiveWhisper = Layer.succeed(
 				const formData = new FormData();
 				formData.append('file', wavFile);
 				formData.append('model', 'whisper-1');
+				formData.append('language', outputLanguage);
 				const data = yield* _(
 					Effect.tryPromise({
 						try: () =>
