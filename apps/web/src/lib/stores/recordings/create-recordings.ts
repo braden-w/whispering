@@ -1,8 +1,8 @@
-import { PleaseEnterAPIKeyToast, SomethingWentWrongToast } from '$lib/toasts';
+import { ClipboardService } from '@repo/services/services/clipboard';
 import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
-import { toast } from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
 
@@ -15,6 +15,7 @@ class TranscriptionRecordingNotFoundError extends TranscriptionError {
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
+	const clipboardService = yield* _(ClipboardService);
 	const { subscribe, set, update } = writable<Recording[]>([]);
 	const setRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
@@ -84,22 +85,16 @@ export const createRecordings = Effect.gen(function* (_) {
 				}
 				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
+					transcriptionService.transcribe(recording.blob, get(settings))
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
-			}).pipe(
-				Effect.catchTags({
-					PleaseEnterApiKeyError: () => {
-						toast.error(PleaseEnterAPIKeyToast);
-						return Effect.succeed(undefined);
-					}
-				}),
-				Effect.catchAll((error) => {
-					console.error(error);
-					toast.error(SomethingWentWrongToast);
-					return Effect.succeed(undefined);
-				})
-			)
+			}),
+		copyRecordingText: (recording: Recording) =>
+			Effect.gen(function* (_) {
+				if (!recording.transcribedText) return;
+				yield* _(clipboardService.setClipboardText(recording.transcribedText));
+				toast.success('Copied to clipboard!');
+			})
 	};
 });

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recordings } from '$lib/stores/recordings';
-	import { copyRecordingText } from '$lib/system-apis/clipboard';
 	import type { Recording } from '@repo/services/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Dialog from '@repo/ui/components/dialog';
@@ -13,15 +12,17 @@
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import EditIcon from '~icons/heroicons/pencil';
 	import TrashIcon from '~icons/heroicons/trash';
+	import Loader2 from '~icons/lucide/loader-2';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
-	import Loader2 from '~icons/lucide/loader-2';
 
 	export let recording: Recording;
 
 	let isDialogOpen = false;
 	let isDeleting = false;
 	let isSaving = false;
+
+	const copyThisRecording = () => recordings.copyRecordingText(recording).pipe(Effect.runPromise);
 </script>
 
 <div class="flex items-center">
@@ -132,7 +133,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => copyRecordingText(recording)}
+				on:click={copyThisRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: recording.id,
 					propertyName: 'transcribedText'

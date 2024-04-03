@@ -1,4 +1,8 @@
-import { TranscriptionComplete } from '$lib/toasts';
+import {
+	PleaseEnterAPIKeyToast,
+	SomethingWentWrongToast,
+	TranscriptionComplete
+} from '$lib/toasts';
 import persistedWritable from '@epicenterhq/svelte-persisted-writable';
 import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
 import { ClipboardService } from '@repo/services/services/clipboard';
@@ -6,10 +10,11 @@ import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { toast } from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
+import type { createRecordings } from '../recordings/create-recordings';
 import { settings } from '../settings';
 
 /**
@@ -91,7 +96,14 @@ export const createRecorder = () =>
 						toast.promise(transcribeAndCopyPromise, {
 							loading: 'Transcribing recording...',
 							success: () => TranscriptionComplete,
-							error: 'Failed to transcribe recording'
+							error: (
+								e: Effect.Effect.Error<
+									ReturnType<Effect.Effect.Success<typeof createRecordings>['transcribeRecording']>
+								>
+							) => {
+								if (e.name === 'PleaseEnterApiKeyError') return PleaseEnterAPIKeyToast;
+								return SomethingWentWrongToast;
+							}
 						});
 						break;
 					}

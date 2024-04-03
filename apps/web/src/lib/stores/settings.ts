@@ -5,7 +5,8 @@ const settingsSchema = z.object({
 	isCopyToClipboardEnabled: z.boolean(),
 	isPasteContentsOnSuccessEnabled: z.boolean(),
 	currentGlobalShortcut: z.string(),
-	apiKey: z.string()
+	apiKey: z.string(),
+	outputLanguage: z.string()
 });
 
 type Settings = z.infer<typeof settingsSchema>;
@@ -14,7 +15,8 @@ const SETTINGS_DEFAULT: Settings = {
 	isCopyToClipboardEnabled: true,
 	isPasteContentsOnSuccessEnabled: false,
 	currentGlobalShortcut: 'CommandOrControl+Shift+;',
-	apiKey: ''
+	apiKey: '',
+	outputLanguage: 'en'
 };
 
 export const settings = persistedWritable({

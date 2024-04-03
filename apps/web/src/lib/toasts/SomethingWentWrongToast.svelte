@@ -4,7 +4,7 @@
 
 <span>
 	Something went wrong. Please verify that your <Button
-		href="/key"
+		href="/settings"
 		variant="link"
 		class="h-fit px-0 py-0"
 	>

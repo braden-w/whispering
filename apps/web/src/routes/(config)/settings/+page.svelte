@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { recorder, selectedAudioInputDeviceId } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings';
+	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.js';
+	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
 	import { Input } from '@repo/ui/components/input';
@@ -10,6 +12,16 @@
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = recorder.getAudioInputDevices.pipe(Effect.runPromise);
+
+	const supportedLanguagesOptions = Effect.gen(function* (_) {
+		const transcriptionService = yield* _(TranscriptionService);
+		const languages = yield* _(transcriptionService.getSupportedLanguages);
+		return languages;
+	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
+
+	$: selectedLanguageOption = supportedLanguagesOptions.find(
+		(option) => option.value === $settings.outputLanguage
+	);
 </script>
 
 <svelte:head>
@@ -79,6 +91,35 @@
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
 				{/await}
+			</div>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="output-language">Output Language</Label>
+				<Select.Root
+					items={supportedLanguagesOptions}
+					selected={selectedLanguageOption}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.update((settings) => ({
+							...settings,
+							outputLanguage: selected.value
+						}));
+					}}
+				>
+					<Select.Trigger class="w-full">
+						<Select.Value placeholder="Select a device" />
+					</Select.Trigger>
+					<Select.Content class="max-h-96 overflow-auto">
+						{#each supportedLanguagesOptions as supportedLanguagesOption}
+							<Select.Item
+								value={supportedLanguagesOption.value}
+								label={supportedLanguagesOption.label}
+							>
+								{supportedLanguagesOption.label}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+					<Select.Input name="output-language" />
+				</Select.Root>
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="api-key">API Key</Label>
