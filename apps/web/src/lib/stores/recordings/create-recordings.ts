@@ -86,7 +86,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				}
 				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, { apiKey: get(settings).apiKey })
+					transcriptionService.transcribe(recording.blob, get(settings))
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
