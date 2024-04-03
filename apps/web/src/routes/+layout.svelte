@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '@repo/ui/app.pcss';
 	import { ModeWatcher } from 'mode-watcher';
-	import { Toaster } from 'svelte-french-toast';
+	import { Toaster } from '@repo/ui/components/sonner';
 	import { onNavigate } from '$app/navigation';
 
 	onNavigate((navigation) => {

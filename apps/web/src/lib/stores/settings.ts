@@ -16,7 +16,7 @@ const SETTINGS_DEFAULT: Settings = {
 	isPasteContentsOnSuccessEnabled: false,
 	currentGlobalShortcut: 'CommandOrControl+Shift+;',
 	apiKey: '',
-	outputLanguage: 'English'
+	outputLanguage: 'en'
 };
 
 export const settings = persistedWritable({

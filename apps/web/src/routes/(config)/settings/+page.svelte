@@ -17,8 +17,7 @@
 		const transcriptionService = yield* _(TranscriptionService);
 		const languages = yield* _(transcriptionService.getSupportedLanguages);
 		return languages;
-	})
-		.pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync)
+	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
 
 	$: selectedLanguageOption = supportedLanguagesOptions.find(
 		(option) => option.value === $settings.outputLanguage
@@ -94,6 +93,8 @@
 				{/await}
 			</div>
 			<div class="grid gap-2">
+				items={JSON.stringify(supportedLanguagesOptions)}
+				selected={selectedLanguageOption}
 				<Label class="text-sm" for="output-language">Output Language</Label>
 				<Select.Root
 					items={supportedLanguagesOptions}

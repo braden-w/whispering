@@ -10,7 +10,7 @@ import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { toast } from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';

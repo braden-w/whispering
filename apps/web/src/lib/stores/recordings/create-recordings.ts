@@ -2,7 +2,7 @@ import { ClipboardService } from '@repo/services/services/clipboard';
 import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
-import { toast } from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { settings } from '../settings';
 
