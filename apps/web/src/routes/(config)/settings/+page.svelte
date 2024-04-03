@@ -19,10 +19,6 @@
 		return languages;
 	})
 		.pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync)
-		.map((language) => ({
-			value: language,
-			label: language
-		}));
 
 	$: selectedLanguageOption = supportedLanguagesOptions.find(
 		(option) => option.value === $settings.outputLanguage
