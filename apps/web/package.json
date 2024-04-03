@@ -34,6 +34,7 @@
 		"mode-watcher": "^0.2.1",
 		"nanoid": "^5.0.6",
 		"svelte-french-toast": "^1.2.0",
+		"svelte-sonner": "^0.3.21",
 		"zod": "^3.22.4"
 	}
 }

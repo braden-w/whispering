@@ -151,6 +151,9 @@ importers:
       svelte-french-toast:
         specifier: ^1.2.0
         version: 1.2.0(svelte@4.2.12)
+      svelte-sonner:
+        specifier: ^0.3.21
+        version: 0.3.21(svelte@4.2.12)
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -315,6 +318,9 @@ importers:
       lucide-svelte:
         specifier: ^0.335.0
         version: 0.335.0(svelte@4.2.12)
+      mode-watcher:
+        specifier: ^0.2.1
+        version: 0.2.1(svelte@4.2.12)
       svelte:
         specifier: ^4.2.12
         version: 4.2.12
