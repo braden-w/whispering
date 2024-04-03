@@ -1,0 +1,13 @@
+{
+	"name": "@repo/services",
+	"exports": {
+		"./services/*": "./src/services/*.ts",
+		"./implementations/*": "./src/implementations/*"
+	},
+	"dependencies": {
+		"audio-recorder-polyfill": "^0.4.1",
+		"effect": "^2.4.0",
+		"idb": "^8.0.0",
+		"typescript": "latest"
+	}
+}

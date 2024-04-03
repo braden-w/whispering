@@ -10,18 +10,15 @@
 		"build": "turbo run build",
 		"dev": "turbo run dev",
 		"format": "prettier --write .",
-		"postinstall": "manypkg check",
 		"lint": "turbo run lint"
 	},
 	"packageManager": "pnpm@7.15.0",
 	"dependencies": {
-		"@manypkg/cli": "latest",
 		"eslint": "^8.40.0",
-		"eslint-config-custom": "0.0.0",
+		"eslint-config-custom": "workspace:*",
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.0",
 		"prettier-plugin-tailwindcss": "^0.2.5",
-		"tailwind-config": "0.0.0",
 		"turbo": "latest"
 	}
 }

@@ -1,0 +1,50 @@
+{
+	"name": "whispering",
+	"displayName": "Whispering",
+	"version": "3.4.1",
+	"description": "Seamlessly integrate voice-to-text transcriptions on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
+	"author": "Braden Wong",
+	"packageManager": "pnpm@7.5.0",
+	"scripts": {
+		"dev": "plasmo dev",
+		"build": "plasmo build",
+		"package": "plasmo package"
+	},
+	"dependencies": {
+		"@plasmohq/storage": "^1.9.3",
+		"@repo/ui": "workspace:*",
+		"mode-watcher": "^0.2.1",
+		"plasmo": "^0.84.2",
+		"svelte": "^3.59.2",
+		"svelte-french-toast": "^1.2.0",
+		"svelte-preprocess": "^5.1.3"
+	},
+	"devDependencies": {
+		"@iconify/json": "^2.2.187",
+		"@types/chrome": "^0.0.237",
+		"@types/node": "^20.11.22",
+		"autoprefixer": "^10.4.17",
+		"eslint-config-custom": "workspace:*",
+		"postcss": "^8.4.35",
+		"tailwindcss": "^3.4.1",
+		"typescript": "^5.3.3",
+		"unplugin-icons": "^0.18.5"
+	},
+	"manifest": {
+		"host_permissions": [
+			"https://*/*"
+		],
+		"permissions": [
+			"clipboardWrite"
+		],
+		"commands": {
+			"toggle-recording": {
+				"suggested_key": {
+					"default": "Ctrl+Shift+X",
+					"mac": "Command+Shift+X"
+				},
+				"description": "Toggle recording"
+			}
+		}
+	}
+}
