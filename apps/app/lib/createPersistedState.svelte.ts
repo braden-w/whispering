@@ -25,7 +25,7 @@ export function PersistedState<TValue extends z.ZodTypeAny>({
 	let value = $state(defaultValue);
 
 	if (!disableLocalStorage) {
-		value = loadFromStorage({ key, schema, defaultValue });
+		value = loadValueFromStorage({ key, schema, defaultValue });
 		createStorageEventListener({ key, schema, bindedValue: value, defaultValue });
 	}
 
@@ -40,7 +40,7 @@ export function PersistedState<TValue extends z.ZodTypeAny>({
 	};
 }
 
-function loadFromStorage<T extends z.ZodTypeAny>({
+function loadValueFromStorage<T extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue
@@ -48,10 +48,11 @@ function loadFromStorage<T extends z.ZodTypeAny>({
 	key: string;
 	schema: T;
 	defaultValue: z.infer<T>;
-}) {
+}): z.infer<T> {
 	try {
 		const item = localStorage.getItem(key);
-		if (item === null) return defaultValue;
+		const isStorageEmpty = item === null;
+		if (isStorageEmpty) return defaultValue;
 		return schema.parse(JSON.parse(item));
 	} catch {
 		return defaultValue;
@@ -76,8 +77,12 @@ function createStorageEventListener<T extends z.ZodTypeAny>({
 	window.addEventListener('storage', (event: StorageEvent) => {
 		if (event.key === key) {
 			try {
-				const newValue = event.newValue ? JSON.parse(event.newValue) : defaultValue;
-				const validValue = schema.parse(newValue);
+				const isStorageEmpty = event.newValue === null;
+				if (isStorageEmpty) {
+					bindedValue = null;
+					return;
+				}
+				const validValue = schema.parse(JSON.parse(event.newValue));
 				bindedValue = validValue;
 			} catch {
 				bindedValue = defaultValue;
