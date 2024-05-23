@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { recorder, selectedAudioInputDeviceId } from '$lib/stores/recorder';
-	import { settings } from '$lib/stores/settings';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.js';
 	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';
@@ -19,8 +19,8 @@
 		return languages;
 	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
 
-	$: selectedLanguageOption = supportedLanguagesOptions.find(
-		(option) => option.value === $settings.outputLanguage
+	const selectedLanguageOption = $derived(
+		supportedLanguagesOptions.find((option) => option.value === settings.value.outputLanguage)
 	);
 </script>
 
@@ -39,7 +39,7 @@
 				<Switch
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
-					bind:checked={$settings.isCopyToClipboardEnabled}
+					bind:checked={settings.value.isCopyToClipboardEnabled}
 				/>
 				<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
 			</div>
@@ -47,7 +47,7 @@
 				<Switch
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
-					bind:checked={$settings.isPasteContentsOnSuccessEnabled}
+					bind:checked={settings.value.isPasteContentsOnSuccessEnabled}
 				/>
 				<Label for="paste-from-clipboard">
 					Paste contents from clipboard after successful transcription
@@ -99,10 +99,7 @@
 					selected={selectedLanguageOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
-						settings.update((settings) => ({
-							...settings,
-							outputLanguage: selected.value
-						}));
+						settings.value.outputLanguage = selected.value;
 					}}
 				>
 					<Select.Trigger class="w-full">
@@ -126,7 +123,7 @@
 				<Input
 					id="api-key"
 					placeholder="Your OpenAI API Key"
-					bind:value={$settings.apiKey}
+					bind:value={settings.value.apiKey}
 					type="text"
 					autocomplete="off"
 				/>

@@ -15,7 +15,7 @@ import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
 import type { createRecordings } from '../recordings/create-recordings.svelte';
-import { settings } from '../settings';
+import { settings } from '../settings.svelte';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.

@@ -7,7 +7,6 @@
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { Effect } from 'effect';
-	import { derived } from 'svelte/store';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import NavItems from '../NavItems.svelte';
 
@@ -26,16 +25,16 @@
 		transcriptionStatus: 'UNPROCESSED'
 	} as const;
 
-	const latestRecording = derived(recordings, ($recordings) => {
-		return $recordings[$recordings.length - 1] ?? PLACEHOLDER_RECORDING;
-	});
+	const latestRecording = $derived(
+		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING
+	);
 
-	const latestAudioSrc = derived(latestRecording, ($latestRecording) => {
-		return $latestRecording.blob ? URL.createObjectURL($latestRecording.blob) : undefined;
-	});
+	const latestAudioSrc = $derived(
+		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined
+	);
 
 	const copyRecordingTextFromLatestRecording = () =>
-		recordings.copyRecordingText($latestRecording).pipe(Effect.runPromise);
+		recordings.copyRecordingText(latestRecording).pipe(Effect.runPromise);
 </script>
 
 <svelte:head>
@@ -76,19 +75,19 @@
 				class="w-64"
 				placeholder="Transcribed text will appear here..."
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: $latestRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'transcribedText'
 				})}"
 				readonly
-				value={$latestRecording.transcriptionStatus === 'TRANSCRIBING'
+				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
 					? '...'
-					: $latestRecording.transcribedText}
+					: latestRecording.transcribedText}
 			/>
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				on:click={copyRecordingTextFromLatestRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: $latestRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'transcribedText'
 				})}-copy-button"
 			>
@@ -96,13 +95,13 @@
 				<span class="sr-only">Copy transcribed text</span>
 			</Button>
 		</div>
-		{#if $latestAudioSrc}
+		{#if latestAudioSrc}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: $latestRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'blob'
 				})}"
-				src={$latestAudioSrc}
+				src={latestAudioSrc}
 				controls
 				class="h-8 w-full"
 			/>
