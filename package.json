@@ -14,12 +14,12 @@
 	},
 	"packageManager": "pnpm@7.15.0",
 	"dependencies": {
-		"@changesets/cli": "^2.27.1",
-		"eslint": "^8.40.0",
+		"@changesets/cli": "^2.27.3",
+		"eslint": "^8.57.0",
 		"eslint-config-custom": "workspace:*",
 		"prettier": "^2.8.8",
-		"prettier-plugin-svelte": "^2.10.0",
-		"prettier-plugin-tailwindcss": "^0.2.5",
+		"prettier-plugin-svelte": "^2.10.1",
+		"prettier-plugin-tailwindcss": "^0.2.8",
 		"turbo": "latest"
 	}
 }

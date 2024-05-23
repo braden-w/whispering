@@ -14,20 +14,20 @@
 		"./app.pcss": "./src/app.pcss"
 	},
 	"dependencies": {
-		"@internationalized/date": "^3.5.2",
-		"bits-ui": "^0.21.1",
-		"clsx": "^2.1.0",
+		"@internationalized/date": "^3.5.4",
+		"bits-ui": "^0.21.9",
+		"clsx": "^2.1.1",
 		"cmdk-sv": "^0.0.13",
 		"embla-carousel-svelte": "8.0.0-rc23",
-		"formsnap": "^0.5.0",
+		"formsnap": "^0.5.1",
 		"lucide-svelte": "^0.335.0",
-		"mode-watcher": "^0.2.1",
-		"svelte": "^4.2.12",
-		"svelte-sonner": "^0.3.21",
-		"sveltekit-superforms": "^2.12.2",
-		"tailwind-merge": "^2.2.1",
-		"tailwind-variants": "^0.2.0",
-		"vaul-svelte": "^0.2.3",
-		"zod": "^3.22.4"
+		"mode-watcher": "^0.2.2",
+		"svelte": "^4.2.17",
+		"svelte-sonner": "^0.3.24",
+		"sveltekit-superforms": "^2.13.1",
+		"tailwind-merge": "^2.3.0",
+		"tailwind-variants": "^0.2.1",
+		"vaul-svelte": "^0.2.4",
+		"zod": "^3.23.8"
 	}
 }

@@ -6,7 +6,7 @@
 	},
 	"dependencies": {
 		"audio-recorder-polyfill": "^0.4.1",
-		"effect": "^2.4.0",
+		"effect": "^2.4.19",
 		"idb": "^8.0.0",
 		"typescript": "latest"
 	}
