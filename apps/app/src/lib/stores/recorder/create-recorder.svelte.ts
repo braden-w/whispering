@@ -14,7 +14,7 @@ import { toast } from 'svelte-sonner';
 import { get, writable } from 'svelte/store';
 import { z } from 'zod';
 import { recordings } from '../recordings';
-import type { createRecordings } from '../recordings/create-recordings';
+import type { createRecordings } from '../recordings/create-recordings.svelte';
 import { settings } from '../settings';
 
 /**
