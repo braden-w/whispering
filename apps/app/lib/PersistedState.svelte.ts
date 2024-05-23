@@ -1,4 +1,3 @@
-import { type Writable } from 'svelte/store';
 import type { z } from 'zod';
 
 /**
@@ -6,7 +5,7 @@ import type { z } from 'zod';
  * automatically restores it.
  * @param key The localStorage key to use for saving the writable's contents.
  * @param schema A Zod schema describing the contents of the writable.
- * @param initialValue The initial value to use if no prior state has been saved in
+ * @param defaultValue The initial value to use if no prior state has been saved in
  * localstorage.
  * @param disableLocalStorage Skip interaction with localStorage, for example during SSR.
  * @returns A stored writable.
@@ -15,19 +14,19 @@ import type { z } from 'zod';
 export function PersistedState<TValue extends z.ZodTypeAny>({
 	key,
 	schema,
-	initialValue,
+	defaultValue,
 	disableLocalStorage = false
 }: {
 	key: string;
 	schema: TValue;
-	initialValue: z.infer<TValue>;
+	defaultValue: z.infer<TValue>;
 	disableLocalStorage?: boolean;
 }) {
-	let value = $state(initialValue);
+	let value = $state(defaultValue);
 
 	if (!disableLocalStorage) {
-		value = loadFromStorage({ key, schema, defaultValue: initialValue });
-		createStorageEventListener({ key, schema, store: value, initialValue });
+		value = loadFromStorage({ key, schema, defaultValue });
+		createStorageEventListener({ key, schema, store: value, defaultValue });
 	}
 
 	return {
@@ -41,15 +40,15 @@ export function PersistedState<TValue extends z.ZodTypeAny>({
 	};
 }
 
-function loadFromStorage<T>({
+function loadFromStorage<T extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue
 }: {
 	key: string;
-	schema: z.ZodSchema<T>;
-	defaultValue: T;
-}): T {
+	schema: T;
+	defaultValue: z.infer<T>;
+}) {
 	try {
 		const item = localStorage.getItem(key);
 		if (item === null) return defaultValue;
@@ -67,21 +66,21 @@ function createStorageEventListener<T extends z.ZodTypeAny>({
 	key,
 	schema,
 	store,
-	initialValue
+	defaultValue
 }: {
 	key: string;
 	schema: T;
 	store: z.infer<T>;
-	initialValue: z.infer<T>;
+	defaultValue: z.infer<T>;
 }) {
 	window.addEventListener('storage', (event: StorageEvent) => {
 		if (event.key === key) {
 			try {
-				const newValue = event.newValue ? JSON.parse(event.newValue) : initialValue;
+				const newValue = event.newValue ? JSON.parse(event.newValue) : defaultValue;
 				const validValue = schema.parse(newValue);
 				store.set(validValue);
 			} catch {
-				store.set(initialValue);
+				store.set(defaultValue);
 			}
 		}
 	});
