@@ -11,7 +11,7 @@ import type { z } from 'zod';
  * @returns A stored writable.
  */
 
-export function PersistedState<TValue extends z.ZodTypeAny>({
+export function createPersistedState<TValue extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue,
