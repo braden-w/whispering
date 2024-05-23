@@ -11,15 +11,15 @@ import type { z } from 'zod';
  * @returns A stored writable.
  */
 
-export function createPersistedState<TValue extends z.ZodTypeAny>({
+export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue,
 	disableLocalStorage = false
 }: {
 	key: string;
-	schema: TValue;
-	defaultValue: z.infer<TValue>;
+	schema: TSchema;
+	defaultValue: z.infer<TSchema>;
 	disableLocalStorage?: boolean;
 }) {
 	let value = $state(defaultValue);
@@ -33,7 +33,7 @@ export function createPersistedState<TValue extends z.ZodTypeAny>({
 		get value() {
 			return value;
 		},
-		set value(newValue: TValue) {
+		set value(newValue: z.infer<TSchema>) {
 			value = newValue;
 			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
 		}

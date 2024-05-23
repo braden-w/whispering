@@ -3,8 +3,7 @@ import { RecordingsDbService, type Recording } from '@repo/services/services/rec
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
-import { get } from 'svelte/store';
-import { settings } from '../settings';
+import { settings } from '../settings.svelte';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
 	constructor({ message }: { message: string }) {
@@ -24,6 +23,9 @@ export const createRecordings = Effect.gen(function* (_) {
 			recordings = recordings.map((r) => (r.id === recording.id ? recording : r));
 		});
 	return {
+		get value() {
+			return recordings;
+		},
 		sync: Effect.gen(function* (_) {
 			recordings = yield* _(recordingsDb.getAllRecordings);
 		}).pipe(
@@ -79,7 +81,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				}
 				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, get(settings))
+					transcriptionService.transcribe(recording.blob, settings.value)
 				);
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
