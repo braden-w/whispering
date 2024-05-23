@@ -19,7 +19,7 @@ export const createRecordings = Effect.gen(function* (_) {
 	const { subscribe, set, update } = writable<Recording[]>([]);
 	const setRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
-			yield* _(recordingsDb.editRecording(recording));
+			yield* _(recordingsDb.updateRecording(recording));
 			update((recordings) => {
 				const index = recordings.findIndex((r) => r.id === recording.id);
 				if (index === -1) return recordings;

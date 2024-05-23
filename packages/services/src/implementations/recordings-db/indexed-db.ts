@@ -44,7 +44,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.succeed(
 						message: `Error adding recording to indexedDB: ${error}`
 					})
 			}),
-		editRecording: (recording) =>
+		updateRecording: (recording) =>
 			Effect.tryPromise({
 				try: async () => {
 					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
