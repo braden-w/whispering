@@ -3,7 +3,7 @@ import { RecordingsDbService, type Recording } from '@repo/services/services/rec
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import { settings } from '../settings';
 
 class TranscriptionRecordingNotFoundError extends TranscriptionError {
@@ -16,22 +16,16 @@ export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
 	const clipboardService = yield* _(ClipboardService);
-	const { subscribe, set, update } = writable<Recording[]>([]);
+
+	let recordings = $state<Recording[]>([]);
 	const setRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
 			yield* _(recordingsDb.updateRecording(recording));
-			update((recordings) => {
-				const index = recordings.findIndex((r) => r.id === recording.id);
-				if (index === -1) return recordings;
-				recordings[index] = recording;
-				return recordings;
-			});
+			recordings = recordings.map((r) => (r.id === recording.id ? recording : r));
 		});
 	return {
-		subscribe,
 		sync: Effect.gen(function* (_) {
-			const recordings = yield* _(recordingsDb.getAllRecordings);
-			set(recordings);
+			recordings = yield* _(recordingsDb.getAllRecordings);
 		}).pipe(
 			Effect.catchAll((error) => {
 				console.error(error);
@@ -42,7 +36,7 @@ export const createRecordings = Effect.gen(function* (_) {
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
-				update((recordings) => [...recordings, recording]);
+				recordings.push(recording);
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);
@@ -64,7 +58,7 @@ export const createRecordings = Effect.gen(function* (_) {
 		deleteRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.deleteRecording(id));
-				update((recordings) => recordings.filter((recording) => recording.id !== id));
+				recordings = recordings.filter((recording) => recording.id !== id);
 				toast.success('Recording deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
