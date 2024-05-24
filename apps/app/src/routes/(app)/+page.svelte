@@ -58,9 +58,9 @@
 		variant="ghost"
 	>
 		<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
-			{#if $recorderState === 'RECORDING'}
+			{#if recorderState.value === 'RECORDING'}
 				🟥
-			{:else if $recorderState === 'SAVING'}
+			{:else if recorderState.value === 'SAVING'}
 				🔄
 			{:else}
 				🎙️
@@ -104,7 +104,7 @@
 				src={latestAudioSrc}
 				controls
 				class="h-8 w-full"
-			/>
+			></audio>
 		{/if}
 	</div>
 

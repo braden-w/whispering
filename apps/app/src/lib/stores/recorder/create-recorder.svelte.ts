@@ -19,14 +19,22 @@ import { settings } from '../settings.svelte';
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
-type RecorderState = 'IDLE' | 'RECORDING' | 'SAVING';
+const recorderStateSchema = z.union([
+	z.literal('IDLE'),
+	z.literal('RECORDING'),
+	z.literal('SAVING')
+]);
 
-const INITIAL_STATE = 'IDLE' satisfies RecorderState;
+const INITIAL_STATE = 'IDLE';
 
 export const createRecorder = () =>
 	Effect.gen(function* (_) {
 		const recorderService = yield* _(RecorderService);
-		let recorderState = $state<RecorderState>(INITIAL_STATE);
+		const recorderState = createPersistedState({
+			key: 'recorder-state',
+			schema: recorderStateSchema,
+			defaultValue: INITIAL_STATE
+		});
 
 		const selectedAudioInputDeviceId = createPersistedState({
 			key: 'selected-audio-input-device-id',
@@ -35,9 +43,7 @@ export const createRecorder = () =>
 		});
 
 		return {
-			get recorderState() {
-				return recorderState;
-			},
+			recorderState,
 			selectedAudioInputDeviceId,
 			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
@@ -63,11 +69,11 @@ export const createRecorder = () =>
 			),
 			toggleRecording: Effect.gen(function* (_) {
 				const $selectedAudioInput = selectedAudioInputDeviceId.value;
-				switch (recorderState) {
+				switch (recorderState.value) {
 					case 'IDLE': {
 						yield* _(recorderService.startRecording($selectedAudioInput));
 						yield* _(Effect.logInfo('Recording started'));
-						recorderState = 'RECORDING';
+						recorderState.value = 'RECORDING';
 						break;
 					}
 					case 'RECORDING': {
@@ -82,7 +88,7 @@ export const createRecorder = () =>
 							blob: audioBlob,
 							transcriptionStatus: 'UNPROCESSED'
 						};
-						recorderState = 'IDLE';
+						recorderState.value = 'IDLE';
 						yield* _(recordings.addRecording(newRecording));
 						const transcribeAndCopyPromise = Effect.gen(function* (_) {
 							const clipboardService = yield* _(ClipboardService);
