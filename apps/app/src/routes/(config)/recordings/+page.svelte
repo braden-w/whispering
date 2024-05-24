@@ -109,6 +109,7 @@
 	]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
+	let rowSelection = $state({});
 
 	function setSorting(updater: Updater<SortingState>) {
 		if (updater instanceof Function) {
@@ -128,6 +129,12 @@
 		} else columnVisibility = updater;
 	}
 
+	function setRowSelection(updater: Updater<Record<string, boolean>>) {
+		if (updater instanceof Function) {
+			rowSelection = updater(rowSelection);
+		} else rowSelection = updater;
+	}
+
 	const table = createSvelteTable({
 		get data() {
 			return recordings.value;
@@ -138,6 +145,7 @@
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setFilters,
 		onColumnVisibilityChange: setVisibility,
+		onRowSelectionChange: setRowSelection,
 		state: {
 			get sorting() {
 				return sorting;
@@ -147,6 +155,9 @@
 			},
 			get columnVisibility() {
 				return columnVisibility;
+			},
+			get rowSelection() {
+				return rowSelection;
 			}
 		},
 		// TODO:
@@ -161,6 +172,10 @@
 	<title>All Recordings</title>
 </svelte:head>
 
+<div class="text-muted-foreground flex-1 text-sm">
+	{table.getFilteredSelectedRowModel().rows.length} of
+	{table.getFilteredRowModel().rows.length} row(s) selected.
+</div>
 <div class="container flex flex-col gap-2">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
