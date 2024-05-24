@@ -20,7 +20,7 @@
 	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
 
 	const selectedLanguageOption = $derived(
-		supportedLanguagesOptions.find((option) => option.value === settings.value.outputLanguage)
+		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage)
 	);
 </script>
 
@@ -39,7 +39,7 @@
 				<Switch
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
-					bind:checked={settings.value.isCopyToClipboardEnabled}
+					bind:checked={settings.isCopyToClipboardEnabled}
 				/>
 				<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
 			</div>
@@ -47,7 +47,7 @@
 				<Switch
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
-					bind:checked={settings.value.isPasteContentsOnSuccessEnabled}
+					bind:checked={settings.isPasteContentsOnSuccessEnabled}
 				/>
 				<Label for="paste-from-clipboard">
 					Paste contents from clipboard after successful transcription
@@ -101,7 +101,7 @@
 					selected={selectedLanguageOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
-						settings.value.outputLanguage = selected.value;
+						settings.outputLanguage = selected.value;
 					}}
 				>
 					<Select.Trigger class="w-full">
@@ -125,7 +125,7 @@
 				<Input
 					id="api-key"
 					placeholder="Your OpenAI API Key"
-					bind:value={settings.value.apiKey}
+					bind:value={settings.apiKey}
 					type="text"
 					autocomplete="off"
 				/>
