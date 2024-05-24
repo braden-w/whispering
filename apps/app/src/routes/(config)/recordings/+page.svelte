@@ -5,7 +5,6 @@
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
-	import { derived, writable } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
@@ -166,6 +165,8 @@
 		// select
 		debugTable: true
 	});
+
+	let selectedRecordings = $derived(table.getFilteredSelectedRowModel().rows)
 </script>
 
 <svelte:head>
@@ -173,35 +174,36 @@
 </svelte:head>
 
 <div class="text-muted-foreground flex-1 text-sm">
-	{table.getFilteredSelectedRowModel().rows.length} of
+	{selectedRecordings.length} of
 	{table.getFilteredRowModel().rows.length} row(s) selected.
 </div>
 <div class="container flex flex-col gap-2">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<!-- <div class="flex items-center gap-2">
+		<div class="flex items-center gap-2">
 			<Input
 				class="max-w-sm"
 				placeholder="Filter recordings..."
 				type="text"
-				bind:value={$filterValue}
+				value={table.getColumn('title')?.getFilterValue() as string}
+				onchange={(e) => table.getColumn('title')?.setFilterValue(e.target?.value)}
 			/>
-			{#if $selectedRecordings.length > 0}
+			{#if selectedRecordings.length> 0}
 				<Button
 					variant="outline"
 					size="icon"
 					on:click={() => {
 						Promise.all(
-							$selectedRecordings.map((recording) => {
+							selectedRecordings.map((recording) => {
 								recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
 							})
 						);
 					}}
 				>
-					{#if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
+					{#if selectedRecordings.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
 						<LoadingTranscriptionIcon />
-					{:else if $selectedRecordings.some((recording) => recording?.transcriptionStatus === 'DONE')}
+					{:else if selectedRecordings.some((recording) => recording?.transcriptionStatus === 'DONE')}
 						<RetryTranscriptionIcon />
 					{:else}
 						<StartTranscriptionIcon />
@@ -212,7 +214,7 @@
 					size="icon"
 					on:click={() => {
 						Promise.all(
-							$selectedRecordings.map((recording) => {
+							selectedRecordings.map((recording) => {
 								recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							})
 						);
@@ -228,14 +230,14 @@
 					</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
-					{#each flatColumns as col}
-						<DropdownMenu.CheckboxItem bind:checked={idToIsVisible[col.id]}>
-							{col.header}
+					{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
+						<DropdownMenu.CheckboxItem checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+							{column.columnDef.meta?.headerText}
 						</DropdownMenu.CheckboxItem>
 					{/each}
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
-		</div> -->
+		</div>
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup}
