@@ -80,9 +80,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					);
 				}
 				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
-				const transcribedText = yield* _(
-					transcriptionService.transcribe(recording.blob, settings.value)
-				);
+				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
 				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
 			}),
