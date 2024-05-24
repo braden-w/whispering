@@ -5,13 +5,6 @@
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import { Effect } from 'effect';
-	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
-	import {
-		addHiddenColumns,
-		addSelectedRows,
-		addSortBy,
-		addTableFilter
-	} from 'svelte-headless-table/plugins';
 	import { derived, writable } from 'svelte/store';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
@@ -25,123 +18,91 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
+	import type {
+		ColumnDef,
+		SortingState,
+		TableOptions,
+		ColumnFiltersState,
+		Updater,
+		VisibilityState
+	} from '@tanstack/table-core';
+	import { getCoreRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/table-core';
+	import type { Recording } from '@repo/services/services/recordings-db';
 
-	const table = createTable(recordings, {
-		hide: addHiddenColumns(),
-		select: addSelectedRows(),
-		sort: addSortBy({
-			initialSortKeys: [
-				{
-					id: 'timestamp',
-					order: 'desc'
-				}
-			]
-		}),
-		filter: addTableFilter({
-			fn: ({ filterValue, value }) => value.toLowerCase().includes(filterValue.toLowerCase())
-		})
-	});
-
-	const columns = table.createColumns([
-		table.column({
-			accessor: 'id',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				const isNoRows = $recordings.length === 0;
-				return createRender(DataTableCheckbox, {
-					checked: isNoRows ? writable(false) : allPageRowsSelected
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-				return createRender(DataTableCheckbox, {
-					checked: isSelected
-				});
-			},
-			plugins: {
-				filter: { exclude: true },
-				sort: { disable: true }
-			}
-		}),
-		table.column({
-			accessor: 'title',
+	const columns: ColumnDef<Recording>[] = [
+		{
+			accessorKey: 'id',
+			header: 'ID'
+		},
+		{
+			accessorKey: 'title',
 			header: 'Title'
-		}),
-		table.column({
-			accessor: 'subtitle',
+		},
+		{
+			accessorKey: 'subtitle',
 			header: 'Subtitle'
-		}),
-		table.column({
-			accessor: 'timestamp',
+		},
+		{
+			accessorKey: 'timestamp',
 			header: 'Timestamp'
-		}),
-		table.column({
-			accessor: ({ id, blob }) => ({ id, blob }),
+		},
+		{
+			accessorFn: ({ id, blob }) => ({ id, blob }),
 			header: 'Blob',
-			cell: ({ value: { id, blob } }) => {
+			cell: ({ getValue }) => {
+				const { id, blob } = getValue<{ id: string; blob: Blob }>();
 				const audioUrl = URL.createObjectURL(blob);
-				return createRender(RenderAudioUrl, { recordingId: id, audioUrl });
+				return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
 			}
-		}),
-		table.column({
-			accessor: ({ id, transcribedText }) => ({ id, transcribedText }),
+		},
+		{
+			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
 			header: 'Transcribed Text',
-			cell: ({ value: { id, transcribedText } }) => {
-				return createRender(TranscribedText, { recordingId: id, transcribedText });
-			},
-			plugins: {
-				filter: {
-					getFilterValue: ({ transcribedText }) => {
-						return transcribedText;
-					}
-				},
-				sort: {
-					getSortValue: ({ transcribedText }) => {
-						return transcribedText;
-					}
-				}
+			cell: ({ getValue }) => {
+				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
+				return renderComponent(TranscribedText, { recordingId: id, transcribedText });
 			}
-		}),
-		table.column({
-			accessor: (recording) => recording,
+		},
+		{
+			accessorFn: (recording) => recording,
 			header: 'Actions',
-			cell: ({ value: recording }) => {
-				return createRender(RowActions, { recording });
+			cell: ({ getValue }) => {
+				const recording = getValue<Recording>();
+				return renderComponent(RowActions, { recording });
 			}
-		})
-	]);
-	const {
-		headerRows,
-		pageRows,
-		flatColumns: [selectColumn, ...flatColumns],
-		pluginStates,
-		tableAttrs,
-		tableBodyAttrs
-	} = table.createViewModel(columns);
-
-	const { filterValue } = pluginStates.filter;
-	const { hiddenColumnIds } = pluginStates.hide;
-	const { selectedDataIds } = pluginStates.select;
-	const selectedRecordings = derived(
-		[selectedDataIds, recordings],
-		([$selectedDataIds, $recordings]) => {
-			return Object.keys($selectedDataIds).map((id) => {
-				/** The id is a string, but Number(id) is the position of the recording in the array */
-				const position = Number(id);
-				return $recordings[position];
-			});
 		}
-	);
+	];
 
-	const DEFAULT_HIDDEN_COLUMN = [] as const;
-	const ids = flatColumns.map((c) => c.id);
-	let idToIsVisible: Record<string, boolean> = Object.fromEntries(
-		ids.map((id) => [id, DEFAULT_HIDDEN_COLUMN.includes(id) ? false : true])
-	);
-	$: $hiddenColumnIds = Object.entries(idToIsVisible)
-		.filter(([, hide]) => !hide)
-		.map(([id]) => id);
+	let sorting = $state<SortingState>([
+		{
+			id: 'timestamp',
+			desc: true
+		}
+	]);
+	let columnFilters = $state<ColumnFiltersState>([]);
+	let columnVisibility = $state<VisibilityState>({});
+
+	function setSorting(updater: Updater<SortingState>) {
+		if (updater instanceof Function) {
+			sorting = updater(sorting);
+		} else sorting = updater;
+	}
+
+	const table = createSvelteTable({
+		get data() {
+			return recordings.value;
+		},
+		columns,
+		onSortingChange: setSorting,
+		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		// TODO:
+		// filters
+		// visibility
+		// select
+		debugTable: true
+	});
 </script>
 
 <svelte:head>
@@ -152,7 +113,7 @@
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex items-center gap-2">
+		<!-- <div class="flex items-center gap-2">
 			<Input
 				class="max-w-sm"
 				placeholder="Filter recordings..."
@@ -207,61 +168,33 @@
 					{/each}
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
-		</div>
-		<Table.Root {...$tableAttrs}>
+		</div> -->
+		<Table.Root>
 			<Table.Header>
-				{#each $headerRows as headerRow}
-					<Subscribe rowAttrs={headerRow.attrs()}>
-						<Table.Row>
-							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head {...attrs} class="[&:has([role=checkbox])]:pl-3">
-										{#if props.sort.disabled && cell.id === 'id'}
-											<div class="px-1"><Render of={cell.render()} /></div>
-										{:else}
-											<Button
-												variant="ghost"
-												on:click={(e) => {
-													props.sort.toggle(e);
-													props.sort.order = props.sort.order;
-												}}
-											>
-												<Render of={cell.render()} />
-												{#if props.sort.order === 'asc'}
-													<ArrowUp class="ml-2 h-4 w-4" />
-												{:else if props.sort.order === 'desc'}
-													<ArrowDown class="ml-2 h-4 w-4" />
-												{:else}
-													<ArrowUpDown class="ml-2 h-4 w-4" />
-												{/if}
-											</Button>
-										{/if}
-									</Table.Head>
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
+				{#each table.getHeaderGroups() as headerGroup}
+					<Table.Row>
+						{#each headerGroup.headers as header}
+							<Table.Head colspan={header.colSpan}>
+								{#if !header.isPlaceholder}
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
+								{/if}
+							</Table.Head>
+						{/each}
+					</Table.Row>
 				{/each}
 			</Table.Header>
-			<Table.Body {...$tableBodyAttrs}>
-				{#each $pageRows as row (row.id)}
-					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-						<Table.Row {...rowAttrs} data-state={$selectedDataIds[row.id] && 'selected'}>
-							{#each row.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs>
-									{#if cell.id === 'id'}
-										<Table.Cell {...attrs} class="text-left">
-											<Render of={cell.render()} />
-										</Table.Cell>
-									{:else}
-										<Table.Cell {...attrs} class="text-center">
-											<Render of={cell.render()} />
-										</Table.Cell>
-									{/if}
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
+			<Table.Body>
+				{#each table.getRowModel().rows as row (row.id)}
+					<Table.Row>
+						{#each row.getVisibleCells() as cell}
+							<Table.Cell>
+								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+							</Table.Cell>
+						{/each}
+					</Table.Row>
 				{/each}
 			</Table.Body>
 		</Table.Root>
