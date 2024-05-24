@@ -31,20 +31,27 @@ export const createRecorder = () =>
 	Effect.gen(function* (_) {
 		const recorderService = yield* _(RecorderService);
 		const recorderState = createPersistedState({
-			key: 'recorder-state',
+			key: 'whispering-recorder-state',
 			schema: recorderStateSchema,
 			defaultValue: INITIAL_STATE
 		});
 
 		const selectedAudioInputDeviceId = createPersistedState({
-			key: 'selected-audio-input-device-id',
+			key: 'whispering-selected-audio-input-device-id',
 			schema: z.string(),
 			defaultValue: ''
 		});
 
 		return {
-			recorderState,
-			selectedAudioInputDeviceId,
+			get recorderState() {
+				return recorderState.value;
+			},
+			get selectedAudioInputDeviceId() {
+				return selectedAudioInputDeviceId.value;
+			},
+			set selectedAudioInputDeviceId(value: string) {
+				selectedAudioInputDeviceId.value = value;
+			},
 			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
@@ -93,9 +100,9 @@ export const createRecorder = () =>
 						const transcribeAndCopyPromise = Effect.gen(function* (_) {
 							const clipboardService = yield* _(ClipboardService);
 							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
-							if (settings.value.isCopyToClipboardEnabled && transcription)
+							if (settings.isCopyToClipboardEnabled && transcription)
 								yield* _(clipboardService.setClipboardText(transcription));
-							if (settings.value.isPasteContentsOnSuccessEnabled && transcription)
+							if (settings.isPasteContentsOnSuccessEnabled && transcription)
 								yield* _(clipboardService.pasteTextFromClipboard);
 						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
 						toast.promise(transcribeAndCopyPromise, {
