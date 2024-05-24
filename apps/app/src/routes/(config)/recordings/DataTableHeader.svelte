@@ -16,6 +16,7 @@
 		column.toggleSorting();
 	}}
 >
+	{headerText}
 	{#if column.getIsSorted() === 'asc'}
 		<ArrowUp class="ml-2 h-4 w-4" />
 	{:else if column.getIsSorted() === 'desc'}
@@ -23,5 +24,4 @@
 	{:else}
 		<ArrowUpDown class="ml-2 h-4 w-4" />
 	{/if}
-	{headerText}
 </Button>
