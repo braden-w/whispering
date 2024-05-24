@@ -94,9 +94,14 @@
 			return recordings.value;
 		},
 		columns,
-		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		onSortingChange: setSorting,
+		state: {
+			get sorting() {
+				return sorting;
+			}
+		},
 		// TODO:
 		// filters
 		// visibility
