@@ -99,6 +99,18 @@
 		} else sorting = updater;
 	}
 
+	function setFilters(updater: Updater<ColumnFiltersState>) {
+		if (updater instanceof Function) {
+			columnFilters = updater(columnFilters);
+		} else columnFilters = updater;
+	}
+
+	function setVisibility(updater: Updater<VisibilityState>) {
+		if (updater instanceof Function) {
+			columnVisibility = updater(columnVisibility);
+		} else columnVisibility = updater;
+	}
+
 	const table = createSvelteTable({
 		get data() {
 			return recordings.value;
@@ -107,9 +119,17 @@
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		onSortingChange: setSorting,
+		onColumnFiltersChange: setFilters,
+		onColumnVisibilityChange: setVisibility,
 		state: {
 			get sorting() {
 				return sorting;
+			},
+			get columnFilters() {
+				return columnFilters;
+			},
+			get columnVisibility() {
+				return columnVisibility;
 			}
 		},
 		// TODO:
