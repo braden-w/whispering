@@ -32,7 +32,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => recordings.transcribeRecording(recording.id).pipe(Effect.runPromise)}
+				onclick={() => recordings.transcribeRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				{#if recording.transcriptionStatus === 'UNPROCESSED'}
 					<StartTranscriptionIcon />
@@ -69,7 +69,7 @@
 			</Dialog.Header>
 			<form
 				class="grid gap-4 py-4"
-				on:submit={async (e) => {
+				onsubmit={async (e) => {
 					e.preventDefault();
 					isSaving = true;
 					await recordings.editRecording(recording).pipe(Effect.runPromise);
@@ -103,7 +103,7 @@
 				</div>
 				<Dialog.Footer>
 					<Button
-						on:click={async () => {
+						onclick={async () => {
 							isDeleting = true;
 							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							isDeleting = false;
@@ -133,7 +133,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={copyThisRecording}
+				onclick={copyThisRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: recording.id,
 					propertyName: 'transcribedText'
@@ -152,7 +152,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				on:click={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
+				onclick={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				<TrashIcon />
 			</Button>
