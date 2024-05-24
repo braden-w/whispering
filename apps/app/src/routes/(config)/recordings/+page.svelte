@@ -75,6 +75,9 @@
 		},
 		{
 			accessorFn: ({ id, blob }) => ({ id, blob }),
+			meta: {
+				headerText: 'Audio',
+			},
 			header: 'Audio',
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<{ id: string; blob: Blob }>();
@@ -84,6 +87,9 @@
 		},
 		{
 			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
+			meta: {
+				headerText: 'Transcribed Text',
+			},
 			header: 'Transcribed Text',
 			cell: ({ getValue }) => {
 				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
@@ -92,6 +98,9 @@
 		},
 		{
 			accessorFn: (recording) => recording,
+			meta: {
+				headerText: 'Actions',
+			},
 			header: 'Actions',
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
