@@ -74,7 +74,6 @@
 						{items}
 						{selected}
 						onSelectedChange={(selected) => {
-							console.log('🚀 ~ selected:', selected);
 							if (!selected) return;
 							recorder.selectedAudioInputDeviceId = selected.value;
 						}}
