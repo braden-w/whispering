@@ -9,12 +9,10 @@
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
-	import ArrowDown from '~icons/lucide/arrow-down';
-	import ArrowUp from '~icons/lucide/arrow-up';
-	import ArrowUpDown from '~icons/lucide/arrow-up-down';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 	import DataTableCheckbox from './DataTableCheckbox.svelte';
+	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -33,23 +31,35 @@
 	const columns: ColumnDef<Recording>[] = [
 		{
 			accessorKey: 'id',
-			header: 'ID'
+			meta: {
+				headerText: 'ID'
+			},
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
 		},
 		{
 			accessorKey: 'title',
-			header: 'Title'
+			meta: {
+				headerText: 'Title'
+			},
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
 		},
 		{
 			accessorKey: 'subtitle',
-			header: 'Subtitle'
+			meta: {
+				headerText: 'Subtitle'
+			},
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
 		},
 		{
 			accessorKey: 'timestamp',
-			header: 'Timestamp'
+			meta: {
+				headerText: 'Timestamp'
+			},
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
 		},
 		{
 			accessorFn: ({ id, blob }) => ({ id, blob }),
-			header: 'Blob',
+			header: 'Audio',
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<{ id: string; blob: Blob }>();
 				const audioUrl = URL.createObjectURL(blob);
