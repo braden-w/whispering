@@ -2,12 +2,13 @@
 	import { cn } from '../../../utils';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	type $$Props = HTMLAttributes<HTMLTableRowElement> & {
+	let {
+		children,
+		class: className,
+		...restProps
+	}: HTMLAttributes<HTMLTableRowElement> & {
 		'data-state'?: unknown;
-	};
-
-	let className: $$Props['class'] = undefined;
-	export { className as class };
+	} = $props();
 </script>
 
 <tr
@@ -15,9 +16,9 @@
 		'hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors',
 		className
 	)}
-	{...$$restProps}
-	on:click
-	on:keydown
+	{...restProps}
 >
-	<slot />
+	{#if children}
+		{@render children()}
+	{/if}
 </tr>

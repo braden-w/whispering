@@ -2,14 +2,13 @@
 	import { cn } from '../../../utils';
 	import type { HTMLTableAttributes } from 'svelte/elements';
 
-	type $$Props = HTMLTableAttributes;
-
-	let className: $$Props['class'] = undefined;
-	export { className as class };
+	let {children, class: className, ...restProps}: HTMLTableAttributes = $props()
 </script>
 
 <div class="w-full overflow-auto">
-	<table class={cn('w-full caption-bottom text-sm', className)} {...$$restProps}>
-		<slot />
+	<table class={cn('w-full caption-bottom text-sm', className)} {...restProps}>
+		{#if children}
+			{@render children()}
+		{/if}
 	</table>
 </div>
