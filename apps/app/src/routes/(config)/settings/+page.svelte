@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { recorder, selectedAudioInputDeviceId } from '$lib/stores/recorder';
+	import { recorder } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.js';
 	import { TranscriptionService } from '@repo/services/services/transcription';
@@ -67,13 +67,16 @@
 						value: device.deviceId,
 						label: device.label
 					}))}
-					{@const selected = items.find((item) => item.value === $selectedAudioInputDeviceId)}
+					{@const selected = items.find(
+						(item) => item.value === recorder.selectedAudioInputDeviceId
+					)}
 					<Select.Root
 						{items}
 						{selected}
 						onSelectedChange={(selected) => {
+							console.log('🚀 ~ selected:', selected);
 							if (!selected) return;
-							selectedAudioInputDeviceId.set(selected.value);
+							recorder.selectedAudioInputDeviceId = selected.value;
 						}}
 					>
 						<Select.Trigger class="w-full">

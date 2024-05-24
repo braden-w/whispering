@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
-	import { recorder, recorderState } from '$lib/stores/recorder';
+	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
@@ -58,9 +58,9 @@
 		variant="ghost"
 	>
 		<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
-			{#if recorderState.value === 'RECORDING'}
+			{#if recorder.recorderState === 'RECORDING'}
 				🟥
-			{:else if recorderState.value === 'SAVING'}
+			{:else if recorder.recorderState === 'SAVING'}
 				🔄
 			{:else}
 				🎙️
@@ -104,7 +104,7 @@
 				src={latestAudioSrc}
 				controls
 				class="h-8 w-full"
-			></audio>
+			/>
 		{/if}
 	</div>
 
