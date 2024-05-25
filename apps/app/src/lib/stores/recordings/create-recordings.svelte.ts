@@ -67,13 +67,14 @@ export const createRecordings = Effect.gen(function* (_) {
 			),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
-				const recording = yield* _(recordingsDb.getRecording(id));
-				if (Option.isNone(recording)) {
+				const maybeRecording = yield* _(recordingsDb.getRecording(id));
+				if (Option.isNone(maybeRecording)) {
 					return yield* _(new TranscriptionError({ message: `Recording with id ${id} not found` }));
 				}
+				const recording = yield* _(maybeRecording);
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
-				yield* _(updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				yield* _(updateRecording({ ...recording, transcriptionStatus: 'DONE' }));
 				return transcribedText;
 			}),
 		copyRecordingText: (recording: Recording) =>
