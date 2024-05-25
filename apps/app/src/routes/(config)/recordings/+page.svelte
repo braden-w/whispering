@@ -116,7 +116,7 @@
 		},
 	]);
 	let columnFilters = $state<ColumnFiltersState>([]);
-	let columnVisibility = $state<VisibilityState>({});
+	let columnVisibility = $state<VisibilityState>({ id: false });
 	let rowSelection = $state({});
 
 	function setSorting(updater: Updater<SortingState>) {
