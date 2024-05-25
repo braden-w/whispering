@@ -1,3 +1,4 @@
+import { Option } from 'effect';
 import { ClipboardService } from '@repo/services/services/clipboard';
 import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
@@ -29,6 +30,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				return Effect.succeed(undefined);
 			})
 		),
+		getRecordingById: (id: string) => {},
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
@@ -66,7 +68,7 @@ export const createRecordings = Effect.gen(function* (_) {
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
-				if (!recording) {
+				if (Option.isNone(recording)) {
 					return yield* _(new TranscriptionError({ message: `Recording with id ${id} not found` }));
 				}
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
