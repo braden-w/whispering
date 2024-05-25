@@ -21,10 +21,10 @@ interface RecordingsDbSchema extends DBSchema {
 	};
 }
 
-export const RecordingsDbServiceLiveIndexedDb = Layer.succeed(
+export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
-	RecordingsDbService.of({
-		addRecording: (recording) =>
+	Effect.gen(function* (_) {
+		const db = yield* _(
 			Effect.tryPromise({
 				try: async () => {
 					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
@@ -36,91 +36,70 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.succeed(
 							}
 						}
 					});
-					await db.add(RECORDING_STORE, recording);
+					return db;
 				},
 				catch: (error) =>
 					new AddRecordingError({
 						origError: error,
-						message: `Error adding recording to indexedDB: ${error}`
-					})
-			}),
-		updateRecording: (recording) =>
-			Effect.tryPromise({
-				try: async () => {
-					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-						upgrade(db) {
-							const isRecordingStoreObjectStoreExists =
-								db.objectStoreNames.contains(RECORDING_STORE);
-							if (!isRecordingStoreObjectStoreExists) {
-								db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-							}
-						}
-					});
-					await db.put(RECORDING_STORE, recording);
-				},
-				catch: (error) =>
-					new EditRecordingError({
-						origError: error,
-						message: `Error editing recording in indexedDB: ${error}`
-					})
-			}),
-		deleteRecording: (id) =>
-			Effect.tryPromise({
-				try: async () => {
-					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-						upgrade(db) {
-							const isRecordingStoreObjectStoreExists =
-								db.objectStoreNames.contains(RECORDING_STORE);
-							if (!isRecordingStoreObjectStoreExists) {
-								db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-							}
-						}
-					});
-					await db.delete(RECORDING_STORE, id);
-				},
-				catch: (error) =>
-					new DeleteRecordingError({
-						origError: error,
-						message: `Error deleting recording from indexedDB: ${error}`
-					})
-			}),
-		getAllRecordings: Effect.tryPromise({
-			try: async () => {
-				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-					upgrade(db) {
-						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
-						if (!isRecordingStoreObjectStoreExists) {
-							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-						}
-					}
-				});
-				return db.getAll(RECORDING_STORE);
-			},
-			catch: (error) =>
-				new GetAllRecordingsError({
-					origError: error,
-					message: `Error getting all recordings from indexedDB: ${error}`
-				})
-		}),
-		getRecording: (id) =>
-			Effect.tryPromise({
-				try: async () => {
-					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-						upgrade(db) {
-							const isRecordingStoreObjectStoreExists =
-								db.objectStoreNames.contains(RECORDING_STORE);
-							if (!isRecordingStoreObjectStoreExists) {
-								db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-							}
-						}
-					});
-					return db.get(RECORDING_STORE, id);
-				},
-				catch: (error) =>
-					new GetRecordingError({
-						origError: error,
-						message: `Error getting recording from indexedDB: ${error}`
+						message: `Error initializing indexedDb: ${error}`
 					})
 			})
+		);
+		return {
+			addRecording: (recording) =>
+				Effect.tryPromise({
+					try: async () => {
+						await db.add(RECORDING_STORE, recording);
+					},
+					catch: (error) =>
+						new AddRecordingError({
+							origError: error,
+							message: `Error adding recording to indexedDB: ${error}`
+						})
+				}),
+			updateRecording: (recording) =>
+				Effect.tryPromise({
+					try: async () => {
+						await db.put(RECORDING_STORE, recording);
+					},
+					catch: (error) =>
+						new EditRecordingError({
+							origError: error,
+							message: `Error editing recording in indexedDB: ${error}`
+						})
+				}),
+			deleteRecording: (id) =>
+				Effect.tryPromise({
+					try: async () => {
+						await db.delete(RECORDING_STORE, id);
+					},
+					catch: (error) =>
+						new DeleteRecordingError({
+							origError: error,
+							message: `Error deleting recording from indexedDB: ${error}`
+						})
+				}),
+			getAllRecordings: Effect.tryPromise({
+				try: async () => {
+					return db.getAll(RECORDING_STORE);
+				},
+				catch: (error) =>
+					new GetAllRecordingsError({
+						origError: error,
+						message: `Error getting all recordings from indexedDB: ${error}`
+					})
+			}),
+			getRecording: (id) =>
+				Effect.tryPromise({
+					try: async () => {
+						return db.get(RECORDING_STORE, id);
+					},
+					catch: (error) =>
+						new GetRecordingError({
+							origError: error,
+							message: `Error getting recording from indexedDB: ${error}`
+						})
+				})
+		};
 	})
 );
