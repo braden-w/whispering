@@ -5,12 +5,6 @@ import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from '../settings.svelte';
 
-class TranscriptionRecordingNotFoundError extends TranscriptionError {
-	constructor({ message }: { message: string }) {
-		super({ message });
-	}
-}
-
 export const createRecordings = Effect.gen(function* (_) {
 	const recordingsDb = yield* _(RecordingsDbService);
 	const transcriptionService = yield* _(TranscriptionService);
@@ -73,11 +67,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			Effect.gen(function* (_) {
 				const recording = yield* _(recordingsDb.getRecording(id));
 				if (!recording) {
-					return yield* _(
-						new TranscriptionRecordingNotFoundError({
-							message: `Recording with id ${id} not found`
-						})
-					);
+					return yield* _(new TranscriptionError({ message: `Recording with id ${id} not found` }));
 				}
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
