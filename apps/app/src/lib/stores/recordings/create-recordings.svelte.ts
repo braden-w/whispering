@@ -28,7 +28,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				console.error(error);
 				toast.error(error.message);
 				return Effect.succeed(undefined);
-			})
+			}),
 		),
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
@@ -39,7 +39,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
-				})
+				}),
 			),
 		editRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
@@ -50,7 +50,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
-				})
+				}),
 			),
 		deleteRecording: (id: string) =>
 			Effect.gen(function* (_) {
@@ -62,7 +62,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					console.error(error);
 					toast.error(error.message);
 					return Effect.succeed(undefined);
-				})
+				}),
 			),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
@@ -81,6 +81,6 @@ export const createRecordings = Effect.gen(function* (_) {
 				if (!recording.transcribedText) return;
 				yield* _(clipboardService.setClipboardText(recording.transcribedText));
 				toast.success('Copied to clipboard!');
-			})
+			}),
 	};
 });
