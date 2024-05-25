@@ -175,7 +175,7 @@
 		debugTable: true
 	});
 
-	let selectedRecordings = $derived(table.getFilteredSelectedRowModel().rows)
+	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows)
 </script>
 
 <svelte:head>
@@ -183,7 +183,7 @@
 </svelte:head>
 
 <div class="text-muted-foreground flex-1 text-sm">
-	{selectedRecordings.length} of
+	{selectedRecordingRows.length} of
 	{table.getFilteredRowModel().rows.length} row(s) selected.
 </div>
 <div class="container flex flex-col gap-2">
@@ -196,23 +196,26 @@
 				placeholder="Filter recordings..."
 				type="text"
 				value={table.getColumn('title')?.getFilterValue() as string}
-				onchange={(e) => table.getColumn('title')?.setFilterValue(e.target?.value)}
+				onchange={(e) => {
+					console.log(e.currentTarget.value); 
+					table.getColumn('title')?.setFilterValue(e.target?.value);
+					}}
 			/>
-			{#if selectedRecordings.length> 0}
+			{#if selectedRecordingRows.length> 0}
 				<Button
 					variant="outline"
 					size="icon"
 					on:click={() => {
 						Promise.all(
-							selectedRecordings.map((recording) => {
+							selectedRecordingRows.map((recording) => {
 								recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
 							})
 						);
 					}}
 				>
-					{#if selectedRecordings.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
+					{#if selectedRecordingRows.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
 						<LoadingTranscriptionIcon />
-					{:else if selectedRecordings.some((recording) => recording?.transcriptionStatus === 'DONE')}
+					{:else if selectedRecordingRows.some((recording) => recording?.transcriptionStatus === 'DONE')}
 						<RetryTranscriptionIcon />
 					{:else}
 						<StartTranscriptionIcon />
@@ -223,7 +226,7 @@
 					size="icon"
 					on:click={() => {
 						Promise.all(
-							selectedRecordings.map((recording) => {
+							selectedRecordingRows.map((recording) => {
 								recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							})
 						);
