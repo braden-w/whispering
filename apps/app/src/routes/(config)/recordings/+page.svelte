@@ -169,10 +169,6 @@
 				return rowSelection;
 			},
 		},
-		// TODO:
-		// filters
-		// visibility
-		// select
 		debugTable: true,
 	});
 
