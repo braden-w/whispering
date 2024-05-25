@@ -30,7 +30,6 @@ export const createRecordings = Effect.gen(function* (_) {
 				return Effect.succeed(undefined);
 			})
 		),
-		getRecordingById: (id: string) => {},
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(recordingsDb.addRecording(recording));
