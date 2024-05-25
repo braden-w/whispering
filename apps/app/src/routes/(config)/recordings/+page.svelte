@@ -144,6 +144,7 @@
 	}
 
 	const table = createSvelteTable({
+		getRowId: (originalRow) => originalRow.id,
 		get data() {
 			return recordings.value;
 		},
@@ -213,9 +214,9 @@
 						);
 					}}
 				>
-					{#if selectedRecordingRows.some((recording) => recording?.transcriptionStatus === 'TRANSCRIBING')}
+					{#if selectedRecordingRows.some((recordingRow) => recordingRow?.transcriptionStatus === 'TRANSCRIBING')}
 						<LoadingTranscriptionIcon />
-					{:else if selectedRecordingRows.some((recording) => recording?.transcriptionStatus === 'DONE')}
+					{:else if selectedRecordingRows.some((recordingRow) => recordingRow?.transcriptionStatus === 'DONE')}
 						<RetryTranscriptionIcon />
 					{:else}
 						<StartTranscriptionIcon />
@@ -226,8 +227,8 @@
 					size="icon"
 					on:click={() => {
 						Promise.all(
-							selectedRecordingRows.map((recording) => {
-								recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							selectedRecordingRows.map((recordingRow) => {
+								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise);
 							})
 						);
 					}}
