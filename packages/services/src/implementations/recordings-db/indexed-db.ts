@@ -8,7 +8,7 @@ import {
 	EditRecordingError,
 	GetAllRecordingsError,
 	GetRecordingError,
-	RecordingsDbService
+	RecordingsDbService,
 } from '../../services/recordings-db';
 
 const DB_NAME = 'RecordingDB' as const;
@@ -35,16 +35,16 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							if (!isRecordingStoreObjectStoreExists) {
 								db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
 							}
-						}
+						},
 					});
 					return db;
 				},
 				catch: (error) =>
 					new AddRecordingError({
 						origError: error,
-						message: `Error initializing indexedDb: ${error}`
-					})
-			})
+						message: `Error initializing indexedDb: ${error}`,
+					}),
+			}),
 		);
 		return {
 			addRecording: (recording) =>
@@ -53,8 +53,8 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new AddRecordingError({
 							origError: error,
-							message: `Error adding recording to indexedDB: ${error}`
-						})
+							message: `Error adding recording to indexedDB: ${error}`,
+						}),
 				}),
 			updateRecording: (recording) =>
 				Effect.tryPromise({
@@ -62,8 +62,8 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new EditRecordingError({
 							origError: error,
-							message: `Error editing recording in indexedDB: ${error}`
-						})
+							message: `Error editing recording in indexedDB: ${error}`,
+						}),
 				}),
 			deleteRecording: (id) =>
 				Effect.tryPromise({
@@ -71,16 +71,16 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new DeleteRecordingError({
 							origError: error,
-							message: `Error deleting recording from indexedDB: ${error}`
-						})
+							message: `Error deleting recording from indexedDB: ${error}`,
+						}),
 				}),
 			getAllRecordings: Effect.tryPromise({
 				try: () => db.getAll(RECORDING_STORE),
 				catch: (error) =>
 					new GetAllRecordingsError({
 						origError: error,
-						message: `Error getting all recordings from indexedDB: ${error}`
-					})
+						message: `Error getting all recordings from indexedDB: ${error}`,
+					}),
 			}),
 			getRecording: (id) =>
 				Effect.tryPromise({
@@ -88,9 +88,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new GetRecordingError({
 							origError: error,
-							message: `Error getting recording from indexedDB: ${error}`
-						})
-				}).pipe(Effect.map(Option.fromNullable))
+							message: `Error getting recording from indexedDB: ${error}`,
+						}),
+				}).pipe(Effect.map(Option.fromNullable)),
 		};
-	})
+	}),
 );
