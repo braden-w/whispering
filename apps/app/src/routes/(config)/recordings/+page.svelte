@@ -22,7 +22,7 @@
 		TableOptions,
 		ColumnFiltersState,
 		Updater,
-		VisibilityState
+		VisibilityState,
 	} from '@tanstack/table-core';
 	import { getCoreRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/table-core';
 	import type { Recording } from '@repo/services/services/recordings-db';
@@ -34,44 +34,44 @@
 				renderComponent(Checkbox, {
 					checked: table.getIsAllPageRowsSelected(),
 					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all'
+					'aria-label': 'Select all',
 				}),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),
 					onCheckedChange: (value) => row.toggleSelected(!!value),
-					'aria-label': 'Select row'
+					'aria-label': 'Select row',
 				}),
 			enableSorting: false,
-			enableHiding: false
+			enableHiding: false,
 		},
 		{
 			accessorKey: 'id',
 			meta: {
-				headerText: 'ID'
+				headerText: 'ID',
 			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'title',
 			meta: {
-				headerText: 'Title'
+				headerText: 'Title',
 			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'subtitle',
 			meta: {
-				headerText: 'Subtitle'
+				headerText: 'Subtitle',
 			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'timestamp',
 			meta: {
-				headerText: 'Timestamp'
+				headerText: 'Timestamp',
 			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext)
+			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorFn: ({ id, blob }) => ({ id, blob }),
@@ -83,7 +83,7 @@
 				const { id, blob } = getValue<{ id: string; blob: Blob }>();
 				const audioUrl = URL.createObjectURL(blob);
 				return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
-			}
+			},
 		},
 		{
 			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
@@ -94,7 +94,7 @@
 			cell: ({ getValue }) => {
 				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
 				return renderComponent(TranscribedText, { recordingId: id, transcribedText });
-			}
+			},
 		},
 		{
 			accessorFn: (recording) => recording,
@@ -105,15 +105,15 @@
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
 				return renderComponent(RowActions, { recording });
-			}
-		}
+			},
+		},
 	];
 
 	let sorting = $state<SortingState>([
 		{
 			id: 'timestamp',
-			desc: true
-		}
+			desc: true,
+		},
 	]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
@@ -167,16 +167,16 @@
 			},
 			get rowSelection() {
 				return rowSelection;
-			}
+			},
 		},
 		// TODO:
 		// filters
 		// visibility
 		// select
-		debugTable: true
+		debugTable: true,
 	});
 
-	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows)
+	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
 </script>
 
 <svelte:head>
