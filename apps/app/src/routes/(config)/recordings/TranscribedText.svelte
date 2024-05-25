@@ -4,11 +4,12 @@
 	let { recordingId, transcribedText }: { recordingId: string; transcribedText: string } = $props();
 </script>
 
-<span
+<p
+	class="max-h-12 overflow-y-auto"
 	style="view-transition-name: {createRecordingViewTransitionName({
 		recordingId: recordingId,
-		propertyName: 'transcribedText'
+		propertyName: 'transcribedText',
 	})}"
 >
 	{transcribedText}
-</span>
+</p>
