@@ -2,8 +2,7 @@
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { onDestroy } from 'svelte';
 
-	export let recordingId: string;
-	export let audioUrl: string;
+	let { recordingId, audioUrl }: { recordingId: string; audioUrl: string } = $props();
 	onDestroy(() => {
 		URL.revokeObjectURL(audioUrl);
 	});
