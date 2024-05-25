@@ -1,4 +1,4 @@
-import type { Effect } from 'effect';
+import type { Effect, Option } from 'effect';
 import { Context, Data } from 'effect';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
@@ -58,7 +58,9 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	RecordingsDbService,
 	{
 		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
-		readonly getRecording: (id: string) => Effect.Effect<Recording | undefined, GetRecordingError>;
+		readonly getRecording: (
+			id: string
+		) => Effect.Effect<Option.Option<Recording>, GetRecordingError>;
 		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
 		readonly updateRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
 		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;

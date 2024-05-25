@@ -1,3 +1,4 @@
+import { Option } from 'effect';
 import { Effect, Layer } from 'effect';
 import { openDB, type DBSchema } from 'idb';
 import type { Recording } from '../../services/recordings-db';
@@ -89,7 +90,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							origError: error,
 							message: `Error getting recording from indexedDB: ${error}`
 						})
-				})
+				}).pipe(Effect.map(Option.fromNullable))
 		};
 	})
 );
