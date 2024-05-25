@@ -16,11 +16,11 @@
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 
-	export let recording: Recording;
+	let { recording }: { recording: Recording } = $props();
 
-	let isDialogOpen = false;
-	let isDeleting = false;
-	let isSaving = false;
+	let isDialogOpen = $state(false);
+	let isDeleting = $state(false);
+	let isSaving = $state(false);
 
 	const copyThisRecording = () => recordings.copyRecordingText(recording).pipe(Effect.runPromise);
 </script>
