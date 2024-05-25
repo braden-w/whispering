@@ -196,11 +196,8 @@
 				class="max-w-sm"
 				placeholder="Filter recordings..."
 				type="text"
-				value={table.getColumn('title')?.getFilterValue() as string}
-				onchange={(e) => {
-					console.log(e.currentTarget.value); 
-					table.getColumn('title')?.setFilterValue(e.target?.value);
-					}}
+				value={table.getColumn('id')?.getFilterValue() as string}
+				onchange={(e) => table.getColumn('id')?.setFilterValue(e.currentTarget.value)}
 			/>
 			{#if selectedRecordingRows.length> 0}
 				<Button
@@ -214,9 +211,15 @@
 						);
 					}}
 				>
-					{#if selectedRecordingRows.some((recordingRow) => recordingRow?.transcriptionStatus === 'TRANSCRIBING')}
+					{#if selectedRecordingRows.some(({id}) => {
+						const currentRow = recordings.value.find((r) => r.id === id);
+						return currentRow?.transcriptionStatus === 'TRANSCRIBING';
+					})}
 						<LoadingTranscriptionIcon />
-					{:else if selectedRecordingRows.some((recordingRow) => recordingRow?.transcriptionStatus === 'DONE')}
+					{:else if selectedRecordingRows.some(({id}) => {
+						const currentRow = recordings.value.find((r) => r.id === id);
+						return currentRow?.transcriptionStatus === 'DONE';
+					})}
 						<RetryTranscriptionIcon />
 					{:else}
 						<StartTranscriptionIcon />
