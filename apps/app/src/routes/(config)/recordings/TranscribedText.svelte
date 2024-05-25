@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 
-	export let recordingId: string;
-	export let transcribedText: string;
+	let { recordingId, transcribedText }: { recordingId: string; transcribedText: string } = $props();
 </script>
 
 <span
