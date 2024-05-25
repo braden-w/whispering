@@ -41,7 +41,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					return Effect.succeed(undefined);
 				}),
 			),
-		editRecording: (recording: Recording) =>
+		updateRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				yield* _(updateRecording(recording));
 				toast.success('Recording updated!');

@@ -72,7 +72,7 @@
 				onsubmit={async (e) => {
 					e.preventDefault();
 					isSaving = true;
-					await recordings.editRecording(recording).pipe(Effect.runPromise);
+					await recordings.updateRecording(recording).pipe(Effect.runPromise);
 					isSaving = false;
 					isDialogOpen = false;
 				}}
@@ -136,7 +136,7 @@
 				onclick={copyThisRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: recording.id,
-					propertyName: 'transcribedText'
+					propertyName: 'transcribedText',
 				})}-copy-button"
 			>
 				<ClipboardIcon />
