@@ -12,7 +12,7 @@
 	class="h-8"
 	style="view-transition-name: {createRecordingViewTransitionName({
 		recordingId,
-		propertyName: 'blob'
+		propertyName: 'blob',
 	})}"
 	controls
 	src={audioUrl}
