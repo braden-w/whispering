@@ -17,7 +17,7 @@ export const createRecordings = Effect.gen(function* (_) {
 	const clipboardService = yield* _(ClipboardService);
 
 	let recordings = $state<Recording[]>([]);
-	const setRecording = (recording: Recording) =>
+	const updateRecording = (recording: Recording) =>
 		Effect.gen(function* (_) {
 			yield* _(recordingsDb.updateRecording(recording));
 			recordings = recordings.map((r) => (r.id === recording.id ? recording : r));
@@ -48,7 +48,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			),
 		editRecording: (recording: Recording) =>
 			Effect.gen(function* (_) {
-				yield* _(setRecording(recording));
+				yield* _(updateRecording(recording));
 				toast.success('Recording updated!');
 			}).pipe(
 				Effect.catchAll((error) => {
@@ -79,9 +79,9 @@ export const createRecordings = Effect.gen(function* (_) {
 						})
 					);
 				}
-				yield* _(setRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
+				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
-				yield* _(setRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				yield* _(updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				return transcribedText;
 			}),
 		copyRecordingText: (recording: Recording) =>
