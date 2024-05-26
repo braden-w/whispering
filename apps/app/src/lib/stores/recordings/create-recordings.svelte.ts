@@ -78,7 +78,7 @@ export const createRecordings = Effect.gen(function* (_) {
 			}),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* (_) {
-				if (!recording.transcribedText) return;
+				if (recording.transcribedText === '') return;
 				yield* _(clipboardService.setClipboardText(recording.transcribedText));
 				toast.success('Copied to clipboard!');
 			}),
