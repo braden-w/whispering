@@ -15,7 +15,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue,
-	disableLocalStorage = false
+	disableLocalStorage = false,
 }: {
 	key: string;
 	schema: TSchema;
@@ -36,14 +36,14 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		set value(newValue: z.infer<TSchema>) {
 			value = newValue;
 			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
-		}
+		},
 	};
 }
 
 function loadValueFromStorage<T extends z.ZodTypeAny>({
 	key,
 	schema,
-	defaultValue
+	defaultValue,
 }: {
 	key: string;
 	schema: T;
@@ -67,7 +67,7 @@ function createStorageEventListener<T extends z.ZodTypeAny>({
 	key,
 	schema,
 	bindedValue,
-	defaultValue
+	defaultValue,
 }: {
 	key: string;
 	schema: T;
