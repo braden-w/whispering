@@ -52,12 +52,6 @@ export const createRecorder = () =>
 			set selectedAudioInputDeviceId(value: string) {
 				selectedAudioInputDeviceId.value = value;
 			},
-			getAudioInputDevices: recorderService.enumerateRecordingDevices.pipe(
-				Effect.catchAll((error) => {
-					toast.error(error.message);
-					return Effect.succeed([] as MediaDeviceInfo[]);
-				}),
-			),
 			refreshDefaultAudioInput: Effect.gen(function* (_) {
 				const recordingDevices = yield* _(recorderService.enumerateRecordingDevices);
 				const $selectedAudioInput = selectedAudioInputDeviceId.value;

@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { recorder } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.js';
+	import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder/web.ts';
+	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.ts';
+	import { RecorderService } from '@repo/services/services/recorder';
 	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
@@ -10,8 +12,19 @@
 	import * as Select from '@repo/ui/components/select';
 	import { Switch } from '@repo/ui/components/switch';
 	import { Effect } from 'effect';
+	import { toast } from 'svelte-sonner';
 
-	const getMediaDevicesPromise = recorder.getAudioInputDevices.pipe(Effect.runPromise);
+	const getMediaDevicesPromise = Effect.gen(function* (_) {
+		const recorderService = yield* _(RecorderService);
+		return yield* _(recorderService.enumerateRecordingDevices);
+	}).pipe(
+		Effect.catchAll((error) => {
+			toast.error(error.message);
+			return Effect.succeed([] as MediaDeviceInfo[]);
+		}),
+		Effect.provide(RecorderServiceLiveWeb),
+		Effect.runPromise,
+	);
 
 	const supportedLanguagesOptions = Effect.gen(function* (_) {
 		const transcriptionService = yield* _(TranscriptionService);
@@ -20,7 +33,7 @@
 	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
 
 	const selectedLanguageOption = $derived(
-		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage)
+		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
 	);
 </script>
 
@@ -65,10 +78,10 @@
 				{:then mediaDevices}
 					{@const items = mediaDevices.map((device) => ({
 						value: device.deviceId,
-						label: device.label
+						label: device.label,
 					}))}
 					{@const selected = items.find(
-						(item) => item.value === recorder.selectedAudioInputDeviceId
+						(item) => item.value === recorder.selectedAudioInputDeviceId,
 					)}
 					<Select.Root
 						{items}
