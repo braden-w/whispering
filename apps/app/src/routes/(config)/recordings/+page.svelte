@@ -26,6 +26,8 @@
 	} from '@tanstack/table-core';
 	import { getCoreRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/table-core';
 	import type { Recording } from '@repo/services/services/recordings-db';
+	import { createPersistedState } from '$lib/createPersistedState.svelte';
+	import { z } from 'zod';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -109,38 +111,49 @@
 		},
 	];
 
-	let sorting = $state<SortingState>([
-		{
-			id: 'timestamp',
-			desc: true,
-		},
-	]);
-	let columnFilters = $state<ColumnFiltersState>([]);
-	let columnVisibility = $state<VisibilityState>({ id: false });
-	let rowSelection = $state({});
+	let sorting = createPersistedState({
+		key: 'whispering-sorting',
+		defaultValue: [{ id: 'timestamp', desc: true }],
+		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
+	});
+	let columnFilters = createPersistedState({
+		key: 'whispering-column-filters',
+		defaultValue: [],
+		schema: z.array(z.object({ id: z.string(), value: z.string() })),
+	});
+	let columnVisibility = createPersistedState({
+		key: 'whispering-column-visibility',
+		defaultValue: { id: false },
+		schema: z.record(z.boolean()),
+	});
+	let rowSelection = createPersistedState({
+		key: 'whispering-row-selection',
+		defaultValue: {},
+		schema: z.record(z.boolean()),
+	});
 
 	function setSorting(updater: Updater<SortingState>) {
 		if (updater instanceof Function) {
-			sorting = updater(sorting);
-		} else sorting = updater;
+			sorting.value = updater(sorting.value);
+		} else sorting.value = updater;
 	}
 
 	function setFilters(updater: Updater<ColumnFiltersState>) {
 		if (updater instanceof Function) {
-			columnFilters = updater(columnFilters);
-		} else columnFilters = updater;
+			columnFilters.value = updater(columnFilters.value);
+		} else columnFilters.value = updater;
 	}
 
 	function setVisibility(updater: Updater<VisibilityState>) {
 		if (updater instanceof Function) {
-			columnVisibility = updater(columnVisibility);
-		} else columnVisibility = updater;
+			columnVisibility.value = updater(columnVisibility.value);
+		} else columnVisibility.value = updater;
 	}
 
 	function setRowSelection(updater: Updater<Record<string, boolean>>) {
 		if (updater instanceof Function) {
-			rowSelection = updater(rowSelection);
-		} else rowSelection = updater;
+			rowSelection.value = updater(rowSelection.value);
+		} else rowSelection.value = updater;
 	}
 
 	const table = createSvelteTable({
@@ -157,16 +170,16 @@
 		onRowSelectionChange: setRowSelection,
 		state: {
 			get sorting() {
-				return sorting;
+				return sorting.value;
 			},
 			get columnFilters() {
-				return columnFilters;
+				return columnFilters.value;
 			},
 			get columnVisibility() {
-				return columnVisibility;
+				return columnVisibility.value;
 			},
 			get rowSelection() {
-				return rowSelection;
+				return rowSelection.value;
 			},
 		},
 		debugTable: true,
@@ -179,8 +192,7 @@
 	<title>All Recordings</title>
 </svelte:head>
 
-
-<div class="container flex flex-col gap-2">	
+<div class="container flex flex-col gap-2">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
