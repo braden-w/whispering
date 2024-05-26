@@ -4,7 +4,7 @@ import { createRecorder } from './create-recorder.svelte';
 
 export const recorder = createRecorder().pipe(
 	Effect.provide(RecorderServiceLiveWeb),
-	Effect.runSync
+	Effect.runSync,
 );
 
 recorder.refreshDefaultAudioInput.pipe(Effect.runPromise);
