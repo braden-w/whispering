@@ -3,7 +3,7 @@
 </script>
 
 <span>
-	First, please enter your OpenAI API key in <Button
+	API Key not provided. Please enter your OpenAI API key in <Button
 		href="/settings"
 		variant="link"
 		class="h-fit px-0 py-0">the settings.</Button
