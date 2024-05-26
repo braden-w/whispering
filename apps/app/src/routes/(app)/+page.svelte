@@ -22,15 +22,15 @@
 		subtitle: '',
 		blob: undefined,
 		transcribedText: '',
-		transcriptionStatus: 'UNPROCESSED'
+		transcriptionStatus: 'UNPROCESSED',
 	} as const;
 
 	const latestRecording = $derived(
-		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING
+		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING,
 	);
 
-	const latestAudioSrc = $derived(
-		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined
+	const maybeLatestAudioSrc = $derived(
+		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined,
 	);
 
 	const copyRecordingTextFromLatestRecording = () =>
@@ -76,7 +76,7 @@
 				placeholder="Transcribed text will appear here..."
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
-					propertyName: 'transcribedText'
+					propertyName: 'transcribedText',
 				})}"
 				readonly
 				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
@@ -88,18 +88,19 @@
 				on:click={copyRecordingTextFromLatestRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
-					propertyName: 'transcribedText'
+					propertyName: 'transcribedText',
 				})}-copy-button"
 			>
 				<ClipboardIcon />
 				<span class="sr-only">Copy transcribed text</span>
 			</Button>
 		</div>
-		{#if latestAudioSrc}
+		{#if maybeLatestAudioSrc}
+			{@const latestAudioSrc = maybeLatestAudioSrc}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
-					propertyName: 'blob'
+					propertyName: 'blob',
 				})}"
 				src={latestAudioSrc}
 				controls
