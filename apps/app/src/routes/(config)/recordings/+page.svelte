@@ -208,7 +208,7 @@
 				<Button
 					variant="outline"
 					size="icon"
-					on:click={() => {
+					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recording) => {
 								recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
@@ -233,7 +233,7 @@
 				<Button
 					variant="outline"
 					size="icon"
-					on:click={() => {
+					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recordingRow) => {
 								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise);
