@@ -78,7 +78,7 @@ export const createRecordings = Effect.gen(function* (_) {
 				const recording = yield* _(maybeRecording);
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
-				yield* _(updateRecording({ ...recording, transcriptionStatus: 'DONE' }));
+				yield* _(updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
 				if (settings.isCopyToClipboardEnabled && transcribedText)
 					yield* _(clipboardService.setClipboardText(transcribedText));
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
