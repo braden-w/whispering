@@ -23,6 +23,7 @@
 		ColumnFiltersState,
 		Updater,
 		VisibilityState,
+		ColumnFilter,
 	} from '@tanstack/table-core';
 	import { getCoreRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/table-core';
 	import type { Recording } from '@repo/services/services/recordings-db';
@@ -119,7 +120,7 @@
 	let columnFilters = createPersistedState({
 		key: 'whispering-column-filters',
 		defaultValue: [],
-		schema: z.array(z.object({ id: z.string(), value: z.string() })),
+		schema: z.array(z.object({ id: z.string(), value: z.unknown() }).refine((data): data is ColumnFilter => data.value !== undefined)),
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-column-visibility',
