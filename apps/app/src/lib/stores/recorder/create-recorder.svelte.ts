@@ -97,26 +97,7 @@ export const createRecorder = () =>
 						};
 						recorderState.value = 'IDLE';
 						yield* _(recordings.addRecording(newRecording));
-						const transcribeAndCopyPromise = Effect.gen(function* (_) {
-							const clipboardService = yield* _(ClipboardService);
-							const transcription = yield* _(recordings.transcribeRecording(newRecording.id));
-							if (settings.isCopyToClipboardEnabled && transcription)
-								yield* _(clipboardService.setClipboardText(transcription));
-							if (settings.isPasteContentsOnSuccessEnabled && transcription)
-								yield* _(clipboardService.pasteTextFromClipboard);
-						}).pipe(Effect.provide(ClipboardServiceLive), Effect.runPromise);
-						toast.promise(transcribeAndCopyPromise, {
-							loading: 'Transcribing recording...',
-							success: () => TranscriptionComplete,
-							error: (
-								e: Effect.Effect.Error<
-									ReturnType<Effect.Effect.Success<typeof createRecordings>['transcribeRecording']>
-								>,
-							) => {
-								if (e.name === 'PleaseEnterApiKeyError') return PleaseEnterAPIKeyToast;
-								return SomethingWentWrongToast;
-							},
-						});
+						recordings.transcribeRecording(newRecording.id).pipe(Effect.runPromise);
 						break;
 					}
 					case 'SAVING': {

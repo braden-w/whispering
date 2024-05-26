@@ -1,8 +1,13 @@
-import { Option } from 'effect';
+import {
+	PleaseEnterAPIKeyToast,
+	SomethingWentWrongToast,
+	TranscriptionComplete,
+} from '$lib/toasts';
 import { ClipboardService } from '@repo/services/services/clipboard';
-import { RecordingsDbService, type Recording } from '@repo/services/services/recordings-db';
+import type { Recording } from '@repo/services/services/recordings-db';
+import { RecordingsDbService } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
-import { Effect } from 'effect';
+import { Effect, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from '../settings.svelte';
 
@@ -74,7 +79,23 @@ export const createRecordings = Effect.gen(function* (_) {
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
 				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
 				yield* _(updateRecording({ ...recording, transcriptionStatus: 'DONE' }));
-				return transcribedText;
+				if (settings.isCopyToClipboardEnabled && transcribedText)
+					yield* _(clipboardService.setClipboardText(transcribedText));
+				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
+					yield* _(clipboardService.pasteTextFromClipboard);
+			}).pipe(Effect.runPromise, (transcribeAndCopyPromise) => {
+				toast.promise(transcribeAndCopyPromise, {
+					loading: 'Transcribing recording...',
+					success: () => TranscriptionComplete,
+					error: (
+						e: Effect.Effect.Error<
+							ReturnType<Effect.Effect.Success<typeof createRecordings>['transcribeRecording']>
+						>,
+					) => {
+						if (e.name === 'PleaseEnterApiKeyError') return PleaseEnterAPIKeyToast;
+						return SomethingWentWrongToast;
+					},
+				});
 			}),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* (_) {
