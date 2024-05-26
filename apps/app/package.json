@@ -31,12 +31,12 @@
 		"@repo/services": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"@tanstack/table-core": "^8.17.3",
+		"@repo/svelte-table": "workspace:*",
 		"effect": "^2.4.19",
 		"mode-watcher": "^0.2.2",
 		"nanoid": "^5.0.7",
 		"svelte-french-toast": "^1.2.0",
 		"svelte-sonner": "^0.3.24",
-		"tanstack-table": "github:wlockiv/tanstack-table#feat-svelte-5-adapter",
 		"zod": "^3.23.8"
 	}
 }
