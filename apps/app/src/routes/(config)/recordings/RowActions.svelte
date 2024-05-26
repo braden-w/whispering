@@ -22,7 +22,7 @@
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
 
-	const copyThisRecording = () => recordings.copyRecordingText(recording).pipe(Effect.runPromise);
+	const copyThisRecording = () => recordings.copyRecordingText(recording);
 </script>
 
 <div class="flex items-center">
@@ -105,7 +105,7 @@
 					<Button
 						onclick={async () => {
 							isDeleting = true;
-							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							await recordings.deleteRecording(recording.id);
 							isDeleting = false;
 							isDialogOpen = false;
 						}}
@@ -152,7 +152,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				onclick={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
+				onclick={() => recordings.deleteRecording(recording.id)}
 			>
 				<TrashIcon />
 			</Button>

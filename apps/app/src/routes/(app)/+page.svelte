@@ -33,8 +33,7 @@
 		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined,
 	);
 
-	const copyRecordingTextFromLatestRecording = () =>
-		recordings.copyRecordingText(latestRecording).pipe(Effect.runPromise);
+	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
 </script>
 
 <svelte:head>

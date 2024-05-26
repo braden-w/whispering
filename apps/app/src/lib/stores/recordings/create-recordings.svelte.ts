@@ -69,6 +69,7 @@ export const createRecordings = Effect.gen(function* (_) {
 					toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
+				Effect.runPromise,
 			),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
@@ -113,6 +114,6 @@ export const createRecordings = Effect.gen(function* (_) {
 				if (recording.transcribedText === '') return;
 				yield* _(clipboardService.setClipboardText(recording.transcribedText));
 				toast.success('Copied to clipboard!');
-			}),
+			}).pipe(Effect.runPromise),
 	};
 });

@@ -197,27 +197,27 @@
 				class="max-w-sm"
 				placeholder="Filter recordings..."
 				type="text"
-				value={table.getColumn('id')?.getFilterValue() as string}
+				value={table.getColumn('id')?.getFilterValue()}
 				onchange={(e) => table.getColumn('id')?.setFilterValue(e.currentTarget.value)}
 			/>
-			{#if selectedRecordingRows.length> 0}
+			{#if selectedRecordingRows.length > 0}
 				<Button
 					variant="outline"
 					size="icon"
 					onclick={() => {
 						Promise.all(
-							selectedRecordingRows.map((recording) => {
-								recordings.transcribeRecording(recording.id)
-							})
+							selectedRecordingRows.map((recording) =>
+								recordings.transcribeRecording(recording.id),
+							),
 						);
 					}}
 				>
-					{#if selectedRecordingRows.some(({id}) => {
+					{#if selectedRecordingRows.some(({ id }) => {
 						const currentRow = recordings.value.find((r) => r.id === id);
 						return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 					})}
 						<LoadingTranscriptionIcon />
-					{:else if selectedRecordingRows.some(({id}) => {
+					{:else if selectedRecordingRows.some(({ id }) => {
 						const currentRow = recordings.value.find((r) => r.id === id);
 						return currentRow?.transcriptionStatus === 'DONE';
 					})}
@@ -231,9 +231,9 @@
 					size="icon"
 					onclick={() => {
 						Promise.all(
-							selectedRecordingRows.map((recordingRow) => {
-								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise);
-							})
+							selectedRecordingRows.map((recordingRow) =>
+								recordings.deleteRecording(recordingRow.id),
+							),
 						);
 					}}
 				>
@@ -252,7 +252,10 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 					{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
-						<DropdownMenu.CheckboxItem checked={column.getIsVisible()} onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+						<DropdownMenu.CheckboxItem
+							checked={column.getIsVisible()}
+							onCheckedChange={(value) => column.toggleVisibility(!!value)}
+						>
 							{column.columnDef.meta?.headerText}
 						</DropdownMenu.CheckboxItem>
 					{/each}
