@@ -3,13 +3,13 @@ import {
 	InvalidApiKeyError,
 	PleaseEnterApiKeyError,
 	TranscriptionError,
-	TranscriptionService
+	TranscriptionService,
 } from '../../services/transcription';
 
 class WhisperFileTooLarge extends TranscriptionError {
 	constructor(fileSizeMb: number, maxFileSizeMb: number) {
 		super({
-			message: `The file size (${fileSizeMb}MB) is too large. Please upload a file smaller than ${maxFileSizeMb}MB.`
+			message: `The file size (${fileSizeMb}MB) is too large. Please upload a file smaller than ${maxFileSizeMb}MB.`,
 		});
 	}
 }
@@ -18,7 +18,7 @@ class WhisperFetchError extends TranscriptionError {
 	constructor({ fetchError }: { fetchError: unknown }) {
 		super({
 			message: 'Failed to fetch transcription from Whisper API',
-			origError: fetchError
+			origError: fetchError,
 		});
 	}
 }
@@ -26,7 +26,7 @@ class WhisperFetchError extends TranscriptionError {
 class WhisperServerError extends TranscriptionError {
 	constructor({ message, code, type }: { message: string; code?: string; type?: string }) {
 		super({
-			message: `Server error from Whisper API: ${message}\nCode: ${code}\nType: ${type}`
+			message: `Server error from Whisper API: ${message}\nCode: ${code}\nType: ${type}`,
 		});
 	}
 }
@@ -34,7 +34,7 @@ class WhisperServerError extends TranscriptionError {
 class TranscriptionIsNotStringError extends TranscriptionError {
 	constructor() {
 		super({
-			message: 'Transcription from Whisper API is invalid or not a string'
+			message: 'Transcription from Whisper API is invalid or not a string',
 		});
 	}
 }
@@ -104,7 +104,7 @@ const SUPPORTED_LANGUAGES = [
 	{ label: 'Ukrainian', value: 'uk' },
 	{ label: 'Urdu', value: 'ur' },
 	{ label: 'Vietnamese', value: 'vi' },
-	{ label: 'Welsh', value: 'cy' }
+	{ label: 'Welsh', value: 'cy' },
 ] as const;
 
 export const TranscriptionServiceLiveWhisper = Layer.succeed(
@@ -134,24 +134,24 @@ export const TranscriptionServiceLiveWhisper = Layer.succeed(
 							fetch('https://api.openai.com/v1/audio/transcriptions', {
 								method: 'POST',
 								headers: { Authorization: `Bearer ${apiKey}` },
-								body: formData
+								body: formData,
 							}).then((res) => res.json()),
-						catch: (error) => new WhisperFetchError({ fetchError: error })
-					})
+						catch: (error) => new WhisperFetchError({ fetchError: error }),
+					}),
 				);
 				if (data?.error?.message) {
 					return yield* _(
 						new WhisperServerError({
 							message: data.error.message,
 							code: data.error.code,
-							type: data.error.type
-						})
+							type: data.error.type,
+						}),
 					);
 				}
 				if (!isString(data.text)) {
 					return yield* _(new TranscriptionIsNotStringError());
 				}
 				return data.text;
-			})
-	})
+			}),
+	}),
 );

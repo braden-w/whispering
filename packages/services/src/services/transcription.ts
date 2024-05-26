@@ -16,7 +16,7 @@ export class TranscriptionService extends Context.Tag('TranscriptionService')<
 		readonly getSupportedLanguages: Effect.Effect<readonly { label: string; value: string }[]>;
 		readonly transcribe: (
 			blob: Blob,
-			options: { apiKey: string; outputLanguage: string }
+			options: { apiKey: string; outputLanguage: string },
 		) => Effect.Effect<string, TranscriptionError | PleaseEnterApiKeyError | InvalidApiKeyError>;
 	}
 >() {}

@@ -5,7 +5,7 @@ import { writeTextToCursor } from '~lib/apis/clipboard';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
 
 export const config: PlasmoCSConfig = {
-	matches: ['https://chat.openai.com/*']
+	matches: ['https://chat.openai.com/*'],
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 				sendMessageToBackground({ action: 'setExtensionIcon', icon });
 				switchMicrophoneButtonIcon(icon);
 			},
-			onSuccessfulTranscription: (text: string) => writeTextToCursor(text)
+			onSuccessfulTranscription: (text: string) => writeTextToCursor(text),
 		});
 });
 
@@ -74,7 +74,7 @@ function injectMicrophoneButtonIntoTextarea() {
 				switchIcon: (icon) => {
 					sendMessageToBackground({ action: 'setExtensionIcon', icon });
 					switchMicrophoneButtonIcon(icon);
-				}
+				},
 			});
 		});
 	}
@@ -99,7 +99,7 @@ const iconToSvgInnerHtml: Record<Icon, string> = {
 		stroke-linejoin="round"
 		d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" 
 		/>
-	`
+	`,
 };
 
 function switchMicrophoneButtonIcon(icon: Icon) {

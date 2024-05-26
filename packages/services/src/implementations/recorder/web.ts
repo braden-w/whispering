@@ -31,8 +31,8 @@ const getMediaStream = (recordingDeviceId: string) =>
 		catch: (error) =>
 			new GetNavigatorMediaError({
 				message: 'Error getting media stream',
-				origError: error
-			})
+				origError: error,
+			}),
 	});
 
 const resetRecorder = () => {
@@ -54,7 +54,7 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 						if (!event.data.size) return;
 						recordedChunks.push(event.data);
 					},
-					{ once: true }
+					{ once: true },
 				);
 				mediaRecorder.start();
 			}),
@@ -68,20 +68,20 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 							resolve(audioBlob);
 							resetRecorder();
 						},
-						{ once: true }
+						{ once: true },
 					);
 					mediaRecorder.stop();
 				}),
 			catch: (error) =>
 				new StopMediaRecorderError({
 					message: 'Error stopping media recorder and getting audio blob',
-					origError: error
-				})
+					origError: error,
+				}),
 		}).pipe(
 			Effect.catchAll((error) => {
 				resetRecorder();
 				return error;
-			})
+			}),
 		),
 		enumerateRecordingDevices: Effect.tryPromise({
 			try: async () => {
@@ -92,8 +92,8 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 			catch: (error) =>
 				new EnumerateRecordingDevicesError({
 					message: 'Error enumerating recording devices',
-					origError: error
-				})
-		})
-	})
+					origError: error,
+				}),
+		}),
+	}),
 );

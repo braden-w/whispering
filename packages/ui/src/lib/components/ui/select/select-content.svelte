@@ -13,7 +13,7 @@
 	export let outTransitionConfig: $$Props['outTransitionConfig'] = {
 		start: 0.95,
 		opacity: 0,
-		duration: 50
+		duration: 50,
 	};
 
 	let className: $$Props['class'] = undefined;
@@ -28,7 +28,7 @@
 	{sideOffset}
 	class={cn(
 		'bg-popover text-popover-foreground relative z-50 min-w-[8rem] overflow-hidden rounded-md border shadow-md outline-none',
-		className
+		className,
 	)}
 	{...$$restProps}
 	on:keydown

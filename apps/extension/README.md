@@ -23,11 +23,9 @@ Whispering Chrome extension offers two key functionalities:
 
 ## Installation
 
-
 To install the Whispering Chrome extension, click the badge below:
 
 [![Download Chrome Extension](https://img.shields.io/badge/Download-Chrome%20Extension-blue)](https://chrome.google.com/webstore/detail/whispering-chrome-extensi/your-extension-id)
-
 
 To install the Whispering Chrome extension, follow these steps:
 

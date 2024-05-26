@@ -16,7 +16,7 @@ type ToggleRecordingOptions = {
 
 export async function toggleRecording({
 	switchIcon,
-	onSuccessfulTranscription
+	onSuccessfulTranscription,
 }: ToggleRecordingOptions): Promise<void> {
 	await apiKey.init();
 	const apiKeyValue = get(apiKey);

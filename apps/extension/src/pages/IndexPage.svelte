@@ -39,7 +39,7 @@
 	storage.watch({
 		'recording-state': () => recordingState.init(),
 		'audio-src': () => audioSrc.init(),
-		'output-text': () => outputText.init()
+		'output-text': () => outputText.init(),
 	});
 </script>
 
@@ -77,7 +77,7 @@
 	<p class="text-xs text-gray-600">
 		Click the microphone or press <kbd>space</kbd> to start recording.
 	</p>
-	<p class="text-xs text-gray-500 font-light">
+	<p class="text-xs font-light text-gray-500">
 		Check out the
 		<a
 			href="https://github.com/braden-w/whispering/releases"

@@ -6,13 +6,13 @@ import { sendMessageToBackground, type MessageToContentScriptRequest } from '~li
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
-	exclude_matches: ['https://chat.openai.com/*']
+	exclude_matches: ['https://chat.openai.com/*'],
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
 	if (message.command === 'toggle-recording')
 		await toggleRecording({
 			switchIcon: (icon: Icon) => sendMessageToBackground({ action: 'setExtensionIcon', icon }),
-			onSuccessfulTranscription: (text: string) => writeTextToCursor(text)
+			onSuccessfulTranscription: (text: string) => writeTextToCursor(text),
 		});
 });

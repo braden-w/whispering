@@ -99,7 +99,7 @@ function isInputElement(element: HTMLElement): element is HTMLInputElement | HTM
  */
 function handleInputElement(
 	inputElement: HTMLInputElement | HTMLTextAreaElement,
-	text: string
+	text: string,
 ): void {
 	const startPos = inputElement.selectionStart ?? 0;
 	const endPos = inputElement.selectionEnd ?? 0;

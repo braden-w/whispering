@@ -47,5 +47,5 @@ export {
 	Menu as MenubarMenu,
 	Group as MenubarGroup,
 	Sub as MenubarSub,
-	RadioGroup as MenubarRadioGroup
+	RadioGroup as MenubarRadioGroup,
 };

@@ -5,7 +5,7 @@ const initialRecordingState: RecordingState = 'idle';
 
 export const recordingState = createStoreSyncedWithStorage<RecordingState>({
 	key: 'recording-state',
-	initialValue: initialRecordingState
+	initialValue: initialRecordingState,
 });
 
 export const outputText = createStoreSyncedWithStorage({ key: 'output-text', initialValue: '' });

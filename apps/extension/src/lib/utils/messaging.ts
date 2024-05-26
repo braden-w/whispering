@@ -23,7 +23,7 @@ export type MessageToContentScriptRequest =
 export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
 	const [tab] = await chrome.tabs.query({
 		active: true,
-		lastFocusedWindow: true
+		lastFocusedWindow: true,
 	});
 	chrome.tabs.sendMessage(tab.id, message);
 }

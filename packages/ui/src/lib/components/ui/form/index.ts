@@ -29,5 +29,5 @@ export {
 	Fieldset as FormFieldset,
 	Legend as FormLegend,
 	ElementField as FormElementField,
-	Button as FormButton
+	Button as FormButton,
 };

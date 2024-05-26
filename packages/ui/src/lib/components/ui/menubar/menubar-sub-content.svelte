@@ -16,7 +16,7 @@
 	{transitionConfig}
 	class={cn(
 		'bg-popover text-popover-foreground z-50 min-w-max rounded-md border p-1 focus:outline-none',
-		className
+		className,
 	)}
 	{...$$restProps}
 	on:focusout

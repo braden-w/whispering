@@ -32,7 +32,7 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center space-y-4">
 	<h1 class="text-4xl font-semibold text-gray-700">Enter OpenAI API Key</h1>
-	<h2 class="text-lg text-gray-500 font-light">
+	<h2 class="text-lg font-light text-gray-500">
 		You can find your OpenAI API key
 		<a
 			href="https://platform.openai.com/account/api-keys"

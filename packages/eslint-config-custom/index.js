@@ -4,24 +4,24 @@ module.exports = {
 		'plugin:@typescript-eslint/recommended',
 		'plugin:svelte/recommended',
 		'turbo',
-		'plugin:prettier/recommended'
+		'plugin:prettier/recommended',
 	],
 	plugins: ['@typescript-eslint', 'prettier'],
 	rules: {
 		'prettier/prettier': 'error',
-		'@typescript-eslint/consistent-type-imports': 'error'
+		'@typescript-eslint/consistent-type-imports': 'error',
 	},
 	ignorePatterns: ['*.cjs'],
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
 		sourceType: 'module',
 		ecmaVersion: 2020,
-		extraFileExtensions: ['.svelte']
+		extraFileExtensions: ['.svelte'],
 	},
 	env: {
 		browser: true,
 		es2017: true,
-		node: true
+		node: true,
 	},
 	overrides: [
 		{
@@ -29,8 +29,8 @@ module.exports = {
 			parser: 'svelte-eslint-parser',
 			parserOptions: {
 				parser: '@typescript-eslint/parser',
-				extraFileExtensions: ['.svelte']
-			}
-		}
-	]
+				extraFileExtensions: ['.svelte'],
+			},
+		},
+	],
 };

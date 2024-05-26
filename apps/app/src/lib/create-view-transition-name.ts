@@ -2,7 +2,7 @@ import type { Recording } from '@repo/services/services/recordings-db';
 
 export function createRecordingViewTransitionName({
 	recordingId,
-	propertyName
+	propertyName,
 }: {
 	recordingId: Recording['id'];
 	propertyName: keyof Recording;

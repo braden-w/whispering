@@ -3,7 +3,7 @@ import { Storage } from '@plasmohq/storage/dist';
 
 export function createStoreSyncedWithStorage<T>({
 	key,
-	initialValue
+	initialValue,
 }: {
 	key: string;
 	initialValue: T;
@@ -25,6 +25,6 @@ export function createStoreSyncedWithStorage<T>({
 		subscribe,
 		init,
 		set: setValue,
-		update
+		update,
 	};
 }

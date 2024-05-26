@@ -44,5 +44,5 @@ export {
 	RadioGroup as ContextMenuRadioGroup,
 	SubContent as ContextMenuSubContent,
 	SubTrigger as ContextMenuSubTrigger,
-	CheckboxItem as ContextMenuCheckboxItem
+	CheckboxItem as ContextMenuCheckboxItem,
 };

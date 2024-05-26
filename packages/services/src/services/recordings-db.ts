@@ -59,7 +59,7 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	{
 		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
 		readonly getRecording: (
-			id: string
+			id: string,
 		) => Effect.Effect<Option.Option<Recording>, GetRecordingError>;
 		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
 		readonly updateRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
