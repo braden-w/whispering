@@ -120,7 +120,11 @@
 	let columnFilters = createPersistedState({
 		key: 'whispering-column-filters',
 		defaultValue: [],
-		schema: z.array(z.object({ id: z.string(), value: z.unknown() }).refine((data): data is ColumnFilter => data.value !== undefined)),
+		schema: z.array(
+			z
+				.object({ id: z.string(), value: z.unknown() })
+				.refine((data): data is ColumnFilter => data.value !== undefined),
+		),
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-column-visibility',
@@ -133,29 +137,20 @@
 		schema: z.record(z.boolean()),
 	});
 
-	function setSorting(updater: Updater<SortingState>) {
-		if (updater instanceof Function) {
-			sorting.value = updater(sorting.value);
-		} else sorting.value = updater;
+	function createUpdater<T>(state: { value: T }) {
+		return function (updater: Updater<T>) {
+			if (updater instanceof Function) {
+				state.value = updater(state.value);
+			} else {
+				state.value = updater;
+			}
+		};
 	}
 
-	function setFilters(updater: Updater<ColumnFiltersState>) {
-		if (updater instanceof Function) {
-			columnFilters.value = updater(columnFilters.value);
-		} else columnFilters.value = updater;
-	}
-
-	function setVisibility(updater: Updater<VisibilityState>) {
-		if (updater instanceof Function) {
-			columnVisibility.value = updater(columnVisibility.value);
-		} else columnVisibility.value = updater;
-	}
-
-	function setRowSelection(updater: Updater<Record<string, boolean>>) {
-		if (updater instanceof Function) {
-			rowSelection.value = updater(rowSelection.value);
-		} else rowSelection.value = updater;
-	}
+	const setSorting = createUpdater(sorting);
+	const setFilters = createUpdater(columnFilters);
+	const setVisibility = createUpdater(columnVisibility);
+	const setRowSelection = createUpdater(rowSelection);
 
 	const table = createSvelteTable({
 		getRowId: (originalRow) => originalRow.id,
