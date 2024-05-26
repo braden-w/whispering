@@ -93,13 +93,14 @@ export const createRecordings = Effect.gen(function* (_) {
 						success: (maybeError) => {
 							if (!maybeError) return TranscriptionComplete;
 							const error = maybeError;
-							if (error._tag === 'PleaseEnterApiKeyError') {
-								return PleaseEnterAPIKeyToast;
+							switch (error._tag) {
+								case 'PleaseEnterApiKeyError':
+									return PleaseEnterAPIKeyToast;
+								case 'InvalidApiKeyError':
+									return InvalidApiKey;
+								default:
+									return SomethingWentWrongToast;
 							}
-							if (error._tag === 'InvalidApiKeyError') {
-								return InvalidApiKey;
-							}
-							return SomethingWentWrongToast;
 						},
 						error: (_uncaughtError) => {
 							return SomethingWentWrongToast;
