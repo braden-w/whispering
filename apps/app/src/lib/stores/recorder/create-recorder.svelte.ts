@@ -2,7 +2,7 @@ import { createPersistedState } from '$lib/createPersistedState.svelte';
 import {
 	PleaseEnterAPIKeyToast,
 	SomethingWentWrongToast,
-	TranscriptionComplete
+	TranscriptionComplete,
 } from '$lib/toasts';
 import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
 import { ClipboardService } from '@repo/services/services/clipboard';
@@ -22,7 +22,7 @@ import { settings } from '../settings.svelte';
 const recorderStateSchema = z.union([
 	z.literal('IDLE'),
 	z.literal('RECORDING'),
-	z.literal('SAVING')
+	z.literal('SAVING'),
 ]);
 
 const INITIAL_STATE = 'IDLE';
@@ -33,13 +33,13 @@ export const createRecorder = () =>
 		const recorderState = createPersistedState({
 			key: 'whispering-recorder-state',
 			schema: recorderStateSchema,
-			defaultValue: INITIAL_STATE
+			defaultValue: INITIAL_STATE,
 		});
 
 		const selectedAudioInputDeviceId = createPersistedState({
 			key: 'whispering-selected-audio-input-device-id',
 			schema: z.string(),
-			defaultValue: ''
+			defaultValue: '',
 		});
 
 		return {
@@ -56,13 +56,13 @@ export const createRecorder = () =>
 				Effect.catchAll((error) => {
 					toast.error(error.message);
 					return Effect.succeed([] as MediaDeviceInfo[]);
-				})
+				}),
 			),
 			refreshDefaultAudioInput: Effect.gen(function* (_) {
 				const recordingDevices = yield* _(recorderService.enumerateRecordingDevices);
 				const $selectedAudioInput = selectedAudioInputDeviceId.value;
 				const isSelectedExists = recordingDevices.some(
-					({ deviceId }) => deviceId === $selectedAudioInput
+					({ deviceId }) => deviceId === $selectedAudioInput,
 				);
 				if (!isSelectedExists) {
 					const firstAudioInput = recordingDevices[0].deviceId;
@@ -72,7 +72,7 @@ export const createRecorder = () =>
 				Effect.catchAll((error) => {
 					toast.error(error.message);
 					return Effect.succeed(undefined);
-				})
+				}),
 			),
 			toggleRecording: Effect.gen(function* (_) {
 				const $selectedAudioInput = selectedAudioInputDeviceId.value;
@@ -93,7 +93,7 @@ export const createRecorder = () =>
 							timestamp: new Date().toISOString(),
 							transcribedText: '',
 							blob: audioBlob,
-							transcriptionStatus: 'UNPROCESSED'
+							transcriptionStatus: 'UNPROCESSED',
 						};
 						recorderState.value = 'IDLE';
 						yield* _(recordings.addRecording(newRecording));
@@ -111,11 +111,11 @@ export const createRecorder = () =>
 							error: (
 								e: Effect.Effect.Error<
 									ReturnType<Effect.Effect.Success<typeof createRecordings>['transcribeRecording']>
-								>
+								>,
 							) => {
 								if (e.name === 'PleaseEnterApiKeyError') return PleaseEnterAPIKeyToast;
 								return SomethingWentWrongToast;
-							}
+							},
 						});
 						break;
 					}
@@ -127,7 +127,7 @@ export const createRecorder = () =>
 				Effect.catchAll((error) => {
 					toast.error(error.message);
 					return Effect.succeed(undefined);
-				})
-			)
+				}),
+			),
 		};
 	});
