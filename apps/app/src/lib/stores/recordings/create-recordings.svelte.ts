@@ -2,6 +2,7 @@ import {
 	PleaseEnterAPIKeyToast,
 	SomethingWentWrongToast,
 	TranscriptionComplete,
+	InvalidApiKey,
 } from '$lib/toasts';
 import { ClipboardService } from '@repo/services/services/clipboard';
 import type { Recording } from '@repo/services/services/recordings-db';
@@ -83,20 +84,29 @@ export const createRecordings = Effect.gen(function* (_) {
 					yield* _(clipboardService.setClipboardText(transcribedText));
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
 					yield* _(clipboardService.pasteTextFromClipboard);
-			}).pipe(Effect.runPromise, (transcribeAndCopyPromise) => {
-				toast.promise(transcribeAndCopyPromise, {
-					loading: 'Transcribing recording...',
-					success: () => TranscriptionComplete,
-					error: (
-						e: Effect.Effect.Error<
-							ReturnType<Effect.Effect.Success<typeof createRecordings>['transcribeRecording']>
-						>,
-					) => {
-						if (e.name === 'PleaseEnterApiKeyError') return PleaseEnterAPIKeyToast;
-						return SomethingWentWrongToast;
-					},
-				});
-			}),
+			}).pipe(
+				Effect.catchAll((error) => Effect.succeed(error)),
+				Effect.runPromise,
+				(transcribeAndCopyPromise) => {
+					toast.promise(transcribeAndCopyPromise, {
+						loading: 'Transcribing recording...',
+						success: (maybeError) => {
+							if (!maybeError) return TranscriptionComplete;
+							const error = maybeError;
+							if (error._tag === 'PleaseEnterApiKeyError') {
+								return PleaseEnterAPIKeyToast;
+							}
+							if (error._tag === 'InvalidApiKeyError') {
+								return InvalidApiKey;
+							}
+							return SomethingWentWrongToast;
+						},
+						error: (_uncaughtError) => {
+							return SomethingWentWrongToast;
+						},
+					});
+				},
+			),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* (_) {
 				if (recording.transcribedText === '') return;
