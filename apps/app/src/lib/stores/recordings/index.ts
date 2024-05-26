@@ -4,11 +4,11 @@ import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/
 import { Effect } from 'effect';
 import { createRecordings } from './create-recordings.svelte';
 
-export const recordings = createRecordings.pipe(
+export const recordings = await createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceLiveWhisper),
 	Effect.provide(ClipboardServiceLive),
-	Effect.runSync
+	Effect.runPromise,
 );
 
 recordings.sync.pipe(Effect.runPromise);
