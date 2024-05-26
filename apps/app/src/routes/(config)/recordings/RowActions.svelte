@@ -32,7 +32,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				onclick={() => recordings.transcribeRecording(recording.id).pipe(Effect.runPromise)}
+				onclick={() => recordings.transcribeRecording(recording.id)}
 			>
 				{#if recording.transcriptionStatus === 'UNPROCESSED'}
 					<StartTranscriptionIcon />

@@ -207,7 +207,7 @@
 					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recording) => {
-								recordings.transcribeRecording(recording.id).pipe(Effect.runPromise);
+								recordings.transcribeRecording(recording.id)
 							})
 						);
 					}}

@@ -91,7 +91,7 @@ export const createRecorder = () =>
 						};
 						recorderState.value = 'IDLE';
 						yield* _(recordings.addRecording(newRecording));
-						recordings.transcribeRecording(newRecording.id).pipe(Effect.runPromise);
+						recordings.transcribeRecording(newRecording.id);
 						break;
 					}
 					case 'SAVING': {
