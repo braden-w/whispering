@@ -35,7 +35,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					yield* Queue.offer(queue, job);
 					yield* processQueue;
 				}),
-			registerShortcut: (shortcut, callback) =>
+			register: (shortcut, callback) =>
 				Effect.gen(function* () {
 					const job: RegisterShortcutJob = Effect.tryPromise({
 						try: () => register(shortcut, callback),
