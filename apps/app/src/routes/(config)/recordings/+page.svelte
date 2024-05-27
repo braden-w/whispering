@@ -1,34 +1,26 @@
 <script lang="ts">
+	import { createPersistedState } from '$lib/createPersistedState.svelte';
 	import { recordings } from '$lib/stores/recordings';
+	import type { Recording } from '@repo/services/services/recordings-db';
+	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import { Button } from '@repo/ui/components/button';
+	import { Checkbox } from '@repo/ui/components/checkbox';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
+	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
+	import { getCoreRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
+	import { z } from 'zod';
 	import ChevronDown from '~icons/heroicons/chevron-down';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
 	import TrashIcon from '~icons/heroicons/trash';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
-	import { Checkbox } from '@repo/ui/components/checkbox';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
-	import type {
-		ColumnDef,
-		SortingState,
-		TableOptions,
-		ColumnFiltersState,
-		Updater,
-		VisibilityState,
-		ColumnFilter,
-	} from '@tanstack/table-core';
-	import { getCoreRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/table-core';
-	import type { Recording } from '@repo/services/services/recordings-db';
-	import { createPersistedState } from '$lib/createPersistedState.svelte';
-	import { z } from 'zod';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -232,7 +224,7 @@
 					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recordingRow) =>
-								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise)
+								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise),
 							),
 						);
 					}}
