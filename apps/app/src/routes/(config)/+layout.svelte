@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { recorder } from '$lib/stores/recorder';
+	import { Button } from '@repo/ui/components/button';
+	import * as Tooltip from '@repo/ui/components/tooltip';
 	import NavItems from '../NavItems.svelte';
 </script>
 
@@ -7,10 +10,26 @@
 	style="view-transition-name: header"
 >
 	<div class="container flex h-14 w-full max-w-screen-2xl items-center justify-between">
-		<a class="flex items-center gap-2" href="/">
-			<span aria-hidden="true" role="img" style="view-transition-name: microphone-icon"> 🎙️ </span>
-			<span class="text-lg font-bold">whispering</span>
-		</a>
+		<div class="flex gap-2">
+			<Button
+				variant="ghost"
+				size="icon"
+				aria-label="Toggle recording"
+				onclick={recorder.toggleRecording}
+				style="view-transition-name: microphone-icon"
+			>
+				{#if recorder.recorderState === 'RECORDING'}
+					🟥
+				{:else if recorder.recorderState === 'SAVING'}
+					🔄
+				{:else}
+					🎙️
+				{/if}
+			</Button>
+			<Button variant="ghost" href="/">
+				<span class="text-lg font-bold">whispering</span>
+			</Button>
+		</div>
 		<NavItems />
 	</div>
 </header>
