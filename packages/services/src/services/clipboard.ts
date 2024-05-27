@@ -9,11 +9,6 @@ export class ClipboardError extends Data.TaggedError('ClipboardError')<{
 export class ClipboardService extends Context.Tag('ClipboardService')<
 	ClipboardService,
 	{
-		/***
-		 * Reads text from the user's clipboard.
-		 * @returns The text from the clipboard.
-		 */
-		readonly getClipboardText: Effect.Effect<string, ClipboardError>;
 		/**
 		 * Writes text to the user's clipboard.
 		 * @param text The text to write to the clipboard.
