@@ -4,6 +4,7 @@ import { RegisterShortcutsService } from '@repo/services/services/register-short
 import { Effect } from 'effect';
 import { z } from 'zod';
 import { recorder } from './recorder';
+import { toast } from 'svelte-sonner';
 
 function createSettings() {
 	const isCopyToClipboardEnabled = createPersistedState({
@@ -55,6 +56,7 @@ function createSettings() {
 				yield* registerShortcut.register(settings.currentGlobalShortcut, () =>
 					recorder.toggleRecording.pipe(Effect.runPromise),
 				);
+				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}!`);
 			}).pipe(Effect.provide(RegisterShortcutsDesktopLive), Effect.runSync);
 		},
 		get apiKey() {
