@@ -69,10 +69,9 @@ export const createRecorder = () =>
 				}),
 			),
 			toggleRecording: Effect.gen(function* (_) {
-				const $selectedAudioInput = selectedAudioInputDeviceId.value;
 				switch (recorderState.value) {
 					case 'IDLE': {
-						yield* _(recorderService.startRecording($selectedAudioInput));
+						yield* _(recorderService.startRecording(selectedAudioInputDeviceId.value));
 						yield* _(Effect.logInfo('Recording started'));
 						recorderState.value = 'RECORDING';
 						break;
