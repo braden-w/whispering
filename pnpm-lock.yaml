@@ -45,8 +45,8 @@ importers:
         specifier: ^8.17.3
         version: 8.17.3
       effect:
-        specifier: ^2.4.19
-        version: 2.4.19
+        specifier: ^3.2.5
+        version: 3.2.5
       mode-watcher:
         specifier: ^0.2.2
         version: 0.2.2(svelte@5.0.0-next.140)
@@ -185,8 +185,8 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1
       effect:
-        specifier: ^2.4.19
-        version: 2.4.19
+        specifier: ^3.2.5
+        version: 3.2.5
       idb:
         specifier: ^8.0.0
         version: 8.0.0
@@ -5070,8 +5070,8 @@ packages:
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  /effect@2.4.19:
-    resolution: {integrity: sha512-z/rn878Po3n522g/AYUDHD1SsZaZdvRxlTCLQ8xl8H6xA82nBwwooD1mdn/73Uywmp7d84oay3w3528r0Uyd0w==}
+  /effect@3.2.5:
+    resolution: {integrity: sha512-Qs/NAX2s/ClRATbiImc4IuzzAs+1RaFzZm7zRx9NKmLFnIeCC+h2LwkrOuprG3PsDM+g1IfPEFWvVbTSDKPnFA==}
     dev: false
 
   /electron-to-chromium@1.4.686:
