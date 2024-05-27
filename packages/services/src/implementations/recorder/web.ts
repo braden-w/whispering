@@ -85,6 +85,7 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 		),
 		enumerateRecordingDevices: Effect.tryPromise({
 			try: async () => {
+				await navigator.mediaDevices.getUserMedia({ audio: true });
 				const devices = await navigator.mediaDevices.enumerateDevices();
 				const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
 				return audioInputDevices;
