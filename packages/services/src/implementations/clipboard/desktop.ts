@@ -1,12 +1,13 @@
+import { writeText } from '@tauri-apps/api/clipboard';
 import { Effect, Layer } from 'effect';
 import { ClipboardError, ClipboardService } from '../../services/clipboard';
 
-export const ClipboardServiceWebLive = Layer.succeed(
+export const ClipboardServiceDesktopLive = Layer.succeed(
 	ClipboardService,
 	ClipboardService.of({
 		setClipboardText: (text) =>
 			Effect.tryPromise({
-				try: () => navigator.clipboard.writeText(text),
+				try: () => writeText(text),
 				catch: (error) =>
 					new ClipboardError({ message: 'Failed to write to clipboard', origError: error }),
 			}),

@@ -1,4 +1,4 @@
-import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder/web.ts';
+import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { Effect } from 'effect';
 import { createRecorder } from './create-recorder.svelte';
 
