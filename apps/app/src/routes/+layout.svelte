@@ -7,6 +7,8 @@
 	import { onMount } from 'svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { Effect } from 'effect';
+	import { unregisterAll } from '@tauri-apps/api/globalShortcut';
+	import { register } from '@tauri-apps/api/globalShortcut';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -19,11 +21,15 @@
 		});
 	});
 
-	onMount(async () => {
-		const { register } = await import('@tauri-apps/api/globalShortcut');
+	const registerCurrentGlobalShortcut = async () => {
+		await unregisterAll();
 		await register(settings.currentGlobalShortcut, () =>
 			recorder.toggleRecording.pipe(Effect.runPromise),
 		);
+	};
+
+	$effect(() => {
+		registerCurrentGlobalShortcut();
 	});
 </script>
 
