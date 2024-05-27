@@ -13,7 +13,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		recorder.toggleRecording.pipe(Effect.runPromise);
+		recorder.toggleRecording();
 	}
 
 	const PLACEHOLDER_RECORDING = {
@@ -52,7 +52,7 @@
 	</div>
 	<Button
 		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		on:click={() => recorder.toggleRecording.pipe(Effect.runPromise)}
+		on:click={recorder.toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
