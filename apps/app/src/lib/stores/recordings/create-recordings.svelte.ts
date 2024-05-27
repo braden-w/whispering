@@ -121,6 +121,12 @@ export const createRecordings = Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
 				toast.success('Copied to clipboard!');
-			}).pipe(Effect.runPromise),
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
+				Effect.runPromise,
+			),
 	};
 });
