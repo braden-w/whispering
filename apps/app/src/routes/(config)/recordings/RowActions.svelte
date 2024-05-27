@@ -105,7 +105,7 @@
 					<Button
 						onclick={async () => {
 							isDeleting = true;
-							await recordings.deleteRecording(recording.id);
+							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							isDeleting = false;
 							isDialogOpen = false;
 						}}
@@ -152,7 +152,7 @@
 				builders={[builder]}
 				variant="ghost"
 				size="icon"
-				onclick={() => recordings.deleteRecording(recording.id)}
+				onclick={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
 			>
 				<TrashIcon />
 			</Button>

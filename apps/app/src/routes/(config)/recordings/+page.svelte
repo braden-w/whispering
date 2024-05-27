@@ -232,7 +232,7 @@
 					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recordingRow) =>
-								recordings.deleteRecording(recordingRow.id),
+								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise)
 							),
 						);
 					}}

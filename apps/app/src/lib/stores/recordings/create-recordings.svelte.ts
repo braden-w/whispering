@@ -69,7 +69,6 @@ export const createRecordings = Effect.gen(function* (_) {
 					toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
-				Effect.runPromise,
 			),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* (_) {
