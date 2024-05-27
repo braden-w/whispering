@@ -24,29 +24,19 @@ interface RecordingsDbSchema extends DBSchema {
 
 export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
-	Effect.gen(function* () {
-		const db = yield* Effect.tryPromise({
-			try: async () => {
-				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-					upgrade(db) {
-						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
-						if (!isRecordingStoreObjectStoreExists) {
-							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-						}
-					},
-				});
-				return db;
+	Effect.sync(() => {
+		const db = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+			upgrade(db) {
+				const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+				if (!isRecordingStoreObjectStoreExists) {
+					db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+				}
 			},
-			catch: (error) =>
-				new AddRecordingError({
-					origError: error,
-					message: `Error initializing indexedDb: ${error}`,
-				}),
 		});
 		return {
 			addRecording: (recording) =>
 				Effect.tryPromise({
-					try: () => db.add(RECORDING_STORE, recording),
+					try: async () => (await db).add(RECORDING_STORE, recording),
 					catch: (error) =>
 						new AddRecordingError({
 							origError: error,
@@ -55,7 +45,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				}),
 			updateRecording: (recording) =>
 				Effect.tryPromise({
-					try: () => db.put(RECORDING_STORE, $state.snapshot(recording)),
+					try: async () => (await db).put(RECORDING_STORE, $state.snapshot(recording)),
 					catch: (error) =>
 						new EditRecordingError({
 							origError: error,
@@ -64,7 +54,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				}),
 			deleteRecording: (id) =>
 				Effect.tryPromise({
-					try: () => db.delete(RECORDING_STORE, id),
+					try: async () => (await db).delete(RECORDING_STORE, id),
 					catch: (error) =>
 						new DeleteRecordingError({
 							origError: error,
@@ -72,7 +62,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						}),
 				}),
 			getAllRecordings: Effect.tryPromise({
-				try: () => db.getAll(RECORDING_STORE),
+				try: async () => (await db).getAll(RECORDING_STORE),
 				catch: (error) =>
 					new GetAllRecordingsError({
 						origError: error,
@@ -81,7 +71,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			}),
 			getRecording: (id) =>
 				Effect.tryPromise({
-					try: () => db.get(RECORDING_STORE, id),
+					try: async () => (await db).get(RECORDING_STORE, id),
 					catch: (error) =>
 						new GetRecordingError({
 							origError: error,
