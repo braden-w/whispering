@@ -28,10 +28,10 @@
 	"type": "module",
 	"dependencies": {
 		"@repo/services": "workspace:*",
+		"@repo/svelte-table": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"@tanstack/table-core": "^8.17.3",
-		"@repo/svelte-table": "workspace:*",
-		"effect": "^2.4.19",
+		"effect": "^3.2.5",
 		"mode-watcher": "^0.2.2",
 		"nanoid": "^5.0.7",
 		"svelte-french-toast": "^1.2.0",
