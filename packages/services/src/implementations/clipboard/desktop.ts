@@ -14,9 +14,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 			}),
 		writeText: (text) =>
 			Effect.try({
-				try: () => {
-					invoke('write_text', { text });
-				},
+				try: () => invoke('write_text', { text }),
 				catch: (error) =>
 					new ClipboardError({ message: 'Failed to paste from clipboard', origError: error }),
 			}),
