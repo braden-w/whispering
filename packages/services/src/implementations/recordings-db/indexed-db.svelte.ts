@@ -24,28 +24,25 @@ interface RecordingsDbSchema extends DBSchema {
 
 export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
-	Effect.gen(function* (_) {
-		const db = yield* _(
-			Effect.tryPromise({
-				try: async () => {
-					const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-						upgrade(db) {
-							const isRecordingStoreObjectStoreExists =
-								db.objectStoreNames.contains(RECORDING_STORE);
-							if (!isRecordingStoreObjectStoreExists) {
-								db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-							}
-						},
-					});
-					return db;
-				},
-				catch: (error) =>
-					new AddRecordingError({
-						origError: error,
-						message: `Error initializing indexedDb: ${error}`,
-					}),
-			}),
-		);
+	Effect.gen(function* () {
+		const db = yield* Effect.tryPromise({
+			try: async () => {
+				const db = await openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+					upgrade(db) {
+						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
+						if (!isRecordingStoreObjectStoreExists) {
+							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
+						}
+					},
+				});
+				return db;
+			},
+			catch: (error) =>
+				new AddRecordingError({
+					origError: error,
+					message: `Error initializing indexedDb: ${error}`,
+				}),
+		});
 		return {
 			addRecording: (recording) =>
 				Effect.tryPromise({

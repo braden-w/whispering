@@ -28,8 +28,8 @@ const recorderStateSchema = z.union([
 const INITIAL_STATE = 'IDLE';
 
 export const createRecorder = () =>
-	Effect.gen(function* (_) {
-		const recorderService = yield* _(RecorderService);
+	Effect.gen(function* () {
+		const recorderService = yield* RecorderService;
 		const recorderState = createPersistedState({
 			key: 'whispering-recorder-state',
 			schema: recorderStateSchema,
@@ -52,8 +52,8 @@ export const createRecorder = () =>
 			set selectedAudioInputDeviceId(value: string) {
 				selectedAudioInputDeviceId.value = value;
 			},
-			refreshDefaultAudioInput: Effect.gen(function* (_) {
-				const recordingDevices = yield* _(recorderService.enumerateRecordingDevices);
+			refreshDefaultAudioInput: Effect.gen(function* () {
+				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
 				const $selectedAudioInput = selectedAudioInputDeviceId.value;
 				const isSelectedExists = recordingDevices.some(
 					({ deviceId }) => deviceId === $selectedAudioInput,
@@ -68,17 +68,17 @@ export const createRecorder = () =>
 					return Effect.succeed(undefined);
 				}),
 			),
-			toggleRecording: Effect.gen(function* (_) {
+			toggleRecording: Effect.gen(function* () {
 				switch (recorderState.value) {
 					case 'IDLE': {
-						yield* _(recorderService.startRecording(selectedAudioInputDeviceId.value));
-						yield* _(Effect.logInfo('Recording started'));
+						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
+						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
 						break;
 					}
 					case 'RECORDING': {
-						const audioBlob = yield* _(recorderService.stopRecording);
-						yield* _(Effect.logInfo('Recording stopped'));
+						const audioBlob = yield* recorderService.stopRecording;
+						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),
 							title: '',
@@ -89,7 +89,7 @@ export const createRecorder = () =>
 							transcriptionStatus: 'UNPROCESSED',
 						};
 						recorderState.value = 'IDLE';
-						yield* _(recordings.addRecording(newRecording));
+						yield* recordings.addRecording(newRecording);
 						recordings.transcribeRecording(newRecording.id);
 						break;
 					}

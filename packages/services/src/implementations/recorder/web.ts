@@ -44,8 +44,8 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 	RecorderService,
 	RecorderService.of({
 		startRecording: (recordingDeviceId) =>
-			Effect.gen(function* (_) {
-				stream = yield* _(getMediaStream(recordingDeviceId));
+			Effect.gen(function* () {
+				stream = yield* getMediaStream(recordingDeviceId);
 				recordedChunks.length = 0;
 				mediaRecorder = new AudioRecorder(stream);
 				mediaRecorder.addEventListener(

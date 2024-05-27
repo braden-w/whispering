@@ -112,44 +112,40 @@ export const TranscriptionServiceLiveWhisper = Layer.succeed(
 	TranscriptionService.of({
 		getSupportedLanguages: Effect.succeed(SUPPORTED_LANGUAGES),
 		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
-			Effect.gen(function* (_) {
+			Effect.gen(function* () {
 				if (!apiKey) {
-					return yield* _(new PleaseEnterApiKeyError());
+					return yield* new PleaseEnterApiKeyError();
 				}
 				if (!apiKey.startsWith('sk-')) {
-					return yield* _(new InvalidApiKeyError());
+					return yield* new InvalidApiKeyError();
 				}
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-					return yield* _(new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB));
+					return yield* new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB);
 				}
 				const wavFile = new File([audioBlob], FILE_NAME);
 				const formData = new FormData();
 				formData.append('file', wavFile);
 				formData.append('model', 'whisper-1');
 				formData.append('language', outputLanguage);
-				const data = yield* _(
-					Effect.tryPromise({
-						try: () =>
-							fetch('https://api.openai.com/v1/audio/transcriptions', {
-								method: 'POST',
-								headers: { Authorization: `Bearer ${apiKey}` },
-								body: formData,
-							}).then((res) => res.json()),
-						catch: (error) => new WhisperFetchError({ fetchError: error }),
-					}),
-				);
+				const data = yield* Effect.tryPromise({
+					try: () =>
+						fetch('https://api.openai.com/v1/audio/transcriptions', {
+							method: 'POST',
+							headers: { Authorization: `Bearer ${apiKey}` },
+							body: formData,
+						}).then((res) => res.json()),
+					catch: (error) => new WhisperFetchError({ fetchError: error }),
+				});
 				if (data?.error?.message) {
-					return yield* _(
-						new WhisperServerError({
-							message: data.error.message,
-							code: data.error.code,
-							type: data.error.type,
-						}),
-					);
+					return yield* new WhisperServerError({
+						message: data.error.message,
+						code: data.error.code,
+						type: data.error.type,
+					});
 				}
 				if (!isString(data.text)) {
-					return yield* _(new TranscriptionIsNotStringError());
+					return yield* new TranscriptionIsNotStringError();
 				}
 				return data.text;
 			}),
