@@ -8,7 +8,7 @@ import { ClipboardService } from '@repo/services/services/clipboard';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { RecordingsDbService } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
-import { Effect, Either, Option } from 'effect';
+import { Console, Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from '../settings.svelte';
 
@@ -91,7 +91,7 @@ export const createRecordings = Effect.gen(function* () {
 				if (settings.isCopyToClipboardEnabled && transcribedText)
 					yield* clipboardService.setClipboardText(transcribedText);
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
-					yield* clipboardService.pasteTextFromClipboard;
+					yield* clipboardService.writeText(transcribedText);
 			}).pipe(
 				Effect.catchAll((error) => Effect.succeed(error)),
 				Effect.runPromise,
@@ -101,6 +101,7 @@ export const createRecordings = Effect.gen(function* () {
 						success: (maybeError) => {
 							if (!maybeError) return TranscriptionComplete;
 							const error = maybeError;
+							Console.error(error).pipe(Effect.runSync);
 							switch (error._tag) {
 								case 'PleaseEnterApiKeyError':
 									return PleaseEnterAPIKeyToast;
@@ -110,7 +111,8 @@ export const createRecordings = Effect.gen(function* () {
 									return SomethingWentWrongToast;
 							}
 						},
-						error: (_uncaughtError) => {
+						error: (uncaughtError) => {
+							Console.error(uncaughtError).pipe(Effect.runSync);
 							return SomethingWentWrongToast;
 						},
 					});
