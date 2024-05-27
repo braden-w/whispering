@@ -1,7 +1,7 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
-export class ClipboardError extends Data.TaggedError('TranscribeError')<{
+export class ClipboardError extends Data.TaggedError('ClipboardError')<{
 	message: string;
 	origError?: unknown;
 }> {}
