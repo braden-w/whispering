@@ -8,7 +8,7 @@ import { ClipboardService } from '@repo/services/services/clipboard';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { RecordingsDbService } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
-import { Effect, Option } from 'effect';
+import { Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from '../settings.svelte';
 
@@ -71,19 +71,27 @@ export const createRecordings = Effect.gen(function* (_) {
 				}),
 			),
 		transcribeRecording: (id: string) =>
-			Effect.gen(function* (_) {
-				const maybeRecording = yield* _(recordingsDb.getRecording(id));
+			Effect.gen(function* () {
+				const maybeRecording = yield* recordingsDb.getRecording(id);
 				if (Option.isNone(maybeRecording)) {
-					return yield* _(new TranscriptionError({ message: `Recording with id ${id} not found` }));
+					return yield* new TranscriptionError({ message: `Recording with id ${id} not found` });
 				}
-				const recording = yield* _(maybeRecording);
-				yield* _(updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' }));
-				const transcribedText = yield* _(transcriptionService.transcribe(recording.blob, settings));
-				yield* _(updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }));
+				const recording = yield* maybeRecording;
+				yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
+				const transcriptionResult = yield* Effect.either(
+					transcriptionService.transcribe(recording.blob, settings),
+				);
+				if (Either.isLeft(transcriptionResult)) {
+					yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });
+					const error = transcriptionResult.left;
+					return yield* error;
+				}
+				const transcribedText = transcriptionResult.right;
+				yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
 				if (settings.isCopyToClipboardEnabled && transcribedText)
-					yield* _(clipboardService.setClipboardText(transcribedText));
+					yield* clipboardService.setClipboardText(transcribedText);
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
-					yield* _(clipboardService.pasteTextFromClipboard);
+					yield* clipboardService.pasteTextFromClipboard;
 			}).pipe(
 				Effect.catchAll((error) => Effect.succeed(error)),
 				Effect.runPromise,
