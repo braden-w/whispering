@@ -52,7 +52,7 @@
 	</div>
 	<Button
 		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		on:click={recorder.toggleRecording}
+		onclick={recorder.toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
@@ -84,7 +84,7 @@
 			/>
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				on:click={copyRecordingTextFromLatestRecording}
+				onclick={copyRecordingTextFromLatestRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
