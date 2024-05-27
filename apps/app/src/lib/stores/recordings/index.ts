@@ -1,5 +1,5 @@
 import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
-import { RecordingsDbServiceLiveIndexedDb } from '@repo/services/implementations/recordings-db/indexed-db.ts';
+import { RecordingsDbServiceLiveIndexedDb } from '@repo/services/implementations/recordings-db/indexed-db.svelte.ts';
 import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription/whisper.ts';
 import { Effect } from 'effect';
 import { createRecordings } from './create-recordings.svelte';
