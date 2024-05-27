@@ -51,7 +51,8 @@ function createSettings() {
 			currentGlobalShortcut.value = newValue;
 			Effect.gen(function* () {
 				const registerShortcut = yield* RegisterShortcutsService;
-				yield* registerShortcut.registerShortcut(settings.currentGlobalShortcut, () =>
+				yield* registerShortcut.unregisterAll();
+				yield* registerShortcut.register(settings.currentGlobalShortcut, () =>
 					recorder.toggleRecording.pipe(Effect.runPromise),
 				);
 			}).pipe(Effect.provide(RegisterShortcutsDesktopLive), Effect.runSync);

@@ -22,13 +22,23 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 			isProcessing = false;
 		});
 		return {
+			unregisterAll: () =>
+				Effect.gen(function* () {
+					const job: RegisterShortcutJob = Effect.tryPromise({
+						try: () => unregisterAll(),
+						catch: (error) =>
+							new RegisterShortcutsError({
+								message: 'Error unregistering all shortcuts',
+								origError: error,
+							}),
+					});
+					yield* Queue.offer(queue, job);
+					yield* processQueue;
+				}),
 			registerShortcut: (shortcut, callback) =>
 				Effect.gen(function* () {
 					const job: RegisterShortcutJob = Effect.tryPromise({
-						try: async () => {
-							await unregisterAll();
-							await register(shortcut, callback);
-						},
+						try: () => register(shortcut, callback),
 						catch: (error) =>
 							new RegisterShortcutsError({
 								message: 'Error registering shortcut',

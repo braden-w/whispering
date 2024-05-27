@@ -10,7 +10,11 @@ export class RegisterShortcutsError extends Data.TaggedError('RegisterShortcutsE
 export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsService')<
 	RegisterShortcutsService,
 	{
-		readonly registerShortcut: (
+		readonly unregisterAll: () => Effect.Effect<
+			void,
+			NoSuchElementException | RegisterShortcutsError
+		>;
+		readonly register: (
 			shortcut: string,
 			callback: () => void,
 		) => Effect.Effect<void, RegisterShortcutsError | NoSuchElementException>;
