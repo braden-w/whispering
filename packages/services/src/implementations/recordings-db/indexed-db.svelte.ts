@@ -58,7 +58,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				}),
 			updateRecording: (recording) =>
 				Effect.tryPromise({
-					try: () => db.put(RECORDING_STORE, recording),
+					try: () => db.put(RECORDING_STORE, $state.snapshot(recording)),
 					catch: (error) =>
 						new EditRecordingError({
 							origError: error,
