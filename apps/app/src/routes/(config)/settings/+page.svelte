@@ -134,6 +134,16 @@
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
+				<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
+				<Input
+					id="global-shortcut"
+					placeholder="Global Shortcut to toggle recording"
+					bind:value={settings.currentGlobalShortcut}
+					type="text"
+					autocomplete="off"
+				/>
+			</div>
+			<div class="grid gap-2">
 				<Label class="text-sm" for="api-key">API Key</Label>
 				<Input
 					id="api-key"
