@@ -1,11 +1,4 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
-import {
-	PleaseEnterAPIKeyToast,
-	SomethingWentWrongToast,
-	TranscriptionComplete,
-} from '$lib/toasts';
-import { ClipboardServiceLive } from '@repo/services/implementations/clipboard/web.js';
-import { ClipboardService } from '@repo/services/services/clipboard';
 import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
@@ -13,8 +6,6 @@ import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recordings } from '../recordings';
-import type { createRecordings } from '../recordings/create-recordings.svelte';
-import { settings } from '../settings.svelte';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
