@@ -1,5 +1,9 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
+import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
+import { RegisterShortcutsService } from '@repo/services/services/register-shortcuts';
+import { Effect } from 'effect';
 import { z } from 'zod';
+import { recorder } from './recorder';
 
 function createSettings() {
 	const isCopyToClipboardEnabled = createPersistedState({
@@ -45,6 +49,12 @@ function createSettings() {
 		},
 		set currentGlobalShortcut(newValue) {
 			currentGlobalShortcut.value = newValue;
+			Effect.gen(function* () {
+				const registerShortcut = yield* RegisterShortcutsService;
+				yield* registerShortcut.registerShortcut(settings.currentGlobalShortcut, () =>
+					recorder.toggleRecording.pipe(Effect.runPromise),
+				);
+			}).pipe(Effect.provide(RegisterShortcutsDesktopLive), Effect.runSync);
 		},
 		get apiKey() {
 			return apiKey.value;
