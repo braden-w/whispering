@@ -16,6 +16,9 @@
 			"clipboard": {
 				"writeText": true
 			},
+			"globalShortcut": {
+				"all": true
+			},
 			"shell": {
 				"all": false,
 				"execute": false,
