@@ -14,17 +14,7 @@
 	import { Effect } from 'effect';
 	import { toast } from 'svelte-sonner';
 
-	const getMediaDevicesPromise = Effect.gen(function* () {
-		const recorderService = yield* RecorderService;
-		return yield* recorderService.enumerateRecordingDevices;
-	}).pipe(
-		Effect.catchAll((error) => {
-			toast.error(error.message);
-			return Effect.succeed([] as MediaDeviceInfo[]);
-		}),
-		Effect.provide(RecorderServiceLiveWeb),
-		Effect.runPromise,
-	);
+	const getMediaDevicesPromise = recorder.enumerateRecordingDevices();
 
 	const supportedLanguagesOptions = Effect.gen(function* () {
 		const transcriptionService = yield* TranscriptionService;

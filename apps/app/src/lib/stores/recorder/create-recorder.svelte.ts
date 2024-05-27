@@ -97,5 +97,15 @@ export const createRecorder = Effect.gen(function* () {
 				}),
 				Effect.runPromise,
 			),
+		enumerateRecordingDevices: () =>
+			Effect.gen(function* () {
+				return yield* recorderService.enumerateRecordingDevices;
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed([] as MediaDeviceInfo[]);
+				}),
+				Effect.runPromise,
+			),
 	};
 });
