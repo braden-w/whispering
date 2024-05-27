@@ -2,11 +2,9 @@
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
 	import { recorder } from '$lib/stores/recorder';
 	import { recordings } from '$lib/stores/recordings';
-	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import { Effect } from 'effect';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import NavItems from '../NavItems.svelte';
 
