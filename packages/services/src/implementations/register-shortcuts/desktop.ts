@@ -13,8 +13,9 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 		const processQueue = Effect.gen(function* () {
 			if (isProcessing) return;
 			isProcessing = true;
-			let maybeJob: Option.Option<RegisterShortcutJob>;
-			while (Option.isSome((maybeJob = yield* Queue.poll(queue)))) {
+			while (true) {
+				const maybeJob = yield* Queue.poll(queue);
+				if (Option.isNone(maybeJob)) break;
 				const job = yield* maybeJob;
 				yield* job;
 			}
