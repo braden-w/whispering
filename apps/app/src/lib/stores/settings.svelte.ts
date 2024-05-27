@@ -54,7 +54,7 @@ function createSettings() {
 				const registerShortcut = yield* RegisterShortcutsService;
 				yield* registerShortcut.unregisterAll();
 				yield* registerShortcut.register(settings.currentGlobalShortcut, recorder.toggleRecording);
-				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}!`);
+				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
 			}).pipe(Effect.provide(RegisterShortcutsDesktopLive), Effect.runSync);
 		},
 		get apiKey() {
