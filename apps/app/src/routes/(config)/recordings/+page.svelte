@@ -122,7 +122,7 @@
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-column-visibility',
-		defaultValue: { id: false, subtitle: false },
+		defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
 		schema: z.record(z.boolean()),
 	});
 	let rowSelection = createPersistedState({
