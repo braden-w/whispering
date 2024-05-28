@@ -4,8 +4,6 @@
 	import { Toaster } from '@repo/ui/components/sonner';
 	import { ModeWatcher } from 'mode-watcher';
 
-	let { children } = $props();
-
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
 
@@ -23,7 +21,7 @@
 </svelte:head>
 
 <div class="relative flex min-h-screen flex-col">
-	{@render children()}
+	<slot />
 </div>
 
 <Toaster position="bottom-right" />

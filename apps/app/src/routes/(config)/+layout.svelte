@@ -3,8 +3,6 @@
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import NavItems from '../NavItems.svelte';
-
-	let { children } = $props();
 </script>
 
 <header
@@ -36,5 +34,5 @@
 	</div>
 </header>
 <main class="flex flex-1 justify-center p-4">
-	{@render children()}
+	<slot />
 </main>
