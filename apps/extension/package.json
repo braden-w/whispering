@@ -13,22 +13,22 @@
 	"dependencies": {
 		"@plasmohq/storage": "^1.10.0",
 		"@repo/ui": "workspace:*",
-		"mode-watcher": "^0.2.2",
-		"plasmo": "^0.84.2",
+		"mode-watcher": "^0.3.0",
+		"plasmo": "^0.86.3",
 		"svelte-french-toast": "^1.2.0",
 		"svelte-preprocess": "^5.1.4"
 	},
 	"devDependencies": {
-		"@iconify/json": "^2.2.213",
-		"@types/chrome": "^0.0.237",
+		"@iconify/json": "^2.2.214",
+		"@types/chrome": "^0.0.268",
 		"@types/node": "^20.12.12",
 		"autoprefixer": "^10.4.19",
 		"eslint-config-custom": "workspace:*",
 		"postcss": "^8.4.38",
 		"svelte": "^5.0.0-next",
 		"tailwindcss": "^3.4.3",
-		"typescript": "^5.4.5",
-		"unplugin-icons": "^0.18.5"
+		"typescript": "latest",
+		"unplugin-icons": "^0.19.0"
 	},
 	"manifest": {
 		"host_permissions": [
