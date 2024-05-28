@@ -2,9 +2,9 @@ import { createPersistedState } from '$lib/createPersistedState.svelte';
 import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
 import { RegisterShortcutsService } from '@repo/services/services/register-shortcuts';
 import { Effect } from 'effect';
+import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recorder } from './recorder';
-import { toast } from 'svelte-sonner';
 
 const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
