@@ -12,20 +12,6 @@ import {
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
 const createSettings = Effect.gen(function* () {
-	const jobQueue = yield* Queue.unbounded<RegisterShortcutJob>();
-	let isProcessing = false;
-	const processJobQueue = Effect.gen(function* () {
-		if (isProcessing) return;
-		isProcessing = true;
-		while (isProcessing) {
-			const job = yield* Queue.take(jobQueue);
-			yield* job;
-			if (Option.isNone(yield* Queue.poll(jobQueue))) {
-				isProcessing = false;
-			}
-		}
-	});
-
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const isPlaySoundEnabled = createPersistedState({
 		key: 'whispering-is-play-sound-enabled',
@@ -57,6 +43,34 @@ const createSettings = Effect.gen(function* () {
 		schema: z.string(),
 		defaultValue: 'en',
 	});
+
+	const jobQueue = yield* Queue.unbounded<RegisterShortcutJob>();
+	let isProcessing = false;
+	const processJobQueue = Effect.gen(function* () {
+		if (isProcessing) return;
+		isProcessing = true;
+		while (isProcessing) {
+			const job = yield* Queue.take(jobQueue);
+			yield* job;
+			if (Option.isNone(yield* Queue.poll(jobQueue))) {
+				isProcessing = false;
+			}
+		}
+	});
+
+	const queueSilentInitialRegisterShortcutJob = Effect.gen(function* () {
+		const job = Effect.gen(function* () {
+			yield* registerShortcutsService.unregisterAll();
+			yield* registerShortcutsService.register({
+				shortcut: settings.currentGlobalShortcut,
+				callback: recorder.toggleRecording,
+			});
+		}).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+		yield* Queue.offer(jobQueue, job);
+		yield* processJobQueue;
+	});
+	queueSilentInitialRegisterShortcutJob.pipe(Effect.runPromise);
+
 	return {
 		get isPlaySoundEnabled() {
 			return isPlaySoundEnabled.value;
