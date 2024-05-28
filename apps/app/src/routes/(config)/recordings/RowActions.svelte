@@ -6,7 +6,6 @@
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { Effect } from 'effect';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
@@ -26,39 +25,26 @@
 </script>
 
 <div class="flex items-center">
-	<Tooltip.Root>
-		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				variant="ghost"
-				size="icon"
-				onclick={() => recordings.transcribeRecording(recording.id)}
-			>
-				{#if recording.transcriptionStatus === 'UNPROCESSED'}
-					<StartTranscriptionIcon />
-				{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
-					<LoadingTranscriptionIcon />
-				{:else}
-					<RetryTranscriptionIcon />
-				{/if}
-			</Button>
-		</Tooltip.Trigger>
-		<Tooltip.Content>
-			<p>Transcribe Recording</p>
-		</Tooltip.Content>
-	</Tooltip.Root>
+	<Button
+		variant="ghost"
+		size="icon"
+		on:click={() => recordings.transcribeRecording(recording.id)}
+		title="Transcribe Recording"
+	>
+		{#if recording.transcriptionStatus === 'UNPROCESSED'}
+			<StartTranscriptionIcon />
+		{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
+			<LoadingTranscriptionIcon />
+		{:else}
+			<RetryTranscriptionIcon />
+		{/if}
+	</Button>
+
 	<Dialog.Root bind:open={isDialogOpen}>
 		<Dialog.Trigger>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild let:builder>
-					<Button builders={[builder]} variant="ghost" size="icon">
-						<EditIcon />
-					</Button>
-				</Tooltip.Trigger>
-				<Tooltip.Content>
-					<p>Edit Recording</p>
-				</Tooltip.Content>
-			</Tooltip.Root>
+			<Button variant="ghost" size="icon" title="Edit Recording">
+				<EditIcon />
+			</Button>
 		</Dialog.Trigger>
 		<Dialog.Content class="sm:max-w-[425px]">
 			<Dialog.Header>
@@ -103,7 +89,7 @@
 				</div>
 				<Dialog.Footer>
 					<Button
-						onclick={async () => {
+						on:click={async () => {
 							isDeleting = true;
 							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
 							isDeleting = false;
@@ -127,38 +113,26 @@
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>
-	<Tooltip.Root>
-		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				variant="ghost"
-				size="icon"
-				onclick={copyThisRecording}
-				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: recording.id,
-					propertyName: 'transcribedText',
-				})}-copy-button"
-			>
-				<ClipboardIcon />
-			</Button>
-		</Tooltip.Trigger>
-		<Tooltip.Content>
-			<p>Copy Transcript</p>
-		</Tooltip.Content>
-	</Tooltip.Root>
-	<Tooltip.Root>
-		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				variant="ghost"
-				size="icon"
-				onclick={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
-			>
-				<TrashIcon />
-			</Button>
-		</Tooltip.Trigger>
-		<Tooltip.Content>
-			<p>Delete Recording</p>
-		</Tooltip.Content>
-	</Tooltip.Root>
+
+	<Button
+		variant="ghost"
+		size="icon"
+		on:click={copyThisRecording}
+		style="view-transition-name: {createRecordingViewTransitionName({
+			recordingId: recording.id,
+			propertyName: 'transcribedText',
+		})}-copy-button"
+		title="Copy Transcript"
+	>
+		<ClipboardIcon />
+	</Button>
+
+	<Button
+		variant="ghost"
+		size="icon"
+		on:click={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
+		title="Delete Recording"
+	>
+		<TrashIcon />
+	</Button>
 </div>

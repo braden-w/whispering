@@ -44,13 +44,13 @@
 	<div class="flex flex-col gap-4">
 		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
-			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow access
-			to your microphone.
+			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
+			access to your microphone.
 		</p>
 	</div>
 	<Button
 		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		onclick={recorder.toggleRecording}
+		on:click={recorder.toggleRecording}
 		aria-label="Toggle recording"
 		variant="ghost"
 	>
@@ -82,7 +82,7 @@
 			/>
 			<Button
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				onclick={copyRecordingTextFromLatestRecording}
+				on:click={copyRecordingTextFromLatestRecording}
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',

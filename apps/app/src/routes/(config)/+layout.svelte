@@ -20,7 +20,7 @@
 			variant="ghost"
 			size="icon"
 			aria-label="Toggle recording"
-			onclick={recorder.toggleRecording}
+			on:click={recorder.toggleRecording}
 			style="view-transition-name: microphone-icon"
 		>
 			{#if recorder.recorderState === 'RECORDING'}

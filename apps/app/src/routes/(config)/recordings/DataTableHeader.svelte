@@ -12,7 +12,7 @@
 
 <Button
 	variant="ghost"
-	onclick={() => {
+	on:click={() => {
 		column.toggleSorting();
 	}}
 >
