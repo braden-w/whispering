@@ -37,6 +37,14 @@
 		<Card.Content class="space-y-6">
 			<div class="flex items-center gap-2">
 				<Switch
+					id="play-sound-enabled"
+					aria-labelledby="play-sound-enabled"
+					bind:checked={settings.isPlaySoundEnabled}
+				/>
+				<Label for="play-sound-enabled">Play sound on toggle on and off</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
 					bind:checked={settings.isCopyToClipboardEnabled}

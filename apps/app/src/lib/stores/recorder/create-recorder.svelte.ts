@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recordings } from '../recordings';
+import { settings } from '../settings.svelte';
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -68,14 +69,14 @@ export const createRecorder = Effect.gen(function* () {
 				switch (recorderState.value) {
 					case 'IDLE': {
 						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
-						startSound.play();
+						if (settings.isPlaySoundEnabled) startSound.play();
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
 						break;
 					}
 					case 'RECORDING': {
 						const audioBlob = yield* recorderService.stopRecording;
-						stopSound.play();
+						if (settings.isPlaySoundEnabled) stopSound.play();
 						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),

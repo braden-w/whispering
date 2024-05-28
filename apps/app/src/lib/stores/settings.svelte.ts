@@ -27,6 +27,11 @@ const createSettings = Effect.gen(function* () {
 	});
 
 	const registerShortcutsService = yield* RegisterShortcutsService;
+	const isPlaySoundEnabled = createPersistedState({
+		key: 'whispering-is-play-sound-enabled',
+		schema: z.boolean(),
+		defaultValue: true,
+	});
 	const isCopyToClipboardEnabled = createPersistedState({
 		key: 'whispering-is-copy-to-clipboard-enabled',
 		schema: z.boolean(),
@@ -53,6 +58,12 @@ const createSettings = Effect.gen(function* () {
 		defaultValue: 'en',
 	});
 	return {
+		get isPlaySoundEnabled() {
+			return isPlaySoundEnabled.value;
+		},
+		set isPlaySoundEnabled(newValue) {
+			isPlaySoundEnabled.value = newValue;
+		},
 		get isCopyToClipboardEnabled() {
 			return isCopyToClipboardEnabled.value;
 		},
