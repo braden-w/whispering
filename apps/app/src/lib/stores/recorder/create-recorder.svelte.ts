@@ -32,6 +32,23 @@ export const createRecorder = Effect.gen(function* () {
 		defaultValue: '',
 	});
 
+	const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
+		const recordingDevices = yield* recorderService.enumerateRecordingDevices;
+		const isSelectedDeviceExists = recordingDevices.some(
+			({ deviceId }) => deviceId === selectedAudioInputDeviceId.value,
+		);
+		if (!isSelectedDeviceExists) {
+			toast.info('Default audio input device not found, selecting first available device');
+			const firstAudioInput = recordingDevices[0].deviceId;
+			selectedAudioInputDeviceId.value = firstAudioInput;
+		}
+	}).pipe(
+		Effect.catchAll((error) => {
+			toast.error(error.message);
+			return Effect.succeed(undefined);
+		}),
+	);
+
 	return {
 		get recorderState() {
 			return recorderState.value;
@@ -42,25 +59,9 @@ export const createRecorder = Effect.gen(function* () {
 		set selectedAudioInputDeviceId(value: string) {
 			selectedAudioInputDeviceId.value = value;
 		},
-		refreshDefaultAudioInput: () =>
-			Effect.gen(function* () {
-				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-				const isSelectedExists = recordingDevices.some(
-					({ deviceId }) => deviceId === selectedAudioInputDeviceId.value,
-				);
-				if (!isSelectedExists) {
-					const firstAudioInput = recordingDevices[0].deviceId;
-					selectedAudioInputDeviceId.value = firstAudioInput;
-				}
-			}).pipe(
-				Effect.catchAll((error) => {
-					toast.error(error.message);
-					return Effect.succeed(undefined);
-				}),
-				Effect.runPromise,
-			),
 		toggleRecording: () =>
 			Effect.gen(function* () {
+				yield* checkAndUpdateSelectedAudioInputDevice;
 				switch (recorderState.value) {
 					case 'IDLE': {
 						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
