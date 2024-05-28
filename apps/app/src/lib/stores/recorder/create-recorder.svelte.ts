@@ -18,6 +18,9 @@ const recorderStateSchema = z.union([
 
 const INITIAL_STATE = 'IDLE';
 
+const startSound = new Audio('/zapsplat_household_alarm_clock_button_press_12967.mp3');
+const stopSound = new Audio('/zapsplat_household_alarm_clock_button_press_12967.mp3');
+
 export const createRecorder = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
 	const recorderState = createPersistedState({
@@ -65,12 +68,14 @@ export const createRecorder = Effect.gen(function* () {
 				switch (recorderState.value) {
 					case 'IDLE': {
 						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
+						startSound.play();
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
 						break;
 					}
 					case 'RECORDING': {
 						const audioBlob = yield* recorderService.stopRecording;
+						stopSound.play();
 						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),
