@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { recorder } from './recorder';
 import { toast } from 'svelte-sonner';
 
-function createSettings() {
+const createSettings = Effect.gen(function* () {
+	const registerShortcutsService = yield* RegisterShortcutsService;
 	const isCopyToClipboardEnabled = createPersistedState({
 		key: 'whispering-is-copy-to-clipboard-enabled',
 		schema: z.boolean(),
@@ -20,7 +21,7 @@ function createSettings() {
 	const currentGlobalShortcut = createPersistedState({
 		key: 'whispering-current-global-shortcut',
 		schema: z.string(),
-		defaultValue: 'CommandOrControl+Shift+;',
+		defaultValue: registerShortcutsService.defaultShortcut,
 	});
 	const apiKey = createPersistedState({
 		key: 'whispering-api-key',
@@ -51,11 +52,13 @@ function createSettings() {
 		set currentGlobalShortcut(newValue) {
 			currentGlobalShortcut.value = newValue;
 			Effect.gen(function* () {
-				const registerShortcut = yield* RegisterShortcutsService;
-				yield* registerShortcut.unregisterAll();
-				yield* registerShortcut.register(settings.currentGlobalShortcut, recorder.toggleRecording);
+				yield* registerShortcutsService.unregisterAll();
+				yield* registerShortcutsService.register(
+					settings.currentGlobalShortcut,
+					recorder.toggleRecording,
+				);
 				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
-			}).pipe(Effect.provide(RegisterShortcutsDesktopLive), Effect.runSync);
+			}).pipe(Effect.runSync);
 		},
 		get apiKey() {
 			return apiKey.value;
@@ -70,6 +73,9 @@ function createSettings() {
 			outputLanguage.value = newValue;
 		},
 	};
-}
+});
 
-export const settings = createSettings();
+export const settings = createSettings.pipe(
+	Effect.provide(RegisterShortcutsDesktopLive),
+	Effect.runSync,
+);

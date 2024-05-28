@@ -22,6 +22,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 			isProcessing = false;
 		});
 		return {
+			defaultShortcut: 'CommandOrControl+Shift+;',
 			unregisterAll: () =>
 				Effect.gen(function* () {
 					const job: RegisterShortcutJob = Effect.tryPromise({
