@@ -13,13 +13,13 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 		const processQueue = Effect.gen(function* () {
 			if (isProcessing) return;
 			isProcessing = true;
-			while (true) {
-				const maybeJob = yield* Queue.poll(queue);
-				if (Option.isNone(maybeJob)) break;
-				const job = yield* maybeJob;
+			while (isProcessing) {
+				const job = yield* Queue.take(queue);
 				yield* job;
+				if (Option.isNone(yield* Queue.poll(queue))) {
+					isProcessing = false;
+				}
 			}
-			isProcessing = false;
 		});
 		return {
 			defaultShortcut: 'CommandOrControl+Shift+;',
