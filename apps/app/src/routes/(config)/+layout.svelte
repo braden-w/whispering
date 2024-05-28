@@ -13,6 +13,9 @@
 	style="view-transition-name: header"
 >
 	<div class="flex gap-2">
+		<Button variant="ghost" href="/">
+			<span class="text-lg font-bold">whispering</span>
+		</Button>
 		<Button
 			variant="ghost"
 			size="icon"
@@ -27,9 +30,6 @@
 			{:else}
 				🎙️
 			{/if}
-		</Button>
-		<Button variant="ghost" href="/">
-			<span class="text-lg font-bold">whispering</span>
 		</Button>
 	</div>
 	<NavItems />
