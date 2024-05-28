@@ -46,6 +46,8 @@
 				headerText: 'ID',
 			},
 			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+			enableSorting: false,
+			enableHiding: false,
 		},
 		{
 			accessorKey: 'title',
