@@ -110,7 +110,7 @@ const SUPPORTED_LANGUAGES = [
 export const TranscriptionServiceLiveWhisper = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
-		getSupportedLanguages: Effect.succeed(SUPPORTED_LANGUAGES),
+		supportedLanguages: SUPPORTED_LANGUAGES,
 		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
 			Effect.gen(function* () {
 				if (!apiKey) {

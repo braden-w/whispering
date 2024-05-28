@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { recorder } from '$lib/stores/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
-	import { RecorderService } from '@repo/services/services/recorder';
 	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
@@ -12,13 +10,12 @@
 	import * as Select from '@repo/ui/components/select';
 	import { Switch } from '@repo/ui/components/switch';
 	import { Effect } from 'effect';
-	import { toast } from 'svelte-sonner';
 
 	const getMediaDevicesPromise = recorder.enumerateRecordingDevices();
 
 	const supportedLanguagesOptions = Effect.gen(function* () {
 		const transcriptionService = yield* TranscriptionService;
-		const languages = yield* transcriptionService.getSupportedLanguages;
+		const languages = transcriptionService.supportedLanguages;
 		return languages;
 	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
 
