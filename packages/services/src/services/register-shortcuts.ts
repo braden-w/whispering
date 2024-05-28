@@ -13,7 +13,7 @@ export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsServ
 		readonly defaultShortcut: string;
 		readonly unregisterAll: () => Effect.Effect<
 			void,
-			NoSuchElementException | RegisterShortcutsError
+			RegisterShortcutsError | NoSuchElementException
 		>;
 		readonly register: (
 			shortcut: string,
