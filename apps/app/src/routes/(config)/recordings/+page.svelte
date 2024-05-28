@@ -71,6 +71,17 @@
 			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
+			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
+			meta: {
+				headerText: 'Transcribed Text',
+			},
+			header: 'Transcribed Text',
+			cell: ({ getValue }) => {
+				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
+				return renderComponent(TranscribedText, { recordingId: id, transcribedText });
+			},
+		},
+		{
 			accessorFn: ({ id, blob }) => ({ id, blob }),
 			meta: {
 				headerText: 'Audio',
@@ -80,17 +91,6 @@
 				const { id, blob } = getValue<{ id: string; blob: Blob }>();
 				const audioUrl = URL.createObjectURL(blob);
 				return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
-			},
-		},
-		{
-			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
-			meta: {
-				headerText: 'Transcribed Text',
-			},
-			header: 'Transcribed Text',
-			cell: ({ getValue }) => {
-				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
-				return renderComponent(TranscribedText, { recordingId: id, transcribedText });
 			},
 		},
 		{
