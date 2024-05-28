@@ -1,12 +1,31 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
 import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
-import { RegisterShortcutsService } from '@repo/services/services/register-shortcuts';
-import { Effect } from 'effect';
+import { Effect, Option, Queue } from 'effect';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recorder } from './recorder';
+import {
+	RegisterShortcutsService,
+	type RegisterShortcutsError,
+} from '@repo/services/services/register-shortcuts';
+
+type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
 const createSettings = Effect.gen(function* () {
+	const queue = yield* Queue.unbounded<RegisterShortcutJob>();
+	let isProcessing = false;
+	const processQueue = Effect.gen(function* () {
+		if (isProcessing) return;
+		isProcessing = true;
+		while (isProcessing) {
+			const job = yield* Queue.take(queue);
+			yield* job;
+			if (Option.isNone(yield* Queue.poll(queue))) {
+				isProcessing = false;
+			}
+		}
+	});
+
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const isCopyToClipboardEnabled = createPersistedState({
 		key: 'whispering-is-copy-to-clipboard-enabled',
@@ -51,20 +70,24 @@ const createSettings = Effect.gen(function* () {
 		},
 		set currentGlobalShortcut(newValue) {
 			currentGlobalShortcut.value = newValue;
-			Effect.gen(function* () {
-				yield* registerShortcutsService.unregisterAll();
-				yield* registerShortcutsService.register({
-					shortcut: settings.currentGlobalShortcut,
-					callback: recorder.toggleRecording,
-				});
-				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
-			}).pipe(
-				Effect.catchAll((error) => {
-					toast.error(error.message);
-					return Effect.succeed(undefined);
-				}),
-				Effect.runPromise,
-			);
+			const queueJob = Effect.gen(function* () {
+				const job = Effect.gen(function* () {
+					yield* registerShortcutsService.unregisterAll();
+					yield* registerShortcutsService.register({
+						shortcut: settings.currentGlobalShortcut,
+						callback: recorder.toggleRecording,
+					});
+					toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
+				}).pipe(
+					Effect.catchAll((error) => {
+						toast.error(error.message);
+						return Effect.succeed(undefined);
+					}),
+				);
+				yield* Queue.offer(queue, job);
+				yield* processQueue;
+			});
+			queueJob.pipe(Effect.runPromise);
 		},
 		get apiKey() {
 			return apiKey.value;
