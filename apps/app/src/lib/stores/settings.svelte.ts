@@ -58,7 +58,7 @@ const createSettings = Effect.gen(function* () {
 					recorder.toggleRecording,
 				);
 				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
-			}).pipe(Effect.runSync);
+			}).pipe(Effect.runPromise);
 		},
 		get apiKey() {
 			return apiKey.value;
