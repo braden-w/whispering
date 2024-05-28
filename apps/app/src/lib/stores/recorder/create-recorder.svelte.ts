@@ -45,9 +45,8 @@ export const createRecorder = Effect.gen(function* () {
 		refreshDefaultAudioInput: () =>
 			Effect.gen(function* () {
 				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-				const $selectedAudioInput = selectedAudioInputDeviceId.value;
 				const isSelectedExists = recordingDevices.some(
-					({ deviceId }) => deviceId === $selectedAudioInput,
+					({ deviceId }) => deviceId === selectedAudioInputDeviceId.value,
 				);
 				if (!isSelectedExists) {
 					const firstAudioInput = recordingDevices[0].deviceId;
