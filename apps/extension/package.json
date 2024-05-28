@@ -27,7 +27,7 @@
 		"postcss": "^8.4.38",
 		"svelte": "^5.0.0-next",
 		"tailwindcss": "^3.4.3",
-		"typescript": "latest",
+		"typescript": "^5.4.5",
 		"unplugin-icons": "^0.19.0"
 	},
 	"manifest": {

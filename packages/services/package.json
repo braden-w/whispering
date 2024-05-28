@@ -9,6 +9,6 @@
 		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^3.2.5",
 		"idb": "^8.0.0",
-		"typescript": "latest"
+		"typescript": "^5.4.5"
 	}
 }
