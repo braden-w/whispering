@@ -53,12 +53,18 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut.value = newValue;
 			Effect.gen(function* () {
 				yield* registerShortcutsService.unregisterAll();
-				yield* registerShortcutsService.register(
-					settings.currentGlobalShortcut,
-					recorder.toggleRecording,
-				);
+				yield* registerShortcutsService.register({
+					shortcut: settings.currentGlobalShortcut,
+					callback: recorder.toggleRecording,
+				});
 				toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
-			}).pipe(Effect.runPromise);
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
+				Effect.runPromise,
+			);
 		},
 		get apiKey() {
 			return apiKey.value;

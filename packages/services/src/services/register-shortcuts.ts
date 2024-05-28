@@ -15,9 +15,9 @@ export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsServ
 			void,
 			RegisterShortcutsError | NoSuchElementException
 		>;
-		readonly register: (
-			shortcut: string,
-			callback: () => void,
-		) => Effect.Effect<void, RegisterShortcutsError | NoSuchElementException>;
+		readonly register: (args: {
+			shortcut: string;
+			callback: () => void;
+		}) => Effect.Effect<void, RegisterShortcutsError | NoSuchElementException>;
 	}
 >() {}
