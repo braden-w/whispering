@@ -11,6 +11,30 @@ import {
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
+const createJobQueue = Effect.gen(function* (_) {
+	const queue = yield* Queue.unbounded<RegisterShortcutJob>();
+	let isProcessing = false;
+	const processJobQueue = Effect.gen(function* () {
+		if (isProcessing) return;
+		isProcessing = true;
+		while (isProcessing) {
+			const job = yield* Queue.take(queue);
+			yield* job;
+			if (Option.isNone(yield* Queue.poll(queue))) {
+				isProcessing = false;
+			}
+		}
+	});
+	return {
+		queue,
+		addJobToQueue: (job: RegisterShortcutJob) =>
+			Effect.gen(function* () {
+				yield* Queue.offer(queue, job);
+				yield* processJobQueue;
+			}),
+	};
+});
+
 const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const isPlaySoundEnabled = createPersistedState({
@@ -44,20 +68,7 @@ const createSettings = Effect.gen(function* () {
 		defaultValue: 'en',
 	});
 
-	const jobQueue = yield* Queue.unbounded<RegisterShortcutJob>();
-	let isProcessing = false;
-	const processJobQueue = Effect.gen(function* () {
-		if (isProcessing) return;
-		isProcessing = true;
-		while (isProcessing) {
-			const job = yield* Queue.take(jobQueue);
-			yield* job;
-			if (Option.isNone(yield* Queue.poll(jobQueue))) {
-				isProcessing = false;
-			}
-		}
-	});
-
+	const jobQueue = yield* createJobQueue;
 	const queueSilentInitialRegisterShortcutJob = Effect.gen(function* () {
 		const job = Effect.gen(function* () {
 			yield* registerShortcutsService.unregisterAll();
@@ -66,8 +77,7 @@ const createSettings = Effect.gen(function* () {
 				callback: recorder.toggleRecording,
 			});
 		}).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
-		yield* Queue.offer(jobQueue, job);
-		yield* processJobQueue;
+		yield* jobQueue.addJobToQueue(job);
 	});
 	queueSilentInitialRegisterShortcutJob.pipe(Effect.runPromise);
 
@@ -109,8 +119,7 @@ const createSettings = Effect.gen(function* () {
 						return Effect.succeed(undefined);
 					}),
 				);
-				yield* Queue.offer(jobQueue, job);
-				yield* processJobQueue;
+				yield* jobQueue.addJobToQueue(job);
 			});
 			queueJob.pipe(Effect.runPromise);
 		},
