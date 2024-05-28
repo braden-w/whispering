@@ -5,6 +5,7 @@
 	import { Button } from '@repo/ui/components/button';
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';
+	import { Textarea } from '@repo/ui/components/textarea';
 	import { Label } from '@repo/ui/components/label';
 	import { Effect } from 'effect';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
@@ -77,7 +78,11 @@
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="transcribedText" class="text-right">Transcribed Text</Label>
-					<Input id="transcribedText" bind:value={recording.transcribedText} class="col-span-3" />
+					<Textarea
+						id="transcribedText"
+						bind:value={recording.transcribedText}
+						class="col-span-3"
+					/>
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="blob" class="text-right">Blob</Label>
