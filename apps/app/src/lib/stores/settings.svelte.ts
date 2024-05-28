@@ -12,15 +12,15 @@ import {
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
 const createSettings = Effect.gen(function* () {
-	const queue = yield* Queue.unbounded<RegisterShortcutJob>();
+	const jobQueue = yield* Queue.unbounded<RegisterShortcutJob>();
 	let isProcessing = false;
-	const processQueue = Effect.gen(function* () {
+	const processJobQueue = Effect.gen(function* () {
 		if (isProcessing) return;
 		isProcessing = true;
 		while (isProcessing) {
-			const job = yield* Queue.take(queue);
+			const job = yield* Queue.take(jobQueue);
 			yield* job;
-			if (Option.isNone(yield* Queue.poll(queue))) {
+			if (Option.isNone(yield* Queue.poll(jobQueue))) {
 				isProcessing = false;
 			}
 		}
@@ -84,8 +84,8 @@ const createSettings = Effect.gen(function* () {
 						return Effect.succeed(undefined);
 					}),
 				);
-				yield* Queue.offer(queue, job);
-				yield* processQueue;
+				yield* Queue.offer(jobQueue, job);
+				yield* processJobQueue;
 			});
 			queueJob.pipe(Effect.runPromise);
 		},
