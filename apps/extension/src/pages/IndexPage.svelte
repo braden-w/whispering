@@ -31,15 +31,9 @@
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
 
-	// --- Recording Logic ---
-
 	// async function toggleRecording() {
 	// 	sendMessageToContentScript({ command: 'toggle-recording' });
 	// }
-
-	function openOptionsPage() {
-		chrome.runtime.openOptionsPage();
-	}
 
 	// recordingState.init();
 	// audioSrc.init();
@@ -188,11 +182,3 @@
 		</p>
 	</div>
 </div>
-
-<button
-	on:click={openOptionsPage}
-	class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
->
-	<AdjustmentsHorizontalIcon />
-	<span>Settings</span>
-</button>
