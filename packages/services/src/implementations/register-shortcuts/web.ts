@@ -9,7 +9,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 	RegisterShortcutsService,
 	Effect.gen(function* () {
 		return {
-			defaultShortcut: 'ctrl+shift+x, command+shift+x',
+			defaultShortcut: 'space',
 			unregisterAll: () =>
 				Effect.try({
 					try: () => hotkeys.unbind(),
