@@ -3,6 +3,8 @@
 	import NavItems from '$lib/NavItems.svelte';
 	import { recorder, recordings } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
+	import { Label } from '@repo/ui/components/label';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;

@@ -1,20 +1,19 @@
-import type { PlasmoCSConfig } from 'plasmo';
 import { writeTextToCursor } from '$lib/apis/clipboard';
+import { recorder } from '$lib/stores';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '$lib/utils/messaging';
+import type { PlasmoCSConfig } from 'plasmo';
 
 export const config: PlasmoCSConfig = {
 	matches: ['https://chat.openai.com/*', 'https://chatgpt.com/*'],
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
-	if (message.command === 'toggle-recording')
-		await toggleRecording({
-			switchIcon: (icon) => {
-				sendMessageToBackground({ action: 'setExtensionIcon', icon });
-				switchMicrophoneButtonIcon(icon);
-			},
-			onSuccessfulTranscription: (text: string) => writeTextToCursor(text),
-		});
+	if (message.command === 'toggle-recording') recorder.toggleRecording();
+	// TODO: Finishthis implementation
+	switchIcon: (icon) => {
+		sendMessageToBackground({ action: 'setExtensionIcon', icon });
+		switchMicrophoneButtonIcon(icon);
+	};
 });
 
 const observer = new MutationObserver((mutations) => {
