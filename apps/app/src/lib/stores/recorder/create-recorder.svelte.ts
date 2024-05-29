@@ -101,6 +101,19 @@ export const createRecorder = Effect.gen(function* () {
 				}),
 				Effect.runPromise,
 			),
+		cancelRecording: () =>
+			Effect.gen(function* () {
+				yield* recorderService.cancelRecording;
+				if (recorderState.value === 'RECORDING' && settings.isPlaySoundEnabled) stopSound.play();
+				yield* Effect.logInfo('Recording cancelled');
+				recorderState.value = 'IDLE';
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
+				Effect.runPromise,
+			),
 		enumerateRecordingDevices: () =>
 			Effect.gen(function* () {
 				return yield* recorderService.enumerateRecordingDevices;

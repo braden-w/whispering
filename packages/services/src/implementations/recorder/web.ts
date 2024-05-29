@@ -58,6 +58,12 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 				);
 				mediaRecorder.start();
 			}),
+		cancelRecording: Effect.sync(() => {
+			if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+				mediaRecorder.stop();
+			}
+			resetRecorder();
+		}),
 		stopRecording: Effect.tryPromise({
 			try: () =>
 				new Promise<Blob>((resolve) => {

@@ -10,6 +10,7 @@ export class RecorderService extends Context.Tag('RecorderService')<
 	RecorderService,
 	{
 		readonly startRecording: (recordingDeviceId: string) => Effect.Effect<void, RecorderError>;
+		readonly cancelRecording: Effect.Effect<void, RecorderError>;
 		readonly stopRecording: Effect.Effect<Blob, RecorderError>;
 		readonly enumerateRecordingDevices: Effect.Effect<MediaDeviceInfo[], RecorderError>;
 	}
