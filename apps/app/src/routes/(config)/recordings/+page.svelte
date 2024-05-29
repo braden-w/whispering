@@ -71,6 +71,7 @@
 			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
 		},
 		{
+			id: 'transcribedText',
 			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
 			meta: {
 				headerText: 'Transcribed Text',
@@ -82,6 +83,7 @@
 			},
 		},
 		{
+			id: 'audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
 			meta: {
 				headerText: 'Audio',
@@ -94,6 +96,7 @@
 			},
 		},
 		{
+			id: 'actions',
 			accessorFn: (recording) => recording,
 			meta: {
 				headerText: 'Actions',
@@ -176,6 +179,10 @@
 	});
 
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
+	console.log(table.getColumn('transcribedText'));
+	console.log(table.getColumn('transcribedText')?.getFilterValue());
+	$inspect(table.getColumn('transcribedText'));
+	$inspect(table.getColumn('transcribedText')?.getFilterValue());
 </script>
 
 <svelte:head>
@@ -191,8 +198,8 @@
 				class="max-w-sm"
 				placeholder="Filter recordings..."
 				type="text"
-				value={table.getColumn('id')?.getFilterValue()}
-				on:change={(e) => table.getColumn('id')?.setFilterValue(e.currentTarget.value)}
+				value={table.getColumn('transcribedText')?.getFilterValue()}
+				on:change={(e) => table.getColumn('transcribedText')?.setFilterValue(e.currentTarget.value)}
 			/>
 			{#if selectedRecordingRows.length > 0}
 				<Button
