@@ -212,7 +212,7 @@
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
 				}}
 			>
-				<Input placeholder="Filter recordings..." type="text" bind:value={filterQuery} />
+				<Input placeholder="Filter transcripts..." type="text" bind:value={filterQuery} />
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
 			{#if selectedRecordingRows.length > 0}
