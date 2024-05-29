@@ -4,7 +4,7 @@
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
-	import ClipboardIcon from '~icons/heroicons/clipboard';
+	import { ClipboardIcon } from '@repo/ui/icons';
 	import NavItems from '../NavItems.svelte';
 
 	function handleKeyDown(event: KeyboardEvent) {

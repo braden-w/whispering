@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
+	import { ClipboardIcon } from '@repo/ui/icons';
 	import NavItems from '$lib/NavItems.svelte';
 	import { recorder, recordings } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';

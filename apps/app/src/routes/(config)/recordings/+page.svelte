@@ -8,13 +8,15 @@
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
+	import {
+		ChevronDown,
+		EllipsisHorizontalIcon as LoadingTranscriptionIcon,
+		TrashIcon,
+	} from '@repo/ui/icons';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
 	import { z } from 'zod';
-	import ChevronDown from '~icons/heroicons/chevron-down';
-	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
-	import TrashIcon from '~icons/heroicons/trash';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 	import DataTableHeader from './DataTableHeader.svelte';

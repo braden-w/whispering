@@ -2,8 +2,8 @@
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
+	import { AdjustmentsVerticalIcon } from '@repo/ui/icons';
 	import { toggleMode } from 'mode-watcher';
-	import AdjustmentsVerticalIcon from '~icons/heroicons/adjustments-vertical';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';

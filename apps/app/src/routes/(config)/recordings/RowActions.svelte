@@ -7,11 +7,13 @@
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { Textarea } from '@repo/ui/components/textarea';
+	import {
+		ClipboardIcon,
+		PencilIcon as EditIcon,
+		EllipsisHorizontalIcon as LoadingTranscriptionIcon,
+		TrashIcon,
+	} from '@repo/ui/icons';
 	import { Effect } from 'effect';
-	import ClipboardIcon from '~icons/heroicons/clipboard';
-	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
-	import EditIcon from '~icons/heroicons/pencil';
-	import TrashIcon from '~icons/heroicons/trash';
 	import Loader2 from '~icons/lucide/loader-2';
 	import StartTranscriptionIcon from '~icons/lucide/play';
 	import RetryTranscriptionIcon from '~icons/lucide/repeat';
