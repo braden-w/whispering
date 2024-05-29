@@ -3,7 +3,7 @@ import { writeTextToCursor } from '$lib/apis/clipboard';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '$lib/utils/messaging';
 
 export const config: PlasmoCSConfig = {
-	matches: ['https://chat.openai.com/*'],
+	matches: ['https://chat.openai.com/*', 'https://chatgpt.com/*'],
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
