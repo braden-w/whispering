@@ -20,7 +20,7 @@ const recorderStateSchema = z.union([
 const INITIAL_STATE = 'IDLE';
 
 const startSound = new Audio('/zapsplat_household_alarm_clock_button_press_12967.mp3');
-const stopSound = new Audio('/zapsplat_household_alarm_clock_button_press_12967.mp3');
+const stopSound = new Audio('/sound_ex_machina_Button_Blip.mp3');
 
 export const createRecorder = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
