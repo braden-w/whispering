@@ -205,20 +205,16 @@
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
 		<div class="flex items-center gap-2">
-			<Input
-				class="max-w-sm"
-				placeholder="Filter recordings..."
-				type="text"
-				bind:value={filterQuery}
-			/>
-			<Button
-				variant="outline"
-				on:click={() => {
+			<form
+				class="flex max-w-sm gap-2"
+				on:submit={(e) => {
+					e.preventDefault();
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
 				}}
 			>
-				Search
-			</Button>
+				<Input placeholder="Filter recordings..." type="text" bind:value={filterQuery} />
+				<Button variant="outline" type="submit">Search</Button>
+			</form>
 			{#if selectedRecordingRows.length > 0}
 				<Button
 					variant="outline"
