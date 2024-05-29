@@ -27,7 +27,7 @@ const createSettings = Effect.gen(function* () {
 	const isPasteContentsOnSuccessEnabled = createPersistedState({
 		key: 'whispering-is-paste-contents-on-success-enabled',
 		schema: z.boolean(),
-		defaultValue: false,
+		defaultValue: true,
 	});
 	const currentGlobalShortcut = createPersistedState({
 		key: 'whispering-current-global-shortcut',
