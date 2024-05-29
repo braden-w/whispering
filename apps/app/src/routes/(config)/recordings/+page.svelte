@@ -192,7 +192,7 @@
 				placeholder="Filter recordings..."
 				type="text"
 				value={table.getColumn('id')?.getFilterValue()}
-				onchange={(e) => table.getColumn('id')?.setFilterValue(e.currentTarget.value)}
+				on:change={(e) => table.getColumn('id')?.setFilterValue(e.currentTarget.value)}
 			/>
 			{#if selectedRecordingRows.length > 0}
 				<Button
