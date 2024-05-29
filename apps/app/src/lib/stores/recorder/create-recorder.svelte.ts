@@ -7,8 +7,8 @@ import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recordings } from '../recordings';
 import { settings } from '../settings.svelte';
-import startSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
-import stopSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
+import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
