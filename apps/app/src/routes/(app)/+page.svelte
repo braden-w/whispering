@@ -156,17 +156,20 @@
 				aria-label="Check out the Chrome Extension"
 			>
 				extension
-			</Button> and <Button
-				href="https://github.com/braden-w/whispering/releases"
-				variant="link"
-				class="h-fit px-0.5 py-0"
-				target="_blank"
-				rel="noopener noreferrer"
-				title="Check out the desktop app"
-				aria-label="Check out the desktop app"
-			>
-				app
-			</Button> for shortcuts.
+			</Button>
+			{#if !window.__TAURI__}
+				and <Button
+					href="https://github.com/braden-w/whispering/releases"
+					variant="link"
+					class="h-fit px-0.5 py-0"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Check out the desktop app"
+					aria-label="Check out the desktop app"
+				>
+					app
+				</Button>
+			{/if} for more integrations!
 		</p>
 	</div>
 </div>
