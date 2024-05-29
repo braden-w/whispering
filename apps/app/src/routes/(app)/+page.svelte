@@ -130,7 +130,7 @@
 		</p>
 		<p class="text-muted-foreground text-sm font-light">
 			Check out the <Button
-				href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo?hl=en&authuser=0"
+				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				variant="link"
 				class="h-fit px-0.5 py-0"
 				target="_blank"
