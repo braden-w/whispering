@@ -1,4 +1,3 @@
-import type { RegisterShortcutsError } from '@repo/services/services/register-shortcuts';
 import { Effect, Option, Queue } from 'effect';
 
 export const createJobQueue = <T extends Effect.Effect<any, any>>() =>
