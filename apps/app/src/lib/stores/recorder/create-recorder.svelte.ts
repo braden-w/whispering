@@ -19,7 +19,6 @@ const stopSound = new Audio(stopSoundSrc);
 const recorderStateSchema = z.union([
 	z.literal('IDLE'),
 	z.literal('RECORDING'),
-	z.literal('SAVING'),
 ]);
 
 const INITIAL_STATE = 'IDLE';
@@ -92,9 +91,6 @@ export const createRecorder = Effect.gen(function* () {
 						recorderState.value = 'IDLE';
 						yield* recordings.addRecording(newRecording);
 						recordings.transcribeRecording(newRecording.id);
-						break;
-					}
-					case 'SAVING': {
 						break;
 					}
 				}
