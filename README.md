@@ -148,6 +148,7 @@ The Whispering Chrome extension is built using:
 - [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
+- [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
 
 ## Development
 
