@@ -1,12 +1,13 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
+import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
-import { recordings } from '../recordings';
-import { settings } from '../settings.svelte';
+import { recordings } from './recordings';
+import { settings } from './settings.svelte';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
@@ -120,3 +121,5 @@ export const createRecorder = Effect.gen(function* () {
 			),
 	};
 });
+
+export const recorder = createRecorder.pipe(Effect.provide(RecorderServiceLiveWeb), Effect.runSync);

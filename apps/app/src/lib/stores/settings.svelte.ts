@@ -1,14 +1,14 @@
+import { createJobQueue } from '$lib/createJobQueue';
 import { createPersistedState } from '$lib/createPersistedState.svelte';
+import { recorder } from '$lib/stores/recorder.svelte';
 import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
-import { Effect, Option, Queue } from 'effect';
-import { toast } from 'svelte-sonner';
-import { z } from 'zod';
-import { recorder } from './recorder';
 import {
 	RegisterShortcutsService,
 	type RegisterShortcutsError,
 } from '@repo/services/services/register-shortcuts';
-import { createJobQueue } from '$lib/createJobQueue';
+import { Effect } from 'effect';
+import { toast } from 'svelte-sonner';
+import { z } from 'zod';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 

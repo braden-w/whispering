@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores/recorder';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { Button } from '@repo/ui/components/button';
 	import { cn } from '@repo/ui/utils';
 	import NavItems from '../NavItems.svelte';
@@ -25,8 +25,6 @@
 		>
 			{#if recorder.recorderState === 'RECORDING'}
 				🟥
-			{:else if recorder.recorderState === 'SAVING'}
-				🔄
 			{:else}
 				🎙️
 			{/if}

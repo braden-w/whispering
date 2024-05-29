@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
-	import { recorder } from '$lib/stores/recorder';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
