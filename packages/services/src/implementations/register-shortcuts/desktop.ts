@@ -1,9 +1,11 @@
 import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
+import { toast } from 'svelte-sonner';
 import { Effect, Layer } from 'effect';
 import {
 	RegisterShortcutsError,
 	RegisterShortcutsService,
 } from '../../services/register-shortcuts';
+import ErrorRegisteringShortcutDesktop from './ErrorRegisteringShortcutDesktop.svelte';
 
 export const RegisterShortcutsDesktopLive = Layer.effect(
 	RegisterShortcutsService,
@@ -15,7 +17,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => unregisterAll(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
+							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
 							origError: error,
 						}),
 				}),
@@ -24,7 +26,10 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => register(shortcut, callback),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
+							renderAsToast: () =>
+								window.__TAURI__
+									? toast.error(ErrorRegisteringShortcutDesktop)
+									: toast.error('Error registering shortcut.'),
 							origError: error,
 						}),
 				}),

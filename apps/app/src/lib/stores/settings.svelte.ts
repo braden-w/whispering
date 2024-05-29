@@ -95,7 +95,7 @@ const createSettings = Effect.gen(function* () {
 					toast.success(`Global shortcut set to ${currentGlobalShortcut.value}`);
 				}).pipe(
 					Effect.catchAll((error) => {
-						toast.error(error.message);
+						error.renderAsToast();
 						return Effect.succeed(undefined);
 					}),
 				);

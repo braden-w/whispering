@@ -1,5 +1,6 @@
 import { Effect, Layer } from 'effect';
 import hotkeys from 'hotkeys-js';
+import { toast } from 'svelte-sonner';
 import {
 	RegisterShortcutsError,
 	RegisterShortcutsService,
@@ -15,7 +16,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
+							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
 							origError: error,
 						}),
 				}),
@@ -29,7 +30,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
+							renderAsToast: () => toast.error('Error registering shortcut'),
 							origError: error,
 						}),
 				}),
