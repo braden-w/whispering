@@ -9,7 +9,7 @@
 	import { Input } from '@repo/ui/components/input';
 	import * as Table from '@repo/ui/components/table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
-	import { getCoreRowModel, getSortedRowModel } from '@tanstack/table-core';
+	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
 	import { z } from 'zod';
 	import ChevronDown from '~icons/heroicons/chevron-down';
@@ -72,6 +72,12 @@
 		},
 		{
 			id: 'transcribedText',
+			filterFn: (row, _columnId, filterValue) => {
+				const { transcribedText } = row.getValue<{ id: string; transcribedText: string }>(
+					'transcribedText',
+				);
+				return transcribedText.includes(filterValue);
+			},
 			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
 			meta: {
 				headerText: 'Transcribed Text',
@@ -157,6 +163,7 @@
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setFilters,
 		onColumnVisibilityChange: setVisibility,
@@ -179,10 +186,6 @@
 	});
 
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
-	console.log(table.getColumn('transcribedText'));
-	console.log(table.getColumn('transcribedText')?.getFilterValue());
-	$inspect(table.getColumn('transcribedText'));
-	$inspect(table.getColumn('transcribedText')?.getFilterValue());
 </script>
 
 <svelte:head>
