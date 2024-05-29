@@ -3,11 +3,9 @@
 </script>
 
 <span>
-	Something went wrong. Please verify that your <Button
+	Invalid API Key. Please check your API key provided in <Button
 		href="/settings"
 		variant="link"
-		class="h-fit px-0 py-0"
+		class="h-fit px-0 py-0">the settings.</Button
 	>
-		API Key in settings
-	</Button> is correct.
 </span>

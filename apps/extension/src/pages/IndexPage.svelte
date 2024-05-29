@@ -1,118 +1,196 @@
 <script lang="ts">
-	import { Storage } from '@plasmohq/storage/dist';
-	import toast from 'svelte-french-toast/dist/core/toast';
-	import { ToggleRecordingIcon } from 'ui/components';
-	import { AdjustmentsHorizontalIcon, ClipboardIcon, KeyboardIcon } from 'ui/icons';
-	import { writeTextToClipboard } from '~lib/apis/clipboard';
-	import { audioSrc, outputText, recordingState } from '~lib/stores/recordingState';
-	import { sendMessageToContentScript } from '~lib/utils/messaging';
-
-	// --- Recording Logic ---
-
-	async function toggleRecording() {
-		sendMessageToContentScript({ command: 'toggle-recording' });
-	}
-
-	// --- Local Shortcuts ---
+	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
+	import NavItems from '~lib/NavItems.svelte';
+	import { recorder, recordings } from '~lib/stores';
+	import { Button } from 'repo/ui/components/button';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
 		event.preventDefault(); // Prevent scrolling
-		toggleRecording();
+		recorder.toggleRecording();
 	}
 
-	// --- Copy Output Button ---
+	const PLACEHOLDER_RECORDING = {
+		id: '',
+		title: '',
+		subtitle: '',
+		blob: undefined,
+		transcribedText: '',
+		transcriptionStatus: 'UNPROCESSED',
+	} as const;
 
-	async function copyOutputText() {
-		writeTextToClipboard($outputText);
-		toast.success('Copied to clipboard!');
-	}
+	const latestRecording = $derived(
+		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING,
+	);
+
+	const maybeLatestAudioSrc = $derived(
+		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined,
+	);
+
+	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
+
+	// --- Recording Logic ---
+
+	// async function toggleRecording() {
+	// 	sendMessageToContentScript({ command: 'toggle-recording' });
+	// }
 
 	function openOptionsPage() {
 		chrome.runtime.openOptionsPage();
 	}
 
-	recordingState.init();
-	audioSrc.init();
-	outputText.init();
-	const storage = new Storage();
-	storage.watch({
-		'recording-state': () => recordingState.init(),
-		'audio-src': () => audioSrc.init(),
-		'output-text': () => outputText.init(),
-	});
+	// recordingState.init();
+	// audioSrc.init();
+	// outputText.init();
+	// const storage = new Storage();
+	// storage.watch({
+	// 	'recording-state': () => recordingState.init(),
+	// 	'audio-src': () => audioSrc.init(),
+	// 	'output-text': () => outputText.init(),
+	// });
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div class="flex min-h-screen flex-col items-center justify-center space-y-4">
-	<h1 class="text-4xl font-semibold text-gray-700">Whispering</h1>
-
-	<ToggleRecordingIcon recordingState={$recordingState} on:click={toggleRecording} />
-
-	<div>
-		<label for="transcripted-text" class="sr-only mb-2 block text-gray-700">
-			Transcribed Text
-		</label>
-		<div class="flex items-center space-x-2">
-			<input
-				id="transcripted-text"
-				class="w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 transition-all duration-200 ease-in-out focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
-				placeholder="Transcribed text will appear here..."
-				bind:value={$outputText}
-			/>
-
-			<button
-				class="rounded-lg border border-gray-600 bg-gray-600 px-4 py-2 text-white transition-all duration-200 ease-in-out hover:bg-gray-700 focus:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
-				on:click={copyOutputText}
-				aria-label="Copy transcribed text"
+<div class="flex flex-col items-center justify-center gap-4 text-center">
+	<div class="flex flex-col gap-4">
+		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
+		<p class="text-muted-foreground">
+			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
+			access to your microphone.
+		</p>
+	</div>
+	<div class="relative">
+		<Button
+			class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
+			on:click={recorder.toggleRecording}
+			aria-label="Toggle recording"
+			variant="ghost"
+		>
+			<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
+				{#if recorder.recorderState === 'RECORDING'}
+					🔲
+				{:else}
+					🎙️
+				{/if}
+			</span>
+		</Button>
+		{#if recorder.recorderState === 'RECORDING'}
+			<Button
+				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+				on:click={recorder.cancelRecording}
+				aria-label="Cancel recording"
+				size="icon"
+				variant="ghost"
 			>
-				<ClipboardIcon />
-			</button>
-		</div>
-		{#if $audioSrc}
-			<audio src={$audioSrc} controls class="mt-2 h-8 w-full" />
+				🚫
+			</Button>
 		{/if}
 	</div>
-	<p class="text-xs text-gray-600">
-		Click the microphone or press <kbd>space</kbd> to start recording.
-	</p>
-	<p class="text-xs font-light text-gray-500">
-		Check out the
-		<a
-			href="https://github.com/braden-w/whispering/releases"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-600 underline hover:text-indigo-900"
-			title="Download the desktop app"
-			aria-label="Download the desktop app"
-		>
-			desktop app
-		</a> for global shortcuts.
-	</p>
+	<div class="flex flex-col gap-2">
+		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
+		<div class="flex items-center gap-2">
+			<Input
+				id="transcribed-text"
+				class="w-64"
+				placeholder="Transcribed text will appear here..."
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'transcribedText',
+				})}"
+				readonly
+				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
+					? '...'
+					: latestRecording.transcribedText}
+			/>
+			<Button
+				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+				on:click={copyRecordingTextFromLatestRecording}
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'transcribedText',
+				})}-copy-button"
+			>
+				<ClipboardIcon />
+				<span class="sr-only">Copy transcribed text</span>
+			</Button>
+		</div>
+		{#if maybeLatestAudioSrc}
+			{@const latestAudioSrc = maybeLatestAudioSrc}
+			<audio
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'blob',
+				})}"
+				src={latestAudioSrc}
+				controls
+				class="h-8 w-full"
+			/>
+		{/if}
+	</div>
 
-	<button
-		on:click={openOptionsPage}
-		class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-	>
-		<AdjustmentsHorizontalIcon />
-		<span>Settings</span>
-	</button>
-
-	<div class="fixed bottom-4 right-4">
-		<a
-			href="https://github.com/braden-w/whisper-desktop"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-gray-500 transition-colors duration-200 hover:text-gray-800"
-			title="View project on GitHub"
-			aria-label="View project on GitHub"
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8">
-				<path
-					d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.6-.015 2.89-.015 3.29 0 .32.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-				/>
-			</svg>
-		</a>
+	<div class="flex flex-col items-center justify-center gap-2">
+		<NavItems />
+		<p class="text-foreground/75 text-sm leading-6">
+			Click the microphone or press
+			{#if window.__TAURI__}
+				<Button
+					href="/settings#global-shortcut"
+					aria-label="Go to global shortcut"
+					title="Go to global shortcut"
+					variant="link"
+					class="px-0.5"
+				>
+					<kbd
+						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					>
+						space
+					</kbd>
+				</Button>
+				to start recording.
+			{:else}
+				<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
+					<kbd
+						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					>
+						space
+					</kbd>
+				</Button> to start recording.
+			{/if}
+		</p>
+		<p class="text-muted-foreground text-sm font-light">
+			Check out the <Button
+				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
+				variant="link"
+				class="h-fit px-0.5 py-0"
+				target="_blank"
+				rel="noopener noreferrer"
+				title="Check out the Chrome Extension"
+				aria-label="Check out the Chrome Extension"
+			>
+				extension
+			</Button>
+			{#if !window.__TAURI__}
+				and <Button
+					href="https://github.com/braden-w/whispering/releases"
+					variant="link"
+					class="h-fit px-0.5 py-0"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Check out the desktop app"
+					aria-label="Check out the desktop app"
+				>
+					app
+				</Button>
+			{/if} for more integrations!
+		</p>
 	</div>
 </div>
+
+<button
+	on:click={openOptionsPage}
+	class="inline-flex items-center space-x-2 rounded-md px-3 py-1 text-gray-700 hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+>
+	<AdjustmentsHorizontalIcon />
+	<span>Settings</span>
+</button>

@@ -117,6 +117,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      effect:
+        specifier: ^3.2.5
+        version: 3.2.5
       mode-watcher:
         specifier: ^0.3.0
         version: 0.3.0(svelte@5.0.0-next.140)
@@ -129,6 +132,9 @@ importers:
       svelte-preprocess:
         specifier: ^5.1.4
         version: 5.1.4(@babel/core@7.24.6)(postcss@8.4.38)(svelte@5.0.0-next.140)(typescript@5.4.5)
+      svelte-sonner:
+        specifier: ^0.3.24
+        version: 0.3.24(svelte@5.0.0-next.140)
     devDependencies:
       '@iconify/json':
         specifier: ^2.2.214

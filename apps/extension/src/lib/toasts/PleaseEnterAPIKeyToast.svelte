@@ -1,14 +1,11 @@
 <script lang="ts">
-	function openOptionsPage() {
-		chrome.runtime.openOptionsPage();
-	}
+	import { Button } from 'repo/ui/components/button';
 </script>
 
 <span>
-	First, please enter your OpenAI API key in <button
-		on:click={openOptionsPage}
-		class="text-gray-600 underline hover:text-indigo-900"
+	API Key not provided. Please enter your OpenAI API key in <Button
+		href="/settings"
+		variant="link"
+		class="h-fit px-0 py-0">the settings.</Button
 	>
-		the settings.
-	</button>
 </span>

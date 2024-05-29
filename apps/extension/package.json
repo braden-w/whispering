@@ -12,11 +12,13 @@
 	},
 	"dependencies": {
 		"@plasmohq/storage": "^1.10.0",
-		"@repo/ui": "workspace:*",
+		"repo/ui": "workspace:*",
+		"effect": "^3.2.5",
 		"mode-watcher": "^0.3.0",
 		"plasmo": "^0.86.3",
 		"svelte-french-toast": "^1.2.0",
-		"svelte-preprocess": "^5.1.4"
+		"svelte-preprocess": "^5.1.4",
+		"svelte-sonner": "^0.3.24"
 	},
 	"devDependencies": {
 		"@iconify/json": "^2.2.214",
