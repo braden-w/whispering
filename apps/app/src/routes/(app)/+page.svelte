@@ -48,22 +48,33 @@
 			access to your microphone.
 		</p>
 	</div>
-	<Button
-		class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-		on:click={recorder.toggleRecording}
-		aria-label="Toggle recording"
-		variant="ghost"
-	>
-		<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
-			{#if recorder.recorderState === 'RECORDING'}
-				🟥
-			{:else if recorder.recorderState === 'SAVING'}
-				🔄
-			{:else}
-				🎙️
-			{/if}
-		</span>
-	</Button>
+	<div class="relative">
+		<Button
+			class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
+			on:click={recorder.toggleRecording}
+			aria-label="Toggle recording"
+			variant="ghost"
+		>
+			<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
+				{#if recorder.recorderState === 'RECORDING'}
+					🔲
+				{:else}
+					🎙️
+				{/if}
+			</span>
+		</Button>
+		{#if recorder.recorderState === 'RECORDING'}
+			<Button
+				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+				on:click={recorder.cancelRecording}
+				aria-label="Cancel recording"
+				size="icon"
+				variant="ghost"
+			>
+				🚫
+			</Button>
+		{/if}
+	</div>
 	<div class="flex flex-col gap-2">
 		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 		<div class="flex items-center gap-2">
