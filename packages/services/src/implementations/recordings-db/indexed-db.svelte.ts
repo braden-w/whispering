@@ -52,9 +52,21 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							message: `Error editing recording in indexedDB: ${error}`,
 						}),
 				}),
-			deleteRecording: (id) =>
+			deleteRecordingById: (id) =>
 				Effect.tryPromise({
 					try: async () => (await db).delete(RECORDING_STORE, id),
+					catch: (error) =>
+						new DeleteRecordingError({
+							origError: error,
+							message: `Error deleting recording from indexedDB: ${error}`,
+						}),
+				}),
+			deleteRecordingsById: (ids) =>
+				Effect.tryPromise({
+					try: async () => {
+						const tx = (await db).transaction(RECORDING_STORE, 'readwrite');
+						await Promise.all([...ids.map((id) => tx.store.delete(id)), tx.done]);
+					},
 					catch: (error) =>
 						new DeleteRecordingError({
 							origError: error,

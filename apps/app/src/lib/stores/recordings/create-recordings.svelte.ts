@@ -58,11 +58,23 @@ export const createRecordings = Effect.gen(function* () {
 					return Effect.succeed(undefined);
 				}),
 			),
-		deleteRecording: (id: string) =>
+		deleteRecordingById: (id: string) =>
 			Effect.gen(function* () {
-				yield* recordingsDb.deleteRecording(id);
+				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
 				toast.success('Recording deleted!');
+			}).pipe(
+				Effect.catchAll((error) => {
+					console.error(error);
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
+			),
+		deleteRecordingsById: (ids: string[]) =>
+			Effect.gen(function* () {
+				yield* recordingsDb.deleteRecordingsById(ids);
+				recordings = recordings.filter((recording) => !ids.includes(recording.id));
+				toast.success('Recordings deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);

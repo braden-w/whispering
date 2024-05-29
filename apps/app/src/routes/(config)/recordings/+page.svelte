@@ -224,11 +224,8 @@
 					variant="outline"
 					size="icon"
 					on:click={() => {
-						Promise.all(
-							selectedRecordingRows.map((recordingRow) =>
-								recordings.deleteRecording(recordingRow.id).pipe(Effect.runPromise),
-							),
-						);
+						const ids = selectedRecordingRows.map(({ id }) => id);
+						recordings.deleteRecordingsById(ids).pipe(Effect.runPromise);
 					}}
 				>
 					<TrashIcon />

@@ -97,7 +97,7 @@
 						class="mr-auto"
 						on:click={async () => {
 							isDeleting = true;
-							await recordings.deleteRecording(recording.id).pipe(Effect.runPromise);
+							await recordings.deleteRecordingById(recording.id).pipe(Effect.runPromise);
 							isDeleting = false;
 							isDialogOpen = false;
 						}}
@@ -137,7 +137,7 @@
 	<Button
 		variant="ghost"
 		size="icon"
-		on:click={() => recordings.deleteRecording(recording.id).pipe(Effect.runPromise)}
+		on:click={() => recordings.deleteRecordingById(recording.id).pipe(Effect.runPromise)}
 		title="Delete Recording"
 	>
 		<TrashIcon />

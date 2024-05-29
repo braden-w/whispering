@@ -63,6 +63,7 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 		) => Effect.Effect<Option.Option<Recording>, GetRecordingError>;
 		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
 		readonly updateRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
-		readonly deleteRecording: (id: string) => Effect.Effect<void, DeleteRecordingError>;
+		readonly deleteRecordingById: (id: string) => Effect.Effect<void, DeleteRecordingError>;
+		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, DeleteRecordingError>;
 	}
 >() {}
