@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createRecordingViewTransitionName } from '$lib/createRecordingViewTransitionName';
 	import { recorder, recordings } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';

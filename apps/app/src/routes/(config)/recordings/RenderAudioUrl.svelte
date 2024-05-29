@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
+	import { createRecordingViewTransitionName } from '$lib/createRecordingViewTransitionName';
 	import { onDestroy } from 'svelte';
 
 	let { recordingId, audioUrl }: { recordingId: string; audioUrl: string } = $props();

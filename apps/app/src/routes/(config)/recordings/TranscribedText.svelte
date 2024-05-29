@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
+	import { createRecordingViewTransitionName } from '$lib/createRecordingViewTransitionName';
 
 	let { recordingId, transcribedText }: { recordingId: string; transcribedText: string } = $props();
 </script>
