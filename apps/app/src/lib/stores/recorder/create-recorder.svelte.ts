@@ -7,6 +7,11 @@ import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 import { recordings } from '../recordings';
 import { settings } from '../settings.svelte';
+import startSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
+import stopSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+
+const startSound = new Audio(startSoundSrc);
+const stopSound = new Audio(stopSoundSrc);
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
@@ -18,9 +23,6 @@ const recorderStateSchema = z.union([
 ]);
 
 const INITIAL_STATE = 'IDLE';
-
-const startSound = new Audio('/zapsplat_household_alarm_clock_button_press_12967.mp3');
-const stopSound = new Audio('/sound_ex_machina_Button_Blip.mp3');
 
 export const createRecorder = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
