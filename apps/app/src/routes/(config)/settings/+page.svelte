@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
+	import { recorder, settings } from '$lib/stores';
 	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
 	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';

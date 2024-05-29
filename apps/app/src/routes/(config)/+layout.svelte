@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores/recorder.svelte';
+	import { recorder } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
 	import { cn } from '@repo/ui/utils';
 	import NavItems from '../NavItems.svelte';

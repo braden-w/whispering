@@ -1,6 +1,6 @@
 import { createJobQueue } from '$lib/createJobQueue';
 import { createPersistedState } from '$lib/createPersistedState.svelte';
-import { recorder } from '$lib/stores/recorder.svelte';
+import { recorder } from '$lib/stores';
 import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
 import {
 	RegisterShortcutsService,

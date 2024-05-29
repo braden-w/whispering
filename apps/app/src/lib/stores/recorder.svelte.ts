@@ -1,6 +1,5 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
-import { recordings } from '$lib/stores/recordings.svelte';
-import { settings } from '$lib/stores/settings.svelte';
+import { recordings, settings } from '$lib/stores';
 import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
