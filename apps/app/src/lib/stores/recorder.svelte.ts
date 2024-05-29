@@ -1,4 +1,6 @@
 import { createPersistedState } from '$lib/createPersistedState.svelte';
+import { recordings } from '$lib/stores/recordings.svelte';
+import { settings } from '$lib/stores/settings.svelte';
 import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
@@ -6,8 +8,6 @@ import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
-import { recordings } from './recordings';
-import { settings } from './settings.svelte';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
@@ -22,7 +22,7 @@ const cancelSound = new Audio(cancelSoundSrc);
 
 const INITIAL_STATE = 'IDLE';
 
-export const createRecorder = Effect.gen(function* () {
+const createRecorder = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
 	let recorderState = $state<'IDLE' | 'RECORDING'>(INITIAL_STATE);
 

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/create-view-transition-name';
-	import { recordings } from '$lib/stores/recordings';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import type { Recording } from '@repo/services/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';
-	import { Textarea } from '@repo/ui/components/textarea';
 	import { Label } from '@repo/ui/components/label';
+	import { Textarea } from '@repo/ui/components/textarea';
 	import { Effect } from 'effect';
 	import ClipboardIcon from '~icons/heroicons/clipboard';
 	import LoadingTranscriptionIcon from '~icons/heroicons/ellipsis-horizontal';
