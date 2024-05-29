@@ -1,10 +1,11 @@
-import { writeTextToCursor } from '$lib/apis/clipboard';
 import { recorder } from '$lib/stores';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '$lib/utils/messaging';
 import type { PlasmoCSConfig } from 'plasmo';
 
+export const CHATGPT_DOMAINS = ['https://chat.openai.com', 'https://chatgpt.com'];
+
 export const config: PlasmoCSConfig = {
-	matches: ['https://chat.openai.com/*', 'https://chatgpt.com/*'],
+	matches: CHATGPT_DOMAINS,
 };
 
 chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
