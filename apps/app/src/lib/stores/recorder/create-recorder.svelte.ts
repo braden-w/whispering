@@ -9,17 +9,16 @@ import { recordings } from '../recordings';
 import { settings } from '../settings.svelte';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
+const cancelSound = new Audio(cancelSoundSrc);
 
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
-const recorderStateSchema = z.union([
-	z.literal('IDLE'),
-	z.literal('RECORDING'),
-]);
+const recorderStateSchema = z.union([z.literal('IDLE'), z.literal('RECORDING')]);
 
 const INITIAL_STATE = 'IDLE';
 
@@ -104,7 +103,7 @@ export const createRecorder = Effect.gen(function* () {
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* recorderService.cancelRecording;
-				if (recorderState.value === 'RECORDING' && settings.isPlaySoundEnabled) stopSound.play();
+				if (recorderState.value === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
 			}).pipe(
