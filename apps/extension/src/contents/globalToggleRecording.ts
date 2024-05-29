@@ -8,6 +8,6 @@ export const config: PlasmoCSConfig = {
 	exclude_matches: CHATGPT_DOMAINS,
 };
 
-chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
+chrome.runtime.onMessage.addListener(function (message: MessageToContentScriptRequest) {
 	if (message.command === 'toggle-recording') recorder.toggleRecording();
 });
