@@ -18,17 +18,12 @@ const cancelSound = new Audio(cancelSoundSrc);
 /**
  * The transcription status of the recorder, which can be one of 'IDLE', 'RECORDING', or 'SAVING'.
  */
-const recorderStateSchema = z.union([z.literal('IDLE'), z.literal('RECORDING')]);
 
 const INITIAL_STATE = 'IDLE';
 
 export const createRecorder = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
-	const recorderState = createPersistedState({
-		key: 'whispering-recorder-state',
-		schema: recorderStateSchema,
-		defaultValue: INITIAL_STATE,
-	});
+	let recorderState = $state<'IDLE' | 'RECORDING'>(INITIAL_STATE);
 
 	const selectedAudioInputDeviceId = createPersistedState({
 		key: 'whispering-selected-audio-input-device-id',
@@ -55,7 +50,7 @@ export const createRecorder = Effect.gen(function* () {
 
 	return {
 		get recorderState() {
-			return recorderState.value;
+			return recorderState;
 		},
 		get selectedAudioInputDeviceId() {
 			return selectedAudioInputDeviceId.value;
@@ -66,12 +61,12 @@ export const createRecorder = Effect.gen(function* () {
 		toggleRecording: () =>
 			Effect.gen(function* () {
 				yield* checkAndUpdateSelectedAudioInputDevice;
-				switch (recorderState.value) {
+				switch (recorderState) {
 					case 'IDLE': {
 						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
 						if (settings.isPlaySoundEnabled) startSound.play();
 						yield* Effect.logInfo('Recording started');
-						recorderState.value = 'RECORDING';
+						recorderState = 'RECORDING';
 						break;
 					}
 					case 'RECORDING': {
@@ -87,7 +82,7 @@ export const createRecorder = Effect.gen(function* () {
 							blob: audioBlob,
 							transcriptionStatus: 'UNPROCESSED',
 						};
-						recorderState.value = 'IDLE';
+						recorderState = 'IDLE';
 						yield* recordings.addRecording(newRecording);
 						recordings.transcribeRecording(newRecording.id);
 						break;
@@ -103,9 +98,9 @@ export const createRecorder = Effect.gen(function* () {
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* recorderService.cancelRecording;
-				if (recorderState.value === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
+				if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 				yield* Effect.logInfo('Recording cancelled');
-				recorderState.value = 'IDLE';
+				recorderState = 'IDLE';
 			}).pipe(
 				Effect.catchAll((error) => {
 					toast.error(error.message);
