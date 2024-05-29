@@ -1,7 +1,10 @@
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { RegisterShortcutsDesktopLive } from '@repo/services/implementations/register-shortcuts';
+import {
+	RegisterShortcutsDesktopLive,
+	RegisterShortcutsWebLive,
+} from '@repo/services/implementations/register-shortcuts';
 import {
 	RegisterShortcutsService,
 	type RegisterShortcutsError,
@@ -50,7 +53,7 @@ const createSettings = Effect.gen(function* () {
 		const initialSilentJob = Effect.gen(function* () {
 			yield* registerShortcutsService.unregisterAll();
 			yield* registerShortcutsService.register({
-				shortcut: settings.currentGlobalShortcut,
+				shortcut: currentGlobalShortcut.value,
 				callback: recorder.toggleRecording,
 			});
 		}).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
@@ -86,10 +89,10 @@ const createSettings = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* registerShortcutsService.unregisterAll();
 					yield* registerShortcutsService.register({
-						shortcut: settings.currentGlobalShortcut,
+						shortcut: currentGlobalShortcut.value,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Global shortcut set to ${settings.currentGlobalShortcut}`);
+					toast.success(`Global shortcut set to ${currentGlobalShortcut.value}`);
 				}).pipe(
 					Effect.catchAll((error) => {
 						toast.error(error.message);
@@ -116,6 +119,6 @@ const createSettings = Effect.gen(function* () {
 });
 
 export const settings = createSettings.pipe(
-	Effect.provide(RegisterShortcutsDesktopLive),
+	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
 	Effect.runSync,
 );
