@@ -120,13 +120,30 @@
 		<NavItems />
 		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press
-			<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
-				<kbd
-					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+			{#if window.__TAURI__}
+				<Button
+					href="/settings#global-shortcut"
+					aria-label="Go to global shortcut"
+					title="Go to global shortcut"
+					variant="link"
+					class="px-0.5"
 				>
-					space
-				</kbd>
-			</Button> to start recording.
+					<kbd
+						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					>
+						space
+					</kbd>
+				</Button>
+				to start recording.
+			{:else}
+				<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
+					<kbd
+						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					>
+						space
+					</kbd>
+				</Button> to start recording.
+			{/if}
 		</p>
 		<p class="text-muted-foreground text-sm font-light">
 			Check out the <Button
