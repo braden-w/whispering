@@ -5,7 +5,7 @@ import {
 	RegisterShortcutsService,
 } from '../../services/register-shortcuts';
 
-export const RegisterShortcutsWeb = Layer.effect(
+export const RegisterShortcutsWebLive = Layer.effect(
 	RegisterShortcutsService,
 	Effect.gen(function* () {
 		return {
