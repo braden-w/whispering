@@ -8,32 +8,9 @@ import {
 	RegisterShortcutsService,
 	type RegisterShortcutsError,
 } from '@repo/services/services/register-shortcuts';
+import { createJobQueue } from '$lib/createJobQueue';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
-
-const createJobQueue = Effect.gen(function* (_) {
-	const queue = yield* Queue.unbounded<RegisterShortcutJob>();
-	let isProcessing = false;
-	const processJobQueue = Effect.gen(function* () {
-		if (isProcessing) return;
-		isProcessing = true;
-		while (isProcessing) {
-			const job = yield* Queue.take(queue);
-			yield* job;
-			if (Option.isNone(yield* Queue.poll(queue))) {
-				isProcessing = false;
-			}
-		}
-	});
-	return {
-		queue,
-		addJobToQueue: (job: RegisterShortcutJob) =>
-			Effect.gen(function* () {
-				yield* Queue.offer(queue, job);
-				yield* processJobQueue;
-			}),
-	};
-});
 
 const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
@@ -68,7 +45,7 @@ const createSettings = Effect.gen(function* () {
 		defaultValue: 'en',
 	});
 
-	const jobQueue = yield* createJobQueue;
+	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
 	const queueSilentInitialRegisterShortcutJob = Effect.gen(function* () {
 		const job = Effect.gen(function* () {
 			yield* registerShortcutsService.unregisterAll();
