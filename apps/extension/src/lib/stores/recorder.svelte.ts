@@ -63,11 +63,17 @@ const createRecorder = Effect.gen(function* () {
 		},
 		toggleRecording: () =>
 			Effect.gen(function* () {
+				if (!settings.apiKey) {
+					alert('Please set your API key in the extension options');
+					openOptionsPage();
+					return;
+				}
 				yield* checkAndUpdateSelectedAudioInputDevice;
 				switch (recorderState) {
 					case 'IDLE': {
 						yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
 						if (settings.isPlaySoundEnabled) startSound.play();
+						chrome.action.setIcon({ path: redLargeSquare });
 						yield* Effect.logInfo('Recording started');
 						recorderState = 'RECORDING';
 						break;
@@ -75,6 +81,7 @@ const createRecorder = Effect.gen(function* () {
 					case 'RECORDING': {
 						const audioBlob = yield* recorderService.stopRecording;
 						if (settings.isPlaySoundEnabled) stopSound.play();
+						chrome.action.setIcon({ path: studioMicrophone });
 						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),
@@ -125,3 +132,7 @@ const createRecorder = Effect.gen(function* () {
 });
 
 export const recorder = createRecorder.pipe(Effect.provide(RecorderServiceLiveWeb), Effect.runSync);
+
+function openOptionsPage() {
+	sendMessageToBackground({ action: 'openOptionsPage' });
+}
