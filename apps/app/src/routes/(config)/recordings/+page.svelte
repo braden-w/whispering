@@ -185,6 +185,14 @@
 		debugTable: true,
 	});
 
+	function getInitialFilterValue() {
+		const filterValue = table.getColumn('transcribedText')?.getFilterValue();
+		if (typeof filterValue === 'string') {
+			return filterValue;
+		}
+		return '';
+	}
+	let filterQuery = $state(getInitialFilterValue());
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
 </script>
 
@@ -201,9 +209,16 @@
 				class="max-w-sm"
 				placeholder="Filter recordings..."
 				type="text"
-				value={table.getColumn('transcribedText')?.getFilterValue()}
-				on:change={(e) => table.getColumn('transcribedText')?.setFilterValue(e.currentTarget.value)}
+				bind:value={filterQuery}
 			/>
+			<Button
+				variant="outline"
+				on:click={() => {
+					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
+				}}
+			>
+				Search
+			</Button>
 			{#if selectedRecordingRows.length > 0}
 				<Button
 					variant="outline"
