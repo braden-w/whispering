@@ -22,7 +22,7 @@
 			"shell": {
 				"all": false,
 				"execute": false,
-				"open": "^(https://github.com/|https://chromewebstore.google.com/)",
+				"open": "^(https://github.com/|https://chrome.google.com/)",
 				"scope": [],
 				"sidecar": false
 			}
