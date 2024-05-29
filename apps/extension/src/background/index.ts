@@ -1,7 +1,4 @@
-import { setIcon } from './setIcon';
-import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
-
-export {};
+import { sendMessageToContentScript, type MessageToBackgroundRequest } from '$lib/utils/messaging';
 
 chrome.runtime.onInstalled.addListener((details) => {
 	if (details.reason === 'install') {

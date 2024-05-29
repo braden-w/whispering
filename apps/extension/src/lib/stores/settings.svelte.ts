@@ -1,10 +1,7 @@
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import {
-	RegisterShortcutsDesktopLive,
-	RegisterShortcutsWebLive,
-} from 'repo/services/implementations/register-shortcuts';
+import { RegisterShortcutsWebLive } from 'repo/services/implementations/register-shortcuts';
 import {
 	RegisterShortcutsService,
 	type RegisterShortcutsError,
@@ -119,6 +116,6 @@ const createSettings = Effect.gen(function* () {
 });
 
 export const settings = createSettings.pipe(
-	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
+	Effect.provide(RegisterShortcutsWebLive),
 	Effect.runSync,
 );

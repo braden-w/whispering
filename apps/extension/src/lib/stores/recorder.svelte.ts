@@ -1,15 +1,18 @@
-import { recordings, settings } from '~lib/stores';
-import { createPersistedState } from '~lib/utils/createPersistedState.svelte';
+import { recordings, settings } from '$lib/stores';
+import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+import { sendMessageToBackground } from '$lib/utils/messaging';
 import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { RecorderService } from '@repo/services/services/recorder';
 import type { Recording } from '@repo/services/services/recordings-db';
+import redLargeSquare from 'data-base64:~assets/red_large_square.png';
+import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
+import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
-import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);

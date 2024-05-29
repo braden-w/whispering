@@ -1,7 +1,7 @@
 <script lang="ts">
-	import 'repo/ui/app.pcss';
-	import { Button } from 'repo/ui/components/button';
-	import * as Tooltip from 'repo/ui/components/tooltip';
+	import '@repo/ui/app.pcss';
+	import { Button } from '@repo/ui/components/button';
+	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { toggleMode } from 'mode-watcher';
 	import AdjustmentsVerticalIcon from '~icons/heroicons/adjustments-vertical';
 	import MoonIcon from '~icons/lucide/moon';

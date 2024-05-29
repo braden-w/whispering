@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
 	import { AdjustmentsVerticalIcon, KeyboardIcon, PaperAirplaneIcon } from 'ui/icons';
-	import { apiKey } from '~lib/stores/apiKey';
-	import { options } from '~lib/stores/options';
+	import { apiKey } from '$lib/stores/apiKey';
+	import { options } from '$lib/stores/options';
 
 	let apiKeyInput: HTMLInputElement;
 	let showOptions: boolean;

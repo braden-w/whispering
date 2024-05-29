@@ -1,4 +1,4 @@
-import type { Icon } from '~background/setIcon';
+import type { Icon } from '$background/setIcon';
 
 export type MessageToBackgroundRequest =
 	| {

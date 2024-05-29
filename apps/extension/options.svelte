@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { recorder } from '~lib/stores';
+	import { recorder } from '$lib/stores';
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import { cn } from '@repo/ui/utils';
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from 'svelte-french-toast';
-	import OptionsPage from '~pages/OptionsPage.svelte';
-	import NavItems from '~lib/NavItems.svelte';
+	import OptionsPage from '$pages/OptionsPage.svelte';
+	import NavItems from '$lib/NavItems.svelte';
 </script>
 
 <div class="relative flex min-h-screen flex-col">

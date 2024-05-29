@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { AdjustmentsHorizontalIcon, ClipboardIcon } from 'ui/icons';
-	import NavItems from '~lib/NavItems.svelte';
-	import { recorder, recordings } from '~lib/stores';
-	import { Button } from 'repo/ui/components/button';
+	import NavItems from '$lib/NavItems.svelte';
+	import { recorder, recordings } from '$lib/stores';
+	import { Button } from '@repo/ui/components/button';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;

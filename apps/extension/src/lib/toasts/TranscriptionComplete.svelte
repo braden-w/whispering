@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Button } from 'repo/ui/components/button';
+	import { Button } from '@repo/ui/components/button';
 </script>
 
 <span>

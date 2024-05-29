@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from 'repo/ui/components/button';
+	import { Button } from '@repo/ui/components/button';
 </script>
 
 <span>
