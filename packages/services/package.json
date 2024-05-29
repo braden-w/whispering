@@ -8,6 +8,7 @@
 		"@tauri-apps/api": "^1.5.6",
 		"audio-recorder-polyfill": "^0.4.1",
 		"effect": "^3.2.5",
+		"hotkeys-js": "^3.13.7",
 		"idb": "^8.0.0",
 		"typescript": "^5.4.5"
 	}
