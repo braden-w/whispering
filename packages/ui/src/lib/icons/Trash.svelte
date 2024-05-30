@@ -1,3 +1,4 @@
+<!-- From https://icon-sets.iconify.design/heroicons/trash/ -->
 <svg
 	xmlns="http://www.w3.org/2000/svg"
 	fill="none"
