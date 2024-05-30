@@ -14,7 +14,7 @@
 		"./utils": "./src/lib/utils.ts",
 		"./tailwind.config": "./tailwind.config.ts",
 		"./postcss.config": "./postcss.config.js",
-		"./app.pcss": "./src/app.pcss"
+		"./app.pcss": "./app.pcss"
 	},
 	"dependencies": {
 		"@internationalized/date": "^3.5.4",
