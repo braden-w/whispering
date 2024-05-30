@@ -98,7 +98,7 @@
 					propertyName: 'transcribedText',
 				})}-copy-button"
 			>
-				<ClipboardIcon />
+				<ClipboardIcon class="h-6 w-6" />
 				<span class="sr-only">Copy transcribed text</span>
 			</Button>
 		</div>
