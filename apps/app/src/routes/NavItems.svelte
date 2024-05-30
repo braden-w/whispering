@@ -2,7 +2,7 @@
 	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
-	import { AdjustmentsVerticalIcon } from '@repo/ui/icons';
+	import { AdjustmentsVerticalIcon, SunIcon, MoonIcon } from '@repo/ui/icons';
 	import { toggleMode } from 'mode-watcher';
 	import MoonIcon from '~icons/lucide/moon';
 	import SunIcon from '~icons/lucide/sun';
@@ -24,13 +24,8 @@
 	</Tooltip.Root>
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				on:click={chrome.runtime.openOptionsPage}
-				variant="ghost"
-				size="icon"
-			>
-				<AdjustmentsVerticalIcon aria-hidden="true" />
+			<Button builders={[builder]} href="/settings" variant="ghost" size="icon">
+				<AdjustmentsVerticalIcon aria-hidden="true" class="h-4 w-4" />
 				<span class="sr-only">Settings</span>
 			</Button>
 		</Tooltip.Trigger>

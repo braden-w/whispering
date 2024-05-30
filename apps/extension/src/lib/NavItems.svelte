@@ -24,7 +24,12 @@
 	</Tooltip.Root>
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
-			<Button builders={[builder]} href="/settings" variant="ghost" size="icon">
+			<Button
+				builders={[builder]}
+				on:click={chrome.runtime.openOptionsPage}
+				variant="ghost"
+				size="icon"
+			>
 				<AdjustmentsVerticalIcon aria-hidden="true" />
 				<span class="sr-only">Settings</span>
 			</Button>
