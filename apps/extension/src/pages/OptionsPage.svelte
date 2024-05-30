@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast/dist/core/toast';
-	import { AdjustmentsVerticalIcon, KeyboardIcon, PaperAirplaneIcon } from 'ui/icons';
+	import { SlidersVerticalIcon, KeyboardIcon, PaperAirplaneIcon } from 'ui/icons';
 	import { apiKey } from '$lib/stores/apiKey';
 	import { options } from '$lib/stores/options';
 
@@ -72,7 +72,7 @@
 			aria-haspopup="true"
 			aria-expanded={showOptions}
 		>
-			<AdjustmentsVerticalIcon />
+			<SlidersVerticalIcon />
 			<span>Advanced</span>
 		</button>
 		<button

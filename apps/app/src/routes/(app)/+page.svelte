@@ -5,7 +5,7 @@
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { ClipboardIcon } from '@repo/ui/icons';
-	import NavItems from '../NavItems.svelte';
+	import { NavItems } from '@repo/ui/shared';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;

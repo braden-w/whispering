@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ClipboardIcon } from '@repo/ui/icons';
-	import NavItems from '$lib/NavItems.svelte';
+	import { NavItems } from '@repo/ui/shared';
 	import { recorder, recordings } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
 	import { Label } from '@repo/ui/components/label';

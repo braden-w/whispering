@@ -1,18 +1,15 @@
 <script lang="ts">
-	import '@repo/ui/app.pcss';
 	import { Button } from '@repo/ui/components/button';
 	import * as Tooltip from '@repo/ui/components/tooltip';
-	import { AdjustmentsVerticalIcon, SunIcon, MoonIcon } from '@repo/ui/icons';
+	import { SlidersVerticalIcon, SunIcon, MoonIcon, ListIcon, GithubIcon } from '@repo/ui/icons';
 	import { toggleMode } from 'mode-watcher';
-	import GithubIcon from '~icons/mdi/github';
-	import ListIcon from '~icons/solar/playlist-outline';
 </script>
 
 <nav class="flex items-center" style="view-transition-name: nav">
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button builders={[builder]} href="/recordings" variant="ghost" size="icon">
-				<ListIcon aria-hidden="true" />
+				<ListIcon class="h-4 w-4" aria-hidden="true" />
 				<span class="sr-only">Recordings</span>
 			</Button>
 		</Tooltip.Trigger>
@@ -23,7 +20,7 @@
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button builders={[builder]} href="/settings" variant="ghost" size="icon">
-				<AdjustmentsVerticalIcon aria-hidden="true" class="h-4 w-4" />
+				<SlidersVerticalIcon class="h-4 w-4" aria-hidden="true" />
 				<span class="sr-only">Settings</span>
 			</Button>
 		</Tooltip.Trigger>

@@ -5,6 +5,7 @@
 	stroke-width="1.5"
 	stroke="currentColor"
 	class="size-6"
+	{...$$props}
 >
 	<path
 		stroke-linecap="round"

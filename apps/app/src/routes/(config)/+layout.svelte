@@ -2,7 +2,7 @@
 	import { recorder } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
 	import { cn } from '@repo/ui/utils';
-	import NavItems from '../NavItems.svelte';
+	import { NavItems } from '@repo/ui/shared';
 </script>
 
 <header
