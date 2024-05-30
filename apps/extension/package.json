@@ -16,12 +16,10 @@
 		"effect": "^3.2.5",
 		"mode-watcher": "^0.3.0",
 		"plasmo": "^0.86.3",
-		"svelte-french-toast": "^1.2.0",
 		"svelte-preprocess": "^5.1.4",
 		"svelte-sonner": "^0.3.24"
 	},
 	"devDependencies": {
-		"@iconify/json": "^2.2.214",
 		"@types/chrome": "^0.0.268",
 		"@types/node": "^20.12.12",
 		"autoprefixer": "^10.4.19",
@@ -29,8 +27,7 @@
 		"postcss": "^8.4.38",
 		"svelte": "^5.0.0-next",
 		"tailwindcss": "^3.4.3",
-		"typescript": "^5.4.5",
-		"unplugin-icons": "^0.19.0"
+		"typescript": "^5.4.5"
 	},
 	"manifest": {
 		"host_permissions": [
