@@ -1,31 +1,130 @@
-import { useState } from "react"
-
-import "./style.css"
+import { Label } from '@radix-ui/react-label';
+import { Button } from '~ui/button';
+import { Input } from '~ui/input';
+import './style.css';
 
 function IndexPopup() {
-  const [data, setData] = useState("")
-
-  return (
-    <div className="flex flex-col p-8">
-      <h2>
-        Welcome to your{" "}
-        <a
-          className="text-blue-500 underline"
-          href="https://www.plasmo.com"
-          target="_blank">
-          Plasmo
-        </a>{" "}
-        Extension!
-      </h2>
-      <input onChange={(e) => setData(e.target.value)} value={data} />
-      <a
-        className="text-red-500 font-bold underline"
-        href="https://docs.plasmo.com"
-        target="_blank">
-        View Docs
-      </a>
-    </div>
-  )
+	return (
+		<div className="h-[28rem] w-96">
+			<div className="relative flex min-h-screen flex-col">
+				<main className="flex flex-1 justify-center p-4">
+					<IndexPage />
+				</main>
+			</div>
+		</div>
+	);
 }
 
-export default IndexPopup
+function IndexPage() {
+	return (
+		<div className="flex flex-col items-center justify-center gap-4 text-center">
+			<div className="flex flex-col gap-4">
+				<h1 className="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
+					Start recording
+				</h1>
+				<p className="text-muted-foreground">
+					Click the <span>🎙</span> button to start. Allow access to your microphone.
+				</p>
+			</div>
+			<div className="relative">
+				<Button
+					className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
+					onClick={recorder.toggleRecording}
+					aria-label="Toggle recording"
+					variant="ghost"
+				>
+					<span style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}>
+						{recorder.recorderState === 'RECORDING' ? '🔲' : '🎙️'}
+					</span>
+				</Button>
+				{recorder.recorderState === 'RECORDING' ?? (
+					<Button
+						className="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+						onClick={recorder.cancelRecording}
+						aria-label="Cancel recording"
+						size="icon"
+						variant="ghost"
+					>
+						🚫
+					</Button>
+				)}
+			</div>
+			<div className="flex flex-col gap-2">
+				<Label htmlFor="transcribed-text" className="sr-only">
+					Transcribed Text
+				</Label>
+				<div className="flex items-center gap-2">
+					<Input
+						id="transcribed-text"
+						className="w-64"
+						placeholder="Transcribed text will appear here..."
+						readonly
+						value={
+							latestRecording.transcriptionStatus === 'TRANSCRIBING'
+								? '...'
+								: latestRecording.transcribedText
+						}
+					/>
+					<Button
+						className="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+						onClick={copyRecordingTextFromLatestRecording}
+					>
+						<ClipboardIcon />
+						<span className="sr-only">Copy transcribed text</span>
+					</Button>
+				</div>
+				{/* {#if maybeLatestAudioSrc}
+			{@const latestAudioSrc = maybeLatestAudioSrc}
+			<audio
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'blob',
+				})}"
+				src={latestAudioSrc}
+				controls
+				className="h-8 w-full"
+			/>
+		{/if} */}
+			</div>
+
+			<div className="flex flex-col items-center justify-center gap-2">
+				{/* <NavItems /> */}
+				<p className="text-foreground/75 text-sm leading-6">
+					Click the microphone or press
+					<Button
+						href="/shortcut"
+						aria-label="Keyboard Shortcuts"
+						variant="link"
+						className="px-0.5"
+					>
+						<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+							space
+						</kbd>
+					</Button>{' '}
+					to start recording.
+				</p>
+				<p className="text-muted-foreground text-sm font-light">
+					Check out the
+					<Button
+						asChild
+						variant="link"
+						className="h-fit px-0.5 py-0"
+						title="Check out the desktop app"
+						aria-label="Check out the desktop app"
+					>
+						<a
+							href="https://github.com/braden-w/whispering/releases"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							app
+						</a>
+					</Button>
+					for more integrations!
+				</p>
+			</div>
+		</div>
+	);
+}
+
+export default IndexPopup;
