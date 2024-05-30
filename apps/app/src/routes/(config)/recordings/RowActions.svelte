@@ -10,7 +10,7 @@
 	import {
 		ClipboardIcon,
 		PencilIcon as EditIcon,
-		EllipsisHorizontalIcon as LoadingTranscriptionIcon,
+		EllipsisIcon as LoadingTranscriptionIcon,
 		TrashIcon,
 	} from '@repo/ui/icons';
 	import { Effect } from 'effect';
@@ -35,18 +35,18 @@
 		title="Transcribe Recording"
 	>
 		{#if recording.transcriptionStatus === 'UNPROCESSED'}
-			<StartTranscriptionIcon />
+			<StartTranscriptionIcon class="h-4 w-4" />
 		{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
-			<LoadingTranscriptionIcon />
+			<LoadingTranscriptionIcon class="h-4 w-4" />
 		{:else}
-			<RetryTranscriptionIcon />
+			<RetryTranscriptionIcon class="h-4 w-4" />
 		{/if}
 	</Button>
 
 	<Dialog.Root bind:open={isDialogOpen}>
 		<Dialog.Trigger>
 			<Button variant="ghost" size="icon" title="Edit Recording">
-				<EditIcon />
+				<EditIcon class="h-4 w-4" />
 			</Button>
 		</Dialog.Trigger>
 		<Dialog.Content class="sm:max-w-[425px]">
@@ -133,7 +133,7 @@
 		})}-copy-button"
 		title="Copy Transcript"
 	>
-		<ClipboardIcon />
+		<ClipboardIcon class="h-4 w-4" />
 	</Button>
 
 	<Button
@@ -142,6 +142,6 @@
 		on:click={() => recordings.deleteRecordingById(recording.id).pipe(Effect.runPromise)}
 		title="Delete Recording"
 	>
-		<TrashIcon />
+		<TrashIcon class="h-4 w-4" />
 	</Button>
 </div>

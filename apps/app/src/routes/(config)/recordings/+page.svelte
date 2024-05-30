@@ -10,7 +10,7 @@
 	import * as Table from '@repo/ui/components/table';
 	import {
 		ChevronDownIcon,
-		EllipsisHorizontalIcon as LoadingTranscriptionIcon,
+		EllipsisIcon as LoadingTranscriptionIcon,
 		TrashIcon,
 	} from '@repo/ui/icons';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
