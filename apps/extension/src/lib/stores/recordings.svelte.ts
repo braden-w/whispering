@@ -5,15 +5,14 @@ import {
 	TranscriptionComplete,
 } from '@repo/ui/toasts';
 import {
-	ClipboardServiceDesktopLive,
-	ClipboardServiceWebLive,
-} from 'repo/services/implementations/clipboard';
-import { RecordingsDbServiceLiveIndexedDb } from 'repo/services/implementations/recordings-db';
-import { TranscriptionServiceLiveWhisper } from 'repo/services/implementations/transcription';
-import { ClipboardService } from 'repo/services/services/clipboard';
-import type { Recording } from 'repo/services/services/recordings-db';
-import { RecordingsDbService } from 'repo/services/services/recordings-db';
-import { TranscriptionError, TranscriptionService } from 'repo/services/services/transcription';
+	ClipboardServiceExtensionLive,
+} from '@repo/services/implementations/clipboard';
+import { RecordingsDbServiceLiveIndexedDb } from '@repo/services/implementations/recordings-db';
+import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
+import { ClipboardService } from '@repo/services/services/clipboard';
+import type { Recording } from '@repo/services/services/recordings-db';
+import { RecordingsDbService } from '@repo/services/services/recordings-db';
+import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Console, Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
@@ -154,7 +153,7 @@ const createRecordings = Effect.gen(function* () {
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceLiveWhisper),
-	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
+	Effect.provide(ClipboardServiceExtensionLive),
 	Effect.runSync,
 );
 

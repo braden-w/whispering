@@ -1,7 +1,7 @@
 import { Effect, Layer } from 'effect';
 import { ClipboardError, ClipboardService } from '../../services/clipboard';
 
-export const ClipboardServiceWebLive = Layer.succeed(
+export const ClipboardServiceExtensionLive = Layer.succeed(
 	ClipboardService,
 	ClipboardService.of({
 		setClipboardText: (text) =>
