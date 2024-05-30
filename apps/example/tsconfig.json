@@ -6,7 +6,7 @@
   "include": [
     ".plasmo/index.d.ts",
     "./**/*.ts",
-    "./**/*.svelte"
+    "./**/*.tsx"
   ],
   "compilerOptions": {
     "paths": {
@@ -14,7 +14,6 @@
         "./*"
       ]
     },
-    "baseUrl": ".",
-    "types": ["svelte"]
+    "baseUrl": "."
   }
 }
