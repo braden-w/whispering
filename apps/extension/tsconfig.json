@@ -4,7 +4,7 @@
 	"include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx", "./**/*.svelte"],
 	"compilerOptions": {
 		"paths": {
-			"$*": ["./src/*"],
+			"$*": ["./*"],
 			"@repo/ui/utils": ["../../packages/ui/src/lib/utils.ts"],
 			"@repo/ui/shared": ["../../packages/ui/src/lib/components/shared/index.ts"],
 			"@repo/ui/components/*": ["../../packages/ui/src/lib/components/ui/*/index.ts"],
