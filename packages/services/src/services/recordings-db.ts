@@ -9,7 +9,7 @@ export type Recording = {
 	subtitle: string;
 	timestamp: string;
 	transcribedText: string;
-	blob: Blob;
+	blob: Blob | undefined;
 	/**
 	 * A recording
 	 * 1. Begins in an 'UNPROCESSED' state
