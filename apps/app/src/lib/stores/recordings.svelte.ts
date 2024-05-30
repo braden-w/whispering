@@ -3,7 +3,7 @@ import {
 	PleaseEnterAPIKeyToast,
 	SomethingWentWrongToast,
 	TranscriptionComplete,
-} from '$lib/toasts';
+} from '@repo/ui/toasts';
 import {
 	ClipboardServiceDesktopLive,
 	ClipboardServiceWebLive,

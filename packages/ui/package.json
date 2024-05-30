@@ -9,6 +9,7 @@
 		},
 		"./components/*": "./src/lib/components/ui/*/index.ts",
 		"./icons": "./src/lib/icons/index.ts",
+		"./toasts": "./src/lib/components/toasts/index.ts",
 		"./utils": "./src/lib/utils.ts",
 		"./tailwind.config": "./tailwind.config.ts",
 		"./postcss.config": "./postcss.config.js",
