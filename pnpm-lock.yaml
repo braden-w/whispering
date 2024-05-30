@@ -66,9 +66,6 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
-      '@iconify/json':
-        specifier: ^2.2.214
-        version: 2.2.214
       '@sveltejs/adapter-static':
         specifier: 3.0.1
         version: 3.0.1(@sveltejs/kit@2.5.10)
@@ -102,9 +99,6 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
-      unplugin-icons:
-        specifier: ^0.19.0
-        version: 0.19.0(@svgr/core@6.5.1)
       vite:
         specifier: ^5.2.11
         version: 5.2.11
@@ -8876,7 +8870,7 @@ packages:
       picocolors: 1.0.1
       sade: 1.8.1
       svelte: 5.0.0-next.140
-      svelte-preprocess: 5.1.4(@babel/core@7.24.6)(postcss@8.4.38)(svelte@5.0.0-next.140)(typescript@5.4.5)
+      svelte-preprocess: 5.1.4(postcss@8.4.38)(svelte@5.0.0-next.140)(typescript@5.4.5)
       typescript: 5.4.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -8971,6 +8965,55 @@ packages:
       strip-indent: 3.0.0
       svelte: 5.0.0-next.140
       typescript: 5.4.5
+    dev: false
+
+  /svelte-preprocess@5.1.4(postcss@8.4.38)(svelte@5.0.0-next.140)(typescript@5.4.5):
+    resolution: {integrity: sha512-IvnbQ6D6Ao3Gg6ftiM5tdbR6aAETwjhHV+UKGf5bHGYR69RQvF1ho0JKPcbUON4vy4R7zom13jPjgdOWCQ5hDA==}
+    engines: {node: '>= 16.0.0'}
+    requiresBuild: true
+    peerDependencies:
+      '@babel/core': ^7.10.2
+      coffeescript: ^2.5.1
+      less: ^3.11.3 || ^4.0.0
+      postcss: ^7 || ^8
+      postcss-load-config: ^2.1.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      pug: ^3.0.0
+      sass: ^1.26.8
+      stylus: ^0.55.0
+      sugarss: ^2.0.0 || ^3.0.0 || ^4.0.0
+      svelte: ^3.23.0 || ^4.0.0-next.0 || ^4.0.0 || ^5.0.0-next.0
+      typescript: '>=3.9.5 || ^4.0.0 || ^5.0.0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      coffeescript:
+        optional: true
+      less:
+        optional: true
+      postcss:
+        optional: true
+      postcss-load-config:
+        optional: true
+      pug:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      '@types/pug': 2.0.10
+      detect-indent: 6.1.0
+      magic-string: 0.30.10
+      postcss: 8.4.38
+      sorcery: 0.11.0
+      strip-indent: 3.0.0
+      svelte: 5.0.0-next.140
+      typescript: 5.4.5
+    dev: true
 
   /svelte-sonner@0.3.24(svelte@4.2.2):
     resolution: {integrity: sha512-txuL0JBUs0v6qGrr0PGCsbXmKHuthdrAkfISYi8umuveF7+gINb6EXl6VmKY9aHhyxCqvVgqd6yophQNrnor4w==}

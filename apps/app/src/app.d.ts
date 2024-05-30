@@ -1,4 +1,3 @@
-import 'unplugin-icons/types/svelte';
 import '@repo/svelte-table';
 
 // See https://kit.svelte.dev/docs/types#app
