@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { recorder, recordings } from '$lib/stores';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { Button } from '@repo/ui/components/button';
+	import { Input } from '@repo/ui/components/input';
+	import { Label } from '@repo/ui/components/label';
 	import { ClipboardIcon } from '@repo/ui/icons';
 	import { NavItems } from '@repo/ui/shared';
-	import { recorder, recordings } from '$lib/stores';
-	import { Button } from '@repo/ui/components/button';
-	import { Label } from '@repo/ui/components/label';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.code !== 'Space') return;
@@ -16,6 +17,7 @@
 		id: '',
 		title: '',
 		subtitle: '',
+		timestamp: '',
 		blob: undefined,
 		transcribedText: '',
 		transcriptionStatus: 'UNPROCESSED',

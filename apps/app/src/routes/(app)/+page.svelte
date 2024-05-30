@@ -17,6 +17,7 @@
 		id: '',
 		title: '',
 		subtitle: '',
+		timestamp: '',
 		blob: undefined,
 		transcribedText: '',
 		transcriptionStatus: 'UNPROCESSED',
