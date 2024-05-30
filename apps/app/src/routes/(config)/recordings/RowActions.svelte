@@ -10,13 +10,13 @@
 	import {
 		ClipboardIcon,
 		PencilIcon as EditIcon,
+		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
+		RepeatIcon as RetryTranscriptionIcon,
+		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
 	} from '@repo/ui/icons';
 	import { Effect } from 'effect';
-	import Loader2 from '~icons/lucide/loader-2';
-	import StartTranscriptionIcon from '~icons/lucide/play';
-	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -107,14 +107,14 @@
 						disabled={isDeleting}
 					>
 						{#if isDeleting}
-							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 						{/if}
 						Delete
 					</Button>
 					<Button on:click={() => (isDialogOpen = false)} variant="secondary">Cancel</Button>
 					<Button type="submit" disabled={isSaving}>
 						{#if isSaving}
-							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 						{/if}
 						Save
 					</Button>

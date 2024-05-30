@@ -11,14 +11,14 @@
 	import {
 		ChevronDownIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
+		RepeatIcon as RetryTranscriptionIcon,
+		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
 	} from '@repo/ui/icons';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
 	import { z } from 'zod';
-	import StartTranscriptionIcon from '~icons/lucide/play';
-	import RetryTranscriptionIcon from '~icons/lucide/repeat';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -233,14 +233,14 @@
 						const currentRow = recordings.value.find((r) => r.id === id);
 						return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 					})}
-						<LoadingTranscriptionIcon />
+						<LoadingTranscriptionIcon class="h-4 w-4" />
 					{:else if selectedRecordingRows.some(({ id }) => {
 						const currentRow = recordings.value.find((r) => r.id === id);
 						return currentRow?.transcriptionStatus === 'DONE';
 					})}
-						<RetryTranscriptionIcon />
+						<RetryTranscriptionIcon class="h-4 w-4" />
 					{:else}
-						<StartTranscriptionIcon />
+						<StartTranscriptionIcon class="h-4 w-4" />
 					{/if}
 				</Button>
 				<Button
@@ -251,7 +251,7 @@
 						recordings.deleteRecordingsById(ids).pipe(Effect.runPromise);
 					}}
 				>
-					<TrashIcon />
+					<TrashIcon class="h-4 w-4" />
 				</Button>
 			{/if}
 			<div class="text-muted-foreground text-sm">

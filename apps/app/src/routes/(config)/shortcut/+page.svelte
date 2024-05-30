@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@repo/ui/components/button';
+	import { LaptopIcon as DesktopIcon } from '@repo/ui/icons';
 	import ChromeWebstoreIcon from '~icons/logos/chrome-web-store';
-	import DesktopIcon from '~icons/lucide/laptop';
 </script>
 
 <svelte:head>
