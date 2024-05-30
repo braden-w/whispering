@@ -11,7 +11,7 @@ import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_bu
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { toast } from 'svelte-sonner';
+// import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 
 const startSound = new Audio(startSoundSrc);
@@ -40,13 +40,13 @@ const createRecorder = Effect.gen(function* () {
 			({ deviceId }) => deviceId === selectedAudioInputDeviceId.value,
 		);
 		if (!isSelectedDeviceExists) {
-			toast.info('Default audio input device not found, selecting first available device');
+			// toast.info('Default audio input device not found, selecting first available device');
 			const firstAudioInput = recordingDevices[0].deviceId;
 			selectedAudioInputDeviceId.value = firstAudioInput;
 		}
 	}).pipe(
 		Effect.catchAll((error) => {
-			toast.error(error.message);
+			// toast.error(error.message);
 			return Effect.succeed(undefined);
 		}),
 	);
@@ -100,7 +100,7 @@ const createRecorder = Effect.gen(function* () {
 				}
 			}).pipe(
 				Effect.catchAll((error) => {
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 				Effect.runPromise,
@@ -113,7 +113,7 @@ const createRecorder = Effect.gen(function* () {
 				recorderState = 'IDLE';
 			}).pipe(
 				Effect.catchAll((error) => {
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 				Effect.runPromise,
@@ -123,7 +123,7 @@ const createRecorder = Effect.gen(function* () {
 				return yield* recorderService.enumerateRecordingDevices;
 			}).pipe(
 				Effect.catchAll((error) => {
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed([] as MediaDeviceInfo[]);
 				}),
 				Effect.runPromise,

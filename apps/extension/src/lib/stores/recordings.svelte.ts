@@ -4,9 +4,7 @@ import {
 	SomethingWentWrongToast,
 	TranscriptionComplete,
 } from '@repo/ui/toasts';
-import {
-	ClipboardServiceExtensionLive,
-} from '@repo/services/implementations/clipboard';
+import { ClipboardServiceExtensionLive } from '@repo/services/implementations/clipboard';
 import { RecordingsDbServiceLiveIndexedDb } from '@repo/services/implementations/recordings-db';
 import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
 import { ClipboardService } from '@repo/services/services/clipboard';
@@ -14,7 +12,7 @@ import type { Recording } from '@repo/services/services/recordings-db';
 import { RecordingsDbService } from '@repo/services/services/recordings-db';
 import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Console, Effect, Either, Option } from 'effect';
-import { toast } from 'svelte-sonner';
+// import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
 
 const createRecordings = Effect.gen(function* () {
@@ -37,7 +35,7 @@ const createRecordings = Effect.gen(function* () {
 		}).pipe(
 			Effect.catchAll((error) => {
 				console.error(error);
-				toast.error(error.message);
+				// toast.error(error.message);
 				return Effect.succeed(undefined);
 			}),
 		),
@@ -48,18 +46,18 @@ const createRecordings = Effect.gen(function* () {
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 			),
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
-				toast.success('Recording updated!');
+				// toast.success('Recording updated!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 			),
@@ -67,11 +65,11 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
-				toast.success('Recording deleted!');
+				// toast.success('Recording deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 			),
@@ -79,11 +77,11 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
 				recordings = recordings.filter((recording) => !ids.includes(recording.id));
-				toast.success('Recordings deleted!');
+				// toast.success('Recordings deleted!');
 			}).pipe(
 				Effect.catchAll((error) => {
 					console.error(error);
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 			),
@@ -113,36 +111,36 @@ const createRecordings = Effect.gen(function* () {
 				Effect.catchAll((error) => Effect.succeed(error)),
 				Effect.runPromise,
 				(transcribeAndCopyPromise) => {
-					toast.promise(transcribeAndCopyPromise, {
-						loading: 'Transcribing recording...',
-						success: (maybeError) => {
-							if (!maybeError) return TranscriptionComplete;
-							const error = maybeError;
-							Console.error(error).pipe(Effect.runSync);
-							switch (error._tag) {
-								case 'PleaseEnterApiKeyError':
-									return PleaseEnterAPIKeyToast;
-								case 'InvalidApiKeyError':
-									return InvalidApiKey;
-								default:
-									return SomethingWentWrongToast;
-							}
-						},
-						error: (uncaughtError) => {
-							Console.error(uncaughtError).pipe(Effect.runSync);
-							return SomethingWentWrongToast;
-						},
-					});
+					// toast.promise(transcribeAndCopyPromise, {
+					// 	loading: 'Transcribing recording...',
+					// 	success: (maybeError) => {
+					// 		if (!maybeError) return TranscriptionComplete;
+					// 		const error = maybeError;
+					// 		Console.error(error).pipe(Effect.runSync);
+					// 		switch (error._tag) {
+					// 			case 'PleaseEnterApiKeyError':
+					// 				return PleaseEnterAPIKeyToast;
+					// 			case 'InvalidApiKeyError':
+					// 				return InvalidApiKey;
+					// 			default:
+					// 				return SomethingWentWrongToast;
+					// 		}
+					// 	},
+					// 	error: (uncaughtError) => {
+					// 		Console.error(uncaughtError).pipe(Effect.runSync);
+					// 		return SomethingWentWrongToast;
+					// 	},
+					// });
 				},
 			),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				toast.success('Copied to clipboard!');
+				// toast.success('Copied to clipboard!');
 			}).pipe(
 				Effect.catchAll((error) => {
-					toast.error(error.message);
+					// toast.error(error.message);
 					return Effect.succeed(undefined);
 				}),
 				Effect.runPromise,

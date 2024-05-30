@@ -1,13 +1,13 @@
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { RegisterShortcutsWebLive } from 'repo/services/implementations/register-shortcuts';
+import { RegisterShortcutsWebLive } from '@repo/services/implementations/register-shortcuts';
 import {
 	RegisterShortcutsService,
 	type RegisterShortcutsError,
-} from 'repo/services/services/register-shortcuts';
+} from '@repo/services/services/register-shortcuts';
 import { Effect } from 'effect';
-import { toast } from 'svelte-sonner';
+// import { toast } from 'svelte-sonner';
 import { z } from 'zod';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
@@ -89,7 +89,7 @@ const createSettings = Effect.gen(function* () {
 						shortcut: currentGlobalShortcut.value,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Global shortcut set to ${currentGlobalShortcut.value}`);
+					// toast.success(`Global shortcut set to ${currentGlobalShortcut.value}`);
 				}).pipe(
 					Effect.catchAll((error) => {
 						error.renderAsToast();
