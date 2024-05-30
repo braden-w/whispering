@@ -105,6 +105,34 @@ importers:
 
   apps/extension:
     dependencies:
+      plasmo:
+        specifier: 0.86.3
+        version: 0.86.3(postcss@8.4.38)
+      svelte:
+        specifier: 4.2.9
+        version: 4.2.9
+      svelte-preprocess:
+        specifier: 5.1.3
+        version: 5.1.3(@babel/core@7.24.6)(svelte@4.2.9)(typescript@5.3.3)
+    devDependencies:
+      '@ianvs/prettier-plugin-sort-imports':
+        specifier: 4.1.1
+        version: 4.1.1(prettier@3.2.4)
+      '@types/chrome':
+        specifier: 0.0.258
+        version: 0.0.258
+      '@types/node':
+        specifier: 20.11.5
+        version: 20.11.5
+      prettier:
+        specifier: 3.2.4
+        version: 3.2.4
+      typescript:
+        specifier: 5.3.3
+        version: 5.3.3
+
+  apps/extension-old:
+    dependencies:
       '@plasmohq/storage':
         specifier: ^1.10.0
         version: 1.10.0
@@ -151,34 +179,6 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
-
-  apps/proj:
-    dependencies:
-      plasmo:
-        specifier: 0.86.3
-        version: 0.86.3(postcss@8.4.38)
-      svelte:
-        specifier: 4.2.9
-        version: 4.2.9
-      svelte-preprocess:
-        specifier: 5.1.3
-        version: 5.1.3(@babel/core@7.24.6)(svelte@4.2.9)(typescript@5.3.3)
-    devDependencies:
-      '@ianvs/prettier-plugin-sort-imports':
-        specifier: 4.1.1
-        version: 4.1.1(prettier@3.2.4)
-      '@types/chrome':
-        specifier: 0.0.258
-        version: 0.0.258
-      '@types/node':
-        specifier: 20.11.5
-        version: 20.11.5
-      prettier:
-        specifier: 3.2.4
-        version: 3.2.4
-      typescript:
-        specifier: 5.3.3
-        version: 5.3.3
 
   packages/eslint-config-custom:
     devDependencies:
@@ -4516,7 +4516,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.23.0
-      caniuse-lite: 1.0.30001621
+      caniuse-lite: 1.0.30001623
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.1
@@ -4783,10 +4783,6 @@ packages:
     engines: {node: '>=16'}
     dev: false
     optional: true
-
-  /caniuse-lite@1.0.30001621:
-    resolution: {integrity: sha512-+NLXZiviFFKX0fk8Piwv3PfLPGtRqJeq2TiNoUff/qB5KJgwecJTvCXDpmlyP/eCI/GUEmp/h/y5j0yckiiZrA==}
-    dev: true
 
   /caniuse-lite@1.0.30001623:
     resolution: {integrity: sha512-X/XhAVKlpIxWPpgRTnlgZssJrF0m6YtRA0QDWgsBNT12uZM6LPRydR7ip405Y3t1LamD8cP2TZFEDZFBf5ApcA==}
@@ -7277,13 +7273,6 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
-  /micromatch@4.0.5:
-    resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
-    engines: {node: '>=8.6'}
-    dependencies:
-      braces: 3.0.3
-      picomatch: 2.3.1
-
   /micromatch@4.0.7:
     resolution: {integrity: sha512-LPP/3KorzCwBxfeUuZmaR6bG2kdeHSbe0P2tY3FLRU4vYrjYz5hI4QZwV0njUx3jeuKe67YukQ1LSPZBKDqO/Q==}
     engines: {node: '>=8.6'}
@@ -7761,9 +7750,6 @@ packages:
       is-reference: 3.0.2
     dev: false
 
-  /picocolors@1.0.0:
-    resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
-
   /picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
 
@@ -7974,13 +7960,6 @@ packages:
     dependencies:
       postcss: 8.4.38
     dev: true
-
-  /postcss-selector-parser@6.0.15:
-    resolution: {integrity: sha512-rEYkQOMUCEMhsKbK66tbEU9QVIxbhN18YiniAwA7XQYTVBqrBy+P2p5JcdqsHgKM2zWylp8d7J6eszocfds5Sw==}
-    engines: {node: '>=4'}
-    dependencies:
-      cssesc: 3.0.0
-      util-deprecate: 1.0.2
 
   /postcss-selector-parser@6.1.0:
     resolution: {integrity: sha512-UMz42UD0UY0EApS0ZL9o1XnLhSTtvvvLe5Dc2H2O56fvRZi+KulDyf5ctDhhtYJBGKStV2FL1fy6253cmLgqVQ==}
@@ -9205,16 +9184,16 @@ packages:
       is-glob: 4.0.3
       jiti: 1.21.0
       lilconfig: 2.1.0
-      micromatch: 4.0.5
+      micromatch: 4.0.7
       normalize-path: 3.0.0
       object-hash: 3.0.0
-      picocolors: 1.0.0
+      picocolors: 1.0.1
       postcss: 8.4.38
       postcss-import: 15.1.0(postcss@8.4.38)
       postcss-js: 4.0.1(postcss@8.4.38)
       postcss-load-config: 4.0.2(postcss@8.4.38)
       postcss-nested: 6.0.1(postcss@8.4.38)
-      postcss-selector-parser: 6.0.15
+      postcss-selector-parser: 6.1.0
       resolve: 1.22.8
       sucrase: 3.35.0
     transitivePeerDependencies:
