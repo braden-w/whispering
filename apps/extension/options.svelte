@@ -6,7 +6,7 @@
 	import { NavItems } from '@repo/ui/shared';
 	import { cn } from '@repo/ui/utils';
 	import { ModeWatcher } from 'mode-watcher';
-	import { Toaster } from 'svelte-french-toast';
+	import { Toaster } from 'svelte-sonner';
 </script>
 
 <div class="relative flex min-h-screen flex-col">
