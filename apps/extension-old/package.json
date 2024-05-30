@@ -45,5 +45,8 @@
 				"description": "Toggle recording"
 			}
 		}
+	},
+	"@parcel/resolver-default": {
+		"packageExports": true
 	}
 }
