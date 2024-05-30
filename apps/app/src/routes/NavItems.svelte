@@ -13,7 +13,7 @@
 		<Tooltip.Trigger asChild let:builder>
 			<Button builders={[builder]} href="/recordings" variant="ghost" size="icon">
 				<ListIcon aria-hidden="true" />
-				<span class="sr-only">Settings</span>
+				<span class="sr-only">Recordings</span>
 			</Button>
 		</Tooltip.Trigger>
 		<Tooltip.Content>
