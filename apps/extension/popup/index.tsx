@@ -27,7 +27,7 @@ function IndexPage() {
 				</p>
 			</div>
 			<div className="relative">
-				<Button
+				{/* <Button
 					className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
 					onClick={recorder.toggleRecording}
 					aria-label="Toggle recording"
@@ -47,7 +47,7 @@ function IndexPage() {
 					>
 						🚫
 					</Button>
-				)}
+				)} */}
 			</div>
 			<div className="flex flex-col gap-2">
 				<Label htmlFor="transcribed-text" className="sr-only">
@@ -58,18 +58,18 @@ function IndexPage() {
 						id="transcribed-text"
 						className="w-64"
 						placeholder="Transcribed text will appear here..."
-						readonly
-						value={
-							latestRecording.transcriptionStatus === 'TRANSCRIBING'
-								? '...'
-								: latestRecording.transcribedText
-						}
+						readOnly
+						// value={
+						// 	latestRecording.transcriptionStatus === 'TRANSCRIBING'
+						// 		? '...'
+						// 		: latestRecording.transcribedText
+						// }
 					/>
 					<Button
 						className="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-						onClick={copyRecordingTextFromLatestRecording}
+						// onClick={copyRecordingTextFromLatestRecording}
 					>
-						<ClipboardIcon />
+						{/* <ClipboardIcon /> */}
 						<span className="sr-only">Copy transcribed text</span>
 					</Button>
 				</div>
@@ -91,15 +91,12 @@ function IndexPage() {
 				{/* <NavItems /> */}
 				<p className="text-foreground/75 text-sm leading-6">
 					Click the microphone or press
-					<Button
-						href="/shortcut"
-						aria-label="Keyboard Shortcuts"
-						variant="link"
-						className="px-0.5"
-					>
-						<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-							space
-						</kbd>
+					<Button aria-label="Keyboard Shortcuts" variant="link" className="px-0.5">
+						<a href="/shortcut">
+							<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+								space
+							</kbd>
+						</a>
 					</Button>{' '}
 					to start recording.
 				</p>
