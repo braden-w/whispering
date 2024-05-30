@@ -4,8 +4,6 @@
 	import * as Tooltip from '@repo/ui/components/tooltip';
 	import { AdjustmentsVerticalIcon, SunIcon, MoonIcon } from '@repo/ui/icons';
 	import { toggleMode } from 'mode-watcher';
-	import MoonIcon from '~icons/lucide/moon';
-	import SunIcon from '~icons/lucide/sun';
 	import GithubIcon from '~icons/mdi/github';
 	import ListIcon from '~icons/solar/playlist-outline';
 </script>
