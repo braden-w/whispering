@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Button } from '@repo/ui/components/button';
-	import { LaptopIcon as DesktopIcon } from '@repo/ui/icons';
-	import ChromeWebstoreIcon from '~icons/logos/chrome-web-store';
+	import { ChromeWebStoreIcon, LaptopIcon as DesktopIcon } from '@repo/ui/icons';
 </script>
 
 <svelte:head>
@@ -38,7 +37,7 @@
 				title="Check out the desktop app"
 				aria-label="Check out the desktop app"
 			>
-				<ChromeWebstoreIcon class="mr-2 h-6 w-6" />
+				<ChromeWebStoreIcon class="mr-2 h-6 w-6" />
 				Get Chrome Extension
 			</Button>
 		</div>
