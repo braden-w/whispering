@@ -9,6 +9,7 @@ export class RegisterShortcutsError extends Data.TaggedError('RegisterShortcutsE
 export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsService')<
 	RegisterShortcutsService,
 	{
+		readonly isGlobalShortcutEnabled: boolean;
 		readonly defaultLocalShortcut: string;
 		readonly defaultGlobalShortcut: string;
 		readonly unregisterAllLocalShortcuts: () => Effect.Effect<void, RegisterShortcutsError>;

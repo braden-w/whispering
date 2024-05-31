@@ -32,10 +32,15 @@ const createSettings = Effect.gen(function* () {
 		schema: z.boolean(),
 		defaultValue: true,
 	});
+	const currentLocalShortcut = createPersistedState({
+		key: 'whispering-current-local-shortcut',
+		schema: z.string(),
+		defaultValue: registerShortcutsService.defaultLocalShortcut,
+	});
 	const currentGlobalShortcut = createPersistedState({
 		key: 'whispering-current-global-shortcut',
 		schema: z.string(),
-		defaultValue: registerShortcutsService.defaultShortcut,
+		defaultValue: registerShortcutsService.defaultGlobalShortcut,
 	});
 	const apiKey = createPersistedState({
 		key: 'whispering-api-key',
@@ -51,8 +56,13 @@ const createSettings = Effect.gen(function* () {
 	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
 	const queueInitialSilentJob = Effect.gen(function* () {
 		const initialSilentJob = Effect.gen(function* () {
-			yield* registerShortcutsService.unregisterAll();
-			yield* registerShortcutsService.register({
+			yield* registerShortcutsService.unregisterAllLocalShortcuts();
+			yield* registerShortcutsService.unregisterAllGlobalShortcuts();
+			yield* registerShortcutsService.registerLocalShortcut({
+				shortcut: currentLocalShortcut.value,
+				callback: recorder.toggleRecording,
+			});
+			yield* registerShortcutsService.registerGlobalShortcut({
 				shortcut: currentGlobalShortcut.value,
 				callback: recorder.toggleRecording,
 			});
@@ -80,6 +90,29 @@ const createSettings = Effect.gen(function* () {
 		set isPasteContentsOnSuccessEnabled(newValue) {
 			isPasteContentsOnSuccessEnabled.value = newValue;
 		},
+		get currentLocalShortcut() {
+			return currentLocalShortcut.value;
+		},
+		set currentLocalShortcut(newValue) {
+			currentLocalShortcut.value = newValue;
+			const queueJob = Effect.gen(function* () {
+				const job = Effect.gen(function* () {
+					yield* registerShortcutsService.unregisterAllLocalShortcuts();
+					yield* registerShortcutsService.registerLocalShortcut({
+						shortcut: currentLocalShortcut.value,
+						callback: recorder.toggleRecording,
+					});
+					toast.success(`Local shortcut set to ${currentLocalShortcut.value}`);
+				}).pipe(
+					Effect.catchAll((error) => {
+						error.renderAsToast();
+						return Effect.succeed(undefined);
+					}),
+				);
+				yield* jobQueue.addJobToQueue(job);
+			});
+			queueJob.pipe(Effect.runPromise);
+		},
 		get currentGlobalShortcut() {
 			return currentGlobalShortcut.value;
 		},
@@ -87,8 +120,8 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut.value = newValue;
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
-					yield* registerShortcutsService.unregisterAll();
-					yield* registerShortcutsService.register({
+					yield* registerShortcutsService.unregisterAllGlobalShortcuts();
+					yield* registerShortcutsService.registerGlobalShortcut({
 						shortcut: currentGlobalShortcut.value,
 						callback: recorder.toggleRecording,
 					});

@@ -127,6 +127,16 @@
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
+				<Label class="text-sm" for="local-shortcut">Local Shortcut</Label>
+				<Input
+					id="local-shortcut"
+					placeholder="Local Shortcut to toggle recording"
+					bind:value={settings.currentLocalShortcut}
+					type="text"
+					autocomplete="off"
+				/>
+			</div>
+			<div class="grid gap-2">
 				<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
 				<Input
 					id="global-shortcut"

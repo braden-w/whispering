@@ -10,8 +10,10 @@ export const RegisterShortcutsWebLive = Layer.effect(
 	RegisterShortcutsService,
 	Effect.gen(function* () {
 		return {
-			defaultShortcut: 'space',
-			unregisterAll: () =>
+			isGlobalShortcutEnabled: false,
+			defaultLocalShortcut: 'space',
+			defaultGlobalShortcut: '',
+			unregisterAllLocalShortcuts: () =>
 				Effect.try({
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
@@ -20,7 +22,30 @@ export const RegisterShortcutsWebLive = Layer.effect(
 							origError: error,
 						}),
 				}),
-			register: ({ shortcut, callback }) =>
+			unregisterAllGlobalShortcuts: () =>
+				Effect.try({
+					try: () => hotkeys.unbind(),
+					catch: (error) =>
+						new RegisterShortcutsError({
+							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
+							origError: error,
+						}),
+				}),
+			registerLocalShortcut: ({ shortcut, callback }) =>
+				Effect.try({
+					try: () =>
+						hotkeys(shortcut, function (event, handler) {
+							// Prevent the default refresh event under WINDOWS system
+							event.preventDefault();
+							callback();
+						}),
+					catch: (error) =>
+						new RegisterShortcutsError({
+							renderAsToast: () => toast.error('Error registering shortcut'),
+							origError: error,
+						}),
+				}),
+			registerGlobalShortcut: ({ shortcut, callback }) =>
 				Effect.try({
 					try: () =>
 						hotkeys(shortcut, function (event, handler) {
