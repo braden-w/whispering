@@ -129,7 +129,7 @@
 				</Button>
 				to start recording.
 			{:else}
-				<Button href="/shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
+				<Button href="/global-shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
 					<kbd
 						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
 					>

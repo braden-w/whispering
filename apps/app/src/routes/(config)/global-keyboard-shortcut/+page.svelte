@@ -4,13 +4,13 @@
 </script>
 
 <svelte:head>
-	<title>Change Keyboard Shortcut</title>
+	<title>Change Global Keyboard Shortcut</title>
 </svelte:head>
 
 <div class="flex items-center justify-center">
 	<section class="container flex flex-col items-center gap-4 text-center">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
-			Change Your Keyboard Shortcut
+			Change Your Global Keyboard Shortcut
 		</h1>
 		<p class="text-muted-foreground lg:text-xl">
 			You can access global keyboard shortcuts on the extension and desktop app.
