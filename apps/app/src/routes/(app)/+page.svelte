@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { recorder, recordings } from '$lib/stores';
+	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Button } from '@repo/ui/components/button';
 	import { Input } from '@repo/ui/components/input';
@@ -124,7 +124,7 @@
 					<kbd
 						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
 					>
-						space
+						{settings.currentGlobalShortcut}
 					</kbd>
 				</Button>
 				to start recording.
