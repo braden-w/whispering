@@ -7,12 +7,6 @@
 	import { ClipboardIcon } from '@repo/ui/icons';
 	import { NavItems } from '@repo/ui/shared';
 
-	function handleKeyDown(event: KeyboardEvent) {
-		if (event.code !== 'Space') return;
-		event.preventDefault(); // Prevent scrolling
-		recorder.toggleRecording();
-	}
-
 	const PLACEHOLDER_RECORDING = {
 		id: '',
 		title: '',
@@ -37,8 +31,6 @@
 <svelte:head>
 	<title>Whispering</title>
 </svelte:head>
-
-<svelte:window on:keydown={handleKeyDown} />
 
 <div class="flex flex-col items-center justify-center gap-4 text-center">
 	<div class="flex flex-col gap-4">
