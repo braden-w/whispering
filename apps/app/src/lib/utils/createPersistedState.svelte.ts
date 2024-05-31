@@ -26,7 +26,12 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 
 	if (!disableLocalStorage) {
 		value = loadValueFromStorage({ key, schema, defaultValue });
-		createStorageEventListener({ key, schema, bindedValue: value, defaultValue });
+		createStorageEventListener({
+			key,
+			schema,
+			setValue: (newValue) => (value = newValue),
+			defaultValue,
+		});
 	}
 
 	return {
@@ -66,12 +71,12 @@ function removeFromStorage(key: string) {
 function createStorageEventListener<T extends z.ZodTypeAny>({
 	key,
 	schema,
-	bindedValue,
+	setValue,
 	defaultValue,
 }: {
 	key: string;
 	schema: T;
-	bindedValue: z.infer<T>;
+	setValue: (newValue: z.infer<T>) => void;
 	defaultValue: z.infer<T>;
 }) {
 	window.addEventListener('storage', (event: StorageEvent) => {
@@ -79,13 +84,13 @@ function createStorageEventListener<T extends z.ZodTypeAny>({
 			try {
 				const isStorageEmpty = event.newValue === null;
 				if (isStorageEmpty) {
-					bindedValue = null;
+					setValue(null);
 					return;
 				}
 				const validValue = schema.parse(JSON.parse(event.newValue));
-				bindedValue = validValue;
+				setValue(validValue);
 			} catch {
-				bindedValue = defaultValue;
+				setValue(defaultValue);
 			}
 		}
 	});
