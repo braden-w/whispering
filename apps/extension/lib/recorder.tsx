@@ -3,8 +3,7 @@
 import { sendMessageToBackground } from '~lib/utils/messaging';
 import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
-import type { CreateRecorderState } from '../../../packages/services/src/services/recorder-state';
-// import type { Recording } from '@repo/services/services/recordings-db';
+import type { Recording } from '../../../packages/services/src/services/recordings-db';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';

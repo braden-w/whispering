@@ -2,6 +2,7 @@ import { Label } from '@radix-ui/react-label';
 import { Button } from '~ui/button';
 import { Input } from '~ui/input';
 import './style.css';
+import { useRecorder } from '~lib/recorder';
 
 function IndexPopup() {
 	return (
@@ -16,6 +17,7 @@ function IndexPopup() {
 }
 
 function IndexPage() {
+	const recorder = useRecorder();
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 text-center">
 			<div className="flex flex-col gap-4">
@@ -27,7 +29,7 @@ function IndexPage() {
 				</p>
 			</div>
 			<div className="relative">
-				{/* <Button
+				<Button
 					className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
 					onClick={recorder.toggleRecording}
 					aria-label="Toggle recording"
@@ -47,7 +49,7 @@ function IndexPage() {
 					>
 						🚫
 					</Button>
-				)} */}
+				)}
 			</div>
 			<div className="flex flex-col gap-2">
 				<Label htmlFor="transcribed-text" className="sr-only">
