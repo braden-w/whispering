@@ -1,16 +1,15 @@
 import type { z } from 'zod';
 
 /**
- * An extension of Svelte's `writable` that also saves its state to localStorage and
- * automatically restores it.
- * @param key The localStorage key to use for saving the writable's contents.
- * @param schema A Zod schema describing the contents of the writable.
- * @param defaultValue The initial value to use if no prior state has been saved in
- * localstorage.
- * @param disableLocalStorage Skip interaction with localStorage, for example during SSR.
- * @returns A stored writable.
+ * Creates a persisted state tied to local storage.
+ * @param {Object} params - The parameters for creating the persisted state.
+ * @param {string} params.key - The key used to store the value in local storage.
+ * @param {TSchema} params.schema - The Zod schema used to validate the value.
+ * @param {z.infer<TSchema>} params.defaultValue - The default value to use if no value is found in local storage.
+ * @param {boolean} [params.disableLocalStorage=false] - If true, disables the use of local storage.
+ * @returns {Object} The persisted state.
+ * @returns {z.infer<TSchema>} value - The reactive value of the persisted state.
  */
-
 export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	key,
 	schema,
