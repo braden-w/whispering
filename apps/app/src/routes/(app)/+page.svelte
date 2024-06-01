@@ -113,11 +113,28 @@
 		<NavItems />
 		<p class="text-foreground/75 text-sm leading-6">
 			Click the microphone or press
-			{#if window.__TAURI__}
+			<Button
+				href="/settings#local-shortcut"
+				aria-label="Go to local shortcut in settings"
+				title="Go to local shortcut in settings"
+				variant="link"
+				class="px-0.5"
+			>
+				<kbd
+					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+				>
+					{settings.currentLocalShortcut}
+				</kbd>
+			</Button>
+			to start recording here.
+		</p>
+		{#if window.__TAURI__}
+			<p class="text-foreground/75 text-sm leading-6">
+				Press
 				<Button
 					href="/settings#global-shortcut"
-					aria-label="Go to global shortcut"
-					title="Go to global shortcut"
+					aria-label="Go to global shortcut in settings"
+					title="Go to global shortcut in settings"
 					variant="link"
 					class="px-0.5"
 				>
@@ -127,17 +144,9 @@
 						{settings.currentGlobalShortcut}
 					</kbd>
 				</Button>
-				to start recording.
-			{:else}
-				<Button href="/global-shortcut" aria-label="Keyboard Shortcuts" variant="link" class="px-0.5">
-					<kbd
-						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-					>
-						space
-					</kbd>
-				</Button> to start recording.
-			{/if}
-		</p>
+				to start recording anywhere.
+			</p>
+		{/if}
 		<p class="text-muted-foreground text-sm font-light">
 			Check out the <Button
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"

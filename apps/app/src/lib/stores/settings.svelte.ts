@@ -113,6 +113,9 @@ const createSettings = Effect.gen(function* () {
 			});
 			queueJob.pipe(Effect.runPromise);
 		},
+		get isGlobalShortcutEnabled() {
+			return registerShortcutsService.isGlobalShortcutEnabled;
+		},
 		get currentGlobalShortcut() {
 			return currentGlobalShortcut.value;
 		},

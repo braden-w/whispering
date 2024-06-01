@@ -138,13 +138,29 @@
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
-				<Input
-					id="global-shortcut"
-					placeholder="Global Shortcut to toggle recording"
-					bind:value={settings.currentGlobalShortcut}
-					type="text"
-					autocomplete="off"
-				/>
+				{#if settings.isGlobalShortcutEnabled}
+					<Input
+						id="global-shortcut"
+						placeholder="Global Shortcut to toggle recording"
+						bind:value={settings.currentGlobalShortcut}
+						type="text"
+						autocomplete="off"
+					/>
+				{:else}
+					<div class="relative">
+						<Input
+							id="global-shortcut"
+							placeholder="Global Shortcut to toggle recording"
+							bind:value={settings.currentGlobalShortcut}
+							type="text"
+							autocomplete="off"
+							disabled
+						/>
+						<Button class="absolute inset-0 backdrop-blur" href="/global-shortcut" variant="link">
+							Enable Global Shortcut
+						</Button>
+					</div>
+				{/if}
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="api-key">API Key</Label>
