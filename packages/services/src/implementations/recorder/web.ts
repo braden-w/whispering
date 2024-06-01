@@ -24,17 +24,6 @@ let stream: MediaStream;
 let mediaRecorder: MediaRecorder;
 const recordedChunks: Blob[] = [];
 
-const getMediaStream = (recordingDeviceId: string) =>
-	Effect.tryPromise({
-		try: () =>
-			navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: recordingDeviceId } } }),
-		catch: (error) =>
-			new GetNavigatorMediaError({
-				message: 'Error getting media stream',
-				origError: error,
-			}),
-	});
-
 const resetRecorder = () => {
 	recordedChunks.length = 0;
 	stream.getTracks().forEach((track) => track.stop());
@@ -45,7 +34,17 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 	RecorderService.of({
 		startRecording: (recordingDeviceId) =>
 			Effect.gen(function* () {
-				stream = yield* getMediaStream(recordingDeviceId);
+				stream = yield* Effect.tryPromise({
+					try: () =>
+						navigator.mediaDevices.getUserMedia({
+							audio: { deviceId: { exact: recordingDeviceId } },
+						}),
+					catch: (error) =>
+						new GetNavigatorMediaError({
+							message: 'Error getting media stream',
+							origError: error,
+						}),
+				});
 				recordedChunks.length = 0;
 				mediaRecorder = new AudioRecorder(stream);
 				mediaRecorder.addEventListener(
