@@ -1,6 +1,8 @@
 // import type { Icon } from '$background/setIcon';
 
+import React from 'react';
 import type { z } from 'zod';
+import { getOrCreateWhisperingTab } from '~background';
 
 export type MessageToBackgroundRequest =
 	| {
@@ -29,6 +31,10 @@ export type MessageToContentScriptRequest =
 			key: string;
 	  }
 	| {
+			action: 'registerListener';
+			callback: (event: StorageEvent) => void;
+	  }
+	| {
 			action: 'setLocalStorage';
 			key: string;
 			value: string;
@@ -46,25 +52,31 @@ export const sendMessageToContentScript = <R>(
 	options?: chrome.tabs.MessageSendOptions,
 ) => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message, options);
 
-export const createGetLocalStorageForTab = (tabId: number) => {
-	const getLocalStorage = async <TSchema extends z.ZodTypeAny>({
-		key,
-		schema,
-		defaultValue,
-	}: {
-		key: string;
-		schema: TSchema;
-		defaultValue: z.infer<TSchema>;
-	}) => {
-		const unparsedValue = await sendMessageToContentScript(tabId, {
-			action: 'getLocalStorage',
-			key,
-		});
-		const parseResult = schema.safeParse(unparsedValue);
-		if (parseResult.success) return parseResult.data as z.infer<TSchema>;
-		return defaultValue;
-	};
-	return getLocalStorage;
+export const useLocalStorageFromWhisperingTab = <TSchema extends z.ZodTypeAny>({
+	key,
+	schema,
+	defaultValue,
+}: {
+	key: string;
+	schema: TSchema;
+	defaultValue: z.infer<TSchema>;
+}) => {
+	const [state, setState] = React.useState<z.infer<TSchema>>(defaultValue);
+	async function loadValueFromStorage() {
+		try {
+			const tabId = await getOrCreateWhisperingTab();
+			const unparsedValue = await sendMessageToContentScript(tabId, {
+				action: 'getLocalStorage',
+				key,
+			});
+			return schema.parse(unparsedValue) as z.infer<TSchema>;
+		} catch {
+			return defaultValue;
+		}
+	}
+	async function syncState() {
+		setState(loadValueFromStorage());
+	}
 };
 
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
