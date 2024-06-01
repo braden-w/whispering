@@ -1,5 +1,7 @@
 // import type { Icon } from '$background/setIcon';
 
+import type { z } from 'zod';
+
 export type MessageToBackgroundRequest =
 	| {
 			action: 'setExtensionIcon';
@@ -37,6 +39,34 @@ export type MessageToContentScriptRequest =
 	| {
 			action: 'setIndexedDb';
 	  };
+
+export const sendMessageToContentScript = <R>(
+	tabId: number,
+	message: MessageToContentScriptRequest,
+	options?: chrome.tabs.MessageSendOptions,
+) => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message, options);
+
+export const createGetLocalStorageForTab = (tabId: number) => {
+	const getLocalStorage = async <TSchema extends z.ZodTypeAny>({
+		key,
+		schema,
+		defaultValue,
+	}: {
+		key: string;
+		schema: TSchema;
+		defaultValue: z.infer<TSchema>;
+	}) => {
+		const unparsedValue = await sendMessageToContentScript(tabId, {
+			action: 'getLocalStorage',
+			key,
+		});
+		const parseResult = schema.safeParse(unparsedValue);
+		if (parseResult.success) return parseResult.data as z.infer<TSchema>;
+		return defaultValue;
+	};
+	return getLocalStorage;
+};
+
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
 // export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
 // 	const [tab] = await chrome.tabs.query({
