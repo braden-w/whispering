@@ -111,7 +111,7 @@
 
 	<div class="flex flex-col items-center justify-center gap-2">
 		<NavItems />
-		<p class="text-foreground/75 text-sm leading-6">
+		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
 			<Button
 				href="/settings#local-shortcut"
@@ -129,7 +129,7 @@
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
-			<p class="text-foreground/75 text-sm leading-6">
+			<p class="text-foreground/75 pb-1 text-sm">
 				Press
 				<Button
 					href="/settings#global-shortcut"
