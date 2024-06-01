@@ -19,6 +19,6 @@ export class LocalStorageService extends Context.Tag('LocalStorageService')<
 			schema: TSchema;
 			defaultValue: z.infer<TSchema>;
 		}) => Effect.Effect<z.infer<TSchema>, LocalStorageError>;
-		readonly set: (key: string, value: string) => Effect.Effect<void, LocalStorageError>;
+		readonly set: (args: { key: string; value: string }) => Effect.Effect<void, LocalStorageError>;
 	}
 >() {}
