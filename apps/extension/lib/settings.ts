@@ -11,11 +11,6 @@ const createSettings = async function () {
 		schema: z.boolean(),
 		defaultValue: true,
 	});
-	getLocalStorage({
-		key: 'whispering-is-play-sound-enabled',
-		schema: z.boolean(),
-		defaultValue: true,
-	});
 	const isCopyToClipboardEnabled = getLocalStorage({
 		key: 'whispering-is-copy-to-clipboard-enabled',
 		schema: z.boolean(),
