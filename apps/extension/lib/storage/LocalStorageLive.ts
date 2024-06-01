@@ -3,7 +3,7 @@ import { Effect, Layer } from 'effect';
 import {
 	LocalStorageError,
 	LocalStorageService,
-} from '../../../packages/services/src/services/localstorage';
+} from '../../../../packages/services/src/services/localstorage';
 
 export const LocalStorageWwwLive = Layer.succeed(
 	LocalStorageService,
