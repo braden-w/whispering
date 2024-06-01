@@ -41,6 +41,6 @@
 				Get Chrome Extension
 			</Button>
 		</div>
-		<Button href="/" variant="link">Go back</Button>
+		<Button on:click={() => window.history.back()} variant="link">Go back</Button>
 	</section>
 </div>
