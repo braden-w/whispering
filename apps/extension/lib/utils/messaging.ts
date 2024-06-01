@@ -1,9 +1,9 @@
-import type { Icon } from '$background/setIcon';
+// import type { Icon } from '$background/setIcon';
 
 export type MessageToBackgroundRequest =
 	| {
 			action: 'setExtensionIcon';
-			icon: Icon;
+			// icon: Icon;
 	  }
 	| {
 			action: 'openOptionsPage';
@@ -16,14 +16,32 @@ export function sendMessageToBackground(message: MessageToBackgroundRequest) {
 
 export type MessageToContentScriptRequest =
 	| {
-			command: 'toggle-recording';
+			action: 'toggle-recording';
 	  }
-	| { command: 'switch-chatgpt-icon'; icon: Icon };
+	// | { action: 'switch-chatgpt-icon'; icon: Icon }
+	| {
+			action: 'openOptionsPage';
+	  }
+	| {
+			action: 'getLocalStorage';
+			key: string;
+	  }
+	| {
+			action: 'setLocalStorage';
+			key: string;
+			value: string;
+	  }
+	| {
+			action: 'getIndexedDb';
+	  }
+	| {
+			action: 'setIndexedDb';
+	  };
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
-export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
-	const [tab] = await chrome.tabs.query({
-		active: true,
-		lastFocusedWindow: true,
-	});
-	chrome.tabs.sendMessage(tab.id, message);
-}
+// export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
+// 	const [tab] = await chrome.tabs.query({
+// 		active: true,
+// 		lastFocusedWindow: true,
+// 	});
+// 	chrome.tabs.sendMessage(tab.id, message);
+// }

@@ -25,8 +25,10 @@ interface RecordingsDbSchema extends DBSchema {
 chrome.runtime.onMessage.addListener(
 	(message: MessageToContentScriptRequest, sender, sendResponse) => {
 		if (message.action === 'getLocalStorage') {
-			const a = localStorage.getItem('whispering-api-key');
-			console.log('🚀 ~ a:', a);
+			const { action, key } = message;
+			const value = localStorage.getItem(key);
+			sendResponse(value);
+		} else if (message.action === 'getIndexedDb' || message.action === 'setIndexedDb') {
 			openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 				upgrade(db) {
 					const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
@@ -36,11 +38,11 @@ chrome.runtime.onMessage.addListener(
 				},
 			}).then((db) => {
 				const b = db.getAll(RECORDING_STORE);
-				sendResponse({ a, b });
+				sendResponse(b);
 				// return b;
 			});
-			// storageService.getLocalStorage(message.key).then(sendResponse);
-		} // else if (message.action === 'setLocalStorage') {
+		}
+		// else if (message.action === 'setLocalStorage') {
 		// storageService.setLocalStorage(message.key, message.value).then(sendResponse);
 		// } else if (message.action === 'getIndexedDB') {
 		// 	storageService.getIndexedDB(message.store, message.key).then(sendResponse);
