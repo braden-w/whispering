@@ -1,3 +1,4 @@
+import { LOCALSTORAGE_KEYS } from '@repo/services/services/localstorage';
 import { recordings, settings } from '$lib/stores';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
@@ -29,7 +30,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 		let recorderState = $state<'IDLE' | 'RECORDING'>(INITIAL_STATE);
 
 		const selectedAudioInputDeviceId = createPersistedState({
-			key: 'whispering-selected-audio-input-device-id',
+			key: LOCALSTORAGE_KEYS.selectedAudioInputDeviceId,
 			schema: z.string(),
 			defaultValue: '',
 		});

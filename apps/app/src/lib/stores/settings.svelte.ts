@@ -1,4 +1,5 @@
 import { recorder } from '$lib/stores';
+import { LOCALSTORAGE_KEYS } from '@repo/services/services/localstorage';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {
@@ -18,37 +19,37 @@ type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const isPlaySoundEnabled = createPersistedState({
-		key: 'whispering-is-play-sound-enabled',
+		key: LOCALSTORAGE_KEYS.isPlaySoundEnabled,
 		schema: z.boolean(),
 		defaultValue: true,
 	});
 	const isCopyToClipboardEnabled = createPersistedState({
-		key: 'whispering-is-copy-to-clipboard-enabled',
+		key: LOCALSTORAGE_KEYS.isCopyToClipboardEnabled,
 		schema: z.boolean(),
 		defaultValue: true,
 	});
 	const isPasteContentsOnSuccessEnabled = createPersistedState({
-		key: 'whispering-is-paste-contents-on-success-enabled',
+		key: LOCALSTORAGE_KEYS.isPasteContentsOnSuccessEnabled,
 		schema: z.boolean(),
 		defaultValue: true,
 	});
 	const currentLocalShortcut = createPersistedState({
-		key: 'whispering-current-local-shortcut',
+		key: LOCALSTORAGE_KEYS.currentLocalShortcut,
 		schema: z.string(),
 		defaultValue: registerShortcutsService.defaultLocalShortcut,
 	});
 	const currentGlobalShortcut = createPersistedState({
-		key: 'whispering-current-global-shortcut',
+		key: LOCALSTORAGE_KEYS.currentGlobalShortcut,
 		schema: z.string(),
 		defaultValue: registerShortcutsService.defaultGlobalShortcut,
 	});
 	const apiKey = createPersistedState({
-		key: 'whispering-api-key',
+		key: LOCALSTORAGE_KEYS.apiKey,
 		schema: z.string(),
 		defaultValue: '',
 	});
 	const outputLanguage = createPersistedState({
-		key: 'whispering-output-language',
+		key: LOCALSTORAGE_KEYS.outputLanguage,
 		schema: z.string(),
 		defaultValue: 'en',
 	});

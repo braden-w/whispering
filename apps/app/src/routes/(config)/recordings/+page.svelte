@@ -2,6 +2,7 @@
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import type { Recording } from '@repo/services/services/recordings-db';
+	import { LOCALSTORAGE_KEYS } from '@repo/services/services/localstorage';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import { Button } from '@repo/ui/components/button';
 	import { Checkbox } from '@repo/ui/components/checkbox';
@@ -118,12 +119,12 @@
 	];
 
 	let sorting = createPersistedState({
-		key: 'whispering-sorting',
+		key: LOCALSTORAGE_KEYS.sorting,
 		defaultValue: [{ id: 'timestamp', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = createPersistedState({
-		key: 'whispering-column-filters',
+		key: LOCALSTORAGE_KEYS.columnFilters,
 		defaultValue: [],
 		schema: z.array(
 			z
@@ -132,12 +133,12 @@
 		),
 	});
 	let columnVisibility = createPersistedState({
-		key: 'whispering-column-visibility',
+		key: LOCALSTORAGE_KEYS.columnVisibility,
 		defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
 		schema: z.record(z.boolean()),
 	});
 	let rowSelection = createPersistedState({
-		key: 'whispering-row-selection',
+		key: LOCALSTORAGE_KEYS.rowSelection,
 		defaultValue: {},
 		schema: z.record(z.boolean()),
 	});
