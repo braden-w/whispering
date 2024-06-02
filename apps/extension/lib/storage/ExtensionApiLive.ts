@@ -16,13 +16,14 @@ export const ExtensionApiFromBackgroundLive = Layer.succeed(
 							origError: error,
 						}),
 				});
-				if (!activeTabs[0]) {
+				const firstActiveTab = activeTabs[0];
+				if (!firstActiveTab) {
 					return yield* new ExtensionApiError({ message: 'No active tab found' });
 				}
-				return activeTabs[0].id;
+				return firstActiveTab.id;
 			}),
-		sendMessageToContentScript: (tabId, message, options) =>
-			Effect.promise(() => chrome.tabs.sendMessage(tabId, message, options)),
+		sendMessageToContentScript: (tabId, message) =>
+			Effect.promise(() => chrome.tabs.sendMessage(tabId, message)),
 		openOptionsPage: () => Effect.sync(() => chrome.runtime.openOptionsPage()),
 		setIcon: (icon) =>
 			Effect.gen(function* () {

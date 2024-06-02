@@ -11,11 +11,10 @@ export class ExtensionApiError extends Data.TaggedError('ExtensionApiError')<{
 export class ExtensionApiService extends Context.Tag('ExtensionApiService')<
 	ExtensionApiService,
 	{
-		readonly getCurrentTabId: () => Effect.Effect<number, ExtensionApiError>;
+		readonly getCurrentTabId: () => Effect.Effect<number | undefined, ExtensionApiError>;
 		readonly sendMessageToContentScript: <R>(
 			tabId: number,
 			message: MessageToContentScriptRequest,
-			options?: chrome.tabs.MessageSendOptions,
 		) => Effect.Effect<R>;
 		openOptionsPage: () => Effect.Effect<void, ExtensionApiError>;
 		setIcon: (icon: Icon) => Effect.Effect<void, ExtensionApiError>;
