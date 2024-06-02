@@ -1,6 +1,4 @@
-import { LOCALSTORAGE_KEYS } from '@repo/services/services/localstorage';
 import { recordings, settings } from '$lib/stores';
-import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
 import { RecorderService } from '@repo/services/services/recorder';
 import { RecorderWithStateService } from '@repo/services/services/recorder-with-state';
@@ -8,7 +6,6 @@ import type { Recording } from '@repo/services/services/recordings-db';
 import { Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
-import { z } from 'zod';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
