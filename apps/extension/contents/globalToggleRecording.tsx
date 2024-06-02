@@ -1,10 +1,13 @@
-// import { type MessageToContentScriptRequest } from '$lib/utils/messaging';
+import type { PlasmoGetStyle } from 'plasmo';
+import { Toaster } from '@/components/ui/toaster';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import type { PlasmoCSConfig } from 'plasmo';
+import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
 import { RecorderStateService } from '~lib/storage/RecorderState';
 import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
 import { SettingsService } from '~lib/storage/Settings';
@@ -13,7 +16,8 @@ import { sendMessageToBackground, type MessageToContentScriptRequest } from '~li
 import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
 import type { Recording } from '../../../packages/services/src/services/recordings-db';
-import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
+import { useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -23,6 +27,12 @@ export const config: PlasmoCSConfig = {
 	matches: ['http://localhost:5173/*'],
 	// matches: ['<all_urls>'],
 	// exclude_matches: CHATGPT_DOMAINS,
+};
+
+export const getStyle: PlasmoGetStyle = () => {
+	const style = document.createElement('style');
+	style.textContent = cssText;
+	return style;
 };
 
 chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
@@ -106,3 +116,15 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
 }
+
+function PlasmoContent() {
+	const { toast } = useToast();
+	return (
+		<div className="fixed inset-5">
+			<button onClick={() => toast({ description: 'Recording shortcut pressed' })}> Hello</button>
+			<Toaster />
+		</div>
+	);
+}
+
+export default PlasmoContent;
