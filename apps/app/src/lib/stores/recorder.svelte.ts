@@ -3,6 +3,7 @@ import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder'
 import { RecorderService } from '@repo/services/services/recorder';
 import { RecorderWithStateService } from '@repo/services/services/recorder-with-state';
 import type { Recording } from '@repo/services/services/recordings-db';
+import { PleaseEnterAPIKeyToast } from '@repo/ui/toasts';
 import { Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
@@ -26,22 +27,23 @@ const RecorderWithSvelteStateLive = Layer.effect(
 		const recorderService = yield* RecorderService;
 		let recorderState = $state<'IDLE' | 'RECORDING'>(INITIAL_STATE);
 
-		const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
-			const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-			const isSelectedDeviceExists = recordingDevices.some(
-				({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
+		const checkAndUpdateSelectedAudioInputDevice = () =>
+			Effect.gen(function* () {
+				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
+				const isSelectedDeviceExists = recordingDevices.some(
+					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
+				);
+				if (!isSelectedDeviceExists) {
+					toast.info('Default audio input device not found, selecting first available device');
+					const firstAudioInput = recordingDevices[0].deviceId;
+					settings.selectedAudioInputDeviceId = firstAudioInput;
+				}
+			}).pipe(
+				Effect.catchAll((error) => {
+					toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
 			);
-			if (!isSelectedDeviceExists) {
-				toast.info('Default audio input device not found, selecting first available device');
-				const firstAudioInput = recordingDevices[0].deviceId;
-				settings.selectedAudioInputDeviceId = firstAudioInput;
-			}
-		}).pipe(
-			Effect.catchAll((error) => {
-				toast.error(error.message);
-				return Effect.succeed(undefined);
-			}),
-		);
 
 		return {
 			get recorderState() {
@@ -49,7 +51,11 @@ const RecorderWithSvelteStateLive = Layer.effect(
 			},
 			toggleRecording: () =>
 				Effect.gen(function* () {
-					yield* checkAndUpdateSelectedAudioInputDevice;
+					if (!settings.apiKey) {
+						toast.error(PleaseEnterAPIKeyToast);
+						return;
+					}
+					yield* checkAndUpdateSelectedAudioInputDevice();
 					switch (recorderState) {
 						case 'IDLE': {
 							yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
