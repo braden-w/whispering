@@ -47,4 +47,4 @@ export const SettingsLive = Layer.effect(
 				}),
 		};
 	}),
-).pipe(Layer.provide(AppStorageFromContentScriptLive), Layer.provide(RegisterShortcutsWebLive));
+).pipe(Layer.provide(RegisterShortcutsWebLive));
