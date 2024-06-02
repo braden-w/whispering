@@ -24,8 +24,7 @@ const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
 export const config: PlasmoCSConfig = {
-	matches: ['http://localhost:5173/*'],
-	// matches: ['<all_urls>'],
+	matches: ['<all_urls>'],
 	// exclude_matches: CHATGPT_DOMAINS,
 };
 
@@ -35,83 +34,88 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
-chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
-	Effect.gen(function* () {
-		if (message.action === 'toggle-recording') {
-			const recorderService = yield* RecorderService;
-			const recorderStateService = yield* RecorderStateService;
-			const settingsService = yield* SettingsService;
+Effect.gen(function* () {
+	const recorderService = yield* RecorderService;
+	const recorderStateService = yield* RecorderStateService;
+	const settingsService = yield* SettingsService;
+
+	const checkAndUpdateSelectedAudioInputDevice = () =>
+		Effect.gen(function* () {
 			const settings = yield* settingsService.get();
-			if (!settings.apiKey) {
-				alert('Please set your API key in the extension options');
-				openOptionsPage();
-				return;
-			}
-			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
-				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-				const isSelectedDeviceExists = recordingDevices.some(
-					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
-				);
-				if (!isSelectedDeviceExists) {
-					// toast.info('Default audio input device not found, selecting first available device');
-					const firstAudioInput = recordingDevices[0].deviceId;
-					const settings = yield* settingsService.get();
-					yield* settingsService.set({
-						...settings,
-						selectedAudioInputDeviceId: firstAudioInput,
-					});
-				}
-			}).pipe(
-				Effect.catchAll((error) => {
-					// toast.error(error.message);
-					return Effect.succeed(undefined);
-				}),
+			const recordingDevices = yield* recorderService.enumerateRecordingDevices;
+			const isSelectedDeviceExists = recordingDevices.some(
+				({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
 			);
-			yield* checkAndUpdateSelectedAudioInputDevice;
-			const recorderState = yield* recorderStateService.get();
-			switch (recorderState) {
-				case 'IDLE': {
-					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
-					if (settings.isPlaySoundEnabled) startSound.play();
-					sendMessageToBackground({ action: 'setIcon', icon: 'redLargeSquare' });
-					yield* Effect.logInfo('Recording started');
-					yield* recorderStateService.set('RECORDING');
-					break;
+			if (!isSelectedDeviceExists) {
+				// toast.info('Default audio input device not found, selecting first available device');
+				const firstAudioInput = recordingDevices[0].deviceId;
+				yield* settingsService.update((settings) => ({
+					...settings,
+					selectedAudioInputDeviceId: firstAudioInput,
+				}));
+			}
+		}).pipe(
+			Effect.catchAll((error) => {
+				// toast.error(error.message);
+				return Effect.succeed(undefined);
+			}),
+		);
+
+	chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
+		Effect.gen(function* () {
+			if (message.action === 'toggle-recording') {
+				const settings = yield* settingsService.get();
+				if (!settings.apiKey) {
+					alert('Please set your API key in the extension options');
+					openOptionsPage();
+					return;
 				}
-				case 'RECORDING': {
-					const audioBlob = yield* recorderService.stopRecording;
-					if (settings.isPlaySoundEnabled) stopSound.play();
-					sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
-					yield* Effect.logInfo('Recording stopped');
-					const newRecording: Recording = {
-						id: nanoid(),
-						title: '',
-						subtitle: '',
-						timestamp: new Date().toISOString(),
-						transcribedText: '',
-						blob: audioBlob,
-						transcriptionStatus: 'UNPROCESSED',
-					};
-					yield* recorderStateService.set('IDLE');
-					// yield* recordings.addRecording(newRecording);
-					// recordings.transcribeRecording(newRecording.id);
-					break;
+				yield* checkAndUpdateSelectedAudioInputDevice();
+				const recorderState = yield* recorderStateService.get();
+				switch (recorderState) {
+					case 'IDLE': {
+						yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
+						if (settings.isPlaySoundEnabled) startSound.play();
+						sendMessageToBackground({ action: 'setIcon', icon: 'redLargeSquare' });
+						yield* Effect.logInfo('Recording started');
+						yield* recorderStateService.set('RECORDING');
+						break;
+					}
+					case 'RECORDING': {
+						const audioBlob = yield* recorderService.stopRecording;
+						if (settings.isPlaySoundEnabled) stopSound.play();
+						sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
+						yield* Effect.logInfo('Recording stopped');
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob: audioBlob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+						yield* recorderStateService.set('IDLE');
+						// yield* recordings.addRecording(newRecording);
+						// recordings.transcribeRecording(newRecording.id);
+						break;
+					}
 				}
 			}
-		}
-	}).pipe(
-		Effect.provide(SettingsLive),
-		Effect.provide(AppStorageFromContentScriptLive),
-		Effect.provide(RecorderStateLive),
-		Effect.provide(RecorderServiceLiveWeb),
-		Effect.catchAll((error) => {
-			console.error('🚀 ~ error:', error);
-			// toast.error(error.message);
-			return Effect.succeed(undefined);
-		}),
-		Effect.runPromise,
-	),
-);
+		}).pipe(
+			Effect.provide(SettingsLive),
+			Effect.provide(AppStorageFromContentScriptLive),
+			Effect.provide(RecorderStateLive),
+			Effect.provide(RecorderServiceLiveWeb),
+			Effect.catchAll((error) => {
+				console.error('🚀 ~ error:', error);
+				// toast.error(error.message);
+				return Effect.succeed(undefined);
+			}),
+			Effect.runPromise,
+		),
+	);
+}).pipe(Effect.runSync);
 
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
