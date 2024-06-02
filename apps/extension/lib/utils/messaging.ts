@@ -1,22 +1,23 @@
 // import type { Icon } from '$background/setIcon';
 
-import React from 'react';
+import { Effect } from 'effect';
+import { useEffect, useState } from 'react';
 import type { z } from 'zod';
-import { getOrCreateWhisperingTab } from '~background';
 
+type Icon = 'studioMicrophone' | 'redLargeSquare' | 'arrowsCounterclockwise';
 export type MessageToBackgroundRequest =
 	| {
-			action: 'setExtensionIcon';
-			// icon: Icon;
+			action: 'setIcon';
+			icon: Icon;
 	  }
 	| {
 			action: 'openOptionsPage';
 	  };
 
 /** Sends a message to the background script, captured in {@link ~background/index.ts}. */
-export function sendMessageToBackground(message: MessageToBackgroundRequest) {
-	chrome.runtime.sendMessage(message);
-}
+export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) => {
+	chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message);
+};
 
 export type MessageToContentScriptRequest =
 	| {
@@ -29,6 +30,9 @@ export type MessageToContentScriptRequest =
 	| {
 			action: 'getLocalStorage';
 			key: string;
+	  }
+	| {
+			action: 'getSettingsFromWhisperingLocalStorage';
 	  }
 	| {
 			action: 'registerListener';
@@ -52,32 +56,36 @@ export const sendMessageToContentScript = <R>(
 	options?: chrome.tabs.MessageSendOptions,
 ) => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message, options);
 
-export const useLocalStorageFromWhisperingTab = <TSchema extends z.ZodTypeAny>({
+export function getLocalStorageFromTab<TSchema extends z.ZodTypeAny>({
+	tabId,
 	key,
 	schema,
 	defaultValue,
 }: {
+	tabId: number;
 	key: string;
 	schema: TSchema;
 	defaultValue: z.infer<TSchema>;
-}) => {
-	const [state, setState] = React.useState<z.infer<TSchema>>(defaultValue);
-	async function loadValueFromStorage() {
-		try {
-			const tabId = await getOrCreateWhisperingTab();
-			const unparsedValue = await sendMessageToContentScript(tabId, {
-				action: 'getLocalStorage',
-				key,
-			});
-			return schema.parse(unparsedValue) as z.infer<TSchema>;
-		} catch {
-			return defaultValue;
-		}
-	}
-	async function syncState() {
-		setState(loadValueFromStorage());
-	}
-};
+}) {
+	const [state, setState] = useState<z.infer<TSchema>>(defaultValue);
+
+	const syncState = () => loadValueFromStorage().then(setState);
+
+	useEffect(() => {
+		syncState();
+		sendMessageToContentScript(tabId, {
+			action: 'registerListener',
+			callback: (event) => {
+				console.log('🚀 ~ registerSyncListener ~ event:', event);
+				if (event.key === key) {
+					syncState();
+				}
+			},
+		});
+	});
+
+	return state;
+}
 
 /** Sends a message to the content script, captured in {@link ~contents/globalToggleRecording}. */
 // export async function sendMessageToContentScript(message: MessageToContentScriptRequest) {
