@@ -1,6 +1,3 @@
-import redLargeSquare from 'data-base64:~assets/red_large_square.png';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-
 // import { type MessageToContentScriptRequest } from '$lib/utils/messaging';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
@@ -8,20 +5,23 @@ import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import type { PlasmoCSConfig } from 'plasmo';
-import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
 import { RecorderStateService } from '~lib/storage/RecorderState';
 import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
 import { SettingsService } from '~lib/storage/Settings';
+import { SettingsLive } from '~lib/storage/SettingsLive';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
+import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
 import type { Recording } from '../../../packages/services/src/services/recordings-db';
+import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
 export const config: PlasmoCSConfig = {
-	matches: ['<all_urls>'],
+	matches: ['http://localhost:5173/*'],
+	// matches: ['<all_urls>'],
 	// exclude_matches: CHATGPT_DOMAINS,
 };
 
@@ -62,17 +62,14 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 			const recorderState = yield* recorderStateService.get();
 			switch (recorderState) {
 				case 'IDLE': {
-					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 					if (settings.isPlaySoundEnabled) startSound.play();
 					sendMessageToBackground({ action: 'setIcon', icon: 'redLargeSquare' });
 					yield* Effect.logInfo('Recording started');
-					recorderStateService.set('RECORDING');
-					console.log('🚀 ~ Effect.gen ~ startRecording:');
+					yield* recorderStateService.set('RECORDING');
 					break;
 				}
 				case 'RECORDING': {
-					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					const audioBlob = yield* recorderService.stopRecording;
 					if (settings.isPlaySoundEnabled) stopSound.play();
 					sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
@@ -86,7 +83,7 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 						blob: audioBlob,
 						transcriptionStatus: 'UNPROCESSED',
 					};
-					recorderStateService.set('IDLE');
+					yield* recorderStateService.set('IDLE');
 					// yield* recordings.addRecording(newRecording);
 					// recordings.transcribeRecording(newRecording.id);
 					break;
@@ -94,9 +91,12 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 			}
 		}
 	}).pipe(
+		Effect.provide(SettingsLive),
 		Effect.provide(AppStorageFromContentScriptLive),
 		Effect.provide(RecorderStateLive),
+		Effect.provide(RecorderServiceLiveWeb),
 		Effect.catchAll((error) => {
+			console.error('🚀 ~ error:', error);
 			// toast.error(error.message);
 			return Effect.succeed(undefined);
 		}),
