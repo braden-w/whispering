@@ -1,5 +1,5 @@
 import { recorder } from '$lib/stores';
-import { LOCALSTORAGE_KEYS } from '@repo/services/services/localstorage';
+import { APP_STORAGE_KEYS } from '@repo/services/services/app-storage';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {
@@ -18,40 +18,26 @@ type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
 const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
-	const isPlaySoundEnabled = createPersistedState({
-		key: LOCALSTORAGE_KEYS.isPlaySoundEnabled,
-		schema: z.boolean(),
-		defaultValue: true,
-	});
-	const isCopyToClipboardEnabled = createPersistedState({
-		key: LOCALSTORAGE_KEYS.isCopyToClipboardEnabled,
-		schema: z.boolean(),
-		defaultValue: true,
-	});
-	const isPasteContentsOnSuccessEnabled = createPersistedState({
-		key: LOCALSTORAGE_KEYS.isPasteContentsOnSuccessEnabled,
-		schema: z.boolean(),
-		defaultValue: true,
-	});
-	const currentLocalShortcut = createPersistedState({
-		key: LOCALSTORAGE_KEYS.currentLocalShortcut,
-		schema: z.string(),
-		defaultValue: registerShortcutsService.defaultLocalShortcut,
-	});
-	const currentGlobalShortcut = createPersistedState({
-		key: LOCALSTORAGE_KEYS.currentGlobalShortcut,
-		schema: z.string(),
-		defaultValue: registerShortcutsService.defaultGlobalShortcut,
-	});
-	const apiKey = createPersistedState({
-		key: LOCALSTORAGE_KEYS.apiKey,
-		schema: z.string(),
-		defaultValue: '',
-	});
-	const outputLanguage = createPersistedState({
-		key: LOCALSTORAGE_KEYS.outputLanguage,
-		schema: z.string(),
-		defaultValue: 'en',
+	const settings = createPersistedState({
+		key: 'whispering-settings',
+		schema: z.object({
+			isPlaySoundEnabled: z.boolean(),
+			isCopyToClipboardEnabled: z.boolean(),
+			isPasteContentsOnSuccessEnabled: z.boolean(),
+			currentLocalShortcut: z.string(),
+			currentGlobalShortcut: z.string(),
+			apiKey: z.string(),
+			outputLanguage: z.string(),
+		}),
+		defaultValue: {
+			isPlaySoundEnabled: true,
+			isCopyToClipboardEnabled: true,
+			isPasteContentsOnSuccessEnabled: true,
+			currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
+			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
+			apiKey: '',
+			outputLanguage: 'en',
+		},
 	});
 
 	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
@@ -60,11 +46,11 @@ const createSettings = Effect.gen(function* () {
 			yield* registerShortcutsService.unregisterAllLocalShortcuts();
 			yield* registerShortcutsService.unregisterAllGlobalShortcuts();
 			yield* registerShortcutsService.registerLocalShortcut({
-				shortcut: currentLocalShortcut.value,
+				shortcut: settings.value.currentLocalShortcut,
 				callback: recorder.toggleRecording,
 			});
 			yield* registerShortcutsService.registerGlobalShortcut({
-				shortcut: currentGlobalShortcut.value,
+				shortcut: settings.value.currentGlobalShortcut,
 				callback: recorder.toggleRecording,
 			});
 		}).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
@@ -74,36 +60,36 @@ const createSettings = Effect.gen(function* () {
 
 	return {
 		get isPlaySoundEnabled() {
-			return isPlaySoundEnabled.value;
+			return settings.value.isPlaySoundEnabled;
 		},
 		set isPlaySoundEnabled(newValue) {
-			isPlaySoundEnabled.value = newValue;
+			settings.value.isPlaySoundEnabled = newValue;
 		},
 		get isCopyToClipboardEnabled() {
-			return isCopyToClipboardEnabled.value;
+			return settings.value.isCopyToClipboardEnabled;
 		},
 		set isCopyToClipboardEnabled(newValue) {
-			isCopyToClipboardEnabled.value = newValue;
+			settings.value.isCopyToClipboardEnabled = newValue;
 		},
 		get isPasteContentsOnSuccessEnabled() {
-			return isPasteContentsOnSuccessEnabled.value;
+			return settings.value.isPasteContentsOnSuccessEnabled;
 		},
 		set isPasteContentsOnSuccessEnabled(newValue) {
-			isPasteContentsOnSuccessEnabled.value = newValue;
+			settings.value.isPasteContentsOnSuccessEnabled = newValue;
 		},
 		get currentLocalShortcut() {
-			return currentLocalShortcut.value;
+			return settings.value.currentLocalShortcut;
 		},
 		set currentLocalShortcut(newValue) {
-			currentLocalShortcut.value = newValue;
+			settings.value.currentLocalShortcut = newValue;
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* registerShortcutsService.unregisterAllLocalShortcuts();
 					yield* registerShortcutsService.registerLocalShortcut({
-						shortcut: currentLocalShortcut.value,
+						shortcut: settings.value.currentLocalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Local shortcut set to ${currentLocalShortcut.value}`);
+					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
 						error.renderAsToast();
@@ -118,18 +104,18 @@ const createSettings = Effect.gen(function* () {
 			return registerShortcutsService.isGlobalShortcutEnabled;
 		},
 		get currentGlobalShortcut() {
-			return currentGlobalShortcut.value;
+			return settings.value.currentGlobalShortcut;
 		},
 		set currentGlobalShortcut(newValue) {
-			currentGlobalShortcut.value = newValue;
+			settings.value.currentGlobalShortcut = newValue;
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* registerShortcutsService.unregisterAllGlobalShortcuts();
 					yield* registerShortcutsService.registerGlobalShortcut({
-						shortcut: currentGlobalShortcut.value,
+						shortcut: settings.value.currentGlobalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Global shortcut set to ${currentGlobalShortcut.value}`);
+					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
 						error.renderAsToast();
@@ -141,16 +127,16 @@ const createSettings = Effect.gen(function* () {
 			queueJob.pipe(Effect.runPromise);
 		},
 		get apiKey() {
-			return apiKey.value;
+			return settings.value.apiKey;
 		},
 		set apiKey(newValue) {
-			apiKey.value = newValue;
+			settings.value.apiKey = newValue;
 		},
 		get outputLanguage() {
-			return outputLanguage.value;
+			return settings.value.outputLanguage;
 		},
 		set outputLanguage(newValue) {
-			outputLanguage.value = newValue;
+			settings.value.outputLanguage = newValue;
 		},
 	};
 });
