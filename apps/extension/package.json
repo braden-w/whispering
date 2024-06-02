@@ -1,5 +1,5 @@
 {
-	"name": "whispering",
+	"name": "extension",
 	"displayName": "Whispering",
 	"version": "0.0.1",
 	"description": "Seamlessly integrate voice-to-text transcriptions on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
