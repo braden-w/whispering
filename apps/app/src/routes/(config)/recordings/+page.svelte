@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { Recording } from '@repo/services/services/recordings-db';
+	import type { Recording } from '@repo/services/services/recordings-db';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import { Button } from '@repo/ui/components/button';
 	import { Checkbox } from '@repo/ui/components/checkbox';

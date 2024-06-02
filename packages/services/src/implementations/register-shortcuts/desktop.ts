@@ -1,12 +1,10 @@
 import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
-import hotkeys from 'hotkeys-js';
-import { toast } from 'svelte-sonner';
 import { Effect, Layer } from 'effect';
+import hotkeys from 'hotkeys-js';
 import {
 	RegisterShortcutsError,
 	RegisterShortcutsService,
 } from '../../services/register-shortcuts';
-import ErrorRegisteringShortcutDesktop from './ErrorRegisteringShortcutDesktop.svelte';
 
 export const RegisterShortcutsDesktopLive = Layer.effect(
 	RegisterShortcutsService,
@@ -20,7 +18,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
+							message: 'Error unregistering all shortcuts',
 							origError: error,
 						}),
 				}),
@@ -29,7 +27,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => unregisterAll(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
+							message: 'Error unregistering all shortcuts',
 							origError: error,
 						}),
 				}),
@@ -43,7 +41,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error registering shortcut'),
+							message: 'Error registering shortcut',
 							origError: error,
 						}),
 				}),
@@ -52,10 +50,9 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => register(shortcut, callback),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () =>
-								window.__TAURI__
-									? toast.error(ErrorRegisteringShortcutDesktop)
-									: toast.error('Error registering shortcut.'),
+							message: window.__TAURI__
+								? 'Error registering shortcut. Please make sure it is a valid Electron keyboard shortcut.'
+								: 'Error registering shortcut.',
 							origError: error,
 						}),
 				}),

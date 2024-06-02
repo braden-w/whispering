@@ -2,7 +2,7 @@ import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
 export class RegisterShortcutsError extends Data.TaggedError('RegisterShortcutsError')<{
-	renderAsToast: () => void;
+	message: string;
 	origError?: unknown;
 }> {}
 

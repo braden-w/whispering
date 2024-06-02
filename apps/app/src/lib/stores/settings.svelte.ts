@@ -99,7 +99,7 @@ const createSettings = Effect.gen(function* () {
 					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
-						error.renderAsToast();
+						toast.error(error.message)
 						return Effect.succeed(undefined);
 					}),
 				);
@@ -125,7 +125,7 @@ const createSettings = Effect.gen(function* () {
 					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
-						error.renderAsToast();
+						toast.error(error.message)
 						return Effect.succeed(undefined);
 					}),
 				);

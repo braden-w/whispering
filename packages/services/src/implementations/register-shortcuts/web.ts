@@ -18,7 +18,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
+							message: 'Error unregistering all shortcuts',
 							origError: error,
 						}),
 				}),
@@ -27,7 +27,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error unregistering all shortcuts'),
+							message: 'Error unregistering all shortcuts',
 							origError: error,
 						}),
 				}),
@@ -41,7 +41,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error registering shortcut'),
+							message: 'Error registering shortcut',
 							origError: error,
 						}),
 				}),
@@ -55,7 +55,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							renderAsToast: () => toast.error('Error registering shortcut'),
+							message: 'Error registering shortcut',
 							origError: error,
 						}),
 				}),
