@@ -27,7 +27,6 @@ export const config: PlasmoCSConfig = {
 
 chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 	Effect.gen(function* () {
-		console.log('🚀 ~ message:', message);
 		if (message.action === 'toggle-recording') {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
