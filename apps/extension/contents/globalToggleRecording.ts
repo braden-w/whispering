@@ -8,19 +8,13 @@ import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import type { PlasmoCSConfig } from 'plasmo';
-import { z } from 'zod';
 import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
-import { ExtensionStorageService } from '~lib/storage/ExtensionStorage';
 import { RecorderStateService } from '~lib/storage/RecorderState';
 import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
+import { SettingsService } from '~lib/storage/Settings';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
-import {
-	APP_STORAGE_KEYS,
-	AppStorageService,
-} from '../../../packages/services/src/services/app-storage';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
 import type { Recording } from '../../../packages/services/src/services/recordings-db';
-import { RegisterShortcutsService } from '../../../packages/services/src/services/register-shortcuts';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -31,37 +25,14 @@ export const config: PlasmoCSConfig = {
 	// exclude_matches: CHATGPT_DOMAINS,
 };
 
-chrome.runtime.onMessage.addListener(async function (message: MessageToContentScriptRequest) {
-	if (message.action === 'toggle-recording') {
-		Effect.gen(function* () {
-			const registerShortcutsService = yield* RegisterShortcutsService;
+chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
+	Effect.gen(function* () {
+		console.log('🚀 ~ message:', message);
+		if (message.action === 'toggle-recording') {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
-			const appStorageService = yield* AppStorageService;
-			const extensionStorageService = yield* ExtensionStorageService;
-			const settings = yield* appStorageService.get({
-				key: 'whispering-settings',
-				schema: z.object({
-					isPlaySoundEnabled: z.boolean(),
-					isCopyToClipboardEnabled: z.boolean(),
-					isPasteContentsOnSuccessEnabled: z.boolean(),
-					selectedAudioInputDeviceId: z.string(),
-					currentLocalShortcut: z.string(),
-					currentGlobalShortcut: z.string(),
-					apiKey: z.string(),
-					outputLanguage: z.string(),
-				}),
-				defaultValue: {
-					isPlaySoundEnabled: true,
-					isCopyToClipboardEnabled: true,
-					isPasteContentsOnSuccessEnabled: true,
-					selectedAudioInputDeviceId: '',
-					currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
-					currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
-					apiKey: '',
-					outputLanguage: 'en',
-				},
-			});
+			const settingsService = yield* SettingsService;
+			const settings = yield* settingsService.get();
 			if (!settings.apiKey) {
 				alert('Please set your API key in the extension options');
 				openOptionsPage();
@@ -75,9 +46,10 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 				if (!isSelectedDeviceExists) {
 					// toast.info('Default audio input device not found, selecting first available device');
 					const firstAudioInput = recordingDevices[0].deviceId;
-					yield* appStorageService.set({
-						key: APP_STORAGE_KEYS.selectedAudioInputDeviceId,
-						value: firstAudioInput,
+					const settings = yield* settingsService.get();
+					yield* settingsService.set({
+						...settings,
+						selectedAudioInputDeviceId: firstAudioInput,
 					});
 				}
 			}).pipe(
@@ -86,19 +58,21 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 					return Effect.succeed(undefined);
 				}),
 			);
-
 			yield* checkAndUpdateSelectedAudioInputDevice;
 			const recorderState = yield* recorderStateService.get();
 			switch (recorderState) {
 				case 'IDLE': {
+					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 					if (settings.isPlaySoundEnabled) startSound.play();
 					chrome.action.setIcon({ path: redLargeSquare });
 					yield* Effect.logInfo('Recording started');
 					recorderStateService.set('RECORDING');
+					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					break;
 				}
 				case 'RECORDING': {
+					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					const audioBlob = yield* recorderService.stopRecording;
 					if (settings.isPlaySoundEnabled) stopSound.play();
 					chrome.action.setIcon({ path: studioMicrophone });
@@ -118,17 +92,17 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 					break;
 				}
 			}
-		}).pipe(
-			Effect.provide(AppStorageFromContentScriptLive),
-			Effect.provide(RecorderStateLive),
-			Effect.catchAll((error) => {
-				// toast.error(error.message);
-				return Effect.succeed(undefined);
-			}),
-			Effect.runPromise,
-		);
-	}
-});
+		}
+	}).pipe(
+		Effect.provide(AppStorageFromContentScriptLive),
+		Effect.provide(RecorderStateLive),
+		Effect.catchAll((error) => {
+			// toast.error(error.message);
+			return Effect.succeed(undefined);
+		}),
+		Effect.runPromise,
+	),
+);
 
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
