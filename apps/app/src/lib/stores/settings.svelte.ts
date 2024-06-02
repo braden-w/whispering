@@ -64,31 +64,31 @@ const createSettings = Effect.gen(function* () {
 			return settings.value.isPlaySoundEnabled;
 		},
 		set isPlaySoundEnabled(newValue) {
-			settings.value.isPlaySoundEnabled = newValue;
+			settings.value = { ...settings.value, isPlaySoundEnabled: newValue };
 		},
 		get isCopyToClipboardEnabled() {
 			return settings.value.isCopyToClipboardEnabled;
 		},
 		set isCopyToClipboardEnabled(newValue) {
-			settings.value.isCopyToClipboardEnabled = newValue;
+			settings.value = { ...settings.value, isCopyToClipboardEnabled: newValue };
 		},
 		get isPasteContentsOnSuccessEnabled() {
 			return settings.value.isPasteContentsOnSuccessEnabled;
 		},
 		set isPasteContentsOnSuccessEnabled(newValue) {
-			settings.value.isPasteContentsOnSuccessEnabled = newValue;
+			settings.value = { ...settings.value, isPasteContentsOnSuccessEnabled: newValue };
 		},
 		get selectedAudioInputDeviceId() {
 			return settings.value.selectedAudioInputDeviceId;
 		},
 		set selectedAudioInputDeviceId(newValue) {
-			settings.value.selectedAudioInputDeviceId = newValue;
+			settings.value = { ...settings.value, selectedAudioInputDeviceId: newValue };
 		},
 		get currentLocalShortcut() {
 			return settings.value.currentLocalShortcut;
 		},
 		set currentLocalShortcut(newValue) {
-			settings.value.currentLocalShortcut = newValue;
+			settings.value = { ...settings.value, currentLocalShortcut: newValue };
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* registerShortcutsService.unregisterAllLocalShortcuts();
@@ -114,7 +114,7 @@ const createSettings = Effect.gen(function* () {
 			return settings.value.currentGlobalShortcut;
 		},
 		set currentGlobalShortcut(newValue) {
-			settings.value.currentGlobalShortcut = newValue;
+			settings.value = { ...settings.value, currentGlobalShortcut: newValue };
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* registerShortcutsService.unregisterAllGlobalShortcuts();
@@ -137,13 +137,13 @@ const createSettings = Effect.gen(function* () {
 			return settings.value.apiKey;
 		},
 		set apiKey(newValue) {
-			settings.value.apiKey = newValue;
+			settings.value = { ...settings.value, apiKey: newValue };
 		},
 		get outputLanguage() {
 			return settings.value.outputLanguage;
 		},
 		set outputLanguage(newValue) {
-			settings.value.outputLanguage = newValue;
+			settings.value = { ...settings.value, outputLanguage: newValue };
 		},
 	};
 });
