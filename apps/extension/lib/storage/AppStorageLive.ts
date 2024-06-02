@@ -38,17 +38,15 @@ export const AppStorageFromPopupLive = Layer.effect(
 		return {
 			get: ({ key, schema, defaultValue }) =>
 				Effect.gen(function* () {
-					yield* sendMessageToContentScript(whisperingTabId, {action: 'getLocalStorage'})
-					
+					yield* sendMessageToContentScript(whisperingTabId, { action: 'getLocalStorage', key });
 				}),
 			set: ({ key, value }) =>
-				Effect.try({
-					try: () => localStorage.setItem(key, value),
-					catch: (error) =>
-						new AppStorageError({
-							message: `Error setting in local storage for key: ${key}`,
-							origError: error,
-						}),
+				Effect.gen(function* () {
+					yield* sendMessageToContentScript(whisperingTabId, {
+						action: 'setLocalStorage',
+						key,
+						value,
+					});
 				}),
 		};
 	}),
