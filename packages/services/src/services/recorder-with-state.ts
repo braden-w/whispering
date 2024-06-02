@@ -4,7 +4,6 @@ export class RecorderWithStateService extends Context.Tag('RecorderWithStateServ
 	RecorderWithStateService,
 	{
 		readonly recorderState: 'IDLE' | 'RECORDING';
-		selectedAudioInputDeviceId: string;
 		toggleRecording: () => Promise<any>;
 		cancelRecording: () => Promise<any>;
 		enumerateRecordingDevices: () => Promise<MediaDeviceInfo[]>;

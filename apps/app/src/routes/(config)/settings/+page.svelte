@@ -74,14 +74,14 @@
 						label: device.label,
 					}))}
 					{@const selected = items.find(
-						(item) => item.value === recorder.selectedAudioInputDeviceId,
+						(item) => item.value === settings.selectedAudioInputDeviceId,
 					)}
 					<Select.Root
 						{items}
 						{selected}
 						onSelectedChange={(selected) => {
 							if (!selected) return;
-							recorder.selectedAudioInputDeviceId = selected.value;
+							settings.selectedAudioInputDeviceId = selected.value;
 						}}
 					>
 						<Select.Trigger class="w-full">

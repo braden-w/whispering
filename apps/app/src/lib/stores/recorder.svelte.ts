@@ -29,21 +29,15 @@ const RecorderWithSvelteStateLive = Layer.effect(
 		const recorderService = yield* RecorderService;
 		let recorderState = $state<'IDLE' | 'RECORDING'>(INITIAL_STATE);
 
-		const selectedAudioInputDeviceId = createPersistedState({
-			key: LOCALSTORAGE_KEYS.selectedAudioInputDeviceId,
-			schema: z.string(),
-			defaultValue: '',
-		});
-
 		const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
 			const recordingDevices = yield* recorderService.enumerateRecordingDevices;
 			const isSelectedDeviceExists = recordingDevices.some(
-				({ deviceId }) => deviceId === selectedAudioInputDeviceId.value,
+				({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
 			);
 			if (!isSelectedDeviceExists) {
 				toast.info('Default audio input device not found, selecting first available device');
 				const firstAudioInput = recordingDevices[0].deviceId;
-				selectedAudioInputDeviceId.value = firstAudioInput;
+				settings.selectedAudioInputDeviceId = firstAudioInput;
 			}
 		}).pipe(
 			Effect.catchAll((error) => {
@@ -56,18 +50,12 @@ const RecorderWithSvelteStateLive = Layer.effect(
 			get recorderState() {
 				return recorderState;
 			},
-			get selectedAudioInputDeviceId() {
-				return selectedAudioInputDeviceId.value;
-			},
-			set selectedAudioInputDeviceId(value: string) {
-				selectedAudioInputDeviceId.value = value;
-			},
 			toggleRecording: () =>
 				Effect.gen(function* () {
 					yield* checkAndUpdateSelectedAudioInputDevice;
 					switch (recorderState) {
 						case 'IDLE': {
-							yield* recorderService.startRecording(selectedAudioInputDeviceId.value);
+							yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 							if (settings.isPlaySoundEnabled) startSound.play();
 							yield* Effect.logInfo('Recording started');
 							recorderState = 'RECORDING';

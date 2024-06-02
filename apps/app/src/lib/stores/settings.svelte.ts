@@ -24,6 +24,7 @@ const createSettings = Effect.gen(function* () {
 			isPlaySoundEnabled: z.boolean(),
 			isCopyToClipboardEnabled: z.boolean(),
 			isPasteContentsOnSuccessEnabled: z.boolean(),
+			selectedAudioInputDeviceId: z.string(),
 			currentLocalShortcut: z.string(),
 			currentGlobalShortcut: z.string(),
 			apiKey: z.string(),
@@ -33,6 +34,7 @@ const createSettings = Effect.gen(function* () {
 			isPlaySoundEnabled: true,
 			isCopyToClipboardEnabled: true,
 			isPasteContentsOnSuccessEnabled: true,
+			selectedAudioInputDeviceId: '',
 			currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
@@ -76,6 +78,12 @@ const createSettings = Effect.gen(function* () {
 		},
 		set isPasteContentsOnSuccessEnabled(newValue) {
 			settings.value.isPasteContentsOnSuccessEnabled = newValue;
+		},
+		get selectedAudioInputDeviceId() {
+			return settings.value.selectedAudioInputDeviceId;
+		},
+		set selectedAudioInputDeviceId(newValue) {
+			settings.value.selectedAudioInputDeviceId = newValue;
 		},
 		get currentLocalShortcut() {
 			return settings.value.currentLocalShortcut;
