@@ -2,24 +2,6 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Effect, Layer } from 'effect';
 import { RecorderError, RecorderService } from '../../services/recorder';
 
-class GetNavigatorMediaError extends RecorderError {
-	constructor({ message, origError }: { message: string; origError?: unknown }) {
-		super({ message, origError });
-	}
-}
-
-class StopMediaRecorderError extends RecorderError {
-	constructor({ message, origError }: { message: string; origError?: unknown }) {
-		super({ message, origError });
-	}
-}
-
-class EnumerateRecordingDevicesError extends RecorderError {
-	constructor({ message, origError }: { message: string; origError?: unknown }) {
-		super({ message, origError });
-	}
-}
-
 let stream: MediaStream;
 let mediaRecorder: MediaRecorder;
 const recordedChunks: Blob[] = [];
@@ -40,7 +22,7 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 							audio: { deviceId: { exact: recordingDeviceId } },
 						}),
 					catch: (error) =>
-						new GetNavigatorMediaError({
+						new RecorderError({
 							message: 'Error getting media stream',
 							origError: error,
 						}),
@@ -78,7 +60,7 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 					mediaRecorder.stop();
 				}),
 			catch: (error) =>
-				new StopMediaRecorderError({
+				new RecorderError({
 					message: 'Error stopping media recorder and getting audio blob',
 					origError: error,
 				}),
@@ -97,7 +79,7 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 				return audioInputDevices;
 			},
 			catch: (error) =>
-				new EnumerateRecordingDevicesError({
+				new RecorderError({
 					message: 'Error enumerating recording devices',
 					origError: error,
 				}),
