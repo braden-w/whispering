@@ -11,38 +11,39 @@ export const SettingsLive = Layer.effect(
 	Effect.gen(function* () {
 		const appStorageService = yield* AppStorageService;
 		const registerShortcutsService = yield* RegisterShortcutsService;
-		return {
-			get: () =>
-				Effect.gen(function* () {
-					return yield* appStorageService.get({
-						key: 'whispering-settings',
-						schema: z.object({
-							isPlaySoundEnabled: z.boolean(),
-							isCopyToClipboardEnabled: z.boolean(),
-							isPasteContentsOnSuccessEnabled: z.boolean(),
-							selectedAudioInputDeviceId: z.string(),
-							currentLocalShortcut: z.string(),
-							currentGlobalShortcut: z.string(),
-							apiKey: z.string(),
-							outputLanguage: z.string(),
-						}),
-						defaultValue: {
-							isPlaySoundEnabled: true,
-							isCopyToClipboardEnabled: true,
-							isPasteContentsOnSuccessEnabled: true,
-							selectedAudioInputDeviceId: '',
-							currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
-							currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
-							apiKey: '',
-							outputLanguage: 'en',
-						},
-					});
+		const getSettings = () =>
+			appStorageService.get({
+				key: 'whispering-settings',
+				schema: z.object({
+					isPlaySoundEnabled: z.boolean(),
+					isCopyToClipboardEnabled: z.boolean(),
+					isPasteContentsOnSuccessEnabled: z.boolean(),
+					selectedAudioInputDeviceId: z.string(),
+					currentLocalShortcut: z.string(),
+					currentGlobalShortcut: z.string(),
+					apiKey: z.string(),
+					outputLanguage: z.string(),
 				}),
-			set: (value) =>
+				defaultValue: {
+					isPlaySoundEnabled: true,
+					isCopyToClipboardEnabled: true,
+					isPasteContentsOnSuccessEnabled: true,
+					selectedAudioInputDeviceId: '',
+					currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
+					currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
+					apiKey: '',
+					outputLanguage: 'en',
+				},
+			});
+		return {
+			get: getSettings,
+			update: (updater) =>
 				Effect.gen(function* () {
+					const oldSettings = yield* getSettings();
+					const newSettings = updater(oldSettings);
 					yield* appStorageService.set({
 						key: 'whispering-settings',
-						value,
+						value: newSettings,
 					});
 				}),
 		};
