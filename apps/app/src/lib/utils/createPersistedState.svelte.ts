@@ -54,17 +54,13 @@ function loadValueFromStorage<T extends z.ZodTypeAny>({
 	defaultValue: z.infer<T>;
 }): z.infer<T> {
 	try {
-		const item = localStorage.getItem(key);
-		const isStorageEmpty = item === null;
-		if (isStorageEmpty) return defaultValue;
-		return schema.parse(JSON.parse(item));
+		const valueFromStorage = localStorage.getItem(key);
+		const isEmpty = valueFromStorage === null;
+		if (isEmpty) return defaultValue;
+		return schema.parse(JSON.parse(valueFromStorage));
 	} catch {
 		return defaultValue;
 	}
-}
-
-function removeFromStorage(key: string) {
-	localStorage.removeItem(key);
 }
 
 function createStorageEventListener<T extends z.ZodTypeAny>({
