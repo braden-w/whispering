@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 					if (settings.isPlaySoundEnabled) startSound.play();
-					chrome.action.setIcon({ path: redLargeSquare });
+					sendMessageToBackground({ action: 'setIcon', icon: 'redLargeSquare' });
 					yield* Effect.logInfo('Recording started');
 					recorderStateService.set('RECORDING');
 					console.log('🚀 ~ Effect.gen ~ startRecording:');
@@ -75,7 +75,7 @@ chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
 					console.log('🚀 ~ Effect.gen ~ startRecording:');
 					const audioBlob = yield* recorderService.stopRecording;
 					if (settings.isPlaySoundEnabled) stopSound.play();
-					chrome.action.setIcon({ path: studioMicrophone });
+					sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
 					yield* Effect.logInfo('Recording stopped');
 					const newRecording: Recording = {
 						id: nanoid(),
