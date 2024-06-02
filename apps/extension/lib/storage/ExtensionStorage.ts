@@ -2,7 +2,7 @@ import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 import type { z } from 'zod';
 
-export class ExtensionStorageError extends Data.TaggedError('LocalStorageError')<{
+export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageError')<{
 	message: string;
 	origError?: unknown;
 }> {}

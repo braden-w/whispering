@@ -16,12 +16,7 @@ export const ExtensionStorageLive = Layer.effect(
 						}
 						return schema.parse(unparsedValue);
 					},
-					catch: (error) => {
-						return new ExtensionStorageError({
-							message: `Error getting from local storage for key: ${key}`,
-							origError: error,
-						});
-					},
+					catch: () => defaultValue,
 				}),
 			set: ({ key, value }) =>
 				Effect.tryPromise({
