@@ -2,6 +2,7 @@ import { Effect, Layer } from 'effect';
 import { z } from 'zod';
 import { ExtensionStorageService } from './ExtensionStorage';
 import { RecorderStateService } from './RecorderState';
+import { ExtensionStorageLive } from './ExtensionStorageLive';
 
 export const RecorderStateLive = Layer.effect(
 	RecorderStateService,
@@ -25,4 +26,4 @@ export const RecorderStateLive = Layer.effect(
 				}),
 		};
 	}),
-);
+).pipe(Layer.provide(ExtensionStorageLive));

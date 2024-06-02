@@ -36,17 +36,17 @@ export const AppStorageFromPopupLive = Layer.effect(
 		const whisperingTabId = yield* getOrCreateWhisperingTab;
 		return {
 			get: ({ key, schema, defaultValue }) =>
-				Effect.gen(function* () {
-					yield* sendMessageToContentScript(whisperingTabId, { action: 'getLocalStorage', key });
-				}),
+				Effect.promise(() =>
+					sendMessageToContentScript(whisperingTabId, { action: 'getLocalStorage', key }),
+				),
 			set: ({ key, value }) =>
-				Effect.gen(function* () {
-					yield* sendMessageToContentScript(whisperingTabId, {
+				Effect.promise(() =>
+					sendMessageToContentScript(whisperingTabId, {
 						action: 'setLocalStorage',
 						key,
 						value,
-					});
-				}),
+					}),
+				),
 		};
 	}),
 );

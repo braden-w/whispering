@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { AppStorageService } from '../../../../packages/services/src/services/app-storage';
 import { RegisterShortcutsService } from '../../../../packages/services/src/services/register-shortcuts';
 import { SettingsService } from './Settings';
+import { AppStorageFromContentScriptLive } from './AppStorageLive';
+import { RegisterShortcutsWebLive } from '../../../../packages/services/src/implementations/register-shortcuts';
 
 export const SettingsLive = Layer.effect(
 	SettingsService,
@@ -45,4 +47,4 @@ export const SettingsLive = Layer.effect(
 				}),
 		};
 	}),
-);
+).pipe(Layer.provide(AppStorageFromContentScriptLive), Layer.provide(RegisterShortcutsWebLive));
