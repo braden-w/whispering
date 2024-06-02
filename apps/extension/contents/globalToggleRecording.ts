@@ -88,11 +88,7 @@ chrome.runtime.onMessage.addListener(async function (message: MessageToContentSc
 			);
 
 			yield* checkAndUpdateSelectedAudioInputDevice;
-			const recorderState = yield* extensionStorageService.get({
-				key: 'whispering-recorder-state',
-				schema: z.enum(['IDLE', 'RECORDING']),
-				defaultValue: 'IDLE',
-			});
+			const recorderState = yield* recorderStateService.get();
 			switch (recorderState) {
 				case 'IDLE': {
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
