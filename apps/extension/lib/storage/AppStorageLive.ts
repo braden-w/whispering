@@ -11,11 +11,10 @@ export const AppStorageFromContentScriptLive = Layer.succeed(
 		get: ({ key, schema, defaultValue }) =>
 			Effect.try({
 				try: () => {
-					const unparsedValue = localStorage.getItem(key);
-					if (unparsedValue === null) {
-						return defaultValue;
-					}
-					return schema.parse(unparsedValue);
+					const valueFromStorage = localStorage.getItem(key);
+					const isEmpty = valueFromStorage === null;
+					if (isEmpty) return defaultValue;
+					return schema.parse(JSON.parse(valueFromStorage));
 				},
 				catch: () => defaultValue,
 			}),

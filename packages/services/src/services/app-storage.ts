@@ -15,6 +15,6 @@ export class AppStorageService extends Context.Tag('AppStorageService')<
 			schema: TSchema;
 			defaultValue: z.infer<TSchema>;
 		}) => Effect.Effect<z.infer<TSchema>, AppStorageError>;
-		readonly set: (args: { key: string; value: string }) => Effect.Effect<void, AppStorageError>;
+		readonly set: (args: { key: string; value: any }) => Effect.Effect<void, AppStorageError>;
 	}
 >() {}

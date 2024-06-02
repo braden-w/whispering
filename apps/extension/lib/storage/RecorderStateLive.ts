@@ -8,13 +8,14 @@ export const RecorderStateLive = Layer.effect(
 	Effect.gen(function* () {
 		const extensionStorageService = yield* ExtensionStorageService;
 		return {
-			get: Effect.gen(function* () {
-				return yield* extensionStorageService.get({
-					key: 'whispering-recording-state',
-					schema: z.union([z.literal('IDLE'), z.literal('RECORDING')]),
-					defaultValue: 'IDLE',
-				});
-			}),
+			get: () =>
+				Effect.gen(function* () {
+					return yield* extensionStorageService.get({
+						key: 'whispering-recording-state',
+						schema: z.union([z.literal('IDLE'), z.literal('RECORDING')]),
+						defaultValue: 'IDLE',
+					});
+				}),
 			set: (value) =>
 				Effect.gen(function* () {
 					yield* extensionStorageService.set({
