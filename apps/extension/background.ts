@@ -33,7 +33,7 @@ Effect.gen(function* () {
 					yield* extensionApiService.setIcon(icon);
 					break;
 				case 'openOptionsPage':
-					chrome.runtime.openOptionsPage();
+					yield* extensionApiService.openOptionsPage();
 					break;
 			}
 		}).pipe(Effect.runPromise),
