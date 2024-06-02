@@ -16,8 +16,12 @@ export const AppStorageFromContentScriptLive = Layer.succeed(
 					if (isEmpty) return defaultValue;
 					return schema.parse(JSON.parse(valueFromStorage));
 				},
-				catch: () => defaultValue,
-			}),
+				catch: (error) =>
+					new AppStorageError({
+						message: `Error getting from local storage for key: ${key}`,
+						origError: error,
+					}),
+			}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
 		set: ({ key, value }) =>
 			Effect.try({
 				try: () => localStorage.setItem(key, value),

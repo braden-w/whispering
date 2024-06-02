@@ -16,8 +16,12 @@ export const ExtensionStorageLive = Layer.effect(
 						}
 						return schema.parse(unparsedValue);
 					},
-					catch: () => defaultValue,
-				}),
+					catch: (error) =>
+						new ExtensionStorageError({
+							message: `Error getting from local storage for key: ${key}`,
+							origError: error,
+						}),
+				}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
 			set: ({ key, value }) =>
 				Effect.tryPromise({
 					try: () => storage.set(key, value),
