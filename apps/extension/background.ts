@@ -1,37 +1,41 @@
-import redLargeSquare from 'data-base64:~assets/red_large_square.png';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-import { sendMessageToContentScript, type MessageToBackgroundRequest } from '~lib/utils/messaging';
+import { Effect } from 'effect';
+import { ExtensionApiService } from '~lib/storage/ExtensionApi';
+import { ExtensionApiFromBackgroundLive } from '~lib/storage/ExtensionApiLive';
+import { type MessageToBackgroundRequest } from '~lib/utils/messaging';
 
-chrome.runtime.onInstalled.addListener((details) => {
-	if (details.reason === 'install') {
-		chrome.runtime.openOptionsPage();
-	}
-});
+Effect.gen(function* () {
+	const extensionApiService = yield* ExtensionApiService;
 
-chrome.commands.onCommand.addListener(async (command) => {
-	if (command === 'toggle-recording') {
-		const activeTabs = await chrome.tabs.query({ active: true, currentWindow: true });
-		if (!activeTabs[0]) return;
-		const activeTab = activeTabs[0];
-		sendMessageToContentScript(activeTab.id, { action: 'toggle-recording' });
-	}
-});
+	chrome.runtime.onInstalled.addListener((details) =>
+		Effect.gen(function* (_) {
+			if (details.reason === 'install') {
+				yield* extensionApiService.openOptionsPage();
+			}
+		}).pipe(Effect.runSync),
+	);
 
-chrome.runtime.onMessage.addListener(function (message: MessageToBackgroundRequest) {
-	switch (message.action) {
-		case 'setIcon':
-			const { icon } = message;
-			switch (icon) {
-				case 'studioMicrophone':
-					chrome.action.setIcon({ path: studioMicrophone });
+	chrome.commands.onCommand.addListener((command) =>
+		Effect.gen(function* () {
+			if (command === 'toggle-recording') {
+				const activeTabId = yield* extensionApiService.getCurrentTabId();
+				yield* extensionApiService.sendMessageToContentScript(activeTabId, {
+					action: 'toggle-recording',
+				});
+			}
+		}).pipe(Effect.runPromise),
+	);
+
+	chrome.runtime.onMessage.addListener((message: MessageToBackgroundRequest) =>
+		Effect.gen(function* () {
+			switch (message.action) {
+				case 'setIcon':
+					const { icon } = message;
+					yield* extensionApiService.setIcon(icon);
 					break;
-				case 'redLargeSquare':
-					chrome.action.setIcon({ path: redLargeSquare });
+				case 'openOptionsPage':
+					chrome.runtime.openOptionsPage();
 					break;
 			}
-			break;
-		case 'openOptionsPage':
-			chrome.runtime.openOptionsPage();
-			break;
-	}
-});
+		}).pipe(Effect.runPromise),
+	);
+}).pipe(Effect.provide(ExtensionApiFromBackgroundLive), Effect.runSync);
