@@ -1,6 +1,5 @@
 import { Effect, Layer } from 'effect';
 import hotkeys from 'hotkeys-js';
-import { toast } from 'svelte-sonner';
 import {
 	RegisterShortcutsError,
 	RegisterShortcutsService,
