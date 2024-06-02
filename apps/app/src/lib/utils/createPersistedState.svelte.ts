@@ -24,7 +24,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	let value = $state(defaultValue);
 
 	if (!disableLocalStorage) {
-		value = loadValueFromStorage({ key, schema, defaultValue });
+		value = loadFromStorage({ key, schema, defaultValue });
 		createStorageEventListener({
 			key,
 			schema,
@@ -44,7 +44,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	};
 }
 
-function loadValueFromStorage<T extends z.ZodTypeAny>({
+function loadFromStorage<T extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue,
