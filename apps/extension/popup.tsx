@@ -1,8 +1,8 @@
-import { Label } from '@radix-ui/react-label';
-import { Button } from '~ui/button';
-import { Input } from '~ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useRecorder } from '~lib/hooks/recorder';
 import './style.css';
-import { useRecorder } from '~lib/recorder';
 
 function IndexPopup() {
 	return (
@@ -42,7 +42,7 @@ function IndexPage() {
 				{recorder.recorderState === 'RECORDING' ?? (
 					<Button
 						className="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-						onClick={recorder.cancelRecording}
+						onClick={recorder.toggleRecording}
 						aria-label="Cancel recording"
 						size="icon"
 						variant="ghost"
@@ -88,7 +88,6 @@ function IndexPage() {
 			/>
 		{/if} */}
 			</div>
-
 			<div className="flex flex-col items-center justify-center gap-2">
 				{/* <NavItems /> */}
 				<p className="text-foreground/75 text-sm leading-6">
