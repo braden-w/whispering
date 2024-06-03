@@ -1,11 +1,13 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
+import { z } from 'zod';
 
 export const recorderStateSchema = z.union([
 	z.literal('IDLE'),
 	z.literal('PAUSED'),
 	z.literal('RECORDING'),
 ]);
+
 export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export class RecorderError extends Data.TaggedError('RecorderError')<{
