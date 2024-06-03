@@ -1,5 +1,5 @@
-import type { PlasmoGetStyle } from 'plasmo';
 import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
@@ -13,7 +13,6 @@ import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
 import { SettingsService } from '~lib/storage/Settings';
 import { SettingsLive } from '~lib/storage/SettingsLive';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
-import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
 import type { Recording } from '../../../packages/services/src/services/recordings-db';
 import { useEffect } from 'react';
@@ -34,7 +33,18 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
-Effect.gen(function* () {
+const syncRecorderStateOnLoad = Effect.gen(function* () {
+	const recorderService = yield* RecorderService;
+	const recorderStateService = yield* RecorderStateService;
+	const initialRecorderState = yield* recorderService.recorderState;
+	yield* recorderStateService.set(initialRecorderState);
+}).pipe(
+	Effect.provide(RecorderStateLive),
+	Effect.provide(RecorderFromContentScriptLive),
+	Effect.runPromise,
+);
+
+const registerListeners = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
 	const recorderStateService = yield* RecorderStateService;
 	const settingsService = yield* SettingsService;
@@ -103,10 +113,6 @@ Effect.gen(function* () {
 				}
 			}
 		}).pipe(
-			Effect.provide(SettingsLive),
-			Effect.provide(AppStorageFromContentScriptLive),
-			Effect.provide(RecorderStateLive),
-			Effect.provide(RecorderServiceLiveWeb),
 			Effect.catchAll((error) => {
 				console.error('🚀 ~ error:', error);
 				// toast.error(error.message);
@@ -115,7 +121,13 @@ Effect.gen(function* () {
 			Effect.runPromise,
 		),
 	);
-}).pipe(Effect.runSync);
+}).pipe(
+	Effect.provide(SettingsLive),
+	Effect.provide(AppStorageFromContentScriptLive),
+	Effect.provide(RecorderStateLive),
+	Effect.provide(RecorderFromContentScriptLive),
+	Effect.runSync,
+);
 
 function openOptionsPage() {
 	sendMessageToBackground({ action: 'openOptionsPage' });
