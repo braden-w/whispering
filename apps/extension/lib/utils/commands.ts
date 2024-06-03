@@ -1,4 +1,7 @@
+import { z } from 'zod';
 import { Data, Effect } from 'effect';
+import { AppStorageService } from '../../../../packages/services/src/services/app-storage';
+import { RegisterShortcutsService } from '../../../../packages/services/src/services/register-shortcuts';
 
 class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	message: string;
@@ -54,9 +57,9 @@ type Command = (typeof commands)[number];
 type CommandToImplementations = Record<
 	Command,
 	Partial<{
-		fromBackground: () => Effect.Effect<any, InvokeCommandError>;
-		fromPopup: () => Effect.Effect<any, InvokeCommandError>;
-		fromContent: () => Effect.Effect<any, InvokeCommandError>;
+		fromBackground: () => Effect.Effect<any, any>;
+		fromPopup: () => Effect.Effect<any, any>;
+		fromContent: () => Effect.Effect<any, any>;
 	}>
 >;
 
@@ -133,8 +136,34 @@ export const invokeCommand = {
 	},
 	getSettings: {
 		// Runs on content on localhost:5173 or whispering.bradenwong.com
-		fromContent: () => Effect.sync(() => {}),
+		fromContent: () =>
+			Effect.gen(function* () {
+				const appStorageService = yield* AppStorageService;
+				const registerShortcutsService = yield* RegisterShortcutsService;
+				return appStorageService.get({
+					key: 'whispering-settings',
+					schema: z.object({
+						isPlaySoundEnabled: z.boolean(),
+						isCopyToClipboardEnabled: z.boolean(),
+						isPasteContentsOnSuccessEnabled: z.boolean(),
+						selectedAudioInputDeviceId: z.string(),
+						currentLocalShortcut: z.string(),
+						currentGlobalShortcut: z.string(),
+						apiKey: z.string(),
+						outputLanguage: z.string(),
+					}),
+					defaultValue: {
+						isPlaySoundEnabled: true,
+						isCopyToClipboardEnabled: true,
+						isPasteContentsOnSuccessEnabled: true,
+						selectedAudioInputDeviceId: '',
+						currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
+						currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
+						apiKey: '',
+						outputLanguage: 'en',
+					},
+				});
+			}).pipe(Effect.provide(AppStorageLive), Effect.provide(RegisterShortcutsWebLive)),
 		fromPopup: () => Effect.sync(() => {}),
-		fromBackground: () => Effect.sync(() => {}),
 	},
 } as const satisfies CommandToImplementations;
