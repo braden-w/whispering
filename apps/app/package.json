@@ -30,7 +30,7 @@
 		"@repo/ui": "workspace:*",
 		"@tanstack/table-core": "^8.17.3",
 		"@tauri-apps/api": "^1.5.6",
-		"effect": "^3.2.5",
+		"effect": "^3.2.7",
 		"mode-watcher": "^0.3.0",
 		"nanoid": "^5.0.7",
 		"svelte-french-toast": "^1.2.0",

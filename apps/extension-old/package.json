@@ -13,7 +13,7 @@
 	"dependencies": {
 		"@plasmohq/storage": "^1.10.0",
 		"@repo/ui": "workspace:*",
-		"effect": "^3.2.5",
+		"effect": "^3.2.7",
 		"mode-watcher": "^0.3.0",
 		"plasmo": "^0.86.3",
 		"svelte-preprocess": "^5.1.4",
