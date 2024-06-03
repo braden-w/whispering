@@ -52,7 +52,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 					}
 					yield* checkAndUpdateSelectedAudioInputDevice();
 					switch (recorderState) {
-						case 'INACTIVE': {
+						case 'IDLE': {
 							yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 							if (settings.isPlaySoundEnabled) startSound.play();
 							yield* Effect.logInfo('Recording started');
@@ -72,7 +72,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 								blob: audioBlob,
 								transcriptionStatus: 'UNPROCESSED',
 							};
-							recorderState = 'INACTIVE';
+							recorderState = 'IDLE';
 							yield* recordings.addRecording(newRecording);
 							recordings.transcribeRecording(newRecording.id);
 							break;
@@ -90,7 +90,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 					yield* recorderService.cancelRecording;
 					if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 					yield* Effect.logInfo('Recording cancelled');
-					recorderState = 'INACTIVE';
+					recorderState = 'IDLE';
 				}).pipe(
 					Effect.catchAll((error) => {
 						toast.error(error.message);

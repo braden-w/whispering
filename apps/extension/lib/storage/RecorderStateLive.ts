@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ExtensionStorageService } from './ExtensionStorage';
 import { RecorderStateService } from './RecorderState';
 import { ExtensionStorageLive } from './ExtensionStorageLive';
+import { recorderStateSchema } from '../../../../packages/services/src/services/recorder';
 
 export const RecorderStateLive = Layer.effect(
 	RecorderStateService,
@@ -12,7 +13,7 @@ export const RecorderStateLive = Layer.effect(
 			get: () =>
 				extensionStorageService.get({
 					key: 'whispering-recording-state',
-					schema: z.union([z.literal('IDLE'), z.literal('RECORDING')]),
+					schema: recorderStateSchema,
 					defaultValue: 'IDLE',
 				}),
 			set: (value) =>
