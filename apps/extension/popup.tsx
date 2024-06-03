@@ -17,7 +17,7 @@ function IndexPopup() {
 }
 
 function IndexPage() {
-	const recorder = useRecorder();
+	const recorder = { toggleRecording: () => {} };
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 text-center">
 			<div className="flex flex-col gap-4">

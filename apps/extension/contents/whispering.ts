@@ -108,5 +108,5 @@ chrome.runtime.onMessage.addListener(
 );
 
 // chrome.runtime.onMessage.addListener(function (message: MessageToContentScriptRequest) {
-// 	if (message.action === 'toggle-recording') recorder.toggleRecording();
+// 	if (message.action === 'toggleRecording') recorder.toggleRecording();
 // });

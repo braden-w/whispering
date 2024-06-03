@@ -42,27 +42,13 @@ export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) 
 	chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message);
 };
 
-const commands = [
-	'getSettings',
-	// 'getWhisperingLocalStorage',
-	// 'getWhisperingTabId',
-	'toggleRecording',
-	'openOptionsPage',
-	'getCurrentTabId',
-	'getRecorderState',
-	'setRecorderState',
-] as const;
-type Command = (typeof commands)[number];
+type CommandToImplementations = Record<string, CommandConfig>;
 
-type CommandToImplementations = Record<
-	Command,
-	Partial<{
-		fromBackground: () => Effect.Effect<any, any>;
-		fromPopup: () => Effect.Effect<any, any>;
-		fromContent: () => Effect.Effect<any, any>;
-	}>
->;
-
+type CommandConfig = Partial<{
+	fromBackground: () => Effect.Effect<any, any>;
+	fromPopup: () => Effect.Effect<any, any>;
+	fromContent: () => Effect.Effect<any, any>;
+}>;
 /**
  * Object containing implementations of various commands.
  *
@@ -76,9 +62,16 @@ type CommandToImplementations = Record<
  * invokeCommand.getCurrentTabId.fromBackground();
  * ```
  */
-export const invokeCommand = {
+const invokeBackgroundAction = {
+	openOptionsPage: {
+		fromBackground: () =>
+			Effect.tryPromise({
+				try: () => chrome.runtime.openOptionsPage(),
+				catch: (e) =>
+					new InvokeCommandError({ message: 'Error opening options page', origError: e }),
+			}),
+	},
 	getCurrentTabId: {
-		// Runs on background
 		fromBackground: () =>
 			Effect.gen(function* () {
 				const activeTabs = yield* Effect.tryPromise({
@@ -96,46 +89,10 @@ export const invokeCommand = {
 				return firstActiveTab.id;
 			}),
 	},
-	openOptionsPage: {
-		// Runs on background
-		fromBackground: () =>
-			Effect.tryPromise({
-				try: () => chrome.runtime.openOptionsPage(),
-				catch: (e) =>
-					new InvokeCommandError({ message: 'Error opening options page', origError: e }),
-			}),
-		fromPopup: () => Effect.sync(() => {}),
-	},
-	toggleRecording: {
-		// Runs on content
-		fromContent: () => Effect.sync(() => {}),
-		fromBackground: () =>
-			Effect.gen(function* () {
-				const getActiveTabId = () =>
-					Effect.gen(function* () {
-						const activeTabs = yield* Effect.tryPromise({
-							try: () => chrome.tabs.query({ active: true, currentWindow: true }),
-							catch: (error) =>
-								new InvokeCommandError({
-									message: 'Error getting active tabs',
-									origError: error,
-								}),
-						});
-						const firstActiveTab = activeTabs[0];
-						if (!firstActiveTab) {
-							return yield* new InvokeCommandError({ message: 'No active tab found' });
-						}
-						return firstActiveTab.id;
-					});
-				const activeTabId = yield* getActiveTabId();
-				yield* sendMessageToContentScript(activeTabId, {
-					action: 'toggleRecording',
-				});
-			}),
-		fromPopup: () => Effect.sync(() => {}),
-	},
+} as const satisfies CommandToImplementations;
+
+const invokeContentAction = {
 	getSettings: {
-		// Runs on content on localhost:5173 or whispering.bradenwong.com
 		fromContent: () =>
 			Effect.gen(function* () {
 				const appStorageService = yield* AppStorageService;
@@ -164,6 +121,32 @@ export const invokeCommand = {
 					},
 				});
 			}).pipe(Effect.provide(AppStorageLive), Effect.provide(RegisterShortcutsWebLive)),
-		fromPopup: () => Effect.sync(() => {}),
+	},
+	// 'getWhisperingLocalStorage',
+	// 'getWhisperingTabId',
+	toggleRecording: {
+		fromBackground: () =>
+			Effect.gen(function* () {
+				const getActiveTabId = () =>
+					Effect.gen(function* () {
+						const activeTabs = yield* Effect.tryPromise({
+							try: () => chrome.tabs.query({ active: true, currentWindow: true }),
+							catch: (error) =>
+								new InvokeCommandError({
+									message: 'Error getting active tabs',
+									origError: error,
+								}),
+						});
+						const firstActiveTab = activeTabs[0];
+						if (!firstActiveTab) {
+							return yield* new InvokeCommandError({ message: 'No active tab found' });
+						}
+						return firstActiveTab.id;
+					});
+				const activeTabId = yield* getActiveTabId();
+				yield* sendMessageToContentScript(activeTabId, {
+					action: 'toggleRecording',
+				});
+			}),
 	},
 } as const satisfies CommandToImplementations;

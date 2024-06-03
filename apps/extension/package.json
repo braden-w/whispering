@@ -48,7 +48,7 @@
 			"storage"
 		],
 		"commands": {
-			"toggle-recording": {
+			"toggleRecording": {
 				"suggested_key": {
 					"default": "Ctrl+Shift+X",
 					"mac": "Command+Shift+X"
