@@ -15,14 +15,14 @@ export const RecorderServiceLiveWeb = Layer.succeed(
 	RecorderService,
 	RecorderService.of({
 		recorderState: Effect.sync(() => {
-			if (!mediaRecorder) return 'INACTIVE';
+			if (!mediaRecorder) return 'IDLE';
 			switch (mediaRecorder.state) {
 				case 'recording':
 					return 'RECORDING';
 				case 'paused':
 					return 'PAUSED';
 				case 'inactive':
-					return 'INACTIVE';
+					return 'IDLE';
 			}
 		}),
 		startRecording: (recordingDeviceId) =>
