@@ -14,6 +14,17 @@ const resetRecorder = () => {
 export const RecorderServiceLiveWeb = Layer.succeed(
 	RecorderService,
 	RecorderService.of({
+		recorderState: Effect.sync(() => {
+			if (!mediaRecorder) return 'INACTIVE';
+			switch (mediaRecorder.state) {
+				case 'recording':
+					return 'RECORDING';
+				case 'paused':
+					return 'PAUSED';
+				case 'inactive':
+					return 'INACTIVE';
+			}
+		}),
 		startRecording: (recordingDeviceId) =>
 			Effect.gen(function* () {
 				stream = yield* Effect.tryPromise({
