@@ -1,11 +1,11 @@
 import { Data, Effect } from 'effect';
 
-export class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
+class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	message: string;
 	origError?: unknown;
 }> {}
 
-type MessageToBackgroundRequest = {
+export type MessageToBackgroundRequest = {
 	action: 'openOptionsPage';
 };
 

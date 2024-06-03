@@ -1,42 +1,50 @@
-import { Effect } from 'effect';
-import { ExtensionApiService } from '~lib/storage/ExtensionApi';
-import { ExtensionApiFromBackgroundLive } from '~lib/storage/ExtensionApiLive';
-import { type MessageToBackgroundRequest } from '~lib/utils/messaging';
+import redLargeSquare from 'data-base64:~assets/red_large_square.png';
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
+import { Data, Effect } from 'effect';
 import { Storage } from '@plasmohq/storage';
+import { invokeCommand } from '~lib/utils/commands';
+import { MessageToBackgroundRequest } from '~lib/utils/commands';
+
+class SetIconError extends Data.TaggedError('SetIconError')<{
+	message: string;
+	origError?: unknown;
+}> {}
+
+const storage = new Storage();
+storage.watch({
+	'whispering-recording-state': (c) =>
+		Effect.gen(function* () {
+			const recordingState = c.newValue;
+			switch (recordingState) {
+				case 'IDLE':
+					yield* Effect.tryPromise({
+						try: () => chrome.action.setIcon({ path: studioMicrophone }),
+						catch: () => new SetIconError({ message: 'Error setting icon to studio microphone' }),
+					});
+					break;
+				case 'RECORDING':
+					yield* Effect.tryPromise({
+						try: () => chrome.action.setIcon({ path: redLargeSquare }),
+						catch: () => new SetIconError({ message: 'Error setting icon to red large square' }),
+					});
+					break;
+			}
+		}).pipe(Effect.runSync),
+});
 
 Effect.gen(function* () {
-	const extensionApiService = yield* ExtensionApiService;
-
-	const storage = new Storage();
-	storage.watch({
-		'whispering-recording-state': (c) =>
-			Effect.gen(function* () {
-				switch (c.newValue) {
-					case 'RECORDING':
-						yield* extensionApiService.syncIconToRecorderState('RECORDING');
-						break;
-					case 'IDLE':
-						yield* extensionApiService.syncIconToRecorderState('IDLE');
-						break;
-				}
-			}).pipe(Effect.runSync),
-	});
-
 	chrome.runtime.onInstalled.addListener((details) =>
 		Effect.gen(function* () {
 			if (details.reason === 'install') {
-				yield* extensionApiService.openOptionsPage();
+				yield* invokeCommand.openOptionsPage.fromBackground();
 			}
 		}).pipe(Effect.runSync),
 	);
 
 	chrome.commands.onCommand.addListener((command) =>
 		Effect.gen(function* () {
-			if (command === 'toggle-recording') {
-				const activeTabId = yield* extensionApiService.getCurrentTabId();
-				yield* extensionApiService.sendMessageToContentScript(activeTabId, {
-					action: 'toggle-recording',
-				});
+			if (command === 'toggleRecording') {
+				yield* invokeCommand.toggleRecording.fromBackground();
 			}
 		}).pipe(Effect.runPromise),
 	);
@@ -44,14 +52,10 @@ Effect.gen(function* () {
 	chrome.runtime.onMessage.addListener((message: MessageToBackgroundRequest) =>
 		Effect.gen(function* () {
 			switch (message.action) {
-				case 'syncIconToRecorderState':
-					const { icon } = message;
-					yield* extensionApiService.syncIconToRecorderState(icon);
-					break;
 				case 'openOptionsPage':
-					yield* extensionApiService.openOptionsPage();
+					yield* invokeCommand.openOptionsPage.fromBackground();
 					break;
 			}
 		}).pipe(Effect.runPromise),
 	);
-}).pipe(Effect.provide(ExtensionApiFromBackgroundLive), Effect.runSync);
+}).pipe(Effect.runSync);
