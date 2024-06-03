@@ -6,17 +6,16 @@ import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button
 import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import type { PlasmoCSConfig } from 'plasmo';
+import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
 import { RecorderStateService } from '~lib/storage/RecorderState';
 import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
 import { SettingsService } from '~lib/storage/Settings';
 import { SettingsLive } from '~lib/storage/SettingsLive';
 import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
+import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder/web';
 import { RecorderService } from '../../../packages/services/src/services/recorder';
 import type { Recording } from '../../../packages/services/src/services/recordings-db';
-import { useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -33,14 +32,15 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
-const syncRecorderStateOnLoad = Effect.gen(function* () {
+const syncRecorderState = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
 	const recorderStateService = yield* RecorderStateService;
 	const initialRecorderState = yield* recorderService.recorderState;
 	yield* recorderStateService.set(initialRecorderState);
-}).pipe(
+});
+const syncRecorderStateOnLoad = syncRecorderState.pipe(
 	Effect.provide(RecorderStateLive),
-	Effect.provide(RecorderFromContentScriptLive),
+	Effect.provide(RecorderServiceLiveWeb),
 	Effect.runPromise,
 );
 
@@ -86,7 +86,7 @@ const registerListeners = Effect.gen(function* () {
 					case 'IDLE': {
 						yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 						if (settings.isPlaySoundEnabled) startSound.play();
-						sendMessageToBackground({ action: 'setIcon', icon: 'redLargeSquare' });
+						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
 						yield* Effect.logInfo('Recording started');
 						yield* recorderStateService.set('RECORDING');
 						break;
@@ -94,7 +94,10 @@ const registerListeners = Effect.gen(function* () {
 					case 'RECORDING': {
 						const audioBlob = yield* recorderService.stopRecording;
 						if (settings.isPlaySoundEnabled) stopSound.play();
-						sendMessageToBackground({ action: 'setIcon', icon: 'studioMicrophone' });
+						sendMessageToBackground({
+							action: 'syncIconToRecorderState',
+							recorderState,
+						});
 						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),
@@ -125,7 +128,7 @@ const registerListeners = Effect.gen(function* () {
 	Effect.provide(SettingsLive),
 	Effect.provide(AppStorageFromContentScriptLive),
 	Effect.provide(RecorderStateLive),
-	Effect.provide(RecorderFromContentScriptLive),
+	Effect.provide(RecorderServiceLiveWeb),
 	Effect.runSync,
 );
 
