@@ -276,6 +276,35 @@ const toggleRecording = {
 		}),
 } as const satisfies CommandConfig;
 
+const cancelRecording = {
+	runsIn: 'GlobalContentScript',
+	runInGlobalContentScript: () =>
+		Effect.gen(function* () {
+			const recorderService = yield* RecorderService;
+			const recorderStateService = yield* RecorderStateService;
+			const settings = yield* getSettings.invokeFromGlobalContentScript();
+			const recorderState = yield* recorderStateService.get();
+			yield* recorderService.cancelRecording;
+			if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
+			yield* Effect.logInfo('Recording cancelled');
+			yield* recorderStateService.set('IDLE');
+		}).pipe(Effect.provide(RecorderServiceLive), Effect.provide(RecorderStateLive)),
+	invokeFromBackgroundServiceWorker: () =>
+		Effect.gen(function* () {
+			const activeTabId = yield* getActiveTabId();
+			yield* sendMessageToContentScript(activeTabId, {
+				command: 'cancelRecording',
+			});
+		}),
+	invokeFromPopup: () =>
+		Effect.gen(function* () {
+			const activeTabId = yield* getActiveTabId();
+			yield* sendMessageToContentScript(activeTabId, {
+				command: 'cancelRecording',
+			});
+		}),
+} as const satisfies CommandConfig;
+
 /**
  * Object containing implementations of various commands.
  *
@@ -293,6 +322,7 @@ export const commands = {
 	getSettings,
 	openOptionsPage,
 	toggleRecording,
+	cancelRecording,
 } as const satisfies Record<CommandName, CommandConfig>;
 
 export type MessageToContentScriptRequest = {
