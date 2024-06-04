@@ -32,16 +32,6 @@ type Context =
 	| WhisperingContentScriptContext;
 
 /**
- * Prefix used to name the method that directly executes the command in its
- * native context.
- *
- * For example, a command that runs in the context "BackgroundServiceWorker"
- * can be directly executed in the background service worker by calling
- * the method "runInBackgroundServiceWorker".
- */
-type NativeRunPrefix = 'runIn';
-
-/**
  * Prefix used to name the method invokes the command from another context.
  *
  * For example, a command that runs in the context "BackgroundServiceWorker"
@@ -54,7 +44,7 @@ type RemoteInvocationPrefix = 'invokeFrom';
  *
  * This configuration includes:
  * - `runsIn`: Specifies the native context where the command runs.
- * - `runIn[C]`: A function to directly execute the command within its native context `C`.
+ * - `runInNativeContext`: A function to directly execute the command within its native context.
  * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
  *
  * @template NativeContext - The context where the command natively runs.
@@ -66,11 +56,15 @@ type ContextConfig<NativeContext extends Context> = {
 	runsIn: NativeContext;
 } & {
 	/**
-	 * The function to directly execute the command within its native context
-	 * via `runIn[NativeContext]`.
+	 * The function to directly execute the command from within its native context
+	 * via `runInNativeContext`.
+	 *
+	 * For example, a command that runs in the context "BackgroundServiceWorker"
+	 * can be directly executed in the background service worker by calling
+	 * the method "runInNativeContext".
 	 */
 	[ExecuteContext in Context as ExecuteContext extends NativeContext
-		? `${NativeRunPrefix}${ExecuteContext}`
+		? 'runInNativeContext'
 		: never]: (...args: any[]) => Effect.Effect<any, any> | Effect.Effect<any, any>;
 } & {
 	/**
@@ -121,7 +115,7 @@ type CommandName = (typeof commandNames)[number];
 
 const openOptionsPage = {
 	runsIn: 'BackgroundServiceWorker',
-	runInBackgroundServiceWorker: () =>
+	runInNativeContext: () =>
 		Effect.tryPromise({
 			try: () => chrome.runtime.openOptionsPage(),
 			catch: (e) => new InvokeCommandError({ message: 'Error opening options page', origError: e }),
@@ -134,7 +128,7 @@ const openOptionsPage = {
 
 const getCurrentTabId = {
 	runsIn: 'BackgroundServiceWorker',
-	runInBackgroundServiceWorker: () =>
+	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const activeTabs = yield* Effect.tryPromise({
 				try: () => chrome.tabs.query({ active: true, currentWindow: true }),
@@ -166,7 +160,7 @@ type Settings = z.infer<typeof settingsSchema>;
 
 const getSettings = {
 	runsIn: 'WhisperingContentScript',
-	runInWhisperingContentScript: () =>
+	runInNativeContext: () =>
 		getLocalStorage({
 			key: 'whispering-settings',
 			schema: settingsSchema,
@@ -192,7 +186,7 @@ const getSettings = {
 
 const setSettings = {
 	runsIn: 'WhisperingContentScript',
-	runInWhisperingContentScript: (settings: Settings) =>
+	runInNativeContext: (settings: Settings) =>
 		setLocalStorage({
 			key: 'whispering-settings',
 			value: JSON.stringify(settings),
@@ -209,7 +203,7 @@ const setSettings = {
 
 const toggleRecording = {
 	runsIn: 'GlobalContentScript',
-	runInGlobalContentScript: () =>
+	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = () =>
 				Effect.gen(function* () {
@@ -283,7 +277,7 @@ const toggleRecording = {
 
 const cancelRecording = {
 	runsIn: 'GlobalContentScript',
-	runInGlobalContentScript: () =>
+	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
@@ -312,7 +306,7 @@ const cancelRecording = {
 
 const sendErrorToast = {
 	runsIn: 'GlobalContentScript',
-	runInGlobalContentScript: (toast: { title: string; description?: string }) =>
+	runInNativeContext: (toast: { title: string; description?: string }) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
 			yield* extensionStorage.set({
