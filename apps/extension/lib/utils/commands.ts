@@ -33,37 +33,36 @@ type NativeRunPrefix = 'runIn';
 type RemoteInvocationPrefix = 'invokeFrom';
 
 /**
- * Represents the configuration for a command. The keys are as follows:
+ * Represents the configuration for a command.
  *
- * runsIn - The context where the command natively runs, and the key which the
- * 				command is discriminated by.
- * runIn[C] - The function that directly executes the command in its native
- * 				context `C`.
- * invokeFrom[C] - The optional function that invokes the command from another
- * 				context `C`.
+ * This configuration includes:
+ * - `runsIn`: Specifies the native context where the command runs.
+ * - `runIn[C]`: A function to directly execute the command within its native context `C`.
+ * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
  *
- * @template NativeContext - The context that the command natively runs in.
+ * @template NativeContext - The context where the command natively runs.
  */
 type ContextConfig<NativeContext extends Context> = {
+	/**
+	 * The native context where the command runs and is discriminated by.
+	 */
 	runsIn: NativeContext;
 } & {
 	/**
-	 * The function is required if the key matches the context (`C`).
+	 * The function to directly execute the command within its native context
+	 * via `runIn[NativeContext]`.
 	 */
 	[NativeContext in Context as NativeContext extends NativeContext
 		? `${NativeRunPrefix}${NativeContext}`
 		: never]: (...args: any[]) => Effect.Effect<any, any>;
 } & {
 	/**
-	 * Dynamically generates the keys for each implementation of the command in all contexts.
-	 * The function is required if the key matches the context (`C`).
-	 * The function is optional for other contexts.
+	 * The optional functions to invoke the command from other contexts via
+	 * `invokeFrom[OtherContext]`.
 	 */
-	[RemoteInvocationContext in Context as RemoteInvocationContext extends NativeContext
+	[OtherContext in Context as OtherContext extends NativeContext
 		? never
-		: `${RemoteInvocationPrefix}${RemoteInvocationContext}`]?: (
-		...args: any[]
-	) => Effect.Effect<any, any>;
+		: `${RemoteInvocationPrefix}${OtherContext}`]?: (...args: any[]) => Effect.Effect<any, any>;
 };
 
 /**
