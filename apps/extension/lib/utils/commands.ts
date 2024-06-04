@@ -1,16 +1,16 @@
+import { RecorderService } from '@/lib/services/RecorderService';
+import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
+import { RecorderStateService } from '@/lib/services/RecorderState';
+import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
-import { RecorderService } from './RecorderService';
-import { RecorderServiceLive } from './RecorderServiceLive';
-import { RecorderStateService } from '~lib/storage/RecorderState';
-import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
 import type { BackgroundServiceWorkerContext } from '~background';
 import type { GlobalContentScriptContext } from '~contents/globalToggleRecording';
-import type { PopupContext } from '~popup';
 import type { WhisperingContentScriptContext } from '~contents/whispering';
+import type { PopupContext } from '~popup';
 
-import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
+import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
 const startSound = new Audio(startSoundSrc);
