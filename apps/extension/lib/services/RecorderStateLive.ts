@@ -1,9 +1,8 @@
 import { Effect, Layer } from 'effect';
-import { z } from 'zod';
-import { ExtensionStorageService } from './ExtensionStorage';
-import { RecorderStateService } from './RecorderState';
-import { ExtensionStorageLive } from './ExtensionStorageLive';
 import { recorderStateSchema } from '../../../../packages/services/src/services/recorder';
+import { ExtensionStorageService } from './ExtensionStorage';
+import { ExtensionStorageLive } from './ExtensionStorageLive';
+import { RecorderStateService } from './RecorderState';
 
 export const RecorderStateLive = Layer.effect(
 	RecorderStateService,
