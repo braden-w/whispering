@@ -15,6 +15,23 @@ type Context =
 	| WhisperingContentScriptContext;
 
 /**
+ * In commands, this prefix is used to directly execute the command in the context.
+ *
+ * For example, a command that natively runs in the context "BackgroundServiceWorker" will have a key like "runInBackgroundServiceWorker".
+ */
+
+type DirectExecutionPrefix = 'runIn';
+
+/**
+ * In commands, this prefix is used to invoke the command from another context.
+ *
+ * For example, a command that runs in the context "BackgroundServiceWorker" can be invoked from the context "Popup" using a key like "invokeFromPopup".
+ */
+type RemoteInvocationPrefix = 'invokeFrom';
+
+type AnyFunction = () => Effect.Effect<any, any>;
+
+/**
  * A command `runsIn` in a specific context, but can be potentially invoked from all other contexts as well through message passing.
  * A command has a `runsIn` property which specifies the context in which it is actually run and discriminated by that context.
  * It also has a `fromContext` property that is its implementation in that context.
@@ -31,9 +48,9 @@ type ContextConfig<C extends Context> = {
 	 * - The function is optional for other contexts.
 	 */
 
-	[K in Context as K extends C ? `runIn${K}` : `invokeFrom${K}`]: () =>
-		| Effect.Effect<any, any>
-		| (K extends C ? never : undefined);
+	[K in Context as K extends C
+		? `${DirectExecutionPrefix}${K}`
+		: `${RemoteInvocationPrefix}${K}`]: K extends C ? AnyFunction : AnyFunction | undefined;
 };
 
 /**
