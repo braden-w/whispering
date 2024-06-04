@@ -43,18 +43,12 @@ type RemoteInvocationPrefix = 'invokeFrom';
  * Represents the configuration for a command.
  *
  * This configuration includes:
- * - `runsIn`: Specifies the native context where the command runs.
  * - `runInNativeContext`: A function to directly execute the command within its native context.
  * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
  *
  * @template NativeContext - The context where the command natively runs.
  */
-type ContextConfig<NativeContext extends Context> = {
-	/**
-	 * The native context where the command runs and is discriminated by.
-	 */
-	runsIn: NativeContext;
-} & {
+type CommandConfig<NativeContext extends Context> = {
 	/**
 	 * The function to directly execute the command from within its native context
 	 * via `runInNativeContext`.
@@ -77,14 +71,6 @@ type ContextConfig<NativeContext extends Context> = {
 		...args: any[]
 	) => Effect.Effect<any, any> | Effect.Effect<any, any>;
 };
-
-/**
- * Represents the configuration for a command, discriminated by context.
- * This type automatically generates the discriminated union of command configurations for all contexts.
- */
-type CommandConfig = {
-	[K in Context]: ContextConfig<K>;
-}[Context];
 
 /**
  * Error thrown when an invocation of a command fails.
@@ -114,7 +100,6 @@ type CommandName = (typeof commandNames)[number];
 // --- Begin commands ---
 
 const openOptionsPage = {
-	runsIn: 'BackgroundServiceWorker',
 	runInNativeContext: () =>
 		Effect.tryPromise({
 			try: () => chrome.runtime.openOptionsPage(),
@@ -124,10 +109,9 @@ const openOptionsPage = {
 		Effect.gen(function* () {
 			yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<BackgroundServiceWorkerContext>;
 
 const getCurrentTabId = {
-	runsIn: 'BackgroundServiceWorker',
 	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const activeTabs = yield* Effect.tryPromise({
@@ -144,7 +128,7 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<BackgroundServiceWorkerContext>;
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -159,7 +143,6 @@ const settingsSchema = z.object({
 type Settings = z.infer<typeof settingsSchema>;
 
 const getSettings = {
-	runsIn: 'WhisperingContentScript',
 	runInNativeContext: () =>
 		getLocalStorage({
 			key: 'whispering-settings',
@@ -182,10 +165,9 @@ const getSettings = {
 				commandName: 'getSettings',
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<WhisperingContentScriptContext>;
 
 const setSettings = {
-	runsIn: 'WhisperingContentScript',
 	runInNativeContext: (settings: Settings) =>
 		setLocalStorage({
 			key: 'whispering-settings',
@@ -199,10 +181,9 @@ const setSettings = {
 				settings,
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<WhisperingContentScriptContext>;
 
 const toggleRecording = {
-	runsIn: 'GlobalContentScript',
 	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = () =>
@@ -273,10 +254,9 @@ const toggleRecording = {
 				commandName: 'toggleRecording',
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<GlobalContentScriptContext>;
 
 const cancelRecording = {
-	runsIn: 'GlobalContentScript',
 	runInNativeContext: () =>
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
@@ -302,10 +282,9 @@ const cancelRecording = {
 				commandName: 'cancelRecording',
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<GlobalContentScriptContext>;
 
 const sendErrorToast = {
-	runsIn: 'GlobalContentScript',
 	runInNativeContext: (toast: { title: string; description?: string }) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
@@ -316,29 +295,36 @@ const sendErrorToast = {
 
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<GlobalContentScriptContext>;
 
 /**
  * Object containing implementations of various commands.
  *
- * Commands can be accessed via `commands.[commandName].invokeFrom[context]`
+ * Commands can be accessed via `commands.[contextName].[commandName].invokeFrom[context]`
  * where `commandName` is the command name, e.g. `getCurrentTabId`,
- * and `context` is one of the designated contexts like `Popup`, `BackgroundServiceWorker`, etc.
+ * and `contextName` is one of the designated contexts like `Popup`, `BackgroundServiceWorker`, etc.
  *
  * Example:
  * ```
- * commands.getCurrentTabId.invokeFromBackgroundServiceWorker();
+ * commands.BackgroundServiceWorker.getCurrentTabId.invokeFromPopup();
  * ```
  */
 export const commands = {
-	getCurrentTabId,
-	getSettings,
-	setSettings,
-	openOptionsPage,
-	toggleRecording,
-	cancelRecording,
-	sendErrorToast,
-} as const satisfies Record<CommandName, CommandConfig>;
+	BackgroundServiceWorker: {
+		getCurrentTabId,
+		openOptionsPage,
+	},
+	WhisperingContentScript: {
+		getSettings,
+		setSettings,
+	},
+	GlobalContentScript: {
+		toggleRecording,
+		cancelRecording,
+		sendErrorToast,
+	},
+	Popup: {},
+} as const satisfies Record<Context, Record<string, CommandConfig<Context>>>;
 
 export type MessageToContentScriptRequest = {
 	readonly [K in CommandName]: {
