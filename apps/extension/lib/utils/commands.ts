@@ -49,7 +49,7 @@ type RemoteInvocationPrefix = 'invokeFrom';
  *
  * @template NC - The context where the command natively runs.
  */
-type ContextConfig<NC extends Context> = {
+type ContextConfig<NC extends Context, Args extends any[], Return> = {
 	/**
 	 * The native context where the command runs and is discriminated by.
 	 */
@@ -62,7 +62,7 @@ type ContextConfig<NC extends Context> = {
 	 * can be directly executed in the background service worker by calling
 	 * the method "runInNativeContext".
 	 */
-	runInNativeContext: (...args: any[]) => Effect.Effect<any, any> | Effect.Effect<any, any>;
+	runInNativeContext: (...args: Args) => Return;
 } & {
 	/**
 	 * The optional functions to invoke the command from other contexts via
@@ -70,17 +70,15 @@ type ContextConfig<NC extends Context> = {
 	 */
 	[OtherContext in Context as OtherContext extends NC
 		? never
-		: `${RemoteInvocationPrefix}${OtherContext}`]?: (
-		...args: any[]
-	) => Effect.Effect<any, any> | Effect.Effect<any, any>;
+		: `${RemoteInvocationPrefix}${OtherContext}`]?: (...args: Args) => Return;
 };
 
 /**
  * Represents the configuration for a command, discriminated by context.
  * This type automatically generates the discriminated union of command configurations for all contexts.
  */
-type CommandConfig = {
-	[K in Context]: ContextConfig<K>;
+type CommandConfig<Args extends any[], Return> = {
+	[K in Context]: ContextConfig<K, Args, Return>;
 }[Context];
 
 /**
@@ -91,22 +89,11 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	origError?: unknown;
 }> {}
 
-const sendMessageToContentScript = <R>(tabId: number, message: MessageToContentScriptRequest) =>
-	Effect.promise(() => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message));
+const sendMessageToContentScript = <R>(tabId: number, message: any) =>
+	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
 
-export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) =>
-	Effect.promise(() => chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message));
-
-const commandNames = [
-	'openOptionsPage',
-	'getCurrentTabId',
-	'getSettings',
-	'setSettings',
-	'toggleRecording',
-	'cancelRecording',
-	'sendErrorToast',
-] as const;
-type CommandName = (typeof commandNames)[number];
+const sendMessageToBackground = <R>(message: any) =>
+	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
 
 // --- Begin commands ---
 
@@ -119,9 +106,10 @@ const openOptionsPage = {
 		}),
 	invokeFromGlobalContentScript: () =>
 		Effect.gen(function* () {
-			yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
+			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
+			return response;
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<[], Effect.Effect<void, InvokeCommandError, never>>;
 
 const getCurrentTabId = {
 	runsIn: 'BackgroundServiceWorker',
@@ -141,7 +129,7 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<[], Effect.Effect<void, InvokeCommandError, never>>;
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -175,11 +163,12 @@ const getSettings = {
 	invokeFromGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			return yield* sendMessageToContentScript<Settings>(whisperingTabId, {
+			const response = yield* sendMessageToContentScript<Settings>(whisperingTabId, {
 				commandName: 'getSettings',
 			});
+			return response;
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<[], Effect.Effect<Settings, InvokeCommandError, never>>;
 
 const setSettings = {
 	runsIn: 'WhisperingContentScript',
@@ -401,7 +390,12 @@ const getOrCreateWhisperingTabId = Effect.gen(function* (_) {
 		);
 		return newTab.id;
 	}
-}).pipe(Effect.flatMap(Option.fromNullable));
+}).pipe(
+	Effect.flatMap(Option.fromNullable),
+	Effect.mapError(
+		() => new InvokeCommandError({ message: 'Error getting or creating Whispering tab' }),
+	),
+);
 
 const getActiveTabId = () =>
 	Effect.gen(function* () {
