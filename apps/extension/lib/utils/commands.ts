@@ -31,7 +31,7 @@ type ContextConfig<C extends Context> = {
 	 * - The function is optional for other contexts.
 	 */
 
-	[K in Context as K extends C ? `executeIn${K}` : `invokeFrom${K}`]: () =>
+	[K in Context as K extends C ? `runIn${K}` : `invokeFrom${K}`]: () =>
 		| Effect.Effect<any, any>
 		| (K extends C ? never : undefined);
 };
@@ -74,7 +74,7 @@ export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) 
 const commands = {
 	openOptionsPage: {
 		runsIn: 'BackgroundServiceWorker',
-		executeInBackgroundServiceWorker: () =>
+		runInBackgroundServiceWorker: () =>
 			Effect.tryPromise({
 				try: () => chrome.runtime.openOptionsPage(),
 				catch: (e) =>
@@ -83,7 +83,7 @@ const commands = {
 	},
 	getCurrentTabId: {
 		runsIn: 'BackgroundServiceWorker',
-		executeInBackgroundServiceWorker: () =>
+		runInBackgroundServiceWorker: () =>
 			Effect.gen(function* () {
 				const activeTabs = yield* Effect.tryPromise({
 					try: () => chrome.tabs.query({ active: true, currentWindow: true }),
@@ -102,7 +102,7 @@ const commands = {
 	},
 	getSettings: {
 		runsIn: 'WhisperingContentScript',
-		executeInWhisperingContentScript: () =>
+		runInWhisperingContentScript: () =>
 			Effect.gen(function* () {
 				const appStorageService = yield* AppStorageService;
 				const registerShortcutsService = yield* RegisterShortcutsService;
@@ -135,7 +135,7 @@ const commands = {
 	// 'getWhisperingTabId',
 	toggleRecording: {
 		runsIn: 'GlobalContentScript',
-		executeInGlobalContentScript: () =>
+		runInGlobalContentScript: () =>
 			Effect.gen(function* () {
 				const settings = yield* settingsService.get();
 				if (!settings.apiKey) {
