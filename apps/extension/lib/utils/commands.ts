@@ -19,7 +19,7 @@ const cancelSound = new Audio(cancelSoundSrc);
 
 /**
  * One popup, one background service worker, and one or many content scripts.
- * 
+ *
  * Represents the possible contexts where a command can run.
  */
 type Context =
@@ -295,13 +295,13 @@ export const commands = {
 	toggleRecording,
 } as const satisfies Record<CommandName, CommandConfig>;
 
-type MessageToContentScriptRequest = {
+export type MessageToContentScriptRequest = {
 	[K in CommandName]: {
 		command: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
 }[CommandName];
 
-type MessageToBackgroundRequest = {
+export type MessageToBackgroundRequest = {
 	[K in CommandName]: {
 		command: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
