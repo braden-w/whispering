@@ -110,6 +110,7 @@ const commandNames = [
 	'openOptionsPage',
 	'getCurrentTabId',
 	'getSettings',
+	'setSettings',
 	'toggleRecording',
 	'cancelRecording',
 	'sendErrorToast',
@@ -338,6 +339,7 @@ const sendErrorToast = {
 export const commands = {
 	getCurrentTabId,
 	getSettings,
+	setSettings,
 	openOptionsPage,
 	toggleRecording,
 	cancelRecording,
