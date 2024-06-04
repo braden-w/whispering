@@ -21,14 +21,14 @@ export class ExtensionStorageService extends Context.Tag('ExtensionStorageServic
 			schema: TSchema;
 			defaultValue: z.infer<TSchema>;
 		}) => Effect.Effect<z.infer<TSchema>, ExtensionStorageError>;
-		readonly set: (args: {
+		readonly set: <T>(args: {
 			key: ExtensionKey;
-			value: string;
+			value: T;
 		}) => Effect.Effect<void, ExtensionStorageError>;
 		readonly watch: <TSchema extends z.ZodTypeAny>(args: {
 			key: ExtensionKey;
 			schema: TSchema;
-			callback: (change: { newValue?: unknown; oldValue?: unknown }) => void;
+			callback: (change: { newValue?: unknown; oldValue?: unknown }) => Effect.Effect<void>;
 		}) => Effect.Effect<void, ExtensionStorageError>;
 	}
 >() {}
