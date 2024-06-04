@@ -109,6 +109,7 @@ const commandNames = [
 	'getSettings',
 	'toggleRecording',
 	'cancelRecording',
+	'sendErrorToast',
 ] as const;
 type CommandName = (typeof commandNames)[number];
 
@@ -123,7 +124,7 @@ const openOptionsPage = {
 		}),
 	invokeFromGlobalContentScript: () =>
 		Effect.gen(function* () {
-			yield* sendMessageToBackground<void>({ command: 'openOptionsPage' });
+			yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 		}),
 } as const satisfies CommandConfig;
 
@@ -180,7 +181,7 @@ const getSettings = {
 		Effect.gen(function* () {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
 			return yield* sendMessageToContentScript<Settings>(whisperingTabId, {
-				command: 'getSettings',
+				commandName: 'getSettings',
 			});
 		}),
 } as const satisfies CommandConfig;
@@ -196,7 +197,7 @@ const setSettings = {
 		Effect.gen(function* () {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
 			return yield* sendMessageToContentScript<void>(whisperingTabId, {
-				command: 'setSettings',
+				commandName: 'setSettings',
 				settings,
 			});
 		}),
@@ -264,14 +265,14 @@ const toggleRecording = {
 		Effect.gen(function* () {
 			const activeTabId = yield* getActiveTabId();
 			yield* sendMessageToContentScript(activeTabId, {
-				command: 'toggleRecording',
+				commandName: 'toggleRecording',
 			});
 		}),
 	invokeFromPopup: () =>
 		Effect.gen(function* () {
 			const activeTabId = yield* getActiveTabId();
 			yield* sendMessageToContentScript(activeTabId, {
-				command: 'toggleRecording',
+				commandName: 'toggleRecording',
 			});
 		}),
 } as const satisfies CommandConfig;
@@ -293,16 +294,23 @@ const cancelRecording = {
 		Effect.gen(function* () {
 			const activeTabId = yield* getActiveTabId();
 			yield* sendMessageToContentScript(activeTabId, {
-				command: 'cancelRecording',
+				commandName: 'cancelRecording',
 			});
 		}),
 	invokeFromPopup: () =>
 		Effect.gen(function* () {
 			const activeTabId = yield* getActiveTabId();
 			yield* sendMessageToContentScript(activeTabId, {
-				command: 'cancelRecording',
+				commandName: 'cancelRecording',
 			});
 		}),
+} as const satisfies CommandConfig;
+
+const sendErrorToast = {
+	runsIn: 'GlobalContentScript',
+	runInGlobalContentScript: (message: string) => {
+		// toast.error(message);
+	},
 } as const satisfies CommandConfig;
 
 /**
@@ -327,13 +335,13 @@ export const commands = {
 
 export type MessageToContentScriptRequest = {
 	[K in CommandName]: {
-		command: K;
+		commandName: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
 }[CommandName];
 
 export type MessageToBackgroundRequest = {
 	[K in CommandName]: {
-		command: K;
+		commandName: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
 }[CommandName];
 
