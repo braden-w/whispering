@@ -1,5 +1,5 @@
 import { Option } from 'effect';
-import { RecorderService } from '@/lib/services/RecorderService';
+import { RecorderError, RecorderService } from '@/lib/services/RecorderService';
 import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
 import { RecorderStateService } from '@/lib/services/RecorderState';
 import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
@@ -13,7 +13,7 @@ import type { PopupContext } from '~popup';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
+import { ExtensionStorageError, ExtensionStorageService } from '~lib/services/ExtensionStorage';
 import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 
 const startSound = new Audio(startSoundSrc);
@@ -49,7 +49,7 @@ type RemoteInvocationPrefix = 'invokeFrom';
  *
  * @template NC - The context where the command natively runs.
  */
-type ContextConfig<NC extends Context, Args extends any[], Return> = {
+type ContextConfig<NC extends Context, Fn extends (...args: any[]) => any> = {
 	/**
 	 * The native context where the command runs and is discriminated by.
 	 */
@@ -62,7 +62,7 @@ type ContextConfig<NC extends Context, Args extends any[], Return> = {
 	 * can be directly executed in the background service worker by calling
 	 * the method "runInNativeContext".
 	 */
-	runInNativeContext: (...args: Args) => Return;
+	runInNativeContext: Fn;
 } & {
 	/**
 	 * The optional functions to invoke the command from other contexts via
@@ -70,15 +70,15 @@ type ContextConfig<NC extends Context, Args extends any[], Return> = {
 	 */
 	[OtherContext in Context as OtherContext extends NC
 		? never
-		: `${RemoteInvocationPrefix}${OtherContext}`]?: (...args: Args) => Return;
+		: `${RemoteInvocationPrefix}${OtherContext}`]?: Fn;
 };
 
 /**
  * Represents the configuration for a command, discriminated by context.
  * This type automatically generates the discriminated union of command configurations for all contexts.
  */
-type CommandConfig<Args extends any[], Return> = {
-	[K in Context]: ContextConfig<K, Args, Return>;
+type CommandConfig<Fn extends (...args: any[]) => any> = {
+	[K in Context]: ContextConfig<K, Fn>;
 }[Context];
 
 /**
@@ -95,7 +95,7 @@ const sendMessageToContentScript = <R>(tabId: number, message: any) =>
 const sendMessageToBackground = <R>(message: any) =>
 	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
 
-// --- Begin commands ---
+// --- Define commands ---
 
 const openOptionsPage = {
 	runsIn: 'BackgroundServiceWorker',
@@ -109,7 +109,7 @@ const openOptionsPage = {
 			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 			return response;
 		}),
-} as const satisfies CommandConfig<[], Effect.Effect<void, InvokeCommandError, never>>;
+} as const satisfies CommandConfig<() => Effect.Effect<void, InvokeCommandError, never>>;
 
 const getCurrentTabId = {
 	runsIn: 'BackgroundServiceWorker',
@@ -129,7 +129,7 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies CommandConfig<[], Effect.Effect<void, InvokeCommandError, never>>;
+} as const satisfies CommandConfig<() => Effect.Effect<void, InvokeCommandError, never>>;
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -168,7 +168,7 @@ const getSettings = {
 			});
 			return response;
 		}),
-} as const satisfies CommandConfig<[], Effect.Effect<Settings, InvokeCommandError, never>>;
+} as const satisfies CommandConfig<() => Effect.Effect<Settings, InvokeCommandError, never>>;
 
 const setSettings = {
 	runsIn: 'WhisperingContentScript',
@@ -185,7 +185,9 @@ const setSettings = {
 				settings,
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<
+	(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
+>;
 
 const toggleRecording = {
 	runsIn: 'GlobalContentScript',
@@ -259,7 +261,9 @@ const toggleRecording = {
 				commandName: 'toggleRecording',
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<
+	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
+>;
 
 const cancelRecording = {
 	runsIn: 'GlobalContentScript',
@@ -288,11 +292,13 @@ const cancelRecording = {
 				commandName: 'cancelRecording',
 			});
 		}),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<
+	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
+>;
 
 const sendErrorToast = {
 	runsIn: 'GlobalContentScript',
-	runInNativeContext: (toast: { title: string; description?: string }) =>
+	runInNativeContext: (toast) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
 			yield* extensionStorage.set({
@@ -302,7 +308,12 @@ const sendErrorToast = {
 
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
-} as const satisfies CommandConfig;
+} as const satisfies CommandConfig<
+	(toast: {
+		title: string;
+		description?: string;
+	}) => Effect.Effect<void, InvokeCommandError | ExtensionStorageError, never>
+>;
 
 /**
  * Object containing implementations of various commands.
@@ -324,19 +335,7 @@ export const commands = {
 	toggleRecording,
 	cancelRecording,
 	sendErrorToast,
-} as const satisfies Record<CommandName, CommandConfig>;
-
-export type MessageToContentScriptRequest = {
-	readonly [K in CommandName]: {
-		commandName: K;
-	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
-}[CommandName];
-
-export type MessageToBackgroundRequest = {
-	readonly [K in CommandName]: {
-		commandName: K;
-	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
-}[CommandName];
+} as const;
 
 const getLocalStorage = <TSchema extends z.ZodTypeAny>({
 	key,
