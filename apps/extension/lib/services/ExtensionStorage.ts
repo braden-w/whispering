@@ -7,6 +7,8 @@ export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageErr
 	origError?: unknown;
 }> {}
 
+type ExtensionKey = 'whispering-recording-state' | 'whispering-toast' | 'whispering-settings';
+
 export class ExtensionStorageService extends Context.Tag('ExtensionStorageService')<
 	ExtensionStorageService,
 	{
@@ -15,13 +17,18 @@ export class ExtensionStorageService extends Context.Tag('ExtensionStorageServic
 			schema,
 			defaultValue,
 		}: {
-			key: string;
+			key: ExtensionKey;
 			schema: TSchema;
 			defaultValue: z.infer<TSchema>;
 		}) => Effect.Effect<z.infer<TSchema>, ExtensionStorageError>;
 		readonly set: (args: {
-			key: string;
+			key: ExtensionKey;
 			value: string;
+		}) => Effect.Effect<void, ExtensionStorageError>;
+		readonly watch: <TSchema extends z.ZodTypeAny>(args: {
+			key: ExtensionKey;
+			schema: TSchema;
+			callback: (change: { newValue?: unknown; oldValue?: unknown }) => void;
 		}) => Effect.Effect<void, ExtensionStorageError>;
 	}
 >() {}
