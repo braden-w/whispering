@@ -54,7 +54,6 @@ type ContextConfig<NC extends Context> = {
 	 * The native context where the command runs and is discriminated by.
 	 */
 	runsIn: NC;
-} & {
 	/**
 	 * The function to directly execute the command from within its native context
 	 * via `runInNativeContext`.
@@ -63,9 +62,7 @@ type ContextConfig<NC extends Context> = {
 	 * can be directly executed in the background service worker by calling
 	 * the method "runInNativeContext".
 	 */
-	[C in Context as C extends NC ? 'runInNativeContext' : never]: (
-		...args: any[]
-	) => Effect.Effect<any, any> | Effect.Effect<any, any>;
+	runInNativeContext: (...args: any[]) => Effect.Effect<any, any> | Effect.Effect<any, any>;
 } & {
 	/**
 	 * The optional functions to invoke the command from other contexts via
