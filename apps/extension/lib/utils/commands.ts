@@ -52,8 +52,8 @@ type ContextConfig<NativeContext extends Context> = {
 	 * The function to directly execute the command within its native context
 	 * via `runIn[NativeContext]`.
 	 */
-	[NativeContext in Context as NativeContext extends NativeContext
-		? `${NativeRunPrefix}${NativeContext}`
+	[ExecuteContext in Context as ExecuteContext extends NativeContext
+		? `${NativeRunPrefix}${ExecuteContext}`
 		: never]: (...args: any[]) => Effect.Effect<any, any>;
 } & {
 	/**
@@ -81,24 +81,19 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	origError?: unknown;
 }> {}
 
-/**
- * Sends a message to a content script running in a specific tab.
- *
- * @param {number} tabId - The ID of the tab where the content script is running.
- * @param {MessageToContentScriptRequest} message - The message to send.
- * @returns {Effect.Effect<any, any>} - An effect representing the message sending operation.
- */
 const sendMessageToContentScript = <R>(tabId: number, message: MessageToContentScriptRequest) =>
 	Effect.promise(() => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message));
 
-/**
- * Sends a message to the shared background script.
- *
- * @param {MessageToBackgroundRequest} message - The message to send.
- * @returns {Effect.Effect<any, any>} - An effect representing the message sending operation.
- */
 export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) =>
 	Effect.promise(() => chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message));
+
+const commandNames = [
+	'openOptionsPage',
+	'getCurrentTabId',
+	'getSettings',
+	'toggleRecording',
+] as const;
+type CommandName = (typeof commandNames)[number];
 
 /**
  * Object containing implementations of various commands.
@@ -188,7 +183,7 @@ const commands = {
 					case 'IDLE': {
 						yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 						if (settings.isPlaySoundEnabled) startSound.play();
-						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
+						sendMessageToBackground({ command: 'syncIconToRecorderState', recorderState });
 						yield* Effect.logInfo('Recording started');
 						yield* recorderStateService.set('RECORDING');
 						break;
@@ -196,7 +191,7 @@ const commands = {
 					case 'RECORDING': {
 						yield* recorderService.stopRecording();
 						if (settings.isPlaySoundEnabled) stopSound.play();
-						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
+						sendMessageToBackground({ command: 'syncIconToRecorderState', recorderState });
 						yield* Effect.logInfo('Recording stopped');
 						yield* recorderStateService.set('IDLE');
 						break;
@@ -226,50 +221,20 @@ const commands = {
 					});
 				const activeTabId = yield* getActiveTabId();
 				yield* sendMessageToContentScript(activeTabId, {
-					action: 'toggleRecording',
+					command: 'toggleRecording',
 				});
 			}),
 	},
-} as const satisfies Record<string, CommandConfig>;
+} as const satisfies Record<CommandName, CommandConfig>;
 
-/**
- * Represents a message to be sent to the background script.
- *
- * @typedef {Object} MessageToBackgroundRequest
- * @property {'openOptionsPage'} action - The action to perform.
- */
-export type MessageToBackgroundRequest = {
-	action: 'openOptionsPage';
-};
+type MessageToContentScriptRequest = {
+	[K in CommandName]: {
+		command: K;
+	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
+}[CommandName];
 
-/**
- * Represents a message to be sent to a content script.
- *
- * @typedef {Object} MessageToContentScriptRequest
- * @property {'toggleRecording'} action - The action to toggle recording.
- * @property {string} [key] - The key for getLocalStorage action.
- * @property {'getSettingsFromWhisperingLocalStorage'} action - The action to get settings from whispering local storage.
- * @property {'registerListener'} action - The action to register a listener.
- * @property {(event: StorageEvent) => void} [callback] - The callback for registerListener action.
- * @property {string} [value] - The value for setLocalStorage action.
- */
-export type MessageToContentScriptRequest =
-	| {
-			action: 'toggleRecording';
-	  }
-	| {
-			action: 'getLocalStorage';
-			key: string;
-	  }
-	| {
-			action: 'getSettingsFromWhisperingLocalStorage';
-	  }
-	| {
-			action: 'registerListener';
-			callback: (event: StorageEvent) => void;
-	  }
-	| {
-			action: 'setLocalStorage';
-			key: string;
-			value: string;
-	  };
+type MessageToBackgroundRequest = {
+	[K in CommandName]: {
+		command: K;
+	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
+}[CommandName];
