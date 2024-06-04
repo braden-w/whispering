@@ -341,16 +341,17 @@ export const commands = {
 	openOptionsPage,
 	toggleRecording,
 	cancelRecording,
+	sendErrorToast,
 } as const satisfies Record<CommandName, CommandConfig>;
 
 export type MessageToContentScriptRequest = {
-	[K in CommandName]: {
+	readonly [K in CommandName]: {
 		commandName: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
 }[CommandName];
 
 export type MessageToBackgroundRequest = {
-	[K in CommandName]: {
+	readonly [K in CommandName]: {
 		commandName: K;
 	}; // & Parameters<(typeof commands)[K][`runIn${(typeof commands)[K]['runsIn']}`]>[0];
 }[CommandName];
