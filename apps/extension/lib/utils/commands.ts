@@ -18,6 +18,8 @@ const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
 /**
+ * One popup, one background service worker, and one or many content scripts.
+ * 
  * Represents the possible contexts where a command can run.
  */
 type Context =
