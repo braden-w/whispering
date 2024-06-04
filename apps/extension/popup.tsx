@@ -1,13 +1,14 @@
 type ContextName = 'Popup';
 export type { ContextName as PopupContext };
 
-import { useStorage } from '@plasmohq/storage/hook';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { commands } from '~/lib/utils/commands';
-import './style.css';
+import { useStorage } from '@plasmohq/storage/hook';
 import { Effect } from 'effect';
+import type { RecorderState } from '~lib/services/RecorderService';
+import './style.css';
+import { commands } from '~lib/utils/commands';
 
 function IndexPopup() {
 	return (
@@ -24,7 +25,7 @@ const toggleRecording = () => commands.toggleRecording.invokeFromPopup().pipe(Ef
 const cancelRecording = () => commands.cancelRecording.invokeFromPopup().pipe(Effect.runPromise);
 
 function IndexPage() {
-	const [recorderState] = useStorage('whispering-recording-state');
+	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 text-center">
 			<div className="flex flex-col gap-4">
