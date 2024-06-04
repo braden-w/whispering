@@ -22,7 +22,7 @@ type Context =
  * can be directly executed in the background service worker by calling
  * the method "runInBackgroundServiceWorker".
  */
-type DirectExecutionPrefix = 'runIn';
+type NativeRunPrefix = 'runIn';
 
 /**
  * Prefix used to name the method invokes the command from another context.
@@ -42,24 +42,26 @@ type RemoteInvocationPrefix = 'invokeFrom';
  * invokeFrom[C] - The optional function that invokes the command from another
  * 				context `C`.
  *
- * @template ExecutionContext - The context that the command natively runs in.
+ * @template NativeContext - The context that the command natively runs in.
  */
-type ContextConfig<ExecutionContext extends Context> = {
-	runsIn: ExecutionContext;
+type ContextConfig<NativeContext extends Context> = {
+	runsIn: NativeContext;
 } & {
 	/**
 	 * The function is required if the key matches the context (`C`).
 	 */
-	[K in Context as K extends ExecutionContext ? `${DirectExecutionPrefix}${K}` : never]: (
-		...args: any[]
-	) => Effect.Effect<any, any>;
+	[NativeContext in Context as NativeContext extends NativeContext
+		? `${NativeRunPrefix}${NativeContext}`
+		: never]: (...args: any[]) => Effect.Effect<any, any>;
 } & {
 	/**
 	 * Dynamically generates the keys for each implementation of the command in all contexts.
 	 * The function is required if the key matches the context (`C`).
 	 * The function is optional for other contexts.
 	 */
-	[K in Context as K extends ExecutionContext ? never : `${RemoteInvocationPrefix}${K}`]?: (
+	[RemoteInvocationContext in Context as RemoteInvocationContext extends NativeContext
+		? never
+		: `${RemoteInvocationPrefix}${RemoteInvocationContext}`]?: (
 		...args: any[]
 	) => Effect.Effect<any, any>;
 };
