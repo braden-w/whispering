@@ -1,10 +1,13 @@
 type ContextName = 'Popup';
-export type { ContextName as Popup };
+export type { ContextName as PopupContext };
 
+import { useStorage } from '@plasmohq/storage/hook';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { commands } from '~/lib/utils/commands';
 import './style.css';
+import { Effect } from 'effect';
 
 function IndexPopup() {
 	return (
@@ -17,9 +20,11 @@ function IndexPopup() {
 		</div>
 	);
 }
+const toggleRecording = () => commands.toggleRecording.invokeFromPopup().pipe(Effect.runPromise);
+const cancelRecording = () => commands.cancelRecording.invokeFromPopup().pipe(Effect.runPromise);
 
 function IndexPage() {
-	const recorder = { toggleRecording: () => {} };
+	const [recorderState] = useStorage('whispering-recording-state');
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 text-center">
 			<div className="flex flex-col gap-4">
@@ -33,18 +38,18 @@ function IndexPage() {
 			<div className="relative">
 				<Button
 					className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-					onClick={recorder.toggleRecording}
+					onClick={toggleRecording}
 					aria-label="Toggle recording"
 					variant="ghost"
 				>
 					<span style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}>
-						{recorder.recorderState === 'RECORDING' ? '🔲' : '🎙️'}
+						{recorderState === 'RECORDING' ? '🔲' : '🎙️'}
 					</span>
 				</Button>
-				{recorder.recorderState === 'RECORDING' ?? (
+				{recorderState === 'RECORDING' ?? (
 					<Button
 						className="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-						onClick={recorder.toggleRecording}
+						onClick={cancelRecording}
 						aria-label="Cancel recording"
 						size="icon"
 						variant="ghost"
