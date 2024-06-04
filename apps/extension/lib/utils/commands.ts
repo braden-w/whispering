@@ -1,3 +1,4 @@
+import { Option } from 'effect';
 import { RecorderService } from '@/lib/services/RecorderService';
 import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
 import { RecorderStateService } from '@/lib/services/RecorderState';
@@ -406,7 +407,7 @@ const getOrCreateWhisperingTabId = Effect.gen(function* (_) {
 		);
 		return newTab.id;
 	}
-});
+}).pipe(Effect.flatMap(Option.fromNullable));
 
 const getActiveTabId = () =>
 	Effect.gen(function* () {
