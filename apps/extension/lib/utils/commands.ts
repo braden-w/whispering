@@ -29,12 +29,16 @@ type DirectExecutionPrefix = 'runIn';
  */
 type RemoteInvocationPrefix = 'invokeFrom';
 
-type AnyFunction = () => Effect.Effect<any, any>;
+/**
+ * Represents a function that can be executed within or invoked from a specific context.
+ * It can accept any arguments and return any type.
+ */
+type AnyFunction = (...args: any[]) => Effect.Effect<any, any>;
 
 /**
  * A command `runsIn` in a specific context, but can be potentially invoked from all other contexts as well through message passing.
  * A command has a `runsIn` property which specifies the context in which it is actually run and discriminated by that context.
- * It also has a `fromContext` property that is its implementation in that context.
+ * It also has a context-specific property that is its implementation in that context.
  * All other contexts have an optional implementation, except the context that the command `runsIn`.
  *
  * @template C - The context for which the configuration type is generated.
@@ -48,9 +52,9 @@ type ContextConfig<C extends Context> = {
 	 * - The function is optional for other contexts.
 	 */
 
-	[K in Context as K extends C
-		? `${DirectExecutionPrefix}${K}`
-		: `${RemoteInvocationPrefix}${K}`]: K extends C ? AnyFunction : AnyFunction | undefined;
+	[K in Context as K extends C ? `${DirectExecutionPrefix}${K}` : never]: AnyFunction;
+} & {
+	[K in Context as K extends C ? never : `${RemoteInvocationPrefix}${K}`]?: AnyFunction;
 };
 
 /**
