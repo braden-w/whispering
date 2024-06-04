@@ -32,24 +32,22 @@ export const ExtensionStorageLive = Layer.effect(
 						});
 					},
 				}),
-			watch: ({ key, schema, callback }) => {
-				const callbackProgram = (newValueUnparsed: unknown) =>
-					Effect.gen(function* () {
-						const newValueParseResult = schema.safeParse(newValueUnparsed);
-						if (!newValueParseResult.success) {
-							console.error(
-								`Error parsing change for key: ${key}`,
-								newValueParseResult.error.errors,
-							);
-							return Effect.succeed(undefined);
-						}
-						const newValue = newValueParseResult.data;
-						yield* callback(newValue);
-					});
-				return Effect.try({
+			watch: ({ key, schema, callback }) =>
+				Effect.try({
 					try: () => {
 						storage.watch({
-							[key]: ({ newValue }) => callbackProgram(newValue).pipe(Effect.runSync),
+							[key]: ({ newValue: newValueUnparsed }) => {
+								const newValueParseResult = schema.safeParse(newValueUnparsed);
+								if (!newValueParseResult.success) {
+									console.error(
+										`Error parsing change for key: ${key}`,
+										newValueParseResult.error.errors,
+									);
+									return;
+								}
+								const newValue = newValueParseResult.data;
+								callback(newValue);
+							},
 						});
 					},
 					catch: (error) =>
@@ -57,8 +55,7 @@ export const ExtensionStorageLive = Layer.effect(
 							message: `Error watching local storage for key: ${key}`,
 							origError: error,
 						}),
-				});
-			},
+				}),
 		};
 	}),
 );
