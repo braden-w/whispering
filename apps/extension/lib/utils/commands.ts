@@ -12,6 +12,8 @@ import type { PopupContext } from '~popup';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
+import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -308,9 +310,16 @@ const cancelRecording = {
 
 const sendErrorToast = {
 	runsIn: 'GlobalContentScript',
-	runInGlobalContentScript: (message: string) => {
-		// toast.error(message);
-	},
+	runInGlobalContentScript: (toast: { title: string; description?: string }) =>
+		Effect.gen(function* () {
+			const extensionStorage = yield* ExtensionStorageService;
+			yield* extensionStorage.set({
+				key: 'whispering-toast',
+				value: toast,
+			});
+
+			// toast.error(message);
+		}).pipe(Effect.provide(ExtensionStorageLive)),
 } as const satisfies CommandConfig;
 
 /**
