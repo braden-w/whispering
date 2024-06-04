@@ -15,67 +15,87 @@ type Context =
 	| WhisperingContentScriptContext;
 
 /**
- * In commands, this prefix is used to directly execute the command in the context.
+ * Prefix used to name the method that directly executes the command in its
+ * native context.
  *
- * For example, a command that natively runs in the context "BackgroundServiceWorker" will have a key like "runInBackgroundServiceWorker".
+ * For example, a command that runs in the context "BackgroundServiceWorker"
+ * can be directly executed in the background service worker by calling
+ * the method "runInBackgroundServiceWorker".
  */
-
 type DirectExecutionPrefix = 'runIn';
 
 /**
- * In commands, this prefix is used to invoke the command from another context.
+ * Prefix used to name the method invokes the command from another context.
  *
- * For example, a command that runs in the context "BackgroundServiceWorker" can be invoked from the context "Popup" using a key like "invokeFromPopup".
+ * For example, a command that runs in the context "BackgroundServiceWorker"
+ * can be invoked from the context "Popup" the method "invokeFromPopup".
  */
 type RemoteInvocationPrefix = 'invokeFrom';
 
 /**
- * Represents a function that can be executed within or invoked from a specific context.
- * It can accept any arguments and return any type.
- */
-type AnyFunction = (...args: any[]) => Effect.Effect<any, any>;
-
-/**
- * A command `runsIn` in a specific context, but can be potentially invoked from all other contexts as well through message passing.
- * A command has a `runsIn` property which specifies the context in which it is actually run and discriminated by that context.
- * It also has a context-specific property that is its implementation in that context.
- * All other contexts have an optional implementation, except the context that the command `runsIn`.
+ * Represents the configuration for a command. The keys are as follows:
  *
- * @template C - The context for which the configuration type is generated.
+ * runsIn - The context where the command natively runs, and the key which the
+ * 				command is discriminated by.
+ * runIn[C] - The function that directly executes the command in its native
+ * 				context `C`.
+ * invokeFrom[C] - The optional function that invokes the command from another
+ * 				context `C`.
+ *
+ * @template ExecutionContext - The context that the command natively runs in.
  */
-type ContextConfig<C extends Context> = {
-	runsIn: C;
+type ContextConfig<ExecutionContext extends Context> = {
+	runsIn: ExecutionContext;
 } & {
 	/**
-	 * Dynamically generates the keys for each implementation of the command in all contexts, like `fromPopup`, `fromBackgroundServiceWorker`, etc.
-	 * - The function is required if the key matches the context (`C`).
-	 * - The function is optional for other contexts.
+	 * The function is required if the key matches the context (`C`).
 	 */
-
-	[K in Context as K extends C ? `${DirectExecutionPrefix}${K}` : never]: AnyFunction;
+	[K in Context as K extends ExecutionContext ? `${DirectExecutionPrefix}${K}` : never]: (
+		...args: any[]
+	) => Effect.Effect<any, any>;
 } & {
-	[K in Context as K extends C ? never : `${RemoteInvocationPrefix}${K}`]?: AnyFunction;
+	/**
+	 * Dynamically generates the keys for each implementation of the command in all contexts.
+	 * The function is required if the key matches the context (`C`).
+	 * The function is optional for other contexts.
+	 */
+	[K in Context as K extends ExecutionContext ? never : `${RemoteInvocationPrefix}${K}`]?: (
+		...args: any[]
+	) => Effect.Effect<any, any>;
 };
 
 /**
  * Represents the configuration for a command, discriminated by context.
- *
  * This type automatically generates the discriminated union of command configurations for all contexts.
  */
-
 type CommandConfig = {
 	[K in Context]: ContextConfig<K>;
 }[Context];
 
+/**
+ * Error thrown when an invocation of a command fails.
+ */
 class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	message: string;
 	origError?: unknown;
 }> {}
 
+/**
+ * Sends a message to a content script running in a specific tab.
+ *
+ * @param {number} tabId - The ID of the tab where the content script is running.
+ * @param {MessageToContentScriptRequest} message - The message to send.
+ * @returns {Effect.Effect<any, any>} - An effect representing the message sending operation.
+ */
 const sendMessageToContentScript = <R>(tabId: number, message: MessageToContentScriptRequest) =>
 	Effect.promise(() => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message));
 
-/** Sends a message to the shared background script, captured in {@link ~background.ts}. */
+/**
+ * Sends a message to the shared background script.
+ *
+ * @param {MessageToBackgroundRequest} message - The message to send.
+ * @returns {Effect.Effect<any, any>} - An effect representing the message sending operation.
+ */
 export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) =>
 	Effect.promise(() => chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message));
 
@@ -91,7 +111,6 @@ export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) 
  * invokeCommand.getCurrentTabId.fromBackgroundServiceWorker();
  * ```
  */
-
 const commands = {
 	openOptionsPage: {
 		runsIn: 'BackgroundServiceWorker',
@@ -152,8 +171,6 @@ const commands = {
 				});
 			}).pipe(Effect.provide(AppStorageLive), Effect.provide(RegisterShortcutsWebLive)),
 	},
-	// 'getWhisperingLocalStorage',
-	// 'getWhisperingTabId',
 	toggleRecording: {
 		runsIn: 'GlobalContentScript',
 		runInGlobalContentScript: () =>
@@ -214,15 +231,31 @@ const commands = {
 	},
 } as const satisfies Record<string, CommandConfig>;
 
+/**
+ * Represents a message to be sent to the background script.
+ *
+ * @typedef {Object} MessageToBackgroundRequest
+ * @property {'openOptionsPage'} action - The action to perform.
+ */
 export type MessageToBackgroundRequest = {
 	action: 'openOptionsPage';
 };
 
+/**
+ * Represents a message to be sent to a content script.
+ *
+ * @typedef {Object} MessageToContentScriptRequest
+ * @property {'toggleRecording'} action - The action to toggle recording.
+ * @property {string} [key] - The key for getLocalStorage action.
+ * @property {'getSettingsFromWhisperingLocalStorage'} action - The action to get settings from whispering local storage.
+ * @property {'registerListener'} action - The action to register a listener.
+ * @property {(event: StorageEvent) => void} [callback] - The callback for registerListener action.
+ * @property {string} [value] - The value for setLocalStorage action.
+ */
 export type MessageToContentScriptRequest =
 	| {
 			action: 'toggleRecording';
 	  }
-	// | { action: 'switch-chatgpt-icon'; icon: Icon }
 	| {
 			action: 'getLocalStorage';
 			key: string;
