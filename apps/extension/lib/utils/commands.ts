@@ -1,70 +1,80 @@
-import { z } from 'zod';
 import { Data, Effect } from 'effect';
-import { AppStorageService } from '../../../../packages/services/src/services/app-storage';
-import { RegisterShortcutsService } from '../../../../packages/services/src/services/register-shortcuts';
+import { z } from 'zod';
+import type { BackgroundServiceWorkerContext } from '~background';
+import type { GlobalContentScriptContext } from '~contents/globalToggleRecording';
+import type { PopupContext } from '~popup';
+import type { WhisperingContentScriptContext } from '~contents/whispering';
+
+/**
+ * Represents the possible contexts where a command can run.
+ */
+type Context =
+	| PopupContext
+	| BackgroundServiceWorkerContext
+	| GlobalContentScriptContext
+	| WhisperingContentScriptContext;
+
+/**
+ * A command `runsIn` in a specific context, but can be potentially invoked from all other contexts as well through message passing.
+ * A command has a `runsIn` property which specifies the context in which it is actually run and discriminated by that context.
+ * It also has a `fromContext` property that is its implementation in that context.
+ * All other contexts have an optional implementation, except the context that the command `runsIn`.
+ *
+ * @template C - The context for which the configuration type is generated.
+ */
+type ContextConfig<C extends Context> = {
+	runsIn: C;
+} & {
+	/**
+	 * Dynamically generates the keys for each implementation of the command in all contexts, like `fromPopup`, `fromBackgroundServiceWorker`, etc.
+	 * - The function is required if the key matches the context (`C`).
+	 * - The function is optional for other contexts.
+	 */
+
+	[K in Context as K extends C ? `executeIn${K}` : `invokeFrom${K}`]: () =>
+		| Effect.Effect<any, any>
+		| (K extends C ? never : undefined);
+};
+
+/**
+ * Represents the configuration for a command, discriminated by context.
+ *
+ * This type automatically generates the discriminated union of command configurations for all contexts.
+ */
+
+type CommandConfig = {
+	[K in Context]: ContextConfig<K>;
+}[Context];
 
 class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	message: string;
 	origError?: unknown;
 }> {}
 
-export type MessageToBackgroundRequest = {
-	action: 'openOptionsPage';
-};
-
-export type MessageToContentScriptRequest =
-	| {
-			action: 'toggleRecording';
-	  }
-	// | { action: 'switch-chatgpt-icon'; icon: Icon }
-	| {
-			action: 'getLocalStorage';
-			key: string;
-	  }
-	| {
-			action: 'getSettingsFromWhisperingLocalStorage';
-	  }
-	| {
-			action: 'registerListener';
-			callback: (event: StorageEvent) => void;
-	  }
-	| {
-			action: 'setLocalStorage';
-			key: string;
-			value: string;
-	  };
-
 const sendMessageToContentScript = <R>(tabId: number, message: MessageToContentScriptRequest) =>
 	Effect.promise(() => chrome.tabs.sendMessage<MessageToContentScriptRequest, R>(tabId, message));
 
 /** Sends a message to the shared background script, captured in {@link ~background.ts}. */
-export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) => {
-	chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message);
-};
+export const sendMessageToBackground = <R>(message: MessageToBackgroundRequest) =>
+	Effect.promise(() => chrome.runtime.sendMessage<MessageToBackgroundRequest, R>(message));
 
-type CommandToImplementations = Record<string, CommandConfig>;
-
-type CommandConfig = Partial<{
-	fromBackground: () => Effect.Effect<any, any>;
-	fromPopup: () => Effect.Effect<any, any>;
-	fromContent: () => Effect.Effect<any, any>;
-}>;
 /**
  * Object containing implementations of various commands.
  *
- * Commands can be accessed via `invokeCommand.[command].[fromContext]`
- * where `command` is the command name, e.g. `getCurrentTabId`,
- * and `fromContext` is one of 'fromBackground', 'fromPopup', 'fromContent'
- * and refers to the context in which the command is being invoked.
+ * Commands can be accessed via `commands.[commandName].invokeFrom[context]`
+ * where `commandName` is the command name, e.g. `getCurrentTabId`,
+ * and `context` is one of the designated contexts like `Popup`, `BackgroundServiceWorker`, etc.
  *
  * Example:
  * ```
- * invokeCommand.getCurrentTabId.fromBackground();
+ * invokeCommand.getCurrentTabId.fromBackgroundServiceWorker();
  * ```
  */
-const invokeBackgroundAction = {
+
+const commands = {
 	openOptionsPage: {
-		fromBackground: () =>
+		runsIn: 'BackgroundServiceWorker',
+		executeInBackgroundServiceWorker: () =>
 			Effect.tryPromise({
 				try: () => chrome.runtime.openOptionsPage(),
 				catch: (e) =>
@@ -72,7 +82,8 @@ const invokeBackgroundAction = {
 			}),
 	},
 	getCurrentTabId: {
-		fromBackground: () =>
+		runsIn: 'BackgroundServiceWorker',
+		executeInBackgroundServiceWorker: () =>
 			Effect.gen(function* () {
 				const activeTabs = yield* Effect.tryPromise({
 					try: () => chrome.tabs.query({ active: true, currentWindow: true }),
@@ -89,11 +100,9 @@ const invokeBackgroundAction = {
 				return firstActiveTab.id;
 			}),
 	},
-} as const satisfies CommandToImplementations;
-
-const invokeContentAction = {
 	getSettings: {
-		fromContent: () =>
+		runsIn: 'WhisperingContentScript',
+		executeInWhisperingContentScript: () =>
 			Effect.gen(function* () {
 				const appStorageService = yield* AppStorageService;
 				const registerShortcutsService = yield* RegisterShortcutsService;
@@ -125,7 +134,40 @@ const invokeContentAction = {
 	// 'getWhisperingLocalStorage',
 	// 'getWhisperingTabId',
 	toggleRecording: {
-		fromBackground: () =>
+		runsIn: 'GlobalContentScript',
+		executeInGlobalContentScript: () =>
+			Effect.gen(function* () {
+				const settings = yield* settingsService.get();
+				if (!settings.apiKey) {
+					alert('Please set your API key in the extension options');
+					openOptionsPage();
+					return;
+				}
+				yield* checkAndUpdateSelectedAudioInputDevice();
+				const recorderState = yield* recorderStateService.get();
+				switch (recorderState) {
+					case 'IDLE': {
+						yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
+						if (settings.isPlaySoundEnabled) startSound.play();
+						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
+						yield* Effect.logInfo('Recording started');
+						yield* recorderStateService.set('RECORDING');
+						break;
+					}
+					case 'RECORDING': {
+						yield* recorderService.stopRecording();
+						if (settings.isPlaySoundEnabled) stopSound.play();
+						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
+						yield* Effect.logInfo('Recording stopped');
+						yield* recorderStateService.set('IDLE');
+						break;
+					}
+					default: {
+						yield* Effect.logError('Invalid recorder state');
+					}
+				}
+			}),
+		invokeFromBackgroundServiceWorker: () =>
 			Effect.gen(function* () {
 				const getActiveTabId = () =>
 					Effect.gen(function* () {
@@ -149,4 +191,30 @@ const invokeContentAction = {
 				});
 			}),
 	},
-} as const satisfies CommandToImplementations;
+} as const satisfies Record<string, CommandConfig>;
+
+export type MessageToBackgroundRequest = {
+	action: 'openOptionsPage';
+};
+
+export type MessageToContentScriptRequest =
+	| {
+			action: 'toggleRecording';
+	  }
+	// | { action: 'switch-chatgpt-icon'; icon: Icon }
+	| {
+			action: 'getLocalStorage';
+			key: string;
+	  }
+	| {
+			action: 'getSettingsFromWhisperingLocalStorage';
+	  }
+	| {
+			action: 'registerListener';
+			callback: (event: StorageEvent) => void;
+	  }
+	| {
+			action: 'setLocalStorage';
+			key: string;
+			value: string;
+	  };
