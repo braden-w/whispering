@@ -47,13 +47,13 @@ type RemoteInvocationPrefix = 'invokeFrom';
  * - `runInNativeContext`: A function to directly execute the command within its native context.
  * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
  *
- * @template NativeContext - The context where the command natively runs.
+ * @template NC - The context where the command natively runs.
  */
-type ContextConfig<NativeContext extends Context> = {
+type ContextConfig<NC extends Context> = {
 	/**
 	 * The native context where the command runs and is discriminated by.
 	 */
-	runsIn: NativeContext;
+	runsIn: NC;
 } & {
 	/**
 	 * The function to directly execute the command from within its native context
@@ -63,15 +63,15 @@ type ContextConfig<NativeContext extends Context> = {
 	 * can be directly executed in the background service worker by calling
 	 * the method "runInNativeContext".
 	 */
-	[ExecuteContext in Context as ExecuteContext extends NativeContext
-		? 'runInNativeContext'
-		: never]: (...args: any[]) => Effect.Effect<any, any> | Effect.Effect<any, any>;
+	[C in Context as C extends NC ? 'runInNativeContext' : never]: (
+		...args: any[]
+	) => Effect.Effect<any, any> | Effect.Effect<any, any>;
 } & {
 	/**
 	 * The optional functions to invoke the command from other contexts via
 	 * `invokeFrom[OtherContext]`.
 	 */
-	[OtherContext in Context as OtherContext extends NativeContext
+	[OtherContext in Context as OtherContext extends NC
 		? never
 		: `${RemoteInvocationPrefix}${OtherContext}`]?: (
 		...args: any[]
