@@ -27,6 +27,8 @@ type ExecutionContext =
 	| 'GlobalContentScript'
 	| 'WhisperingContentScript';
 
+type AnyFunction = (...args: any[]) => any;
+
 /**
  * Represents the configuration for a command.
  *
@@ -48,8 +50,10 @@ type ExecutionContext =
  * @template NativeContext - The native context where the command runs.
  * @template CommandFn - The function definition of the command.
  */
-type Command<NativeContext extends ExecutionContext, CommandFn extends (...args: any[]) => any> = {
-	[C in ExecutionContext as C extends NativeContext ? `runIn${C}` : never]: CommandFn;
+type Command<NativeContext extends ExecutionContext, CommandFn extends AnyFunction> = {
+	runsIn: NativeContext;
+} & {
+	[K in ExecutionContext as K extends NativeContext ? `runIn${K}` : never]: CommandFn;
 } & {
 	[C in ExecutionContext as C extends NativeContext ? never : `invokeFrom${C}`]?: CommandFn;
 };
@@ -65,6 +69,12 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 const sendMessageToContentScript = <R>(tabId: number, message: any) =>
 	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
 
+type MessageToContext<ContextName extends ExecutionContext> = {
+	[K in keyof Commands as Commands[K]['runsIn'] extends ContextName ? K : never]: {
+		commandName: K;
+		args: Commands[K];
+	};
+};
 const sendMessageToBackground = <R>(message: any) =>
 	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
 
@@ -105,6 +115,7 @@ type Commands = {
 };
 
 const openOptionsPage = {
+	runsIn: 'BackgroundServiceWorker',
 	runInBackgroundServiceWorker: () =>
 		Effect.tryPromise({
 			try: () => chrome.runtime.openOptionsPage(),
@@ -115,12 +126,10 @@ const openOptionsPage = {
 			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 			return response;
 		}),
-} as const satisfies Command<
-	'BackgroundServiceWorker',
-	() => Effect.Effect<void, InvokeCommandError, never>
->;
+} as const satisfies Commands['openOptionsPage'];
 
 const getCurrentTabId = {
+	runsIn: 'BackgroundServiceWorker',
 	runInBackgroundServiceWorker: () =>
 		Effect.gen(function* () {
 			const activeTabs = yield* Effect.tryPromise({
@@ -137,10 +146,7 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies Command<
-	'BackgroundServiceWorker',
-	() => Effect.Effect<void, InvokeCommandError, never>
->;
+} as const satisfies Commands['getCurrentTabId'];
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -155,6 +161,7 @@ const settingsSchema = z.object({
 type Settings = z.infer<typeof settingsSchema>;
 
 const getSettings = {
+	runsIn: 'WhisperingContentScript',
 	runInWhisperingContentScript: () =>
 		getLocalStorage({
 			key: 'whispering-settings',
@@ -178,12 +185,10 @@ const getSettings = {
 			});
 			return response;
 		}),
-} as const satisfies Command<
-	'WhisperingContentScript',
-	() => Effect.Effect<Settings, InvokeCommandError, never>
->;
+} as const satisfies Commands['getSettings'];
 
 const setSettings = {
+	runsIn: 'WhisperingContentScript',
 	runInWhisperingContentScript: (settings: Settings) =>
 		setLocalStorage({
 			key: 'whispering-settings',
@@ -197,12 +202,9 @@ const setSettings = {
 				settings,
 			});
 		}),
-} as const satisfies Command<
-	'WhisperingContentScript',
-	(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
->;
-
+} as const satisfies Commands['setSettings'];
 const toggleRecording = {
+	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = () =>
@@ -273,12 +275,10 @@ const toggleRecording = {
 				commandName: 'toggleRecording',
 			});
 		}),
-} as const satisfies Command<
-	'GlobalContentScript',
-	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
->;
+} as const satisfies Commands['toggleRecording'];
 
 const cancelRecording = {
+	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
@@ -304,12 +304,10 @@ const cancelRecording = {
 				commandName: 'cancelRecording',
 			});
 		}),
-} as const satisfies Command<
-	'GlobalContentScript',
-	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
->;
+} as const satisfies Commands['cancelRecording'];
 
 const sendErrorToast = {
+	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: (toast) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
@@ -320,13 +318,7 @@ const sendErrorToast = {
 
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
-} as const satisfies Command<
-	'GlobalContentScript',
-	(toast: {
-		title: string;
-		description?: string;
-	}) => Effect.Effect<void, InvokeCommandError | ExtensionStorageError, never>
->;
+} as const satisfies Commands['sendErrorToast'];
 
 /**
  * Object containing implementations of various commands.
