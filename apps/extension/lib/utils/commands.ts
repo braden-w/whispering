@@ -21,46 +21,37 @@ const cancelSound = new Audio(cancelSoundSrc);
  *
  * Represents the possible contexts where a command can run.
  */
-type Context =
+type ExecutionContext =
 	| 'Popup'
 	| 'BackgroundServiceWorker'
 	| 'GlobalContentScript'
 	| 'WhisperingContentScript';
 
 /**
- * Prefix used to name the method invokes the command from another context.
- *
- * For example, a command that runs in the context "BackgroundServiceWorker"
- * can be invoked from the context "Popup" the method "invokeFromPopup".
- */
-type RemoteInvocationPrefix = 'invokeFrom';
-
-/**
  * Represents the configuration for a command.
  *
  * This configuration includes:
- * - `runsIn`: Specifies the native context where the command runs.
- * - `runInNativeContext`: A function to directly execute the command within its native context.
- * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
+ * - `runIn[NativeContext]`: Function to directly execute the command in its
+ *   native context.
+ * - `invokeFrom[OtherContexts]`?: Optional functions to invoke the command from
+ *   other contexts.
  *
- * @template NativeContext - The context where the command natively runs.
+ * For example:
+ * - A command `toggleRecrding` that runs in the context "GlobalContentScript"
+ *   can be directly executed from the gobal content script by calling
+ *   `runInGlobalContentScript`.
+ * - The same command can be invoked from the background service worker by calling
+ *   `invokeFromBackgroundServiceWorker`.
+ * - The same command can be invoked from the context "Popup" by calling
+ *   `invokeFromPopup`.
+ *
+ * @template NativeContext - The native context where the command runs.
+ * @template CommandFn - The function definition of the command.
  */
-type ContextConfig<NativeContext extends Context, Fn extends (...args: any[]) => any> = {
-	/**
-	 * The function to directly execute the command from within its native context
-	 * via `runInNativeContext`.
-	 *
-	 * For example, a command that runs in the context "BackgroundServiceWorker"
-	 * can be directly executed in the background service worker by calling
-	 * the method "runInNativeContext".
-	 */
-	[C in Context as C extends NativeContext ? `runIn${C}` : never]: Fn;
+type Command<NativeContext extends ExecutionContext, CommandFn extends (...args: any[]) => any> = {
+	[C in ExecutionContext as C extends NativeContext ? `runIn${C}` : never]: CommandFn;
 } & {
-	/**
-	 * The optional functions to invoke the command from other contexts via
-	 * `invokeFrom[OtherContext]`.
-	 */
-	[C in Context as C extends NativeContext ? never : `${RemoteInvocationPrefix}${C}`]?: Fn;
+	[C in ExecutionContext as C extends NativeContext ? never : `invokeFrom${C}`]?: CommandFn;
 };
 
 /**
@@ -80,31 +71,31 @@ const sendMessageToBackground = <R>(message: any) =>
 // --- Define commands ---
 
 type Commands = {
-	openOptionsPage: ContextConfig<
+	openOptionsPage: Command<
 		'BackgroundServiceWorker',
 		() => Effect.Effect<void, InvokeCommandError, never>
 	>;
-	getCurrentTabId: ContextConfig<
+	getCurrentTabId: Command<
 		'BackgroundServiceWorker',
 		() => Effect.Effect<void, InvokeCommandError, never>
 	>;
-	getSettings: ContextConfig<
+	getSettings: Command<
 		'WhisperingContentScript',
 		() => Effect.Effect<Settings, InvokeCommandError, never>
 	>;
-	setSettings: ContextConfig<
+	setSettings: Command<
 		'WhisperingContentScript',
 		(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
 	>;
-	toggleRecording: ContextConfig<
+	toggleRecording: Command<
 		'GlobalContentScript',
 		() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 	>;
-	cancelRecording: ContextConfig<
+	cancelRecording: Command<
 		'GlobalContentScript',
 		() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 	>;
-	sendErrorToast: ContextConfig<
+	sendErrorToast: Command<
 		'GlobalContentScript',
 		(toast: {
 			title: string;
@@ -124,7 +115,7 @@ const openOptionsPage = {
 			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 			return response;
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'BackgroundServiceWorker',
 	() => Effect.Effect<void, InvokeCommandError, never>
 >;
@@ -146,7 +137,7 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'BackgroundServiceWorker',
 	() => Effect.Effect<void, InvokeCommandError, never>
 >;
@@ -187,7 +178,7 @@ const getSettings = {
 			});
 			return response;
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'WhisperingContentScript',
 	() => Effect.Effect<Settings, InvokeCommandError, never>
 >;
@@ -206,7 +197,7 @@ const setSettings = {
 				settings,
 			});
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'WhisperingContentScript',
 	(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
 >;
@@ -282,7 +273,7 @@ const toggleRecording = {
 				commandName: 'toggleRecording',
 			});
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'GlobalContentScript',
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
@@ -313,7 +304,7 @@ const cancelRecording = {
 				commandName: 'cancelRecording',
 			});
 		}),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'GlobalContentScript',
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
@@ -329,7 +320,7 @@ const sendErrorToast = {
 
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
-} as const satisfies ContextConfig<
+} as const satisfies Command<
 	'GlobalContentScript',
 	(toast: {
 		title: string;
