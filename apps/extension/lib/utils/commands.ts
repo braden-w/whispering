@@ -51,8 +51,6 @@ type AnyFunction = (...args: any[]) => any;
  * @template CommandFn - The function definition of the command.
  */
 type Command<NativeContext extends ExecutionContext, CommandFn extends AnyFunction> = {
-	runsIn: NativeContext;
-} & {
 	[K in ExecutionContext as K extends NativeContext ? `runIn${K}` : never]: CommandFn;
 } & {
 	[C in ExecutionContext as C extends NativeContext ? never : `invokeFrom${C}`]?: CommandFn;
@@ -70,11 +68,14 @@ const sendMessageToContentScript = <R>(tabId: number, message: any) =>
 	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
 
 type MessageToContext<ContextName extends ExecutionContext> = {
-	[K in keyof Commands as Commands[K]['runsIn'] extends ContextName ? K : never]: {
+	[K in keyof Commands as Commands[K][`runIn${ContextName}`] extends AnyFunction ? K : never]: {
 		commandName: K;
-		args: Commands[K];
+		args: Parameters<Commands[K][`runIn${ContextName}`]>;
 	};
 };
+
+type a = MessageToContext<'GlobalContentScript'>;
+
 const sendMessageToBackground = <R>(message: any) =>
 	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
 
@@ -115,7 +116,6 @@ type Commands = {
 };
 
 const openOptionsPage = {
-	runsIn: 'BackgroundServiceWorker',
 	runInBackgroundServiceWorker: () =>
 		Effect.tryPromise({
 			try: () => chrome.runtime.openOptionsPage(),
@@ -129,7 +129,6 @@ const openOptionsPage = {
 } as const satisfies Commands['openOptionsPage'];
 
 const getCurrentTabId = {
-	runsIn: 'BackgroundServiceWorker',
 	runInBackgroundServiceWorker: () =>
 		Effect.gen(function* () {
 			const activeTabs = yield* Effect.tryPromise({
@@ -161,7 +160,6 @@ const settingsSchema = z.object({
 type Settings = z.infer<typeof settingsSchema>;
 
 const getSettings = {
-	runsIn: 'WhisperingContentScript',
 	runInWhisperingContentScript: () =>
 		getLocalStorage({
 			key: 'whispering-settings',
@@ -188,7 +186,6 @@ const getSettings = {
 } as const satisfies Commands['getSettings'];
 
 const setSettings = {
-	runsIn: 'WhisperingContentScript',
 	runInWhisperingContentScript: (settings: Settings) =>
 		setLocalStorage({
 			key: 'whispering-settings',
@@ -204,7 +201,6 @@ const setSettings = {
 		}),
 } as const satisfies Commands['setSettings'];
 const toggleRecording = {
-	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = () =>
@@ -278,7 +274,6 @@ const toggleRecording = {
 } as const satisfies Commands['toggleRecording'];
 
 const cancelRecording = {
-	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
@@ -307,7 +302,6 @@ const cancelRecording = {
 } as const satisfies Commands['cancelRecording'];
 
 const sendErrorToast = {
-	runsIn: 'GlobalContentScript',
 	runInGlobalContentScript: (toast) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
