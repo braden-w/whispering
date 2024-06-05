@@ -1,59 +1,60 @@
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Data, Effect } from 'effect';
-import { Storage } from '@plasmohq/storage';
+import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
+import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
+import { recorderStateSchema } from '~lib/services/RecorderService';
+import { commands, type MessageToContext } from '~lib/utils/commands';
 
 class SetIconError extends Data.TaggedError('SetIconError')<{
 	message: string;
 	origError?: unknown;
 }> {}
 
-const storage = new Storage();
-storage.watch({
-	'whispering-recording-state': (c) =>
-		Effect.gen(function* () {
-			const recordingState = c.newValue;
-			switch (recordingState) {
-				case 'IDLE':
-					yield* Effect.tryPromise({
-						try: () => chrome.action.setIcon({ path: studioMicrophone }),
-						catch: () => new SetIconError({ message: 'Error setting icon to studio microphone' }),
-					});
-					break;
-				case 'RECORDING':
-					yield* Effect.tryPromise({
-						try: () => chrome.action.setIcon({ path: redLargeSquare }),
-						catch: () => new SetIconError({ message: 'Error setting icon to red large square' }),
-					});
-					break;
-			}
-		}).pipe(Effect.runSync),
-});
+const syncIconWithExtensionStorage = Effect.gen(function* () {
+	const extensionStorage = yield* ExtensionStorageService;
+	yield* extensionStorage.watch({
+		key: 'whispering-recording-state',
+		schema: recorderStateSchema,
+		callback: (recordingState) =>
+			Effect.gen(function* () {
+				switch (recordingState) {
+					case 'IDLE':
+						yield* Effect.tryPromise({
+							try: () => chrome.action.setIcon({ path: studioMicrophone }),
+							catch: () => new SetIconError({ message: 'Error setting icon to studio microphone' }),
+						});
+					case 'RECORDING':
+						yield* Effect.tryPromise({
+							try: () => chrome.action.setIcon({ path: redLargeSquare }),
+							catch: () => new SetIconError({ message: 'Error setting icon to stop icon' }),
+						});
+				}
+			}),
+	});
+}).pipe(Effect.provide(ExtensionStorageLive), Effect.runSync);
 
-Effect.gen(function* () {
-	chrome.runtime.onInstalled.addListener((details) =>
-		Effect.gen(function* () {
-			if (details.reason === 'install') {
-				yield* invokeCommand.openOptionsPage.fromBackground();
-			}
-		}).pipe(Effect.runSync),
-	);
+chrome.runtime.onInstalled.addListener((details) =>
+	Effect.gen(function* () {
+		if (details.reason === 'install') {
+			yield* commands.openOptionsPage.runInBackgroundServiceWorker();
+		}
+	}).pipe(Effect.runSync),
+);
 
-	chrome.commands.onCommand.addListener((command) =>
+chrome.commands.onCommand.addListener((command) =>
+	Effect.gen(function* () {
+		if (command === 'toggleRecording') {
+			yield* commands.toggleRecording.invokeFromBackgroundServiceWorker();
+		}
+	}).pipe(Effect.runPromise),
+);
+
+const registerListeners = chrome.runtime.onMessage.addListener(
+	(message: MessageToContext<'BackgroundServiceWorker'>) =>
 		Effect.gen(function* () {
-			if (command === 'toggleRecording') {
-				yield* invokeCommand.toggleRecording.fromBackground();
-			}
+			const { commandName, args } = message;
+			const correspondingCommand = commands[commandName];
+			yield* correspondingCommand.runInBackgroundServiceWorker();
 		}).pipe(Effect.runPromise),
-	);
-
-	chrome.runtime.onMessage.addListener((message: MessageToBackgroundRequest) =>
-		Effect.gen(function* () {
-			switch (message.action) {
-				case 'openOptionsPage':
-					yield* invokeCommand.openOptionsPage.fromBackground();
-					break;
-			}
-		}).pipe(Effect.runPromise),
-	);
-}).pipe(Effect.runSync);
+);
