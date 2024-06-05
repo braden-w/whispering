@@ -75,19 +75,40 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
  *
  * @template ContextName - The execution context.
  */
-
 type MessageToContext<ContextName extends ExecutionContext> = {
 	[K in keyof Commands as Commands[K] extends Command<ContextName, infer _CommandFn> ? K : never]: {
 		commandName: K;
 		args: Commands[K] extends Command<ContextName, infer CommandFn> ? Parameters<CommandFn> : never;
 	};
-};
+}[keyof {
+	[K in keyof Commands as Commands[K] extends Command<ContextName, infer _CommandFn>
+		? K
+		: never]: any;
+}];
 
-const sendMessageToContentScript = <R>(tabId: number, message: any) =>
-	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
+const sendMessageToWhisperingContentScript = <
+	Message extends MessageToContext<'WhisperingContentScript'>,
+>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+		return yield* Effect.promise(() =>
+			chrome.runtime.sendMessage<Message, R>(whisperingTabId, message),
+		);
+	});
 
-const sendMessageToBackground = <R>(message: any) =>
-	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
+const sendMessageToGlobalContentScript = <Message extends MessageToContext<'GlobalContentScript'>>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const activeTabId = yield* getActiveTabId();
+		return yield* Effect.promise(() => chrome.tabs.sendMessage<any, R>(activeTabId, message));
+	});
+
+const sendMessageToBackground = <Message extends MessageToContext<'BackgroundServiceWorker'>>(
+	message: Message,
+) => Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
 
 // --- Define commands ---
 
