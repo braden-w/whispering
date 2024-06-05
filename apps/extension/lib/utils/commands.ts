@@ -76,15 +76,26 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
  * @template ContextName - The execution context.
  */
 type MessageToContext<ContextName extends ExecutionContext> = {
-	[K in keyof Commands as Commands[K] extends Command<ContextName, infer _CommandFn> ? K : never]: {
+	[K in ExtractCommandNames<ContextName>]: {
 		commandName: K;
-		args: Commands[K] extends Command<ContextName, infer CommandFn> ? Parameters<CommandFn> : never;
+		args: ExtractCommandArgs<ContextName, K>;
 	};
-}[keyof {
-	[K in keyof Commands as Commands[K] extends Command<ContextName, infer _CommandFn>
-		? K
-		: never]: any;
-}];
+}[ExtractCommandNames<ContextName>];
+
+/**
+ * Gets all the command names that run natively in a given context.
+ */
+type ExtractCommandNames<ContextName extends ExecutionContext> = {
+	[K in keyof Commands]: Commands[K] extends Command<ContextName, infer _CommandFn> ? K : never;
+}[keyof Commands];
+
+/**
+ * Gets the arguments for a given command in a given context.
+ */
+type ExtractCommandArgs<ContextName extends ExecutionContext, CommandName extends keyof Commands> =
+	Commands[CommandName] extends Command<ContextName, infer CommandFn>
+		? Parameters<CommandFn>
+		: never;
 
 const sendMessageToWhisperingContentScript = <
 	Message extends MessageToContext<'WhisperingContentScript'>,
