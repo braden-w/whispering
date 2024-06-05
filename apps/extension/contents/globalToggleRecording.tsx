@@ -1,25 +1,17 @@
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
-import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { RecorderService } from '@/lib/services/RecorderService';
+import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
+import { RecorderStateService } from '@/lib/services/RecorderState';
+import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
 import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
-import { nanoid } from 'nanoid';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
-import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
-import { RecorderStateService } from '~lib/storage/RecorderState';
-import { RecorderStateLive } from '~lib/storage/RecorderStateLive';
-import { SettingsService } from '~lib/storage/Settings';
-import { SettingsLive } from '~lib/storage/SettingsLive';
-import { sendMessageToBackground, type MessageToContentScriptRequest } from '~lib/utils/messaging';
-import { RecorderServiceLiveWeb } from '../../../packages/services/src/implementations/recorder/web';
-import { RecorderService } from '../../../packages/services/src/services/recorder';
-import type { Recording } from '../../../packages/services/src/services/recordings-db';
-
-const startSound = new Audio(startSoundSrc);
-const stopSound = new Audio(stopSoundSrc);
-const cancelSound = new Audio(cancelSoundSrc);
+import { useEffect } from 'react';
+import { z } from 'zod';
+import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
+import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
+import { commands, type MessageToContext } from '~lib/utils/commands';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
@@ -32,112 +24,43 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
-const syncRecorderState = Effect.gen(function* () {
+const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
 	const recorderService = yield* RecorderService;
 	const recorderStateService = yield* RecorderStateService;
 	const initialRecorderState = yield* recorderService.recorderState;
 	yield* recorderStateService.set(initialRecorderState);
-});
-const syncRecorderStateOnLoad = syncRecorderState.pipe(
-	Effect.provide(RecorderStateLive),
-	Effect.provide(RecorderServiceLiveWeb),
-	Effect.runPromise,
-);
+}).pipe(Effect.provide(RecorderStateLive), Effect.provide(RecorderServiceLive), Effect.runPromise);
 
-const registerListeners = Effect.gen(function* () {
-	const recorderService = yield* RecorderService;
-	const recorderStateService = yield* RecorderStateService;
-	const settingsService = yield* SettingsService;
-
-	const checkAndUpdateSelectedAudioInputDevice = () =>
+const registerListeners = chrome.runtime.onMessage.addListener(
+	(message: MessageToContext<'GlobalContentScript'>) =>
 		Effect.gen(function* () {
-			const settings = yield* settingsService.get();
-			const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-			const isSelectedDeviceExists = recordingDevices.some(
-				({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
-			);
-			if (!isSelectedDeviceExists) {
-				// toast.info('Default audio input device not found, selecting first available device');
-				const firstAudioInput = recordingDevices[0].deviceId;
-				yield* settingsService.update((settings) => ({
-					...settings,
-					selectedAudioInputDeviceId: firstAudioInput,
-				}));
-			}
-		}).pipe(
-			Effect.catchAll((error) => {
-				// toast.error(error.message);
-				return Effect.succeed(undefined);
-			}),
-		);
-
-	chrome.runtime.onMessage.addListener((message: MessageToContentScriptRequest) =>
-		Effect.gen(function* () {
-			if (message.action === 'toggle-recording') {
-				const settings = yield* settingsService.get();
-				if (!settings.apiKey) {
-					alert('Please set your API key in the extension options');
-					openOptionsPage();
-					return;
-				}
-				yield* checkAndUpdateSelectedAudioInputDevice();
-				const recorderState = yield* recorderStateService.get();
-				switch (recorderState) {
-					case 'IDLE': {
-						yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
-						if (settings.isPlaySoundEnabled) startSound.play();
-						sendMessageToBackground({ action: 'syncIconToRecorderState', recorderState });
-						yield* Effect.logInfo('Recording started');
-						yield* recorderStateService.set('RECORDING');
-						break;
-					}
-					case 'RECORDING': {
-						const audioBlob = yield* recorderService.stopRecording;
-						if (settings.isPlaySoundEnabled) stopSound.play();
-						sendMessageToBackground({
-							action: 'syncIconToRecorderState',
-							recorderState,
-						});
-						yield* Effect.logInfo('Recording stopped');
-						const newRecording: Recording = {
-							id: nanoid(),
-							title: '',
-							subtitle: '',
-							timestamp: new Date().toISOString(),
-							transcribedText: '',
-							blob: audioBlob,
-							transcriptionStatus: 'UNPROCESSED',
-						};
-						yield* recorderStateService.set('IDLE');
-						// yield* recordings.addRecording(newRecording);
-						// recordings.transcribeRecording(newRecording.id);
-						break;
-					}
-				}
-			}
-		}).pipe(
-			Effect.catchAll((error) => {
-				console.error('🚀 ~ error:', error);
-				// toast.error(error.message);
-				return Effect.succeed(undefined);
-			}),
-			Effect.runPromise,
-		),
-	);
-}).pipe(
-	Effect.provide(SettingsLive),
-	Effect.provide(AppStorageFromContentScriptLive),
-	Effect.provide(RecorderStateLive),
-	Effect.provide(RecorderServiceLiveWeb),
-	Effect.runSync,
+			const { commandName, ...args } = message;
+			const correspondingCommand = commands[commandName];
+			yield* correspondingCommand.runInGlobalContentScript(args);
+		}).pipe(Effect.runPromise),
 );
-
-function openOptionsPage() {
-	sendMessageToBackground({ action: 'openOptionsPage' });
-}
 
 function PlasmoContent() {
 	const { toast } = useToast();
+	useEffect(
+		() =>
+			Effect.gen(function* () {
+				const extensionStorage = yield* ExtensionStorageService;
+				yield* extensionStorage.watch({
+					key: 'whispering-toast',
+					schema: z.object({
+						title: z.string(),
+						description: z.string().optional(),
+					}),
+					callback: (newValue) =>
+						toast({
+							...newValue,
+							variant: 'destructive',
+						}),
+				});
+			}).pipe(Effect.provide(ExtensionStorageLive), Effect.runSync),
+		[],
+	);
 	return (
 		<div className="fixed inset-5">
 			<button onClick={() => toast({ description: 'Recording shortcut pressed' })}> Hello</button>
