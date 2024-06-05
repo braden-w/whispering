@@ -64,9 +64,6 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 	origError?: unknown;
 }> {}
 
-const sendMessageToContentScript = <R>(tabId: number, message: any) =>
-	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
-
 /**
  * Creates a type that, for a given context, gets all the commands that run
  * natively in that context. For each command, it creates a message object
@@ -80,13 +77,14 @@ const sendMessageToContentScript = <R>(tabId: number, message: any) =>
  */
 
 type MessageToContext<ContextName extends ExecutionContext> = {
-	[K in keyof Commands as Commands[K] extends Command<ContextName, infer CommandFn> ? K : never]: {
+	[K in keyof Commands as Commands[K] extends Command<ContextName, infer _CommandFn> ? K : never]: {
 		commandName: K;
 		args: Commands[K] extends Command<ContextName, infer CommandFn> ? Parameters<CommandFn> : never;
 	};
 };
 
-type a = MessageToContext<'GlobalContentScript'>;
+const sendMessageToContentScript = <R>(tabId: number, message: any) =>
+	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
 
 const sendMessageToBackground = <R>(message: any) =>
 	Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
