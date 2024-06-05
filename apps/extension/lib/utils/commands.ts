@@ -122,7 +122,7 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
  *
  * @template ContextName - The execution context.
  */
-type MessageToContext<ContextName extends ExecutionContext> = {
+export type MessageToContext<ContextName extends ExecutionContext> = {
 	[K in ExtractCommandNames<ContextName>]: {
 		commandName: K;
 		args: ExtractCommandArgs<ContextName, K>;
