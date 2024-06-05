@@ -67,10 +67,22 @@ class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
 const sendMessageToContentScript = <R>(tabId: number, message: any) =>
 	Effect.promise(() => chrome.tabs.sendMessage<any, R>(tabId, message));
 
+/**
+ * Creates a type that, for a given context, gets all the commands that run
+ * natively in that context. For each command, it creates a message object
+ * that contains the command name and arguments to be passed to the command.
+ *
+ * For example, `MessageToContext<'BackgroundServiceWorker'>`
+ * creates all message objects containing the command name and arguments
+ * for commands that run in the 'BackgroundServiceWorker' context.
+ *
+ * @template ContextName - The execution context.
+ */
+
 type MessageToContext<ContextName extends ExecutionContext> = {
-	[K in keyof Commands as Commands[K][`runIn${ContextName}`] extends AnyFunction ? K : never]: {
+	[K in keyof Commands as Commands[K] extends Command<ContextName, infer CommandFn> ? K : never]: {
 		commandName: K;
-		args: Parameters<Commands[K][`runIn${ContextName}`]>;
+		args: Commands[K] extends Command<ContextName, infer CommandFn> ? Parameters<CommandFn> : never;
 	};
 };
 
