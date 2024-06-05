@@ -79,6 +79,40 @@ const sendMessageToBackground = <R>(message: any) =>
 
 // --- Define commands ---
 
+type Commands = {
+	openOptionsPage: ContextConfig<
+		'BackgroundServiceWorker',
+		() => Effect.Effect<void, InvokeCommandError, never>
+	>;
+	getCurrentTabId: ContextConfig<
+		'BackgroundServiceWorker',
+		() => Effect.Effect<void, InvokeCommandError, never>
+	>;
+	getSettings: ContextConfig<
+		'WhisperingContentScript',
+		() => Effect.Effect<Settings, InvokeCommandError, never>
+	>;
+	setSettings: ContextConfig<
+		'WhisperingContentScript',
+		(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
+	>;
+	toggleRecording: ContextConfig<
+		'GlobalContentScript',
+		() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
+	>;
+	cancelRecording: ContextConfig<
+		'GlobalContentScript',
+		() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
+	>;
+	sendErrorToast: ContextConfig<
+		'GlobalContentScript',
+		(toast: {
+			title: string;
+			description?: string;
+		}) => Effect.Effect<void, InvokeCommandError | ExtensionStorageError, never>
+	>;
+};
+
 const openOptionsPage = {
 	runInBackgroundServiceWorker: () =>
 		Effect.tryPromise({
@@ -323,7 +357,7 @@ export const commands = {
 	toggleRecording,
 	cancelRecording,
 	sendErrorToast,
-} as const;
+} as const satisfies Commands;
 
 const getLocalStorage = <TSchema extends z.ZodTypeAny>({
 	key,
