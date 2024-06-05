@@ -21,14 +21,61 @@ const cancelSound = new Audio(cancelSoundSrc);
  *
  * Represents the possible contexts where a command can run.
  */
-type ExecutionContext =
-	| 'Popup'
-	| 'BackgroundServiceWorker'
-	| 'GlobalContentScript'
-	| 'WhisperingContentScript';
+const EXECUTION_CONTEXTS = [
+	'Popup',
+	'BackgroundServiceWorker',
+	'GlobalContentScript',
+	'WhisperingContentScript',
+] as const;
+
+type ExecutionContext = (typeof EXECUTION_CONTEXTS)[number];
+
+// type SendMessageToContextFromContext = {
+// 	[K1 in ExecutionContext as `to${K1}`]: {
+// 		[K2 in Exclude<ExecutionContext, K1> as `from${K2}`]: <Message, Result>(
+// 			message: Message,
+// 		) => Effect.Effect<Result, InvokeCommandError, never>;
+// 	};
+// };
+
+// const sendMessage = {
+// 	toPopup: {
+// 		fromBackgroundServiceWorker: () => Effect.succeed(undefined),
+// 		fromGlobalContentScript: () => Effect.succeed(undefined),
+// 		fromWhisperingContentScript: () => Effect.succeed(undefined),
+// 	},
+// 	toBackgroundServiceWorker: {
+// 		fromPopup: () => Effect.succeed(undefined),
+// 		fromGlobalContentScript: () => Effect.succeed(undefined),
+// 		fromWhisperingContentScript: () => Effect.succeed(undefined),
+// 	},
+// 	toGlobalContentScript: {
+// 		fromPopup: () => Effect.succeed(undefined),
+// 		fromBackgroundServiceWorker: () => Effect.succeed(undefined),
+// 		fromWhisperingContentScript: () => Effect.succeed(undefined),
+// 		// GlobalContentScript: <Message>(message: Message) =>
+// 		// 	Effect.gen(function* () {
+// 		// 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+// 		// 		return yield* Effect.promise(() =>
+// 		// 			chrome.tabs.sendMessage<Message, any>(whisperingTabId, message),
+// 		// 		);
+// 		// 	}),
+// 	},
+// 	toWhisperingContentScript: {
+// 		fromPopup: () => Effect.succeed(undefined),
+// 		fromBackgroundServiceWorker: () => Effect.succeed(undefined),
+// 		fromGlobalContentScript: () => Effect.succeed(undefined),
+// 	},
+// 	// <Message>(message: Message) =>
+// 	// Effect.gen(function* () {
+// 	// 	const activeTabId = yield* getActiveTabId();
+// 	// 	return yield* Effect.promise(() =>
+// 	// 		chrome.tabs.sendMessage<Message, any>(activeTabId, message),
+// 	// 	);
+// 	// }),
+// } as const satisfies SendMessageToContextFromContext;
 
 type AnyFunction = (...args: any[]) => any;
-
 /**
  * Represents the configuration for a command.
  *
