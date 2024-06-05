@@ -47,13 +47,9 @@ type RemoteInvocationPrefix = 'invokeFrom';
  * - `runInNativeContext`: A function to directly execute the command within its native context.
  * - `invokeFrom[C]`: An optional function to invoke the command from another context `C`.
  *
- * @template NC - The context where the command natively runs.
+ * @template NativeContext - The context where the command natively runs.
  */
-type ContextConfig<NC extends Context, Fn extends (...args: any[]) => any> = {
-	/**
-	 * The native context where the command runs and is discriminated by.
-	 */
-	runsIn: NC;
+type ContextConfig<NativeContext extends Context, Fn extends (...args: any[]) => any> = {
 	/**
 	 * The function to directly execute the command from within its native context
 	 * via `runInNativeContext`.
@@ -62,24 +58,14 @@ type ContextConfig<NC extends Context, Fn extends (...args: any[]) => any> = {
 	 * can be directly executed in the background service worker by calling
 	 * the method "runInNativeContext".
 	 */
-	runInNativeContext: Fn;
+	[C in Context as C extends NativeContext ? `runIn${C}` : never]: Fn;
 } & {
 	/**
 	 * The optional functions to invoke the command from other contexts via
 	 * `invokeFrom[OtherContext]`.
 	 */
-	[OtherContext in Context as OtherContext extends NC
-		? never
-		: `${RemoteInvocationPrefix}${OtherContext}`]?: Fn;
+	[C in Context as C extends NativeContext ? never : `${RemoteInvocationPrefix}${C}`]?: Fn;
 };
-
-/**
- * Represents the configuration for a command, discriminated by context.
- * This type automatically generates the discriminated union of command configurations for all contexts.
- */
-type CommandConfig<Fn extends (...args: any[]) => any> = {
-	[K in Context]: ContextConfig<K, Fn>;
-}[Context];
 
 /**
  * Error thrown when an invocation of a command fails.
@@ -98,8 +84,7 @@ const sendMessageToBackground = <R>(message: any) =>
 // --- Define commands ---
 
 const openOptionsPage = {
-	runsIn: 'BackgroundServiceWorker',
-	runInNativeContext: () =>
+	runInBackgroundServiceWorker: () =>
 		Effect.tryPromise({
 			try: () => chrome.runtime.openOptionsPage(),
 			catch: (e) => new InvokeCommandError({ message: 'Error opening options page', origError: e }),
@@ -109,11 +94,13 @@ const openOptionsPage = {
 			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
 			return response;
 		}),
-} as const satisfies CommandConfig<() => Effect.Effect<void, InvokeCommandError, never>>;
+} as const satisfies ContextConfig<
+	BackgroundServiceWorkerContext,
+	() => Effect.Effect<void, InvokeCommandError, never>
+>;
 
 const getCurrentTabId = {
-	runsIn: 'BackgroundServiceWorker',
-	runInNativeContext: () =>
+	runInBackgroundServiceWorker: () =>
 		Effect.gen(function* () {
 			const activeTabs = yield* Effect.tryPromise({
 				try: () => chrome.tabs.query({ active: true, currentWindow: true }),
@@ -129,7 +116,10 @@ const getCurrentTabId = {
 			}
 			return firstActiveTab.id;
 		}),
-} as const satisfies CommandConfig<() => Effect.Effect<void, InvokeCommandError, never>>;
+} as const satisfies ContextConfig<
+	BackgroundServiceWorkerContext,
+	() => Effect.Effect<void, InvokeCommandError, never>
+>;
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -144,8 +134,7 @@ const settingsSchema = z.object({
 type Settings = z.infer<typeof settingsSchema>;
 
 const getSettings = {
-	runsIn: 'WhisperingContentScript',
-	runInNativeContext: () =>
+	runInWhisperingContentScript: () =>
 		getLocalStorage({
 			key: 'whispering-settings',
 			schema: settingsSchema,
@@ -168,11 +157,13 @@ const getSettings = {
 			});
 			return response;
 		}),
-} as const satisfies CommandConfig<() => Effect.Effect<Settings, InvokeCommandError, never>>;
+} as const satisfies ContextConfig<
+	WhisperingContentScriptContext,
+	() => Effect.Effect<Settings, InvokeCommandError, never>
+>;
 
 const setSettings = {
-	runsIn: 'WhisperingContentScript',
-	runInNativeContext: (settings: Settings) =>
+	runInWhisperingContentScript: (settings: Settings) =>
 		setLocalStorage({
 			key: 'whispering-settings',
 			value: JSON.stringify(settings),
@@ -185,13 +176,13 @@ const setSettings = {
 				settings,
 			});
 		}),
-} as const satisfies CommandConfig<
+} as const satisfies ContextConfig<
+	WhisperingContentScriptContext,
 	(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
 >;
 
 const toggleRecording = {
-	runsIn: 'GlobalContentScript',
-	runInNativeContext: () =>
+	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = () =>
 				Effect.gen(function* () {
@@ -261,13 +252,13 @@ const toggleRecording = {
 				commandName: 'toggleRecording',
 			});
 		}),
-} as const satisfies CommandConfig<
+} as const satisfies ContextConfig<
+	GlobalContentScriptContext,
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
 
 const cancelRecording = {
-	runsIn: 'GlobalContentScript',
-	runInNativeContext: () =>
+	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
@@ -292,13 +283,13 @@ const cancelRecording = {
 				commandName: 'cancelRecording',
 			});
 		}),
-} as const satisfies CommandConfig<
+} as const satisfies ContextConfig<
+	GlobalContentScriptContext,
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
 
 const sendErrorToast = {
-	runsIn: 'GlobalContentScript',
-	runInNativeContext: (toast) =>
+	runInGlobalContentScript: (toast) =>
 		Effect.gen(function* () {
 			const extensionStorage = yield* ExtensionStorageService;
 			yield* extensionStorage.set({
@@ -308,7 +299,8 @@ const sendErrorToast = {
 
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
-} as const satisfies CommandConfig<
+} as const satisfies ContextConfig<
+	GlobalContentScriptContext,
 	(toast: {
 		title: string;
 		description?: string;
