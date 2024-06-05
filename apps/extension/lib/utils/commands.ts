@@ -90,22 +90,35 @@ type ExtractCommandNames<ContextName extends ExecutionContext> = {
 }[keyof Commands];
 
 /**
- * Gets the arguments for a given command in a given context.
+ * Gets the arguments of the function for a given command.
  */
 type ExtractCommandArgs<ContextName extends ExecutionContext, CommandName extends keyof Commands> =
 	Commands[CommandName] extends Command<ContextName, infer CommandFn>
 		? Parameters<CommandFn>
 		: never;
 
+/**
+ * Gets the return type of the function for a given command.
+ */
+type ExtractCommandReturnType<
+	ContextName extends ExecutionContext,
+	CommandName extends keyof Commands,
+> =
+	Commands[CommandName] extends Command<ContextName, infer CommandFn>
+		? ReturnType<CommandFn>
+		: never;
+
 const sendMessageToWhisperingContentScript = <
-	Message extends MessageToContext<'WhisperingContentScript'>,
+	R,
+	Message extends
+		MessageToContext<'WhisperingContentScript'> = MessageToContext<'WhisperingContentScript'>,
 >(
 	message: Message,
 ) =>
 	Effect.gen(function* () {
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
 		return yield* Effect.promise(() =>
-			chrome.runtime.sendMessage<Message, R>(whisperingTabId, message),
+			chrome.tabs.sendMessage<Message, R>(whisperingTabId, message),
 		);
 	});
 
@@ -114,12 +127,12 @@ const sendMessageToGlobalContentScript = <Message extends MessageToContext<'Glob
 ) =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId();
-		return yield* Effect.promise(() => chrome.tabs.sendMessage<any, R>(activeTabId, message));
+		return yield* Effect.promise(() => chrome.tabs.sendMessage<Message, any>(activeTabId, message));
 	});
 
 const sendMessageToBackground = <Message extends MessageToContext<'BackgroundServiceWorker'>>(
 	message: Message,
-) => Effect.promise(() => chrome.runtime.sendMessage<any, R>(message));
+) => Effect.promise(() => chrome.runtime.sendMessage<Message, any>(message));
 
 // --- Define commands ---
 
@@ -164,10 +177,7 @@ const openOptionsPage = {
 			catch: (e) => new InvokeCommandError({ message: 'Error opening options page', origError: e }),
 		}),
 	invokeFromGlobalContentScript: () =>
-		Effect.gen(function* () {
-			const response = yield* sendMessageToBackground<void>({ commandName: 'openOptionsPage' });
-			return response;
-		}),
+		sendMessageToBackground({ commandName: 'openOptionsPage', args: [] }),
 } as const satisfies Commands['openOptionsPage'];
 
 const getCurrentTabId = {
@@ -218,12 +228,9 @@ const getSettings = {
 			},
 		}),
 	invokeFromGlobalContentScript: () =>
-		Effect.gen(function* () {
-			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			const response = yield* sendMessageToContentScript<Settings>(whisperingTabId, {
-				commandName: 'getSettings',
-			});
-			return response;
+		sendMessageToWhisperingContentScript<Settings>({
+			commandName: 'getSettings',
+			args: [],
 		}),
 } as const satisfies Commands['getSettings'];
 
@@ -234,14 +241,12 @@ const setSettings = {
 			value: JSON.stringify(settings),
 		}),
 	invokeFromGlobalContentScript: (settings: Settings) =>
-		Effect.gen(function* () {
-			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			return yield* sendMessageToContentScript<void>(whisperingTabId, {
-				commandName: 'setSettings',
-				settings,
-			});
+		sendMessageToWhisperingContentScript<void>({
+			commandName: 'setSettings',
+			args: [settings],
 		}),
 } as const satisfies Commands['setSettings'];
+
 const toggleRecording = {
 	runInGlobalContentScript: () =>
 		Effect.gen(function* () {
@@ -300,18 +305,14 @@ const toggleRecording = {
 			}
 		}).pipe(Effect.provide(RecorderServiceLive), Effect.provide(RecorderStateLive)),
 	invokeFromBackgroundServiceWorker: () =>
-		Effect.gen(function* () {
-			const activeTabId = yield* getActiveTabId();
-			yield* sendMessageToContentScript(activeTabId, {
-				commandName: 'toggleRecording',
-			});
+		sendMessageToGlobalContentScript({
+			commandName: 'toggleRecording',
+			args: [],
 		}),
 	invokeFromPopup: () =>
-		Effect.gen(function* () {
-			const activeTabId = yield* getActiveTabId();
-			yield* sendMessageToContentScript(activeTabId, {
-				commandName: 'toggleRecording',
-			});
+		sendMessageToGlobalContentScript({
+			commandName: 'toggleRecording',
+			args: [],
 		}),
 } as const satisfies Commands['toggleRecording'];
 
@@ -328,18 +329,14 @@ const cancelRecording = {
 			yield* recorderStateService.set('IDLE');
 		}).pipe(Effect.provide(RecorderServiceLive), Effect.provide(RecorderStateLive)),
 	invokeFromBackgroundServiceWorker: () =>
-		Effect.gen(function* () {
-			const activeTabId = yield* getActiveTabId();
-			yield* sendMessageToContentScript(activeTabId, {
-				commandName: 'cancelRecording',
-			});
+		sendMessageToGlobalContentScript({
+			commandName: 'cancelRecording',
+			args: [],
 		}),
 	invokeFromPopup: () =>
-		Effect.gen(function* () {
-			const activeTabId = yield* getActiveTabId();
-			yield* sendMessageToContentScript(activeTabId, {
-				commandName: 'cancelRecording',
-			});
+		sendMessageToGlobalContentScript({
+			commandName: 'cancelRecording',
+			args: [],
 		}),
 } as const satisfies Commands['cancelRecording'];
 
@@ -351,7 +348,6 @@ const sendErrorToast = {
 				key: 'whispering-toast',
 				value: toast,
 			});
-
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
 } as const satisfies Commands['sendErrorToast'];
