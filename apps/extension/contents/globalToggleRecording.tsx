@@ -32,11 +32,12 @@ const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
 }).pipe(Effect.provide(RecorderStateLive), Effect.provide(RecorderServiceLive), Effect.runPromise);
 
 const registerListeners = chrome.runtime.onMessage.addListener(
-	(message: MessageToContext<'GlobalContentScript'>) =>
+	(message: MessageToContext<'GlobalContentScript'>, sender, sendResponse) =>
 		Effect.gen(function* () {
-			const { commandName, ...args } = message;
+			const { commandName, args } = message;
 			const correspondingCommand = commands[commandName];
-			yield* correspondingCommand.runInGlobalContentScript(args);
+			sendResponse(yield* correspondingCommand.runInGlobalContentScript(...args));
+			return true; // Will respond asynchronously.
 		}).pipe(Effect.runPromise),
 );
 

@@ -3,10 +3,7 @@ import { openDB, type DBSchema } from 'idb';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { z } from 'zod';
-import { AppStorageFromContentScriptLive } from '~lib/storage/AppStorageLive';
-import { type MessageToContentScriptRequest } from '~lib/utils/messaging';
-import { AppStorageService } from '../../../packages/services/src/services/app-storage';
-import type { Recording } from '../../../packages/services/src/services/recordings-db';
+import { commands, type MessageToContext } from '~lib/utils/commands';
 // import { CHATGPT_DOMAINS } from './chatGptButton';
 
 export const config: PlasmoCSConfig = {
@@ -43,68 +40,13 @@ export const defaultSettings = {
 };
 
 chrome.runtime.onMessage.addListener(
-	(message: MessageToContentScriptRequest, sender, sendResponse) =>
+	(message: MessageToContext<'WhisperingContentScript'>, sender, sendResponse) =>
 		Effect.gen(function* () {
-			const appStorageService = yield* AppStorageService;
-			if (message.action === 'getSettingsFromWhisperingLocalStorage') {
-				const settings: Settings = {
-					isPlaySoundEnabled: yield* appStorageService.get({
-						key: 'whispering-is-play-sound-enabled',
-						schema: z.boolean(),
-						defaultValue: true,
-					}),
-					isCopyToClipboardEnabled: yield* appStorageService.get({
-						key: 'whispering-is-copy-to-clipboard-enabled',
-						schema: z.boolean(),
-						defaultValue: true,
-					}),
-					isPasteContentsOnSuccessEnabled: yield* appStorageService.get({
-						key: 'whispering-is-paste-contents-on-success-enabled',
-						schema: z.boolean(),
-						defaultValue: true,
-					}),
-					apiKey: yield* appStorageService.get({
-						key: 'whispering-api-key',
-						schema: z.string(),
-						defaultValue: '',
-					}),
-					outputLanguage: yield* appStorageService.get({
-						key: 'whispering-output-language',
-						schema: z.string(),
-						defaultValue: 'en',
-					}),
-				};
-				sendResponse(settings);
-			} else if (message.action === 'getLocalStorage') {
-				const { key } = message;
-				const value = yield* appStorageService.get({
-					key,
-					schema: z.string(),
-					defaultValue: '',
-				});
-			} else if (message.action === 'getIndexedDb' || message.action === 'setIndexedDb') {
-				openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-					upgrade(db) {
-						const isRecordingStoreObjectStoreExists = db.objectStoreNames.contains(RECORDING_STORE);
-						if (!isRecordingStoreObjectStoreExists) {
-							db.createObjectStore(RECORDING_STORE, { keyPath: 'id' });
-						}
-					},
-				}).then((db) => {
-					const b = db.getAll(RECORDING_STORE);
-					sendResponse(b);
-					// return b;
-				});
-			}
-			// else if (message.action === 'setLocalStorage') {
-			// storageService.setLocalStorage(message.key, message.value).then(sendResponse);
-			// } else if (message.action === 'getIndexedDB') {
-			// 	storageService.getIndexedDB(message.store, message.key).then(sendResponse);
-			// } else if (message.action === 'setIndexedDB') {
-			// 	storageService.setIndexedDB(message.store, message.key, message.value).then(sendResponse);
-			// }
+			const { commandName, args } = message;
+			const correspondingCommand = commands[commandName];
+			sendResponse(yield* correspondingCommand.runInWhisperingContentScript(...args));
 			return true; // Will respond asynchronously.
-		}).pipe(Effect.provide(AppStorageFromContentScriptLive), Effect.runPromise),
+		}).pipe(Effect.runPromise),
 );
 
 // chrome.runtime.onMessage.addListener(function (message: MessageToContentScriptRequest) {
