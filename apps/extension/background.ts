@@ -1,6 +1,3 @@
-type ContextName = 'BackgroundServiceWorker';
-export type { ContextName as BackgroundServiceWorkerContext };
-
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Data, Effect } from 'effect';

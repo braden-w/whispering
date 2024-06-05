@@ -5,10 +5,6 @@ import { RecorderStateService } from '@/lib/services/RecorderState';
 import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
-import type { BackgroundServiceWorkerContext } from '~background';
-import type { GlobalContentScriptContext } from '~contents/globalToggleRecording';
-import type { WhisperingContentScriptContext } from '~contents/whispering';
-import type { PopupContext } from '~popup';
 
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
@@ -26,10 +22,10 @@ const cancelSound = new Audio(cancelSoundSrc);
  * Represents the possible contexts where a command can run.
  */
 type Context =
-	| PopupContext
-	| BackgroundServiceWorkerContext
-	| GlobalContentScriptContext
-	| WhisperingContentScriptContext;
+	| 'Popup'
+	| 'BackgroundServiceWorker'
+	| 'GlobalContentScript'
+	| 'WhisperingContentScript';
 
 /**
  * Prefix used to name the method invokes the command from another context.
@@ -95,7 +91,7 @@ const openOptionsPage = {
 			return response;
 		}),
 } as const satisfies ContextConfig<
-	BackgroundServiceWorkerContext,
+	'BackgroundServiceWorker',
 	() => Effect.Effect<void, InvokeCommandError, never>
 >;
 
@@ -117,7 +113,7 @@ const getCurrentTabId = {
 			return firstActiveTab.id;
 		}),
 } as const satisfies ContextConfig<
-	BackgroundServiceWorkerContext,
+	'BackgroundServiceWorker',
 	() => Effect.Effect<void, InvokeCommandError, never>
 >;
 
@@ -158,7 +154,7 @@ const getSettings = {
 			return response;
 		}),
 } as const satisfies ContextConfig<
-	WhisperingContentScriptContext,
+	'WhisperingContentScript',
 	() => Effect.Effect<Settings, InvokeCommandError, never>
 >;
 
@@ -177,7 +173,7 @@ const setSettings = {
 			});
 		}),
 } as const satisfies ContextConfig<
-	WhisperingContentScriptContext,
+	'WhisperingContentScript',
 	(settings: Settings) => Effect.Effect<void, InvokeCommandError, never>
 >;
 
@@ -253,7 +249,7 @@ const toggleRecording = {
 			});
 		}),
 } as const satisfies ContextConfig<
-	GlobalContentScriptContext,
+	'GlobalContentScript',
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
 
@@ -284,7 +280,7 @@ const cancelRecording = {
 			});
 		}),
 } as const satisfies ContextConfig<
-	GlobalContentScriptContext,
+	'GlobalContentScript',
 	() => Effect.Effect<void, InvokeCommandError | ExtensionStorageError | RecorderError, never>
 >;
 
@@ -300,7 +296,7 @@ const sendErrorToast = {
 			// toast.error(message);
 		}).pipe(Effect.provide(ExtensionStorageLive)),
 } as const satisfies ContextConfig<
-	GlobalContentScriptContext,
+	'GlobalContentScript',
 	(toast: {
 		title: string;
 		description?: string;

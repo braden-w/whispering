@@ -1,6 +1,3 @@
-type ContextName = 'Popup';
-export type { ContextName as PopupContext };
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
