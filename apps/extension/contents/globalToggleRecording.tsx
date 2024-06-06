@@ -41,7 +41,7 @@ const registerListeners = chrome.runtime.onMessage.addListener(
 		}).pipe(Effect.runPromise),
 );
 
-function PlasmoContent() {
+function ErrorToast() {
 	const { toast } = useToast();
 	useEffect(
 		() =>
@@ -65,4 +65,4 @@ function PlasmoContent() {
 	return <Toaster />;
 }
 
-export default PlasmoContent;
+export default ErrorToast;
