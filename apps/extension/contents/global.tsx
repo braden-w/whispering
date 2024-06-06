@@ -161,7 +161,7 @@ const _registerListeners = chrome.runtime.onMessage.addListener(
 			});
 			sendResponse(response);
 		});
-		program.pipe(Effect.runPromise);
+		program.pipe(Effect.provide(ExtensionStorageLive), Effect.runPromise);
 		return true; // Will respond asynchronously.
 	},
 );
