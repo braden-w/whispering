@@ -45,7 +45,6 @@ export const globalContentScriptCommands = {
 							commandName: 'getSettings',
 							args: [],
 						});
-
 						yield* sendMessageToWhisperingContentScript({
 							commandName: 'setSettings',
 							args: [
