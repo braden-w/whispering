@@ -4,6 +4,7 @@ import { RecorderService } from '@/lib/services/RecorderService';
 import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
 import { RecorderStateService } from '@/lib/services/RecorderState';
 import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
+import { Console } from 'effect';
 import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
@@ -29,16 +30,26 @@ const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
 	const recorderStateService = yield* RecorderStateService;
 	const initialRecorderState = yield* recorderService.recorderState;
 	yield* recorderStateService.set(initialRecorderState);
+	yield* Console.info('Synced recorder state with media recorder state on load', {
+		initialRecorderState,
+	});
 }).pipe(Effect.provide(RecorderStateLive), Effect.provide(RecorderServiceLive), Effect.runPromise);
 
-const registerListeners = chrome.runtime.onMessage.addListener(
-	(message: MessageToContext<'GlobalContentScript'>, sender, sendResponse) =>
-		Effect.gen(function* () {
+const _registerListeners = chrome.runtime.onMessage.addListener(
+	(message: MessageToContext<'GlobalContentScript'>, sender, sendResponse) => {
+		const program = Effect.gen(function* () {
 			const { commandName, args } = message;
+			yield* Console.info('Received message in global content script', { commandName, args });
 			const correspondingCommand = commands[commandName];
-			sendResponse(yield* correspondingCommand.runInGlobalContentScript(...args));
-			return true; // Will respond asynchronously.
-		}).pipe(Effect.runPromise),
+			const response = yield* correspondingCommand.runInGlobalContentScript(...args);
+			yield* Console.info(`Responding to invoked command ${commandName} in global content script`, {
+				response,
+			});
+			sendResponse(response);
+		});
+		program.pipe(Effect.runPromise);
+		return true; // Will respond asynchronously.
+	},
 );
 
 function ErrorToast() {

@@ -1,3 +1,4 @@
+import { Console } from 'effect';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Data, Effect } from 'effect';
@@ -42,13 +43,15 @@ chrome.runtime.onInstalled.addListener((details) =>
 	}).pipe(Effect.runSync),
 );
 
-chrome.commands.onCommand.addListener((command) =>
-	Effect.gen(function* () {
-		if (command === 'toggleRecording') {
-			yield* commands.toggleRecording.invokeFromBackgroundServiceWorker();
-		}
-	}).pipe(Effect.runPromise),
-);
+chrome.commands.onCommand.addListener((command) => {
+	if (command !== 'toggleRecording') return false;
+	const program = Effect.gen(function* () {
+		yield* Console.info('Toggling recording from background service worker');
+		yield* commands.toggleRecording.invokeFromBackgroundServiceWorker();
+	});
+	program.pipe(Effect.runPromise);
+	return true; // Will respond asynchronously.
+});
 
 const registerListeners = chrome.runtime.onMessage.addListener(
 	(message: MessageToContext<'BackgroundServiceWorker'>, sender, sendResponse) =>
@@ -58,4 +61,24 @@ const registerListeners = chrome.runtime.onMessage.addListener(
 			sendResponse(yield* correspondingCommand.runInBackgroundServiceWorker(...args));
 			return true; // Will respond asynchronously.
 		}).pipe(Effect.runPromise),
+);
+
+const _registerListeners = chrome.runtime.onMessage.addListener(
+	(message: MessageToContext<'BackgroundServiceWorker'>, sender, sendResponse) => {
+		const program = Effect.gen(function* () {
+			const { commandName, args } = message;
+			yield* Console.info('Received message in BackgroundServiceWorker', { commandName, args });
+			const correspondingCommand = commands[commandName];
+			const response = yield* correspondingCommand.runInBackgroundServiceWorker(...args);
+			yield* Console.info(
+				`Responding to invoked command ${commandName} in BackgroundServiceWorker`,
+				{
+					response,
+				},
+			);
+			sendResponse(response);
+		});
+		program.pipe(Effect.runPromise);
+		return true; // Will respond asynchronously.
+	},
 );
