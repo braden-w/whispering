@@ -27,6 +27,9 @@ const cancelSound = new Audio(cancelSoundSrc);
 export const globalContentScriptCommands = {
 	toggleRecording: () =>
 		Effect.gen(function* () {
+			const recorderService = yield* RecorderService;
+			const recorderStateService = yield* RecorderStateService;
+
 			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
 				const settings = yield* sendMessageToWhisperingContentScript({
 					commandName: 'getSettings',
@@ -59,8 +62,7 @@ export const globalContentScriptCommands = {
 					return Effect.succeed(undefined);
 				}),
 			);
-			const recorderService = yield* RecorderService;
-			const recorderStateService = yield* RecorderStateService;
+
 			const settings = yield* sendMessageToWhisperingContentScript({
 				commandName: 'getSettings',
 				args: [],
