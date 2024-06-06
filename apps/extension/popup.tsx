@@ -5,7 +5,7 @@ import { useStorage } from '@plasmohq/storage/hook';
 import { Effect } from 'effect';
 import type { RecorderState } from '~lib/services/RecorderService';
 import './style.css';
-import { commands } from '~lib/utils/commands';
+import { commands } from '~lib/commands';
 
 function IndexPopup() {
 	return (
