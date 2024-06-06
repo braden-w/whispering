@@ -2,8 +2,7 @@ import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Data, Effect } from 'effect';
 import { sendMessageToGlobalContentScript, type Message } from '~lib/commands';
-import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
-import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
+import { extensionStorage } from '~lib/services/ExtensionStorageLive';
 import { recorderStateSchema } from '~lib/services/RecorderService';
 
 class BackgroundServiceWorkerError extends Data.TaggedError('BackgroundServiceWorkerError')<{
@@ -39,7 +38,6 @@ export const backgroundServiceWorkerCommands = {
 export type BackgroundServiceWorkerMessage = Message<typeof backgroundServiceWorkerCommands>;
 
 const syncIconWithExtensionStorage = Effect.gen(function* () {
-	const extensionStorage = yield* ExtensionStorageService;
 	yield* extensionStorage.watch({
 		key: 'whispering-recording-state',
 		schema: recorderStateSchema,
@@ -63,7 +61,7 @@ const syncIconWithExtensionStorage = Effect.gen(function* () {
 				}
 			}),
 	});
-}).pipe(Effect.provide(ExtensionStorageLive), Effect.runSync);
+}).pipe(Effect.runSync);
 
 chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {

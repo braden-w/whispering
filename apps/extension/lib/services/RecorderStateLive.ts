@@ -1,25 +1,23 @@
 import { Effect, Layer } from 'effect';
-import { ExtensionStorageService } from './ExtensionStorage';
-import { ExtensionStorageLive } from './ExtensionStorageLive';
-import { RecorderStateService } from './RecorderState';
+import { extensionStorage } from './storage';
 import { recorderStateSchema } from './RecorderService';
+import { RecorderStateService } from './RecorderState';
 
 export const RecorderStateLive = Layer.effect(
 	RecorderStateService,
 	Effect.gen(function* () {
-		const extensionStorageService = yield* ExtensionStorageService;
 		return {
 			get: () =>
-				extensionStorageService.get({
+				extensionStorage.get({
 					key: 'whispering-recording-state',
 					schema: recorderStateSchema,
 					defaultValue: 'IDLE',
 				}),
 			set: (value) =>
-				extensionStorageService.set({
+				extensionStorage.set({
 					key: 'whispering-recording-state',
 					value,
 				}),
 		};
 	}),
-).pipe(Layer.provide(ExtensionStorageLive));
+);

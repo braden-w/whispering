@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import { Context } from 'effect';
-import { ExtensionStorageError } from './ExtensionStorage';
+import { ExtensionStorageError } from './storage';
 import type { RecorderState } from './RecorderService';
 
 export class RecorderStateService extends Context.Tag('RecorderStateService')<

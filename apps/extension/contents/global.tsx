@@ -17,8 +17,7 @@ import {
 	sendMessageToWhisperingContentScript,
 	type Message,
 } from '~lib/commands';
-import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
-import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
+import { extensionStorage } from '~lib/services/ExtensionStorageLive';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
@@ -33,7 +32,6 @@ export const globalContentScriptCommands = {
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
-			const extensionStorageService = yield* ExtensionStorageService;
 
 			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
 				const settings = yield* sendMessageToWhisperingContentScript({
@@ -81,7 +79,7 @@ export const globalContentScriptCommands = {
 				});
 				return;
 			}
-			const recordingTabId = yield* extensionStorageService.get({
+			const recordingTabId = yield* extensionStorage.get({
 				key: 'whispering-recording-tab-id',
 				schema: z.string(),
 				defaultValue: String(currentTab?.id) ?? '',
@@ -161,7 +159,7 @@ const _registerListeners = chrome.runtime.onMessage.addListener(
 			});
 			sendResponse(response);
 		});
-		program.pipe(Effect.provide(ExtensionStorageLive), Effect.runPromise);
+		program.pipe(Effect.runPromise);
 		return true; // Will respond asynchronously.
 	},
 );
@@ -171,7 +169,6 @@ function ErrorToast() {
 	useEffect(
 		() =>
 			Effect.gen(function* () {
-				const extensionStorage = yield* ExtensionStorageService;
 				yield* extensionStorage.watch({
 					key: 'whispering-toast',
 					schema: z.object({
@@ -184,7 +181,7 @@ function ErrorToast() {
 							variant: 'destructive',
 						}),
 				});
-			}).pipe(Effect.provide(ExtensionStorageLive), Effect.runSync),
+			}).pipe(Effect.runSync),
 		[],
 	);
 	return <Toaster />;
