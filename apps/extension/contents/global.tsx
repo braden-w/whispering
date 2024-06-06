@@ -20,6 +20,10 @@ import {
 import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
 import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 
+export const config: PlasmoCSConfig = {
+	matches: ['<all_urls>'],
+	all_frames: true,
+};
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
@@ -29,6 +33,7 @@ export const globalContentScriptCommands = {
 		Effect.gen(function* () {
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
+			const extensionStorageService = yield* ExtensionStorageService;
 
 			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
 				const settings = yield* sendMessageToWhisperingContentScript({
@@ -63,6 +68,7 @@ export const globalContentScriptCommands = {
 				}),
 			);
 
+			const currentTab = yield* Effect.promise(() => chrome.tabs.getCurrent());
 			const settings = yield* sendMessageToWhisperingContentScript({
 				commandName: 'getSettings',
 				args: [],
@@ -73,6 +79,16 @@ export const globalContentScriptCommands = {
 					commandName: 'openOptionsPage',
 					args: [],
 				});
+				return;
+			}
+			const recordingTabId = yield* extensionStorageService.get({
+				key: 'whispering-recording-tab-id',
+				schema: z.string(),
+				defaultValue: String(currentTab?.id) ?? '',
+			});
+			if (recordingTabId) {
+				yield* Effect.promise(() => chrome.tabs.update(Number(recordingTabId), { active: true }));
+				alert('You are already recording in another tab');
 				return;
 			}
 			yield* checkAndUpdateSelectedAudioInputDevice;
@@ -116,11 +132,6 @@ export const globalContentScriptCommands = {
 } as const;
 
 export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
-
-export const config: PlasmoCSConfig = {
-	matches: ['<all_urls>'],
-	// exclude_matches: CHATGPT_DOMAINS,
-};
 
 export const getStyle: PlasmoGetStyle = () => {
 	const style = document.createElement('style');
