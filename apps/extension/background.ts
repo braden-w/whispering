@@ -53,16 +53,6 @@ chrome.commands.onCommand.addListener((command) => {
 	return true; // Will respond asynchronously.
 });
 
-const registerListeners = chrome.runtime.onMessage.addListener(
-	(message: MessageToContext<'BackgroundServiceWorker'>, sender, sendResponse) =>
-		Effect.gen(function* () {
-			const { commandName, args } = message;
-			const correspondingCommand = commands[commandName];
-			sendResponse(yield* correspondingCommand.runInBackgroundServiceWorker(...args));
-			return true; // Will respond asynchronously.
-		}).pipe(Effect.runPromise),
-);
-
 const _registerListeners = chrome.runtime.onMessage.addListener(
 	(message: MessageToContext<'BackgroundServiceWorker'>, sender, sendResponse) => {
 		const program = Effect.gen(function* () {
