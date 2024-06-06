@@ -13,6 +13,7 @@
 		"hotkeys-js": "^3.13.7",
 		"idb": "^8.0.0",
 		"svelte-sonner": "^0.3.24",
-		"typescript": "^5.4.5"
+		"typescript": "^5.4.5",
+		"zod": "^3.23.8"
 	}
 }
