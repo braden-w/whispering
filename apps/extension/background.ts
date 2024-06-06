@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener((details) =>
 		if (details.reason === 'install') {
 			yield* commands.openOptionsPage.runInBackgroundServiceWorker();
 		}
-	}).pipe(Effect.runSync),
+	}).pipe(Effect.runPromise),
 );
 
 chrome.commands.onCommand.addListener((command) => {
@@ -50,7 +50,6 @@ chrome.commands.onCommand.addListener((command) => {
 		yield* commands.toggleRecording.invokeFromBackgroundServiceWorker();
 	});
 	program.pipe(Effect.runPromise);
-	return true; // Will respond asynchronously.
 });
 
 const _registerListeners = chrome.runtime.onMessage.addListener(
