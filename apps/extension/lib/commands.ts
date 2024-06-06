@@ -1,4 +1,4 @@
-import { Data, Effect, Option } from 'effect';
+import { Console, Data, Effect, Option } from 'effect';
 import type { BackgroundServiceWorkerMessage, backgroundServiceWorkerCommands } from '~background';
 import type { GlobalContentScriptMessage, globalContentScriptCommands } from '~contents/global';
 import type { WhisperingMessage, whisperingCommands } from '~contents/whispering';
@@ -26,12 +26,16 @@ export const sendMessageToWhisperingContentScript = <Message extends WhisperingM
 ) =>
 	Effect.gen(function* () {
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		return yield* Effect.promise(() =>
+		yield* Console.info('Whispering tab ID:', whisperingTabId);
+		yield* Console.info('Sending message to Whispering content script:', message);
+		const response = yield* Effect.promise(() =>
 			chrome.tabs.sendMessage<
 				Message,
 				Effect.Effect.Success<ReturnType<(typeof whisperingCommands)[Message['commandName']]>>
 			>(whisperingTabId, message),
 		);
+		yield* Console.info('Response from Whispering content script:', response);
+		return response;
 	});
 
 export const sendMessageToGlobalContentScript = <Message extends GlobalContentScriptMessage>(
@@ -39,7 +43,9 @@ export const sendMessageToGlobalContentScript = <Message extends GlobalContentSc
 ) =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId();
-		return yield* Effect.promise(() =>
+		yield* Console.info('Active tab ID:', activeTabId);
+		yield* Console.info('Sending message to global content script:', message);
+		const response = yield* Effect.promise(() =>
 			chrome.tabs.sendMessage<
 				Message,
 				Effect.Effect.Success<
@@ -47,19 +53,26 @@ export const sendMessageToGlobalContentScript = <Message extends GlobalContentSc
 				>
 			>(activeTabId, message),
 		);
+		yield* Console.info('Response from global content script:', response);
+		return response;
 	});
 
 export const sendMessageToBackground = <Message extends BackgroundServiceWorkerMessage>(
 	message: Message,
 ) =>
-	Effect.promise(() =>
-		chrome.runtime.sendMessage<
-			Message,
-			Effect.Effect.Success<
-				ReturnType<(typeof backgroundServiceWorkerCommands)[Message['commandName']]>
-			>
-		>(message),
-	);
+	Effect.gen(function* () {
+		yield* Console.info('Sending message to background service worker:', message);
+		const response = yield* Effect.promise(() =>
+			chrome.runtime.sendMessage<
+				Message,
+				Effect.Effect.Success<
+					ReturnType<(typeof backgroundServiceWorkerCommands)[Message['commandName']]>
+				>
+			>(message),
+		);
+		yield* Console.info('Response from background service worker:', response);
+		return response;
+	});
 
 // const sendErrorToast = {
 // 	runInGlobalContentScript: (toast) =>
