@@ -62,12 +62,7 @@ function PlasmoContent() {
 			}).pipe(Effect.provide(ExtensionStorageLive), Effect.runSync),
 		[],
 	);
-	return (
-		<div className="fixed inset-5">
-			<button onClick={() => toast({ description: 'Recording shortcut pressed' })}> Hello</button>
-			<Toaster />
-		</div>
-	);
+	return <Toaster />;
 }
 
 export default PlasmoContent;
