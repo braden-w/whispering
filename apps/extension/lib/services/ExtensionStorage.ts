@@ -7,7 +7,11 @@ export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageErr
 	origError?: unknown;
 }> {}
 
-type ExtensionKey = 'whispering-recording-state' | 'whispering-toast' | 'whispering-settings';
+type ExtensionKey =
+	| 'whispering-recording-state'
+	| 'whispering-toast'
+	| 'whispering-settings'
+	| 'whispering-recording-tab-id';
 
 export class ExtensionStorageService extends Context.Tag('ExtensionStorageService')<
 	ExtensionStorageService,
