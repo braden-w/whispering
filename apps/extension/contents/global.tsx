@@ -1,9 +1,5 @@
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
-import { RecorderService } from '@/lib/services/RecorderService';
-import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
-import { RecorderStateService } from '@/lib/services/RecorderState';
-import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
 import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
@@ -17,7 +13,9 @@ import {
 	sendMessageToWhisperingContentScript,
 	type Message,
 } from '~lib/commands';
-import { extensionStorage } from '~lib/services/ExtensionStorageLive';
+import { recorderService } from '~lib/services/recorder';
+import { recorderStateService } from '~lib/services/recorderStateService';
+import { extensionStorage } from '~lib/services/storage';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
@@ -30,9 +28,6 @@ const cancelSound = new Audio(cancelSoundSrc);
 export const globalContentScriptCommands = {
 	toggleRecording: () =>
 		Effect.gen(function* () {
-			const recorderService = yield* RecorderService;
-			const recorderStateService = yield* RecorderStateService;
-
 			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
 				const settings = yield* sendMessageToWhisperingContentScript({
 					commandName: 'getSettings',
@@ -112,11 +107,9 @@ export const globalContentScriptCommands = {
 					yield* Effect.logError('Invalid recorder state');
 				}
 			}
-		}).pipe(Effect.provide(RecorderServiceLive), Effect.provide(RecorderStateLive)),
+		}),
 	cancelRecording: () =>
 		Effect.gen(function* () {
-			const recorderService = yield* RecorderService;
-			const recorderStateService = yield* RecorderStateService;
 			const settings = yield* sendMessageToWhisperingContentScript({
 				commandName: 'getSettings',
 				args: [],
@@ -126,7 +119,7 @@ export const globalContentScriptCommands = {
 			if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 			yield* Effect.logInfo('Recording cancelled');
 			yield* recorderStateService.set('IDLE');
-		}).pipe(Effect.provide(RecorderServiceLive), Effect.provide(RecorderStateLive)),
+		}),
 } as const;
 
 export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
@@ -138,14 +131,12 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
-	const recorderService = yield* RecorderService;
-	const recorderStateService = yield* RecorderStateService;
 	const initialRecorderState = yield* recorderService.recorderState;
 	yield* recorderStateService.set(initialRecorderState);
 	yield* Console.info('Synced recorder state with media recorder state on load', {
 		initialRecorderState,
 	});
-}).pipe(Effect.provide(RecorderStateLive), Effect.provide(RecorderServiceLive), Effect.runPromise);
+}).pipe(Effect.runPromise);
 
 const _registerListeners = chrome.runtime.onMessage.addListener(
 	(message: GlobalContentScriptMessage, sender, sendResponse) => {

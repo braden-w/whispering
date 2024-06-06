@@ -2,8 +2,8 @@ import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Data, Effect } from 'effect';
 import { sendMessageToGlobalContentScript, type Message } from '~lib/commands';
-import { extensionStorage } from '~lib/services/ExtensionStorageLive';
-import { recorderStateSchema } from '~lib/services/RecorderService';
+import { recorderStateSchema } from '~lib/services/recorder';
+import { extensionStorage } from '~lib/services/storage';
 
 class BackgroundServiceWorkerError extends Data.TaggedError('BackgroundServiceWorkerError')<{
 	message: string;

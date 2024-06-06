@@ -87,4 +87,4 @@ export const extensionStorage = {
 					origError: error,
 				}),
 		}),
-};
+} as const;
