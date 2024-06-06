@@ -1,25 +1,24 @@
-import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
 import { RecorderService } from '@/lib/services/RecorderService';
 import { RecorderServiceLive } from '@/lib/services/RecorderServiceLive';
 import { RecorderStateService } from '@/lib/services/RecorderState';
 import { RecorderStateLive } from '@/lib/services/RecorderStateLive';
-import { Console } from 'effect';
+import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
+import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import cssText from 'data-text:~/style.css';
-import { Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
-import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 import {
 	sendMessageToBackground,
 	sendMessageToWhisperingContentScript,
 	type Message,
 } from '~lib/commands';
+import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
+import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -63,7 +62,10 @@ export const globalContentScriptCommands = {
 				);
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
-			const settings = { apiKey: '', selectedAudioInputDeviceId: '', isPlaySoundEnabled: true };
+			const settings = yield* sendMessageToWhisperingContentScript({
+				commandName: 'getSettings',
+				args: [],
+			});
 			if (!settings.apiKey) {
 				alert('Please set your API key in the extension options');
 				yield* sendMessageToBackground({
