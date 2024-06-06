@@ -154,39 +154,6 @@ type ExtractCommandReturnType<
 		? ReturnType<CommandFn>
 		: never;
 
-const sendMessageToWhisperingContentScript = <
-	R,
-	Message extends
-		MessageToContext<'WhisperingContentScript'> = MessageToContext<'WhisperingContentScript'>,
->(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		return yield* Effect.promise(() =>
-			chrome.tabs.sendMessage<Message, R>(whisperingTabId, message),
-		);
-	});
-
-const sendMessageToGlobalContentScript = <
-	R,
-	Message extends MessageToContext<'GlobalContentScript'>,
->(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		const activeTabId = yield* getActiveTabId();
-		return yield* Effect.promise(() => chrome.tabs.sendMessage<Message, R>(activeTabId, message));
-	});
-
-const sendMessageToBackground = <
-	R,
-	Message extends
-		MessageToContext<'BackgroundServiceWorker'> = MessageToContext<'BackgroundServiceWorker'>,
->(
-	message: Message,
-) => Effect.promise(() => chrome.runtime.sendMessage<Message, R>(message));
-
 // --- Define commands ---
 
 type Commands = {
@@ -222,6 +189,39 @@ type Commands = {
 		}) => Effect.Effect<void, InvokeCommandError | ExtensionStorageError, never>
 	>;
 };
+
+const sendMessageToWhisperingContentScript = <
+	R,
+	Message extends
+		MessageToContext<'WhisperingContentScript'> = MessageToContext<'WhisperingContentScript'>,
+>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+		return yield* Effect.promise(() =>
+			chrome.tabs.sendMessage<Message, R>(whisperingTabId, message),
+		);
+	});
+
+const sendMessageToGlobalContentScript = <
+	R,
+	Message extends MessageToContext<'GlobalContentScript'>,
+>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const activeTabId = yield* getActiveTabId();
+		return yield* Effect.promise(() => chrome.tabs.sendMessage<Message, R>(activeTabId, message));
+	});
+
+const sendMessageToBackground = <
+	R,
+	Message extends
+		MessageToContext<'BackgroundServiceWorker'> = MessageToContext<'BackgroundServiceWorker'>,
+>(
+	message: Message,
+) => Effect.promise(() => chrome.runtime.sendMessage<Message, R>(message));
 
 const openOptionsPage = {
 	runInBackgroundServiceWorker: () =>

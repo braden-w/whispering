@@ -5,7 +5,7 @@ import { Data, Effect } from 'effect';
 import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
 import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
 import { recorderStateSchema } from '~lib/services/RecorderService';
-import { commands, type MessageToContext } from '~lib/utils/commands';
+import { commands, type MessageToContext } from '~lib/commands';
 
 class SetIconError extends Data.TaggedError('SetIconError')<{
 	message: string;

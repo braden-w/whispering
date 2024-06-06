@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
 import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
-import { commands, type MessageToContext } from '~lib/utils/commands';
+import { commands, type MessageToContext } from '~lib/commands';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],

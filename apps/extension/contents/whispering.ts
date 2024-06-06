@@ -1,7 +1,7 @@
 // import { type MessageToContentScriptRequest } from '$lib/utils/messaging';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
-import { commands, type MessageToContext } from '~lib/utils/commands';
+import { commands, type MessageToContext } from '~lib/commands';
 
 // import { CHATGPT_DOMAINS } from './chatGptButton';
 
