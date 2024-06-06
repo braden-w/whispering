@@ -27,39 +27,38 @@ const cancelSound = new Audio(cancelSoundSrc);
 export const globalContentScriptCommands = {
 	toggleRecording: () =>
 		Effect.gen(function* () {
-			const checkAndUpdateSelectedAudioInputDevice = () =>
-				Effect.gen(function* () {
-					const settings = yield* sendMessageToWhisperingContentScript({
+			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
+				const settings = yield* sendMessageToWhisperingContentScript({
+					commandName: 'getSettings',
+					args: [],
+				});
+				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
+				const isSelectedDeviceExists = recordingDevices.some(
+					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
+				);
+				if (!isSelectedDeviceExists) {
+					// toast.info('Default audio input device not found, selecting first available device');
+					const firstAudioInput = recordingDevices[0].deviceId;
+					const oldSettings = yield* sendMessageToWhisperingContentScript({
 						commandName: 'getSettings',
 						args: [],
 					});
-					const recordingDevices = yield* recorderService.enumerateRecordingDevices;
-					const isSelectedDeviceExists = recordingDevices.some(
-						({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
-					);
-					if (!isSelectedDeviceExists) {
-						// toast.info('Default audio input device not found, selecting first available device');
-						const firstAudioInput = recordingDevices[0].deviceId;
-						const oldSettings = yield* sendMessageToWhisperingContentScript({
-							commandName: 'getSettings',
-							args: [],
-						});
-						yield* sendMessageToWhisperingContentScript({
-							commandName: 'setSettings',
-							args: [
-								{
-									...oldSettings,
-									selectedAudioInputDeviceId: firstAudioInput,
-								},
-							],
-						});
-					}
-				}).pipe(
-					Effect.catchAll((error) => {
-						// toast.error(error.message);
-						return Effect.succeed(undefined);
-					}),
-				);
+					yield* sendMessageToWhisperingContentScript({
+						commandName: 'setSettings',
+						args: [
+							{
+								...oldSettings,
+								selectedAudioInputDeviceId: firstAudioInput,
+							},
+						],
+					});
+				}
+			}).pipe(
+				Effect.catchAll((error) => {
+					// toast.error(error.message);
+					return Effect.succeed(undefined);
+				}),
+			);
 			const recorderService = yield* RecorderService;
 			const recorderStateService = yield* RecorderStateService;
 			const settings = yield* sendMessageToWhisperingContentScript({
@@ -74,7 +73,7 @@ export const globalContentScriptCommands = {
 				});
 				return;
 			}
-			yield* checkAndUpdateSelectedAudioInputDevice();
+			yield* checkAndUpdateSelectedAudioInputDevice;
 			const recorderState = yield* recorderStateService.get();
 			switch (recorderState) {
 				case 'IDLE': {
