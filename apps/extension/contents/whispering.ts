@@ -1,4 +1,3 @@
-// import { type MessageToContentScriptRequest } from '$lib/utils/messaging';
 import { Console, Data, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { z } from 'zod';

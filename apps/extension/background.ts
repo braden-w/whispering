@@ -1,7 +1,6 @@
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Data, Effect } from 'effect';
-import { globalContentScriptCommands } from '~contents/global';
 import { sendMessageToGlobalContentScript, type Message } from '~lib/commands';
 import { ExtensionStorageService } from '~lib/services/ExtensionStorage';
 import { ExtensionStorageLive } from '~lib/services/ExtensionStorageLive';
