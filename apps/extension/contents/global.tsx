@@ -33,7 +33,7 @@ export const globalContentScriptCommands = {
 					commandName: 'getSettings',
 					args: [],
 				});
-				const recordingDevices = yield* recorderService.enumerateRecordingDevices;
+				const recordingDevices = yield* recorderService.enumerateRecordingDevices();
 				const isSelectedDeviceExists = recordingDevices.some(
 					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
 				);
@@ -115,7 +115,7 @@ export const globalContentScriptCommands = {
 				args: [],
 			});
 			const recorderState = yield* recorderStateService.get();
-			yield* recorderService.cancelRecording;
+			yield* recorderService.cancelRecording();
 			if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 			yield* Effect.logInfo('Recording cancelled');
 			yield* recorderStateService.set('IDLE');
@@ -131,7 +131,7 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
-	const initialRecorderState = yield* recorderService.recorderState;
+	const initialRecorderState = recorderService.recorderState;
 	yield* recorderStateService.set(initialRecorderState);
 	yield* Console.info('Synced recorder state with media recorder state on load', {
 		initialRecorderState,
