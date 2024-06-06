@@ -2,15 +2,6 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
 
-let stream: MediaStream;
-let mediaRecorder: MediaRecorder;
-const recordedChunks: Blob[] = [];
-
-const resetRecorder = () => {
-	recordedChunks.length = 0;
-	stream.getTracks().forEach((track) => track.stop());
-};
-
 export const recorderStateSchema = z.union([
 	z.literal('IDLE'),
 	z.literal('PAUSED'),
@@ -23,21 +14,35 @@ class RecorderError extends Data.TaggedError('RecorderError')<{
 	origError?: unknown;
 }> {}
 
-export const recorderService = {
-	recorderState: Effect.sync(() => {
-		if (!mediaRecorder) return 'IDLE';
-		switch (mediaRecorder.state) {
+class RecorderService {
+	private stream: MediaStream | null = null;
+	private mediaRecorder: MediaRecorder | null = null;
+	private recordedChunks: Blob[] = [];
+
+	private resetRecorder() {
+		this.recordedChunks.length = 0;
+		this.stream?.getTracks().forEach((track) => track.stop());
+		this.stream = null;
+		this.mediaRecorder = null;
+	}
+
+	get recorderState() {
+		if (!this.mediaRecorder) return 'IDLE';
+		switch (this.mediaRecorder.state) {
 			case 'recording':
 				return 'RECORDING';
 			case 'paused':
 				return 'PAUSED';
 			case 'inactive':
 				return 'IDLE';
+			default:
+				return 'IDLE';
 		}
-	}),
-	startRecording: (recordingDeviceId: string) =>
-		Effect.gen(function* () {
-			stream = yield* Effect.tryPromise({
+	}
+
+	startRecording(recordingDeviceId: string) {
+		return Effect.gen(this, function* () {
+			this.stream = yield* Effect.tryPromise({
 				try: () =>
 					navigator.mediaDevices.getUserMedia({
 						audio: { deviceId: { exact: recordingDeviceId } },
@@ -48,38 +53,46 @@ export const recorderService = {
 						origError: error,
 					}),
 			});
-			recordedChunks.length = 0;
-			mediaRecorder = new AudioRecorder(stream);
-			mediaRecorder.addEventListener(
+			this.recordedChunks.length = 0;
+			this.mediaRecorder = new AudioRecorder(this.stream);
+			this.mediaRecorder!.addEventListener(
 				'dataavailable',
 				(event: BlobEvent) => {
 					if (!event.data.size) return;
-					recordedChunks.push(event.data);
+					this.recordedChunks.push(event.data);
 				},
 				{ once: true },
 			);
-			mediaRecorder.start();
-		}),
-	cancelRecording: Effect.sync(() => {
-		if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-			mediaRecorder.stop();
+			this.mediaRecorder!.start();
+		});
+	}
+
+	cancelRecording() {
+		if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+			this.mediaRecorder.stop();
 		}
-		resetRecorder();
-	}),
-	stopRecording: () =>
-		Effect.tryPromise({
+		this.resetRecorder();
+	}
+
+	stopRecording() {
+		return Effect.tryPromise({
 			try: () =>
 				new Promise<Blob>((resolve) => {
-					mediaRecorder.addEventListener(
+					if (!this.mediaRecorder) {
+						throw new RecorderError({
+							message: 'Media recorder is not initialized',
+						});
+					}
+					this.mediaRecorder.addEventListener(
 						'stop',
 						() => {
-							const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+							const audioBlob = new Blob(this.recordedChunks, { type: 'audio/wav' });
 							resolve(audioBlob);
-							resetRecorder();
+							this.resetRecorder();
 						},
 						{ once: true },
 					);
-					mediaRecorder.stop();
+					this.mediaRecorder.stop();
 				}),
 			catch: (error) =>
 				new RecorderError({
@@ -88,22 +101,28 @@ export const recorderService = {
 				}),
 		}).pipe(
 			Effect.catchAll((error) => {
-				resetRecorder();
+				this.resetRecorder();
 				return error;
 			}),
-		),
-	enumerateRecordingDevices: Effect.tryPromise({
-		try: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			stream.getTracks().forEach((track) => track.stop());
-			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-			return audioInputDevices;
-		},
-		catch: (error) =>
-			new RecorderError({
-				message: 'Error enumerating recording devices',
-				origError: error,
-			}),
-	}),
-} as const;
+		);
+	}
+
+	enumerateRecordingDevices() {
+		return Effect.tryPromise({
+			try: async () => {
+				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+				const devices = await navigator.mediaDevices.enumerateDevices();
+				stream.getTracks().forEach((track) => track.stop());
+				const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+				return audioInputDevices;
+			},
+			catch: (error) =>
+				new RecorderError({
+					message: 'Error enumerating recording devices',
+					origError: error,
+				}),
+		});
+	}
+}
+
+export const recorderService = new RecorderService();
