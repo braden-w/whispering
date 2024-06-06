@@ -21,14 +21,12 @@ const cancelSound = new Audio(cancelSoundSrc);
  *
  * Represents the possible contexts where a command can run.
  */
-const EXECUTION_CONTEXTS = [
-	'Popup',
-	'BackgroundServiceWorker',
-	'GlobalContentScript',
-	'WhisperingContentScript',
-] as const;
 
-type ExecutionContext = (typeof EXECUTION_CONTEXTS)[number];
+type ExecutionContext =
+	| 'Popup'
+	| 'BackgroundServiceWorker'
+	| 'GlobalContentScript'
+	| 'WhisperingContentScript';
 
 // type SendMessageToContextFromContext = {
 // 	[K1 in ExecutionContext as `to${K1}`]: {
@@ -76,6 +74,7 @@ type ExecutionContext = (typeof EXECUTION_CONTEXTS)[number];
 // } as const satisfies SendMessageToContextFromContext;
 
 type AnyFunction = (...args: any[]) => any;
+
 /**
  * Represents the configuration for a command.
  *
@@ -169,17 +168,24 @@ const sendMessageToWhisperingContentScript = <
 		);
 	});
 
-const sendMessageToGlobalContentScript = <Message extends MessageToContext<'GlobalContentScript'>>(
+const sendMessageToGlobalContentScript = <
+	R,
+	Message extends MessageToContext<'GlobalContentScript'>,
+>(
 	message: Message,
 ) =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId();
-		return yield* Effect.promise(() => chrome.tabs.sendMessage<Message, any>(activeTabId, message));
+		return yield* Effect.promise(() => chrome.tabs.sendMessage<Message, R>(activeTabId, message));
 	});
 
-const sendMessageToBackground = <Message extends MessageToContext<'BackgroundServiceWorker'>>(
+const sendMessageToBackground = <
+	R,
+	Message extends
+		MessageToContext<'BackgroundServiceWorker'> = MessageToContext<'BackgroundServiceWorker'>,
+>(
 	message: Message,
-) => Effect.promise(() => chrome.runtime.sendMessage<Message, any>(message));
+) => Effect.promise(() => chrome.runtime.sendMessage<Message, R>(message));
 
 // --- Define commands ---
 
