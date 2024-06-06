@@ -1,7 +1,7 @@
 import { Console, Data, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { z } from 'zod';
-import { type Message } from '~lib/commands';
+import type { Message } from '~lib/commands';
 
 // import { CHATGPT_DOMAINS } from './chatGptButton';
 
