@@ -1,5 +1,5 @@
-import { Console, Data, Effect, Option } from 'effect';
-import type { backgroundServiceWorkerCommands } from '~background';
+import { Console, Effect } from 'effect';
+import type { commands } from '~background';
 import type { globalContentScriptCommands } from '~contents/global';
 import type { whisperingCommands } from '~contents/whispering';
 
@@ -14,70 +14,19 @@ export type Message<T extends CommandDefinition> = {
 }[keyof T];
 
 export type WhisperingMessage = Message<typeof whisperingCommands>;
-export type BackgroundServiceWorkerMessage = Message<typeof backgroundServiceWorkerCommands>;
+export type BackgroundServiceWorkerMessage = Message<typeof commands>;
 export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
 export type ExtensionMessage =
 	| WhisperingMessage
 	| BackgroundServiceWorkerMessage
 	| GlobalContentScriptMessage;
 
-/**
- * Error thrown when an invocation of a command fails.
- */
-class InvokeCommandError extends Data.TaggedError('InvokeCommandError')<{
-	message: string;
-	origError?: unknown;
-}> {}
-
-export const sendMessageToWhisperingContentScript = <Message extends WhisperingMessage>(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		yield* Console.info('Whispering tab ID:', whisperingTabId);
-		yield* Console.info('Sending message to Whispering content script:', message);
-		const response = yield* Effect.promise(() =>
-			chrome.tabs.sendMessage<
-				Message,
-				Effect.Effect.Success<ReturnType<(typeof whisperingCommands)[Message['commandName']]>>
-			>(whisperingTabId, message),
-		);
-		yield* Console.info('Response from Whispering content script:', response);
-		return response;
-	});
-
-export const sendMessageToGlobalContentScript = <Message extends GlobalContentScriptMessage>(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		const activeTabId = yield* getActiveTabId();
-		yield* Console.info('Active tab ID:', activeTabId);
-		yield* Console.info('Sending message to global content script:', message);
-		const response = yield* Effect.promise(() =>
-			chrome.tabs.sendMessage<
-				Message,
-				Effect.Effect.Success<
-					ReturnType<(typeof globalContentScriptCommands)[Message['commandName']]>
-				>
-			>(activeTabId, message),
-		);
-		yield* Console.info('Response from global content script:', response);
-		return response;
-	});
-
 export const sendMessageToBackground = <Message extends BackgroundServiceWorkerMessage>(
 	message: Message,
 ) =>
 	Effect.gen(function* () {
 		yield* Console.info('Sending message to background service worker:', message);
-		const response = yield* Effect.promise(() =>
-			chrome.runtime.sendMessage<
-				Message,
-				Effect.Effect.Success<
-					ReturnType<(typeof backgroundServiceWorkerCommands)[Message['commandName']]>
-				>
-			>(message),
-		);
+		const response = yield* Effect.promise(() => chrome.runtime.sendMessage<Message>(message));
 		yield* Console.info('Response from background service worker:', response);
 		return response;
 	});
@@ -106,45 +55,3 @@ export const sendMessageToBackground = <Message extends BackgroundServiceWorkerM
  * commands.getCurrentTabId.invokeFromBackgroundServiceWorker();
  * ```
  */
-const getOrCreateWhisperingTabId = Effect.gen(function* (_) {
-	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
-	if (tabs.length > 0) {
-		for (const tab of tabs) {
-			if (tab.pinned) {
-				return tab.id;
-			}
-		}
-		return tabs[0].id;
-	} else {
-		const newTab = yield* Effect.promise(() =>
-			chrome.tabs.create({
-				url: 'http://localhost:5173',
-				active: false,
-				pinned: true,
-			}),
-		);
-		return newTab.id;
-	}
-}).pipe(
-	Effect.flatMap(Option.fromNullable),
-	Effect.mapError(
-		() => new InvokeCommandError({ message: 'Error getting or creating Whispering tab' }),
-	),
-);
-
-const getActiveTabId = () =>
-	Effect.gen(function* () {
-		const activeTabs = yield* Effect.tryPromise({
-			try: () => chrome.tabs.query({ active: true, currentWindow: true }),
-			catch: (error) =>
-				new InvokeCommandError({
-					message: 'Error getting active tabs',
-					origError: error,
-				}),
-		});
-		const firstActiveTab = activeTabs[0];
-		if (!firstActiveTab.id) {
-			return yield* new InvokeCommandError({ message: 'No active tab ID found' });
-		}
-		return firstActiveTab.id;
-	});
