@@ -81,7 +81,7 @@ export const globalContentScriptCommands = {
 			});
 			if (recordingTabId) {
 				yield* Effect.promise(() => chrome.tabs.update(Number(recordingTabId), { active: true }));
-				alert('You are already recording in another tab');
+				alert('Please stop the recording in the current tab before starting a new one');
 				return;
 			}
 			yield* checkAndUpdateSelectedAudioInputDevice;
