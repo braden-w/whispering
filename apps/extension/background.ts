@@ -1,7 +1,11 @@
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Data, Effect } from 'effect';
-import { sendMessageToGlobalContentScript, type Message } from '~lib/commands';
+import {
+	sendMessageToGlobalContentScript,
+	type BackgroundServiceWorkerMessage,
+	type ExtensionMessage,
+} from '~lib/commands';
 import { recorderStateSchema } from '~lib/services/recorder';
 import { extensionStorage } from '~lib/services/storage';
 
@@ -28,14 +32,12 @@ export const backgroundServiceWorkerCommands = {
 					}),
 			});
 			const firstActiveTab = activeTabs[0];
-			if (!firstActiveTab) {
+			if (!firstActiveTab.id) {
 				return yield* new BackgroundServiceWorkerError({ message: 'No active tab found' });
 			}
 			return firstActiveTab.id;
 		}),
 } as const;
-
-export type BackgroundServiceWorkerMessage = Message<typeof backgroundServiceWorkerCommands>;
 
 const syncIconWithExtensionStorage = Effect.gen(function* () {
 	yield* extensionStorage.watch({
@@ -71,21 +73,32 @@ chrome.runtime.onInstalled.addListener((details) =>
 	}).pipe(Effect.runPromise),
 );
 
-chrome.commands.onCommand.addListener((command) => {
-	if (command !== 'toggleRecording') return false;
-	const program = Effect.gen(function* () {
-		yield* Console.info('Toggling recording from background service worker');
-		yield* sendMessageToGlobalContentScript({ commandName: 'toggleRecording', args: [] });
-	});
-	program.pipe(Effect.runPromise);
-});
+chrome.commands.onCommand.addListener((command) =>
+	Effect.gen(function* () {
+		yield* Console.info('Received command in background service worker', { command });
+		if (command !== 'toggleRecording') return false;
+		const program = Effect.gen(function* () {
+			yield* Console.info('Toggling recording from background service worker');
+			yield* sendMessageToGlobalContentScript({ commandName: 'toggleRecording', args: [] });
+		});
+		program.pipe(Effect.runPromise);
+		return true;
+	}).pipe(Effect.runSync),
+);
+
+const isBackgroundServiceWorkerMessage = (
+	message: ExtensionMessage,
+): message is BackgroundServiceWorkerMessage =>
+	message.commandName in backgroundServiceWorkerCommands;
 
 const _registerListeners = chrome.runtime.onMessage.addListener(
-	(message: BackgroundServiceWorkerMessage, sender, sendResponse) => {
+	(message: ExtensionMessage, sender, sendResponse) => {
 		const program = Effect.gen(function* () {
+			if (!isBackgroundServiceWorkerMessage(message)) return false;
 			const { commandName, args } = message;
 			yield* Console.info('Received message in BackgroundServiceWorker', { commandName, args });
 			const correspondingCommand = backgroundServiceWorkerCommands[commandName];
+			yield* Console.info('Corresponding command:', correspondingCommand);
 			const response = yield* correspondingCommand(...args);
 			yield* Console.info(
 				`Responding to invoked command ${commandName} in BackgroundServiceWorker`,
