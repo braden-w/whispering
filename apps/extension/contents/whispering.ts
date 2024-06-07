@@ -1,6 +1,6 @@
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
-import type { ExtensionMessage, WhisperingMessage } from '~lib/commands';
+import type { ExtensionMessage, Message } from '~lib/commands';
 import { localStorageService, type Settings } from '~lib/services/local-storage';
 
 // import { CHATGPT_DOMAINS } from './chatGptButton';
@@ -31,6 +31,8 @@ export const whisperingCommands = {
 			value: settings,
 		}),
 } as const;
+
+export type WhisperingMessage = Message<typeof whisperingCommands>;
 
 const isWhisperingMessage = (message: ExtensionMessage): message is WhisperingMessage =>
 	message.commandName in whisperingCommands;

@@ -1,10 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import {
-	BackgroundServiceWorkerError,
-	openOptionsPage,
-	type BackgroundServiceWorkerResponse,
-} from '~background';
+import { openOptionsPage, type BackgroundServiceWorkerResponse } from '~background';
 
 export type RequestBody = {};
 

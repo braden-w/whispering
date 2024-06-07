@@ -1,5 +1,5 @@
-import type { globalContentScriptCommands } from '~contents/global';
-import type { whisperingCommands } from '~contents/whispering';
+import type { GlobalContentScriptMessage } from '~contents/global';
+import type { WhisperingMessage } from '~contents/whispering';
 
 type AnyFunction = (...args: any[]) => any;
 type CommandDefinition = Record<string, AnyFunction>;
@@ -11,8 +11,6 @@ export type Message<T extends CommandDefinition> = {
 	};
 }[keyof T];
 
-export type WhisperingMessage = Message<typeof whisperingCommands>;
-export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
 export type ExtensionMessage = WhisperingMessage | GlobalContentScriptMessage;
 
 // const sendErrorToast = {

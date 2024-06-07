@@ -1,9 +1,8 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { Console, Data, Effect, Option } from 'effect';
-import type { globalContentScriptCommands } from '~contents/global';
-import type { whisperingCommands } from '~contents/whispering';
+import type { GlobalContentScriptMessage, globalContentScriptCommands } from '~contents/global';
+import type { WhisperingMessage, whisperingCommands } from '~contents/whispering';
 import { getActiveTabId } from './messages/getActiveTabId';
-import type { GlobalContentScriptMessage, WhisperingMessage } from '~lib/commands';
 
 export type BackgroundServiceWorkerResponse<T> =
 	| {

@@ -123,6 +123,9 @@ export const globalContentScriptCommands = {
 		}),
 } as const;
 
+
+export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
+
 export const getStyle: PlasmoGetStyle = () => {
 	const style = document.createElement('style');
 	style.textContent = cssText;
