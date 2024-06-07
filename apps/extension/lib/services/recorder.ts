@@ -10,8 +10,9 @@ export const recorderStateSchema = z.union([
 export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 class RecorderError extends Data.TaggedError('RecorderError')<{
-	message: string;
-	origError?: unknown;
+	title: string;
+	description?: string;
+	error?: unknown;
 }> {}
 
 class RecorderService {
@@ -49,8 +50,9 @@ class RecorderService {
 					}),
 				catch: (error) =>
 					new RecorderError({
-						message: 'Error getting media stream',
-						origError: error,
+						title: 'Error getting media stream',
+						description: error instanceof Error ? error.message : undefined,
+						error: error,
 					}),
 			});
 			this.recordedChunks.length = 0;
@@ -80,7 +82,7 @@ class RecorderService {
 				new Promise<Blob>((resolve) => {
 					if (!this.mediaRecorder) {
 						throw new RecorderError({
-							message: 'Media recorder is not initialized',
+							title: 'Media recorder is not initialized',
 						});
 					}
 					this.mediaRecorder.addEventListener(
@@ -96,8 +98,8 @@ class RecorderService {
 				}),
 			catch: (error) =>
 				new RecorderError({
-					message: 'Error stopping media recorder and getting audio blob',
-					origError: error,
+					title: 'Error stopping media recorder and getting audio blob',
+					error: error,
 				}),
 		}).pipe(
 			Effect.catchAll((error) => {
@@ -118,8 +120,8 @@ class RecorderService {
 			},
 			catch: (error) =>
 				new RecorderError({
-					message: 'Error enumerating recording devices',
-					origError: error,
+					title: 'Error enumerating recording devices',
+					error: error,
 				}),
 		});
 	}

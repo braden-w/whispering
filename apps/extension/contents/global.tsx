@@ -7,16 +7,15 @@ import cssText from 'data-text:~/style.css';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
-import { z } from 'zod';
-import {
-	sendMessageToBackground,
-	sendMessageToWhisperingContentScript,
-	type ExtensionMessage,
-	type GlobalContentScriptMessage,
-} from '~lib/commands';
+import { sendToBgsw } from '~background';
+import type * as GetActiveTabId from '~background/messages/getActiveTabId';
+import type * as GetSettings from '~background/messages/getSettings';
+import type * as OpenOptionsPage from '~background/messages/openOptionsPage';
+import type * as SetSettings from '~background/messages/setSettings';
+import { type ExtensionMessage, type GlobalContentScriptMessage } from '~lib/commands';
+import { extensionStorage, sendErrorToastViaStorage } from '~lib/services/extension-storage';
 import { recorderService } from '~lib/services/recorder';
 import { recorderStateService } from '~lib/services/recorderStateService';
-import { extensionStorage } from '~lib/services/storage';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
@@ -30,9 +29,8 @@ export const globalContentScriptCommands = {
 	toggleRecording: () =>
 		Effect.gen(function* () {
 			const checkAndUpdateSelectedAudioInputDevice = Effect.gen(function* () {
-				const settings = yield* sendMessageToWhisperingContentScript({
-					commandName: 'getSettings',
-					args: [],
+				const settings = yield* sendToBgsw<GetSettings.RequestBody, GetSettings.ResponseBody>({
+					name: 'getSettings',
 				});
 				const recordingDevices = yield* recorderService.enumerateRecordingDevices();
 				const isSelectedDeviceExists = recordingDevices.some(
@@ -41,46 +39,42 @@ export const globalContentScriptCommands = {
 				if (!isSelectedDeviceExists) {
 					// toast.info('Default audio input device not found, selecting first available device');
 					const firstAudioInput = recordingDevices[0].deviceId;
-					const oldSettings = yield* sendMessageToWhisperingContentScript({
-						commandName: 'getSettings',
-						args: [],
+					const oldSettings = yield* sendToBgsw<GetSettings.RequestBody, GetSettings.ResponseBody>({
+						name: 'getSettings',
 					});
-					yield* sendMessageToWhisperingContentScript({
-						commandName: 'setSettings',
-						args: [
-							{
+					yield* sendToBgsw<SetSettings.RequestBody, SetSettings.ResponseBody>({
+						name: 'setSettings',
+						body: {
+							settings: {
 								...oldSettings,
 								selectedAudioInputDeviceId: firstAudioInput,
 							},
-						],
+						},
 					});
 				}
 			}).pipe(
-				Effect.catchAll((error) => {
-					// toast.error(error.message);
-					return Effect.succeed(undefined);
-				}),
+				Effect.catchAll((error) =>
+					Effect.gen(function* () {
+						yield* sendErrorToastViaStorage(error);
+					}),
+				),
 			);
-
-			const settings = yield* sendMessageToWhisperingContentScript({
-				commandName: 'getSettings',
-				args: [],
+			const settings = yield* sendToBgsw<GetSettings.RequestBody, GetSettings.ResponseBody>({
+				name: 'getSettings',
 			});
 			if (!settings.apiKey) {
 				alert('Please set your API key in the extension options');
-				yield* sendMessageToBackground({
-					commandName: 'openOptionsPage',
-					args: [],
+				yield* sendToBgsw<OpenOptionsPage.RequestBody, OpenOptionsPage.ResponseBody>({
+					name: 'openOptionsPage',
 				});
 				return;
 			}
-			const activeTabId = yield* sendMessageToBackground({
-				commandName: 'getCurrentTabId',
-				args: [],
-			});
+			const activeTabId = yield* sendToBgsw<
+				GetActiveTabId.RequestBody,
+				GetActiveTabId.ResponseBody
+			>({ name: 'getActiveTabId' });
 			const recordingTabId = yield* extensionStorage.get({
 				key: 'whispering-recording-tab-id',
-				schema: z.string(),
 				defaultValue: String(activeTabId),
 			});
 			if (recordingTabId) {
@@ -109,12 +103,17 @@ export const globalContentScriptCommands = {
 					yield* Effect.logError('Invalid recorder state');
 				}
 			}
-		}),
+		}).pipe(
+			Effect.catchAll((error) =>
+				Effect.gen(function* () {
+					yield* sendErrorToastViaStorage(error);
+				}),
+			),
+		),
 	cancelRecording: () =>
 		Effect.gen(function* () {
-			const settings = yield* sendMessageToWhisperingContentScript({
-				commandName: 'getSettings',
-				args: [],
+			const settings = yield* sendToBgsw<GetSettings.RequestBody, GetSettings.ResponseBody>({
+				name: 'getSettings',
 			});
 			const recorderState = yield* recorderStateService.get();
 			recorderService.cancelRecording();
@@ -167,15 +166,7 @@ function ErrorToast() {
 			Effect.gen(function* () {
 				yield* extensionStorage.watch({
 					key: 'whispering-toast',
-					schema: z.object({
-						title: z.string(),
-						description: z.string().optional(),
-					}),
-					callback: (newValue) =>
-						toast({
-							...newValue,
-							variant: 'destructive',
-						}),
+					callback: (newValue) => toast(newValue),
 				});
 			}).pipe(Effect.runSync),
 		[],

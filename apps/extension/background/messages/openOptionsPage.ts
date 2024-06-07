@@ -1,6 +1,10 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { Effect } from 'effect';
-import { BackgroundServiceWorkerError, type BackgroundServiceWorkerResponse } from '~background';
+import { Console, Effect } from 'effect';
+import {
+	BackgroundServiceWorkerError,
+	openOptionsPage,
+	type BackgroundServiceWorkerResponse,
+} from '~background';
 
 export type RequestBody = {};
 
@@ -8,15 +12,8 @@ export type ResponseBody = BackgroundServiceWorkerResponse<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		yield* Effect.tryPromise({
-			try: () => chrome.runtime.openOptionsPage(),
-			catch: (error) =>
-				new BackgroundServiceWorkerError({
-					title: 'Error opening options page',
-					description: error instanceof Error ? error.message : undefined,
-					error,
-				}),
-		});
+		yield* Console.info('BackgroundServiceWorker: openOptionsPage');
+		yield* openOptionsPage;
 		return true as const;
 	}).pipe(
 		Effect.map((data) => ({ data, error: null })),

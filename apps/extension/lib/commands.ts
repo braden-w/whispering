@@ -1,4 +1,3 @@
-import { Console, Effect } from 'effect';
 import type { globalContentScriptCommands } from '~contents/global';
 import type { whisperingCommands } from '~contents/whispering';
 
@@ -13,22 +12,8 @@ export type Message<T extends CommandDefinition> = {
 }[keyof T];
 
 export type WhisperingMessage = Message<typeof whisperingCommands>;
-export type BackgroundServiceWorkerMessage = Message<typeof commands>;
 export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
-export type ExtensionMessage =
-	| WhisperingMessage
-	| BackgroundServiceWorkerMessage
-	| GlobalContentScriptMessage;
-
-export const sendMessageToBackground = <Message extends BackgroundServiceWorkerMessage>(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		yield* Console.info('Sending message to background service worker:', message);
-		const response = yield* Effect.promise(() => chrome.runtime.sendMessage<Message>(message));
-		yield* Console.info('Response from background service worker:', response);
-		return response;
-	});
+export type ExtensionMessage = WhisperingMessage | GlobalContentScriptMessage;
 
 // const sendErrorToast = {
 // 	runInGlobalContentScript: (toast) =>

@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStorage } from '@plasmohq/storage/hook';
 import { Effect } from 'effect';
-import { sendMessageToGlobalContentScript } from '~lib/commands';
+import { sendToBgsw } from '~background';
 import type { RecorderState } from '~lib/services/recorder';
 import './style.css';
 
@@ -18,14 +18,8 @@ function IndexPopup() {
 		</div>
 	);
 }
-const toggleRecording = () =>
-	sendMessageToGlobalContentScript({ commandName: 'toggleRecording', args: [] }).pipe(
-		Effect.runPromise,
-	);
-const cancelRecording = () =>
-	sendMessageToGlobalContentScript({ commandName: 'cancelRecording', args: [] }).pipe(
-		Effect.runPromise,
-	);
+const toggleRecording = () => sendToBgsw({ name: 'toggleRecording' }).pipe(Effect.runPromise);
+const cancelRecording = () => sendToBgsw({ name: 'cancelRecording' }).pipe(Effect.runPromise);
 
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');

@@ -10,6 +10,7 @@
 		"package": "plasmo package"
 	},
 	"dependencies": {
+		"@plasmohq/messaging": "^0.6.2",
 		"@plasmohq/storage": "^1.10.0",
 		"@radix-ui/react-label": "^2.0.2",
 		"@radix-ui/react-slot": "^1.0.2",

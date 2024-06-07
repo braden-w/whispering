@@ -1,7 +1,7 @@
-import { Console, Data, Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
-import { z } from 'zod';
 import type { ExtensionMessage, WhisperingMessage } from '~lib/commands';
+import { localStorageService, type Settings } from '~lib/services/local-storage';
 
 // import { CHATGPT_DOMAINS } from './chatGptButton';
 
@@ -10,61 +10,10 @@ export const config: PlasmoCSConfig = {
 	// exclude_matches: CHATGPT_DOMAINS,
 };
 
-class WhisperingContentScriptError extends Data.TaggedError('WhisperingContentScriptError')<{
-	message: string;
-	origError?: unknown;
-}> {}
-
-const settingsSchema = z.object({
-	isPlaySoundEnabled: z.boolean(),
-	isCopyToClipboardEnabled: z.boolean(),
-	isPasteContentsOnSuccessEnabled: z.boolean(),
-	selectedAudioInputDeviceId: z.string(),
-	currentLocalShortcut: z.string(),
-	currentGlobalShortcut: z.string(),
-	apiKey: z.string(),
-	outputLanguage: z.string(),
-});
-type Settings = z.infer<typeof settingsSchema>;
-
-const getLocalStorage = <TSchema extends z.ZodTypeAny>({
-	key,
-	schema,
-	defaultValue,
-}: {
-	key: string;
-	schema: TSchema;
-	defaultValue: z.infer<TSchema>;
-}) =>
-	Effect.try({
-		try: () => {
-			const valueFromStorage = localStorage.getItem(key);
-			const isEmpty = valueFromStorage === null;
-			if (isEmpty) return defaultValue;
-			return schema.parse(JSON.parse(valueFromStorage)) as z.infer<TSchema>;
-		},
-		catch: (error) =>
-			new WhisperingContentScriptError({
-				message: `Error getting from local storage for key: ${key}`,
-				origError: error,
-			}),
-	}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue)));
-
-const setLocalStorage = ({ key, value }: { key: string; value: any }) =>
-	Effect.try({
-		try: () => localStorage.setItem(key, value),
-		catch: (error) =>
-			new WhisperingContentScriptError({
-				message: `Error setting in local storage for key: ${key}`,
-				origError: error,
-			}),
-	});
-
 export const whisperingCommands = {
 	getSettings: () =>
-		getLocalStorage({
+		localStorageService.get({
 			key: 'whispering-settings',
-			schema: settingsSchema,
 			defaultValue: {
 				isPlaySoundEnabled: true,
 				isCopyToClipboardEnabled: true,
@@ -77,9 +26,9 @@ export const whisperingCommands = {
 			},
 		}),
 	setSettings: (settings: Settings) =>
-		setLocalStorage({
+		localStorageService.set({
 			key: 'whispering-settings',
-			value: JSON.stringify(settings),
+			value: settings,
 		}),
 } as const;
 

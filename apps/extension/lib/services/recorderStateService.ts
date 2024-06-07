@@ -1,11 +1,10 @@
-import { recorderStateSchema, type RecorderState } from './recorder';
-import { extensionStorage } from './storage';
+import { extensionStorage } from './extension-storage';
+import { type RecorderState } from './recorder';
 
 export const recorderStateService = {
 	get: () =>
 		extensionStorage.get({
 			key: 'whispering-recording-state',
-			schema: recorderStateSchema,
 			defaultValue: 'IDLE',
 		}),
 	set: (value: RecorderState) =>

@@ -1,33 +1,87 @@
+import { sendToBackground } from '@plasmohq/messaging';
 import { Console, Data, Effect, Option } from 'effect';
 import type { globalContentScriptCommands } from '~contents/global';
 import type { whisperingCommands } from '~contents/whispering';
-import {
-	type BackgroundServiceWorkerMessage,
-	type ExtensionMessage,
-	type GlobalContentScriptMessage,
-	type WhisperingMessage,
-} from '~lib/commands';
+import { getActiveTabId } from './messages/getActiveTabId';
+import type { GlobalContentScriptMessage, WhisperingMessage } from '~lib/commands';
 
-class BackgroundServiceWorkerError extends Data.TaggedError('BackgroundServiceWorkerError')<{
-	message: string;
-	origError?: unknown;
-}> {}
+export type BackgroundServiceWorkerResponse<T> =
+	| {
+			data: T;
+			error: null;
+	  }
+	| {
+			data: null;
+			error: BackgroundServiceWorkerError;
+	  };
 
-const getActiveTabId = Effect.gen(function* () {
-	const activeTabs = yield* Effect.tryPromise({
-		try: () => chrome.tabs.query({ active: true, currentWindow: true }),
+type ExtractData<T> = T extends { data: infer U; error: null } ? U : never;
+type ExtractError<T> = T extends { data: null; error: infer U } ? U : never;
+
+export const sendToBgsw = <
+	RequestBody,
+	ResponseBody extends BackgroundServiceWorkerResponse<any>,
+	TData = ExtractData<ResponseBody>,
+	TError = ExtractError<ResponseBody>,
+>(
+	...args: Parameters<typeof sendToBackground<RequestBody, ResponseBody>>
+) =>
+	Effect.tryPromise({
+		try: () => sendToBackground<RequestBody, ResponseBody>(...args),
 		catch: (error) =>
 			new BackgroundServiceWorkerError({
-				message: 'Error getting active tabs',
-				origError: error,
+				title: `Error sending message ${args[0].name} to background service worker`,
+				description: error instanceof Error ? error.message : undefined,
+				error,
 			}),
+	}).pipe(
+		Effect.flatMap(({ data, error }) => {
+			if (error) return Effect.fail(error as TError);
+			return Effect.succeed(data as TData);
+		}),
+	);
+
+export const sendMessageToWhisperingContentScript = <Message extends WhisperingMessage>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+		yield* Console.info('Whispering tab ID:', whisperingTabId);
+		yield* Console.info('Sending message to Whispering content script:', message);
+		const response = yield* Effect.promise(() =>
+			chrome.tabs.sendMessage<
+				Message,
+				Effect.Effect.Success<ReturnType<(typeof whisperingCommands)[Message['commandName']]>>
+			>(whisperingTabId, message),
+		);
+		yield* Console.info('Response from Whispering content script:', response);
+		return response;
 	});
-	const firstActiveTab = activeTabs[0];
-	if (!firstActiveTab.id) {
-		return yield* new BackgroundServiceWorkerError({ message: 'No active tab found' });
-	}
-	return firstActiveTab.id;
-});
+
+export const sendMessageToGlobalContentScript = <Message extends GlobalContentScriptMessage>(
+	message: Message,
+) =>
+	Effect.gen(function* () {
+		const activeTabId = yield* getActiveTabId;
+		yield* Console.info('Active tab ID:', activeTabId);
+		yield* Console.info('Sending message to global content script:', message);
+		const response = yield* Effect.promise(() =>
+			chrome.tabs.sendMessage<
+				Message,
+				Effect.Effect.Success<
+					ReturnType<(typeof globalContentScriptCommands)[Message['commandName']]>
+				>
+			>(activeTabId, message),
+		);
+		yield* Console.info('Response from global content script:', response);
+		return response;
+	});
+
+export class BackgroundServiceWorkerError extends Data.TaggedError('BackgroundServiceWorkerError')<{
+	title: string;
+	description?: string;
+	error?: unknown;
+}> {}
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
@@ -51,50 +105,9 @@ const getOrCreateWhisperingTabId = Effect.gen(function* () {
 }).pipe(
 	Effect.flatMap(Option.fromNullable),
 	Effect.mapError(
-		() => new BackgroundServiceWorkerError({ message: 'Error getting or creating Whispering tab' }),
+		() => new BackgroundServiceWorkerError({ title: 'Error getting or creating Whispering tab' }),
 	),
 );
-
-export const commands = {
-	openOptionsPage: () =>
-		Effect.tryPromise({
-			try: () => chrome.runtime.openOptionsPage(),
-			catch: (e) =>
-				new BackgroundServiceWorkerError({ message: 'Error opening options page', origError: e }),
-		}),
-	sendMessageToWhisperingContentScript: <Message extends WhisperingMessage>(message: Message) =>
-		Effect.gen(function* () {
-			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			yield* Console.info('Whispering tab ID:', whisperingTabId);
-			yield* Console.info('Sending message to Whispering content script:', message);
-			const response = yield* Effect.promise(() =>
-				chrome.tabs.sendMessage<
-					Message,
-					Effect.Effect.Success<ReturnType<(typeof whisperingCommands)[Message['commandName']]>>
-				>(whisperingTabId, message),
-			);
-			yield* Console.info('Response from Whispering content script:', response);
-			return response;
-		}),
-	sendMessageToGlobalContentScript: <Message extends GlobalContentScriptMessage>(
-		message: Message,
-	) =>
-		Effect.gen(function* () {
-			const activeTabId = yield* getActiveTabId;
-			yield* Console.info('Active tab ID:', activeTabId);
-			yield* Console.info('Sending message to global content script:', message);
-			const response = yield* Effect.promise(() =>
-				chrome.tabs.sendMessage<
-					Message,
-					Effect.Effect.Success<
-						ReturnType<(typeof globalContentScriptCommands)[Message['commandName']]>
-					>
-				>(activeTabId, message),
-			);
-			yield* Console.info('Response from global content script:', response);
-			return response;
-		}),
-} as const;
 
 // const syncIconWithExtensionStorage = Effect.gen(function* () {
 // 	yield* extensionStorage.watch({
@@ -122,51 +135,36 @@ export const commands = {
 // 	});
 // }).pipe(Effect.runSync);
 
+export const openOptionsPage = Effect.tryPromise({
+	try: () => chrome.runtime.openOptionsPage(),
+	catch: (error) =>
+		new BackgroundServiceWorkerError({
+			title: 'Error opening options page',
+			description: error instanceof Error ? error.message : undefined,
+			error,
+		}),
+});
+
 chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {
 		if (details.reason === 'install') {
-			yield* commands.openOptionsPage();
+			yield* openOptionsPage;
 		}
 	}).pipe(Effect.runPromise),
 );
 
 chrome.commands.onCommand.addListener((command) =>
 	Effect.gen(function* () {
-		yield* Console.info('Received command in background service worker', { command });
+		yield* Console.info(
+			'Received command in background service worker via Chrome Keyboard Shortcut',
+			{ command },
+		);
 		if (command !== 'toggleRecording') return false;
 		const program = Effect.gen(function* () {
-			yield* Console.info('Toggling recording from background service worker');
-			yield* commands.sendMessageToGlobalContentScript({
-				commandName: 'toggleRecording',
-				args: [],
-			});
+			yield* sendMessageToGlobalContentScript({ commandName: 'toggleRecording', args: [] });
+			return true as const;
 		});
 		program.pipe(Effect.runPromise);
 		return true;
 	}).pipe(Effect.runSync),
-);
-
-const isBackgroundServiceWorkerMessage = (
-	message: ExtensionMessage,
-): message is BackgroundServiceWorkerMessage => message.commandName in commands;
-
-const _registerListeners = chrome.runtime.onMessage.addListener(
-	(message: ExtensionMessage, sender, sendResponse) => {
-		const program = Effect.gen(function* () {
-			if (!isBackgroundServiceWorkerMessage(message)) return false;
-			const { commandName, args } = message;
-			yield* Console.info('Received message in BackgroundServiceWorker', { commandName, args });
-			const correspondingCommand = commands[commandName];
-			const response = yield* correspondingCommand(...args);
-			yield* Console.info(
-				`Responding to invoked command ${commandName} in BackgroundServiceWorker`,
-				{
-					response,
-				},
-			);
-			sendResponse(response);
-		});
-		program.pipe(Effect.runPromise);
-		return true; // Will respond asynchronously.
-	},
 );
