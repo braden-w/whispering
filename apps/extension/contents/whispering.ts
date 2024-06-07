@@ -1,7 +1,7 @@
 import { Console, Data, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { z } from 'zod';
-import type { Message } from '~lib/commands';
+import type { ExtensionMessage, WhisperingMessage } from '~lib/commands';
 
 // import { CHATGPT_DOMAINS } from './chatGptButton';
 
@@ -83,11 +83,13 @@ export const whisperingCommands = {
 		}),
 } as const;
 
-export type WhisperingMessage = Message<typeof whisperingCommands>;
+const isWhisperingMessage = (message: ExtensionMessage): message is WhisperingMessage =>
+	message.commandName in whisperingCommands;
 
 const _registerListeners = chrome.runtime.onMessage.addListener(
-	(message: WhisperingMessage, sender, sendResponse) => {
+	(message: ExtensionMessage, sender, sendResponse) => {
 		const program = Effect.gen(function* () {
+			if (!isWhisperingMessage(message)) return false;
 			const { commandName, args } = message;
 			yield* Console.info('Received message in Whispering content script', { commandName, args });
 			const correspondingCommand = whisperingCommands[commandName];

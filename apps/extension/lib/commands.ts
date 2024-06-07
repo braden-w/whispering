@@ -1,7 +1,7 @@
 import { Console, Data, Effect, Option } from 'effect';
-import type { BackgroundServiceWorkerMessage, backgroundServiceWorkerCommands } from '~background';
-import type { GlobalContentScriptMessage, globalContentScriptCommands } from '~contents/global';
-import type { WhisperingMessage, whisperingCommands } from '~contents/whispering';
+import type { backgroundServiceWorkerCommands } from '~background';
+import type { globalContentScriptCommands } from '~contents/global';
+import type { whisperingCommands } from '~contents/whispering';
 
 type AnyFunction = (...args: any[]) => any;
 type CommandDefinition = Record<string, AnyFunction>;
@@ -12,6 +12,14 @@ export type Message<T extends CommandDefinition> = {
 		args: Parameters<T[K]>;
 	};
 }[keyof T];
+
+export type WhisperingMessage = Message<typeof whisperingCommands>;
+export type BackgroundServiceWorkerMessage = Message<typeof backgroundServiceWorkerCommands>;
+export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
+export type ExtensionMessage =
+	| WhisperingMessage
+	| BackgroundServiceWorkerMessage
+	| GlobalContentScriptMessage;
 
 /**
  * Error thrown when an invocation of a command fails.

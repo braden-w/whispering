@@ -11,7 +11,8 @@ import { z } from 'zod';
 import {
 	sendMessageToBackground,
 	sendMessageToWhisperingContentScript,
-	type Message,
+	type ExtensionMessage,
+	type GlobalContentScriptMessage,
 } from '~lib/commands';
 import { recorderService } from '~lib/services/recorder';
 import { recorderStateService } from '~lib/services/recorderStateService';
@@ -61,7 +62,6 @@ export const globalContentScriptCommands = {
 				}),
 			);
 
-			const currentTab = yield* Effect.promise(() => chrome.tabs.getCurrent());
 			const settings = yield* sendMessageToWhisperingContentScript({
 				commandName: 'getSettings',
 				args: [],
@@ -74,10 +74,14 @@ export const globalContentScriptCommands = {
 				});
 				return;
 			}
+			const activeTabId = yield* sendMessageToBackground({
+				commandName: 'getCurrentTabId',
+				args: [],
+			});
 			const recordingTabId = yield* extensionStorage.get({
 				key: 'whispering-recording-tab-id',
 				schema: z.string(),
-				defaultValue: String(currentTab?.id) ?? '',
+				defaultValue: String(activeTabId),
 			});
 			if (recordingTabId) {
 				yield* Effect.promise(() => chrome.tabs.update(Number(recordingTabId), { active: true }));
@@ -120,8 +124,6 @@ export const globalContentScriptCommands = {
 		}),
 } as const;
 
-export type GlobalContentScriptMessage = Message<typeof globalContentScriptCommands>;
-
 export const getStyle: PlasmoGetStyle = () => {
 	const style = document.createElement('style');
 	style.textContent = cssText;
@@ -136,9 +138,14 @@ const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
 	});
 }).pipe(Effect.runPromise);
 
+const isGlobalContentScriptMessage = (
+	message: ExtensionMessage,
+): message is GlobalContentScriptMessage => message.commandName in globalContentScriptCommands;
+
 const _registerListeners = chrome.runtime.onMessage.addListener(
-	(message: GlobalContentScriptMessage, sender, sendResponse) => {
+	(message: ExtensionMessage, sender, sendResponse) => {
 		const program = Effect.gen(function* () {
+			if (!isGlobalContentScriptMessage(message)) return false;
 			const { commandName, args } = message;
 			yield* Console.info('Received message in global content script', { commandName, args });
 			const correspondingCommand = globalContentScriptCommands[commandName];
