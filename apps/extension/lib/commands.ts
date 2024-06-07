@@ -1,5 +1,4 @@
 import { Console, Effect } from 'effect';
-import type { commands } from '~background';
 import type { globalContentScriptCommands } from '~contents/global';
 import type { whisperingCommands } from '~contents/whispering';
 
@@ -42,16 +41,3 @@ export const sendMessageToBackground = <Message extends BackgroundServiceWorkerM
 // 			// toast.error(message);
 // 		}).pipe(Effect.provide(ExtensionStorageLive)),
 // } as const satisfies Commands['sendErrorToast'];
-
-/**
- * Object containing implementations of various commands.
- *
- * Commands can be accessed via `commands.[commandName].invokeFrom[context]`
- * where `commandName` is the command name, e.g. `getCurrentTabId`,
- * and `context` is one of the designated contexts like `Popup`, `BackgroundServiceWorker`, etc.
- *
- * Example:
- * ```
- * commands.getCurrentTabId.invokeFromBackgroundServiceWorker();
- * ```
- */
