@@ -90,7 +90,6 @@ export const globalContentScriptCommands = {
 				case 'IDLE': {
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 					if (settings.isPlaySoundEnabled) startSound.play();
-					// sendMessageToBackground({ command: 'syncIconToRecorderState', recorderState });
 					yield* Effect.logInfo('Recording started');
 					yield* recorderStateService.set('RECORDING');
 					break;
@@ -98,7 +97,6 @@ export const globalContentScriptCommands = {
 				case 'RECORDING': {
 					yield* recorderService.stopRecording();
 					if (settings.isPlaySoundEnabled) stopSound.play();
-					// sendMessageToBackground({ command: 'syncIconToRecorderState', recorderState });
 					yield* Effect.logInfo('Recording stopped');
 					yield* recorderStateService.set('IDLE');
 					break;
@@ -115,7 +113,7 @@ export const globalContentScriptCommands = {
 				args: [],
 			});
 			const recorderState = yield* recorderStateService.get();
-			yield* recorderService.cancelRecording();
+			recorderService.cancelRecording();
 			if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 			yield* Effect.logInfo('Recording cancelled');
 			yield* recorderStateService.set('IDLE');
