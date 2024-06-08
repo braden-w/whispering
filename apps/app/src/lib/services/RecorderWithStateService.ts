@@ -1,5 +1,5 @@
 import { Context } from 'effect';
-import type { RecorderState } from './recorder';
+import type { RecorderState } from './RecorderService';
 
 export class RecorderWithStateService extends Context.Tag('RecorderWithStateService')<
 	RecorderWithStateService,

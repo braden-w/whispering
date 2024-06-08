@@ -1,8 +1,9 @@
+import { RecorderService, recorderStateSchema } from '$lib/services/RecorderService';
+import { RecorderServiceLiveWeb } from '$lib/services/RecorderServiceWebLive';
+import { RecorderWithStateService } from '$lib/services/RecorderWithStateService';
+import type { Recording } from '$lib/services/RecordingDbService';
 import { recordings, settings } from '$lib/stores';
-import { RecorderServiceLiveWeb } from '@repo/services/implementations/recorder';
-import { RecorderService } from '@repo/services/services/recorder';
-import { RecorderWithStateService } from '@repo/services/services/recorder-with-state';
-import type { Recording } from '@repo/services/services/recordings-db';
+import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { PleaseEnterAPIKeyToast } from '@repo/ui/toasts';
 import { Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid';
@@ -20,7 +21,11 @@ const RecorderWithSvelteStateLive = Layer.effect(
 	Effect.gen(function* () {
 		const recorderService = yield* RecorderService;
 		const initialRecorderState = yield* recorderService.recorderState;
-		let recorderState = $state(initialRecorderState);
+		let recorderState = createPersistedState({
+			key: 'whispering-recorder-state',
+			schema: recorderStateSchema,
+			defaultValue: initialRecorderState,
+		});
 
 		const checkAndUpdateSelectedAudioInputDevice = () =>
 			Effect.gen(function* () {
@@ -42,7 +47,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 
 		return {
 			get recorderState() {
-				return recorderState;
+				return recorderState.value;
 			},
 			toggleRecording: () =>
 				Effect.gen(function* () {
@@ -51,12 +56,12 @@ const RecorderWithSvelteStateLive = Layer.effect(
 						return;
 					}
 					yield* checkAndUpdateSelectedAudioInputDevice();
-					switch (recorderState) {
+					switch (recorderState.value) {
 						case 'IDLE': {
 							yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
 							if (settings.isPlaySoundEnabled) startSound.play();
 							yield* Effect.logInfo('Recording started');
-							recorderState = 'RECORDING';
+							recorderState.value = 'RECORDING';
 							break;
 						}
 						case 'RECORDING': {
@@ -72,7 +77,7 @@ const RecorderWithSvelteStateLive = Layer.effect(
 								blob: audioBlob,
 								transcriptionStatus: 'UNPROCESSED',
 							};
-							recorderState = 'IDLE';
+							recorderState.value = 'IDLE';
 							yield* recordings.addRecording(newRecording);
 							recordings.transcribeRecording(newRecording.id);
 							break;
@@ -88,9 +93,10 @@ const RecorderWithSvelteStateLive = Layer.effect(
 			cancelRecording: () =>
 				Effect.gen(function* () {
 					yield* recorderService.cancelRecording;
-					if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
+					if (recorderState.value === 'RECORDING' && settings.isPlaySoundEnabled)
+						cancelSound.play();
 					yield* Effect.logInfo('Recording cancelled');
-					recorderState = 'IDLE';
+					recorderState.value = 'IDLE';
 				}).pipe(
 					Effect.catchAll((error) => {
 						toast.error(error.message);

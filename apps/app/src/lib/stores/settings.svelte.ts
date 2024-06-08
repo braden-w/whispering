@@ -1,14 +1,12 @@
+import {
+	RegisterShortcutsError,
+	RegisterShortcutsService,
+} from '$lib/services/RegisterShortcutsService';
+import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
+import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import {
-	RegisterShortcutsDesktopLive,
-	RegisterShortcutsWebLive,
-} from '@repo/services/implementations/register-shortcuts';
-import {
-	RegisterShortcutsService,
-	type RegisterShortcutsError,
-} from '@repo/services/services/register-shortcuts';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
 import { z } from 'zod';
@@ -99,7 +97,7 @@ const createSettings = Effect.gen(function* () {
 					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
-						toast.error(error.message)
+						toast.error(error.message);
 						return Effect.succeed(undefined);
 					}),
 				);
@@ -125,7 +123,7 @@ const createSettings = Effect.gen(function* () {
 					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
 				}).pipe(
 					Effect.catchAll((error) => {
-						toast.error(error.message)
+						toast.error(error.message);
 						return Effect.succeed(undefined);
 					}),
 				);

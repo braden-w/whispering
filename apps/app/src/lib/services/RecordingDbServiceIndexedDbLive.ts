@@ -1,7 +1,7 @@
 import { Option } from 'effect';
 import { Effect, Layer } from 'effect';
 import { openDB, type DBSchema } from 'idb';
-import type { Recording } from '../../services/recordings-db';
+import type { Recording } from './RecordingDbService';
 import {
 	AddRecordingError,
 	DeleteRecordingError,
@@ -9,7 +9,7 @@ import {
 	GetAllRecordingsError,
 	GetRecordingError,
 	RecordingsDbService,
-} from '../../services/recordings-db';
+} from './RecordingDbService';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 1 as const;

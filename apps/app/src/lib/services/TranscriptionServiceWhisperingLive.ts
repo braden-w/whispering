@@ -4,7 +4,7 @@ import {
 	PleaseEnterApiKeyError,
 	TranscriptionError,
 	TranscriptionService,
-} from '../../services/transcription';
+} from './TranscriptionService';
 
 class WhisperFileTooLarge extends TranscriptionError {
 	constructor(fileSizeMb: number, maxFileSizeMb: number) {

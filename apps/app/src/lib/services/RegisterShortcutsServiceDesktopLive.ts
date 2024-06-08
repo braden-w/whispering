@@ -1,17 +1,15 @@
+import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { Effect, Layer } from 'effect';
 import hotkeys from 'hotkeys-js';
-import {
-	RegisterShortcutsError,
-	RegisterShortcutsService,
-} from '../../services/register-shortcuts';
+import { RegisterShortcutsError, RegisterShortcutsService } from './RegisterShortcutsService';
 
-export const RegisterShortcutsWebLive = Layer.effect(
+export const RegisterShortcutsDesktopLive = Layer.effect(
 	RegisterShortcutsService,
 	Effect.gen(function* () {
 		return {
-			isGlobalShortcutEnabled: false,
+			isGlobalShortcutEnabled: true,
 			defaultLocalShortcut: 'space',
-			defaultGlobalShortcut: '',
+			defaultGlobalShortcut: 'CommandOrControl+Shift+;',
 			unregisterAllLocalShortcuts: () =>
 				Effect.try({
 					try: () => hotkeys.unbind(),
@@ -22,8 +20,8 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 				}),
 			unregisterAllGlobalShortcuts: () =>
-				Effect.try({
-					try: () => hotkeys.unbind(),
+				Effect.tryPromise({
+					try: () => unregisterAll(),
 					catch: (error) =>
 						new RegisterShortcutsError({
 							message: 'Error unregistering all shortcuts',
@@ -45,16 +43,13 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 				}),
 			registerGlobalShortcut: ({ shortcut, callback }) =>
-				Effect.try({
-					try: () =>
-						hotkeys(shortcut, function (event, handler) {
-							// Prevent the default refresh event under WINDOWS system
-							event.preventDefault();
-							callback();
-						}),
+				Effect.tryPromise({
+					try: () => register(shortcut, callback),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
+							message: window.__TAURI__
+								? 'Error registering shortcut. Please make sure it is a valid Electron keyboard shortcut.'
+								: 'Error registering shortcut.',
 							origError: error,
 						}),
 				}),

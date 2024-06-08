@@ -1,19 +1,16 @@
+import { ClipboardService } from '$lib/services/ClipboardService';
+import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
+import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebive';
+import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
+import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive';
+import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
+import { TranscriptionServiceLiveWhisper } from '$lib/services/TranscriptionServiceWhisperingLive';
 import {
 	InvalidApiKey,
 	PleaseEnterAPIKeyToast,
 	SomethingWentWrongToast,
 	TranscriptionComplete,
 } from '@repo/ui/toasts';
-import {
-	ClipboardServiceDesktopLive,
-	ClipboardServiceWebLive,
-} from '@repo/services/implementations/clipboard';
-import { RecordingsDbServiceLiveIndexedDb } from '@repo/services/implementations/recordings-db';
-import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
-import { ClipboardService } from '@repo/services/services/clipboard';
-import type { Recording } from '@repo/services/services/recordings-db';
-import { RecordingsDbService } from '@repo/services/services/recordings-db';
-import { TranscriptionError, TranscriptionService } from '@repo/services/services/transcription';
 import { Console, Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';

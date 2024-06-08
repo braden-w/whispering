@@ -1,4 +1,4 @@
-import type { Recording } from '@repo/services/services/recordings-db';
+import type { Recording } from '$lib/services/RecordingDbService';
 
 export function createRecordingViewTransitionName({
 	recordingId,

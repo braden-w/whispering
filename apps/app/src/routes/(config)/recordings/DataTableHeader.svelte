@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Recording } from '@repo/services/services/recordings-db';
+	import type { Recording } from '$lib/services/RecordingDbService';
 	import { Button } from '@repo/ui/components/button';
 	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@repo/ui/icons';
 	import type { HeaderContext } from '@tanstack/table-core';

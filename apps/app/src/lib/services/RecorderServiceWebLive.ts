@@ -1,6 +1,6 @@
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Effect, Layer } from 'effect';
-import { RecorderError, RecorderService } from '../../services/recorder';
+import { RecorderError, RecorderService } from './RecorderService';
 
 let stream: MediaStream;
 let mediaRecorder: MediaRecorder;

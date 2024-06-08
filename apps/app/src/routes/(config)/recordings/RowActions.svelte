@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recordings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import type { Recording } from '@repo/services/services/recordings-db';
 	import { Button } from '@repo/ui/components/button';
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';

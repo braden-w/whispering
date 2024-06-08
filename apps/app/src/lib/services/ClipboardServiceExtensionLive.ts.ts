@@ -1,5 +1,5 @@
 import { Effect, Layer } from 'effect';
-import { ClipboardError, ClipboardService } from '../../services/clipboard';
+import { ClipboardError, ClipboardService } from './ClipboardService';
 
 export const ClipboardServiceExtensionLive = Layer.succeed(
 	ClipboardService,

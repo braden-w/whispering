@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { TranscriptionService } from '$lib/services/TranscriptionService';
+	import { TranscriptionServiceLiveWhisper } from '$lib/services/TranscriptionServiceWhisperingLive';
 	import { recorder, settings } from '$lib/stores';
-	import { TranscriptionServiceLiveWhisper } from '@repo/services/implementations/transcription';
-	import { TranscriptionService } from '@repo/services/services/transcription';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
 	import { Input } from '@repo/ui/components/input';

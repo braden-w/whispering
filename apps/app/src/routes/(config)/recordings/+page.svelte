@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import type { Recording } from '@repo/services/services/recordings-db';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import { Button } from '@repo/ui/components/button';
 	import { Checkbox } from '@repo/ui/components/checkbox';
@@ -23,6 +22,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import type { Recording } from '$lib/services/RecordingDbService';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
