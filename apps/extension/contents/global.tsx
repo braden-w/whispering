@@ -1,8 +1,8 @@
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
-// import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
-// import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-// import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import stopSoundSrc from 'data-base64:~assets/sound_ex_machina_Button_Blip.mp3';
+import startSoundSrc from 'data-base64:~assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import cancelSoundSrc from 'data-base64:~assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import cssText from 'data-text:~/style.css';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
@@ -16,15 +16,14 @@ import type * as SetSettings from '~background/messages/setSettings';
 import { type ExtensionMessage, type Message } from '~lib/commands';
 import { extensionStorage, sendErrorToastViaStorage } from '~lib/services/extension-storage';
 import { recorderService } from '~lib/services/recorder';
-import { recorderStateService } from '~lib/services/recorderStateService';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
 	all_frames: true,
 };
-// const startSound = new Audio(startSoundSrc);
-// const stopSound = new Audio(stopSoundSrc);
-// const cancelSound = new Audio(cancelSoundSrc);
+const startSound = new Audio(startSoundSrc);
+const stopSound = new Audio(stopSoundSrc);
+const cancelSound = new Audio(cancelSoundSrc);
 
 export const globalContentScriptCommands = {
 	toggleRecording: () =>
@@ -87,20 +86,23 @@ export const globalContentScriptCommands = {
 				return;
 			}
 			yield* checkAndUpdateSelectedAudioInputDevice;
-			const recorderState = yield* recorderStateService.get();
+			const recorderState = yield* extensionStorage.get({
+				key: 'whispering-recording-state',
+				defaultValue: 'IDLE',
+			});
 			switch (recorderState) {
 				case 'IDLE': {
 					yield* recorderService.startRecording(settings.selectedAudioInputDeviceId);
-					// if (settings.isPlaySoundEnabled) startSound.play();
+					if (settings.isPlaySoundEnabled) startSound.play();
 					yield* Effect.logInfo('Recording started');
-					yield* recorderStateService.set('RECORDING');
+					yield* extensionStorage.set({ key: 'whispering-recording-state', value: 'RECORDING' });
 					break;
 				}
 				case 'RECORDING': {
 					yield* recorderService.stopRecording();
-					// if (settings.isPlaySoundEnabled) stopSound.play();
+					if (settings.isPlaySoundEnabled) stopSound.play();
 					yield* Effect.logInfo('Recording stopped');
-					yield* recorderStateService.set('IDLE');
+					yield* extensionStorage.set({ key: 'whispering-recording-state', value: 'IDLE' });
 					break;
 				}
 				default: {
@@ -119,11 +121,14 @@ export const globalContentScriptCommands = {
 			const settings = yield* sendToBgsw<GetSettings.RequestBody, GetSettings.ResponseBody>({
 				name: 'getSettings',
 			});
-			const recorderState = yield* recorderStateService.get();
+			const recorderState = yield* extensionStorage.get({
+				key: 'whispering-recording-state',
+				defaultValue: 'IDLE',
+			});
 			recorderService.cancelRecording();
-			// if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
+			if (recorderState === 'RECORDING' && settings.isPlaySoundEnabled) cancelSound.play();
 			yield* Effect.logInfo('Recording cancelled');
-			yield* recorderStateService.set('IDLE');
+			yield* extensionStorage.set({ key: 'whispering-recording-state', value: 'IDLE' });
 		}),
 } as const;
 
@@ -137,7 +142,7 @@ export const getStyle: PlasmoGetStyle = () => {
 
 const syncRecorderStateWithMediaRecorderStateOnLoad = Effect.gen(function* () {
 	const initialRecorderState = recorderService.recorderState;
-	yield* recorderStateService.set(initialRecorderState);
+	yield* extensionStorage.set({ key: 'whispering-recording-state', value: initialRecorderState });
 	yield* Console.info('Synced recorder state with media recorder state on load', {
 		initialRecorderState,
 	});
