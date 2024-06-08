@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { TranscriptionService } from '$lib/services/TranscriptionService';
-	import { TranscriptionServiceLiveWhisper } from '$lib/services/TranscriptionServiceWhisperingLive';
+	import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 	import { recorder, settings } from '$lib/stores';
 	import { Button } from '@repo/ui/components/button';
 	import * as Card from '@repo/ui/components/card';
@@ -16,7 +16,7 @@
 		const transcriptionService = yield* TranscriptionService;
 		const languages = transcriptionService.supportedLanguages;
 		return languages;
-	}).pipe(Effect.provide(TranscriptionServiceLiveWhisper), Effect.runSync);
+	}).pipe(Effect.provide(TranscriptionServiceWhisperLive), Effect.runSync);
 
 	const selectedLanguageOption = $derived(
 		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),

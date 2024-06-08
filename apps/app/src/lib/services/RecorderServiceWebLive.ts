@@ -11,7 +11,7 @@ const resetRecorder = () => {
 	stream.getTracks().forEach((track) => track.stop());
 };
 
-export const RecorderServiceLiveWeb = Layer.succeed(
+export const RecorderServiceWebLive = Layer.succeed(
 	RecorderService,
 	RecorderService.of({
 		recorderState: Effect.sync(() => {

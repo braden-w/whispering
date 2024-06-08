@@ -4,7 +4,7 @@ import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
-import { TranscriptionServiceLiveWhisper } from '$lib/services/TranscriptionServiceWhisperingLive';
+import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import {
 	InvalidApiKey,
 	PleaseEnterAPIKeyToast,
@@ -150,7 +150,7 @@ const createRecordings = Effect.gen(function* () {
 
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(TranscriptionServiceLiveWhisper),
+	Effect.provide(TranscriptionServiceWhisperLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.runSync,
 );

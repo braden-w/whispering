@@ -1,5 +1,5 @@
 import { RecorderService, recorderStateSchema } from '$lib/services/RecorderService';
-import { RecorderServiceLiveWeb } from '$lib/services/RecorderServiceWebLive';
+import { RecorderServiceWebLive } from '$lib/services/RecorderServiceWebLive';
 import { RecorderWithStateService } from '$lib/services/RecorderWithStateService';
 import type { Recording } from '$lib/services/RecordingDbService';
 import { recordings, settings } from '$lib/stores';
@@ -123,6 +123,6 @@ export const recorder = Effect.gen(function* () {
 	return recorderWithState;
 }).pipe(
 	Effect.provide(RecorderWithSvelteStateLive),
-	Effect.provide(RecorderServiceLiveWeb),
+	Effect.provide(RecorderServiceWebLive),
 	Effect.runSync,
 );

@@ -107,7 +107,7 @@ const SUPPORTED_LANGUAGES = [
 	{ label: 'Welsh', value: 'cy' },
 ] as const;
 
-export const TranscriptionServiceLiveWhisper = Layer.succeed(
+export const TranscriptionServiceWhisperLive = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
 		supportedLanguages: SUPPORTED_LANGUAGES,
