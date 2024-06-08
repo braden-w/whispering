@@ -1,6 +1,6 @@
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
-import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebive';
+import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
