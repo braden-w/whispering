@@ -21,7 +21,7 @@ const extensionSchemas = {
 		description: z.string().optional(),
 		variant: z.union([z.literal('default'), z.literal('destructive')]),
 	}),
-	'whispering-recording-tab-id': z.string(),
+	'whispering-recording-tab-id': z.number(),
 } as const;
 
 export const extensionStorage = {

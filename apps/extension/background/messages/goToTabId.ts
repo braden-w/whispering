@@ -1,27 +1,22 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
-import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
-import type { Settings } from '~lib/services/local-storage';
+import { BackgroundServiceWorkerError } from '~lib/commands';
 
-export type RequestBody = { settings: Settings };
+export type RequestBody = { tabId: number };
 
 export type ResponseBody = BackgroundServiceWorkerResponse<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
-		yield* Console.info('BackgroundServiceWorker: setSettings');
-		if (!body?.settings) {
+		yield* Console.info('BackgroundServiceWorker: goToTabId');
+		if (!body?.tabId) {
 			return yield* new BackgroundServiceWorkerError({
-				title: 'Error invoking setSettings command',
-				description: 'Settings must be provided in the request body of the message',
+				title: 'Error invoking goToTabId command',
+				description: 'Tab id must be provided in the request body of the message',
 			});
 		}
-		yield* sendMessageToWhisperingContentScript({
-			commandName: 'setSettings',
-			args: [body.settings],
-		});
+		yield* Effect.promise(() => chrome.tabs.update(Number(body.tabId), { active: true }));
 		return true as const;
 	}).pipe(
 		Effect.map((data) => ({ data, error: null })),

@@ -1,6 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import { openOptionsPage, type BackgroundServiceWorkerResponse } from '~background';
+import { openOptionsPage } from '~background';
+import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
 
 export type RequestBody = {};
 

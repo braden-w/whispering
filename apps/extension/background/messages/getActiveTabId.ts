@@ -1,22 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import { BackgroundServiceWorkerError, type BackgroundServiceWorkerResponse } from '~background';
-
-export const getActiveTabId = Effect.gen(function* () {
-	const activeTabs = yield* Effect.tryPromise({
-		try: () => chrome.tabs.query({ active: true, currentWindow: true }),
-		catch: (error) =>
-			new BackgroundServiceWorkerError({
-				title: 'Error getting active tabs',
-				error: error,
-			}),
-	});
-	const firstActiveTab = activeTabs[0];
-	if (!firstActiveTab.id) {
-		return yield* new BackgroundServiceWorkerError({ title: 'No active tab found' });
-	}
-	return firstActiveTab.id;
-});
+import { getActiveTabId, type BackgroundServiceWorkerResponse } from '~background/sendMessage';
 
 export type RequestBody = {};
 

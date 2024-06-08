@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStorage } from '@plasmohq/storage/hook';
 import { Effect } from 'effect';
-import { sendToBgsw } from '~background';
+import { sendToBgsw } from '~lib/commands';
 import type { RecorderState } from '~lib/services/recorder';
 import './style.css';
 

@@ -1,9 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import {
-	sendMessageToWhisperingContentScript,
-	type BackgroundServiceWorkerResponse,
-} from '~background';
+import { sendMessageToWhisperingContentScript, type BackgroundServiceWorkerResponse } from '~background/sendMessage';
 import type { Settings } from '~lib/services/local-storage';
 
 export type RequestBody = {};

@@ -1,9 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import {
-	sendMessageToGlobalContentScript,
-	type BackgroundServiceWorkerResponse,
-} from '~background';
+import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
+import { sendMessageToGlobalContentScript } from '~background/sendMessage';
 
 export type RequestBody = {};
 
