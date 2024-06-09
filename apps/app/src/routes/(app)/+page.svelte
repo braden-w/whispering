@@ -6,6 +6,7 @@
 	import { Label } from '@repo/ui/components/label';
 	import { ClipboardIcon } from '@repo/ui/icons';
 	import { NavItems } from '@repo/ui/shared';
+	import { onMount } from 'svelte';
 
 	const PLACEHOLDER_RECORDING = {
 		id: '',
@@ -26,6 +27,10 @@
 	);
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
+
+	onMount(() => {
+		window.toggleRecording = recorder.toggleRecording;
+	});
 </script>
 
 <svelte:head>
