@@ -2,8 +2,8 @@ import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
 
 export class ClipboardError extends Data.TaggedError('ClipboardError')<{
-	message: string;
-	origError?: unknown;
+	title: string;
+	error?: unknown;
 }> {}
 
 export class ClipboardService extends Context.Tag('ClipboardService')<

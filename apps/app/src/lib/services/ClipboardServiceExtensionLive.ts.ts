@@ -8,13 +8,13 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 			Effect.tryPromise({
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
-					new ClipboardError({ message: 'Failed to write to clipboard', origError: error }),
+					new ClipboardError({ title: 'Failed to write to clipboard', error: error }),
 			}),
 		writeText: (text) =>
 			Effect.try({
 				try: () => writeTextToCursor(text),
 				catch: (error) =>
-					new ClipboardError({ message: 'Failed to write text to cursor', origError: error }),
+					new ClipboardError({ title: 'Failed to write text to cursor', error: error }),
 			}),
 	}),
 );

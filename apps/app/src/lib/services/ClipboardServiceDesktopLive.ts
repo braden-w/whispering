@@ -10,13 +10,13 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 			Effect.tryPromise({
 				try: () => writeText(text),
 				catch: (error) =>
-					new ClipboardError({ message: 'Failed to write to clipboard', origError: error }),
+					new ClipboardError({ title: 'Failed to write to clipboard', error: error }),
 			}),
 		writeText: (text) =>
 			Effect.try({
 				try: () => invoke('write_text', { text }),
 				catch: (error) =>
-					new ClipboardError({ message: 'Failed to paste from clipboard', origError: error }),
+					new ClipboardError({ title: 'Failed to paste from clipboard', error: error }),
 			}),
 	}),
 );

@@ -140,7 +140,7 @@ const createRecordings = Effect.gen(function* () {
 				toast.success('Copied to clipboard!');
 			}).pipe(
 				Effect.catchAll((error) => {
-					toast.error(error.message);
+					toast.error(error.title);
 					return Effect.succeed(undefined);
 				}),
 				Effect.runPromise,
