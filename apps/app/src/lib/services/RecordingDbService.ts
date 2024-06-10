@@ -1,5 +1,6 @@
 import type { Effect, Option } from 'effect';
 import { Context, Data } from 'effect';
+import type { WhisperingErrorProperties } from './errors';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -19,51 +20,20 @@ export type Recording = {
 	transcriptionStatus: TranscriptionStatus;
 };
 
-export class RecordingDbError extends Data.TaggedError('RecordingDbError')<{
-	message: string;
-	origError: unknown;
-}> {}
-
-export class GetAllRecordingsError extends RecordingDbError {
-	constructor({ message, origError }: { message: string; origError: unknown }) {
-		super({ message, origError });
-	}
-}
-
-export class GetRecordingError extends RecordingDbError {
-	constructor({ message, origError }: { message: string; origError: unknown }) {
-		super({ message, origError });
-	}
-}
-
-export class AddRecordingError extends RecordingDbError {
-	constructor({ message, origError }: { message: string; origError: unknown }) {
-		super({ message, origError });
-	}
-}
-
-export class EditRecordingError extends RecordingDbError {
-	constructor({ message, origError }: { message: string; origError: unknown }) {
-		super({ message, origError });
-	}
-}
-
-export class DeleteRecordingError extends RecordingDbError {
-	constructor({ message, origError }: { message: string; origError: unknown }) {
-		super({ message, origError });
-	}
-}
+export class RecordingDbError extends Data.TaggedError(
+	'RecordingDbError',
+)<WhisperingErrorProperties> {}
 
 export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	RecordingsDbService,
 	{
-		readonly getAllRecordings: Effect.Effect<Recording[], GetAllRecordingsError>;
+		readonly getAllRecordings: Effect.Effect<Recording[], RecordingDbError>;
 		readonly getRecording: (
 			id: string,
-		) => Effect.Effect<Option.Option<Recording>, GetRecordingError>;
-		readonly addRecording: (recording: Recording) => Effect.Effect<void, AddRecordingError>;
-		readonly updateRecording: (recording: Recording) => Effect.Effect<void, EditRecordingError>;
-		readonly deleteRecordingById: (id: string) => Effect.Effect<void, DeleteRecordingError>;
-		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, DeleteRecordingError>;
+		) => Effect.Effect<Option.Option<Recording>, RecordingDbError>;
+		readonly addRecording: (recording: Recording) => Effect.Effect<void, RecordingDbError>;
+		readonly updateRecording: (recording: Recording) => Effect.Effect<void, RecordingDbError>;
+		readonly deleteRecordingById: (id: string) => Effect.Effect<void, RecordingDbError>;
+		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, RecordingDbError>;
 	}
 >() {}

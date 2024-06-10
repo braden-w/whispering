@@ -6,39 +6,6 @@ import {
 	TranscriptionService,
 } from './TranscriptionService';
 
-class WhisperFileTooLarge extends TranscriptionError {
-	constructor(fileSizeMb: number, maxFileSizeMb: number) {
-		super({
-			message: `The file size (${fileSizeMb}MB) is too large. Please upload a file smaller than ${maxFileSizeMb}MB.`,
-		});
-	}
-}
-
-class WhisperFetchError extends TranscriptionError {
-	constructor({ fetchError }: { fetchError: unknown }) {
-		super({
-			message: 'Failed to fetch transcription from Whisper API',
-			origError: fetchError,
-		});
-	}
-}
-
-class WhisperServerError extends TranscriptionError {
-	constructor({ message, code, type }: { message: string; code?: string; type?: string }) {
-		super({
-			message: `Server error from Whisper API: ${message}\nCode: ${code}\nType: ${type}`,
-		});
-	}
-}
-
-class TranscriptionIsNotStringError extends TranscriptionError {
-	constructor() {
-		super({
-			message: 'Transcription from Whisper API is invalid or not a string',
-		});
-	}
-}
-
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
 }
@@ -121,7 +88,10 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				}
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-					return yield* new WhisperFileTooLarge(blobSizeInMb, MAX_FILE_SIZE_MB);
+					return yield* new TranscriptionError({
+						title: `The file size (${blobSizeInMb}MB) is too large`,
+						description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
+					});
 				}
 				const wavFile = new File([audioBlob], FILE_NAME);
 				const formData = new FormData();
@@ -135,17 +105,23 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 							headers: { Authorization: `Bearer ${apiKey}` },
 							body: formData,
 						}).then((res) => res.json()),
-					catch: (error) => new WhisperFetchError({ fetchError: error }),
+					catch: (error) =>
+						new TranscriptionError({
+							title: 'Failed to fetch transcription from Whisper API',
+							description: error instanceof Error ? error.message : undefined,
+							error,
+						}),
 				});
 				if (data?.error?.message) {
-					return yield* new WhisperServerError({
-						message: data.error.message,
-						code: data.error.code,
-						type: data.error.type,
+					return yield* new TranscriptionError({
+						title: `Server error from Whisper API: ${data.error.message}`,
+						description: `Code: ${data.error.code}\nType: ${data.error.type}`,
 					});
 				}
 				if (!isString(data.text)) {
-					return yield* new TranscriptionIsNotStringError();
+					return yield* new TranscriptionError({
+						title: 'Transcription from Whisper API is invalid or not a string',
+					});
 				}
 				return data.text;
 			}),

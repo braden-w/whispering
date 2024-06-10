@@ -1,10 +1,10 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
+import type { WhisperingErrorProperties } from './errors';
 
-export class RegisterShortcutsError extends Data.TaggedError('RegisterShortcutsError')<{
-	message: string;
-	origError?: unknown;
-}> {}
+export class RegisterShortcutsError extends Data.TaggedError(
+	'RegisterShortcutsError',
+)<WhisperingErrorProperties> {}
 
 export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsService')<
 	RegisterShortcutsService,

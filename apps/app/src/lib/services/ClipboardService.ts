@@ -1,10 +1,8 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
+import type { WhisperingErrorProperties } from './errors';
 
-export class ClipboardError extends Data.TaggedError('ClipboardError')<{
-	title: string;
-	error?: unknown;
-}> {}
+export class ClipboardError extends Data.TaggedError('ClipboardError')<WhisperingErrorProperties> {}
 
 export class ClipboardService extends Context.Tag('ClipboardService')<
 	ClipboardService,

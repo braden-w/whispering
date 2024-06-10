@@ -14,8 +14,9 @@ export const RegisterShortcutsWebLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
-							origError: error,
+							title: 'Error unregistering all shortcuts',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			unregisterAllGlobalShortcuts: () =>
@@ -23,8 +24,9 @@ export const RegisterShortcutsWebLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
-							origError: error,
+							title: 'Error unregistering all shortcuts',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			registerLocalShortcut: ({ shortcut, callback }) =>
@@ -37,8 +39,9 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
-							origError: error,
+							title: 'Error registering shortcut',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			registerGlobalShortcut: ({ shortcut, callback }) =>
@@ -51,8 +54,9 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
-							origError: error,
+							title: 'Error registering shortcut',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 		};

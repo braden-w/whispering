@@ -1,10 +1,8 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
+import type { WhisperingErrorProperties } from './errors';
 
-export class TranscriptionError extends Data.TaggedError('TranscriptionError')<{
-	message: string;
-	origError?: unknown;
-}> {}
+export class TranscriptionError extends Data.TaggedError('TranscriptionError')<WhisperingErrorProperties> {}
 
 export class PleaseEnterApiKeyError extends Data.TaggedError('PleaseEnterApiKeyError') {}
 

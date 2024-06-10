@@ -15,8 +15,9 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => hotkeys.unbind(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
-							origError: error,
+							title: 'Error unregistering all shortcuts',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			unregisterAllGlobalShortcuts: () =>
@@ -24,8 +25,9 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => unregisterAll(),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error unregistering all shortcuts',
-							origError: error,
+							title: 'Error unregistering all shortcuts',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			registerLocalShortcut: ({ shortcut, callback }) =>
@@ -38,8 +40,9 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: 'Error registering shortcut',
-							origError: error,
+							title: 'Error registering shortcut',
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 			registerGlobalShortcut: ({ shortcut, callback }) =>
@@ -47,10 +50,11 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => register(shortcut, callback),
 					catch: (error) =>
 						new RegisterShortcutsError({
-							message: window.__TAURI__
+							title: window.__TAURI__
 								? 'Error registering shortcut. Please make sure it is a valid Electron keyboard shortcut.'
 								: 'Error registering shortcut.',
-							origError: error,
+							description: error instanceof Error ? error.message : undefined,
+							error,
 						}),
 				}),
 		};
