@@ -1,4 +1,4 @@
-import { Effect, Either } from 'effect';
+import { Console, Effect, Either } from 'effect';
 import { toast } from 'svelte-sonner';
 
 export type WhisperingErrorProperties = {
@@ -22,6 +22,7 @@ export const catchErrorsAsToast = <
 		const failureOrSuccess = yield* Effect.either(program);
 		if (Either.isLeft(failureOrSuccess)) {
 			const error = failureOrSuccess.left;
+			yield* Console.error(error.error);
 			toast.error(error.title, {
 				id: options?.toastId,
 				description: error.description,
