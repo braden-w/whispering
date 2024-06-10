@@ -58,55 +58,35 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					});
 					mediaRecorder!.start();
 				}),
-			stopRecording: Effect.tryPromise({
-				try: () =>
-					new Promise<Blob>((resolve) => {
-						if (!mediaRecorder) {
-							throw new MediaRecorderError({
-								title: 'Media recorder is not initialized',
-							});
-						}
-						mediaRecorder.addEventListener('stop', () => {
-							const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-							resolve(audioBlob);
-							resetRecorder();
-						});
-						mediaRecorder.stop();
-					}),
-				catch: (error) =>
-					new MediaRecorderError({
-						title: 'Error stopping media recorder and getting audio blob',
-						error: error,
-					}),
+			stopRecording: Effect.async<Blob, Error>((resume) => {
+				mediaRecorder.addEventListener('stop', () => {
+					const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+					resume(Effect.succeed(audioBlob));
+					resetRecorder();
+				});
+				mediaRecorder.stop();
 			}).pipe(
 				Effect.catchAll((error) => {
 					resetRecorder();
-					return error;
+					return new MediaRecorderError({
+						title: 'Error canceling media recorder',
+						error: error,
+					});
 				}),
 			),
-			cancelRecording: Effect.tryPromise({
-				try: () =>
-					new Promise<void>((resolve) => {
-						if (!mediaRecorder) {
-							throw new MediaRecorderError({
-								title: 'Media recorder is not initialized',
-							});
-						}
-						mediaRecorder.addEventListener('stop', () => {
-							resetRecorder();
-							resolve();
-						});
-						mediaRecorder.stop();
-					}),
-				catch: (error) =>
-					new MediaRecorderError({
-						title: 'Error stopping media recorder',
-						error: error,
-					}),
+			cancelRecording: Effect.async<undefined, Error>((resume) => {
+				mediaRecorder.addEventListener('stop', () => {
+					resetRecorder();
+					resume(Effect.succeed(undefined));
+				});
+				mediaRecorder.stop();
 			}).pipe(
 				Effect.catchAll((error) => {
 					resetRecorder();
-					return error;
+					return new MediaRecorderError({
+						title: 'Error stopping media recorder',
+						error: error,
+					});
 				}),
 			),
 		};
