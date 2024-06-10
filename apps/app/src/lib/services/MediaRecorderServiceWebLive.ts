@@ -52,11 +52,11 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					});
 					recordedChunks.length = 0;
 					mediaRecorder = new AudioRecorder(stream!);
-					(mediaRecorder!.ondataavailable = (event: BlobEvent) => {
+					mediaRecorder!.addEventListener('dataavailable', (event: BlobEvent) => {
 						if (!event.data.size) return;
 						recordedChunks.push(event.data);
-					}),
-						mediaRecorder!.start();
+					});
+					mediaRecorder!.start();
 				}),
 			stopRecording: Effect.tryPromise({
 				try: () =>
