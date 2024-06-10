@@ -59,6 +59,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					mediaRecorder!.start();
 				}),
 			stopRecording: Effect.async<Blob, Error>((resume) => {
+				if (!mediaRecorder) return;
 				mediaRecorder.addEventListener('stop', () => {
 					const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
 					resume(Effect.succeed(audioBlob));
@@ -75,6 +76,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 				}),
 			),
 			cancelRecording: Effect.async<undefined, Error>((resume) => {
+				if (!mediaRecorder) return;
 				mediaRecorder.addEventListener('stop', () => {
 					resetRecorder();
 					resume(Effect.succeed(undefined));
