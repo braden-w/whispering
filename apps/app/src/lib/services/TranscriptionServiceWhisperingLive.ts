@@ -1,10 +1,6 @@
+import { goto } from '$app/navigation';
 import { Effect, Layer } from 'effect';
-import {
-	InvalidApiKeyError,
-	PleaseEnterApiKeyError,
-	TranscriptionError,
-	TranscriptionService,
-} from './TranscriptionService';
+import { TranscriptionError, TranscriptionService } from './TranscriptionService';
 
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
@@ -80,11 +76,15 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 		supportedLanguages: SUPPORTED_LANGUAGES,
 		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
 			Effect.gen(function* () {
-				if (!apiKey) {
-					return yield* new PleaseEnterApiKeyError();
-				}
 				if (!apiKey.startsWith('sk-')) {
-					return yield* new InvalidApiKeyError();
+					return yield* new TranscriptionError({
+						title: 'Invalid API Key',
+						description: 'The API Key must start with "sk-"',
+						action: {
+							label: 'Update API Key',
+							onClick: () => goto('/settings'),
+						},
+					});
 				}
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
