@@ -4,6 +4,7 @@ import {
 } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
+import { catchErrorsAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -40,22 +41,22 @@ const createSettings = Effect.gen(function* () {
 	});
 
 	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
-	// const queueInitialSilentJob = Effect.gen(function* () {
-	// 	const initialSilentJob = Effect.gen(function* () {
-	// 		yield* registerShortcutsService.unregisterAllLocalShortcuts();
-	// 		yield* registerShortcutsService.unregisterAllGlobalShortcuts();
-	// 		yield* registerShortcutsService.registerLocalShortcut({
-	// 			shortcut: settings.value.currentLocalShortcut,
-	// 			callback: recorder.toggleRecording,
-	// 		});
-	// 		yield* registerShortcutsService.registerGlobalShortcut({
-	// 			shortcut: settings.value.currentGlobalShortcut,
-	// 			callback: recorder.toggleRecording,
-	// 		});
-	// 	}).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
-	// 	yield* jobQueue.addJobToQueue(initialSilentJob);
-	// });
-	// queueInitialSilentJob.pipe(Effect.runPromise);
+	const queueInitialSilentJob = Effect.gen(function* () {
+		const initialSilentJob = Effect.gen(function* () {
+			yield* registerShortcutsService.unregisterAllLocalShortcuts();
+			yield* registerShortcutsService.unregisterAllGlobalShortcuts();
+			yield* registerShortcutsService.registerLocalShortcut({
+				shortcut: settings.value.currentLocalShortcut,
+				callback: recorder.toggleRecording,
+			});
+			yield* registerShortcutsService.registerGlobalShortcut({
+				shortcut: settings.value.currentGlobalShortcut,
+				callback: recorder.toggleRecording,
+			});
+		}).pipe(catchErrorsAsToast);
+		yield* jobQueue.addJobToQueue(initialSilentJob);
+	});
+	queueInitialSilentJob.pipe(Effect.runPromise);
 
 	return {
 		get isPlaySoundEnabled() {
@@ -95,12 +96,7 @@ const createSettings = Effect.gen(function* () {
 						callback: recorder.toggleRecording,
 					});
 					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
-				}).pipe(
-					Effect.catchAll((error) => {
-						toast.error(error.message);
-						return Effect.succeed(undefined);
-					}),
-				);
+				}).pipe(catchErrorsAsToast);
 				yield* jobQueue.addJobToQueue(job);
 			});
 			queueJob.pipe(Effect.runPromise);
@@ -121,12 +117,7 @@ const createSettings = Effect.gen(function* () {
 						callback: recorder.toggleRecording,
 					});
 					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
-				}).pipe(
-					Effect.catchAll((error) => {
-						toast.error(error.message);
-						return Effect.succeed(undefined);
-					}),
-				);
+				}).pipe(catchErrorsAsToast);
 				yield* jobQueue.addJobToQueue(job);
 			});
 			queueJob.pipe(Effect.runPromise);

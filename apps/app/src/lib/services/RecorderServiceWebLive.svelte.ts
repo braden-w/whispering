@@ -9,6 +9,7 @@ import type { Recording } from './RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { catchErrorsAsToast } from './errors';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -108,15 +109,7 @@ export const RecorderServiceWebLive = Layer.effect(
 			},
 			enumerateRecordingDevices: () =>
 				enumerateRecordingDevices.pipe(
-					Effect.catchAll((error) =>
-						Effect.gen(function* () {
-							toast.error(error.title, {
-								description: error.description,
-								action: error.action,
-							});
-							return [] satisfies MediaDeviceInfo[];
-						}),
-					),
+					(program) => catchErrorsAsToast(program, [] satisfies MediaDeviceInfo[]),
 					Effect.runPromise,
 				),
 			toggleRecording: () =>
@@ -169,17 +162,7 @@ export const RecorderServiceWebLive = Layer.effect(
 						recordings.transcribeRecording(newRecording.id);
 						return;
 					}
-				}).pipe(
-					Effect.catchAll((error) =>
-						Effect.gen(function* () {
-							toast.error(error.title, {
-								description: error.description,
-								action: error.action,
-							});
-						}),
-					),
-					Effect.runPromise,
-				),
+				}).pipe(catchErrorsAsToast, Effect.runPromise),
 			cancelRecording: () =>
 				Effect.gen(function* () {
 					if (!mediaRecorder) return;
