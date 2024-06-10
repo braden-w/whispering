@@ -114,8 +114,8 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				});
 				if (data?.error?.message) {
 					return yield* new TranscriptionError({
-						title: `Server error from Whisper API: ${data.error.message}`,
-						description: `Code: ${data.error.code}\nType: ${data.error.type}`,
+						title: 'Server error from Whisper API',
+						description: data.error.message,
 					});
 				}
 				if (!isString(data.text)) {
