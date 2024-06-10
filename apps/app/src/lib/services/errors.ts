@@ -16,17 +16,18 @@ export const catchErrorsAsToast = <
 	A = Effect.Effect.Success<E>,
 >(
 	program: E,
-	defaultValue?: A,
+	options?: { defaultValue?: A; toastId?: number | string },
 ): Effect.Effect<A, never, never> =>
 	Effect.gen(function* () {
 		const failureOrSuccess = yield* Effect.either(program);
 		if (Either.isLeft(failureOrSuccess)) {
 			const error = failureOrSuccess.left;
 			toast.error(error.title, {
+				id: options?.toastId,
 				description: error.description,
 				action: error.action,
 			});
-			return defaultValue;
+			return options?.defaultValue;
 		} else {
 			return failureOrSuccess.right;
 		}

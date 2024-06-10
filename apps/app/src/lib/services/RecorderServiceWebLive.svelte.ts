@@ -109,7 +109,8 @@ export const RecorderServiceWebLive = Layer.effect(
 			},
 			enumerateRecordingDevices: () =>
 				enumerateRecordingDevices.pipe(
-					(program) => catchErrorsAsToast(program, [] satisfies MediaDeviceInfo[]),
+					(program) =>
+						catchErrorsAsToast(program, { defaultValue: [] satisfies MediaDeviceInfo[] }),
 					Effect.runPromise,
 				),
 			toggleRecording: () =>
