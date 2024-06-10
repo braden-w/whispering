@@ -56,7 +56,7 @@ const createSettings = Effect.gen(function* () {
 		}).pipe(catchErrorsAsToast);
 		yield* jobQueue.addJobToQueue(initialSilentJob);
 	});
-	queueInitialSilentJob.pipe(Effect.runPromise);
+	queueInitialSilentJob.pipe(catchErrorsAsToast, Effect.runPromise);
 
 	return {
 		get isPlaySoundEnabled() {
@@ -99,7 +99,7 @@ const createSettings = Effect.gen(function* () {
 				}).pipe(catchErrorsAsToast);
 				yield* jobQueue.addJobToQueue(job);
 			});
-			queueJob.pipe(Effect.runPromise);
+			queueJob.pipe(catchErrorsAsToast, Effect.runPromise);
 		},
 		get isGlobalShortcutEnabled() {
 			return registerShortcutsService.isGlobalShortcutEnabled;
@@ -120,7 +120,7 @@ const createSettings = Effect.gen(function* () {
 				}).pipe(catchErrorsAsToast);
 				yield* jobQueue.addJobToQueue(job);
 			});
-			queueJob.pipe(Effect.runPromise);
+			queueJob.pipe(catchErrorsAsToast, Effect.runPromise);
 		},
 		get apiKey() {
 			return settings.value.apiKey;

@@ -23,6 +23,7 @@
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { catchErrorsAsToast } from '$lib/services/errors';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -248,7 +249,7 @@
 					size="icon"
 					on:click={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings.deleteRecordingsById(ids).pipe(Effect.runPromise);
+						recordings.deleteRecordingsById(ids).pipe(catchErrorsAsToast, Effect.runPromise);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />

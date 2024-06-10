@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { catchErrorsAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Button } from '@repo/ui/components/button';
@@ -61,7 +62,7 @@
 				onsubmit={async (e) => {
 					e.preventDefault();
 					isSaving = true;
-					await recordings.updateRecording(recording).pipe(Effect.runPromise);
+					await recordings.updateRecording(recording).pipe(catchErrorsAsToast, Effect.runPromise);
 					isSaving = false;
 					isDialogOpen = false;
 				}}
@@ -99,7 +100,9 @@
 						class="mr-auto"
 						on:click={async () => {
 							isDeleting = true;
-							await recordings.deleteRecordingById(recording.id).pipe(Effect.runPromise);
+							await recordings
+								.deleteRecordingById(recording.id)
+								.pipe(catchErrorsAsToast, Effect.runPromise);
 							isDeleting = false;
 							isDialogOpen = false;
 						}}
@@ -139,7 +142,8 @@
 	<Button
 		variant="ghost"
 		size="icon"
-		on:click={() => recordings.deleteRecordingById(recording.id).pipe(Effect.runPromise)}
+		on:click={() =>
+			recordings.deleteRecordingById(recording.id).pipe(catchErrorsAsToast, Effect.runPromise)}
 		title="Delete Recording"
 	>
 		<TrashIcon class="h-4 w-4" />
