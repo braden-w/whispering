@@ -1,3 +1,4 @@
+import { goto } from '$app/navigation';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
@@ -6,13 +7,7 @@ import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServi
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { catchErrorsAsToast } from '$lib/services/errors';
-import {
-	InvalidApiKey,
-	PleaseEnterAPIKeyToast,
-	SomethingWentWrongToast,
-	TranscriptionComplete,
-} from '@repo/ui/toasts';
-import { Console, Effect, Either, Option } from 'effect';
+import { Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
 
@@ -56,13 +51,14 @@ const createRecordings = Effect.gen(function* () {
 				recordings = recordings.filter((recording) => !ids.includes(recording.id));
 				toast.success('Recordings deleted!');
 			}).pipe(catchErrorsAsToast),
-		transcribeRecording: (id: string) =>
-			Effect.gen(function* () {
+		transcribeRecording: (id: string) => {
+			const toastId = toast.loading('Transcribing recording...');
+			return Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
 				if (Option.isNone(maybeRecording)) {
 					return yield* new TranscriptionError({ title: `Recording with id ${id} not found` });
 				}
-				const recording = yield* maybeRecording;
+				const recording = maybeRecording.value;
 				yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
 				const transcriptionResult = yield* Effect.either(
 					transcriptionService.transcribe(recording.blob, settings),
@@ -78,28 +74,16 @@ const createRecordings = Effect.gen(function* () {
 					yield* clipboardService.setClipboardText(transcribedText);
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
 					yield* clipboardService.writeText(transcribedText);
-			}).pipe(Effect.runPromise, (transcribeAndCopyPromise) => {
-				toast.promise(transcribeAndCopyPromise, {
-					loading: 'Transcribing recording...',
-					success: (maybeError) => {
-						if (!maybeError) return TranscriptionComplete;
-						const error = maybeError;
-						Console.error(error).pipe(Effect.runSync);
-						switch (error._tag) {
-							case 'PleaseEnterApiKeyError':
-								return PleaseEnterAPIKeyToast;
-							case 'InvalidApiKeyError':
-								return InvalidApiKey;
-							default:
-								return SomethingWentWrongToast;
-						}
-					},
-					error: (uncaughtError) => {
-						Console.error(uncaughtError).pipe(Effect.runSync);
-						return SomethingWentWrongToast;
+				toast.success('Transcription complete!', {
+					id: toastId,
+					description: 'Check it out in your recordings',
+					action: {
+						label: 'Go to recordings',
+						onClick: () => goto('/recordings'),
 					},
 				});
-			}),
+			}).pipe((program) => catchErrorsAsToast(program, { toastId }), Effect.runPromise);
+		},
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
