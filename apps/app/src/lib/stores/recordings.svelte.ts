@@ -3,7 +3,7 @@ import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
-import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive';
+import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { catchErrorsAsToast } from '$lib/services/errors';
