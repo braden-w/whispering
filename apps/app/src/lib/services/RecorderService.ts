@@ -11,17 +11,21 @@ export const recorderStateSchema = z.union([
 export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export class RecorderError extends Data.TaggedError('RecorderError')<{
-	message: string;
-	origError?: unknown;
+	title: string;
+	description?: string;
+	action?: {
+		label: string;
+		onClick: () => void;
+	};
+	error?: unknown;
 }> {}
 
 export class RecorderService extends Context.Tag('RecorderService')<
 	RecorderService,
 	{
-		readonly recorderState: Effect.Effect<RecorderState, RecorderError>;
-		readonly startRecording: (recordingDeviceId: string) => Effect.Effect<void, RecorderError>;
-		readonly cancelRecording: Effect.Effect<void, RecorderError>;
-		readonly stopRecording: Effect.Effect<Blob, RecorderError>;
-		readonly enumerateRecordingDevices: Effect.Effect<MediaDeviceInfo[], RecorderError>;
+		readonly recorderState: RecorderState;
+		readonly enumerateRecordingDevices: () => Promise<MediaDeviceInfo[]>;
+		readonly toggleRecording: () => void;
+		readonly cancelRecording: () => void;
 	}
 >() {}

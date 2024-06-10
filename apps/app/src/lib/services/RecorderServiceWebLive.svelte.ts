@@ -1,6 +1,47 @@
+import { goto } from '$app/navigation';
+import { recordings, settings } from '$lib/stores';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Effect, Layer } from 'effect';
-import { RecorderError, RecorderService } from './RecorderService';
+import { nanoid } from 'nanoid';
+import { toast } from 'svelte-sonner';
+import { RecorderError, RecorderService, type RecorderState } from './RecorderService';
+import type { Recording } from './RecordingDbService';
+import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
+import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+
+const startSound = new Audio(startSoundSrc);
+const stopSound = new Audio(stopSoundSrc);
+const cancelSound = new Audio(cancelSoundSrc);
+
+const getStream = (recordingDeviceId: string) =>
+	Effect.tryPromise({
+		try: () =>
+			navigator.mediaDevices.getUserMedia({
+				audio: { deviceId: { exact: recordingDeviceId } },
+			}),
+		catch: (error) =>
+			new RecorderError({
+				title: 'Error getting media stream',
+				error: error,
+			}),
+	});
+
+const enumerateRecordingDevices = Effect.tryPromise({
+	try: async () => {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		const devices = await navigator.mediaDevices.enumerateDevices();
+		stream.getTracks().forEach((track) => track.stop());
+		const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+		return audioInputDevices;
+	},
+	catch: (error) =>
+		new RecorderError({
+			title: 'Error enumerating recording devices',
+			description: 'Please make sure you have given permission to access your audio devices',
+			error: error,
+		}),
+});
 
 export const RecorderServiceWebLive = Layer.effect(
 	RecorderService,
@@ -9,6 +50,8 @@ export const RecorderServiceWebLive = Layer.effect(
 		let mediaRecorder: MediaRecorder | null = null;
 		const recordedChunks: Blob[] = [];
 
+		let recorderState = $state<RecorderState>('IDLE');
+
 		const resetRecorder = () => {
 			recordedChunks.length = 0;
 			stream?.getTracks().forEach((track) => track.stop());
@@ -16,93 +59,137 @@ export const RecorderServiceWebLive = Layer.effect(
 			mediaRecorder = null;
 		};
 
-		return {
-			recorderState: Effect.sync(() => {
-				if (!mediaRecorder) return 'IDLE';
-				switch (mediaRecorder.state) {
-					case 'recording':
-						return 'RECORDING';
-					case 'paused':
-						return 'PAUSED';
-					case 'inactive':
-						return 'IDLE';
-				}
-			}),
-			startRecording: (recordingDeviceId) =>
-				Effect.gen(function* () {
-					stream = yield* Effect.tryPromise({
-						try: () =>
-							navigator.mediaDevices.getUserMedia({
-								audio: { deviceId: { exact: recordingDeviceId } },
-							}),
-						catch: (error) =>
-							new RecorderError({
-								message: 'Error getting media stream',
-								origError: error,
-							}),
-					});
-					recordedChunks.length = 0;
-					mediaRecorder = new AudioRecorder(stream);
-					mediaRecorder!.addEventListener(
-						'dataavailable',
-						(event: BlobEvent) => {
-							if (!event.data.size) return;
-							recordedChunks.push(event.data);
+		const startRecording = (recordingDeviceId: string) =>
+			Effect.gen(function* () {
+				stream = yield* getStream(recordingDeviceId);
+				recordedChunks.length = 0;
+				mediaRecorder = new AudioRecorder(stream!);
+				(mediaRecorder!.ondataavailable = (event: BlobEvent) => {
+					if (!event.data.size) return;
+					recordedChunks.push(event.data);
+				}),
+					mediaRecorder!.start();
+			});
+
+		const stopRecording = Effect.tryPromise({
+			try: () =>
+				new Promise<Blob>((resolve) => {
+					if (!mediaRecorder) {
+						throw new RecorderError({
+							title: 'Media recorder is not initialized',
+						});
+					}
+					mediaRecorder.addEventListener(
+						'stop',
+						() => {
+							const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+							resolve(audioBlob);
+							resetRecorder();
 						},
 						{ once: true },
 					);
-					mediaRecorder!.start();
-				}),
-			cancelRecording: Effect.sync(() => {
-				if (mediaRecorder && mediaRecorder.state !== 'inactive') {
 					mediaRecorder.stop();
-				}
-				resetRecorder();
-			}),
-			stopRecording: Effect.tryPromise({
-				try: () =>
-					new Promise<Blob>((resolve) => {
-						if (!mediaRecorder) {
-							throw new RecorderError({
-								title: 'Media recorder is not initialized',
-							});
-						}
-						mediaRecorder.addEventListener(
-							'stop',
-							() => {
-								const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-								resolve(audioBlob);
-								resetRecorder();
-							},
-							{ once: true },
-						);
-						mediaRecorder.stop();
-					}),
-				catch: (error) =>
-					new RecorderError({
-						message: 'Error stopping media recorder and getting audio blob',
-						origError: error,
-					}),
-			}).pipe(
-				Effect.catchAll((error) => {
-					resetRecorder();
-					return error;
 				}),
-			),
-			enumerateRecordingDevices: Effect.tryPromise({
-				try: async () => {
-					const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					const devices = await navigator.mediaDevices.enumerateDevices();
-					stream.getTracks().forEach((track) => track.stop());
-					const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-					return audioInputDevices;
-				},
-				catch: (error) =>
-					new RecorderError({
-						message: 'Error enumerating recording devices',
-						origError: error,
-					}),
+			catch: (error) =>
+				new RecorderError({
+					title: 'Error stopping media recorder and getting audio blob',
+					error: error,
+				}),
+		}).pipe(
+			Effect.catchAll((error) => {
+				resetRecorder();
+				return error;
 			}),
+		);
+
+		return {
+			get recorderState() {
+				return recorderState;
+			},
+			enumerateRecordingDevices: () =>
+				enumerateRecordingDevices.pipe(
+					Effect.catchAll((error) =>
+						Effect.gen(function* () {
+							toast.error(error.title, {
+								description: error.description,
+								action: error.action,
+							});
+							return [] satisfies MediaDeviceInfo[];
+						}),
+					),
+					Effect.runPromise,
+				),
+			toggleRecording: () =>
+				Effect.gen(function* () {
+					if (!settings.apiKey) {
+						return yield* new RecorderError({
+							title: 'API Key not provided.',
+							description: 'Please enter your OpenAI API key in the settings',
+							action: {
+								label: 'Go to settings',
+								onClick: () => goto('/settings'),
+							},
+						});
+					}
+					const recordingDevices = yield* enumerateRecordingDevices;
+					const isSelectedDeviceExists = recordingDevices.some(
+						({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
+					);
+					if (!isSelectedDeviceExists) {
+						toast.info('Default audio input device not found, selecting first available device');
+						const firstAudioInput = recordingDevices[0].deviceId;
+						settings.selectedAudioInputDeviceId = firstAudioInput;
+					}
+					yield* Effect.logInfo('Media recorder state:', mediaRecorder?.state);
+					if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+						yield* startRecording(settings.selectedAudioInputDeviceId);
+						if (settings.isPlaySoundEnabled) startSound.play();
+						yield* Effect.logInfo('Recording started');
+						recorderState = 'RECORDING';
+						return;
+					} else if (mediaRecorder.state === 'paused') {
+						mediaRecorder.resume();
+						recorderState = 'RECORDING';
+						return;
+					} else if (mediaRecorder.state === 'recording') {
+						const audioBlob = yield* stopRecording;
+						if (settings.isPlaySoundEnabled) stopSound.play();
+						yield* Effect.logInfo('Recording stopped');
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob: audioBlob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+						recorderState = 'IDLE';
+						yield* recordings.addRecording(newRecording);
+						recordings.transcribeRecording(newRecording.id);
+						return;
+					}
+				}).pipe(
+					Effect.catchAll((error) =>
+						Effect.gen(function* () {
+							toast.error(error.title, {
+								description: error.description,
+								action: error.action,
+							});
+						}),
+					),
+					Effect.runPromise,
+				),
+			cancelRecording: () =>
+				Effect.gen(function* () {
+					if (!mediaRecorder) return;
+					if (mediaRecorder.state !== 'recording') return;
+					mediaRecorder.stop();
+					resetRecorder();
+					if (settings.isPlaySoundEnabled) cancelSound.play();
+					yield* Effect.logInfo('Recording cancelled');
+					recorderState = 'IDLE';
+				}).pipe(Effect.runSync),
 		};
 	}),
 );
