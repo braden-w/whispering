@@ -22,7 +22,7 @@ export const catchErrorsAsToast = <
 		const failureOrSuccess = yield* Effect.either(program);
 		if (Either.isLeft(failureOrSuccess)) {
 			const error = failureOrSuccess.left;
-			yield* Console.error(error.error);
+			yield* Console.error(error.error as any);
 			toast.error(error.title, {
 				id: options?.toastId,
 				description: error.description,
