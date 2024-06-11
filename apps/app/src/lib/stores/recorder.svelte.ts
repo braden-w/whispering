@@ -28,7 +28,7 @@ export let recorderState = (() => {
 			sendMessageToExtension({
 				message: 'setRecorderState',
 				recorderState: newValue,
-			});
+			}).pipe(Effect.runPromise);
 		},
 	};
 })();
