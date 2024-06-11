@@ -10,6 +10,7 @@ import { catchErrorsAsToast } from '$lib/services/errors';
 import { Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
+import { recorderState, setRecorderState } from './recorder.svelte';
 
 const createRecordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
@@ -53,6 +54,9 @@ const createRecordings = Effect.gen(function* () {
 			}).pipe(catchErrorsAsToast),
 		transcribeRecording: (id: string) => {
 			const toastId = toast.loading('Transcribing recording...');
+			if (recorderState !== 'RECORDING') {
+				setRecorderState('LOADING');
+			}
 			return Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
 				if (Option.isNone(maybeRecording)) {
@@ -74,6 +78,9 @@ const createRecordings = Effect.gen(function* () {
 					yield* clipboardService.setClipboardText(transcribedText);
 				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
 					yield* clipboardService.writeText(transcribedText);
+				if (recorderState !== 'RECORDING') {
+					setRecorderState('IDLE');
+				}
 				toast.success('Transcription complete!', {
 					id: toastId,
 					description: 'Check it out in your recordings',
