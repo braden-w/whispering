@@ -7,7 +7,9 @@ import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { WhisperingErrorProperties } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 import cancelRecording from './scripts/cancelRecording';
+import setClipboardText from './scripts/setClipboardText';
 import toggleRecording from './scripts/toggleRecording';
+import type { Result } from '@repo/shared';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
@@ -91,28 +93,6 @@ export const serviceWorkerCommands = {
 				error,
 			}),
 	}),
-	setIcon: (icon: 'IDLE' | 'STOP' | 'LOADING') =>
-		Effect.tryPromise({
-			try: () => {
-				const path = ((icon: 'IDLE' | 'STOP' | 'LOADING') => {
-					switch (icon) {
-						case 'IDLE':
-							return studioMicrophone;
-						case 'STOP':
-							return redLargeSquare;
-						case 'LOADING':
-							return arrowsCounterclockwise;
-					}
-				})(icon);
-				return chrome.action.setIcon({ path });
-			},
-			catch: (error) =>
-				new BackgroundServiceWorkerError({
-					title: `Error setting icon to ${icon} icon`,
-					description: error instanceof Error ? error.message : undefined,
-					error,
-				}),
-		}).pipe(Effect.tap(() => Console.info('Icon set to', icon))),
 	toggleRecording: Effect.gen(function* () {
 		const tabId = yield* getOrCreateWhisperingTabId;
 		chrome.scripting.executeScript({
@@ -160,4 +140,51 @@ export const serviceWorkerCommands = {
 		}
 		return firstActiveTab.id;
 	}),
+	setIcon: (icon: 'IDLE' | 'STOP' | 'LOADING') =>
+		Effect.tryPromise({
+			try: () => {
+				const path = ((icon: 'IDLE' | 'STOP' | 'LOADING') => {
+					switch (icon) {
+						case 'IDLE':
+							return studioMicrophone;
+						case 'STOP':
+							return redLargeSquare;
+						case 'LOADING':
+							return arrowsCounterclockwise;
+					}
+				})(icon);
+				return chrome.action.setIcon({ path });
+			},
+			catch: (error) =>
+				new BackgroundServiceWorkerError({
+					title: `Error setting icon to ${icon} icon`,
+					description: error instanceof Error ? error.message : undefined,
+					error,
+				}),
+		}).pipe(Effect.tap(() => Console.info('Icon set to', icon))),
+	setClipboardText: (text: string) =>
+		Effect.gen(function* () {
+			const tabId = yield* getOrCreateWhisperingTabId;
+			return yield* Effect.async<Result<string, unknown>, BackgroundServiceWorkerError>((resume) =>
+				chrome.scripting.executeScript(
+					{
+						target: { tabId },
+						world: 'MAIN',
+						func: setClipboardText,
+						args: [text],
+					},
+					([{ result }]) => {
+						if (!result) {
+							resume(
+								Effect.fail(
+									new BackgroundServiceWorkerError({ title: 'No result from setClipboardText' }),
+								),
+							);
+						} else {
+							resume(Effect.succeed(result));
+						}
+					},
+				),
+			);
+		}),
 };
