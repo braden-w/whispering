@@ -9,7 +9,7 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
 					new ClipboardError({
-						title: 'Failed to write to clipboard',
+						title: 'Unable to write to clipboard',
 						description: error instanceof Error ? error.message : undefined,
 						error,
 					}),
@@ -19,7 +19,7 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 				try: () => writeTextToCursor(text),
 				catch: (error) =>
 					new ClipboardError({
-						title: 'Failed to write text to cursor',
+						title: 'Unable to write text to cursor',
 						description: error instanceof Error ? error.message : undefined,
 						error,
 					}),

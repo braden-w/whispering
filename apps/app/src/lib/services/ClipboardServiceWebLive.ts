@@ -9,7 +9,7 @@ export const ClipboardServiceWebLive = Layer.succeed(
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
 					new ClipboardError({
-						title: 'Failed to write to clipboard',
+						title: 'Unable to write to clipboard',
 						description: error instanceof Error ? error.message : undefined,
 						error,
 					}),
@@ -21,7 +21,7 @@ export const ClipboardServiceWebLive = Layer.succeed(
 				},
 				catch: (error) =>
 					new ClipboardError({
-						title: 'Failed to paste from clipboard',
+						title: 'Unable to paste from clipboard',
 						description: error instanceof Error ? error.message : undefined,
 						error,
 					}),
