@@ -6,6 +6,7 @@ import { whisperingCommands, type WhisperingMessage } from '~contents/whispering
 import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { WhisperingErrorProperties } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
+import cancelRecording from './scripts/cancelRecording';
 import toggleRecording from './scripts/toggleRecording';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
@@ -114,7 +115,7 @@ export const serviceWorkerCommands = {
 		chrome.scripting.executeScript({
 			target: { tabId },
 			world: 'MAIN',
-			func: () => window.cancelRecording(),
+			func: cancelRecording,
 		});
 		return true as const;
 	}),
