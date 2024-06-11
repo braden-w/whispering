@@ -3,11 +3,9 @@ import type { PlasmoCSConfig } from 'plasmo';
 import type { ExtensionMessage, Message } from '~lib/commands';
 import { localStorageService, type Settings } from '~lib/services/local-storage';
 
-// import { CHATGPT_DOMAINS } from './chatGptButton';
-
 export const config: PlasmoCSConfig = {
 	matches: ['http://localhost:5173/*'],
-	// exclude_matches: CHATGPT_DOMAINS,
+	world: 'MAIN',
 };
 
 export const whisperingCommands = {
