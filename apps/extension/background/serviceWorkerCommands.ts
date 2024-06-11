@@ -1,9 +1,8 @@
-import { Option, Console, Effect } from 'effect';
+import { Console, Effect, Option } from 'effect';
+import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 import { BackgroundServiceWorkerError } from '~lib/commands';
-import type { GlobalContentScriptMessage, globalContentScriptCommands } from '~contents/global';
 import type { Settings } from '~lib/services/local-storage';
 import toggleRecording from './scripts/toggleRecording';
-import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
@@ -49,25 +48,6 @@ const sendMessageToWhisperingContentScript = <Message extends WhisperingMessage>
 			>(whisperingTabId, message),
 		);
 		yield* Console.info('Response from Whispering content script:', response);
-		return response;
-	});
-
-export const sendMessageToGlobalContentScript = <Message extends GlobalContentScriptMessage>(
-	message: Message,
-) =>
-	Effect.gen(function* () {
-		const activeTabId = yield* serviceWorkerCommands.getActiveTabId;
-		yield* Console.info('Active tab ID:', activeTabId);
-		yield* Console.info('Sending message to global content script:', message);
-		const response = yield* Effect.promise(() =>
-			chrome.tabs.sendMessage<
-				Message,
-				Effect.Effect.Success<
-					ReturnType<(typeof globalContentScriptCommands)[Message['commandName']]>
-				>
-			>(activeTabId, message),
-		);
-		yield* Console.info('Response from global content script:', response);
 		return response;
 	});
 

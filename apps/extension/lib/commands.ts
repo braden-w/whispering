@@ -1,7 +1,6 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { Data, Effect } from 'effect';
-import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
-import type { GlobalContentScriptMessage } from '~contents/global';
+import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
 import type { WhisperingMessage } from '~contents/whispering';
 
 type AnyFunction = (...args: any[]) => any;
@@ -14,7 +13,7 @@ export type Message<T extends CommandDefinition> = {
 	};
 }[keyof T];
 
-export type ExtensionMessage = WhisperingMessage | GlobalContentScriptMessage;
+export type ExtensionMessage = WhisperingMessage;
 
 type ExtractData<T> = T extends { data: infer U; error: null } ? U : never;
 type ExtractError<T> = T extends { data: null; error: infer U } ? U : never;
