@@ -1,6 +1,5 @@
-import { Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import { BackgroundServiceWorkerError } from '~lib/commands';
-import setClipboardText from '../scripts/setClipboardText';
 
 const getCurrentTabId = Effect.gen(function* () {
 	const [currentTab] = yield* Effect.promise(() =>
@@ -15,31 +14,40 @@ const getCurrentTabId = Effect.gen(function* () {
 const handler = (text: string) =>
 	Effect.gen(function* () {
 		const currentTabId = yield* getCurrentTabId;
-		return yield* Effect.async<string, BackgroundServiceWorkerError>((resume) =>
-			chrome.scripting.executeScript(
-				{
+		const [{ result }] = yield* Effect.tryPromise({
+			try: () =>
+				chrome.scripting.executeScript({
 					target: { tabId: currentTabId },
 					world: 'MAIN',
-					func: setClipboardText,
+					func: (text: string) => {
+						try {
+							console.info('Setting clipboard text:', text);
+							navigator.clipboard.writeText(text);
+							console.info('Clipboard text set:', text);
+							return { isSuccess: true, data: text } as const;
+						} catch (error) {
+							console.error('Error setting clipboard text:', error);
+							return { isSuccess: false, error } as const;
+						}
+					},
 					args: [text],
-				},
-				([{ result }]) => {
-					if (!result || !result.isSuccess) {
-						resume(
-							Effect.fail(
-								new BackgroundServiceWorkerError({
-									title: 'No result from setClipboardText',
-									description: result?.error instanceof Error ? result.error.message : undefined,
-									error: result?.error,
-								}),
-							),
-						);
-						return;
-					}
-					resume(Effect.succeed(result.data));
-				},
-			),
-		);
+				}),
+			catch: (error) =>
+				new BackgroundServiceWorkerError({
+					title: 'No result from setClipboardText',
+					description: error instanceof Error ? error.message : undefined,
+					error,
+				}),
+		});
+		yield* Console.info('setClipboardText result:', result);
+		if (!result || !result.isSuccess) {
+			return yield* new BackgroundServiceWorkerError({
+				title: 'Error setting clipboard text',
+				description: result?.error instanceof Error ? result.error.message : undefined,
+				error: result?.error,
+			});
+		}
+		return result.data;
 	});
 
 export default handler;
