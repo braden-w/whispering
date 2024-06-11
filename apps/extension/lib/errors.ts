@@ -1,5 +1,5 @@
 import type { WhisperingErrorProperties } from '@repo/shared';
-import { Console, Effect, Either } from 'effect';
+import { Effect } from 'effect';
 import { toast } from 'sonner';
 
 export const catchErrorsAsToast = <
@@ -9,18 +9,11 @@ export const catchErrorsAsToast = <
 	program: E,
 	options?: { defaultValue?: A; toastId?: number | string },
 ): Effect.Effect<A, never, never> =>
-	Effect.gen(function* () {
-		const failureOrSuccess = yield* Effect.either(program);
-		if (Either.isLeft(failureOrSuccess)) {
-			const error = failureOrSuccess.left;
-			yield* Console.error(error.error as any);
-			toast.error(error.title, {
-				id: options?.toastId,
-				description: error.description,
-				action: error.action,
-			});
-			return options?.defaultValue;
-		} else {
-			return failureOrSuccess.right;
-		}
+	Effect.catchAll(program, (error) => {
+		toast.error(error.title, {
+			id: options?.toastId,
+			description: error.description,
+			action: error.action,
+		});
+		return Effect.succeed(options?.defaultValue);
 	});
