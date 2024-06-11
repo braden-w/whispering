@@ -1,10 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { Console, Effect } from 'effect';
+import { Effect } from 'effect';
+import { serviceWorkerCommands } from '~background/serviceWorkerCommands';
+import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
 import { BackgroundServiceWorkerError } from '~lib/commands';
-import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
-import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
 import type { Settings } from '~lib/services/local-storage';
-import { commands } from '~background/commands';
 
 export type RequestBody = { settings: Settings };
 
@@ -18,7 +17,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 				description: 'Settings must be provided in the request body of the message',
 			});
 		}
-		yield* commands.setSettings(body.settings);
+		yield* serviceWorkerCommands.setSettings(body.settings);
 		return true as const;
 	}).pipe(
 		Effect.map((data) => ({ data, error: null })),

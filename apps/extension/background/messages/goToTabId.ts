@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
+import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 
 export type RequestBody = { tabId: number };

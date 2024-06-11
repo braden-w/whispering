@@ -3,7 +3,7 @@ import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect } from 'effect';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 import { extensionStorage } from '~lib/services/extension-storage';
-import { commands } from './commands';
+import { serviceWorkerCommands } from './serviceWorkerCommands';
 
 Effect.gen(function* () {
 	yield* extensionStorage.watch({
@@ -38,9 +38,8 @@ Effect.gen(function* () {
 
 chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {
-		if (details.reason === 'install') {
-			yield* commands.openOptionsPage;
-		}
+		if (details.reason !== 'install') return;
+		yield* serviceWorkerCommands.openOptionsPage;
 	}).pipe(Effect.runPromise),
 );
 
@@ -48,7 +47,7 @@ chrome.commands.onCommand.addListener((command) =>
 	Effect.gen(function* () {
 		yield* Console.info('Received command via Chrome Keyboard Shortcut', command);
 		if (command !== 'toggleRecording') return false;
-		yield* commands.toggleRecording;
+		yield* serviceWorkerCommands.toggleRecording;
 		return true;
-	}).pipe(Effect.runSync),
+	}).pipe(Effect.runPromise),
 );

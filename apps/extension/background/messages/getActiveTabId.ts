@@ -1,16 +1,16 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { Console, Effect } from 'effect';
-import { getActiveTabId, type BackgroundServiceWorkerResponse } from '~background/sendMessage';
+import { Effect } from 'effect';
+import {
+	serviceWorkerCommands,
+	type BackgroundServiceWorkerResponse,
+} from '~background/serviceWorkerCommands';
 
 export type RequestBody = {};
 
 export type ResponseBody = BackgroundServiceWorkerResponse<number>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
-	Effect.gen(function* () {
-		const activeTabId = yield* getActiveTabId;
-		return activeTabId;
-	}).pipe(
+	serviceWorkerCommands.getActiveTabId.pipe(
 		Effect.map((data) => ({ data, error: null })),
 		Effect.catchAll((error) => Effect.succeed({ data: null, error })),
 		Effect.map((payload) => res.send(payload)),

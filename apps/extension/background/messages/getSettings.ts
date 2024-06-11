@@ -1,9 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { Console, Effect } from 'effect';
+import { Effect } from 'effect';
 import {
-	sendMessageToWhisperingContentScript,
+	serviceWorkerCommands,
 	type BackgroundServiceWorkerResponse,
-} from '~background/sendMessage';
+} from '~background/serviceWorkerCommands';
 import type { Settings } from '~lib/services/local-storage';
 
 export type RequestBody = {};
@@ -11,10 +11,7 @@ export type RequestBody = {};
 export type ResponseBody = BackgroundServiceWorkerResponse<Settings>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
-	Effect.gen(function* () {
-		yield* Console.info('BackgroundServiceWorker: getSettings');
-		return settings;
-	}).pipe(
+	serviceWorkerCommands.getSettings.pipe(
 		Effect.map((data) => ({ data, error: null })),
 		Effect.catchAll((error) => Effect.succeed({ data: null, error })),
 		Effect.map((payload) => res.send(payload)),
