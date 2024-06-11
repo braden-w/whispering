@@ -1,15 +1,14 @@
+import type { Result } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect, Option } from 'effect';
 import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 import { BackgroundServiceWorkerError } from '~lib/commands';
-import type { WhisperingErrorProperties } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 import cancelRecording from './scripts/cancelRecording';
 import setClipboardText from './scripts/setClipboardText';
 import toggleRecording from './scripts/toggleRecording';
-import type { Result } from '@repo/shared';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
@@ -69,19 +68,6 @@ const sendMessageToWhisperingContentScript = <Message extends WhisperingMessage>
 		yield* Console.info('Response from Whispering content script:', response);
 		return response;
 	});
-
-export type BackgroundServiceWorkerResponse<
-	T,
-	E extends WhisperingErrorProperties = WhisperingErrorProperties,
-> =
-	| {
-			data: T;
-			error: null;
-	  }
-	| {
-			data: null;
-			error: E;
-	  };
 
 export const serviceWorkerCommands = {
 	openOptionsPage: Effect.tryPromise({
@@ -165,7 +151,7 @@ export const serviceWorkerCommands = {
 	setClipboardText: (text: string) =>
 		Effect.gen(function* () {
 			const tabId = yield* getOrCreateWhisperingTabId;
-			return yield* Effect.async<Result<string, unknown>, BackgroundServiceWorkerError>((resume) =>
+			return yield* Effect.async<string, BackgroundServiceWorkerError>((resume) =>
 				chrome.scripting.executeScript(
 					{
 						target: { tabId },
@@ -174,15 +160,19 @@ export const serviceWorkerCommands = {
 						args: [text],
 					},
 					([{ result }]) => {
-						if (!result) {
+						if (!result || !result.isSuccess) {
 							resume(
 								Effect.fail(
-									new BackgroundServiceWorkerError({ title: 'No result from setClipboardText' }),
+									new BackgroundServiceWorkerError({
+										title: 'No result from setClipboardText',
+										description: result?.error instanceof Error ? result.error.message : undefined,
+										error: result?.error,
+									}),
 								),
 							);
-						} else {
-							resume(Effect.succeed(result));
+							return;
 						}
+						resume(Effect.succeed(result.data));
 					},
 				),
 			);
