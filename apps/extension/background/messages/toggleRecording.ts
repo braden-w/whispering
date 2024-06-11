@@ -14,13 +14,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		yield* commands.toggleRecording;
 		return true as const;
 	}).pipe(
-		(program) =>
-			Effect.gen(function* () {
-				const failureOrSuccess = yield* Effect.either(program);
-				return Either.isLeft(failureOrSuccess)
-					? { data: null, error: failureOrSuccess.left }
-					: { data: failureOrSuccess.right, error: null };
-			}),
+		Effect.map((data) => ({ data, error: null })),
+		Effect.catchAll((error) => Effect.succeed({ data: null, error })),
 		Effect.map((payload) => res.send(payload)),
 		Effect.runPromise,
 	);
