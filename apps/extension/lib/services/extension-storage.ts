@@ -1,6 +1,7 @@
 import { Storage } from '@plasmohq/storage';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
+import { recorderStateSchema } from '../recorderStateSchema';
 
 export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageError')<{
 	title: string;
@@ -11,12 +12,9 @@ export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageErr
 const storage = new Storage();
 
 const extensionSchemas = {
-	'whispering-recording-state': z.union([
-		z.literal('IDLE'),
-		z.literal('PAUSED'),
-		z.literal('RECORDING'),
-	]),
+	'whispering-recording-state': recorderStateSchema,
 	'whispering-toast': z.object({
+		id: z.union([z.string(), z.number()]).optional(),
 		title: z.string(),
 		description: z.string().optional(),
 		variant: z.union([z.literal('default'), z.literal('destructive')]),

@@ -1,13 +1,5 @@
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
-import { z } from 'zod';
-
-export const recorderStateSchema = z.union([
-	z.literal('IDLE'),
-	z.literal('PAUSED'),
-	z.literal('RECORDING'),
-]);
-export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 class RecorderError extends Data.TaggedError('RecorderError')<{
 	title: string;
