@@ -98,7 +98,7 @@ const createRecordings = Effect.gen(function* () {
 							yield* clipboardService.setClipboardText(transcribedText).pipe(
 								Effect.catchAll((error) =>
 									sendMessageToExtension({
-										message: 'transcription',
+										message: 'setClipboardText',
 										transcription: transcribedText,
 									}),
 								),

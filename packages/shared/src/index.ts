@@ -26,5 +26,7 @@ export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export const externalMessageSchema = z.discriminatedUnion('message', [
 	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
-	z.object({ message: z.literal('transcription'), transcription: z.string() }),
+	z.object({ message: z.literal('setClipboardText'), transcription: z.string() }),
 ]);
+
+export type ExternalMessage = z.infer<typeof externalMessageSchema>;

@@ -14,7 +14,7 @@ export const registerExternalListener = () =>
 					case 'setRecorderState':
 						const { recorderState } = externalMessage;
 						return yield* setRecorderState(recorderState);
-					case 'transcription':
+					case 'setClipboardText':
 						const { transcription } = externalMessage;
 						return yield* setClipboardText(transcription);
 				}
