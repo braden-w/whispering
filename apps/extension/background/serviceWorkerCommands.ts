@@ -1,6 +1,10 @@
+import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
+import redLargeSquare from 'data-base64:~assets/red_large_square.png';
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect, Option } from 'effect';
 import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 import { BackgroundServiceWorkerError } from '~lib/commands';
+import type { WhisperingErrorProperties } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 import toggleRecording from './scripts/toggleRecording';
 
@@ -74,6 +78,28 @@ export const serviceWorkerCommands = {
 				error,
 			}),
 	}),
+	setIcon: (icon: 'IDLE' | 'STOP' | 'LOADING') =>
+		Effect.tryPromise({
+			try: () => {
+				const path = ((icon: 'IDLE' | 'STOP' | 'LOADING') => {
+					switch (icon) {
+						case 'IDLE':
+							return studioMicrophone;
+						case 'STOP':
+							return redLargeSquare;
+						case 'LOADING':
+							return arrowsCounterclockwise;
+					}
+				})(icon);
+				return chrome.action.setIcon({ path });
+			},
+			catch: (error) =>
+				new BackgroundServiceWorkerError({
+					title: `Error setting icon to ${icon} icon`,
+					description: error instanceof Error ? error.message : undefined,
+					error,
+				}),
+		}).pipe(Effect.tap(() => Console.info('Icon set to', icon))),
 	toggleRecording: Effect.gen(function* () {
 		const tabId = yield* getOrCreateWhisperingTabId;
 		chrome.scripting.executeScript({
