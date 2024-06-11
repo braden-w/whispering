@@ -46,7 +46,8 @@
 		"permissions": [
 			"tabs",
 			"clipboardWrite",
-			"storage"
+			"storage",
+			"scripting"
 		],
 		"commands": {
 			"toggleRecording": {
@@ -56,6 +57,11 @@
 				},
 				"description": "Toggle recording"
 			}
+		},
+		"externally_connectable": {
+			"matches": [
+				"http://localhost:5173/*"
+			]
 		}
 	}
 }
