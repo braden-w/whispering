@@ -1,9 +1,10 @@
 import { externalMessageSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
+import { catchErrorsAsToast } from '~lib/errors';
 import setClipboardText from './setClipboardText';
 import setRecorderState from './setRecorderState';
 
-export const registerOnMessageExternalToggleRecording = Effect.sync(() =>
+export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener((requestUnparsed, sender, sendResponse) =>
 		Effect.gen(function* () {
 			yield* Console.info('Received message from external website', requestUnparsed);
@@ -19,6 +20,7 @@ export const registerOnMessageExternalToggleRecording = Effect.sync(() =>
 					sendResponse(response);
 					break;
 			}
-		}).pipe(Effect.runPromise),
-	),
-);
+		}).pipe(
+			catchErrorsAsToast,
+			Effect.runPromise),
+	);
