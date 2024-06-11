@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
+	import { settings } from '$lib/stores';
 	import '@repo/ui/app.pcss';
 	import { Toaster } from '@repo/ui/components/sonner';
 	import { ModeWatcher } from 'mode-watcher';
@@ -24,5 +25,5 @@
 	<slot />
 </div>
 
-<Toaster position="bottom-right" />
+<Toaster {...settings.toast} />
 <ModeWatcher />

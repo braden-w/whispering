@@ -10,6 +10,7 @@ import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
+import { get } from 'svelte/store';
 import { z } from 'zod';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
@@ -27,6 +28,20 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut: z.string(),
 			apiKey: z.string(),
 			outputLanguage: z.string(),
+			toast: z.object({
+				position: z.enum([
+					'top-left',
+					'top-right',
+					'bottom-left',
+					'bottom-right',
+					'top-center',
+					'bottom-center',
+				]),
+				richColors: z.boolean(),
+				expand: z.boolean(),
+				duration: z.number(),
+				visibileToasts: z.number(),
+			}),
 		}),
 		defaultValue: {
 			isPlaySoundEnabled: true,
@@ -37,6 +52,13 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
 			outputLanguage: 'en',
+			toast: {
+				position: 'bottom-right',
+				richColors: true,
+				expand: true,
+				duration: 4000,
+				visibileToasts: 5,
+			},
 		},
 	});
 
@@ -133,6 +155,12 @@ const createSettings = Effect.gen(function* () {
 		},
 		set outputLanguage(newValue) {
 			settings.value = { ...settings.value, outputLanguage: newValue };
+		},
+		get toast() {
+			return settings.value.toast;
+		},
+		set toast(newValue) {
+			settings.value = { ...settings.value, toast: newValue };
 		},
 	};
 });
