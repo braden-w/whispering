@@ -1,11 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
-import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
+import type { Result } from '@repo/shared';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 
 export type RequestBody = { tabId: number };
 
-export type ResponseBody = BackgroundServiceWorkerResponse<true>;
+export type ResponseBody = Result<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
@@ -19,8 +19,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		yield* Effect.promise(() => chrome.tabs.update(Number(body.tabId), { active: true }));
 		return true as const;
 	}).pipe(
-		Effect.map((data) => ({ data, error: null })),
-		Effect.catchAll((error) => Effect.succeed({ data: null, error })),
+		Effect.map((data) => ({ isSuccess: true, data }) as const),
+		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
 		Effect.map((payload) => res.send(payload)),
 		Effect.runPromise,
 	);

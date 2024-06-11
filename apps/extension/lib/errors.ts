@@ -1,15 +1,6 @@
+import type { WhisperingErrorProperties } from '@repo/shared';
 import { Console, Effect, Either } from 'effect';
 import { toast } from 'sonner';
-
-export type WhisperingErrorProperties = {
-	title: string;
-	description?: string;
-	action?: {
-		label: string;
-		onClick: () => void;
-	};
-	error?: unknown;
-};
 
 export const catchErrorsAsToast = <
 	E extends Effect.Effect<any, WhisperingErrorProperties, never>,

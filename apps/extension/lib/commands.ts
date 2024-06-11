@@ -1,8 +1,7 @@
 import { sendToBackground } from '@plasmohq/messaging';
+import type { Result, WhisperingErrorProperties } from '@repo/shared';
 import { Data, Effect } from 'effect';
-import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
 import type { WhisperingMessage } from '~contents/whispering';
-import type { WhisperingErrorProperties } from './errors';
 
 type AnyFunction = (...args: any[]) => any;
 type CommandDefinition = Record<string, AnyFunction>;
@@ -16,12 +15,12 @@ export type Message<T extends CommandDefinition> = {
 
 export type ExtensionMessage = WhisperingMessage;
 
-type ExtractData<T> = T extends { data: infer U; error: null } ? U : never;
-type ExtractError<T> = T extends { data: null; error: infer U } ? U : never;
+type ExtractData<T> = T extends { isSuccess: true; data: infer U } ? U : never;
+type ExtractError<T> = T extends { isSuccess: false; error: infer U } ? U : never;
 
 export const sendToBgsw = <
 	RequestBody,
-	ResponseBody extends BackgroundServiceWorkerResponse<any>,
+	ResponseBody extends Result<any>,
 	TData = ExtractData<ResponseBody>,
 	TError = ExtractError<ResponseBody>,
 >(
