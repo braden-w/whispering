@@ -30,7 +30,7 @@
 <div class="container flex items-center justify-center">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title>Settings</Card.Title>
+			<Card.Title class="text-xl">Settings</Card.Title>
 			<Card.Description>Customize your Whispering experience</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-6">
