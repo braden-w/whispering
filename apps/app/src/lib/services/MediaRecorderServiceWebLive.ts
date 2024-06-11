@@ -17,10 +17,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 		};
 
 		return {
-			get recorderState() {
-				if (!mediaRecorder) return 'IDLE';
-				if (mediaRecorder.state === 'recording') return 'RECORDING';
-				return 'IDLE';
+			get recordingState() {
+				if (!mediaRecorder) return 'inactive';
+				return mediaRecorder.state;
 			},
 			enumerateRecordingDevices: Effect.tryPromise({
 				try: async () => {
