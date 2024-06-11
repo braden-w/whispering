@@ -10,7 +10,7 @@ import { catchErrorsAsToast } from '$lib/services/errors';
 import { Effect, Either, Option } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
-import { recorderState, setRecorderState } from './recorder.svelte';
+import { recorderState } from './recorder.svelte';
 
 const createRecordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
@@ -54,8 +54,8 @@ const createRecordings = Effect.gen(function* () {
 			}).pipe(catchErrorsAsToast),
 		transcribeRecording: (id: string) => {
 			const toastId = toast.loading('Transcribing recording...');
-			if (recorderState !== 'RECORDING') {
-				setRecorderState('LOADING');
+			if (recorderState.value !== 'RECORDING') {
+				recorderState.value = 'LOADING';
 			}
 			return Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
@@ -74,12 +74,8 @@ const createRecordings = Effect.gen(function* () {
 				}
 				const transcribedText = transcriptionResult.right;
 				yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
-				if (settings.isCopyToClipboardEnabled && transcribedText)
-					yield* clipboardService.setClipboardText(transcribedText);
-				if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
-					yield* clipboardService.writeText(transcribedText);
-				if (recorderState !== 'RECORDING') {
-					setRecorderState('IDLE');
+				if (recorderState.value !== 'RECORDING') {
+					recorderState.value = 'IDLE';
 				}
 				toast.success('Transcription complete!', {
 					id: toastId,
@@ -89,7 +85,21 @@ const createRecordings = Effect.gen(function* () {
 						onClick: () => goto('/recordings'),
 					},
 				});
-			}).pipe((program) => catchErrorsAsToast(program, { toastId }), Effect.runPromise);
+				return transcribedText;
+			}).pipe(
+				(program) => catchErrorsAsToast(program, { toastId }),
+				Effect.flatMap((transcribedText) =>
+					Effect.gen(function* () {
+						if (settings.isCopyToClipboardEnabled && transcribedText)
+							yield* clipboardService.setClipboardText(transcribedText);
+						if (settings.isPasteContentsOnSuccessEnabled && transcribedText)
+							yield* clipboardService.writeText(transcribedText);
+						toast.success('Copied to clipboard!');
+					}),
+				),
+				(program) => catchErrorsAsToast(program),
+				Effect.runPromise,
+			);
 		},
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {

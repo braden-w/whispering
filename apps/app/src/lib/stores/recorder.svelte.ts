@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { sendRecorderStateToExtension } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { recordings, settings } from '$lib/stores';
 import { Effect } from 'effect';
@@ -14,25 +15,30 @@ import { catchErrorsAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { sendRecorderStateToExtension } from '$lib/messaging';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
-export let recorderState = $state<RecorderState>('IDLE');
-
-export const setRecorderState = (state: RecorderState) => {
-	recorderState = state;
-	sendRecorderStateToExtension(state);
-};
+export let recorderState = (() => {
+	let value = $state<RecorderState>('IDLE');
+	return {
+		get value() {
+			return value;
+		},
+		set value(newValue: RecorderState) {
+			value = newValue;
+			sendRecorderStateToExtension(newValue);
+		},
+	};
+})();
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
 
 	return {
 		get recorderState() {
-			return recorderState;
+			return recorderState.value;
 		},
 		enumerateRecordingDevices: () =>
 			mediaRecorderService.enumerateRecordingDevices.pipe(
@@ -63,13 +69,13 @@ export const recorder = Effect.gen(function* () {
 				}
 
 				switch (mediaRecorderService.recordingState) {
-					case 'recording':
+					case 'inactive':
 						yield* mediaRecorderService.startRecording(settings.selectedAudioInputDeviceId);
 						if (settings.isPlaySoundEnabled) startSound.play();
 						yield* Effect.logInfo('Recording started');
-						setRecorderState('RECORDING');
+						recorderState.value = 'RECORDING';
 						return;
-					case 'inactive':
+					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
 						if (settings.isPlaySoundEnabled) stopSound.play();
 						yield* Effect.logInfo('Recording stopped');
@@ -82,7 +88,7 @@ export const recorder = Effect.gen(function* () {
 							blob: audioBlob,
 							transcriptionStatus: 'UNPROCESSED',
 						};
-						setRecorderState('IDLE');
+						recorderState.value = 'IDLE';
 						yield* recordings.addRecording(newRecording);
 						recordings.transcribeRecording(newRecording.id);
 						return;
@@ -93,7 +99,7 @@ export const recorder = Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
 				if (settings.isPlaySoundEnabled) cancelSound.play();
 				yield* Effect.logInfo('Recording cancelled');
-				setRecorderState('IDLE');
+				recorderState.value = 'IDLE';
 			}).pipe(Effect.runSync),
 	};
 }).pipe(Effect.provide(MediaRecorderServiceWebLive), Effect.runSync);
