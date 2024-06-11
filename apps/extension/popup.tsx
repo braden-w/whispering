@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { useStorage } from '@plasmohq/storage/hook';
 import { Effect } from 'effect';
 import { sendToBgsw } from '~lib/commands';
-import type { RecorderState } from '~lib/services/recorder';
+import type { RecorderState } from '~lib/recorderStateSchema';
 import './style.css';
 
 function IndexPopup() {
