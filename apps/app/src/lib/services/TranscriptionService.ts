@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import { Context, Data } from 'effect';
-import type { WhisperingErrorProperties } from './errors';
+import type { WhisperingErrorProperties } from '@repo/shared';
 
 export class TranscriptionError extends Data.TaggedError(
 	'TranscriptionError',

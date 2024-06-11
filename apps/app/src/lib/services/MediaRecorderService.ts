@@ -1,5 +1,5 @@
 import { Context, Data, Effect } from 'effect';
-import type { WhisperingErrorProperties } from './errors';
+import type { WhisperingErrorProperties } from '@repo/shared';
 
 export class MediaRecorderError extends Data.TaggedError(
 	'MediaRecorderError',

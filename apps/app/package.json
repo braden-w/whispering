@@ -29,6 +29,7 @@
 		"@effect/platform": "^0.56.0",
 		"@repo/svelte-table": "workspace:*",
 		"@repo/ui": "workspace:*",
+		"@repo/shared": "workspace:*",
 		"@tanstack/table-core": "^8.17.3",
 		"@tauri-apps/api": "^1.5.6",
 		"audio-recorder-polyfill": "^0.4.1",

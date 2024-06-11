@@ -1,6 +1,6 @@
 import type { Effect, Option } from 'effect';
 import { Context, Data } from 'effect';
-import type { WhisperingErrorProperties } from './errors';
+import type { WhisperingErrorProperties } from '@repo/shared';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
