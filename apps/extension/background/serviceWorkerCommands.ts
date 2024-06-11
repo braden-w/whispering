@@ -51,14 +51,17 @@ const sendMessageToWhisperingContentScript = <Message extends WhisperingMessage>
 		return response;
 	});
 
-export type BackgroundServiceWorkerResponse<T> =
+export type BackgroundServiceWorkerResponse<
+	T,
+	E extends WhisperingErrorProperties = WhisperingErrorProperties,
+> =
 	| {
 			data: T;
 			error: null;
 	  }
 	| {
 			data: null;
-			error: BackgroundServiceWorkerError;
+			error: E;
 	  };
 
 export const serviceWorkerCommands = {
