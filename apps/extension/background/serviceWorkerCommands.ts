@@ -21,18 +21,25 @@ const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		);
 		return newTab.id;
 	}
-	const [pinnedTab] = tabs.filter((tab) => tab.pinned);
-	if (!pinnedTab) {
-		const [firstTab] = tabs;
-		if (firstTab.discarded) {
-			yield* Effect.promise(() => chrome.tabs.reload(firstTab.id));
-		}
-		return firstTab.id;
+	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
+		tabs.find((tab) => tab.pinned) ?? tabs[0];
+	if (!selectedTabId) {
+		return yield* new BackgroundServiceWorkerError({
+			title: 'Whispering tab does not have Tab ID',
+		});
 	}
-	if (pinnedTab.discarded) {
-		yield* Effect.promise(() => chrome.tabs.reload(pinnedTab.id));
+	if (isSelectedTabDiscarded) {
+		return yield* Effect.async<number>((resume) => {
+			chrome.tabs.reload(selectedTabId);
+			chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+				if (updatedTabId === selectedTabId && changeInfo.status === 'complete') {
+					resume(Effect.succeed(selectedTabId));
+					chrome.tabs.onUpdated.removeListener(listener);
+				}
+			});
+		});
 	}
-	return pinnedTab.id;
+	return selectedTabId;
 }).pipe(
 	Effect.flatMap(Option.fromNullable),
 	Effect.mapError(
