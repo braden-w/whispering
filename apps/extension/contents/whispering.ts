@@ -1,11 +1,10 @@
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
-import type { ExtensionMessage, Message } from '~lib/commands';
+import { type ExtensionMessage, type Message } from '~lib/commands';
 import { localStorageService, type Settings } from '~lib/services/local-storage';
 
 export const config: PlasmoCSConfig = {
 	matches: ['http://localhost:5173/*'],
-	world: 'MAIN',
 };
 
 export const whisperingCommands = {
