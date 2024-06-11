@@ -2,6 +2,7 @@ import { sendToBackground } from '@plasmohq/messaging';
 import { Data, Effect } from 'effect';
 import type { BackgroundServiceWorkerResponse } from '~background/serviceWorkerCommands';
 import type { WhisperingMessage } from '~contents/whispering';
+import type { WhisperingErrorProperties } from './errors';
 
 type AnyFunction = (...args: any[]) => any;
 type CommandDefinition = Record<string, AnyFunction>;
@@ -41,8 +42,6 @@ export const sendToBgsw = <
 		}),
 	);
 
-export class BackgroundServiceWorkerError extends Data.TaggedError('BackgroundServiceWorkerError')<{
-	title: string;
-	description?: string;
-	error?: unknown;
-}> {}
+export class BackgroundServiceWorkerError extends Data.TaggedError(
+	'BackgroundServiceWorkerError',
+)<WhisperingErrorProperties> {}
