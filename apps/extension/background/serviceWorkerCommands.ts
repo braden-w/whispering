@@ -14,8 +14,14 @@ const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	if (tabs.length > 0) {
 		for (const tab of tabs) {
 			if (tab.pinned) {
+				if (tab.discarded) {
+					yield* Effect.promise(() => chrome.tabs.reload(tab.id));
+				}
 				return tab.id;
 			}
+		}
+		if (tabs[0].discarded) {
+			yield* Effect.promise(() => chrome.tabs.reload(tabs[0].id));
 		}
 		return tabs[0].id;
 	} else {
