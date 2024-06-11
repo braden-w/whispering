@@ -2,7 +2,7 @@ import { Context, Data, Effect } from 'effect';
 import { z } from 'zod';
 import type { WhisperingErrorProperties } from './errors';
 
-export const recorderStateSchema = z.union([z.literal('IDLE'), z.literal('RECORDING')]);
+export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
 
 export type RecorderState = z.infer<typeof recorderStateSchema>;
 
@@ -13,7 +13,7 @@ export class MediaRecorderError extends Data.TaggedError(
 export class MediaRecorderService extends Context.Tag('MediaRecorderService')<
 	MediaRecorderService,
 	{
-		readonly recorderState: RecorderState;
+		readonly recordingState: RecordingState;
 		readonly enumerateRecordingDevices: Effect.Effect<MediaDeviceInfo[], MediaRecorderError, never>;
 		readonly startRecording: (
 			recordingDeviceId: string,
