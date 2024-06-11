@@ -9,26 +9,24 @@ export const RegisterShortcutsWebLive = Layer.effect(
 			isGlobalShortcutEnabled: false,
 			defaultLocalShortcut: 'space',
 			defaultGlobalShortcut: '',
-			unregisterAllLocalShortcuts: () =>
-				Effect.try({
-					try: () => hotkeys.unbind(),
-					catch: (error) =>
-						new RegisterShortcutsError({
-							title: 'Error unregistering all shortcuts',
-							description: error instanceof Error ? error.message : undefined,
-							error,
-						}),
-				}),
-			unregisterAllGlobalShortcuts: () =>
-				Effect.try({
-					try: () => hotkeys.unbind(),
-					catch: (error) =>
-						new RegisterShortcutsError({
-							title: 'Error unregistering all shortcuts',
-							description: error instanceof Error ? error.message : undefined,
-							error,
-						}),
-				}),
+			unregisterAllLocalShortcuts: Effect.try({
+				try: () => hotkeys.unbind(),
+				catch: (error) =>
+					new RegisterShortcutsError({
+						title: 'Error unregistering all shortcuts',
+						description: error instanceof Error ? error.message : undefined,
+						error,
+					}),
+			}),
+			unregisterAllGlobalShortcuts: Effect.try({
+				try: () => hotkeys.unbind(),
+				catch: (error) =>
+					new RegisterShortcutsError({
+						title: 'Error unregistering all shortcuts',
+						description: error instanceof Error ? error.message : undefined,
+						error,
+					}),
+			}),
 			registerLocalShortcut: ({ shortcut, callback }) =>
 				Effect.try({
 					try: () =>

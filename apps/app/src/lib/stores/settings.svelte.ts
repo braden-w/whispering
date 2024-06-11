@@ -43,8 +43,8 @@ const createSettings = Effect.gen(function* () {
 	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
 	const queueInitialSilentJob = Effect.gen(function* () {
 		const initialSilentJob = Effect.gen(function* () {
-			yield* registerShortcutsService.unregisterAllLocalShortcuts();
-			yield* registerShortcutsService.unregisterAllGlobalShortcuts();
+			yield* registerShortcutsService.unregisterAllLocalShortcuts;
+			yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 			yield* registerShortcutsService.registerLocalShortcut({
 				shortcut: settings.value.currentLocalShortcut,
 				callback: recorder.toggleRecording,
@@ -90,7 +90,7 @@ const createSettings = Effect.gen(function* () {
 			settings.value = { ...settings.value, currentLocalShortcut: newValue };
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
-					yield* registerShortcutsService.unregisterAllLocalShortcuts();
+					yield* registerShortcutsService.unregisterAllLocalShortcuts;
 					yield* registerShortcutsService.registerLocalShortcut({
 						shortcut: settings.value.currentLocalShortcut,
 						callback: recorder.toggleRecording,
@@ -111,7 +111,7 @@ const createSettings = Effect.gen(function* () {
 			settings.value = { ...settings.value, currentGlobalShortcut: newValue };
 			const queueJob = Effect.gen(function* () {
 				const job = Effect.gen(function* () {
-					yield* registerShortcutsService.unregisterAllGlobalShortcuts();
+					yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 					yield* registerShortcutsService.registerGlobalShortcut({
 						shortcut: settings.value.currentGlobalShortcut,
 						callback: recorder.toggleRecording,

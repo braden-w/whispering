@@ -10,26 +10,24 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 			isGlobalShortcutEnabled: true,
 			defaultLocalShortcut: 'space',
 			defaultGlobalShortcut: 'CommandOrControl+Shift+;',
-			unregisterAllLocalShortcuts: () =>
-				Effect.try({
-					try: () => hotkeys.unbind(),
-					catch: (error) =>
-						new RegisterShortcutsError({
-							title: 'Error unregistering all shortcuts',
-							description: error instanceof Error ? error.message : undefined,
-							error,
-						}),
-				}),
-			unregisterAllGlobalShortcuts: () =>
-				Effect.tryPromise({
-					try: () => unregisterAll(),
-					catch: (error) =>
-						new RegisterShortcutsError({
-							title: 'Error unregistering all shortcuts',
-							description: error instanceof Error ? error.message : undefined,
-							error,
-						}),
-				}),
+			unregisterAllLocalShortcuts: Effect.try({
+				try: () => hotkeys.unbind(),
+				catch: (error) =>
+					new RegisterShortcutsError({
+						title: 'Error unregistering all shortcuts',
+						description: error instanceof Error ? error.message : undefined,
+						error,
+					}),
+			}),
+			unregisterAllGlobalShortcuts: Effect.tryPromise({
+				try: () => unregisterAll(),
+				catch: (error) =>
+					new RegisterShortcutsError({
+						title: 'Error unregistering all shortcuts',
+						description: error instanceof Error ? error.message : undefined,
+						error,
+					}),
+			}),
 			registerLocalShortcut: ({ shortcut, callback }) =>
 				Effect.try({
 					try: () =>

@@ -12,8 +12,8 @@ export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsServ
 		readonly isGlobalShortcutEnabled: boolean;
 		readonly defaultLocalShortcut: string;
 		readonly defaultGlobalShortcut: string;
-		readonly unregisterAllLocalShortcuts: () => Effect.Effect<void, RegisterShortcutsError>;
-		readonly unregisterAllGlobalShortcuts: () => Effect.Effect<void, RegisterShortcutsError>;
+		readonly unregisterAllLocalShortcuts: Effect.Effect<void, RegisterShortcutsError>;
+		readonly unregisterAllGlobalShortcuts: Effect.Effect<void, RegisterShortcutsError>;
 		readonly registerLocalShortcut: (args: {
 			shortcut: string;
 			callback: () => void;
