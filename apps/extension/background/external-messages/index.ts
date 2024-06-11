@@ -1,7 +1,7 @@
 import { externalMessageSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { extensionStorage } from '~lib/services/extension-storage';
-import { serviceWorkerCommands } from './serviceWorkerCommands';
+import setClipboardText from './setClipboardText';
+import setRecorderState from './setRecorderState';
 
 export const registerOnMessageExternalToggleRecording = Effect.sync(() =>
 	chrome.runtime.onMessageExternal.addListener((requestUnparsed, sender, sendResponse) =>
@@ -11,22 +11,11 @@ export const registerOnMessageExternalToggleRecording = Effect.sync(() =>
 			switch (externalMessage.message) {
 				case 'setRecorderState':
 					const { recorderState } = externalMessage;
-					yield* extensionStorage.set({
-						key: 'whispering-recording-state',
-						value: recorderState,
-					});
-					switch (recorderState) {
-						case 'IDLE':
-							yield* serviceWorkerCommands.setIcon('IDLE');
-							break;
-						case 'RECORDING':
-							yield* serviceWorkerCommands.setIcon('STOP');
-							break;
-					}
+					yield* setRecorderState(recorderState);
 					break;
 				case 'transcription':
 					const { transcription } = externalMessage;
-					const response = yield* serviceWorkerCommands.setClipboardText(transcription);
+					const response = yield* setClipboardText(transcription);
 					sendResponse(response);
 					break;
 			}
