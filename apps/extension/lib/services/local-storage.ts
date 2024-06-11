@@ -1,4 +1,3 @@
-import { Storage } from '@plasmohq/storage';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
 
@@ -7,8 +6,6 @@ export class LocalstorageStorageError extends Data.TaggedError('LocalstorageStor
 	description?: string;
 	error: unknown;
 }> {}
-
-const storage = new Storage();
 
 const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
@@ -56,7 +53,7 @@ export const localStorageService = {
 		key: K;
 		value: z.infer<(typeof localstorageSchemas)[K]>;
 	}): Effect.Effect<void, LocalstorageStorageError> =>
-		Effect.tryPromise({
+		Effect.try({
 			try: () => localStorage.setItem(key, JSON.stringify(value)),
 			catch: (error) => {
 				return new LocalstorageStorageError({
@@ -65,36 +62,5 @@ export const localStorageService = {
 					error,
 				});
 			},
-		}),
-	watch: <K extends keyof typeof localstorageSchemas>({
-		key,
-		callback,
-	}: {
-		key: K;
-		callback: (newValue: z.infer<(typeof localstorageSchemas)[K]>) => void;
-	}) =>
-		Effect.try({
-			try: () => {
-				storage.watch({
-					[key]: ({ newValue: newValueUnparsed }) => {
-						const newValueParseResult = localstorageSchemas[key].safeParse(newValueUnparsed);
-						if (!newValueParseResult.success) {
-							console.error(
-								`Error parsing change for key: ${key}`,
-								newValueParseResult.error.errors,
-							);
-							return;
-						}
-						const newValue = newValueParseResult.data;
-						callback(newValue);
-					},
-				});
-			},
-			catch: (error) =>
-				new LocalstorageStorageError({
-					title: `Error watching local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
-					error,
-				}),
 		}),
 } as const;
