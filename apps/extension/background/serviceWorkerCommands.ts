@@ -11,20 +11,7 @@ import toggleRecording from './scripts/toggleRecording';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
-	if (tabs.length > 0) {
-		for (const tab of tabs) {
-			if (tab.pinned) {
-				if (tab.discarded) {
-					yield* Effect.promise(() => chrome.tabs.reload(tab.id));
-				}
-				return tab.id;
-			}
-		}
-		if (tabs[0].discarded) {
-			yield* Effect.promise(() => chrome.tabs.reload(tabs[0].id));
-		}
-		return tabs[0].id;
-	} else {
+	if (tabs.length === 0) {
 		const newTab = yield* Effect.promise(() =>
 			chrome.tabs.create({
 				url: 'http://localhost:5173',
@@ -34,6 +21,18 @@ const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		);
 		return newTab.id;
 	}
+	const [pinnedTab] = tabs.filter((tab) => tab.pinned);
+	if (!pinnedTab) {
+		const [firstTab] = tabs;
+		if (firstTab.discarded) {
+			yield* Effect.promise(() => chrome.tabs.reload(firstTab.id));
+		}
+		return firstTab.id;
+	}
+	if (pinnedTab.discarded) {
+		yield* Effect.promise(() => chrome.tabs.reload(pinnedTab.id));
+	}
+	return pinnedTab.id;
 }).pipe(
 	Effect.flatMap(Option.fromNullable),
 	Effect.mapError(
