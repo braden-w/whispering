@@ -1,10 +1,5 @@
 import { Context, Data, Effect } from 'effect';
-import { z } from 'zod';
 import type { WhisperingErrorProperties } from './errors';
-
-export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
-
-export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export class MediaRecorderError extends Data.TaggedError(
 	'MediaRecorderError',

@@ -2,9 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStorage } from '@plasmohq/storage/hook';
+import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendToBgsw } from '~lib/commands';
-import type { RecorderState } from '~lib/recorderStateSchema';
 import './style.css';
 
 function IndexPopup() {

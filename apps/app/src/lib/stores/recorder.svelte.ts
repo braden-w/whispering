@@ -2,14 +2,11 @@ import { goto } from '$app/navigation';
 import { sendRecorderStateToExtension } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { recordings, settings } from '$lib/stores';
+import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
-import {
-	MediaRecorderError,
-	MediaRecorderService,
-	type RecorderState,
-} from '../services/MediaRecorderService';
+import { MediaRecorderError, MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
 import { catchErrorsAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
