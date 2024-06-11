@@ -4,6 +4,7 @@ import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { BackgroundServiceWorkerResponse } from '~background/sendMessage';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
 import type { Settings } from '~lib/services/local-storage';
+import { commands } from '~background/commands';
 
 export type RequestBody = { settings: Settings };
 
@@ -11,17 +12,13 @@ export type ResponseBody = BackgroundServiceWorkerResponse<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
-		yield* Console.info('BackgroundServiceWorker: setSettings');
 		if (!body?.settings) {
 			return yield* new BackgroundServiceWorkerError({
 				title: 'Error invoking setSettings command',
 				description: 'Settings must be provided in the request body of the message',
 			});
 		}
-		yield* sendMessageToWhisperingContentScript({
-			commandName: 'setSettings',
-			args: [body.settings],
-		});
+		yield* commands.setSettings(body.settings);
 		return true as const;
 	}).pipe(
 		Effect.map((data) => ({ data, error: null })),

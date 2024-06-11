@@ -1,9 +1,8 @@
 import { Option, Console, Effect } from 'effect';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { GlobalContentScriptMessage, globalContentScriptCommands } from '~contents/global';
-import type { WhisperingMessage, whisperingCommands } from '~contents/whispering';
 
-const getOrCreateWhisperingTabId = Effect.gen(function* () {
+export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
 	if (tabs.length > 0) {
 		for (const tab of tabs) {
@@ -25,7 +24,11 @@ const getOrCreateWhisperingTabId = Effect.gen(function* () {
 }).pipe(
 	Effect.flatMap(Option.fromNullable),
 	Effect.mapError(
-		() => new BackgroundServiceWorkerError({ title: 'Error getting or creating Whispering tab' }),
+		(error) =>
+			new BackgroundServiceWorkerError({
+				title: 'Error getting or creating Whispering tab',
+				error,
+			}),
 	),
 );
 
@@ -80,6 +83,7 @@ export const sendMessageToGlobalContentScript = <Message extends GlobalContentSc
 		yield* Console.info('Response from global content script:', response);
 		return response;
 	});
+
 export type BackgroundServiceWorkerResponse<T> =
 	| {
 			data: T;

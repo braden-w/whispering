@@ -8,7 +8,6 @@ export type ResponseBody = BackgroundServiceWorkerResponse<number>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		yield* Console.info('BackgroundServiceWorker: getActiveTabId');
 		const activeTabId = yield* getActiveTabId;
 		return activeTabId;
 	}).pipe(
