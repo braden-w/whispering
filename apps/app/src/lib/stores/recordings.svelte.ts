@@ -13,8 +13,6 @@ import { settings } from './settings.svelte';
 import { recorderState } from './recorder.svelte';
 import { sendMessageToExtension } from '$lib/messaging';
 
-const MAX_LENGTH_TRANSCRIBED_TEXT_IN_TOAST = 92;
-
 const createRecordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
