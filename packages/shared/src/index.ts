@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export type Result<T, E> =
+export type WhisperingErrorProperties = {
+	title: string;
+	description?: string;
+	action?: {
+		label: string;
+		onClick: () => void;
+	};
+	error?: unknown;
+};
+
+export type Result<T, E extends WhisperingErrorProperties = WhisperingErrorProperties> =
 	| {
 			isSuccess: true;
 			data: T;
