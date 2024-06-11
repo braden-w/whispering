@@ -11,7 +11,7 @@ import { Effect, Either, Option, pipe } from 'effect';
 import { toast } from 'svelte-sonner';
 import { settings } from './settings.svelte';
 import { recorderState } from './recorder.svelte';
-import { copyTranscriptionFromExtension } from '$lib/messaging';
+import { sendMessageToExtension } from '$lib/messaging';
 
 const createRecordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
@@ -94,7 +94,12 @@ const createRecordings = Effect.gen(function* () {
 						// Copy transcription to clipboard if enabled
 						if (settings.isCopyToClipboardEnabled && transcribedText) {
 							yield* clipboardService.setClipboardText(transcribedText).pipe(
-								Effect.catchAll((error) => copyTranscriptionFromExtension(transcribedText)),
+								Effect.catchAll((error) =>
+									sendMessageToExtension({
+										message: 'transcription',
+										transcription: transcribedText,
+									}),
+								),
 								Effect.tap(() => toast.success('Copied to clipboard!')),
 							);
 						}

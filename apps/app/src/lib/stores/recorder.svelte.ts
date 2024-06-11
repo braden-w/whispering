@@ -1,5 +1,4 @@
 import { goto } from '$app/navigation';
-import { sendRecorderStateToExtension } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { recordings, settings } from '$lib/stores';
 import type { RecorderState } from '@repo/shared';
@@ -12,6 +11,7 @@ import { catchErrorsAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { sendMessageToExtension } from '$lib/messaging';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -25,7 +25,10 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			sendRecorderStateToExtension(newValue);
+			sendMessageToExtension({
+				message: 'setRecorderState',
+				recorderState: newValue,
+			});
 		},
 	};
 })();
