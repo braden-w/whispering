@@ -13,6 +13,8 @@ import { settings } from './settings.svelte';
 import { recorderState } from './recorder.svelte';
 import { sendMessageToExtension } from '$lib/messaging';
 
+const MAX_LENGTH_TRANSCRIBED_TEXT_IN_TOAST = 92;
+
 const createRecordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
@@ -89,10 +91,12 @@ const createRecordings = Effect.gen(function* () {
 				return transcribedText;
 			}).pipe(
 				(program) => catchErrorsAsToast(program, { toastId }),
-				Effect.flatMap((transcribedText) =>
+				Effect.andThen((transcribedText) =>
 					Effect.gen(function* () {
-						// Copy transcription to clipboard if enabled
-						if (settings.isCopyToClipboardEnabled && transcribedText) {
+						if (transcribedText === '') return;
+
+						if (settings.isCopyToClipboardEnabled) {
+							// Copy transcription to clipboard if enabled
 							yield* clipboardService.setClipboardText(transcribedText).pipe(
 								Effect.catchAll((error) =>
 									sendMessageToExtension({
@@ -100,15 +104,25 @@ const createRecordings = Effect.gen(function* () {
 										transcription: transcribedText,
 									}),
 								),
-								Effect.tap(() => toast.success('Copied to clipboard!')),
+								Effect.andThen(() => {
+									toast.success('Copied transcription to clipboard!', {
+										description: transcribedText,
+										descriptionClass: 'line-clamp-2',
+									});
+								}),
 							);
 						}
 
 						// Paste transcription if enabled
-						if (settings.isPasteContentsOnSuccessEnabled && transcribedText) {
-							yield* clipboardService
-								.writeText(transcribedText)
-								.pipe(Effect.tap(() => toast.success('Pasted transcription!')));
+						if (settings.isPasteContentsOnSuccessEnabled) {
+							yield* clipboardService.writeText(transcribedText).pipe(
+								Effect.andThen(() => {
+									toast.success('Pasted transcription!', {
+										description: transcribedText,
+										descriptionClass: 'line-clamp-2',
+									});
+								}),
+							);
 						}
 					}),
 				),
@@ -120,7 +134,10 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				toast.success('Copied to clipboard!');
+				toast.success('Copied transcription to clipboard!', {
+					description: recording.transcribedText,
+					descriptionClass: 'line-clamp-2',
+				});
 			}).pipe(catchErrorsAsToast, Effect.runPromise),
 	};
 });
