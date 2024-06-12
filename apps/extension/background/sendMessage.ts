@@ -1,6 +1,6 @@
 import { Console, Effect, Option } from 'effect';
+import { NoSuchElementException } from 'effect/Cause';
 import type { WhisperingMessage } from '~contents/whispering';
-import { BackgroundServiceWorkerError } from '~lib/errors';
 
 export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
@@ -17,9 +17,7 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
 		tabs.find((tab) => tab.pinned) ?? tabs[0];
 	if (!selectedTabId) {
-		return yield* new BackgroundServiceWorkerError({
-			title: 'Whispering tab does not have Tab ID',
-		});
+		return yield* new NoSuchElementException();
 	}
 	if (isSelectedTabDiscarded) {
 		return yield* Effect.async<number>((resume) => {
@@ -33,16 +31,7 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		});
 	}
 	return selectedTabId;
-}).pipe(
-	Effect.flatMap(Option.fromNullable),
-	Effect.mapError(
-		(error) =>
-			new BackgroundServiceWorkerError({
-				title: 'Error getting or creating Whispering tab',
-				error,
-			}),
-	),
-);
+}).pipe(Effect.flatMap(Option.fromNullable));
 
 export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
 	Effect.gen(function* () {
