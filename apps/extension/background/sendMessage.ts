@@ -38,7 +38,10 @@ const createWhisperingTabId = Effect.gen(function* () {
 });
 
 export const getOrCreateWhisperingTabId = Effect.gen(function* () {
-	return Option.firstSomeOf([yield* getWhisperingTabId, yield* createWhisperingTabId]);
+	const maybeFoundWhisperingId = yield* getWhisperingTabId;
+	if (Option.isSome(maybeFoundWhisperingId)) return maybeFoundWhisperingId;
+	const maybeCreatedWhisperingid = yield* createWhisperingTabId;
+	return maybeCreatedWhisperingid;
 });
 
 export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
