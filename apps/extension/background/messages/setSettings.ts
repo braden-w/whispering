@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
-import { BackgroundServiceWorkerError } from '~lib/errors';
+import { WhisperingError } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 
 export type RequestBody = { settings: Settings };
@@ -12,8 +12,8 @@ export type ResponseBody = Result<true>;
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
 		if (!body || !body.settings) {
-			return yield* new BackgroundServiceWorkerError({
-				title: 'Error invoking setSettings command',
+			return yield* new WhisperingError({
+				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the request body of the message',
 			});
 		}
