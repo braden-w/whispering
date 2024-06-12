@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { toastOptionsSchema } from './ToastService.js';
 
 export type WhisperingErrorProperties = {
 	title: string;
@@ -26,7 +27,8 @@ export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export const externalMessageSchema = z.discriminatedUnion('message', [
 	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
-	z.object({ message: z.literal('setClipboardText'), transcription: z.string() }),
+	z.object({ message: z.literal('setClipboardText'), transcribedText: z.string() }),
+	z.object({ message: z.literal('toast'), toastOptions: toastOptionsSchema }),
 ]);
 
 export type ExternalMessage = z.infer<typeof externalMessageSchema>;
