@@ -8,15 +8,15 @@ const getCurrentTabId = Effect.gen(function* () {
 	const [currentTab] = yield* Effect.promise(() =>
 		chrome.tabs.query({ active: true, currentWindow: true }),
 	);
-	return yield* Option.fromNullable(currentTab.id);
+	return yield* Option.fromNullable(currentTab?.id);
 }).pipe(Effect.mapError(() => new GetCurrentTabIdError()));
 
 const handler = (text: string) =>
 	Effect.gen(function* () {
 		const currentTabId = yield* getCurrentTabId;
-		const [{ result }] = yield* Effect.tryPromise({
+		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
-				chrome.scripting.executeScript({
+				chrome.scripting.executeScript<[string], Result<string, unknown>>({
 					target: { tabId: currentTabId },
 					world: 'MAIN',
 					func: (text: string) => {
@@ -36,6 +36,13 @@ const handler = (text: string) =>
 					error,
 				}),
 		});
+		if (!injectionResult) {
+			return yield* new WhisperingError({
+				title: 'Unable to copy transcribed text to clipboard in current tab',
+				description: 'The result of the script injection is undefined',
+			});
+		}
+		const { result } = injectionResult;
 		yield* Console.info('setClipboardText result:', result);
 		if (!result || !result.isSuccess) {
 			return yield* new WhisperingError({
