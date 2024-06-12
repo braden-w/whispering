@@ -119,7 +119,7 @@ const createRecordings = Effect.gen(function* () {
 								Effect.catchAll((error) =>
 									sendMessageToExtension({
 										message: 'setClipboardText',
-										transcription: transcribedText,
+										transcribedText,
 									}),
 								),
 								Effect.andThen(() => {
