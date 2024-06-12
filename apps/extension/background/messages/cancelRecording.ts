@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
-import { getOrCreateWhisperingTabId } from '~background/sendMessage';
+import { getWhisperingTabId } from '~background/sendMessage';
 
 declare const window: {
 	toggleRecording: () => void;
@@ -14,7 +14,7 @@ export type ResponseBody = Result<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		const tabId = yield* getOrCreateWhisperingTabId;
+		const tabId = yield* getWhisperingTabId;
 		chrome.scripting.executeScript({
 			target: { tabId },
 			world: 'MAIN',

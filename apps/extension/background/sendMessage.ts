@@ -2,7 +2,7 @@ import { Console, Effect, Option } from 'effect';
 import { NoSuchElementException } from 'effect/Cause';
 import type { WhisperingMessage } from '~contents/whispering';
 
-export const getOrCreateWhisperingTabId = Effect.gen(function* () {
+export const getWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
 	if (tabs.length === 0) {
 		const newTab = yield* Effect.promise(() =>
@@ -35,7 +35,7 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 
 export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
 	Effect.gen(function* () {
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+		const whisperingTabId = yield* getWhisperingTabId;
 		yield* Console.info('Whispering tab ID:', whisperingTabId);
 		yield* Console.info('Sending message to Whispering content script:', message);
 		const response = yield* Effect.promise(() =>
