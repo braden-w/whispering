@@ -1,13 +1,7 @@
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
 
-export class LocalstorageStorageError extends Data.TaggedError('LocalstorageStorageError')<{
-	title: string;
-	description?: string;
-	error: unknown;
-}> {}
-
-const settingsSchema = z.object({
+export const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
 	isCopyToClipboardEnabled: z.boolean(),
 	isPasteContentsOnSuccessEnabled: z.boolean(),
@@ -20,45 +14,61 @@ const settingsSchema = z.object({
 
 export type Settings = z.infer<typeof settingsSchema>;
 
-const localstorageSchemas = {
+const localStorageSchemas = {
 	'whispering-settings': settingsSchema,
 } as const;
 
+export class GetLocalStorageError<
+	K extends keyof typeof localStorageSchemas,
+> extends Data.TaggedError('GetLocalStorageError')<{
+	key: K;
+	defaultValue: z.infer<(typeof localStorageSchemas)[K]>;
+	error: unknown;
+}> {}
+
+export class SetLocalStorageError<
+	K extends keyof typeof localStorageSchemas,
+> extends Data.TaggedError('SetLocalStorageError')<{
+	key: K;
+	value: z.infer<(typeof localStorageSchemas)[K]>;
+	error: unknown;
+}> {}
+
 export const localStorageService = {
-	get: <K extends keyof typeof localstorageSchemas>({
+	get: <K extends keyof typeof localStorageSchemas>({
 		key,
 		defaultValue,
 	}: {
 		key: K;
-		defaultValue: z.infer<(typeof localstorageSchemas)[K]>;
-	}): Effect.Effect<z.infer<(typeof localstorageSchemas)[K]>> =>
+		defaultValue: z.infer<(typeof localStorageSchemas)[K]>;
+	}): Effect.Effect<z.infer<(typeof localStorageSchemas)[K]>> =>
 		Effect.tryPromise({
 			try: async () => {
 				const valueFromStorage = localStorage.getItem(key);
 				const isEmpty = valueFromStorage === null;
 				if (isEmpty) return defaultValue;
-				return localstorageSchemas[key].parse(JSON.parse(valueFromStorage));
+				return localStorageSchemas[key].parse(JSON.parse(valueFromStorage));
 			},
 			catch: (error) =>
-				new LocalstorageStorageError({
-					title: `Error getting from local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
+				new GetLocalStorageError({
+					key,
+					defaultValue,
 					error,
 				}),
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
-	set: <K extends keyof typeof localstorageSchemas>({
+	set: <K extends keyof typeof localStorageSchemas>({
 		key,
 		value,
 	}: {
 		key: K;
-		value: z.infer<(typeof localstorageSchemas)[K]>;
-	}): Effect.Effect<void, LocalstorageStorageError> =>
+		value: z.infer<(typeof localStorageSchemas)[K]>;
+	}): Effect.Effect<void, SetLocalStorageError<K>> =>
 		Effect.try({
 			try: () => localStorage.setItem(key, JSON.stringify(value)),
 			catch: (error) => {
-				return new LocalstorageStorageError({
-					title: `Error setting in local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
+				return new SetLocalStorageError({
+					key,
+					value,
 					error,
 				});
 			},
