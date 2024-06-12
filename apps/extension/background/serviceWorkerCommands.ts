@@ -1,9 +1,11 @@
 import { Console, Effect, Option } from 'effect';
-import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { Settings } from '~lib/services/local-storage';
-import cancelRecording from './scripts/cancelRecording';
-import toggleRecording from './scripts/toggleRecording';
+
+declare const window: {
+	toggleRecording: () => void;
+	cancelRecording: () => void;
+} & Window;
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
