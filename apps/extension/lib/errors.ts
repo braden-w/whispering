@@ -1,7 +1,10 @@
 import type { WhisperingErrorProperties } from '@repo/shared';
-import { Data } from 'effect';
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
 import { toast } from 'sonner';
+
+export class BackgroundServiceWorkerError extends Data.TaggedError(
+	'BackgroundServiceWorkerError',
+)<WhisperingErrorProperties> {}
 
 export const catchErrorsAsToast = <
 	E extends Effect.Effect<any, WhisperingErrorProperties, never>,
@@ -18,7 +21,3 @@ export const catchErrorsAsToast = <
 		});
 		return Effect.succeed(options?.defaultValue);
 	});
-
-export class BackgroundServiceWorkerError extends Data.TaggedError(
-	'BackgroundServiceWorkerError',
-)<WhisperingErrorProperties> {}
