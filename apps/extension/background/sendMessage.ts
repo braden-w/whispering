@@ -2,32 +2,39 @@ import { Console, Effect, Option } from 'effect';
 import type { WhisperingMessage } from '~contents/whispering';
 import { WhisperingError } from '~lib/errors';
 
+const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
+
 const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(function* () {
 	const whisperingTabs = yield* Effect.promise(() =>
 		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
 	);
 	if (whisperingTabs.length === 0) return Option.none();
-	const selectedTab =
-		whisperingTabs.find((tab) => tab.pinned && !tab.discarded) ??
-		whisperingTabs.find((tab) => !tab.discarded) ??
-		whisperingTabs[0];
-	if (selectedTab.discarded) {
-		const reloadedTabId = yield* Effect.async<Option.Option<number>>((resume) => {
-			if (!selectedTab.id) {
-				resume(Effect.succeed(Option.none()));
-				return;
-			}
-			chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
-				if (updatedTabId === selectedTab.id && changeInfo.status === 'complete') {
-					resume(Effect.succeed(Option.some(selectedTab.id)));
-					chrome.tabs.onUpdated.removeListener(listener);
-				}
-			});
-			chrome.tabs.reload(selectedTab.id);
-		});
-		return reloadedTabId;
+
+	const pinnedAwakeTab = whisperingTabs.find((tab) => tab.pinned && !tab.discarded);
+	if (pinnedAwakeTab) return Option.fromNullable(pinnedAwakeTab.id);
+
+	const unpinnedAwakeTab = whisperingTabs.find((tab) => !tab.pinned && !tab.discarded);
+	if (unpinnedAwakeTab && unpinnedAwakeTab.id) {
+		yield* pinTab(unpinnedAwakeTab.id);
+		return Option.some(unpinnedAwakeTab.id);
 	}
-	return Option.fromNullable(selectedTab.id);
+
+	const someDiscardedTab = whisperingTabs[0];
+	if (!someDiscardedTab) return Option.none();
+	const reloadedTabId = yield* Effect.async<Option.Option<number>>((resume) => {
+		if (!someDiscardedTab.id) {
+			resume(Effect.succeed(Option.none()));
+			return;
+		}
+		chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+			if (updatedTabId === someDiscardedTab.id && changeInfo.status === 'complete') {
+				resume(Effect.succeed(Option.some(someDiscardedTab.id)));
+				chrome.tabs.onUpdated.removeListener(listener);
+			}
+		});
+		chrome.tabs.reload(someDiscardedTab.id);
+	});
+	return reloadedTabId;
 });
 
 const createWhisperingTabId = Effect.gen(function* () {
