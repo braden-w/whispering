@@ -4,6 +4,18 @@ import { WhisperingError } from '~lib/errors';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
+const reloadTab = (tabId: number) =>
+	Effect.async<number>((resume) => {
+		chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+			if (updatedTabId === tabId && changeInfo.status === 'complete') {
+				// Tab is done reloading
+				chrome.tabs.onUpdated.removeListener(listener);
+				resume(Effect.succeed(updatedTabId));
+			}
+		});
+		chrome.tabs.reload(tabId);
+	});
+
 const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(function* () {
 	const whisperingTabs = yield* Effect.promise(() =>
 		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
@@ -20,24 +32,10 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 	}
 
 	const someDiscardedTab = whisperingTabs[0];
-	if (!someDiscardedTab) return Option.none();
-	const reloadedTabId = yield* Effect.async<Option.Option<number>>((resume) => {
-		if (!someDiscardedTab.id) {
-			resume(Effect.succeed(Option.none()));
-			return;
-		}
-		chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
-			if (updatedTabId === someDiscardedTab.id && changeInfo.status === 'complete') {
-				// Tab is done reloading
-				chrome.tabs.onUpdated.removeListener(listener);
-				resume(Effect.succeed(Option.some(someDiscardedTab.id)));
-			}
-		});
-		chrome.tabs.reload(someDiscardedTab.id);
-	});
-	yield* Console.info('Reloaded tab ID:', reloadedTabId);
-	if (Option.isSome(reloadedTabId)) yield* pinTab(reloadedTabId.value);
-	return reloadedTabId;
+	if (!someDiscardedTab || !someDiscardedTab.id) return Option.none();
+	const reloadedTabId = yield* reloadTab(someDiscardedTab.id);
+	yield* pinTab(reloadedTabId);
+	return Option.some(reloadedTabId)
 });
 
 const createWhisperingTabId = Effect.gen(function* () {
