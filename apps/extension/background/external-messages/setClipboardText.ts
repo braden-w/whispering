@@ -1,15 +1,15 @@
-import { Console, Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/errors';
+import type { Result } from '@repo/shared';
+import { Console, Data, Effect, Option } from 'effect';
+import { WhisperingError } from '~lib/errors';
+
+class GetCurrentTabIdError extends Data.TaggedError('GetCurrentTabIdError') {}
 
 const getCurrentTabId = Effect.gen(function* () {
 	const [currentTab] = yield* Effect.promise(() =>
 		chrome.tabs.query({ active: true, currentWindow: true }),
 	);
-	if (!currentTab.id) {
-		return yield* Effect.fail(new BackgroundServiceWorkerError({ title: 'No active tab found' }));
-	}
-	return currentTab.id;
-});
+	return yield* Option.fromNullable(currentTab.id);
+}).pipe(Effect.mapError(() => new GetCurrentTabIdError()));
 
 const handler = (text: string) =>
 	Effect.gen(function* () {
@@ -21,29 +21,27 @@ const handler = (text: string) =>
 					world: 'MAIN',
 					func: (text: string) => {
 						try {
-							console.info('Setting clipboard text:', text);
 							navigator.clipboard.writeText(text);
-							console.info('Clipboard text set:', text);
 							return { isSuccess: true, data: text } as const;
 						} catch (error) {
-							console.error('Error setting clipboard text:', error);
 							return { isSuccess: false, error } as const;
 						}
 					},
 					args: [text],
 				}),
 			catch: (error) =>
-				new BackgroundServiceWorkerError({
-					title: 'No result from setClipboardText',
-					description: error instanceof Error ? error.message : undefined,
+				new WhisperingError({
+					title: 'Unable to execute setClipboardText script in current tab',
+					description: error instanceof Error ? error.message : `Unknown error: ${error}`,
 					error,
 				}),
 		});
 		yield* Console.info('setClipboardText result:', result);
 		if (!result || !result.isSuccess) {
-			return yield* new BackgroundServiceWorkerError({
-				title: 'Error setting clipboard text',
-				description: result?.error instanceof Error ? result.error.message : undefined,
+			return yield* new WhisperingError({
+				title: 'Unable to copy transcribed text to clipboard in current tab',
+				description:
+					result?.error instanceof Error ? result.error.message : `Unknown error: ${result?.error}`,
 				error: result?.error,
 			});
 		}
