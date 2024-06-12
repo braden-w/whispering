@@ -5,11 +5,10 @@ import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
 import { WhisperingError } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 
-export type RequestBody = { settings: Settings };
-
-export type ResponseBody = Result<true>;
-
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+const handler: PlasmoMessaging.MessageHandler<{ settings: Settings }, Result<true>> = (
+	{ body },
+	res,
+) =>
 	Effect.gen(function* () {
 		if (!body || !body.settings) {
 			return yield* new WhisperingError({

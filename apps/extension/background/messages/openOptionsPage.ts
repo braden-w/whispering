@@ -13,11 +13,7 @@ export const openOptionsPage = Effect.tryPromise({
 		}),
 });
 
-export type RequestBody = {};
-
-export type ResponseBody = Result<true>;
-
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
+const handler: PlasmoMessaging.MessageHandler<{}, Result<true>> = (req, res) =>
 	Effect.gen(function* () {
 		yield* openOptionsPage;
 		return true as const;

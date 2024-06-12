@@ -5,7 +5,9 @@ import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { WhisperingError } from '~lib/errors';
+import type * as ToggleRecording from './background/messages/toggleRecording';
+import type * as CancelRecording from './background/messages/cancelRecording';
 import './style.css';
 
 function IndexPopup() {
@@ -22,22 +24,34 @@ function IndexPopup() {
 
 const toggleRecording = () =>
 	Effect.tryPromise({
-		try: () => sendToBackground({ name: 'toggleRecording' }),
+		try: () =>
+			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
+				name: 'toggleRecording',
+			}),
 		catch: (error) =>
-			new BackgroundServiceWorkerError({
-				title: `Error sending toggleRecording to background service worker`,
-				description: error instanceof Error ? error.message : undefined,
+			new WhisperingError({
+				title: `Unable to toggle recording via background service worker`,
+				description:
+					error instanceof Error
+						? error.message
+						: 'There was likely an issue sending the message to the background service worker from the popup.',
 				error,
 			}),
 	}).pipe(Effect.runPromise);
 
 const cancelRecording = () =>
 	Effect.tryPromise({
-		try: () => sendToBackground({ name: 'cancelRecording' }),
+		try: () =>
+			sendToBackground<CancelRecording.RequestBody, CancelRecording.ResponseBody>({
+				name: 'cancelRecording',
+			}),
 		catch: (error) =>
-			new BackgroundServiceWorkerError({
-				title: `Error sending cancelRecording to background service worker`,
-				description: error instanceof Error ? error.message : undefined,
+			new WhisperingError({
+				title: `Unable to cancel recording via background service worker`,
+				description:
+					error instanceof Error
+						? error.message
+						: 'There was likely an issue sending the message to the background service worker from the popup.',
 				error,
 			}),
 	}).pipe(Effect.runPromise);
