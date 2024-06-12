@@ -3,8 +3,10 @@ import type { WhisperingMessage } from '~contents/whispering';
 import { WhisperingError } from '~lib/errors';
 
 export const getWhisperingTabId = Effect.gen(function* () {
-	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));
-	if (tabs.length === 0) {
+	const whisperingTabs = yield* Effect.promise(() =>
+		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
+	);
+	if (whisperingTabs.length === 0) {
 		const newTab = yield* Effect.promise(() =>
 			chrome.tabs.create({
 				url: 'http://localhost:5173',
@@ -15,7 +17,7 @@ export const getWhisperingTabId = Effect.gen(function* () {
 		return newTab.id;
 	}
 	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
-		tabs.find((tab) => tab.pinned) ?? tabs[0];
+		whisperingTabs.find((tab) => tab.pinned) ?? whisperingTabs[0];
 	if (!selectedTabId) return undefined;
 	if (isSelectedTabDiscarded) {
 		return yield* Effect.async<number>((resume) => {
