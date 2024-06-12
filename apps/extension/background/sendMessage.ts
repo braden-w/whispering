@@ -8,7 +8,9 @@ export const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.g
 	);
 	if (whisperingTabs.length === 0) return Option.none();
 	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
-		whisperingTabs.find((tab) => tab.pinned) ?? whisperingTabs[0];
+		whisperingTabs.find((tab) => tab.pinned && !tab.discarded) ??
+		whisperingTabs.find((tab) => !tab.discarded) ??
+		whisperingTabs[0];
 	if (!selectedTabId) return Option.none();
 	if (isSelectedTabDiscarded) {
 		const reloadedTabId = yield* Effect.async<number>((resume) => {
