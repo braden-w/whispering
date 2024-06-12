@@ -1,17 +1,17 @@
 import { goto } from '$app/navigation';
+import { sendMessageToExtension } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
-import type { RecorderState } from '@repo/shared';
+import { ToastService, type RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { toast } from 'svelte-sonner';
 import { MediaRecorderError, MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
 import { catchErrorsAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { sendMessageToExtension } from '$lib/messaging';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -35,6 +35,7 @@ export let recorderState = (() => {
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
+	const toast = yield* ToastService;
 
 	return {
 		get recorderState() {
@@ -63,7 +64,10 @@ export const recorder = Effect.gen(function* () {
 					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
 				);
 				if (!isSelectedDeviceExists) {
-					toast.info('Default audio input device not found, selecting first available device');
+					toast.info({
+						title: 'Default audio input device not found',
+						description: 'Selecting the first available device',
+					});
 					const firstAudioInput = recordingDevices[0].deviceId;
 					settings.selectedAudioInputDeviceId = firstAudioInput;
 				}
@@ -102,4 +106,8 @@ export const recorder = Effect.gen(function* () {
 				recorderState.value = 'IDLE';
 			}).pipe(Effect.runSync),
 	};
-}).pipe(Effect.provide(MediaRecorderServiceWebLive), Effect.runSync);
+}).pipe(
+	Effect.provide(MediaRecorderServiceWebLive),
+	Effect.provide(ToastServiceLive),
+	Effect.runSync,
+);

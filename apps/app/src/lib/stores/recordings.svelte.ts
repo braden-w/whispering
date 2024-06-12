@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { sendMessageToExtension } from '$lib/messaging';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
@@ -7,13 +8,14 @@ import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServi
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { catchErrorsAsToast } from '$lib/services/errors';
-import { Effect, Either, Option, pipe } from 'effect';
-import { toast } from 'svelte-sonner';
-import { settings } from './settings.svelte';
+import { ToastService } from '@repo/shared';
+import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
-import { sendMessageToExtension } from '$lib/messaging';
+import { settings } from './settings.svelte';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 
 const createRecordings = Effect.gen(function* () {
+	const toast = yield* ToastService;
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
 	const clipboardService = yield* ClipboardService;
@@ -39,22 +41,34 @@ const createRecordings = Effect.gen(function* () {
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
-				toast.success('Recording updated!');
+				toast.success({
+					title: 'Recording updated!',
+					description: 'Your recording has been updated successfully.',
+				});
 			}).pipe(catchErrorsAsToast),
 		deleteRecordingById: (id: string) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
-				toast.success('Recording deleted!');
+				toast.success({
+					title: 'Recording deleted!',
+					description: 'Your recording has been deleted successfully.',
+				});
 			}).pipe(catchErrorsAsToast),
 		deleteRecordingsById: (ids: string[]) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
 				recordings = recordings.filter((recording) => !ids.includes(recording.id));
-				toast.success('Recordings deleted!');
+				toast.success({
+					title: 'Recordings deleted!',
+					description: 'Your recordings have been deleted successfully.',
+				});
 			}).pipe(catchErrorsAsToast),
 		transcribeRecording: (id: string) => {
-			const toastId = toast.loading('Transcribing recording...');
+			const toastId = toast.loading({
+				title: 'Transcribing recording...',
+				description: 'Your recording is being transcribed.',
+			});
 			if (recorderState.value !== 'RECORDING') {
 				recorderState.value = 'LOADING';
 			}
@@ -78,8 +92,9 @@ const createRecordings = Effect.gen(function* () {
 				if (recorderState.value !== 'RECORDING') {
 					recorderState.value = 'IDLE';
 				}
-				toast.success('Transcription complete!', {
+				toast.success({
 					id: toastId,
+					title: 'Transcription complete!',
 					description: 'Check it out in your recordings',
 					action: {
 						label: 'Go to recordings',
@@ -103,7 +118,8 @@ const createRecordings = Effect.gen(function* () {
 									}),
 								),
 								Effect.andThen(() => {
-									toast.success('Copied transcription to clipboard!', {
+									toast.success({
+										title: 'Copied transcription to clipboard!',
 										description: transcribedText,
 										descriptionClass: 'line-clamp-2',
 									});
@@ -115,7 +131,8 @@ const createRecordings = Effect.gen(function* () {
 						if (settings.isPasteContentsOnSuccessEnabled) {
 							yield* clipboardService.writeText(transcribedText).pipe(
 								Effect.andThen(() => {
-									toast.success('Pasted transcription!', {
+									toast.success({
+										title: 'Pasted transcription!',
 										description: transcribedText,
 										descriptionClass: 'line-clamp-2',
 									});
@@ -132,7 +149,8 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				toast.success('Copied transcription to clipboard!', {
+				toast.success({
+					title: 'Copied transcription to clipboard!',
 					description: recording.transcribedText,
 					descriptionClass: 'line-clamp-2',
 				});
@@ -143,6 +161,7 @@ const createRecordings = Effect.gen(function* () {
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceWhisperLive),
+	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.runSync,
 );
