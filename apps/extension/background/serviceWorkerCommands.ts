@@ -1,13 +1,8 @@
-import type { Result } from '@repo/shared';
-import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
-import redLargeSquare from 'data-base64:~assets/red_large_square.png';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect, Option } from 'effect';
 import { whisperingCommands, type WhisperingMessage } from '~contents/whispering';
 import { BackgroundServiceWorkerError } from '~lib/commands';
 import type { Settings } from '~lib/services/local-storage';
 import cancelRecording from './scripts/cancelRecording';
-import setClipboardText from './scripts/setClipboardText';
 import toggleRecording from './scripts/toggleRecording';
 
 const getOrCreateWhisperingTabId = Effect.gen(function* () {
@@ -84,7 +79,7 @@ export const serviceWorkerCommands = {
 		chrome.scripting.executeScript({
 			target: { tabId },
 			world: 'MAIN',
-			func: toggleRecording,
+			func: () => window.toggleRecording(),
 		});
 		return true as const;
 	}),
@@ -93,7 +88,7 @@ export const serviceWorkerCommands = {
 		chrome.scripting.executeScript({
 			target: { tabId },
 			world: 'MAIN',
-			func: cancelRecording,
+			func: () => window.cancelRecording(),
 		});
 		return true as const;
 	}),
@@ -126,55 +121,4 @@ export const serviceWorkerCommands = {
 		}
 		return firstActiveTab.id;
 	}),
-	setIcon: (icon: 'IDLE' | 'STOP' | 'LOADING') =>
-		Effect.tryPromise({
-			try: () => {
-				const path = ((icon: 'IDLE' | 'STOP' | 'LOADING') => {
-					switch (icon) {
-						case 'IDLE':
-							return studioMicrophone;
-						case 'STOP':
-							return redLargeSquare;
-						case 'LOADING':
-							return arrowsCounterclockwise;
-					}
-				})(icon);
-				return chrome.action.setIcon({ path });
-			},
-			catch: (error) =>
-				new BackgroundServiceWorkerError({
-					title: `Error setting icon to ${icon} icon`,
-					description: error instanceof Error ? error.message : undefined,
-					error,
-				}),
-		}).pipe(Effect.tap(() => Console.info('Icon set to', icon))),
-	setClipboardText: (text: string) =>
-		Effect.gen(function* () {
-			const tabId = yield* getOrCreateWhisperingTabId;
-			return yield* Effect.async<string, BackgroundServiceWorkerError>((resume) =>
-				chrome.scripting.executeScript(
-					{
-						target: { tabId },
-						world: 'MAIN',
-						func: setClipboardText,
-						args: [text],
-					},
-					([{ result }]) => {
-						if (!result || !result.isSuccess) {
-							resume(
-								Effect.fail(
-									new BackgroundServiceWorkerError({
-										title: 'No result from setClipboardText',
-										description: result?.error instanceof Error ? result.error.message : undefined,
-										error: result?.error,
-									}),
-								),
-							);
-							return;
-						}
-						resume(Effect.succeed(result.data));
-					},
-				),
-			);
-		}),
 };
