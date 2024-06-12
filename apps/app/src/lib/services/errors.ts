@@ -1,5 +1,5 @@
 import { ToastService, type WhisperingErrorProperties } from '@repo/shared';
-import { Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import { ToastServiceLive } from './ToastServiceLive';
 
 export const catchErrorsAsToast = <
@@ -18,6 +18,7 @@ export const catchErrorsAsToast = <
 				description: error.description,
 				action: error.action,
 			});
+			yield* Console.error(error.error instanceof Error ? error.error.message : error.error);
 			return options?.defaultValue;
 		}).pipe(Effect.provide(ToastServiceLive)),
 	);
