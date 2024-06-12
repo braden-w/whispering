@@ -27,13 +27,6 @@ export const registerExternalListener = () =>
 								description:
 									'This might be due to a permissions issue or an unexpected tab state. Please check your Whispering tabs and try again.',
 							}),
-						SetExtensionStorageError: ({ key, value, error }) =>
-							new WhisperingError({
-								title: `Unable to set "${key}" in extension storage while handling "${externalMessage.message}" command from Whispering website`,
-								description:
-									'Please check your local storage settings on the Whispering website and try again.',
-								error: error,
-							}),
 					}),
 				);
 				return yield* processExternalMessageProgram;

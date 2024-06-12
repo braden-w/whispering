@@ -46,6 +46,15 @@ const handler = (recorderState: RecorderState) =>
 				yield* setIcon('LOADING');
 				break;
 		}
-	});
+	}).pipe(
+		Effect.catchAll(
+			(error) =>
+				new WhisperingError({
+					title: `Error setting recorder state to ${recorderState}`,
+					description: error instanceof Error ? error.message : "An error occurred while setting the recorder state via the Chrome s"
+					error,
+				}),
+		),
+	);
 
 export default handler;
