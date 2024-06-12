@@ -7,24 +7,27 @@ export const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.g
 		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
 	);
 	if (whisperingTabs.length === 0) return Option.none();
-	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
+	const selectedTab =
 		whisperingTabs.find((tab) => tab.pinned && !tab.discarded) ??
 		whisperingTabs.find((tab) => !tab.discarded) ??
 		whisperingTabs[0];
-	if (!selectedTabId) return Option.none();
-	if (isSelectedTabDiscarded) {
-		const reloadedTabId = yield* Effect.async<number>((resume) => {
-			chrome.tabs.reload(selectedTabId);
+	if (selectedTab.discarded) {
+		const reloadedTabId = yield* Effect.async<Option.Option<number>>((resume) => {
+			if (!selectedTab.id) {
+				resume(Effect.succeed(Option.none()));
+				return;
+			}
+			chrome.tabs.reload(selectedTab.id);
 			chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
-				if (updatedTabId === selectedTabId && changeInfo.status === 'complete') {
-					resume(Effect.succeed(selectedTabId));
+				if (updatedTabId === selectedTab.id && changeInfo.status === 'complete') {
+					resume(Effect.succeed(Option.some(selectedTab.id)));
 					chrome.tabs.onUpdated.removeListener(listener);
 				}
 			});
-		}).pipe(Effect.map(Option.fromNullable));
+		});
 		return reloadedTabId;
 	}
-	return Option.some(selectedTabId);
+	return Option.fromNullable(selectedTab.id);
 });
 
 export const createWhisperingTab = Effect.gen(function* () {
