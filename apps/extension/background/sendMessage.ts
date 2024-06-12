@@ -35,7 +35,7 @@ export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessa
 	Effect.gen(function* () {
 		const maybeWhisperingTabId = yield* getWhisperingTabId;
 		if (Option.isNone(maybeWhisperingTabId)) {
-			yield* new WhisperingError({
+			return yield* new WhisperingError({
 				title: 'Whispering tab not found',
 				description: `Could not find a Whispering tab to call command: ${message.commandName}`,
 			});
