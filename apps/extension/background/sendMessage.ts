@@ -34,6 +34,7 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 		});
 		chrome.tabs.reload(someDiscardedTab.id);
 	});
+	yield* Console.info('Reloaded tab ID:', reloadedTabId);
 	if (Option.isSome(reloadedTabId)) yield* pinTab(reloadedTabId.value);
 	return reloadedTabId;
 });
