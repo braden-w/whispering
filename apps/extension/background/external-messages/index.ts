@@ -38,8 +38,8 @@ export const registerExternalListener = () =>
 				);
 				return yield* processExternalMessageProgram;
 			}).pipe(
+				Effect.tapError(renderErrorAsToast),
 				Effect.map((result) => ({ isSuccess: true, data: result }) as const),
-				Effect.catchAll(renderErrorAsToast),
 				Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
 				Effect.map((response) => sendResponse(response)),
 				Effect.runPromise,
