@@ -17,13 +17,13 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 				resume(Effect.succeed(Option.none()));
 				return;
 			}
-			chrome.tabs.reload(selectedTab.id);
 			chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
 				if (updatedTabId === selectedTab.id && changeInfo.status === 'complete') {
 					resume(Effect.succeed(Option.some(selectedTab.id)));
 					chrome.tabs.onUpdated.removeListener(listener);
 				}
 			});
+			chrome.tabs.reload(selectedTab.id);
 		});
 		return reloadedTabId;
 	}
