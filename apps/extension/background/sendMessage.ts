@@ -39,7 +39,10 @@ export const createWhisperingTab = Effect.gen(function* () {
 
 export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
 	Effect.gen(function* () {
-		const maybeWhisperingTabId = yield* getWhisperingTabId;
+		const maybeWhisperingTabId = Option.firstSomeOf([
+			yield* getWhisperingTabId,
+			yield* createWhisperingTab,
+		]);
 		if (Option.isNone(maybeWhisperingTabId)) {
 			return yield* new WhisperingError({
 				title: 'Whispering tab not found',
