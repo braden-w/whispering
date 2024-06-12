@@ -1,6 +1,6 @@
 import { externalMessageSchema, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { toast } from 'sonner';
+import { renderErrorAsToast } from '~lib/errors';
 import setClipboardText from './setClipboardText';
 import setRecorderState from './setRecorderState';
 
@@ -20,12 +20,8 @@ export const registerExternalListener = () =>
 				}
 			}).pipe(
 				Effect.map((result) => ({ isSuccess: true, data: result }) as const),
-				Effect.catchAll((error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-					return Effect.succeed({ isSuccess: false, error } as const);
-				}),
+				Effect.catchAll(renderErrorAsToast),
+				Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
 				Effect.map((response) => sendResponse(response)),
 				Effect.runPromise,
 			),
