@@ -16,6 +16,8 @@ const whisperingMessageSchema = z.discriminatedUnion('commandName', [
 	z.object({ commandName: z.literal('setSettings'), settings: settingsSchema }),
 ]);
 
+export type WhisperingMessage = z.infer<typeof whisperingMessageSchema>;
+
 chrome.runtime.onMessage.addListener(
 	(requestUnparsed, sender, sendResponse: <R extends Result<any>>(response: R) => void) =>
 		Effect.gen(function* () {
