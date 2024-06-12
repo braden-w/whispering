@@ -1,6 +1,6 @@
-import type { WhisperingErrorProperties } from '@repo/shared';
+import { ToastService, type WhisperingErrorProperties } from '@repo/shared';
 import { Effect } from 'effect';
-import { toast } from 'svelte-sonner';
+import { ToastServiceLive } from './ToastServiceLive';
 
 export const catchErrorsAsToast = <
 	E extends Effect.Effect<any, WhisperingErrorProperties, never>,
@@ -9,11 +9,15 @@ export const catchErrorsAsToast = <
 	program: E,
 	options?: { defaultValue?: A; toastId?: number | string },
 ): Effect.Effect<A, never, never> =>
-	Effect.catchAll(program, (error) => {
-		toast.error(error.title, {
-			id: options?.toastId,
-			description: error.description,
-			action: error.action,
-		});
-		return Effect.succeed(options?.defaultValue);
-	});
+	Effect.catchAll(program, (error) =>
+		Effect.gen(function* () {
+			const toast = yield* ToastService;
+			toast.error({
+				id: options?.toastId,
+				title: error.title,
+				description: error.description,
+				action: error.action,
+			});
+			return options?.defaultValue;
+		}).pipe(Effect.provide(ToastServiceLive)),
+	);
