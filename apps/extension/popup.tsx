@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
-import { sendToBgsw } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/commands';
 import './style.css';
 
 function IndexPopup() {
@@ -18,8 +19,28 @@ function IndexPopup() {
 		</div>
 	);
 }
-const toggleRecording = () => sendToBgsw({ name: 'toggleRecording' }).pipe(Effect.runPromise);
-const cancelRecording = () => sendToBgsw({ name: 'cancelRecording' }).pipe(Effect.runPromise);
+
+const toggleRecording = () =>
+	Effect.tryPromise({
+		try: () => sendToBackground({ name: 'toggleRecording' }),
+		catch: (error) =>
+			new BackgroundServiceWorkerError({
+				title: `Error sending toggleRecording to background service worker`,
+				description: error instanceof Error ? error.message : undefined,
+				error,
+			}),
+	}).pipe(Effect.runPromise);
+
+const cancelRecording = () =>
+	Effect.tryPromise({
+		try: () => sendToBackground({ name: 'cancelRecording' }),
+		catch: (error) =>
+			new BackgroundServiceWorkerError({
+				title: `Error sending cancelRecording to background service worker`,
+				description: error instanceof Error ? error.message : undefined,
+				error,
+			}),
+	}).pipe(Effect.runPromise);
 
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
