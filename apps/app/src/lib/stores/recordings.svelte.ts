@@ -5,6 +5,7 @@ import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDeskt
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { catchErrorsAsToast } from '$lib/services/errors';
@@ -12,10 +13,9 @@ import { ToastService } from '@repo/shared';
 import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 
 const createRecordings = Effect.gen(function* () {
-	const toast = yield* ToastService;
+	const { toast } = yield* ToastService;
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
 	const clipboardService = yield* ClipboardService;
@@ -41,7 +41,8 @@ const createRecordings = Effect.gen(function* () {
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
-				toast.success({
+				toast({
+					variant: 'success',
 					title: 'Recording updated!',
 					description: 'Your recording has been updated successfully.',
 				});
@@ -50,7 +51,8 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
-				toast.success({
+				toast({
+					variant: 'success',
 					title: 'Recording deleted!',
 					description: 'Your recording has been deleted successfully.',
 				});
@@ -59,13 +61,15 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
 				recordings = recordings.filter((recording) => !ids.includes(recording.id));
-				toast.success({
+				toast({
+					variant: 'success',
 					title: 'Recordings deleted!',
 					description: 'Your recordings have been deleted successfully.',
 				});
 			}).pipe(catchErrorsAsToast),
 		transcribeRecording: (id: string) => {
-			const toastId = toast.loading({
+			const toastId = toast({
+				variant: 'loading',
 				title: 'Transcribing recording...',
 				description: 'Your recording is being transcribed.',
 			});
@@ -92,7 +96,8 @@ const createRecordings = Effect.gen(function* () {
 				if (recorderState.value !== 'RECORDING') {
 					recorderState.value = 'IDLE';
 				}
-				toast.success({
+				toast({
+					variant: 'success',
 					id: toastId,
 					title: 'Transcription complete!',
 					description: 'Check it out in your recordings',
@@ -118,7 +123,8 @@ const createRecordings = Effect.gen(function* () {
 									}),
 								),
 								Effect.andThen(() => {
-									toast.success({
+									toast({
+										variant: 'success',
 										title: 'Copied transcription to clipboard!',
 										description: transcribedText,
 										descriptionClass: 'line-clamp-2',
@@ -131,7 +137,8 @@ const createRecordings = Effect.gen(function* () {
 						if (settings.isPasteContentsOnSuccessEnabled) {
 							yield* clipboardService.writeText(transcribedText).pipe(
 								Effect.andThen(() => {
-									toast.success({
+									toast({
+										variant: 'success',
 										title: 'Pasted transcription!',
 										description: transcribedText,
 										descriptionClass: 'line-clamp-2',
@@ -149,7 +156,8 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				toast.success({
+				toast({
+					variant: 'success',
 					title: 'Copied transcription to clipboard!',
 					description: recording.transcribedText,
 					descriptionClass: 'line-clamp-2',

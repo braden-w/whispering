@@ -11,8 +11,9 @@ export const catchErrorsAsToast = <
 ): Effect.Effect<A, never, never> =>
 	Effect.catchAll(program, (error) =>
 		Effect.gen(function* () {
-			const toast = yield* ToastService;
-			toast.error({
+			const { toast } = yield* ToastService;
+			toast({
+				variant: 'error',
 				id: options?.toastId,
 				title: error.title,
 				description: error.description,

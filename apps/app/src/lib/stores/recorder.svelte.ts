@@ -35,7 +35,7 @@ export let recorderState = (() => {
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
-	const toast = yield* ToastService;
+	const { toast } = yield* ToastService;
 
 	return {
 		get recorderState() {
@@ -64,7 +64,8 @@ export const recorder = Effect.gen(function* () {
 					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
 				);
 				if (!isSelectedDeviceExists) {
-					toast.info({
+					toast({
+						variant: 'info',
 						title: 'Default audio input device not found',
 						description: 'Selecting the first available device',
 					});
