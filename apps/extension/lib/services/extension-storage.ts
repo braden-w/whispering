@@ -1,11 +1,28 @@
 import { Storage } from '@plasmohq/storage';
+import { recorderStateSchema, toastOptionsSchema } from '@repo/shared';
 import { Data, Effect } from 'effect';
 import { z } from 'zod';
-import { recorderStateSchema } from '../recorderStateSchema';
 
-export class ExtensionStorageError extends Data.TaggedError('ExtensionStorageError')<{
-	title: string;
-	description?: string;
+export class GetExtensionStorageError<
+	K extends keyof typeof extensionSchemas,
+> extends Data.TaggedError('GetExtensionStorageError')<{
+	key: K;
+	defaultValue: z.infer<(typeof extensionSchemas)[K]>;
+	error: unknown;
+}> {}
+
+export class SetExtensionStorageError<
+	K extends keyof typeof extensionSchemas,
+> extends Data.TaggedError('SetExtensionStorageError')<{
+	key: K;
+	value: z.infer<(typeof extensionSchemas)[K]>;
+	error: unknown;
+}> {}
+
+export class WatchExtensionStorageError<
+	K extends keyof typeof extensionSchemas,
+> extends Data.TaggedError('WatchExtensionStorageError')<{
+	key: K;
 	error: unknown;
 }> {}
 
@@ -13,11 +30,8 @@ const storage = new Storage();
 
 const extensionSchemas = {
 	'whispering-recording-state': recorderStateSchema,
-	'whispering-toast': z.object({
-		id: z.union([z.string(), z.number()]).optional(),
-		title: z.string(),
-		description: z.string().optional(),
-		variant: z.union([z.literal('default'), z.literal('destructive')]),
+	'whispering-toast': toastOptionsSchema.extend({
+		variant: z.enum(['success', 'info', 'loading', 'error']),
 	}),
 	'whispering-recording-tab-id': z.number(),
 } as const;
@@ -39,9 +53,9 @@ export const extensionStorage = {
 				return extensionSchemas[key].parse(unparsedValue);
 			},
 			catch: (error) =>
-				new ExtensionStorageError({
-					title: `Error getting from local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
+				new GetExtensionStorageError({
+					key,
+					defaultValue,
 					error,
 				}),
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
@@ -51,15 +65,11 @@ export const extensionStorage = {
 	}: {
 		key: K;
 		value: z.infer<(typeof extensionSchemas)[K]>;
-	}): Effect.Effect<void, ExtensionStorageError> =>
+	}): Effect.Effect<void, SetExtensionStorageError<K>> =>
 		Effect.tryPromise({
 			try: () => storage.set(key, value),
 			catch: (error) => {
-				return new ExtensionStorageError({
-					title: `Error setting in local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
-					error,
-				});
+				return new SetExtensionStorageError({ key, value, error });
 			},
 		}),
 	watch: <K extends keyof typeof extensionSchemas>({
@@ -87,18 +97,9 @@ export const extensionStorage = {
 				});
 			},
 			catch: (error) =>
-				new ExtensionStorageError({
-					title: `Error watching local storage for key: ${key}`,
-					description: error instanceof Error ? error.message : undefined,
+				new WatchExtensionStorageError({
+					key,
 					error,
 				}),
 		}),
 } as const;
-
-export const sendErrorToastViaStorage = (
-	value: Omit<z.infer<(typeof extensionSchemas)['whispering-toast']>, 'variant'>,
-) =>
-	extensionStorage.set({
-		key: 'whispering-toast',
-		value: { ...value, variant: 'destructive' },
-	});
