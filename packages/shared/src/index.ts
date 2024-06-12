@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export type WhisperingErrorProperties = {
 	title: string;
-	description?: string;
+	description: string;
 	action?: {
 		label: string;
 		onClick: () => void;
@@ -10,7 +10,7 @@ export type WhisperingErrorProperties = {
 	error?: unknown;
 };
 
-export type Result<T, E extends WhisperingErrorProperties = WhisperingErrorProperties> =
+export type Result<T, E = WhisperingErrorProperties> =
 	| {
 			isSuccess: true;
 			data: T;
@@ -30,3 +30,5 @@ export const externalMessageSchema = z.discriminatedUnion('message', [
 ]);
 
 export type ExternalMessage = z.infer<typeof externalMessageSchema>;
+
+export * from './ToastService.js';
