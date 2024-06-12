@@ -2,25 +2,16 @@ import { Console, Effect, Option } from 'effect';
 import type { WhisperingMessage } from '~contents/whispering';
 import { WhisperingError } from '~lib/errors';
 
-export const getWhisperingTabId = Effect.gen(function* () {
+export const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(function* () {
 	const whisperingTabs = yield* Effect.promise(() =>
 		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
 	);
-	if (whisperingTabs.length === 0) {
-		const newTab = yield* Effect.promise(() =>
-			chrome.tabs.create({
-				url: 'http://localhost:5173',
-				active: false,
-				pinned: true,
-			}),
-		);
-		return newTab.id;
-	}
+	if (whisperingTabs.length === 0) return Option.none();
 	const { id: selectedTabId, discarded: isSelectedTabDiscarded } =
 		whisperingTabs.find((tab) => tab.pinned) ?? whisperingTabs[0];
-	if (!selectedTabId) return undefined;
+	if (!selectedTabId) return Option.none();
 	if (isSelectedTabDiscarded) {
-		return yield* Effect.async<number>((resume) => {
+		const reloadedTabId = yield* Effect.async<number>((resume) => {
 			chrome.tabs.reload(selectedTabId);
 			chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
 				if (updatedTabId === selectedTabId && changeInfo.status === 'complete') {
@@ -28,10 +19,18 @@ export const getWhisperingTabId = Effect.gen(function* () {
 					chrome.tabs.onUpdated.removeListener(listener);
 				}
 			});
-		});
+		}).pipe(Effect.map(Option.fromNullable));
+		return reloadedTabId;
 	}
-	return selectedTabId;
-}).pipe(Effect.map(Option.fromNullable));
+	return Option.some(selectedTabId);
+});
+
+export const createWhisperingTab = Effect.gen(function* () {
+	const newTab = yield* Effect.promise(() =>
+		chrome.tabs.create({ url: 'http://localhost:5173', active: false, pinned: true }),
+	);
+	return Option.fromNullable(newTab.id);
+});
 
 export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
 	Effect.gen(function* () {
