@@ -1,6 +1,6 @@
 import { Console, Effect, Option } from 'effect';
 import type { WhisperingMessage } from '~contents/whispering';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/errors';
 
 export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const tabs = yield* Effect.promise(() => chrome.tabs.query({ url: 'http://localhost:5173/*' }));

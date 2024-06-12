@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Console, Effect } from 'effect';
 import type { Result } from '@repo/shared';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/errors';
 
 export type RequestBody = { tabId: number };
 

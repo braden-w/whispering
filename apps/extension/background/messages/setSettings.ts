@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/errors';
 import type { Settings } from '~lib/services/local-storage';
 
 export type RequestBody = { settings: Settings };

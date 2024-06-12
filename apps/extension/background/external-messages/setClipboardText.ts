@@ -1,5 +1,5 @@
 import { Console, Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/errors';
 
 const getCurrentTabId = Effect.gen(function* () {
 	const [currentTab] = yield* Effect.promise(() =>

@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/commands';
+import { BackgroundServiceWorkerError } from '~lib/errors';
 
 export type RequestBody = {};
 
