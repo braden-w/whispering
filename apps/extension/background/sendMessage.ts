@@ -28,8 +28,9 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 		}
 		chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
 			if (updatedTabId === someDiscardedTab.id && changeInfo.status === 'complete') {
-				resume(Effect.succeed(Option.some(someDiscardedTab.id)));
+				// Tab is done reloading
 				chrome.tabs.onUpdated.removeListener(listener);
+				resume(Effect.succeed(Option.some(someDiscardedTab.id)));
 			}
 		});
 		chrome.tabs.reload(someDiscardedTab.id);
