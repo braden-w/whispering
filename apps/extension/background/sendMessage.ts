@@ -35,7 +35,7 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 	if (!someDiscardedTab || !someDiscardedTab.id) return Option.none();
 	const reloadedTabId = yield* reloadTab(someDiscardedTab.id);
 	yield* pinTab(reloadedTabId);
-	return Option.some(reloadedTabId)
+	return Option.some(reloadedTabId);
 });
 
 const createWhisperingTabId = Effect.gen(function* () {
