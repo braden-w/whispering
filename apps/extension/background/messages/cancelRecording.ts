@@ -23,10 +23,19 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 			});
 		}
 		const whisperingTabId = maybeWhisperingTabId.value;
-		chrome.scripting.executeScript({
-			target: { tabId: whisperingTabId },
-			world: 'MAIN',
-			func: () => window.cancelRecording(),
+		yield* Effect.tryPromise({
+			try: () =>
+				chrome.scripting.executeScript({
+					target: { tabId: whisperingTabId },
+					world: 'MAIN',
+					func: () => window.cancelRecording(),
+				}),
+			catch: (error) =>
+				new WhisperingError({
+					title: 'Unable to execute "cancelRecording" script in Whispering tab',
+					description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+					error,
+				}),
 		});
 		return true as const;
 	}).pipe(

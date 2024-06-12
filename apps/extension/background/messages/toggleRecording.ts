@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { Option, Effect } from 'effect';
+import { Console, Option, Effect } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/sendMessage';
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
 
@@ -11,6 +11,7 @@ declare const window: {
 
 export const toggleRecording = Effect.gen(function* () {
 	const maybeWhisperingTabId = yield* getOrCreateWhisperingTabId;
+	yield* Console.info('Whispering tab ID:', maybeWhisperingTabId);
 	if (Option.isNone(maybeWhisperingTabId)) {
 		return yield* new WhisperingError({
 			title: 'Whispering tab not found',
@@ -18,10 +19,20 @@ export const toggleRecording = Effect.gen(function* () {
 		});
 	}
 	const whisperingTabId = maybeWhisperingTabId.value;
-	chrome.scripting.executeScript({
-		target: { tabId: whisperingTabId },
-		world: 'MAIN',
-		func: () => window.toggleRecording(),
+	yield* Console.info('Whispering tab ID:', whisperingTabId);
+	yield* Effect.tryPromise({
+		try: () =>
+			chrome.scripting.executeScript({
+				target: { tabId: whisperingTabId },
+				world: 'MAIN',
+				func: () => window.toggleRecording(),
+			}),
+		catch: (error) =>
+			new WhisperingError({
+				title: 'Unable to execute "toggleRecording" script in Whispering tab',
+				description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+				error,
+			}),
 	});
 	return true as const;
 });
