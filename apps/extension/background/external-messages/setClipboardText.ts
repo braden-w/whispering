@@ -53,6 +53,15 @@ const handler = (text: string) =>
 			});
 		}
 		return result.data;
-	});
+	}).pipe(
+		Effect.catchTags({
+			GetCurrentTabIdError: () =>
+				new WhisperingError({
+					title: 'Unable to get current tab ID to copy transcribed text to clipboard',
+					description:
+						'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+				}),
+		}),
+	);
 
 export default handler;
