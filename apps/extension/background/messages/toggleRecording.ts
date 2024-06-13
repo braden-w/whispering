@@ -19,7 +19,7 @@ export const toggleRecording = Effect.gen(function* () {
 	}
 	const whisperingTabId = maybeWhisperingTabId.value;
 	yield* Console.info('Whispering tab ID:', whisperingTabId);
-	yield* Effect.tryPromise({
+	const [injectionResult] = yield* Effect.tryPromise({
 		try: () =>
 			chrome.scripting.executeScript({
 				target: { tabId: whisperingTabId },
@@ -33,6 +33,7 @@ export const toggleRecording = Effect.gen(function* () {
 				error,
 			}),
 	});
+	yield* Console.info('Injection result "toggleRecording" script:', injectionResult);
 	return true as const;
 });
 

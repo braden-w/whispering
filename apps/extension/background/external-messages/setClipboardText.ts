@@ -33,6 +33,7 @@ const handler = (text: string) =>
 					error,
 				}),
 		});
+		yield* Console.info('Injection result "setClipboardText" script:', injectionResult);
 		if (!injectionResult) {
 			return yield* new WhisperingError({
 				title: 'Unable to copy transcribed text to clipboard in active tab',

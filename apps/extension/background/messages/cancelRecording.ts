@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { Option, Effect } from 'effect';
+import { Option, Effect, Console } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/sendMessage';
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
 
@@ -23,7 +23,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 			});
 		}
 		const whisperingTabId = maybeWhisperingTabId.value;
-		yield* Effect.tryPromise({
+		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
 				chrome.scripting.executeScript({
 					target: { tabId: whisperingTabId },
@@ -37,6 +37,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 					error,
 				}),
 		});
+		yield* Console.info('Injection result "cancelRecording" script:', injectionResult);
 		return true as const;
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),
