@@ -1,3 +1,4 @@
+import { ClipboardIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,8 +7,8 @@ import { useStorage } from '@plasmohq/storage/hook';
 import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
-import type * as ToggleRecording from './background/messages/toggleRecording';
 import type * as CancelRecording from './background/messages/cancelRecording';
+import type * as ToggleRecording from './background/messages/toggleRecording';
 import './style.css';
 
 function IndexPopup() {
@@ -56,8 +57,25 @@ const cancelRecording = () =>
 			}),
 	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
+const recorderStateToIcons = {
+	RECORDING: '🔲',
+	LOADING: '🔄',
+	IDLE: '🎙️',
+} as const satisfies Record<RecorderState, string>;
+
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
+	const [latestRecordingTranscribedText] = useStorage<string>(
+		'whispering-latest-recording-transcribed-text',
+	);
+
+	const recorderStateAsIcon = recorderStateToIcons[recorderState ?? 'IDLE'];
+	const copyToClipboardText = (() => {
+		if (latestRecordingTranscribedText) return latestRecordingTranscribedText;
+		if (recorderState === 'LOADING') return '...';
+		return '';
+	})();
+
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 text-center">
 			<div className="flex flex-col gap-4">
@@ -76,7 +94,7 @@ function IndexPage() {
 					variant="ghost"
 				>
 					<span style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}>
-						{recorderState === 'RECORDING' ? '🔲' : '🎙️'}
+						{recorderStateAsIcon}
 					</span>
 				</Button>
 				{recorderState === 'RECORDING' ?? (
@@ -101,17 +119,15 @@ function IndexPage() {
 						className="w-64"
 						placeholder="Transcribed text will appear here..."
 						readOnly
-						// value={
-						// 	latestRecording.transcriptionStatus === 'TRANSCRIBING'
-						// 		? '...'
-						// 		: latestRecording.transcribedText
-						// }
+						value={copyToClipboardText}
 					/>
 					<Button
 						className="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-						// onClick={copyRecordingTextFromLatestRecording}
+						onClick={() => {
+							navigator.clipboard.writeText(copyToClipboardText);
+						}}
 					>
-						{/* <ClipboardIcon /> */}
+						<ClipboardIcon className="h-6 w-6"/>
 						<span className="sr-only">Copy transcribed text</span>
 					</Button>
 				</div>

@@ -2,10 +2,15 @@ import type { Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getCurrentTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '~lib/errors';
+import { extensionStorage } from '~lib/services/extension-storage';
 
 const handler = (text: string) =>
 	Effect.gen(function* () {
 		const currentTabId = yield* getCurrentTabId;
+		yield* extensionStorage.set({
+			key: 'whispering-latest-recording-transcribed-text',
+			value: text,
+		});
 		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
 				chrome.scripting.executeScript<[string], Result<string, unknown>>({
