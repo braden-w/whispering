@@ -3,7 +3,13 @@
 	"exclude": ["node_modules"],
 	"include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx"],
 	"compilerOptions": {
+		"isolatedModules": true,
+
+		/* Strictness */
 		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+
 		"paths": {
 			"~*": ["./*"],
 			"@/*": ["./*"],
