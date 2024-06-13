@@ -2,23 +2,23 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Data, Effect, Option } from 'effect';
 
-class GetCurrentTabIdError extends Data.TaggedError('GetCurrentTabIdError') {}
+class GetActiveTabIdError extends Data.TaggedError('GetActiveTabIdError') {}
 
-export const getCurrentTabId = Effect.gen(function* () {
-	const [currentTab] = yield* Effect.promise(() =>
+export const getActiveTabId = Effect.gen(function* () {
+	const [activeTab] = yield* Effect.promise(() =>
 		chrome.tabs.query({ active: true, currentWindow: true }),
 	);
-	return yield* Option.fromNullable(currentTab?.id);
-}).pipe(Effect.mapError(() => new GetCurrentTabIdError()));
+	return yield* Option.fromNullable(activeTab?.id);
+}).pipe(Effect.mapError(() => new GetActiveTabIdError()));
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<number, GetCurrentTabIdError>;
+export type ResponseBody = Result<number, GetActiveTabIdError>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		const currentTabId = yield* getCurrentTabId;
-		return currentTabId;
+		const activeTabId = yield* getActiveTabId;
+		return activeTabId;
 	}).pipe(
 		Effect.map((data) => ({ isSuccess: true, data }) as const),
 		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
