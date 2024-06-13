@@ -139,7 +139,7 @@ function IndexPage() {
 				<div className="flex flex-col items-center justify-center gap-2">
 					<NavItems />
 					<p className="text-foreground/75 text-sm leading-6">
-						Click the microphone or press your configured{' '}
+						Click the microphone or press your configured global{' '}
 						<Button
 							aria-label="Keyboard Shortcuts"
 							variant="link"
@@ -149,7 +149,7 @@ function IndexPage() {
 							}}
 						>
 							<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-								keyboard shortcut
+								shortcut
 							</kbd>
 						</Button>{' '}
 						to start recording.
