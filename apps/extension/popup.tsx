@@ -150,9 +150,9 @@ function IndexPage() {
 				</div>
 				<div className="flex flex-col items-center justify-center gap-2">
 					<NavItems />
-					<p className="text-foreground/75 text-xs leading-6">
-						Click the microphone or press your
-						{' '}<Button
+					<p className="text-foreground/75 text-sm leading-6">
+						Click the microphone or press your configured{' '}
+						<Button
 							aria-label="Keyboard Shortcuts"
 							variant="link"
 							className="px-0.5"
@@ -160,8 +160,8 @@ function IndexPage() {
 								chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 							}}
 						>
-							<kbd className="bg-muted relative rounded font-mono text-xs font-semibold">
-								global keyboard shortcut
+							<kbd className="bg-muted relative rounded font-mono text-sm font-semibold">
+								keyboard shortcut
 							</kbd>
 						</Button>{' '}
 						to start recording.
