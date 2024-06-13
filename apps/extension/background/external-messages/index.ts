@@ -3,6 +3,7 @@ import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import setClipboardText from './setClipboardText';
 import setRecorderState from './setRecorderState';
+import playSound from './playSound';
 
 export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener(
@@ -17,6 +18,10 @@ export const registerExternalListener = () =>
 					case 'setClipboardText':
 						const { transcribedText } = externalMessage;
 						return yield* setClipboardText(transcribedText);
+					case 'playSound': {
+						const { sound } = externalMessage;
+						return yield* playSound(sound);
+					}
 				}
 			}).pipe(
 				Effect.tapError(renderErrorAsToast),
