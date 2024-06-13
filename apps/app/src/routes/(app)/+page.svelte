@@ -127,7 +127,7 @@
 		<NavItems />
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
-			<Button
+			{' '}<Button
 				href="/settings#local-shortcut"
 				aria-label="Go to local shortcut in settings"
 				title="Go to local shortcut in settings"
@@ -139,13 +139,13 @@
 				>
 					{settings.currentLocalShortcut}
 				</kbd>
-			</Button>
+			</Button>{' '}
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
 			<p class="text-foreground/75 pb-1 text-sm">
 				Press
-				<Button
+				{' '}<Button
 					href="/settings#global-shortcut"
 					aria-label="Go to global shortcut in settings"
 					title="Go to global shortcut in settings"
@@ -157,7 +157,7 @@
 					>
 						{settings.currentGlobalShortcut}
 					</kbd>
-				</Button>
+				</Button>{' '}
 				to start recording anywhere.
 			</p>
 		{/if}
