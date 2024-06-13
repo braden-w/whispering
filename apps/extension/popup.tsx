@@ -5,7 +5,7 @@ import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import type { RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
-import { WhisperingError } from '~lib/errors';
+import { WhisperingError, renderErrorAsToast } from '~lib/errors';
 import type * as ToggleRecording from './background/messages/toggleRecording';
 import type * as CancelRecording from './background/messages/cancelRecording';
 import './style.css';
@@ -37,7 +37,7 @@ const toggleRecording = () =>
 						: 'There was likely an issue sending the message to the background service worker from the popup.',
 				error,
 			}),
-	}).pipe(Effect.runPromise);
+	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
 const cancelRecording = () =>
 	Effect.tryPromise({
@@ -54,7 +54,7 @@ const cancelRecording = () =>
 						: 'There was likely an issue sending the message to the background service worker from the popup.',
 				error,
 			}),
-	}).pipe(Effect.runPromise);
+	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
