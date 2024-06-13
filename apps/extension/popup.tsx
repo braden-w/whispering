@@ -246,7 +246,7 @@ function NavItems() {
 							variant="ghost"
 							size="icon"
 						>
-							<GithubIcon className="h-4 w-4" aria-hidden="true" />
+							<GithubIcon className="text-foreground h-4 w-4 fill-current" aria-hidden="true" />
 							<span className="sr-only">View project on GitHub</span>
 						</Button>
 					</TooltipTrigger>
