@@ -162,7 +162,7 @@
 			</p>
 		{/if}
 		<p class="text-muted-foreground text-sm font-light">
-			Check out the <Button
+			Check out the {' '}<Button
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				variant="link"
 				class="h-fit px-0.5 py-0"
@@ -172,9 +172,9 @@
 				aria-label="Check out the Chrome Extension"
 			>
 				extension
-			</Button>
+			</Button>{' '}
 			{#if !window.__TAURI__}
-				and <Button
+				and {' '}<Button
 					href="https://github.com/braden-w/whispering/releases"
 					variant="link"
 					class="h-fit px-0.5 py-0"
@@ -184,7 +184,7 @@
 					aria-label="Check out the desktop app"
 				>
 					app
-				</Button>
+				</Button>{' '}
 			{/if} for more integrations!
 		</p>
 	</div>
