@@ -4,7 +4,7 @@ import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceW
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
 import { ToastService, type RecorderState } from '@repo/shared';
-import { Effect } from 'effect';
+import { Effect, Either } from 'effect';
 import { nanoid } from 'nanoid';
 import { MediaRecorderError, MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
@@ -76,13 +76,31 @@ export const recorder = Effect.gen(function* () {
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
 						yield* mediaRecorderService.startRecording(settings.selectedAudioInputDeviceId);
-						if (settings.isPlaySoundEnabled) startSound.play();
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								startSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									message: 'playSound',
+									sound: 'start',
+								});
+							}
+						}
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
 						return;
 					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
-						if (settings.isPlaySoundEnabled) stopSound.play();
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								stopSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									message: 'playSound',
+									sound: 'stop',
+								});
+							}
+						}
 						yield* Effect.logInfo('Recording stopped');
 						const newRecording: Recording = {
 							id: nanoid(),
@@ -102,7 +120,16 @@ export const recorder = Effect.gen(function* () {
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
-				if (settings.isPlaySoundEnabled) cancelSound.play();
+				if (settings.isPlaySoundEnabled) {
+					if (!document.hidden) {
+						cancelSound.play();
+					} else {
+						yield* sendMessageToExtension({
+							message: 'playSound',
+							sound: 'cancel',
+						});
+					}
+				}
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
 			}).pipe(Effect.runSync),
