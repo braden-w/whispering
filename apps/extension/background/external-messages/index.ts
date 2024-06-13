@@ -1,9 +1,10 @@
-import { externalMessageSchema, type Result } from '@repo/shared';
+import { ToastService, externalMessageSchema, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceLive } from '~lib/services/ToastServiceLive';
+import playSound from './playSound';
 import setClipboardText from './setClipboardText';
 import setRecorderState from './setRecorderState';
-import playSound from './playSound';
 
 export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener(
@@ -18,12 +19,17 @@ export const registerExternalListener = () =>
 					case 'setClipboardText':
 						const { transcribedText } = externalMessage;
 						return yield* setClipboardText(transcribedText);
+					case 'toast':
+						const { toast } = yield* ToastService;
+						const { toastOptions } = externalMessage;
+						return toast(toastOptions);
 					case 'playSound': {
 						const { sound } = externalMessage;
 						return yield* playSound(sound);
 					}
 				}
 			}).pipe(
+				Effect.provide(ToastServiceLive),
 				Effect.tapError(renderErrorAsToast),
 				Effect.map((result) => ({ isSuccess: true, data: result }) as const),
 				Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
