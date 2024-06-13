@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { toastOptionsSchema } from './ToastService.js';
 
+export const WHISPERING_URL = 'https://whispering.bradenwong.com';
+export const WHISPERING_EXTENSION_ID = 'kiiocjnndmjallnnojknfblenodpbkha';
+
 export type WhisperingErrorProperties = {
 	title: string;
 	description: string;
@@ -28,6 +31,7 @@ export type RecorderState = z.infer<typeof recorderStateSchema>;
 export const externalMessageSchema = z.discriminatedUnion('message', [
 	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
 	z.object({ message: z.literal('setClipboardText'), transcribedText: z.string() }),
+	z.object({ message: z.literal('playSound'), sound: z.enum(['start', 'stop', 'cancel']) }),
 	z.object({ message: z.literal('toast'), toastOptions: toastOptionsSchema }),
 ]);
 

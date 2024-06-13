@@ -1,7 +1,6 @@
 import type { ExternalMessage, Result, WhisperingErrorProperties } from '@repo/shared';
+import { WHISPERING_EXTENSION_ID } from '@repo/shared';
 import { Effect } from 'effect';
-
-const WHISPERING_EXTENSION_ID = 'kiiocjnndmjallnnojknfblenodpbkha';
 
 export const sendMessageToExtension = <M extends ExternalMessage, R extends Result<any>>(
 	message: M,
