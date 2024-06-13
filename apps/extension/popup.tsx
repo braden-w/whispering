@@ -81,7 +81,7 @@ function IndexPage() {
 
 	return (
 		<ThemeProvider defaultTheme="system" storageKey="whispering-theme">
-			<div className="flex flex-col items-center justify-center gap-4 text-center">
+			<div className="flex h-[28rem] w-96 flex-col items-center justify-center gap-4 text-center">
 				<div className="flex flex-col gap-4">
 					<h1 className="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
 						Start recording
