@@ -150,7 +150,7 @@ function IndexPage() {
 				</div>
 				<div className="flex flex-col items-center justify-center gap-2">
 					<NavItems />
-					<p className="text-foreground/75 text-sm leading-6">
+					<p className="text-foreground/75 text-xs leading-6">
 						Click the microphone or press
 						<Button
 							aria-label="Keyboard Shortcuts"
@@ -167,7 +167,7 @@ function IndexPage() {
 						to start recording.
 					</p>
 					<p className="text-muted-foreground text-sm font-light">
-						Check out the
+						Check out the{' '}
 						<Button
 							asChild
 							variant="link"
@@ -182,7 +182,7 @@ function IndexPage() {
 							>
 								desktop app
 							</a>
-						</Button>
+						</Button>{' '}
 						for more integrations!
 					</p>
 				</div>
