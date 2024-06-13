@@ -1,15 +1,7 @@
 import type { Result } from '@repo/shared';
-import { Console, Data, Effect, Option } from 'effect';
+import { Console, Effect } from 'effect';
+import { getCurrentTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '~lib/errors';
-
-class GetCurrentTabIdError extends Data.TaggedError('GetCurrentTabIdError') {}
-
-const getCurrentTabId = Effect.gen(function* () {
-	const [currentTab] = yield* Effect.promise(() =>
-		chrome.tabs.query({ active: true, currentWindow: true }),
-	);
-	return yield* Option.fromNullable(currentTab?.id);
-}).pipe(Effect.mapError(() => new GetCurrentTabIdError()));
 
 const handler = (text: string) =>
 	Effect.gen(function* () {
