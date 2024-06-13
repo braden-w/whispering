@@ -2,7 +2,7 @@ import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
-import { Toaster, toast } from 'sonner';
+import { Toaster } from 'sonner';
 import { extensionStorage } from '~lib/services/extension-storage';
 import { ToastService } from '../../../packages/shared/src/ToastService';
 import { ToastServiceLive } from '~lib/services/ToastServiceLive';
