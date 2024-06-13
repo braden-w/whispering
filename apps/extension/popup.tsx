@@ -148,7 +148,7 @@ function IndexPage() {
 								chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 							}}
 						>
-							<kbd className="bg-muted relative rounded font-mono text-sm font-semibold">
+							<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
 								keyboard shortcut
 							</kbd>
 						</Button>{' '}
