@@ -1,3 +1,4 @@
+import type { PlasmoGetOverlayAnchorList } from 'plasmo';
 import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import { recorderStateToIcons, type RecorderState } from '@repo/shared';
@@ -7,14 +8,11 @@ import type { PlasmoCSConfig, PlasmoGetStyle, PlasmoWatchOverlayAnchor } from 'p
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
 import type * as ToggleRecording from '../background/messages/toggleRecording';
 
-export const getOverlayAnchorList = async () => {
+export const getOverlayAnchorList: PlasmoGetOverlayAnchorList = async () => {
 	const inputs = document.querySelectorAll(
 		"input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='tel'], input[type='password'], input[type='number'], input:not([type]), textarea, [contenteditable='true'], [contenteditable='']",
 	);
-	return Array.from(inputs).map((element) => ({
-		element,
-		insertPosition: 'afterend',
-	}));
+	return inputs;
 };
 
 export const config: PlasmoCSConfig = {
