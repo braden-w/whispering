@@ -60,12 +60,6 @@ const cancelRecording = () =>
 			}),
 	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
-const recorderStateToIcons = {
-	RECORDING: '🔲',
-	LOADING: '🔄',
-	IDLE: '🎙️',
-} as const satisfies Record<RecorderState, string>;
-
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
 	const [latestRecordingTranscribedText] = useStorage<string>(

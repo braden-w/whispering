@@ -28,6 +28,12 @@ export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
 
 export type RecorderState = z.infer<typeof recorderStateSchema>;
 
+export const recorderStateToIcons = {
+	RECORDING: '🔲',
+	LOADING: '🔄',
+	IDLE: '🎙️',
+} as const satisfies Record<RecorderState, string>;
+
 export const externalMessageSchema = z.discriminatedUnion('message', [
 	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
 	z.object({ message: z.literal('setClipboardText'), transcribedText: z.string() }),
