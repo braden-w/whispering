@@ -1,6 +1,6 @@
 import { sendMessageToExtension } from '$lib/messaging';
 import { ToastService } from '@repo/shared';
-import { Layer } from 'effect';
+import { Effect, Layer } from 'effect';
 import { toast } from 'svelte-sonner';
 
 export const ToastServiceLive = Layer.succeed(
@@ -15,7 +15,7 @@ export const ToastServiceLive = Layer.succeed(
 					title,
 					...args,
 				},
-			});
+			}).pipe(Effect.runPromise);
 			return toastId;
 		},
 	}),
