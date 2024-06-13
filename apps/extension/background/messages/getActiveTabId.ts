@@ -1,27 +1,24 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { Effect } from 'effect';
-import { BackgroundServiceWorkerError } from '~lib/errors';
+import { Data, Effect, Option } from 'effect';
+
+class GetCurrentTabIdError extends Data.TaggedError('GetCurrentTabIdError') {}
+
+export const getCurrentTabId = Effect.gen(function* () {
+	const [currentTab] = yield* Effect.promise(() =>
+		chrome.tabs.query({ active: true, currentWindow: true }),
+	);
+	return yield* Option.fromNullable(currentTab?.id);
+}).pipe(Effect.mapError(() => new GetCurrentTabIdError()));
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<number>;
+export type ResponseBody = Result<number, GetCurrentTabIdError>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		const activeTabs = yield* Effect.tryPromise({
-			try: () => chrome.tabs.query({ active: true, currentWindow: true }),
-			catch: (error) =>
-				new BackgroundServiceWorkerError({
-					title: 'Error getting active tabs',
-					error: error,
-				}),
-		});
-		const firstActiveTab = activeTabs[0];
-		if (!firstActiveTab.id) {
-			return yield* new BackgroundServiceWorkerError({ title: 'No active tab found' });
-		}
-		return firstActiveTab.id;
+		const currentTabId = yield* getCurrentTabId;
+		return currentTabId;
 	}).pipe(
 		Effect.map((data) => ({ isSuccess: true, data }) as const),
 		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
