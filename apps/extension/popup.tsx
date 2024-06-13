@@ -135,18 +135,6 @@ function IndexPage() {
 							<span className="sr-only">Copy transcribed text</span>
 						</Button>
 					</div>
-					{/* {#if maybeLatestAudioSrc}
-			{@const latestAudioSrc = maybeLatestAudioSrc}
-			<audio
-				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
-					propertyName: 'blob',
-				})}"
-				src={latestAudioSrc}
-				controls
-				className="h-8 w-full"
-			/>
-		{/if} */}
 				</div>
 				<div className="flex flex-col items-center justify-center gap-2">
 					<NavItems />
