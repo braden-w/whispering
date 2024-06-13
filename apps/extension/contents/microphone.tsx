@@ -3,11 +3,11 @@ import { useStorage } from '@plasmohq/storage/hook';
 import { recorderStateToIcons, type RecorderState } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
-import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
+import type { PlasmoCSConfig, PlasmoGetStyle, PlasmoWatchOverlayAnchor } from 'plasmo';
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
 import type * as ToggleRecording from '../background/messages/toggleRecording';
 
-export const getInlineAnchorList = async () => {
+export const getOverlayAnchorList = async () => {
 	const inputs = document.querySelectorAll(
 		"input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='tel'], input[type='password'], input[type='number'], input:not([type]), textarea, [contenteditable='true'], [contenteditable='']",
 	);
@@ -26,6 +26,17 @@ export const getStyle: PlasmoGetStyle = () => {
 	const style = document.createElement('style');
 	style.textContent = cssText;
 	return style;
+};
+
+export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (updatePosition) => {
+	const interval = setInterval(() => {
+		updatePosition();
+	}, 420);
+
+	// Clear the interval when unmounted
+	return () => {
+		clearInterval(interval);
+	};
 };
 
 const toggleRecording = () =>
@@ -48,7 +59,11 @@ const toggleRecording = () =>
 function RecorderStateAsIcon() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
 	const recorderStateAsIcon = recorderStateToIcons[recorderState ?? 'IDLE'];
-	return <button onClick={toggleRecording}>{recorderStateAsIcon}</button>;
+	return (
+		<button className="inset-y right-8" onClick={toggleRecording}>
+			{recorderStateAsIcon}
+		</button>
+	);
 }
 
 export default RecorderStateAsIcon;
