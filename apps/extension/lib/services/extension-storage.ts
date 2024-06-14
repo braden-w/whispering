@@ -34,6 +34,7 @@ const extensionSchemas = {
 		variant: z.enum(['success', 'info', 'loading', 'error']),
 	}),
 	'whispering-recording-tab-id': z.number(),
+	'whispering-latest-recording-transcribed-text': z.string(),
 } as const;
 
 export const extensionStorage = {
