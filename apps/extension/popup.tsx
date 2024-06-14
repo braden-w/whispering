@@ -6,7 +6,7 @@ import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
-import { WHISPERING_URL, type RecorderState } from '@repo/shared';
+import { WHISPERING_URL, recorderStateToIcons, type RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import { WhisperingError, renderErrorAsToast } from '~lib/errors';
