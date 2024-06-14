@@ -1,15 +1,20 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import GithubIcon from 'react:./components/icons/github.svg';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
-import { WHISPERING_URL, recorderStateToIcons, type RecorderState } from '@repo/shared';
+import {
+	WHISPERING_URL,
+	WhisperingError,
+	recorderStateToIcons,
+	type RecorderState,
+} from '@repo/shared';
 import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import GithubIcon from 'react:./components/icons/github.svg';
+import { renderErrorAsToast } from '~lib/errors';
 import type * as CancelRecording from './background/messages/cancelRecording';
 import type * as ToggleRecording from './background/messages/toggleRecording';
 import './style.css';

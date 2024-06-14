@@ -2,7 +2,8 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsToast } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 import type { Settings } from '~lib/services/local-storage';
 
 const handler: PlasmoMessaging.MessageHandler<{ settings: Settings }, Result<true>> = (

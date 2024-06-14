@@ -1,7 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Effect } from 'effect';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsToast } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 
 export type RequestBody = { tabId: number };
 

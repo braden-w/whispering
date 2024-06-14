@@ -1,7 +1,7 @@
 import type { Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
-import { WhisperingError } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 
 const isTextarea = (element: Element): element is HTMLTextAreaElement =>
 	element.tagName === 'TEXTAREA';

@@ -1,3 +1,4 @@
+import { Data } from 'effect';
 import { z } from 'zod';
 import { toastOptionsSchema } from './ToastService.js';
 
@@ -13,6 +14,10 @@ export type WhisperingErrorProperties = {
 	};
 	error?: unknown;
 };
+
+export class WhisperingError extends Data.TaggedError(
+	'WhisperingError',
+)<WhisperingErrorProperties> {}
 
 export type Result<T, E = WhisperingErrorProperties> =
 	| {

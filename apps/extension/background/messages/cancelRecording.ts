@@ -2,7 +2,8 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Option, Effect, Console } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/sendMessage';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsToast } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 
 declare const window: {
 	toggleRecording: () => void;

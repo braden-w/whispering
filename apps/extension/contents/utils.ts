@@ -1,6 +1,7 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { Effect } from 'effect';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsToast } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 import type * as ToggleRecording from '../background/messages/toggleRecording';
 import { cva } from 'class-variance-authority';
 

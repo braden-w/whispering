@@ -1,7 +1,7 @@
 import type { Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
-import { WhisperingError } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 import { extensionStorage } from '~lib/services/extension-storage';
 
 const handler = (text: string) =>

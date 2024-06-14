@@ -3,7 +3,7 @@ import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect } from 'effect';
-import { WhisperingError } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 import { extensionStorage } from '~lib/services/extension-storage';
 
 const setIcon = (icon: 'IDLE' | 'STOP' | 'LOADING') =>

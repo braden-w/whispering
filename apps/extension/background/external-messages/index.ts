@@ -1,6 +1,7 @@
 import { ToastService, externalMessageSchema, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { WhisperingError, renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsToast } from '~lib/errors';
+import { WhisperingError } from '@repo/shared';
 import { ToastServiceLive } from '~lib/services/ToastServiceLive';
 import playSound from './playSound';
 import setClipboardText from './setClipboardText';

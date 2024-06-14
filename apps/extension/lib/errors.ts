@@ -1,11 +1,7 @@
-import { ToastService, type WhisperingErrorProperties } from '@repo/shared';
-import { Console, Data, Effect } from 'effect';
+import { ToastService, WhisperingError } from '@repo/shared';
+import { Console, Effect } from 'effect';
 import type { YieldableError } from 'effect/Cause';
 import { ToastServiceLive } from './services/ToastServiceLive';
-
-export class WhisperingError extends Data.TaggedError(
-	'WhisperingError',
-)<WhisperingErrorProperties> {}
 
 export const renderErrorAsToast = <E extends YieldableError & Readonly<WhisperingError>>(
 	error: E,
