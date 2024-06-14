@@ -13,7 +13,7 @@ const handler: PlasmoMessaging.MessageHandler<{ settings: Settings }, Result<tru
 		if (!body || !body.settings) {
 			return yield* new WhisperingError({
 				title: 'Error setting Whispering settings',
-				description: 'Settings must be provided in the request body of the message',
+				description: 'Settings must be provided in the message request body',
 			});
 		}
 		yield* sendMessageToWhisperingContentScript<void>({
