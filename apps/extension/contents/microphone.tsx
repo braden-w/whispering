@@ -54,11 +54,34 @@ const toggleRecording = () =>
 			}),
 	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
+function DraggableIcon() {
+	const [position, setPosition] = useState({ x: 0, y: 0 });
+	useEffect(() => {
+		// Load saved position from localStorage
+		const savedPosition = localStorage.getItem('buttonPosition');
+		if (savedPosition) {
+			setPosition(JSON.parse(savedPosition));
+		}
+	}, []);
+	return (
+		<Draggable
+			position={position}
+			onStop={(e, data) => {
+				const newPosition = { x: data.x, y: data.y };
+				setPosition(newPosition);
+				// Save position to localStorage
+				localStorage.setItem('buttonPosition', JSON.stringify(newPosition));
+			}}
+		>
+			<RecorderStateAsIcon />
+		</Draggable>
+	);
+}
 function RecorderStateAsIcon() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
 	const recorderStateAsIcon = recorderStateToIcons[recorderState ?? 'IDLE'];
 	return (
-		<button className="inset-y right-8" onClick={toggleRecording}>
+		<button className="inset-y absolute right-8" onClick={toggleRecording}>
 			{recorderStateAsIcon}
 		</button>
 	);
