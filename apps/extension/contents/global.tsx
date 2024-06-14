@@ -3,9 +3,7 @@ import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
-import { ToastServiceLive } from '~lib/services/ToastServiceLive';
 import { extensionStorage } from '~lib/services/extension-storage';
-import { ToastService } from '../../../packages/shared/src/ToastService';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
