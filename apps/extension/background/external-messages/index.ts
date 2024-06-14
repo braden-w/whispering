@@ -5,6 +5,7 @@ import { ToastServiceLive } from '~lib/services/ToastServiceLive';
 import playSound from './playSound';
 import setClipboardText from './setClipboardText';
 import setRecorderState from './setRecorderState';
+import writeTextToCursor from './writeTextToCursor';
 
 export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener(
@@ -31,6 +32,9 @@ export const registerExternalListener = () =>
 					case 'setClipboardText':
 						const { transcribedText } = externalMessage;
 						return yield* setClipboardText(transcribedText);
+					case 'writeTextToCursor':
+						const { text } = externalMessage;
+						return yield* writeTextToCursor(text);
 					case 'toast':
 						const { toast } = yield* ToastService;
 						const { toastOptions } = externalMessage;

@@ -37,6 +37,7 @@ export const recorderStateToIcons = {
 export const externalMessageSchema = z.discriminatedUnion('message', [
 	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
 	z.object({ message: z.literal('setClipboardText'), transcribedText: z.string() }),
+	z.object({ message: z.literal('writeTextToCursor'), text: z.string() }),
 	z.object({ message: z.literal('playSound'), sound: z.enum(['start', 'stop', 'cancel']) }),
 	z.object({ message: z.literal('toast'), toastOptions: toastOptionsSchema }),
 ]);
