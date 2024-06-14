@@ -3,9 +3,9 @@ import { WHISPERING_EXTENSION_ID } from '@repo/shared';
 import { Effect } from 'effect';
 
 export const sendMessageToExtension = <
-	M extends ExternalMessage,
 	T extends unknown,
-	R extends Result<T>,
+	M extends ExternalMessage = ExternalMessage,
+	R extends Result<T> = Result<T>,
 >(
 	message: M,
 ) =>
