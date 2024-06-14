@@ -1,5 +1,4 @@
 import { goto } from '$app/navigation';
-import { sendMessageToExtension } from '$lib/messaging';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
@@ -79,7 +78,10 @@ const createRecordings = Effect.gen(function* () {
 			return Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
 				if (Option.isNone(maybeRecording)) {
-					return yield* new TranscriptionError({ title: `Recording with id ${id} not found` });
+					return yield* new TranscriptionError({
+						title: `Recording with id ${id} not found`,
+						description: 'Please try again.',
+					});
 				}
 				const recording = maybeRecording.value;
 				yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
@@ -115,36 +117,24 @@ const createRecordings = Effect.gen(function* () {
 
 						if (settings.isCopyToClipboardEnabled) {
 							// Copy transcription to clipboard if enabled
-							yield* clipboardService.setClipboardText(transcribedText).pipe(
-								Effect.catchAll((error) =>
-									sendMessageToExtension({
-										message: 'setClipboardText',
-										transcribedText,
-									}),
-								),
-								Effect.andThen(() => {
-									toast({
-										variant: 'success',
-										title: 'Copied transcription to clipboard!',
-										description: transcribedText,
-										descriptionClass: 'line-clamp-2',
-									});
-								}),
-							);
+							yield* clipboardService.setClipboardText(transcribedText);
+							toast({
+								variant: 'success',
+								title: 'Copied transcription to clipboard!',
+								description: transcribedText,
+								descriptionClass: 'line-clamp-2',
+							});
 						}
 
 						// Paste transcription if enabled
 						if (settings.isPasteContentsOnSuccessEnabled) {
-							yield* clipboardService.writeText(transcribedText).pipe(
-								Effect.andThen(() => {
-									toast({
-										variant: 'success',
-										title: 'Pasted transcription!',
-										description: transcribedText,
-										descriptionClass: 'line-clamp-2',
-									});
-								}),
-							);
+							yield* clipboardService.writeText(transcribedText);
+							toast({
+								variant: 'success',
+								title: 'Pasted transcription!',
+								description: transcribedText,
+								descriptionClass: 'line-clamp-2',
+							});
 						}
 					}),
 				),

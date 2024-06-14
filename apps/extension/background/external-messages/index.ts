@@ -30,11 +30,9 @@ export const registerExternalListener = () =>
 						const { recorderState } = externalMessage;
 						return yield* setRecorderState(recorderState);
 					case 'setClipboardText':
-						const { transcribedText } = externalMessage;
-						return yield* setClipboardText(transcribedText);
+						return yield* setClipboardText(externalMessage.transcribedText);
 					case 'writeTextToCursor':
-						const { text } = externalMessage;
-						return yield* writeTextToCursor(text);
+						return yield* writeTextToCursor(externalMessage.transcribedText);
 					case 'toast':
 						const { toast } = yield* ToastService;
 						const { toastOptions } = externalMessage;

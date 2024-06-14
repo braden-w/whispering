@@ -12,7 +12,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 				catch: (error) =>
 					new ClipboardError({
 						title: 'Unable to write to clipboard',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -22,7 +22,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 				catch: (error) =>
 					new ClipboardError({
 						title: 'Unable to paste from clipboard',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
