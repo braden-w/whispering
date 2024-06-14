@@ -12,7 +12,6 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { catchErrorsAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
@@ -24,6 +23,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { renderErrorAsToast } from '$lib/services/errors';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -248,7 +248,7 @@
 					size="icon"
 					on:click={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings.deleteRecordingsById(ids).pipe(catchErrorsAsToast, Effect.runPromise);
+						recordings.deleteRecordingsById(ids).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />

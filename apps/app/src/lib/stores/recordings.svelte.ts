@@ -7,7 +7,7 @@ import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServi
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
-import { catchErrorsAsToast } from '$lib/services/errors';
+import { renderErrorAsToast } from '$lib/services/errors';
 import { ToastService } from '@repo/shared';
 import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
@@ -31,12 +31,12 @@ const createRecordings = Effect.gen(function* () {
 		},
 		sync: Effect.gen(function* () {
 			recordings = yield* recordingsDb.getAllRecordings;
-		}).pipe(catchErrorsAsToast),
+		}).pipe(Effect.catchAll(renderErrorAsToast)),
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.addRecording(recording);
 				recordings.push(recording);
-			}).pipe(catchErrorsAsToast),
+			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
@@ -45,7 +45,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recording updated!',
 					description: 'Your recording has been updated successfully.',
 				});
-			}).pipe(catchErrorsAsToast),
+			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		deleteRecordingById: (id: string) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
@@ -55,7 +55,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recording deleted!',
 					description: 'Your recording has been deleted successfully.',
 				});
-			}).pipe(catchErrorsAsToast),
+			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		deleteRecordingsById: (ids: string[]) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
@@ -65,7 +65,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recordings deleted!',
 					description: 'Your recordings have been deleted successfully.',
 				});
-			}).pipe(catchErrorsAsToast),
+			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		transcribeRecording: (id: string) => {
 			const toastId = toast({
 				variant: 'loading',
@@ -110,8 +110,8 @@ const createRecordings = Effect.gen(function* () {
 				});
 				return transcribedText;
 			}).pipe(
-				(program) => catchErrorsAsToast(program, { toastId }),
-				Effect.andThen((transcribedText) =>
+				Effect.catchAll((error) => renderErrorAsToast(error, { toastId })),
+				Effect.map((transcribedText) =>
 					Effect.gen(function* () {
 						if (transcribedText === '') return;
 
@@ -138,7 +138,7 @@ const createRecordings = Effect.gen(function* () {
 						}
 					}),
 				),
-				catchErrorsAsToast,
+				Effect.catchAll(renderErrorAsToast),
 				Effect.runPromise,
 			);
 		},
@@ -152,7 +152,7 @@ const createRecordings = Effect.gen(function* () {
 					description: recording.transcribedText,
 					descriptionClass: 'line-clamp-2',
 				});
-			}).pipe(catchErrorsAsToast, Effect.runPromise),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
 });
 

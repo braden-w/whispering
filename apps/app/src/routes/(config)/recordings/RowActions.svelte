@@ -14,7 +14,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { catchErrorsAsToast } from '$lib/services/errors';
+	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Effect } from 'effect';
@@ -62,7 +62,7 @@
 				onsubmit={async (e) => {
 					e.preventDefault();
 					isSaving = true;
-					await recordings.updateRecording(recording).pipe(catchErrorsAsToast, Effect.runPromise);
+					await recordings.updateRecording(recording).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 					isSaving = false;
 					isDialogOpen = false;
 				}}
@@ -102,7 +102,7 @@
 							isDeleting = true;
 							await recordings
 								.deleteRecordingById(recording.id)
-								.pipe(catchErrorsAsToast, Effect.runPromise);
+								.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 							isDeleting = false;
 							isDialogOpen = false;
 						}}
@@ -143,7 +143,7 @@
 		variant="ghost"
 		size="icon"
 		on:click={() =>
-			recordings.deleteRecordingById(recording.id).pipe(catchErrorsAsToast, Effect.runPromise)}
+			recordings.deleteRecordingById(recording.id).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise)}
 		title="Delete Recording"
 	>
 		<TrashIcon class="h-4 w-4" />

@@ -4,13 +4,12 @@ import {
 } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
-import { catchErrorsAsToast } from '$lib/services/errors';
+import { renderErrorAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
-import { get } from 'svelte/store';
 import { z } from 'zod';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
@@ -75,10 +74,10 @@ const createSettings = Effect.gen(function* () {
 				shortcut: settings.value.currentGlobalShortcut,
 				callback: recorder.toggleRecording,
 			});
-		}).pipe(catchErrorsAsToast);
+		});
 		yield* jobQueue.addJobToQueue(initialSilentJob);
 	});
-	queueInitialSilentJob.pipe(catchErrorsAsToast, Effect.runPromise);
+	queueInitialSilentJob.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
 	return {
 		get isPlaySoundEnabled() {
@@ -118,10 +117,10 @@ const createSettings = Effect.gen(function* () {
 						callback: recorder.toggleRecording,
 					});
 					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
-				}).pipe(catchErrorsAsToast);
+				});
 				yield* jobQueue.addJobToQueue(job);
 			});
-			queueJob.pipe(catchErrorsAsToast, Effect.runPromise);
+			queueJob.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},
 		get isGlobalShortcutEnabled() {
 			return registerShortcutsService.isGlobalShortcutEnabled;
@@ -139,10 +138,10 @@ const createSettings = Effect.gen(function* () {
 						callback: recorder.toggleRecording,
 					});
 					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
-				}).pipe(catchErrorsAsToast);
+				});
 				yield* jobQueue.addJobToQueue(job);
 			});
-			queueJob.pipe(catchErrorsAsToast, Effect.runPromise);
+			queueJob.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},
 		get apiKey() {
 			return settings.value.apiKey;

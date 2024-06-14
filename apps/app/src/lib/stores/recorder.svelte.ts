@@ -4,11 +4,11 @@ import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceW
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
 import { ToastService, type RecorderState } from '@repo/shared';
-import { Effect, Either } from 'effect';
+import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import { MediaRecorderError, MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
-import { catchErrorsAsToast } from '../services/errors';
+import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
@@ -43,7 +43,10 @@ export const recorder = Effect.gen(function* () {
 		},
 		enumerateRecordingDevices: () =>
 			mediaRecorderService.enumerateRecordingDevices.pipe(
-				(program) => catchErrorsAsToast(program, { defaultValue: [] as MediaDeviceInfo[] }),
+				Effect.catchAll((error) => {
+					renderErrorAsToast(error);
+					return Effect.succeed([] as MediaDeviceInfo[]);
+				}),
 				Effect.runPromise,
 			),
 		toggleRecording: () =>
@@ -116,7 +119,7 @@ export const recorder = Effect.gen(function* () {
 						recordings.transcribeRecording(newRecording.id);
 						return;
 				}
-			}).pipe(catchErrorsAsToast, Effect.runPromise),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
