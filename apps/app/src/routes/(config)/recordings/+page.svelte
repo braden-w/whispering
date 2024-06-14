@@ -185,7 +185,6 @@
 				return rowSelection.value;
 			},
 		},
-		debugTable: true,
 	});
 
 	function getInitialFilterValue() {
