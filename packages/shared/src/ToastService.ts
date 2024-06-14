@@ -1,40 +1,28 @@
-import type { Effect } from 'effect';
 import { Context } from 'effect';
+import { z } from 'zod';
 
-type ToastId = string | number;
+const toastIdSchema = z.union([z.string(), z.number()]);
+type ToastId = z.infer<typeof toastIdSchema>;
+
+export const toastOptionsSchema = z.object({
+	variant: z.enum(['success', 'info', 'loading', 'error']),
+	id: toastIdSchema.optional(),
+	title: z.string(),
+	description: z.string(),
+	descriptionClass: z.string().optional(),
+	action: z
+		.object({
+			label: z.string(),
+			onClick: z.function(z.tuple([]), z.void()),
+		})
+		.optional(),
+});
+
+type ToastOptions = z.infer<typeof toastOptionsSchema>;
 
 export class ToastService extends Context.Tag('ToastService')<
 	ToastService,
 	{
-		success: (options: {
-			id?: ToastId;
-			title: string;
-			description: string;
-			descriptionClass?: string;
-			action?: {
-				label: string;
-				onClick: () => void;
-			};
-		}) => ToastId;
-		loading: (options: {
-			id?: ToastId;
-			title: string;
-			description: string;
-			descriptionClass?: string;
-			action?: {
-				label: string;
-				onClick: () => void;
-			};
-		}) => ToastId;
-		error: (options: {
-			id?: ToastId;
-			title: string;
-			description?: string;
-			descriptionClass?: string;
-			action?: {
-				label: string;
-				onClick: () => void;
-			};
-		}) => ToastId;
+		toast: (options: ToastOptions) => ToastId;
 	}
 >() {}
