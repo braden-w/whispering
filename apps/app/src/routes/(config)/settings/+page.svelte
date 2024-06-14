@@ -2,12 +2,12 @@
 	import { TranscriptionService } from '$lib/services/TranscriptionService';
 	import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 	import { recorder, settings } from '$lib/stores';
-	import { Button } from '@repo/ui/components/button';
-	import * as Card from '@repo/ui/components/card';
-	import { Input } from '@repo/ui/components/input';
-	import { Label } from '@repo/ui/components/label';
-	import * as Select from '@repo/ui/components/select';
-	import { Switch } from '@repo/ui/components/switch';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import * as Select from '$lib/components/ui/select';
+	import { Switch } from '$lib/components/ui/switch';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = recorder.enumerateRecordingDevices();

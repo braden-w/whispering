@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { recorder } from '$lib/stores';
-	import { Button } from '@repo/ui/components/button';
+	import { Button } from '$lib/components/ui/button';
 	import { cn } from '@repo/ui/utils';
-	import { NavItems } from '@repo/ui/shared';
+	import { NavItems } from '$lib/components/shared';
 </script>
 
 <header

@@ -3,11 +3,11 @@
 	import { catchErrorsAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Button } from '@repo/ui/components/button';
-	import * as Dialog from '@repo/ui/components/dialog';
-	import { Input } from '@repo/ui/components/input';
-	import { Label } from '@repo/ui/components/label';
-	import { Textarea } from '@repo/ui/components/textarea';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import {
 		ClipboardIcon,
 		PencilIcon as EditIcon,

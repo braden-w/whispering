@@ -2,11 +2,11 @@
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
-	import { Button } from '@repo/ui/components/button';
-	import { Checkbox } from '@repo/ui/components/checkbox';
-	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
-	import { Input } from '@repo/ui/components/input';
-	import * as Table from '@repo/ui/components/table';
+	import { Button } from '$lib/components/ui/button';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Input } from '$lib/components/ui/input';
+	import * as Table from '$lib/components/ui/table';
 	import {
 		ChevronDownIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,

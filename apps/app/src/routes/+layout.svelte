@@ -2,7 +2,7 @@
 	import { onNavigate } from '$app/navigation';
 	import { settings } from '$lib/stores';
 	import '@repo/ui/app.pcss';
-	import { Toaster } from '@repo/ui/components/sonner';
+	import { Toaster } from '$lib/components/ui/sonner';
 	import { ModeWatcher } from 'mode-watcher';
 
 	onNavigate((navigation) => {

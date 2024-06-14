@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { Button } from '@repo/ui/components/button';
+	import { Button } from '$lib/components/ui/button';
 	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@repo/ui/icons';
 	import type { HeaderContext } from '@tanstack/table-core';
 

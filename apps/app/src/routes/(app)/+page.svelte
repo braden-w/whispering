@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { recorder, recorderState, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Button } from '@repo/ui/components/button';
-	import { Input } from '@repo/ui/components/input';
-	import { Label } from '@repo/ui/components/label';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import { ClipboardIcon } from '@repo/ui/icons';
-	import { NavItems } from '@repo/ui/shared';
+	import { NavItems } from '$lib/components/shared';
 	import { onMount } from 'svelte';
 
 	const PLACEHOLDER_RECORDING = {

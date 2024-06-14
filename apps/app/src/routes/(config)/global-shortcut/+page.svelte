@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '@repo/ui/components/button';
+	import { Button } from '$lib/components/ui/button';
 	import { ChromeWebStoreIcon, LaptopIcon as DesktopIcon } from '@repo/ui/icons';
 </script>
 
