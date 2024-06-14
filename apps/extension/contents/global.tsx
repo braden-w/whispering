@@ -2,7 +2,7 @@ import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { ToastServiceLive } from '~lib/services/ToastServiceLive';
 import { extensionStorage } from '~lib/services/extension-storage';
 import { ToastService } from '../../../packages/shared/src/ToastService';
@@ -22,12 +22,11 @@ function ErrorToast() {
 	useEffect(
 		() =>
 			Effect.gen(function* () {
-				const { toast } = yield* ToastService;
 				yield* extensionStorage.watch({
 					key: 'whispering-toast',
-					callback: (args) => toast(args),
+					callback: ({ variant, title, ...args }) => toast[variant](title, args),
 				});
-			}).pipe(Effect.provide(ToastServiceLive), Effect.runSync),
+			}).pipe(Effect.runSync),
 		[],
 	);
 	return <Toaster />;
