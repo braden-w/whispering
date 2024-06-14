@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from '@repo/ui/utils';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { cn } from '$lib/utils.js';
 
 	let {
 		children,
@@ -14,7 +14,7 @@
 <tr
 	class={cn(
 		'hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors',
-		className
+		className,
 	)}
 	{...restProps}
 >

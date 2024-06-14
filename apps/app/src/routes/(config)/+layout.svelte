@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { recorder } from '$lib/stores';
 	import { Button } from '$lib/components/ui/button';
-	import { cn } from '@repo/ui/utils';
+	import { cn } from '$lib/utils.js';
 	import { NavItems } from '$lib/components/shared';
 </script>
 

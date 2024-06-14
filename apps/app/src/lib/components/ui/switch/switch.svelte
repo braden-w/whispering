@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Switch as SwitchPrimitive } from 'bits-ui';
-	import { cn } from '@repo/ui/utils';
+	import { cn } from '$lib/utils.js';
 
 	let {
 		class: className = undefined,
