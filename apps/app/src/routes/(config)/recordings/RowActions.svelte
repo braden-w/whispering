@@ -1,13 +1,4 @@
 <script lang="ts">
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { catchErrorsAsToast } from '$lib/services/errors';
-	import { recordings } from '$lib/stores';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Button } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Textarea } from '$lib/components/ui/textarea';
 	import {
 		ClipboardIcon,
 		PencilIcon as EditIcon,
@@ -16,7 +7,16 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
-	} from '@repo/ui/icons';
+	} from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import { catchErrorsAsToast } from '$lib/services/errors';
+	import { recordings } from '$lib/stores';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Effect } from 'effect';
 
 	let { recording }: { recording: Recording } = $props();

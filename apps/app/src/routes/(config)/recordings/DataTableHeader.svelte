@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Recording } from '$lib/services/RecordingDbService';
+	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
-	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '@repo/ui/icons';
+	import type { Recording } from '$lib/services/RecordingDbService';
 	import type { HeaderContext } from '@tanstack/table-core';
 
 	let { column }: HeaderContext<Recording, unknown> = $props();

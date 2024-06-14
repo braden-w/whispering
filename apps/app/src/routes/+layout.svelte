@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
-	import { settings } from '$lib/stores';
-	import '@repo/ui/app.pcss';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { settings } from '$lib/stores';
 	import { ModeWatcher } from 'mode-watcher';
+	import '../app.pcss';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;

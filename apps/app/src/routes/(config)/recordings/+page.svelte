@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { recordings } from '$lib/stores';
-	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
-	import { Button } from '$lib/components/ui/button';
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Input } from '$lib/components/ui/input';
-	import * as Table from '$lib/components/ui/table';
 	import {
 		ChevronDownIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
-	} from '@repo/ui/icons';
+	} from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Input } from '$lib/components/ui/input';
+	import * as Table from '$lib/components/ui/table';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import { catchErrorsAsToast } from '$lib/services/errors';
+	import { recordings } from '$lib/stores';
+	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
@@ -22,8 +24,6 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { catchErrorsAsToast } from '$lib/services/errors';
 
 	const columns: ColumnDef<Recording>[] = [
 		{

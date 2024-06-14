@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { ChromeWebStoreIcon, LaptopIcon as DesktopIcon } from '@repo/ui/icons';
+	import { ChromeWebStoreIcon, LaptopIcon as DesktopIcon } from '$lib/components/icons';
 </script>
 
 <svelte:head>
