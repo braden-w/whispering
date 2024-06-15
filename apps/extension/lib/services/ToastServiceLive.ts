@@ -1,14 +1,14 @@
 import { ToastService } from '@repo/shared';
 import { Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
-import { extensionStorage } from './extension-storage';
+import { extensionStorageService } from './extension-storage';
 
 export const ToastServiceLive = Layer.succeed(
 	ToastService,
 	ToastService.of({
 		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) => {
 			const id = maybeId ?? nanoid();
-			extensionStorage.set({
+			extensionStorageService.set({
 				key: 'whispering-toast',
 				value: { variant, id, title, description, descriptionClass, action },
 			});

@@ -4,7 +4,7 @@ import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
 import { useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
-import { extensionStorage } from '~lib/services/extension-storage';
+import { extensionStorageService } from '~lib/services/extension-storage';
 
 export const config: PlasmoCSConfig = {
 	matches: ['<all_urls>'],
@@ -21,7 +21,7 @@ function ErrorToast() {
 	useEffect(
 		() =>
 			Effect.gen(function* () {
-				yield* extensionStorage.watch({
+				yield* extensionStorageService.watch({
 					key: 'whispering-toast',
 					callback: ({ variant, id, title, description, descriptionClass, action }) =>
 						toast[variant](title, {

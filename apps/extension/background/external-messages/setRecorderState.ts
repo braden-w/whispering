@@ -4,7 +4,7 @@ import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect } from 'effect';
 import { WhisperingError } from '@repo/shared';
-import { extensionStorage } from '~lib/services/extension-storage';
+import { extensionStorageService } from '~lib/services/extension-storage';
 
 const setIcon = (icon: 'IDLE' | 'STOP' | 'LOADING') =>
 	Effect.tryPromise({
@@ -31,7 +31,7 @@ const setIcon = (icon: 'IDLE' | 'STOP' | 'LOADING') =>
 
 const handler = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
-		yield* extensionStorage.set({
+		yield* extensionStorageService.set({
 			key: 'whispering-recording-state',
 			value: recorderState,
 		});

@@ -1,6 +1,6 @@
 import { Schema as S } from '@effect/schema';
 import { settingsSchema } from '@repo/shared';
-import { Data, Effect } from 'effect';
+import { Console, Data, Effect } from 'effect';
 
 const keys = ['whispering-settings'] as const;
 
@@ -39,6 +39,7 @@ export const localStorageService = {
 			if (isEmpty) return defaultValue;
 			const thisKeyValueSchema = S.parseJson(S.asSchema(keyToSchema[key]));
 			const parsedValue = yield* S.decodeUnknown(thisKeyValueSchema)(valueFromStorage);
+			yield* Console.info('localStorageService.get', key, parsedValue);
 			return parsedValue;
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
 	set: <K extends Key>({

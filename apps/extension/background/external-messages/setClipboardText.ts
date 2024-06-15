@@ -2,12 +2,12 @@ import type { Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
-import { extensionStorage } from '~lib/services/extension-storage';
+import { extensionStorageService } from '~lib/services/extension-storage';
 
 const handler = (text: string) =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
-		yield* extensionStorage.set({
+		yield* extensionStorageService.set({
 			key: 'whispering-latest-recording-transcribed-text',
 			value: text,
 		});
