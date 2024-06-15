@@ -1,6 +1,7 @@
 import { Data } from 'effect';
 import { z } from 'zod';
 import { toastOptionsSchema } from './ToastService.js';
+import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL = 'https://whispering.bradenwong.com';
 export const WHISPERING_EXTENSION_ID = 'kiiocjnndmjallnnojknfblenodpbkha';
@@ -50,3 +51,11 @@ export const externalMessageSchema = z.discriminatedUnion('message', [
 export type ExternalMessage = z.infer<typeof externalMessageSchema>;
 
 export * from './ToastService.js';
+
+export const TOASTER_SETTINGS = {
+	position: 'bottom-right',
+	richColors: true,
+	expand: true,
+	duration: 5000,
+	visibleToasts: 5,
+} satisfies ToasterProps;

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type { ToasterProps } from 'svelte-sonner';
 	import { onNavigate } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { settings } from '$lib/stores';
+	import { TOASTER_SETTINGS } from '@repo/shared';
 	import { ModeWatcher } from 'mode-watcher';
 	import '../app.pcss';
 
@@ -16,14 +15,6 @@
 			});
 		});
 	});
-
-	const TOASTER_SETTINGS = {
-		position: 'bottom-right',
-		richColors: true,
-		expand: true,
-		duration: 5000,
-		visibleToasts: 5,
-	} satisfies ToasterProps;
 </script>
 
 <svelte:head>

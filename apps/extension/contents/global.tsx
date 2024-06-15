@@ -1,3 +1,4 @@
+import { TOASTER_SETTINGS } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig, PlasmoGetStyle } from 'plasmo';
@@ -27,7 +28,7 @@ function ErrorToast() {
 			}).pipe(Effect.runSync),
 		[],
 	);
-	return <Toaster />;
+	return <Toaster {...TOASTER_SETTINGS} />;
 }
 
 export default ErrorToast;
