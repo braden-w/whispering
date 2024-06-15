@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
 import { RecorderState, toastOptionsSchema } from '@repo/shared';
-import { Data, Effect } from 'effect';
+import { Console, Data, Effect } from 'effect';
 
 const keyToSchema = {
 	'whispering-recording-state': RecorderState,
@@ -79,18 +79,12 @@ export const extensionStorage = {
 		const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
 			Effect.gen(function* () {
 				const newValue = yield* S.decodeUnknown(thisKeyValueSchema)(newValueUnparsed);
+				yield* Console.log('watch', key, newValue);
 				callback(newValue);
 			}).pipe(Effect.runSync);
 		return Effect.try({
-			try: () =>
-				storage.watch({
-					[key]: listener,
-				}),
-			catch: (error) =>
-				new WatchExtensionStorageError({
-					key,
-					error,
-				}),
+			try: () => storage.watch({ [key]: listener }),
+			catch: (error) => new WatchExtensionStorageError({ key, error }),
 		});
 	},
 } as const;
