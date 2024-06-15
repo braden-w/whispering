@@ -10,6 +10,7 @@
 		"package": "plasmo package"
 	},
 	"dependencies": {
+		"@effect/schema": "^0.67.23",
 		"@plasmohq/messaging": "^0.6.2",
 		"@plasmohq/storage": "^1.10.0",
 		"@radix-ui/react-label": "^2.0.2",
@@ -18,11 +19,11 @@
 		"audio-recorder-polyfill": "^0.4.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
-		"effect": "^3.2.7",
+		"effect": "^3.3.2",
 		"idb": "^8.0.0",
 		"lucide-react": "^0.383.0",
 		"nanoid": "^5.0.7",
-		"plasmo": "^0.86.3",
+		"plasmo": "^0.87.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-draggable": "^4.4.6",
