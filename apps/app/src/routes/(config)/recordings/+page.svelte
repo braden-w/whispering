@@ -12,18 +12,18 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
-	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { renderErrorAsToast } from '$lib/services/errors';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -121,26 +121,27 @@
 	let sorting = createPersistedState({
 		key: 'whispering-data-table-sorting',
 		defaultValue: [{ id: 'timestamp', desc: true }],
-		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
+		schema: S.Struct({ desc: S.Boolean, id: S.String }).pipe(S.mutable, S.Array, S.mutable),
 	});
 	let columnFilters = createPersistedState({
 		key: 'whispering-data-table-column-filters',
 		defaultValue: [],
-		schema: z.array(
-			z
-				.object({ id: z.string(), value: z.unknown() })
-				.refine((data): data is ColumnFilter => data.value !== undefined),
+		schema: S.Struct({ id: S.String, value: S.Unknown }).pipe(
+			S.filter((data): data is ColumnFilter => data.value !== undefined),
+			S.mutable,
+			S.Array,
+			S.mutable,
 		),
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-data-table-column-visibility',
 		defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
-		schema: z.record(z.boolean()),
+		schema: S.Record(S.String, S.Boolean).pipe(S.mutable),
 	});
 	let rowSelection = createPersistedState({
 		key: 'whispering-data-table-row-selection',
 		defaultValue: {},
-		schema: z.record(z.boolean()),
+		schema: S.Record(S.String, S.Boolean).pipe(S.mutable),
 	});
 
 	function createUpdater<T>(state: { value: T }) {
@@ -248,7 +249,9 @@
 					size="icon"
 					on:click={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings.deleteRecordingsById(ids).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+						recordings
+							.deleteRecordingsById(ids)
+							.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />

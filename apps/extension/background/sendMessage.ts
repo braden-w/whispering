@@ -1,21 +1,21 @@
-import { Console, Effect, Option } from 'effect';
-import { z } from 'zod';
+import { Console, Effect, Either, Option, pipe } from 'effect';
+import { Schema as S } from '@effect/schema';
 import type { WhisperingMessage } from '~contents/whispering';
 import { WhisperingError } from '@repo/shared';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
-const whisperingTabContentReadyMessageSchema = z.object({
-	name: z.literal('whisperingTabContentReady'),
-	body: z.object({ tabId: z.number() }),
+const whisperingTabContentReadyMessageSchema = S.Struct({
+	name: S.Literal('whisperingTabContentReady'),
+	body: S.Struct({ tabId: S.Number }),
 });
 
-type WhisperingTabContentReadyMessage = z.infer<typeof whisperingTabContentReadyMessageSchema>;
+type WhisperingTabContentReadyMessage = S.Schema.Type<typeof whisperingTabContentReadyMessageSchema>;
 
 const isWhisperingTabContentReadyMessage = (
 	message: unknown,
 ): message is WhisperingTabContentReadyMessage =>
-	whisperingTabContentReadyMessageSchema.safeParse(message).success;
+	pipe(message, S.decodeUnknownEither(whisperingTabContentReadyMessageSchema), Either.isRight)
 
 const waitForContentScriptLoaded = <T>(action: () => Promise<T>) =>
 	Effect.async<number>((resume) => {

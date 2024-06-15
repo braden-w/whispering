@@ -3,7 +3,7 @@ import type { Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import { Schema as S } from '@effect/schema';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
 import { settingsSchema } from '~lib/services/local-storage';
@@ -14,17 +14,17 @@ export const config: PlasmoCSConfig = {
 	matches: ['http://localhost:5173/*'],
 };
 
-const whisperingMessageSchema = z.discriminatedUnion('commandName', [
-	z.object({ commandName: z.literal('getSettings') }),
-	z.object({ commandName: z.literal('setSettings'), settings: settingsSchema }),
-]);
+const whisperingMessageSchema = S.Union(
+	S.Struct({ commandName: S.Literal('getSettings') }),
+	S.Struct({ commandName: S.Literal('setSettings'), settings: settingsSchema }),
+);
 
-export type WhisperingMessage = z.infer<typeof whisperingMessageSchema>;
+export type WhisperingMessage = S.Schema.Type<typeof whisperingMessageSchema>;
 
 chrome.runtime.onMessage.addListener(
 	(requestUnparsed, sender, sendResponse: <R extends Result<any>>(response: R) => void) =>
 		Effect.gen(function* () {
-			const whisperingMessage = whisperingMessageSchema.parse(requestUnparsed);
+			const whisperingMessage = S.decodeUnknownSync(whisperingMessageSchema)(requestUnparsed);
 			yield* Console.info('Received message in Whispering content script', whisperingMessage);
 			switch (whisperingMessage.commandName) {
 				case 'getSettings':

@@ -1,24 +1,24 @@
-import type { z } from 'zod';
+import { Schema as S } from '@effect/schema';
 
 /**
  * Creates a persisted state tied to local storage.
  * @param {Object} params - The parameters for creating the persisted state.
  * @param {string} params.key - The key used to store the value in local storage.
- * @param {TSchema} params.schema - The Zod schema used to validate the value.
- * @param {z.infer<TSchema>} params.defaultValue - The default value to use if no value is found in local storage.
+ * @param {Schema} params.schema - The schema used to validate the value.
+ * @param {S.Schema.Type<Schema>} params.defaultValue - The default value to use if no value is found in local storage.
  * @param {boolean} [params.disableLocalStorage=false] - If true, disables the use of local storage.
  * @returns {Object} The persisted state.
- * @returns {z.infer<TSchema>} value - The reactive value of the persisted state.
+ * @returns {S.Schema.Type<Schema>} value - The reactive value of the persisted state.
  */
-export function createPersistedState<TSchema extends z.ZodTypeAny>({
+export function createPersistedState<A, I>({
 	key,
 	schema,
 	defaultValue,
 	disableLocalStorage = false,
 }: {
 	key: string;
-	schema: TSchema;
-	defaultValue: z.infer<TSchema>;
+	schema: S.Schema<A, I>;
+	defaultValue: A;
 	disableLocalStorage?: boolean;
 }) {
 	let value = $state(defaultValue);
@@ -29,6 +29,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 			key,
 			schema,
 			setValue: (newValue) => (value = newValue),
+			resetValue: () => (value = defaultValue),
 			defaultValue,
 		});
 	}
@@ -37,52 +38,57 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		get value() {
 			return value;
 		},
-		set value(newValue: z.infer<TSchema>) {
+		set value(newValue: A) {
 			value = newValue;
 			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
 		},
 	};
 }
 
-function loadFromStorage<T extends z.ZodTypeAny>({
+function loadFromStorage<A, I>({
 	key,
 	schema,
 	defaultValue,
 }: {
 	key: string;
-	schema: T;
-	defaultValue: z.infer<T>;
-}): z.infer<T> {
+	schema: S.Schema<A, I>
+	defaultValue: A
+}): A {
 	try {
-		const valueFromStorage = localStorage.getItem(key);
-		const isEmpty = valueFromStorage === null;
+		const valueFromStorageStringified = localStorage.getItem(key);
+		const isEmpty = valueFromStorageStringified === null;
 		if (isEmpty) return defaultValue;
-		return schema.parse(JSON.parse(valueFromStorage));
+		const jsonSchema = S.parseJson(schema)
+		return S.decodeUnknownSync(jsonSchema)(valueFromStorageStringified)
 	} catch {
 		return defaultValue;
 	}
 }
 
-function createStorageEventListener<T extends z.ZodTypeAny>({
+
+function createStorageEventListener<A, I>({
 	key,
 	schema,
 	setValue,
+	resetValue,
 	defaultValue,
 }: {
 	key: string;
-	schema: T;
-	setValue: (newValue: z.infer<T>) => void;
-	defaultValue: z.infer<T>;
+	schema: S.Schema<A, I>;
+	setValue: (newValue: A) => void;
+	resetValue: () => void;
+	defaultValue: A
 }) {
 	window.addEventListener('storage', (event: StorageEvent) => {
 		if (event.key === key) {
 			try {
 				const isStorageEmpty = event.newValue === null;
 				if (isStorageEmpty) {
-					setValue(null);
+					resetValue();
 					return;
 				}
-				const validValue = schema.parse(JSON.parse(event.newValue));
+				const jsonSchema = S.parseJson(schema)
+				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue)
 				setValue(validValue);
 			} catch {
 				setValue(defaultValue);
