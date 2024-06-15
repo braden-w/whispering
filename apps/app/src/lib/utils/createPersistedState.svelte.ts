@@ -51,20 +51,19 @@ function loadFromStorage<A, I>({
 	defaultValue,
 }: {
 	key: string;
-	schema: S.Schema<A, I>
-	defaultValue: A
+	schema: S.Schema<A, I>;
+	defaultValue: A;
 }): A {
 	try {
 		const valueFromStorageStringified = localStorage.getItem(key);
 		const isEmpty = valueFromStorageStringified === null;
 		if (isEmpty) return defaultValue;
-		const jsonSchema = S.parseJson(schema)
-		return S.decodeUnknownSync(jsonSchema)(valueFromStorageStringified)
+		const jsonSchema = S.parseJson(schema);
+		return S.decodeUnknownSync(jsonSchema)(valueFromStorageStringified);
 	} catch {
 		return defaultValue;
 	}
 }
-
 
 function createStorageEventListener<A, I>({
 	key,
@@ -77,7 +76,7 @@ function createStorageEventListener<A, I>({
 	schema: S.Schema<A, I>;
 	setValue: (newValue: A) => void;
 	resetValue: () => void;
-	defaultValue: A
+	defaultValue: A;
 }) {
 	window.addEventListener('storage', (event: StorageEvent) => {
 		if (event.key === key) {
@@ -87,8 +86,8 @@ function createStorageEventListener<A, I>({
 					resetValue();
 					return;
 				}
-				const jsonSchema = S.parseJson(schema)
-				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue)
+				const jsonSchema = S.parseJson(schema);
+				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue);
 				setValue(validValue);
 			} catch {
 				setValue(defaultValue);
