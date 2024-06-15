@@ -23,7 +23,18 @@ function ErrorToast() {
 			Effect.gen(function* () {
 				yield* extensionStorage.watch({
 					key: 'whispering-toast',
-					callback: ({ variant, title, ...args }) => toast[variant](title, args),
+					callback: ({ variant, id, title, description, descriptionClass, action }) =>
+						toast[variant](title, {
+							id,
+							description,
+							descriptionClassName: descriptionClass,
+							action: action && {
+								label: action.label,
+								onClick: () => {
+									window.location.href = action.goto;
+								},
+							},
+						}),
 				});
 			}).pipe(Effect.runSync),
 		[],

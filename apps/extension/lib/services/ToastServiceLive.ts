@@ -6,11 +6,11 @@ import { extensionStorage } from './extension-storage';
 export const ToastServiceLive = Layer.succeed(
 	ToastService,
 	ToastService.of({
-		toast: ({ id: maybeId, ...args }) => {
+		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) => {
 			const id = maybeId ?? nanoid();
 			extensionStorage.set({
 				key: 'whispering-toast',
-				value: { id, ...args },
+				value: { variant, id, title, description, descriptionClass, action },
 			});
 			return id;
 		},

@@ -105,7 +105,7 @@ const createRecordings = Effect.gen(function* () {
 					description: 'Check it out in your recordings',
 					action: {
 						label: 'Go to recordings',
-						onClick: () => goto('/recordings'),
+						goto: '/recordings',
 					},
 				});
 				return transcribedText;

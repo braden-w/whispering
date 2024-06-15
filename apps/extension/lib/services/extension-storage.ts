@@ -1,3 +1,4 @@
+import { Schema as S } from '@effect/schema';
 import { Storage } from '@plasmohq/storage';
 import { recorderStateSchema, toastOptionsSchema } from '@repo/shared';
 import { Data, Effect } from 'effect';
@@ -7,7 +8,7 @@ export class GetExtensionStorageError<
 	K extends keyof typeof extensionSchemas,
 > extends Data.TaggedError('GetExtensionStorageError')<{
 	key: K;
-	defaultValue: z.infer<(typeof extensionSchemas)[K]>;
+	defaultValue: S.Schema.Type<(typeof extensionSchemas)[K]>;
 	error: unknown;
 }> {}
 
@@ -15,7 +16,7 @@ export class SetExtensionStorageError<
 	K extends keyof typeof extensionSchemas,
 > extends Data.TaggedError('SetExtensionStorageError')<{
 	key: K;
-	value: z.infer<(typeof extensionSchemas)[K]>;
+	value: S.Schema.Type<(typeof extensionSchemas)[K]>;
 	error: unknown;
 }> {}
 
@@ -30,9 +31,13 @@ const storage = new Storage();
 
 const extensionSchemas = {
 	'whispering-recording-state': recorderStateSchema,
-	'whispering-toast': toastOptionsSchema.extend({
-		variant: z.enum(['success', 'info', 'loading', 'error']),
-	}),
+	'whispering-toast': toastOptionsSchema.pipe(
+		S.extend(
+			S.Struct({
+				variant: S.Literal('success', 'info', 'loading', 'error'),
+			}),
+		),
+	),
 	'whispering-recording-tab-id': z.number(),
 	'whispering-latest-recording-transcribed-text': z.string(),
 } as const;
@@ -43,8 +48,8 @@ export const extensionStorage = {
 		defaultValue,
 	}: {
 		key: K;
-		defaultValue: z.infer<(typeof extensionSchemas)[K]>;
-	}): Effect.Effect<z.infer<(typeof extensionSchemas)[K]>> =>
+		defaultValue: S.Schema.Type<(typeof extensionSchemas)[K]>;
+	}): Effect.Effect<S.Schema.Type<(typeof extensionSchemas)[K]>> =>
 		Effect.tryPromise({
 			try: async () => {
 				const unparsedValue = await storage.get(key);
@@ -65,7 +70,7 @@ export const extensionStorage = {
 		value,
 	}: {
 		key: K;
-		value: z.infer<(typeof extensionSchemas)[K]>;
+		value: S.Schema.Type<(typeof extensionSchemas)[K]>;
 	}): Effect.Effect<void, SetExtensionStorageError<K>> =>
 		Effect.tryPromise({
 			try: () => storage.set(key, value),
@@ -78,7 +83,7 @@ export const extensionStorage = {
 		callback,
 	}: {
 		key: K;
-		callback: (newValue: z.infer<(typeof extensionSchemas)[K]>) => void;
+		callback: (newValue: S.Schema.Type<(typeof extensionSchemas)[K]>) => void;
 	}) =>
 		Effect.try({
 			try: () => {

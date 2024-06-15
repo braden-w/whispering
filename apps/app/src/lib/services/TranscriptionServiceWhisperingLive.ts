@@ -82,7 +82,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						description: 'The API Key must start with "sk-"',
 						action: {
 							label: 'Update API Key',
-							onClick: () => goto('/settings'),
+							goto: '/settings',
 						},
 					});
 				}

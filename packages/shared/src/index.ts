@@ -1,20 +1,57 @@
-import { Data } from 'effect';
-import { z } from 'zod';
-import { toastOptionsSchema } from './ToastService.js';
+import { Schema as S } from '@effect/schema';
+import { Context, Data } from 'effect';
 import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL = 'https://whispering.bradenwong.com';
 export const WHISPERING_EXTENSION_ID = 'kiiocjnndmjallnnojknfblenodpbkha';
 
-export type WhisperingErrorProperties = {
-	title: string;
-	description: string;
-	action?: {
-		label: string;
-		onClick: () => void;
-	};
-	error?: unknown;
-};
+const BaseError = S.Struct({
+	title: S.String,
+	description: S.String,
+	action: S.optional(
+		S.Struct({
+			label: S.String,
+			goto: S.String,
+		}),
+	),
+});
+
+const ToastId = S.Union(S.String, S.Number);
+
+export const toastOptionsSchema = S.Struct({
+	variant: S.Literal('success', 'info', 'loading', 'error'),
+	id: S.optional(ToastId),
+	...BaseError.fields,
+	descriptionClass: S.optional(S.String),
+});
+
+type ToastId = S.Schema.Type<typeof ToastId>;
+
+type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
+
+export class ToastService extends Context.Tag('ToastService')<
+	ToastService,
+	{
+		toast: (options: ToastOptions) => ToastId;
+	}
+>() {}
+
+const WhisperingErrorProperties = S.Struct({
+	...BaseError.fields,
+	error: S.optional(S.Unknown),
+});
+
+export type WhisperingErrorProperties = S.Schema.Type<typeof WhisperingErrorProperties>;
+
+// export type WhisperingErrorProperties = {
+// 	title: string;
+// 	description: string;
+// 	action?: {
+// 		label: string;
+// 		goto: string;
+// 	};
+// 	error?: unknown;
+// };
 
 export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
@@ -30,9 +67,12 @@ export type Result<T, E = WhisperingErrorProperties> =
 			error: E;
 	  };
 
-export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
+export const RecorderState = S.Literal('IDLE', 'RECORDING', 'LOADING');
 
-export type RecorderState = z.infer<typeof recorderStateSchema>;
+export type RecorderState = S.Schema.Type<typeof RecorderState>;
+
+// export const RecorderState = z.enum(['IDLE', 'RECORDING', 'LOADING']);
+// export type RecorderState = z.infer<typeof RecorderState>;
 
 export const recorderStateToIcons = {
 	RECORDING: '🔲',
@@ -40,17 +80,30 @@ export const recorderStateToIcons = {
 	IDLE: '🎙️',
 } as const satisfies Record<RecorderState, string>;
 
-export const externalMessageSchema = z.discriminatedUnion('message', [
-	z.object({ message: z.literal('setRecorderState'), recorderState: recorderStateSchema }),
-	z.object({ message: z.literal('setClipboardText'), transcribedText: z.string() }),
-	z.object({ message: z.literal('writeTextToCursor'), transcribedText: z.string() }),
-	z.object({ message: z.literal('playSound'), sound: z.enum(['start', 'stop', 'cancel']) }),
-	z.object({ message: z.literal('toast'), toastOptions: toastOptionsSchema }),
-]);
+export const externalMessageSchema = S.Union(
+	S.Struct({
+		message: S.Literal('setRecorderState'),
+		recorderState: RecorderState,
+	}),
+	S.Struct({
+		message: S.Literal('setClipboardText'),
+		transcribedText: S.String,
+	}),
+	S.Struct({
+		message: S.Literal('writeTextToCursor'),
+		transcribedText: S.String,
+	}),
+	S.Struct({
+		message: S.Literal('playSound'),
+		sound: S.Literal('start', 'stop', 'cancel'),
+	}),
+	S.Struct({
+		message: S.Literal('toast'),
+		toastOptions: toastOptionsSchema,
+	}),
+);
 
-export type ExternalMessage = z.infer<typeof externalMessageSchema>;
-
-export * from './ToastService.js';
+export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
 
 export const TOASTER_SETTINGS = {
 	position: 'bottom-right',
