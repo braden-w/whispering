@@ -27,20 +27,6 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut: z.string(),
 			apiKey: z.string(),
 			outputLanguage: z.string(),
-			toast: z.object({
-				position: z.enum([
-					'top-left',
-					'top-right',
-					'bottom-left',
-					'bottom-right',
-					'top-center',
-					'bottom-center',
-				]),
-				richColors: z.boolean(),
-				expand: z.boolean(),
-				duration: z.number(),
-				visibileToasts: z.number(),
-			}),
 		}),
 		defaultValue: {
 			isPlaySoundEnabled: true,
@@ -51,13 +37,6 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
 			outputLanguage: 'en',
-			toast: {
-				position: 'bottom-right',
-				richColors: true,
-				expand: true,
-				duration: 4000,
-				visibileToasts: 5,
-			},
 		},
 	});
 
