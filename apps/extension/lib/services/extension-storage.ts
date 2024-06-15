@@ -1,76 +1,66 @@
 import { Schema as S } from '@effect/schema';
-import { Storage } from '@plasmohq/storage';
-import { recorderStateSchema, toastOptionsSchema } from '@repo/shared';
+import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
+import { RecorderState, toastOptionsSchema } from '@repo/shared';
 import { Data, Effect } from 'effect';
-import { z } from 'zod';
 
-export class GetExtensionStorageError<
-	K extends keyof typeof extensionSchemas,
-> extends Data.TaggedError('GetExtensionStorageError')<{
+const keyToSchema = {
+	'whispering-recording-state': RecorderState,
+	'whispering-toast': toastOptionsSchema,
+	'whispering-recording-tab-id': S.Number,
+	'whispering-latest-recording-transcribed-text': S.String,
+} as const;
+
+type Keys = keyof typeof keyToSchema;
+
+type KeyToType<K extends Keys> = S.Schema.Type<(typeof keyToSchema)[K]>;
+
+export class GetExtensionStorageError<K extends Keys> extends Data.TaggedError(
+	'GetExtensionStorageError',
+)<{
 	key: K;
-	defaultValue: S.Schema.Type<(typeof extensionSchemas)[K]>;
+	defaultValue: KeyToType<K>;
 	error: unknown;
 }> {}
 
-export class SetExtensionStorageError<
-	K extends keyof typeof extensionSchemas,
-> extends Data.TaggedError('SetExtensionStorageError')<{
+export class SetExtensionStorageError<K extends Keys> extends Data.TaggedError(
+	'SetExtensionStorageError',
+)<{
 	key: K;
-	value: S.Schema.Type<(typeof extensionSchemas)[K]>;
+	value: KeyToType<K>;
 	error: unknown;
 }> {}
 
-export class WatchExtensionStorageError<
-	K extends keyof typeof extensionSchemas,
-> extends Data.TaggedError('WatchExtensionStorageError')<{
+export class WatchExtensionStorageError<K extends Keys> extends Data.TaggedError(
+	'WatchExtensionStorageError',
+)<{
 	key: K;
 	error: unknown;
 }> {}
 
 const storage = new Storage();
 
-const extensionSchemas = {
-	'whispering-recording-state': recorderStateSchema,
-	'whispering-toast': toastOptionsSchema.pipe(
-		S.extend(
-			S.Struct({
-				variant: S.Literal('success', 'info', 'loading', 'error'),
-			}),
-		),
-	),
-	'whispering-recording-tab-id': z.number(),
-	'whispering-latest-recording-transcribed-text': z.string(),
-} as const;
-
 export const extensionStorage = {
-	get: <K extends keyof typeof extensionSchemas>({
-		key,
-		defaultValue,
-	}: {
-		key: K;
-		defaultValue: S.Schema.Type<(typeof extensionSchemas)[K]>;
-	}): Effect.Effect<S.Schema.Type<(typeof extensionSchemas)[K]>> =>
-		Effect.tryPromise({
-			try: async () => {
-				const unparsedValue = await storage.get(key);
-				if (unparsedValue === null) {
-					return defaultValue;
-				}
-				return extensionSchemas[key].parse(unparsedValue);
-			},
-			catch: (error) =>
-				new GetExtensionStorageError({
-					key,
-					defaultValue,
-					error,
-				}),
+	get: <K extends Keys>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
+		Effect.gen(function* () {
+			const unparsedValue = yield* Effect.tryPromise({
+				try: () => storage.get<unknown>(key),
+				catch: (error) =>
+					new GetExtensionStorageError({
+						key,
+						defaultValue,
+						error,
+					}),
+			});
+			if (unparsedValue === null || unparsedValue === undefined) return defaultValue;
+			const thisKeyValueSchema = S.asSchema(keyToSchema[key]);
+			return yield* S.decodeUnknown(thisKeyValueSchema)(unparsedValue);
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
-	set: <K extends keyof typeof extensionSchemas>({
+	set: <K extends Keys>({
 		key,
 		value,
 	}: {
 		key: K;
-		value: S.Schema.Type<(typeof extensionSchemas)[K]>;
+		value: S.Schema.Type<(typeof keyToSchema)[K]>;
 	}): Effect.Effect<void, SetExtensionStorageError<K>> =>
 		Effect.tryPromise({
 			try: () => storage.set(key, value),
@@ -78,34 +68,29 @@ export const extensionStorage = {
 				return new SetExtensionStorageError({ key, value, error });
 			},
 		}),
-	watch: <K extends keyof typeof extensionSchemas>({
+	watch: <K extends Keys>({
 		key,
 		callback,
 	}: {
 		key: K;
-		callback: (newValue: S.Schema.Type<(typeof extensionSchemas)[K]>) => void;
-	}) =>
-		Effect.try({
-			try: () => {
+		callback: (newValue: S.Schema.Type<(typeof keyToSchema)[K]>) => void;
+	}) => {
+		const thisKeyValueSchema = S.asSchema(keyToSchema[key]);
+		const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
+			Effect.gen(function* () {
+				const newValue = yield* S.decodeUnknown(thisKeyValueSchema)(newValueUnparsed);
+				callback(newValue);
+			}).pipe(Effect.runSync);
+		return Effect.try({
+			try: () =>
 				storage.watch({
-					[key]: ({ newValue: newValueUnparsed }) => {
-						const newValueParseResult = extensionSchemas[key].safeParse(newValueUnparsed);
-						if (!newValueParseResult.success) {
-							console.error(
-								`Error parsing change for key: ${key}`,
-								newValueParseResult.error.errors,
-							);
-							return;
-						}
-						const newValue = newValueParseResult.data;
-						callback(newValue);
-					},
-				});
-			},
+					[key]: listener,
+				}),
 			catch: (error) =>
 				new WatchExtensionStorageError({
 					key,
 					error,
 				}),
-		}),
+		});
+	},
 } as const;
