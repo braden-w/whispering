@@ -27,7 +27,7 @@ const createSettings = Effect.gen(function* () {
 			currentGlobalShortcut: S.String,
 			apiKey: S.String,
 			outputLanguage: S.String,
-		}),
+		}).pipe(S.mutable),
 		defaultValue: {
 			isPlaySoundEnabled: true,
 			isCopyToClipboardEnabled: true,
