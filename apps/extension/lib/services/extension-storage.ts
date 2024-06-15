@@ -42,7 +42,7 @@ const storage = new Storage();
 export const extensionStorage = {
 	get: <K extends Key>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
 		Effect.gen(function* () {
-			const unparsedValue = yield* Effect.tryPromise({
+			const valueFromStorage = yield* Effect.tryPromise({
 				try: () => storage.get<unknown>(key),
 				catch: (error) =>
 					new GetExtensionStorageError({
@@ -51,9 +51,10 @@ export const extensionStorage = {
 						error,
 					}),
 			});
-			if (unparsedValue === null || unparsedValue === undefined) return defaultValue;
+			const isEmpty = valueFromStorage === null || valueFromStorage === undefined;
+			if (isEmpty) return defaultValue;
 			const thisKeyValueSchema = S.asSchema(keyToSchema[key]);
-			const parsedValue = yield* S.decodeUnknown(thisKeyValueSchema)(unparsedValue);
+			const parsedValue = yield* S.decodeUnknown(thisKeyValueSchema)(valueFromStorage);
 			yield* Console.info('get', key, parsedValue);
 			return parsedValue;
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),

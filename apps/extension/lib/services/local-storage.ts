@@ -32,21 +32,21 @@ export class SetLocalStorageError<K extends Key> extends Data.TaggedError('SetLo
 
 export const localStorageService = {
 	get: <K extends Key>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
-		Effect.tryPromise({
-			try: async () => {
-				const valueFromStorage = localStorage.getItem(key);
-				const isEmpty = valueFromStorage === null;
-				if (isEmpty) return defaultValue;
-				const schema = S.parseJson(getSchemaByKey(key));
-				const result = S.decodeUnknownSync(schema)(valueFromStorage);
-				return result;
-			},
-			catch: (error) =>
-				new GetLocalStorageError({
-					key,
-					defaultValue,
-					error,
-				}),
+		Effect.gen(function* () {
+			const valueFromStorage = yield* Effect.try({
+				try: () => localStorage.getItem(key),
+				catch: (error) =>
+					new GetLocalStorageError({
+						key,
+						defaultValue,
+						error,
+					}),
+			});
+			const isEmpty = valueFromStorage === null || valueFromStorage === undefined;
+			if (isEmpty) return defaultValue;
+			const thisKeyValueSchema = S.parseJson(S.asSchema(keyToSchema[key]));
+			const parsedValue = yield* S.decodeUnknown(thisKeyValueSchema)(valueFromStorage);
+			return parsedValue;
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
 	set: <K extends Key>({
 		key,
