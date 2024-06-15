@@ -17,4 +17,5 @@ export const renderErrorAsToast = <E extends YieldableError & Readonly<Whisperin
 			action: error.action,
 		});
 		yield* Console.error(error.error instanceof Error ? error.error.message : error.error);
+		return yield* error;
 	}).pipe(Effect.provide(ToastServiceLive));
