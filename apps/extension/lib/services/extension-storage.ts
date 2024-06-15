@@ -53,7 +53,9 @@ export const extensionStorage = {
 			});
 			if (unparsedValue === null || unparsedValue === undefined) return defaultValue;
 			const thisKeyValueSchema = S.asSchema(keyToSchema[key]);
-			return yield* S.decodeUnknown(thisKeyValueSchema)(unparsedValue);
+			const parsedValue = yield* S.decodeUnknown(thisKeyValueSchema)(unparsedValue);
+			yield* Console.info('get', key, parsedValue);
+			return parsedValue;
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
 	set: <K extends Keys>({
 		key,
@@ -64,9 +66,7 @@ export const extensionStorage = {
 	}): Effect.Effect<void, SetExtensionStorageError<K>> =>
 		Effect.tryPromise({
 			try: () => storage.set(key, value),
-			catch: (error) => {
-				return new SetExtensionStorageError({ key, value, error });
-			},
+			catch: (error) => new SetExtensionStorageError({ key, value, error }),
 		}),
 	watch: <K extends Keys>({
 		key,
@@ -79,7 +79,7 @@ export const extensionStorage = {
 		const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
 			Effect.gen(function* () {
 				const newValue = yield* S.decodeUnknown(thisKeyValueSchema)(newValueUnparsed);
-				yield* Console.log('watch', key, newValue);
+				yield* Console.info('watch', key, newValue);
 				callback(newValue);
 			}).pipe(Effect.runSync);
 		return Effect.try({
