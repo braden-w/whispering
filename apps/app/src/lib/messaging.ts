@@ -1,15 +1,16 @@
 import type { ExternalMessage, Result, WhisperingErrorProperties } from '@repo/shared';
 import { WHISPERING_EXTENSION_ID } from '@repo/shared';
-import { Effect } from 'effect';
+import { Effect, Cause } from 'effect';
 
 export const sendMessageToExtension = <
 	T extends unknown,
+	E extends Cause.YieldableError & Readonly<WhisperingErrorProperties>,
 	M extends ExternalMessage = ExternalMessage,
-	R extends Result<T> = Result<T>,
+	R extends Result<T, E> = Result<T, E>,
 >(
 	message: M,
 ) =>
-	Effect.async<T, WhisperingErrorProperties>((resume) => {
+	Effect.async<T, E>((resume) => {
 		chrome.runtime.sendMessage<ExternalMessage>(
 			WHISPERING_EXTENSION_ID,
 			message,
