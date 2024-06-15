@@ -6,13 +6,6 @@ const keys = ['whispering-settings'] as const;
 
 type Key = (typeof keys)[number];
 
-const getSchemaByKey = (key: Key) => {
-	switch (key) {
-		case 'whispering-settings':
-			return settingsSchema;
-	}
-};
-
 const keyToSchema = {
 	'whispering-settings': settingsSchema,
 } as const;
