@@ -1,53 +1,40 @@
+import { Schema as S } from '@effect/schema';
+import { settingsSchema } from '@repo/shared';
 import { Data, Effect } from 'effect';
-import { z } from 'zod';
 
-export const settingsSchema = z.object({
-	isPlaySoundEnabled: z.boolean(),
-	isCopyToClipboardEnabled: z.boolean(),
-	isPasteContentsOnSuccessEnabled: z.boolean(),
-	selectedAudioInputDeviceId: z.string(),
-	currentLocalShortcut: z.string(),
-	currentGlobalShortcut: z.string(),
-	apiKey: z.string(),
-	outputLanguage: z.string(),
-});
-
-export type Settings = z.infer<typeof settingsSchema>;
-
-const localStorageSchemas = {
+const keyToSchema = {
 	'whispering-settings': settingsSchema,
 } as const;
 
-export class GetLocalStorageError<
-	K extends keyof typeof localStorageSchemas,
-> extends Data.TaggedError('GetLocalStorageError')<{
+type Keys = keyof typeof keyToSchema;
+
+type KeyToType<K extends Keys> = S.Schema.Type<(typeof keyToSchema)[K]>;
+export class GetLocalStorageError<K extends Keys> extends Data.TaggedError('GetLocalStorageError')<{
 	key: K;
-	defaultValue: z.infer<(typeof localStorageSchemas)[K]>;
+	defaultValue: KeyToType<K>;
 	error: unknown;
 }> {}
 
-export class SetLocalStorageError<
-	K extends keyof typeof localStorageSchemas,
-> extends Data.TaggedError('SetLocalStorageError')<{
+export class SetLocalStorageError<K extends Keys> extends Data.TaggedError('SetLocalStorageError')<{
 	key: K;
-	value: z.infer<(typeof localStorageSchemas)[K]>;
+	value: KeyToType<K>;
 	error: unknown;
 }> {}
 
 export const localStorageService = {
-	get: <K extends keyof typeof localStorageSchemas>({
+	get: <K extends Keys>({
 		key,
 		defaultValue,
 	}: {
 		key: K;
-		defaultValue: z.infer<(typeof localStorageSchemas)[K]>;
-	}): Effect.Effect<z.infer<(typeof localStorageSchemas)[K]>> =>
+		defaultValue: KeyToType<K>;
+	}): Effect.Effect<KeyToType<K>> =>
 		Effect.tryPromise({
 			try: async () => {
 				const valueFromStorage = localStorage.getItem(key);
 				const isEmpty = valueFromStorage === null;
 				if (isEmpty) return defaultValue;
-				return localStorageSchemas[key].parse(JSON.parse(valueFromStorage));
+				return keyToSchema[key].parse(JSON.parse(valueFromStorage));
 			},
 			catch: (error) =>
 				new GetLocalStorageError({
@@ -56,21 +43,15 @@ export const localStorageService = {
 					error,
 				}),
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
-	set: <K extends keyof typeof localStorageSchemas>({
+	set: <K extends Keys>({
 		key,
 		value,
 	}: {
 		key: K;
-		value: z.infer<(typeof localStorageSchemas)[K]>;
+		value: KeyToType<K>;
 	}): Effect.Effect<void, SetLocalStorageError<K>> =>
 		Effect.try({
 			try: () => localStorage.setItem(key, JSON.stringify(value)),
-			catch: (error) => {
-				return new SetLocalStorageError({
-					key,
-					value,
-					error,
-				});
-			},
+			catch: (error) => new SetLocalStorageError({ key, value, error }),
 		}),
 } as const;

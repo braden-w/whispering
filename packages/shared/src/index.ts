@@ -16,6 +16,19 @@ const BaseError = S.Struct({
 	),
 });
 
+export const settingsSchema = S.Struct({
+	isPlaySoundEnabled: S.Boolean,
+	isCopyToClipboardEnabled: S.Boolean,
+	isPasteContentsOnSuccessEnabled: S.Boolean,
+	selectedAudioInputDeviceId: S.String,
+	currentLocalShortcut: S.String,
+	currentGlobalShortcut: S.String,
+	apiKey: S.String,
+	outputLanguage: S.String,
+});
+
+export type Settings = S.Schema.Type<typeof settingsSchema>;
+
 const ToastId = S.Union(S.String, S.Number);
 
 export const toastOptionsSchema = S.Struct({

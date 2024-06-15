@@ -11,6 +11,7 @@ import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Effect } from 'effect';
 import { toast } from 'svelte-sonner';
 import { Schema as S } from '@effect/schema';
+import { settingsSchema } from '@repo/shared';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 
@@ -18,16 +19,7 @@ const createSettings = Effect.gen(function* () {
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const settings = createPersistedState({
 		key: 'whispering-settings',
-		schema: S.Struct({
-			isPlaySoundEnabled: S.Boolean,
-			isCopyToClipboardEnabled: S.Boolean,
-			isPasteContentsOnSuccessEnabled: S.Boolean,
-			selectedAudioInputDeviceId: S.String,
-			currentLocalShortcut: S.String,
-			currentGlobalShortcut: S.String,
-			apiKey: S.String,
-			outputLanguage: S.String,
-		}).pipe(S.mutable),
+		schema: settingsSchema.pipe(S.mutable),
 		defaultValue: {
 			isPlaySoundEnabled: true,
 			isCopyToClipboardEnabled: true,

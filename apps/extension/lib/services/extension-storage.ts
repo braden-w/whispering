@@ -40,7 +40,13 @@ export class WatchExtensionStorageError<K extends Keys> extends Data.TaggedError
 const storage = new Storage();
 
 export const extensionStorage = {
-	get: <K extends Keys>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
+	get: <K extends Keys>({
+		key,
+		defaultValue,
+	}: {
+		key: K;
+		defaultValue: KeyToType<K>;
+	}): Effect.Effect<KeyToType<K>> =>
 		Effect.gen(function* () {
 			const unparsedValue = yield* Effect.tryPromise({
 				try: () => storage.get<unknown>(key),
@@ -62,7 +68,7 @@ export const extensionStorage = {
 		value,
 	}: {
 		key: K;
-		value: S.Schema.Type<(typeof keyToSchema)[K]>;
+		value: KeyToType<K>;
 	}): Effect.Effect<void, SetExtensionStorageError<K>> =>
 		Effect.tryPromise({
 			try: () => storage.set(key, value),
