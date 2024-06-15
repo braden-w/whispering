@@ -2,39 +2,44 @@ import { Schema as S } from '@effect/schema';
 import { settingsSchema } from '@repo/shared';
 import { Data, Effect } from 'effect';
 
+const keys = ['whispering-settings'] as const;
+
+type Key = (typeof keys)[number];
+
+const getSchemaByKey = (key: Key) => {
+	switch (key) {
+		case 'whispering-settings':
+			return settingsSchema;
+	}
+};
+
 const keyToSchema = {
 	'whispering-settings': settingsSchema,
 } as const;
 
-type Keys = keyof typeof keyToSchema;
-
-type KeyToType<K extends Keys> = S.Schema.Type<(typeof keyToSchema)[K]>;
-export class GetLocalStorageError<K extends Keys> extends Data.TaggedError('GetLocalStorageError')<{
+type KeyToType<K extends Key> = S.Schema.Type<(typeof keyToSchema)[K]>;
+export class GetLocalStorageError<K extends Key> extends Data.TaggedError('GetLocalStorageError')<{
 	key: K;
 	defaultValue: KeyToType<K>;
 	error: unknown;
 }> {}
 
-export class SetLocalStorageError<K extends Keys> extends Data.TaggedError('SetLocalStorageError')<{
+export class SetLocalStorageError<K extends Key> extends Data.TaggedError('SetLocalStorageError')<{
 	key: K;
 	value: KeyToType<K>;
 	error: unknown;
 }> {}
 
 export const localStorageService = {
-	get: <K extends Keys>({
-		key,
-		defaultValue,
-	}: {
-		key: K;
-		defaultValue: KeyToType<K>;
-	}): Effect.Effect<KeyToType<K>> =>
+	get: <K extends Key>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
 		Effect.tryPromise({
 			try: async () => {
 				const valueFromStorage = localStorage.getItem(key);
 				const isEmpty = valueFromStorage === null;
 				if (isEmpty) return defaultValue;
-				return keyToSchema[key].parse(JSON.parse(valueFromStorage));
+				const schema = S.parseJson(getSchemaByKey(key));
+				const result = S.decodeUnknownSync(schema)(valueFromStorage);
+				return result;
 			},
 			catch: (error) =>
 				new GetLocalStorageError({
@@ -43,7 +48,7 @@ export const localStorageService = {
 					error,
 				}),
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
-	set: <K extends Keys>({
+	set: <K extends Key>({
 		key,
 		value,
 	}: {

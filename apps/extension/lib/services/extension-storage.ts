@@ -10,11 +10,11 @@ const keyToSchema = {
 	'whispering-latest-recording-transcribed-text': S.String,
 } as const;
 
-type Keys = keyof typeof keyToSchema;
+type Key = keyof typeof keyToSchema;
 
-type KeyToType<K extends Keys> = S.Schema.Type<(typeof keyToSchema)[K]>;
+type KeyToType<K extends Key> = S.Schema.Type<(typeof keyToSchema)[K]>;
 
-export class GetExtensionStorageError<K extends Keys> extends Data.TaggedError(
+export class GetExtensionStorageError<K extends Key> extends Data.TaggedError(
 	'GetExtensionStorageError',
 )<{
 	key: K;
@@ -22,7 +22,7 @@ export class GetExtensionStorageError<K extends Keys> extends Data.TaggedError(
 	error: unknown;
 }> {}
 
-export class SetExtensionStorageError<K extends Keys> extends Data.TaggedError(
+export class SetExtensionStorageError<K extends Key> extends Data.TaggedError(
 	'SetExtensionStorageError',
 )<{
 	key: K;
@@ -30,7 +30,7 @@ export class SetExtensionStorageError<K extends Keys> extends Data.TaggedError(
 	error: unknown;
 }> {}
 
-export class WatchExtensionStorageError<K extends Keys> extends Data.TaggedError(
+export class WatchExtensionStorageError<K extends Key> extends Data.TaggedError(
 	'WatchExtensionStorageError',
 )<{
 	key: K;
@@ -40,13 +40,7 @@ export class WatchExtensionStorageError<K extends Keys> extends Data.TaggedError
 const storage = new Storage();
 
 export const extensionStorage = {
-	get: <K extends Keys>({
-		key,
-		defaultValue,
-	}: {
-		key: K;
-		defaultValue: KeyToType<K>;
-	}): Effect.Effect<KeyToType<K>> =>
+	get: <K extends Key>({ key, defaultValue }: { key: K; defaultValue: KeyToType<K> }) =>
 		Effect.gen(function* () {
 			const unparsedValue = yield* Effect.tryPromise({
 				try: () => storage.get<unknown>(key),
@@ -63,7 +57,7 @@ export const extensionStorage = {
 			yield* Console.info('get', key, parsedValue);
 			return parsedValue;
 		}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue))),
-	set: <K extends Keys>({
+	set: <K extends Key>({
 		key,
 		value,
 	}: {
@@ -74,12 +68,12 @@ export const extensionStorage = {
 			try: () => storage.set(key, value),
 			catch: (error) => new SetExtensionStorageError({ key, value, error }),
 		}),
-	watch: <K extends Keys>({
+	watch: <K extends Key>({
 		key,
 		callback,
 	}: {
 		key: K;
-		callback: (newValue: S.Schema.Type<(typeof keyToSchema)[K]>) => void;
+		callback: (newValue: KeyToType<K>) => void;
 	}) => {
 		const thisKeyValueSchema = S.asSchema(keyToSchema[key]);
 		const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
