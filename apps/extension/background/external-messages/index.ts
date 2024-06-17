@@ -1,12 +1,11 @@
 import { Schema as S } from '@effect/schema';
-import { ToastService, effectToResult, externalMessageSchema, type Result } from '@repo/shared';
-import { Console, Effect, Either } from 'effect';
+import { WhisperingError, effectToResult, externalMessageSchema, type Result } from '@repo/shared';
+import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
-import { WhisperingError } from '@repo/shared';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 import { playSound } from './playSound';
 import { setClipboardText } from './setClipboardText';
 import { setRecorderState } from './setRecorderState';
+import { toast } from './toast';
 import { writeTextToCursor } from './writeTextToCursor';
 
 export const registerExternalListener = () =>
@@ -14,22 +13,18 @@ export const registerExternalListener = () =>
 		(requestUnparsed, sender, sendResponse: <R extends Result<any>>(response: R) => void) =>
 			Effect.gen(function* () {
 				yield* Console.info('Received message from external website', requestUnparsed);
-				const externalMessage = yield* S.decode(externalMessageSchema)(requestUnparsed);
-				switch (externalMessage.message) {
+				const { name, body } = yield* S.decode(externalMessageSchema)(requestUnparsed);
+				switch (name) {
 					case 'setRecorderState':
-						const { recorderState } = externalMessage;
-						return yield* setRecorderState(recorderState);
+						return yield* setRecorderState(body.recorderState);
 					case 'setClipboardText':
-						return yield* setClipboardText(externalMessage.transcribedText);
+						return yield* setClipboardText(body.transcribedText);
 					case 'writeTextToCursor':
-						return yield* writeTextToCursor(externalMessage.transcribedText);
+						return yield* writeTextToCursor(body.transcribedText);
 					case 'toast':
-						const { toast } = yield* ToastService;
-						const { toastOptions } = externalMessage;
-						return toast(toastOptions);
+						return toast(body.toastOptions);
 					case 'playSound':
-						const { sound } = externalMessage;
-						return yield* playSound(sound);
+						return yield* playSound(body.sound);
 				}
 			}).pipe(
 				Effect.catchTags({

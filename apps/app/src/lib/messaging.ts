@@ -1,9 +1,4 @@
-import type {
-	ExternalMessage,
-	RecorderState,
-	Result,
-	ToastOptions
-} from '@repo/shared';
+import type { ExternalMessage, RecorderState, Result, ToastOptions } from '@repo/shared';
 import { WHISPERING_EXTENSION_ID, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 
@@ -25,28 +20,28 @@ const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 export const extensionCommands = {
 	setRecorderState: (recorderState: RecorderState) =>
 		sendMessageToExtension<void>({
-			message: 'setRecorderState',
-			recorderState,
+			name: 'setRecorderState',
+			body: { recorderState },
 		}),
 	playSound: (sound: 'start' | 'stop' | 'cancel') =>
 		sendMessageToExtension<void>({
-			message: 'playSound',
-			sound,
+			name: 'playSound',
+			body: { sound },
 		}),
 	setClipboardText: (text: string) =>
 		sendMessageToExtension<void>({
-			message: 'setClipboardText',
-			transcribedText: text,
+			name: 'setClipboardText',
+			body: { transcribedText: text },
 		}),
 	writeTextToCursor: (text: string) =>
 		sendMessageToExtension<void>({
-			message: 'writeTextToCursor',
-			transcribedText: text,
+			name: 'writeTextToCursor',
+			body: { transcribedText: text },
 		}),
 	toast: (toastOptions: ToastOptions) =>
 		sendMessageToExtension<string | number>({
-			message: 'toast',
-			toastOptions,
+			name: 'toast',
+			body: { toastOptions },
 		}),
 } as const satisfies Record<
 	ExternalMessage['message'],

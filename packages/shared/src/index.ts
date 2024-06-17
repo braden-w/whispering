@@ -93,24 +93,24 @@ export const recorderStateToIcons = {
 
 export const externalMessageSchema = S.Union(
 	S.Struct({
-		message: S.Literal('setRecorderState'),
-		recorderState: RecorderState,
+		name: S.Literal('setRecorderState'),
+		body: S.Struct({ recorderState: RecorderState }),
 	}),
 	S.Struct({
-		message: S.Literal('setClipboardText'),
-		transcribedText: S.String,
+		name: S.Literal('setClipboardText'),
+		body: S.Struct({ transcribedText: S.String }),
 	}),
 	S.Struct({
-		message: S.Literal('writeTextToCursor'),
-		transcribedText: S.String,
+		name: S.Literal('writeTextToCursor'),
+		body: S.Struct({ transcribedText: S.String }),
 	}),
 	S.Struct({
-		message: S.Literal('playSound'),
-		sound: S.Literal('start', 'stop', 'cancel'),
+		name: S.Literal('playSound'),
+		body: S.Struct({ sound: S.Literal('start', 'stop', 'cancel') }),
 	}),
 	S.Struct({
-		message: S.Literal('toast'),
-		toastOptions: toastOptionsSchema,
+		name: S.Literal('toast'),
+		body: S.Struct({ toastOptions: toastOptionsSchema }),
 	}),
 );
 
