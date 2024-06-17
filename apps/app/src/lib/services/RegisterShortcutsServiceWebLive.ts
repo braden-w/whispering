@@ -1,6 +1,7 @@
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import hotkeys from 'hotkeys-js';
-import { RegisterShortcutsError, RegisterShortcutsService } from './RegisterShortcutsService';
+import { RegisterShortcutsService } from './RegisterShortcutsService';
 
 export const RegisterShortcutsWebLive = Layer.effect(
 	RegisterShortcutsService,
@@ -12,7 +13,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 			unregisterAllLocalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>
-					new RegisterShortcutsError({
+					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
 						description: error instanceof Error ? error.message : undefined,
 						error,
@@ -21,7 +22,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 			unregisterAllGlobalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>
-					new RegisterShortcutsError({
+					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
 						description: error instanceof Error ? error.message : undefined,
 						error,
@@ -36,7 +37,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 							callback();
 						}),
 					catch: (error) =>
-						new RegisterShortcutsError({
+						new WhisperingError({
 							title: 'Error registering shortcut',
 							description: error instanceof Error ? error.message : undefined,
 							error,
@@ -51,9 +52,12 @@ export const RegisterShortcutsWebLive = Layer.effect(
 							callback();
 						}),
 					catch: (error) =>
-						new RegisterShortcutsError({
+						new WhisperingError({
 							title: 'Error registering shortcut',
-							description: error instanceof Error ? error.message : undefined,
+							description:
+								error instanceof Error
+									? error.message
+									: 'Please make sure it is a valid keyboard shortcut.',
 							error,
 						}),
 				}),

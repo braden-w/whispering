@@ -1,7 +1,8 @@
+import { WhisperingError } from '@repo/shared';
 import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { Effect, Layer } from 'effect';
 import hotkeys from 'hotkeys-js';
-import { RegisterShortcutsError, RegisterShortcutsService } from './RegisterShortcutsService';
+import { RegisterShortcutsService } from './RegisterShortcutsService';
 
 export const RegisterShortcutsDesktopLive = Layer.effect(
 	RegisterShortcutsService,
@@ -13,7 +14,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 			unregisterAllLocalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>
-					new RegisterShortcutsError({
+					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
 						description: error instanceof Error ? error.message : undefined,
 						error,
@@ -22,7 +23,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 			unregisterAllGlobalShortcuts: Effect.tryPromise({
 				try: () => unregisterAll(),
 				catch: (error) =>
-					new RegisterShortcutsError({
+					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
 						description: error instanceof Error ? error.message : undefined,
 						error,
@@ -37,7 +38,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 							callback();
 						}),
 					catch: (error) =>
-						new RegisterShortcutsError({
+						new WhisperingError({
 							title: 'Error registering shortcut',
 							description: error instanceof Error ? error.message : undefined,
 							error,
@@ -47,7 +48,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 				Effect.tryPromise({
 					try: () => register(shortcut, callback),
 					catch: (error) =>
-						new RegisterShortcutsError({
+						new WhisperingError({
 							title: window.__TAURI__
 								? 'Error registering shortcut. Please make sure it is a valid Electron keyboard shortcut.'
 								: 'Error registering shortcut.',
