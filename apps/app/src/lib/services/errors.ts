@@ -1,7 +1,8 @@
 import { ToastService, type WhisperingErrorProperties } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import type { YieldableError } from 'effect/Cause';
-import { ToastServiceLive } from './ToastServiceLive';
+import { ToastServiceDesktopLive } from './ToastServiceDesktopLive';
+import { ToastServiceWebLive } from './ToastServiceWebLive';
 
 export const renderErrorAsToast = <E extends YieldableError & Readonly<WhisperingErrorProperties>>(
 	error: E,
@@ -18,4 +19,4 @@ export const renderErrorAsToast = <E extends YieldableError & Readonly<Whisperin
 		});
 		yield* Console.error(error.error instanceof Error ? error.error.message : error.error);
 		return yield* error;
-	}).pipe(Effect.provide(ToastServiceLive));
+	}).pipe(Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive));
