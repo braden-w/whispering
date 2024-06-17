@@ -1,5 +1,5 @@
 import { Schema as S } from '@effect/schema';
-import { Context, Data, Effect, Either } from 'effect';
+import { Context, Data } from 'effect';
 import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL = 'https://whispering.bradenwong.com';
@@ -56,16 +56,6 @@ const WhisperingErrorProperties = S.Struct({
 
 export type WhisperingErrorProperties = S.Schema.Type<typeof WhisperingErrorProperties>;
 
-// export type WhisperingErrorProperties = {
-// 	title: string;
-// 	description: string;
-// 	action?: {
-// 		label: string;
-// 		goto: string;
-// 	};
-// 	error?: unknown;
-// };
-
 export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
 )<WhisperingErrorProperties> {}
@@ -83,9 +73,6 @@ export type Result<T, E = WhisperingErrorProperties> =
 export const RecorderState = S.Literal('IDLE', 'RECORDING', 'LOADING');
 
 export type RecorderState = S.Schema.Type<typeof RecorderState>;
-
-// export const RecorderState = z.enum(['IDLE', 'RECORDING', 'LOADING']);
-// export type RecorderState = z.infer<typeof RecorderState>;
 
 export const recorderStateToIcons = {
 	RECORDING: '🔲',
