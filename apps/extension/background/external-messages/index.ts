@@ -14,16 +14,16 @@ export const registerExternalListener = () =>
 		(requestUnparsed, sender, sendResponse: <R extends Result<any>>(response: R) => void) =>
 			Effect.gen(function* () {
 				yield* Console.info('Received message from external website', requestUnparsed);
-				const externalMessageParseResult = S.decodeEither(externalMessageSchema)(requestUnparsed);
-				if (Either.isLeft(externalMessageParseResult)) {
-					yield* Console.error('Failed to parse external message', externalMessageParseResult.left);
-					return yield* new WhisperingError({
-						title: 'Failed to parse external message',
-						description: 'The external message was not in the expected format.',
-						error: externalMessageParseResult.left,
-					});
-				}
-				const externalMessage = externalMessageParseResult.right;
+				const externalMessage = yield* S.decode(externalMessageSchema)(requestUnparsed).pipe(
+					Effect.mapError(
+						(error) =>
+							new WhisperingError({
+								title: 'Failed to parse external message',
+								description: 'The external message was not in the expected format.',
+								error,
+							}),
+					),
+				);
 				switch (externalMessage.message) {
 					case 'setRecorderState':
 						const { recorderState } = externalMessage;
