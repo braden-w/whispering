@@ -3,6 +3,7 @@ import type { Result, Settings } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 export type RequestBody = {};
 
@@ -19,6 +20,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		Effect.map((data) => ({ isSuccess: true, data }) as const),
 		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
 		Effect.map((payload) => res.send(payload)),
+		Effect.provide(ToastServiceBgswLive),
 		Effect.runPromise,
 	);
 
