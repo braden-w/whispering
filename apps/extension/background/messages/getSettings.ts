@@ -1,9 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { Result } from '@repo/shared';
+import type { Result, Settings } from '@repo/shared';
 import { Effect } from 'effect';
 import { sendMessageToWhisperingContentScript } from '~background/sendMessage';
 import { renderErrorAsToast } from '~lib/errors';
-import type { Settings } from '~lib/services/local-storage';
 
 export type RequestBody = {};
 
