@@ -3,7 +3,7 @@ import { Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { extensionStorageService } from './extension-storage';
 
-export const ToastServiceLive = Layer.succeed(
+export const ToastServiceBgswLive = Layer.succeed(
 	ToastService,
 	ToastService.of({
 		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) => {
