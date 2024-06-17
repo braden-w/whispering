@@ -35,12 +35,11 @@ export const toggleRecording = Effect.gen(function* () {
 			}),
 	});
 	yield* Console.info('Injection result "toggleRecording" script:', injectionResult);
-	return true as const;
 });
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<true>;
+export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	toggleRecording.pipe(

@@ -7,7 +7,7 @@ import { renderErrorAsToast } from '~lib/errors';
 
 export type RequestBody = { settings: Settings };
 
-export type ResponseBody = Result<true>;
+export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
@@ -21,7 +21,6 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 			commandName: 'setSettings',
 			settings: body.settings,
 		});
-		return true as const;
 	}).pipe(
 		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,

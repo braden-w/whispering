@@ -12,7 +12,7 @@ declare const window: {
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<true>;
+export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
@@ -39,7 +39,6 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 				}),
 		});
 		yield* Console.info('Injection result "cancelRecording" script:', injectionResult);
-		return true as const;
 	}).pipe(
 		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
