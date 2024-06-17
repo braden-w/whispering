@@ -1,10 +1,10 @@
-import { goto } from '$app/navigation';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
+import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
+import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { renderErrorAsToast } from '$lib/services/errors';
@@ -159,7 +159,7 @@ const createRecordings = Effect.gen(function* () {
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceWhisperLive),
-	Effect.provide(ToastServiceLive),
+	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.runSync,
 );
