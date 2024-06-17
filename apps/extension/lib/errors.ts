@@ -1,6 +1,5 @@
 import { ToastService, WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { ToastServiceLive } from './services/ToastServiceLive';
 
 export const renderErrorAsToast = (
 	error: WhisperingError,
@@ -17,4 +16,4 @@ export const renderErrorAsToast = (
 		});
 		yield* Console.error(error.error instanceof Error ? error.error.message : error.error);
 		return yield* error;
-	}).pipe(Effect.provide(ToastServiceLive));
+	})
