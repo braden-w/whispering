@@ -11,26 +11,30 @@ import { cn } from '~lib/utils';
 import { toggleRecordingFromContentScript } from './utils';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
-	const inputs = document.querySelectorAll(
+	const editableElements = document.querySelectorAll(
 		"input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='tel'], input[type='password'], input[type='number'], input:not([type]), textarea, [contenteditable='true'], [contenteditable='']",
 	);
-	return Array.from(inputs).map((element) => ({
+	return Array.from(editableElements).map((element) => ({
 		element,
 		insertPosition: 'afterend',
 	}));
 };
 
 export const mountShadowHost: PlasmoMountShadowHost = ({ shadowHost, anchor, mountState }) => {
+	if (!anchor?.element) return;
+	const editableElement = anchor.element as HTMLElement;
+
 	const wrapper = document.createElement('div');
 	wrapper.style.display = 'flex';
 	wrapper.style.alignItems = 'center';
 
-	anchor.element.style.width = '100%';
+	editableElement.style.width = '100%';
 
-	anchor?.element?.parentNode?.insertBefore(wrapper, anchor.element);
-	wrapper.appendChild(anchor?.element);
+	editableElement.parentNode?.insertBefore(wrapper, editableElement);
+	wrapper.appendChild(editableElement);
 	wrapper.appendChild(shadowHost);
-	mountState.observer.disconnect(); // OPTIONAL DEMO: stop the observer as needed
+
+	// mountState?.observer?.disconnect(); // OPTIONAL DEMO: stop the observer as needed
 };
 
 export const config: PlasmoCSConfig = {
