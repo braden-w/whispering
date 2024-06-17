@@ -1,6 +1,7 @@
 import { extensionCommands } from '$lib/messaging';
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { ClipboardError, ClipboardService } from './ClipboardService';
+import { ClipboardService } from './ClipboardService';
 
 export const ClipboardServiceWebLive = Layer.effect(
 	ClipboardService,
@@ -9,7 +10,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 			Effect.tryPromise({
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
-					new ClipboardError({
+					new WhisperingError({
 						title: 'Unable to write to clipboard',
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
@@ -22,7 +23,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 					return;
 				},
 				catch: (error) =>
-					new ClipboardError({
+					new WhisperingError({
 						title: 'Unable to paste from clipboard',
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,

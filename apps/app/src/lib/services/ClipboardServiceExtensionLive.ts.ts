@@ -1,5 +1,6 @@
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { ClipboardError, ClipboardService } from './ClipboardService';
+import { ClipboardService } from './ClipboardService';
 
 export const ClipboardServiceExtensionLive = Layer.succeed(
 	ClipboardService,
@@ -8,7 +9,7 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 			Effect.tryPromise({
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
-					new ClipboardError({
+					new WhisperingError({
 						title: 'Unable to write to clipboard',
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
@@ -18,7 +19,7 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 			Effect.try({
 				try: () => writeTextToCursor(text),
 				catch: (error) =>
-					new ClipboardError({
+					new WhisperingError({
 						title: 'Unable to write text to cursor',
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
