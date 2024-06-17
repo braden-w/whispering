@@ -70,9 +70,13 @@ export type Result<T> =
 			error: WhisperingErrorProperties;
 	  };
 
-export const effectToResult = <A, I extends WhisperingError = WhisperingError, R>(
-	effect: Effect.Effect<A, I, R>,
-): Effect.Effect<Result<A>> => effect.pipe(effectToResult);
+export const effectToResult = <A, >(
+	effect: Effect.Effect<A, WhisperingError>,
+): Effect.Effect<Result<A>> =>
+	effect.pipe(
+		Effect.map((data) => ({ isSuccess: true, data }) as const),
+		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
+	);
 
 export const RecorderState = S.Literal('IDLE', 'RECORDING', 'LOADING');
 
