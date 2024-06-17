@@ -17,7 +17,7 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
-function ErrorToast() {
+function WhisperingToaster() {
 	useEffect(
 		() =>
 			Effect.gen(function* () {
@@ -42,4 +42,4 @@ function ErrorToast() {
 	return <Toaster {...TOASTER_SETTINGS} />;
 }
 
-export default ErrorToast;
+export default WhisperingToaster;
