@@ -36,10 +36,9 @@ export const registerExternalListener = () =>
 						const { toast } = yield* ToastService;
 						const { toastOptions } = externalMessage;
 						return toast(toastOptions);
-					case 'playSound': {
+					case 'playSound':
 						const { sound } = externalMessage;
 						return yield* playSound(sound);
-					}
 				}
 			}).pipe(
 				Effect.provide(ToastServiceLive),
