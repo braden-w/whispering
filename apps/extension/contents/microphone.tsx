@@ -1,13 +1,16 @@
+import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
-import { recorderStateToIcons, type RecorderState } from '@repo/shared';
+import { WhisperingError, recorderStateToIcons, type RecorderState } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
+import { Effect } from 'effect';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchorList,
 	PlasmoGetStyle,
 	PlasmoMountShadowHost,
 } from 'plasmo';
-import { toggleRecordingFromContentScript } from './utils';
+import { renderErrorAsToast } from '~lib/errors';
+import type * as ToggleRecording from '../background/messages/toggleRecording';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(
@@ -57,6 +60,23 @@ export const getStyle: PlasmoGetStyle = () => {
 	style.textContent = cssText.replaceAll(':root', ':host(plasmo-csui)');
 	return style;
 };
+
+const toggleRecordingFromContentScript = () =>
+	Effect.tryPromise({
+		try: () =>
+			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
+				name: 'toggleRecording',
+			}),
+		catch: (error) =>
+			new WhisperingError({
+				title: `Unable to toggle recording via background service worker`,
+				description:
+					error instanceof Error
+						? error.message
+						: 'There was likely an issue sending the message to the background service worker from the contentscript.',
+				error,
+			}),
+	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
 function RecorderStateAsIcon() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
