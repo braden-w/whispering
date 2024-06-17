@@ -2,13 +2,20 @@ import { sendToBackground } from '@plasmohq/messaging';
 import {
 	MediaRecorderService,
 	MediaRecorderServiceWebLive,
-	type Settings,
 	TranscriptionService,
 	TranscriptionServiceWhisperLive,
+	type Settings,
 } from '@repo/shared';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import {
+	QueryClient,
+	QueryClientProvider,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from '@tanstack/react-query';
 import { Effect } from 'effect';
 import * as GetSettings from '~background/messages/getSettings';
+import * as SetSettings from '~background/messages/setSettings';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -55,6 +62,8 @@ function IndexPopup() {
 }
 
 function Settings() {
+	const queryClient = useQueryClient();
+
 	const {
 		isLoading: isSettingsLoading,
 		isError: isSettingsError,
@@ -70,7 +79,23 @@ function Settings() {
 			}),
 	});
 
-	const getMediaDevicesPromise = useQuery({
+	const setSettings = useMutation({
+		onSuccess: (data) => queryClient.setQueryData(['settings'], data),
+		mutationFn: (settings: Settings) =>
+			sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
+				name: 'setSettings',
+				body: { settings },
+			}).then((response) => {
+				if (!response.isSuccess) throw response.error;
+				return response.data;
+			}),
+	});
+
+	const {
+		isLoading: isMediaDevicesLoading,
+		isError: isMediaDevicesError,
+		data: mediaDevices,
+	} = useQuery({
 		queryKey: ['media-devices'],
 		queryFn: () =>
 			Effect.gen(function* () {
@@ -111,7 +136,9 @@ function Settings() {
 					id="play-sound-enabled"
 					aria-labelledby="play-sound-enabled"
 					checked={settings.isPlaySoundEnabled}
-					onCheckedChange={() => {}}
+					onCheckedChange={() =>
+						setSettings.mutate({ ...settings, isPlaySoundEnabled: !settings.isPlaySoundEnabled })
+					}
 				/>
 				<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
 			</div>
@@ -120,7 +147,12 @@ function Settings() {
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
 					checked={settings.isCopyToClipboardEnabled}
-					onCheckedChange={() => {}}
+					onCheckedChange={() =>
+						setSettings.mutate({
+							...settings,
+							isCopyToClipboardEnabled: !settings.isCopyToClipboardEnabled,
+						})
+					}
 				/>
 				<Label htmlFor="copy-to-clipboard">
 					Copy text to clipboard on successful transcription
@@ -131,7 +163,12 @@ function Settings() {
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
 					checked={settings.isPasteContentsOnSuccessEnabled}
-					onCheckedChange={() => {}}
+					onCheckedChange={() =>
+						setSettings.mutate({
+							...settings,
+							isPasteContentsOnSuccessEnabled: !settings.isPasteContentsOnSuccessEnabled,
+						})
+					}
 				/>
 				<Label htmlFor="paste-from-clipboard">
 					Paste contents from clipboard after successful transcription
@@ -141,34 +178,47 @@ function Settings() {
 				<Label className="text-sm" htmlFor="recording-device">
 					Recording Device
 				</Label>
-				{getMediaDevicesPromise.isLoading && (
+				{isMediaDevicesLoading && (
 					<Select disabled>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Loading devices..." />
 						</SelectTrigger>
 					</Select>
 				)}
-				{getMediaDevicesPromise.isError && (
+				{isMediaDevicesError && (
 					<Select disabled>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Error loading devices" />
 						</SelectTrigger>
 					</Select>
 				)}
-				{getMediaDevicesPromise.isSuccess && (
-					<RenderMediaDevices devices={getMediaDevicesPromise.data} />
-				)}
+				<Select
+					value={settings.selectedAudioInputDeviceId}
+					onValueChange={(value) =>
+						setSettings.mutate({
+							...settings,
+							selectedAudioInputDeviceId: value,
+						})
+					}
+				>
+					<SelectTrigger className="w-full">
+						<SelectValue placeholder="Select a device" />
+					</SelectTrigger>
+					<SelectContent>
+						{mediaDevices.map((device) => (
+							<SelectItem value={device.deviceId}>{device.label}</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
 			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="output-language">
 					Output Language
 				</Label>
 				<Select
-					items={supportedLanguagesOptions}
-					selected={selectedLanguageOption}
-					onSelectedChange={(selected) => {
-						if (!selected) return;
-						settings.outputLanguage = selected.value;
+					value={settings.outputLanguage}
+					onValueChange={(value) => {
+						settings.outputLanguage = value;
 					}}
 				>
 					<SelectTrigger className="w-full">
@@ -181,7 +231,6 @@ function Settings() {
 							</SelectItem>
 						))}
 					</SelectContent>
-					{/* <SelectInput name="output-language" /> */}
 				</Select>
 			</div>
 			<div className="grid gap-2">
@@ -193,7 +242,7 @@ function Settings() {
 					placeholder="Local Shortcut to toggle recording"
 					value={settings.currentLocalShortcut}
 					type="text"
-					autocomplete="off"
+					autoComplete="off"
 				/>
 			</div>
 			<div className="grid gap-2">
@@ -206,7 +255,7 @@ function Settings() {
 						placeholder="Global Shortcut to toggle recording"
 						value={settings.currentGlobalShortcut}
 						type="text"
-						autocomplete="off"
+						autoComplete="off"
 					/>
 				) : (
 					<div className="relative">
@@ -215,15 +264,11 @@ function Settings() {
 							placeholder="Global Shortcut to toggle recording"
 							value={settings.currentGlobalShortcut}
 							type="text"
-							autocomplete="off"
+							autoComplete="off"
 							disabled
 						/>
-						<Button
-							className="absolute inset-0 backdrop-blur"
-							href="/global-shortcut"
-							variant="link"
-						>
-							Enable Global Shortcut
+						<Button className="absolute inset-0 backdrop-blur" variant="link" asChild>
+							<a href="/global-shortcut">Enable Global Shortcut</a>
 						</Button>
 					</div>
 				)}
@@ -241,36 +286,6 @@ function Settings() {
 				/>
 			</div>
 		</CardContent>
-	);
-}
-
-function RenderMediaDevices({ mediaDevices }: { mediaDevices: MediaDeviceInfo[] }) {
-	const items = mediaDevices.map((device) => ({
-		value: device.deviceId,
-		label: device.label,
-	}));
-	const selected = items.find((item) => item.value === settings.selectedAudioInputDeviceId);
-	return (
-		<Select
-			items={items}
-			selected={selected}
-			onSelectedChange={(selected) => {
-				if (!selected) return;
-				settings.selectedAudioInputDeviceId = selected.value;
-			}}
-		>
-			<SelectTrigger className="w-full">
-				<SelectValue placeholder="Select a device" />
-			</SelectTrigger>
-			<SelectContent>
-				{mediaDevices.map((device) => (
-					<SelectItem value={device.deviceId} label={device.label}>
-						{device.label}
-					</SelectItem>
-				))}
-			</SelectContent>
-			<SelectInput name="recording-device" />
-		</Select>
 	);
 }
 
