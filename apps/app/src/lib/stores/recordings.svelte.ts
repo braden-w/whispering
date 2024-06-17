@@ -115,8 +115,8 @@ const createRecordings = Effect.gen(function* () {
 					Effect.gen(function* () {
 						if (transcribedText === '') return;
 
+						// Copy transcription to clipboard if enabled
 						if (settings.isCopyToClipboardEnabled) {
-							// Copy transcription to clipboard if enabled
 							yield* clipboardService.setClipboardText(transcribedText);
 							toast({
 								variant: 'success',
