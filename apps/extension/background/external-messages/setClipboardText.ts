@@ -41,7 +41,7 @@ export const setClipboardText = (text: string): Effect.Effect<void, WhisperingEr
 				}),
 		});
 		yield* Console.info('Injection result "setClipboardText" script:', injectionResult);
-		if (!injectionResult) {
+		if (!injectionResult || !injectionResult.result) {
 			return yield* new WhisperingError({
 				title: 'Unable to copy transcribed text to clipboard in active tab',
 				description: 'The result of the script injection is undefined',
@@ -49,12 +49,12 @@ export const setClipboardText = (text: string): Effect.Effect<void, WhisperingEr
 		}
 		const { result } = injectionResult;
 		yield* Console.info('setClipboardText result:', result);
-		if (!result || !result.isSuccess) {
+		if (!result.isSuccess) {
 			return yield* new WhisperingError({
 				title: 'Unable to copy transcribed text to clipboard in active tab',
 				description:
-					result?.error instanceof Error ? result.error.message : `Unknown error: ${result?.error}`,
-				error: result?.error,
+					result.error instanceof Error ? result.error.message : `Unknown error: ${result.error}`,
+				error: result.error,
 			});
 		}
 	}).pipe(
@@ -76,4 +76,3 @@ export const setClipboardText = (text: string): Effect.Effect<void, WhisperingEr
 				}),
 		}),
 	);
-

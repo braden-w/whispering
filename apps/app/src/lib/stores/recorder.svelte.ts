@@ -1,12 +1,16 @@
 import { extensionCommands } from '$lib/messaging';
-import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { recordings, settings } from '$lib/stores';
-import { ToastService, WhisperingError, type RecorderState } from '@repo/shared';
+import {
+	MediaRecorderService,
+	MediaRecorderServiceWebLive,
+	ToastService,
+	WhisperingError,
+	type RecorderState,
+} from '@repo/shared';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
 import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';

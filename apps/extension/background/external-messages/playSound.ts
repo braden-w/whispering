@@ -1,6 +1,6 @@
+import { WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
-import { WhisperingError } from '@repo/shared';
 
 export const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
