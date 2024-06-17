@@ -53,10 +53,11 @@ function RecorderStateAsIcon() {
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
-			className={cn('h-10 w-10', 'transform hover:scale-110 focus:scale-110')}
-			style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}
+			className="group relative z-10 h-10 w-10 transform rounded-md hover:scale-110 focus:scale-110"
+			style={{ transformOrigin: 'center', filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}
 			onClick={toggleRecordingFromContentScript}
 		>
+			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10"></div>
 			{recorderStateAsIcon}
 		</button>
 	);
