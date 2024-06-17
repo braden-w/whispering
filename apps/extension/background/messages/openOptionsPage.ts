@@ -14,7 +14,11 @@ export const openOptionsPage = Effect.tryPromise({
 		}),
 }).pipe(Effect.catchAll(renderErrorAsToast));
 
-const handler: PlasmoMessaging.MessageHandler<{}, Result<true>> = (req, res) =>
+export type RequestBody = {};
+
+export type ResponseBody = Result<number>;
+
+const handler: PlasmoMessaging.MessageHandler<RequestBody, RequestBody> = (req, res) =>
 	Effect.gen(function* () {
 		yield* openOptionsPage;
 		return true as const;

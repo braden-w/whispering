@@ -2,8 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
 	WhisperingError,
 	effectToResult,
-	type Result,
-	type WhisperingErrorProperties,
+	type Result
 } from '@repo/shared';
 import { Data, Effect, Option } from 'effect';
 
