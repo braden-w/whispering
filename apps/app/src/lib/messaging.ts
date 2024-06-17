@@ -23,7 +23,7 @@ const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 		);
 	});
 
-export const invokeExtensionCommand = {
+export const extensionCommands = {
 	setRecorderState: (recorderState: RecorderState) =>
 		sendMessageToExtension<void>({
 			message: 'setRecorderState',

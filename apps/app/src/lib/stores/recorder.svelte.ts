@@ -1,4 +1,4 @@
-import { invokeExtensionCommand } from '$lib/messaging';
+import { extensionCommands } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
@@ -24,7 +24,7 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			invokeExtensionCommand.setRecorderState(newValue).pipe(Effect.runPromise);
+			extensionCommands.setRecorderState(newValue).pipe(Effect.runPromise);
 		},
 	};
 })();
@@ -79,7 +79,7 @@ export const recorder = Effect.gen(function* () {
 							if (!document.hidden) {
 								startSound.play();
 							} else {
-								yield* invokeExtensionCommand.playSound('start');
+								yield* extensionCommands.playSound('start');
 							}
 						}
 						yield* Effect.logInfo('Recording started');
@@ -91,7 +91,7 @@ export const recorder = Effect.gen(function* () {
 							if (!document.hidden) {
 								stopSound.play();
 							} else {
-								yield* invokeExtensionCommand.playSound('stop');
+								yield* extensionCommands.playSound('stop');
 							}
 						}
 						yield* Effect.logInfo('Recording stopped');
@@ -117,7 +117,7 @@ export const recorder = Effect.gen(function* () {
 					if (!document.hidden) {
 						cancelSound.play();
 					} else {
-						yield* invokeExtensionCommand.playSound('cancel');
+						yield* extensionCommands.playSound('cancel');
 					}
 				}
 				yield* Effect.logInfo('Recording cancelled');

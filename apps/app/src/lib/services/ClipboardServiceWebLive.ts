@@ -1,4 +1,4 @@
-import { invokeExtensionCommand } from '$lib/messaging';
+import { extensionCommands } from '$lib/messaging';
 import { Effect, Layer } from 'effect';
 import { ClipboardError, ClipboardService } from './ClipboardService';
 import { ToastServiceLive } from './ToastServiceLive';
@@ -15,7 +15,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
-			}).pipe(Effect.catchAll(() => invokeExtensionCommand.setClipboardText(text)));
+			}).pipe(Effect.catchAll(() => extensionCommands.setClipboardText(text)));
 
 		const writeText = (text: string) =>
 			Effect.try({
@@ -28,7 +28,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
-			}).pipe(Effect.catchAll(() => invokeExtensionCommand.writeTextToCursor(text)));
+			}).pipe(Effect.catchAll(() => extensionCommands.writeTextToCursor(text)));
 
 		return {
 			setClipboardText,
