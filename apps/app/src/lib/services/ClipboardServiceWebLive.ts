@@ -1,7 +1,6 @@
 import { extensionCommands } from '$lib/messaging';
 import { Effect, Layer } from 'effect';
 import { ClipboardError, ClipboardService } from './ClipboardService';
-import { ToastServiceLive } from './ToastServiceLive';
 
 export const ClipboardServiceWebLive = Layer.effect(
 	ClipboardService,
@@ -34,5 +33,5 @@ export const ClipboardServiceWebLive = Layer.effect(
 			setClipboardText,
 			writeText,
 		};
-	}).pipe(Effect.provide(ToastServiceLive)),
+	}),
 );
