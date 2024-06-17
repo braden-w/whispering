@@ -1,12 +1,11 @@
+import { Schema as S } from '@effect/schema';
 import { sendToBackground } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
+import { WhisperingError, settingsSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import { toast } from 'sonner';
-import { Schema as S } from '@effect/schema';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
-import { WhisperingError } from '@repo/shared';
-import { settingsSchema } from '~lib/services/local-storage';
 import getSettings from './getSettings';
 import setSettings from './setSettings';
 
