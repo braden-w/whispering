@@ -1,6 +1,6 @@
 import { localStorageService } from '~lib/services/local-storage';
 
-const handler = () =>
+export const getSettings = () =>
 	localStorageService.get({
 		key: 'whispering-settings',
 		defaultValue: {
@@ -14,5 +14,3 @@ const handler = () =>
 			outputLanguage: 'en',
 		},
 	});
-
-export default handler;

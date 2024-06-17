@@ -1,13 +1,13 @@
 import { Schema as S } from '@effect/schema';
 import { sendToBackground } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { WhisperingError, settingsSchema } from '@repo/shared';
+import { WhisperingError, effectToResult, settingsSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
-import { toast } from 'sonner';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
-import getSettings from './getSettings';
-import setSettings from './setSettings';
+import { getSettings } from './getSettings';
+import { setSettings } from './setSettings';
+import { renderErrorAsToast } from '~lib/errors';
 
 export const config: PlasmoCSConfig = {
 	matches: ['http://localhost:5173/*'],
@@ -33,14 +33,9 @@ chrome.runtime.onMessage.addListener(
 					return yield* setSettings(settings);
 			}
 		}).pipe(
-			Effect.map((result) => ({ isSuccess: true, data: result }) as const),
-			Effect.catchAll((error) => {
-				toast.error(error.title, {
-					description: error.description,
-				});
-				return Effect.succeed({ isSuccess: false, error } as const);
-			}),
-			Effect.map((response) => sendResponse(response)),
+			Effect.catchAll(renderErrorAsToast('content')),
+			effectToResult,
+			Effect.map(sendResponse),
 			Effect.runPromise,
 		),
 );

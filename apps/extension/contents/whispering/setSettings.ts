@@ -1,8 +1,8 @@
+import { WhisperingError, type Settings } from '@repo/shared';
 import { Effect } from 'effect';
-import { WhisperingError } from '@repo/shared';
-import { localStorageService, type Settings } from '~lib/services/local-storage';
+import { localStorageService } from '~lib/services/local-storage';
 
-const handler = (settings: Settings) =>
+export const setSettings = (settings: Settings) =>
 	localStorageService
 		.set({
 			key: 'whispering-settings',
@@ -21,5 +21,3 @@ const handler = (settings: Settings) =>
 					}),
 			}),
 		);
-
-export default handler;
