@@ -7,23 +7,24 @@ import { WhisperingError } from '@repo/shared';
 import { extensionStorageService } from '~lib/services/extension-storage';
 
 const setIcon = (icon: 'IDLE' | 'STOP' | 'LOADING') =>
-	Effect.tryPromise({
-		try: () => {
-			const iconPaths = {
-				IDLE: studioMicrophone,
-				STOP: redLargeSquare,
-				LOADING: arrowsCounterclockwise,
-			} as const;
-			const path = iconPaths[icon];
-			return chrome.action.setIcon({ path });
-		},
-		catch: (error) =>
-			new WhisperingError({
-				title: `Error setting icon to ${icon} icon`,
-				description: error instanceof Error ? error.message : `Error: ${error}`,
-				error,
-			}),
-	}).pipe(Effect.tap(() => Console.info('Icon set to', icon)));
+	Effect.gen(function* () {
+		const iconPaths = {
+			IDLE: studioMicrophone,
+			STOP: redLargeSquare,
+			LOADING: arrowsCounterclockwise,
+		} as const;
+		const path = iconPaths[icon];
+		yield* Effect.tryPromise({
+			try: () => chrome.action.setIcon({ path }),
+			catch: (error) =>
+				new WhisperingError({
+					title: `Error setting icon to ${icon} icon`,
+					description: error instanceof Error ? error.message : `Error: ${error}`,
+					error,
+				}),
+		});
+		yield* Console.info('Icon set to', icon);
+	});
 
 const handler = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
