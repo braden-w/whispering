@@ -1,18 +1,20 @@
 import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
+import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
+import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
-import { WhisperingError, settingsSchema } from '@repo/shared';
+import { ToastService, WhisperingError, settingsSchema } from '@repo/shared';
 import { Effect } from 'effect';
-import { toast } from 'svelte-sonner';
 
 type RegisterShortcutJob = Effect.Effect<void, WhisperingError>;
 
 const createSettings = Effect.gen(function* () {
+	const { toast } = yield* ToastService;
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const settings = createPersistedState({
 		key: 'whispering-settings',
@@ -84,7 +86,11 @@ const createSettings = Effect.gen(function* () {
 						shortcut: settings.value.currentLocalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Local shortcut set to ${settings.value.currentLocalShortcut}`);
+					toast({
+						variant: 'success',
+						title: `Local shortcut set to ${settings.value.currentLocalShortcut}`,
+						description: 'Press the shortcut to start recording',
+					});
 				});
 				yield* jobQueue.addJobToQueue(job);
 			});
@@ -105,7 +111,11 @@ const createSettings = Effect.gen(function* () {
 						shortcut: settings.value.currentGlobalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast.success(`Global shortcut set to ${settings.value.currentGlobalShortcut}`);
+					toast({
+						variant: 'success',
+						title: `Global shortcut set to ${settings.value.currentGlobalShortcut}`,
+						description: 'Press the shortcut to start recording',
+					});
 				});
 				yield* jobQueue.addJobToQueue(job);
 			});
@@ -123,16 +133,11 @@ const createSettings = Effect.gen(function* () {
 		set outputLanguage(newValue) {
 			settings.value = { ...settings.value, outputLanguage: newValue };
 		},
-		get toast() {
-			return settings.value.toast;
-		},
-		set toast(newValue) {
-			settings.value = { ...settings.value, toast: newValue };
-		},
 	};
 });
 
 export const settings = createSettings.pipe(
 	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
+	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
 	Effect.runSync,
 );
