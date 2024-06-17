@@ -1,5 +1,4 @@
-import { sendMessageToExtension } from '$lib/messaging';
-import { WhisperingError } from '@repo/shared';
+import { invokeExtensionCommand } from '$lib/messaging';
 import { Effect, Layer } from 'effect';
 import { ClipboardError, ClipboardService } from './ClipboardService';
 import { ToastServiceLive } from './ToastServiceLive';
@@ -16,14 +15,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
-			}).pipe(
-				Effect.catchAll(() =>
-					sendMessageToExtension<string, WhisperingError>({
-						message: 'setClipboardText',
-						transcribedText: text,
-					}),
-				),
-			);
+			}).pipe(Effect.catchAll(() => invokeExtensionCommand.setClipboardText(text)));
 
 		const writeText = (text: string) =>
 			Effect.try({
@@ -36,14 +28,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
-			}).pipe(
-				Effect.catchAll(() =>
-					sendMessageToExtension<string, WhisperingError>({
-						message: 'writeTextToCursor',
-						transcribedText: text,
-					}),
-				),
-			);
+			}).pipe(Effect.catchAll(() => invokeExtensionCommand.writeTextToCursor(text)));
 
 		return {
 			setClipboardText,

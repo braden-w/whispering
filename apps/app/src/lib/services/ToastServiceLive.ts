@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { sendMessageToExtension } from '$lib/messaging';
+import { invokeExtensionCommand } from '$lib/messaging';
 import { ToastService } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { toast } from 'svelte-sonner';
@@ -17,17 +17,15 @@ export const ToastServiceLive = Layer.succeed(
 					onClick: () => goto(action.goto),
 				},
 			});
-			sendMessageToExtension({
-				message: 'toast',
-				toastOptions: {
-					variant,
-					id,
-					title,
-					description,
-					descriptionClass,
-					action,
-				},
-			}).pipe(Effect.runPromise);
+			const sendToast = invokeExtensionCommand.toast({
+				variant,
+				id,
+				title,
+				description,
+				descriptionClass,
+				action,
+			});
+			sendToast.pipe(Effect.runPromise);
 			return toastId;
 		},
 	}),

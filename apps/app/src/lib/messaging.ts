@@ -1,24 +1,55 @@
-import type { ExternalMessage, Result, WhisperingErrorProperties } from '@repo/shared';
-import { WHISPERING_EXTENSION_ID } from '@repo/shared';
-import { Effect, Cause } from 'effect';
+import type {
+	ExternalMessage,
+	RecorderState,
+	Result,
+	ToastOptions,
+	WhisperingErrorProperties,
+} from '@repo/shared';
+import { WHISPERING_EXTENSION_ID, WhisperingError } from '@repo/shared';
+import { Effect } from 'effect';
 
-export const sendMessageToExtension = <
-	T extends unknown,
-	E extends Cause.YieldableError & Readonly<WhisperingErrorProperties>,
-	M extends ExternalMessage = ExternalMessage,
-	R extends Result<T, E> = Result<T, E>,
->(
-	message: M,
-) =>
-	Effect.async<T, E>((resume) => {
+const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
+	Effect.async<T, WhisperingError>((resume) => {
 		chrome.runtime.sendMessage<ExternalMessage>(
 			WHISPERING_EXTENSION_ID,
 			message,
-			function (response: R) {
+			function (response: Result<T, WhisperingErrorProperties>) {
 				if (!response.isSuccess) {
-					return resume(Effect.fail(response.error));
+					const whisperingError = new WhisperingError(response.error);
+					return resume(Effect.fail(whisperingError));
 				}
 				return resume(Effect.succeed(response.data));
 			},
 		);
 	});
+
+export const invokeExtensionCommand = {
+	setRecorderState: (recorderState: RecorderState) =>
+		sendMessageToExtension<void>({
+			message: 'setRecorderState',
+			recorderState,
+		}),
+	playSound: (sound: 'start' | 'stop' | 'cancel') =>
+		sendMessageToExtension<void>({
+			message: 'playSound',
+			sound,
+		}),
+	setClipboardText: (text: string) =>
+		sendMessageToExtension<void>({
+			message: 'setClipboardText',
+			transcribedText: text,
+		}),
+	writeTextToCursor: (text: string) =>
+		sendMessageToExtension<void>({
+			message: 'writeTextToCursor',
+			transcribedText: text,
+		}),
+	toast: (toastOptions: ToastOptions) =>
+		sendMessageToExtension<string | number>({
+			message: 'toast',
+			toastOptions,
+		}),
+} as const satisfies Record<
+	ExternalMessage['message'],
+	(...args: any[]) => Effect.Effect<any, WhisperingError>
+>;

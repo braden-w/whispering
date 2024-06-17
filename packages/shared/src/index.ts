@@ -1,5 +1,5 @@
 import { Schema as S } from '@effect/schema';
-import { Context, Data } from 'effect';
+import { Context, Data, Effect, Either } from 'effect';
 import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL = 'https://whispering.bradenwong.com';
@@ -40,7 +40,7 @@ export const toastOptionsSchema = S.Struct({
 
 type ToastId = S.Schema.Type<typeof ToastId>;
 
-type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
+export type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
 
 export class ToastService extends Context.Tag('ToastService')<
 	ToastService,

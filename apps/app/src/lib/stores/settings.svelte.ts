@@ -8,10 +8,10 @@ import { renderErrorAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { Effect } from 'effect';
-import { toast } from 'svelte-sonner';
 import { Schema as S } from '@effect/schema';
 import { settingsSchema } from '@repo/shared';
+import { Effect } from 'effect';
+import { toast } from 'svelte-sonner';
 
 type RegisterShortcutJob = Effect.Effect<void, RegisterShortcutsError>;
 

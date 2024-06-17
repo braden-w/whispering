@@ -4,7 +4,7 @@ import { getActiveTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
 import { extensionStorageService } from '~lib/services/extension-storage';
 
-const handler = (text: string) =>
+const handler = (text: string): Effect.Effect<void, WhisperingError> =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		yield* extensionStorageService.set({
@@ -50,7 +50,6 @@ const handler = (text: string) =>
 				error: result?.error,
 			});
 		}
-		return result.data;
 	}).pipe(
 		Effect.catchTags({
 			GetActiveTabIdError: () =>

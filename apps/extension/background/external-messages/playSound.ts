@@ -5,16 +5,7 @@ import { WhisperingError } from '@repo/shared';
 const handler = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
 		yield* Console.info('Playing sound', sound);
-		const activeTabId = yield* getActiveTabId.pipe(
-			Effect.mapError(
-				(error) =>
-					new WhisperingError({
-						title: 'Failed to get active tab ID',
-						description: 'Failed to get active tab ID to play sound',
-						error,
-					}),
-			),
-		);
+		const activeTabId = yield* getActiveTabId;
 		yield* Effect.tryPromise({
 			try: () =>
 				chrome.tabs.sendMessage(activeTabId, {
@@ -28,8 +19,15 @@ const handler = (sound: 'start' | 'stop' | 'cancel') =>
 					error,
 				}),
 		});
-
-		return true;
-	});
+	}).pipe(
+		Effect.catchTags({
+			GetActiveTabIdError: (error) =>
+				new WhisperingError({
+					title: 'Failed to get active tab ID',
+					description: 'Failed to get active tab ID to play sound',
+					error,
+				}),
+		}),
+	);
 
 export default handler;

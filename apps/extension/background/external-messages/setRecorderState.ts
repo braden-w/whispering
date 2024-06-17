@@ -9,16 +9,12 @@ import { extensionStorageService } from '~lib/services/extension-storage';
 const setIcon = (icon: 'IDLE' | 'STOP' | 'LOADING') =>
 	Effect.tryPromise({
 		try: () => {
-			const path = ((icon: 'IDLE' | 'STOP' | 'LOADING') => {
-				switch (icon) {
-					case 'IDLE':
-						return studioMicrophone;
-					case 'STOP':
-						return redLargeSquare;
-					case 'LOADING':
-						return arrowsCounterclockwise;
-				}
-			})(icon);
+			const iconPaths = {
+				IDLE: studioMicrophone,
+				STOP: redLargeSquare,
+				LOADING: arrowsCounterclockwise,
+			} as const;
+			const path = iconPaths[icon];
 			return chrome.action.setIcon({ path });
 		},
 		catch: (error) =>
