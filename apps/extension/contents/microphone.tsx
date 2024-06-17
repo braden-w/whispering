@@ -32,8 +32,8 @@ const recorderStateToIcons = {
 } as const satisfies Record<RecorderState, React.JSX.Element>;
 
 function RecorderStateAsIcon() {
-	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
-	const recorderStateAsIcon = recorderStateToIcons[recorderState ?? 'IDLE'];
+	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
+	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
 			className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'rounded-full')}

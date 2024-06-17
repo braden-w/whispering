@@ -66,12 +66,12 @@ const cancelRecording = () =>
 	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 
 function IndexPage() {
-	const [recorderState] = useStorage<RecorderState>('whispering-recording-state');
+	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
 	const [latestRecordingTranscribedText] = useStorage<string>(
 		'whispering-latest-recording-transcribed-text',
 	);
 
-	const recorderStateAsIcon = recorderStateToIcons[recorderState ?? 'IDLE'];
+	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	const copyToClipboardText = (() => {
 		if (latestRecordingTranscribedText) return latestRecordingTranscribedText;
 		if (recorderState === 'LOADING') return '...';
