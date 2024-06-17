@@ -53,12 +53,8 @@ function RecorderStateAsIcon() {
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
-			className={cn(
-				// buttonVariants({ size: 'icon' }),
-				// 'mb-1 mr-1 flex h-8 w-8 items-center justify-center rounded-full bg-black text-white transition-colors hover:opacity-70 focus-visible:outline-none focus-visible:outline-black disabled:bg-[#D7D7D7] disabled:text-[#f4f4f4] disabled:hover:opacity-100 dark:bg-white dark:text-black dark:focus-visible:outline-white',
-				'h-9 w-9',
-				'rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-white dark:hover:bg-gray-900 md:bottom-3 md:p-2',
-			)}
+			className={cn('h-10 w-10', 'transform hover:scale-110 focus:scale-110')}
+			style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}
 			onClick={toggleRecordingFromContentScript}
 		>
 			{recorderStateAsIcon}
