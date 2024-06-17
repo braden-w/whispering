@@ -44,9 +44,9 @@ export type ResponseBody = Result<true>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	toggleRecording.pipe(
-		Effect.tapError(renderErrorAsToast),
+		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
-		Effect.map((payload) => res.send(payload)),
+		Effect.map(res.send),
 		Effect.runPromise,
 	);
 

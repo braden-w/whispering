@@ -23,9 +23,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		});
 		return true as const;
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
+		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
-		Effect.map((payload) => res.send(payload)),
+		Effect.map(res.send),
 		Effect.runPromise,
 	);
 

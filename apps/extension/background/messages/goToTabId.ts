@@ -1,6 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { WhisperingError, effectToResult, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
+import { renderErrorAsToast } from '~lib/errors';
 
 export type RequestBody = { tabId: number };
 
@@ -26,8 +27,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		});
 		return true as const;
 	}).pipe(
+		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
-		Effect.map((payload) => res.send(payload)),
+		Effect.map(res.send),
 		Effect.runPromise,
 	);
 

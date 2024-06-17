@@ -1,8 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
+import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
-import { WhisperingError } from '@repo/shared';
 
 export type RequestBody = { tabId: number };
 
@@ -18,10 +18,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		return true as const;
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
-		Effect.map((payload) => res.send(payload)),
+		Effect.tapError(renderErrorAsToast('bgsw')),
+		effectToResult,
+		Effect.map(res.send),
 		Effect.runPromise,
 	);
 

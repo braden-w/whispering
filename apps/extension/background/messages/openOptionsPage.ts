@@ -12,7 +12,7 @@ export const openOptionsPage = Effect.tryPromise({
 			description: error instanceof Error ? error.message : `Unknown error: ${error}`,
 			error,
 		}),
-}).pipe(Effect.catchAll(renderErrorAsToast));
+});
 
 export type RequestBody = {};
 
@@ -23,9 +23,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, RequestBody> = (req, 
 		yield* openOptionsPage;
 		return true as const;
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
+		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
-		Effect.map((payload) => res.send(payload)),
+		Effect.map(res.send),
 		Effect.runPromise,
 	);
 
