@@ -1,4 +1,4 @@
-import type { Result } from '@repo/shared';
+import type { Result, WhisperingErrorProperties } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
@@ -13,7 +13,7 @@ const handler = (text: string): Effect.Effect<void, WhisperingError> =>
 		});
 		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
-				chrome.scripting.executeScript<[string], Result<string, unknown>>({
+				chrome.scripting.executeScript<[string], Result<string>>({
 					target: { tabId: activeTabId },
 					world: 'MAIN',
 					func: (text: string) => {
@@ -21,7 +21,14 @@ const handler = (text: string): Effect.Effect<void, WhisperingError> =>
 							navigator.clipboard.writeText(text);
 							return { isSuccess: true, data: text } as const;
 						} catch (error) {
-							return { isSuccess: false, error } as const;
+							return {
+								isSuccess: false,
+								error: {
+									title: 'Unable to copy transcribed text to clipboard in active tab',
+									description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+									error,
+								},
+							} as const;
 						}
 					},
 					args: [text],

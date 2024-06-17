@@ -1,5 +1,10 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { Result } from '@repo/shared';
+import {
+	WhisperingError,
+	effectToResult,
+	type Result,
+	type WhisperingErrorProperties,
+} from '@repo/shared';
 import { Data, Effect, Option } from 'effect';
 
 class GetActiveTabIdError extends Data.TaggedError('GetActiveTabIdError') {}
@@ -13,15 +18,22 @@ export const getActiveTabId = Effect.gen(function* () {
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<number, GetActiveTabIdError>;
+export type ResponseBody = Result<number>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		return activeTabId;
 	}).pipe(
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
+		Effect.catchTags({
+			GetActiveTabIdError: (error) =>
+				new WhisperingError({
+					title: 'Failed to get active tab ID',
+					description: 'Failed to get active tab ID',
+					error,
+				}),
+		}),
+		effectToResult,
 		Effect.map((payload) => res.send(payload)),
 		Effect.runPromise,
 	);

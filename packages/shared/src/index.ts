@@ -1,5 +1,5 @@
 import { Schema as S } from '@effect/schema';
-import { Context, Data } from 'effect';
+import { Context, Data, Effect } from 'effect';
 import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL = 'https://whispering.bradenwong.com';
@@ -60,15 +60,19 @@ export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
 )<WhisperingErrorProperties> {}
 
-export type Result<T, E = WhisperingErrorProperties> =
+export type Result<T> =
 	| {
 			isSuccess: true;
 			data: T;
 	  }
 	| {
 			isSuccess: false;
-			error: E;
+			error: WhisperingErrorProperties;
 	  };
+
+export const effectToResult = <A, I extends WhisperingError = WhisperingError, R>(
+	effect: Effect.Effect<A, I, R>,
+): Effect.Effect<Result<A>> => effect.pipe(effectToResult);
 
 export const RecorderState = S.Literal('IDLE', 'RECORDING', 'LOADING');
 

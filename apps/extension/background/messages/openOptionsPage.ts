@@ -1,8 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
+import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
-import { WhisperingError } from '@repo/shared';
 
 export const openOptionsPage = Effect.tryPromise({
 	try: () => chrome.runtime.openOptionsPage(),
@@ -20,8 +20,7 @@ const handler: PlasmoMessaging.MessageHandler<{}, Result<true>> = (req, res) =>
 		return true as const;
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
+		effectToResult,
 		Effect.map((payload) => res.send(payload)),
 		Effect.runPromise,
 	);

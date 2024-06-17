@@ -1,9 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { Console, Option, Effect } from 'effect';
+import { WhisperingError, effectToResult } from '@repo/shared';
+import { Console, Effect, Option } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/sendMessage';
 import { renderErrorAsToast } from '~lib/errors';
-import { WhisperingError } from '@repo/shared';
 
 declare const window: {
 	toggleRecording: () => void;
@@ -45,8 +45,7 @@ export type ResponseBody = Result<true>;
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	toggleRecording.pipe(
 		Effect.tapError(renderErrorAsToast),
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
+		effectToResult,
 		Effect.map((payload) => res.send(payload)),
 		Effect.runPromise,
 	);
