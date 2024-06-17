@@ -5,10 +5,10 @@ import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbSe
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
-import { TranscriptionError, TranscriptionService } from '$lib/services/TranscriptionService';
+import { TranscriptionService } from '$lib/services/TranscriptionService';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { renderErrorAsToast } from '$lib/services/errors';
-import { ToastService } from '@repo/shared';
+import { ToastService, WhisperingError } from '@repo/shared';
 import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
@@ -78,7 +78,7 @@ const createRecordings = Effect.gen(function* () {
 			return Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
 				if (Option.isNone(maybeRecording)) {
-					return yield* new TranscriptionError({
+					return yield* new WhisperingError({
 						title: `Recording with id ${id} not found`,
 						description: 'Please try again.',
 					});

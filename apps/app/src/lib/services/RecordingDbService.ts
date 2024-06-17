@@ -1,6 +1,6 @@
+import type { WhisperingError } from '@repo/shared';
 import type { Effect, Option } from 'effect';
-import { Context, Data } from 'effect';
-import type { WhisperingErrorProperties } from '@repo/shared';
+import { Context } from 'effect';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -20,20 +20,14 @@ export type Recording = {
 	transcriptionStatus: TranscriptionStatus;
 };
 
-export class RecordingDbError extends Data.TaggedError(
-	'RecordingDbError',
-)<WhisperingErrorProperties> {}
-
 export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	RecordingsDbService,
 	{
-		readonly getAllRecordings: Effect.Effect<Recording[], RecordingDbError>;
-		readonly getRecording: (
-			id: string,
-		) => Effect.Effect<Option.Option<Recording>, RecordingDbError>;
-		readonly addRecording: (recording: Recording) => Effect.Effect<void, RecordingDbError>;
-		readonly updateRecording: (recording: Recording) => Effect.Effect<void, RecordingDbError>;
-		readonly deleteRecordingById: (id: string) => Effect.Effect<void, RecordingDbError>;
-		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, RecordingDbError>;
+		readonly getAllRecordings: Effect.Effect<Recording[], WhisperingError>;
+		readonly getRecording: (id: string) => Effect.Effect<Option.Option<Recording>, WhisperingError>;
+		readonly addRecording: (recording: Recording) => Effect.Effect<void, WhisperingError>;
+		readonly updateRecording: (recording: Recording) => Effect.Effect<void, WhisperingError>;
+		readonly deleteRecordingById: (id: string) => Effect.Effect<void, WhisperingError>;
+		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, WhisperingError>;
 	}
 >() {}

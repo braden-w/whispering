@@ -1,6 +1,6 @@
-import { goto } from '$app/navigation';
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { TranscriptionError, TranscriptionService } from './TranscriptionService';
+import { TranscriptionService } from './TranscriptionService';
 
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
@@ -77,7 +77,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
 			Effect.gen(function* () {
 				if (!apiKey.startsWith('sk-')) {
-					return yield* new TranscriptionError({
+					return yield* new WhisperingError({
 						title: 'Invalid API Key',
 						description: 'The API Key must start with "sk-"',
 						action: {
@@ -88,7 +88,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				}
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-					return yield* new TranscriptionError({
+					return yield* new WhisperingError({
 						title: `The file size (${blobSizeInMb}MB) is too large`,
 						description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					});
@@ -106,22 +106,23 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 							body: formData,
 						}).then((res) => res.json()),
 					catch: (error) =>
-						new TranscriptionError({
+						new WhisperingError({
 							title: 'Failed to fetch transcription from Whisper API',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				});
 				if (data?.error?.message) {
-					return yield* new TranscriptionError({
+					return yield* new WhisperingError({
 						title: 'Server error from Whisper API',
 						description: data.error.message,
 						error: data?.error,
 					});
 				}
 				if (!isString(data.text)) {
-					return yield* new TranscriptionError({
+					return yield* new WhisperingError({
 						title: 'Transcription from Whisper API is invalid or not a string',
+						description: 'This is likely a server error on their part. Please try again.',
 					});
 				}
 				return data.text;

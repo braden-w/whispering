@@ -1,7 +1,8 @@
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer, Option } from 'effect';
 import { openDB, type DBSchema } from 'idb';
 import type { Recording } from './RecordingDbService';
-import { RecordingDbError, RecordingsDbService } from './RecordingDbService';
+import { RecordingsDbService } from './RecordingDbService';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 1 as const;
@@ -30,9 +31,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				Effect.tryPromise({
 					try: async () => (await db).add(RECORDING_STORE, recording),
 					catch: (error) =>
-						new RecordingDbError({
+						new WhisperingError({
 							title: 'Error adding recording to indexedDB',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -40,9 +41,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				Effect.tryPromise({
 					try: async () => (await db).put(RECORDING_STORE, $state.snapshot(recording)),
 					catch: (error) =>
-						new RecordingDbError({
+						new WhisperingError({
 							title: 'Error editing recording in indexedDB',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -50,9 +51,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				Effect.tryPromise({
 					try: async () => (await db).delete(RECORDING_STORE, id),
 					catch: (error) =>
-						new RecordingDbError({
+						new WhisperingError({
 							title: 'Error deleting recording from indexedDB',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -63,18 +64,18 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						await Promise.all([...ids.map((id) => tx.store.delete(id)), tx.done]);
 					},
 					catch: (error) =>
-						new RecordingDbError({
+						new WhisperingError({
 							title: 'Error deleting recording from indexedDB',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
 			getAllRecordings: Effect.tryPromise({
 				try: async () => (await db).getAll(RECORDING_STORE),
 				catch: (error) =>
-					new RecordingDbError({
+					new WhisperingError({
 						title: 'Error getting all recordings from indexedDB',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -82,9 +83,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				Effect.tryPromise({
 					try: async () => (await db).get(RECORDING_STORE, id),
 					catch: (error) =>
-						new RecordingDbError({
+						new WhisperingError({
 							title: 'Error getting recording from indexedDB',
-							description: error instanceof Error ? error.message : undefined,
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}).pipe(Effect.map(Option.fromNullable)),

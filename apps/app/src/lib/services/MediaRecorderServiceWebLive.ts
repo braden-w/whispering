@@ -1,6 +1,7 @@
+import { WhisperingError } from '@repo/shared';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Effect, Layer } from 'effect';
-import { MediaRecorderError, MediaRecorderService } from './MediaRecorderService';
+import { MediaRecorderService } from './MediaRecorderService';
 
 export const MediaRecorderServiceWebLive = Layer.effect(
 	MediaRecorderService,
@@ -30,7 +31,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					return audioInputDevices;
 				},
 				catch: (error) =>
-					new MediaRecorderError({
+					new WhisperingError({
 						title: 'Error enumerating recording devices',
 						description: 'Please make sure you have given permission to access your audio devices',
 						error: error,
@@ -44,8 +45,10 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 								audio: { deviceId: { exact: recordingDeviceId } },
 							}),
 						catch: (error) =>
-							new MediaRecorderError({
+							new WhisperingError({
 								title: 'Error getting media stream',
+								description:
+									'Please make sure you have given permission to access your audio devices',
 								error: error,
 							}),
 					});
@@ -68,8 +71,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			}).pipe(
 				Effect.catchAll((error) => {
 					resetRecorder();
-					return new MediaRecorderError({
+					return new WhisperingError({
 						title: 'Error canceling media recorder',
+						description: error instanceof Error ? error.message : 'Please try again',
 						error: error,
 					});
 				}),
@@ -84,8 +88,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			}).pipe(
 				Effect.catchAll((error) => {
 					resetRecorder();
-					return new MediaRecorderError({
+					return new WhisperingError({
 						title: 'Error stopping media recorder',
+						description: error instanceof Error ? error.message : 'Please try again',
 						error: error,
 					});
 				}),

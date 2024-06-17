@@ -1,10 +1,9 @@
-import { ToastService, type WhisperingErrorProperties } from '@repo/shared';
+import { ToastService, WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import type { YieldableError } from 'effect/Cause';
 import { ToastServiceLive } from './services/ToastServiceLive';
 
-export const renderErrorAsToast = <E extends YieldableError & Readonly<WhisperingErrorProperties>>(
-	error: E,
+export const renderErrorAsToast = (
+	error: WhisperingError,
 	options?: { toastId?: number | string },
 ) =>
 	Effect.gen(function* () {

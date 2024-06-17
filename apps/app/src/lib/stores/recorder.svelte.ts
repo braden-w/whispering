@@ -1,11 +1,12 @@
 import { extensionCommands } from '$lib/messaging';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
+import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
+import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { recordings, settings } from '$lib/stores';
-import { ToastService, type RecorderState } from '@repo/shared';
+import { ToastService, WhisperingError, type RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
-import { MediaRecorderError, MediaRecorderService } from '../services/MediaRecorderService';
+import { MediaRecorderService } from '../services/MediaRecorderService';
 import type { Recording } from '../services/RecordingDbService';
 import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
@@ -48,7 +49,7 @@ export const recorder = Effect.gen(function* () {
 		toggleRecording: () =>
 			Effect.gen(function* () {
 				if (!settings.apiKey) {
-					return yield* new MediaRecorderError({
+					return yield* new WhisperingError({
 						title: 'API Key not provided.',
 						description: 'Please enter your OpenAI API key in the settings',
 						action: {
@@ -126,6 +127,6 @@ export const recorder = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(MediaRecorderServiceWebLive),
-	Effect.provide(ToastServiceLive),
+	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
 	Effect.runSync,
 );

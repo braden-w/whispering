@@ -1,10 +1,6 @@
+import type { WhisperingError } from '@repo/shared';
 import type { Effect } from 'effect';
-import { Context, Data } from 'effect';
-import type { WhisperingErrorProperties } from '@repo/shared';
-
-export class TranscriptionError extends Data.TaggedError(
-	'TranscriptionError',
-)<WhisperingErrorProperties> {}
+import { Context } from 'effect';
 
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
@@ -13,6 +9,6 @@ export class TranscriptionService extends Context.Tag('TranscriptionService')<
 		readonly transcribe: (
 			blob: Blob,
 			options: { apiKey: string; outputLanguage: string },
-		) => Effect.Effect<string, TranscriptionError>;
+		) => Effect.Effect<string, WhisperingError>;
 	}
 >() {}
