@@ -10,10 +10,21 @@ import type {
 import { toggleRecordingFromContentScript } from './utils';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
-	const editableElements = document.querySelectorAll(
+	const allEditableElements = document.querySelectorAll(
 		"input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='tel'], input[type='password'], input[type='number'], input:not([type]), textarea, [contenteditable='true'], [contenteditable='']",
-	);
-	return Array.from(editableElements).map((element) => ({
+	) as NodeListOf<HTMLElement>;
+
+	const editableElements = Array.from(allEditableElements).filter((element) => {
+		const style = window.getComputedStyle(element);
+		return (
+			style.display !== 'none' &&
+			style.visibility !== 'hidden' &&
+			!element.disabled &&
+			element.offsetParent !== null
+		);
+	});
+
+	return editableElements.map((element) => ({
 		element,
 		insertPosition: 'afterend',
 	}));
