@@ -4,10 +4,10 @@ import { Console, Effect, Either } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { WhisperingError } from '@repo/shared';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
-import playSound from './playSound';
-import setClipboardText from './setClipboardText';
-import setRecorderState from './setRecorderState';
-import writeTextToCursor from './writeTextToCursor';
+import { playSound } from './playSound';
+import { setClipboardText } from './setClipboardText';
+import { setRecorderState } from './setRecorderState';
+import { writeTextToCursor } from './writeTextToCursor';
 
 export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener(

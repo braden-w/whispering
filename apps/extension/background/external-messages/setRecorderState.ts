@@ -12,7 +12,7 @@ const iconPaths = {
 	LOADING: arrowsCounterclockwise,
 } as const satisfies Record<RecorderState, string>;
 
-const handler = (recorderState: RecorderState) =>
+export const setRecorderState = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
 		yield* extensionStorageService.set({
 			key: 'whispering-recording-state',
@@ -42,4 +42,3 @@ const handler = (recorderState: RecorderState) =>
 		}),
 	);
 
-export default handler;

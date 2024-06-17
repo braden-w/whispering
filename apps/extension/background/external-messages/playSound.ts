@@ -2,7 +2,7 @@ import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
 
-const handler = (sound: 'start' | 'stop' | 'cancel') =>
+export const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
 		yield* Console.info('Playing sound', sound);
 		const activeTabId = yield* getActiveTabId;
@@ -30,4 +30,3 @@ const handler = (sound: 'start' | 'stop' | 'cancel') =>
 		}),
 	);
 
-export default handler;
