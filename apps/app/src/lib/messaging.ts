@@ -2,8 +2,7 @@ import type {
 	ExternalMessage,
 	RecorderState,
 	Result,
-	ToastOptions,
-	WhisperingErrorProperties,
+	ToastOptions
 } from '@repo/shared';
 import { WHISPERING_EXTENSION_ID, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
@@ -13,7 +12,7 @@ const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 		chrome.runtime.sendMessage<ExternalMessage>(
 			WHISPERING_EXTENSION_ID,
 			message,
-			function (response: Result<T, WhisperingErrorProperties>) {
+			function (response: Result<T>) {
 				if (!response.isSuccess) {
 					const whisperingError = new WhisperingError(response.error);
 					return resume(Effect.fail(whisperingError));
