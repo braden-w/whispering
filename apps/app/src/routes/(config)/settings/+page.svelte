@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { TranscriptionService } from '$lib/services/TranscriptionService';
-	import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
-	import { recorder, settings } from '$lib/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
+	import { recorder, settings } from '$lib/stores';
+	import { TranscriptionService, TranscriptionServiceWhisperLive } from '@repo/shared';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = recorder.enumerateRecordingDevices();

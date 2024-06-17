@@ -1,9 +1,10 @@
 import { Schema as S } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
-import { RecorderState, toastOptionsSchema } from '@repo/shared';
+import { RecorderState, settingsSchema, toastOptionsSchema } from '@repo/shared';
 import { Console, Data, Effect } from 'effect';
 
 const keyToSchema = {
+	'whispering-settings': settingsSchema,
 	'whispering-recording-state': RecorderState,
 	'whispering-toast': toastOptionsSchema,
 	'whispering-recording-tab-id': S.Number,

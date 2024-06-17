@@ -5,10 +5,13 @@ import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbSe
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
-import { TranscriptionService } from '$lib/services/TranscriptionService';
-import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperingLive';
 import { renderErrorAsToast } from '$lib/services/errors';
-import { ToastService, WhisperingError } from '@repo/shared';
+import {
+	ToastService,
+	TranscriptionService,
+	TranscriptionServiceWhisperLive,
+	WhisperingError,
+} from '@repo/shared';
 import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
