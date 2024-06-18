@@ -7,7 +7,6 @@ import { renderErrorAsToast } from '~lib/errors';
 
 const keys = [
 	'whispering-recording-state',
-	'whispering-toast',
 	'whispering-latest-recording-transcribed-text',
 ] as const;
 
@@ -47,10 +46,6 @@ export const extensionStorageService = {
 	'whispering-recording-state': createSetWatch({
 		key: 'whispering-recording-state',
 		schema: RecorderState,
-	}),
-	'whispering-toast': createSetWatch({
-		key: 'whispering-toast',
-		schema: toastOptionsSchema,
 	}),
 	'whispering-latest-recording-transcribed-text': createSetWatch({
 		key: 'whispering-latest-recording-transcribed-text',
