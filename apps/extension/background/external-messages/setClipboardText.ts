@@ -7,10 +7,7 @@ import { extensionStorageService } from '~lib/services/extension-storage';
 export const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
-		yield* extensionStorageService.set({
-			key: 'whispering-latest-recording-transcribed-text',
-			value: text,
-		});
+		yield* extensionStorageService['whispering-latest-recording-transcribed-text'].set(text);
 		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
 				chrome.scripting.executeScript<[string], Result<string>>({

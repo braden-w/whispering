@@ -21,9 +21,8 @@ function WhisperingToaster() {
 	useEffect(
 		() =>
 			Effect.gen(function* () {
-				yield* extensionStorageService.watch({
-					key: 'whispering-toast',
-					callback: ({ variant, id, title, description, descriptionClass, action }) =>
+				yield* extensionStorageService['whispering-toast'].watch(
+					({ variant, id, title, description, descriptionClass, action }) =>
 						toast[variant](title, {
 							id,
 							description,
@@ -35,7 +34,7 @@ function WhisperingToaster() {
 								},
 							},
 						}),
-				});
+				);
 			}).pipe(Effect.runSync),
 		[],
 	);

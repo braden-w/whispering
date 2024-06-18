@@ -8,9 +8,13 @@ export const ToastServiceBgswLive = Layer.succeed(
 	ToastService.of({
 		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) => {
 			const id = maybeId ?? nanoid();
-			extensionStorageService.set({
-				key: 'whispering-toast',
-				value: { variant, id, title, description, descriptionClass, action },
+			extensionStorageService['whispering-toast'].set({
+				variant,
+				id,
+				title,
+				description,
+				descriptionClass,
+				action,
 			});
 			return id;
 		},

@@ -14,10 +14,7 @@ const iconPaths = {
 
 export const setRecorderState = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
-		yield* extensionStorageService.set({
-			key: 'whispering-recording-state',
-			value: recorderState,
-		});
+		yield* extensionStorageService['whispering-recording-state'].set(recorderState);
 		const path = iconPaths[recorderState];
 		yield* Effect.tryPromise({
 			try: () => chrome.action.setIcon({ path }),
@@ -41,4 +38,3 @@ export const setRecorderState = (recorderState: RecorderState) =>
 				}),
 		}),
 	);
-
