@@ -123,8 +123,8 @@ function Settings() {
 					id="play-sound-enabled"
 					aria-labelledby="play-sound-enabled"
 					checked={settings.isPlaySoundEnabled}
-					onCheckedChange={() =>
-						setSettings.mutate({ ...settings, isPlaySoundEnabled: !settings.isPlaySoundEnabled })
+					onCheckedChange={(newValue) =>
+						setSettings.mutate({ ...settings, isPlaySoundEnabled: newValue })
 					}
 				/>
 				<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
@@ -134,10 +134,10 @@ function Settings() {
 					id="copy-to-clipboard"
 					aria-labelledby="copy-to-clipboard"
 					checked={settings.isCopyToClipboardEnabled}
-					onCheckedChange={() =>
+					onCheckedChange={(newValue) =>
 						setSettings.mutate({
 							...settings,
-							isCopyToClipboardEnabled: !settings.isCopyToClipboardEnabled,
+							isCopyToClipboardEnabled: newValue,
 						})
 					}
 				/>
@@ -150,10 +150,10 @@ function Settings() {
 					id="paste-from-clipboard"
 					aria-labelledby="paste-from-clipboard"
 					checked={settings.isPasteContentsOnSuccessEnabled}
-					onCheckedChange={() =>
+					onCheckedChange={(newValue) =>
 						setSettings.mutate({
 							...settings,
-							isPasteContentsOnSuccessEnabled: !settings.isPasteContentsOnSuccessEnabled,
+							isPasteContentsOnSuccessEnabled: newValue,
 						})
 					}
 				/>
@@ -229,6 +229,12 @@ function Settings() {
 					id="local-shortcut"
 					placeholder="Local Shortcut to toggle recording"
 					value={settings.currentLocalShortcut}
+					onChange={(e) => {
+						setSettings.mutate({
+							...settings,
+							currentLocalShortcut: e.target.value,
+						});
+					}}
 					type="text"
 					autoComplete="off"
 				/>
