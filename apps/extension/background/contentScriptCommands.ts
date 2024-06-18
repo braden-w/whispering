@@ -1,7 +1,7 @@
-import { Console, Effect, Either, Option, pipe } from 'effect';
 import { Schema as S } from '@effect/schema';
+import { WhisperingError, type Settings } from '@repo/shared';
+import { Console, Effect, Either, Option, pipe } from 'effect';
 import type { WhisperingMessage } from '~contents/whispering';
-import { WhisperingError } from '@repo/shared';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
@@ -10,12 +10,14 @@ const whisperingTabContentReadyMessageSchema = S.Struct({
 	body: S.Struct({ tabId: S.Number }),
 });
 
-type WhisperingTabContentReadyMessage = S.Schema.Type<typeof whisperingTabContentReadyMessageSchema>;
+type WhisperingTabContentReadyMessage = S.Schema.Type<
+	typeof whisperingTabContentReadyMessageSchema
+>;
 
 const isWhisperingTabContentReadyMessage = (
 	message: unknown,
 ): message is WhisperingTabContentReadyMessage =>
-	pipe(message, S.decodeUnknownEither(whisperingTabContentReadyMessageSchema), Either.isRight)
+	pipe(message, S.decodeUnknownEither(whisperingTabContentReadyMessageSchema), Either.isRight);
 
 const waitForContentScriptLoaded = <T>(action: () => Promise<T>) =>
 	Effect.async<number>((resume) => {
@@ -68,13 +70,13 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	return maybeCreatedWhisperingid;
 });
 
-export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
+const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessage) =>
 	Effect.gen(function* () {
 		const maybeWhisperingTabId = yield* getOrCreateWhisperingTabId;
 		if (Option.isNone(maybeWhisperingTabId)) {
 			return yield* new WhisperingError({
 				title: 'Whispering tab not found',
-				description: `Could not find or create a Whispering tab to call "${message.commandName}" command`,
+				description: `Could not find or create a Whispering tab to call "${message.name}" command`,
 			});
 		}
 		const whisperingTabId = maybeWhisperingTabId.value;
@@ -88,3 +90,9 @@ export const sendMessageToWhisperingContentScript = <R>(message: WhisperingMessa
 		yield* Console.info('Received response from Whispering content script:', response);
 		return response;
 	});
+
+export const contentCommands = {
+	getSettings: () => sendMessageToWhisperingContentScript<Settings>({ name: 'getSettings' }),
+	setSettings: (settings: Settings) =>
+		sendMessageToWhisperingContentScript<void>({ name: 'setSettings', body: { settings } }),
+};
