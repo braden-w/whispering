@@ -34,7 +34,6 @@ import {
 	SelectValue,
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
-import { renderErrorAsToast } from '~lib/errors';
 import './style.css';
 
 const queryClient = new QueryClient();
