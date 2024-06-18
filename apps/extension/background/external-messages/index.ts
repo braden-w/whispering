@@ -7,6 +7,7 @@ import { setClipboardText } from './setClipboardText';
 import { setRecorderState } from './setRecorderState';
 import { toast } from './toast';
 import { writeTextToCursor } from './writeTextToCursor';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 export const registerExternalListener = () =>
 	chrome.runtime.onMessageExternal.addListener(
@@ -35,7 +36,8 @@ export const registerExternalListener = () =>
 							error,
 						}),
 				}),
-				Effect.tapError(renderErrorAsToast('bgsw')),
+				Effect.tapError(renderErrorAsToast),
+				Effect.provide(ToastServiceBgswLive),
 				effectToResult,
 				Effect.map(sendResponse),
 				Effect.runPromise,

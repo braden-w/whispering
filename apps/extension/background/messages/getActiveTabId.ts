@@ -2,6 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { WhisperingError, effectToResult, type Result } from '@repo/shared';
 import { Data, Effect, Option } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 class GetActiveTabIdError extends Data.TaggedError('GetActiveTabIdError') {}
 
@@ -29,7 +30,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 					error,
 				}),
 		}),
-		Effect.tapError(renderErrorAsToast('bgsw')),
+		Effect.tapError(renderErrorAsToast),
+		Effect.provide(ToastServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

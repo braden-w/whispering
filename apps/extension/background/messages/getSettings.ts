@@ -3,6 +3,7 @@ import { effectToResult, type Result, type Settings } from '@repo/shared';
 import { Effect } from 'effect';
 import { contentCommands } from '~background/contentScriptCommands';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 export type RequestBody = {};
 
@@ -13,7 +14,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		const settings = yield* contentCommands.getSettings();
 		return settings;
 	}).pipe(
-		Effect.tapError(renderErrorAsToast('bgsw')),
+		Effect.tapError(renderErrorAsToast),
+		Effect.provide(ToastServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

@@ -4,6 +4,7 @@ import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { contentCommands } from '~background/contentScriptCommands';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 export type RequestBody = { settings: Settings };
 
@@ -19,7 +20,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		yield* contentCommands.setSettings(body.settings);
 	}).pipe(
-		Effect.tapError(renderErrorAsToast('bgsw')),
+		Effect.tapError(renderErrorAsToast),
+		Effect.provide(ToastServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

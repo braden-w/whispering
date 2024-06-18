@@ -1,9 +1,10 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { Option, Effect, Console } from 'effect';
+import { WhisperingError, effectToResult } from '@repo/shared';
+import { Console, Effect } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
 import { renderErrorAsToast } from '~lib/errors';
-import { WhisperingError, effectToResult } from '@repo/shared';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 declare const window: {
 	toggleRecording: () => void;
@@ -33,7 +34,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		});
 		yield* Console.info('Injection result "cancelRecording" script:', injectionResult);
 	}).pipe(
-		Effect.tapError(renderErrorAsToast('bgsw')),
+		Effect.tapError(renderErrorAsToast),
+		Effect.provide(ToastServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,
