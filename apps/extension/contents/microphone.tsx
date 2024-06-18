@@ -23,6 +23,7 @@ export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 			style.display !== 'none' &&
 			style.visibility !== 'hidden' &&
 			!element.disabled &&
+			!element.readOnly &&
 			element.offsetParent !== null
 		);
 	});
