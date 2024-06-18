@@ -17,27 +17,26 @@ export const getStyle: PlasmoGetStyle = () => {
 	return style;
 };
 
+const registerToastStorageListener = () =>
+	Effect.gen(function* () {
+		yield* extensionStorageService['whispering-toast'].watch(
+			({ variant, id, title, description, descriptionClass, action }) =>
+				toast[variant](title, {
+					id,
+					description,
+					descriptionClassName: descriptionClass,
+					action: action && {
+						label: action.label,
+						onClick: () => {
+							window.location.href = action.goto;
+						},
+					},
+				}),
+		);
+	}).pipe(Effect.runSync);
+
 function WhisperingToaster() {
-	useEffect(
-		() =>
-			Effect.gen(function* () {
-				yield* extensionStorageService['whispering-toast'].watch(
-					({ variant, id, title, description, descriptionClass, action }) =>
-						toast[variant](title, {
-							id,
-							description,
-							descriptionClassName: descriptionClass,
-							action: action && {
-								label: action.label,
-								onClick: () => {
-									window.location.href = action.goto;
-								},
-							},
-						}),
-				);
-			}).pipe(Effect.runSync),
-		[],
-	);
+	useEffect(registerToastStorageListener, []);
 	return <Toaster {...TOASTER_SETTINGS} />;
 }
 
