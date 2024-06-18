@@ -25,12 +25,20 @@ export function createPersistedState<A, I>({
 
 	if (!disableLocalStorage) {
 		value = loadFromStorage({ key, schema, defaultValue });
-		createStorageEventListener({
-			key,
-			schema,
-			setValue: (newValue) => (value = newValue),
-			resetValue: () => (value = defaultValue),
-			defaultValue,
+		window.addEventListener('storage', (event: StorageEvent) => {
+			if (event.key !== key) return;
+			try {
+				const isStorageEmpty = event.newValue === null;
+				if (isStorageEmpty) {
+					value = defaultValue;
+					return;
+				}
+				const jsonSchema = S.parseJson(schema);
+				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue);
+				value = validValue;
+			} catch {
+				value = defaultValue;
+			}
 		});
 	}
 
@@ -63,35 +71,4 @@ function loadFromStorage<A, I>({
 	} catch {
 		return defaultValue;
 	}
-}
-
-function createStorageEventListener<A, I>({
-	key,
-	schema,
-	setValue,
-	resetValue,
-	defaultValue,
-}: {
-	key: string;
-	schema: S.Schema<A, I>;
-	setValue: (newValue: A) => void;
-	resetValue: () => void;
-	defaultValue: A;
-}) {
-	window.addEventListener('storage', (event: StorageEvent) => {
-		if (event.key === key) {
-			try {
-				const isStorageEmpty = event.newValue === null;
-				if (isStorageEmpty) {
-					resetValue();
-					return;
-				}
-				const jsonSchema = S.parseJson(schema);
-				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue);
-				setValue(validValue);
-			} catch {
-				setValue(defaultValue);
-			}
-		}
-	});
 }
