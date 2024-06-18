@@ -268,7 +268,7 @@ function Settings() {
 						variant="link"
 						onClick={() => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })}
 					>
-						Enable Global Shortcut
+						Edit Global Shortcut in Extension Settings
 					</Button>
 				</div>
 			</div>
