@@ -1,9 +1,9 @@
 import { Schema as S } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
-import { RecorderState, WhisperingError, settingsSchema, toastOptionsSchema } from '@repo/shared';
-import { Console, Data, Effect, Option } from 'effect';
-import { parse } from 'path';
+import { RecorderState, WhisperingError } from '@repo/shared';
+import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from './ToastServiceBgswLive';
 
 const keys = [
 	'whispering-recording-state',
@@ -36,7 +36,11 @@ const createSetWatch = <A, I>({ key, schema }: { key: string; schema: S.Schema<A
 					);
 					yield* Console.info('watch', key, newValue);
 					callback(newValue);
-				}).pipe(Effect.catchAll(renderErrorAsToast('bgsw')), Effect.runSync);
+				}).pipe(
+					Effect.catchAll(renderErrorAsToast),
+					Effect.provide(ToastServiceBgswLive),
+					Effect.runSync,
+				);
 			return Effect.sync(() => storage.watch({ [key]: listener }));
 		},
 	};
