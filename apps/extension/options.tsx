@@ -104,7 +104,9 @@ function Settings() {
 	} = useQuery({
 		queryKey: ['media-devices'],
 		queryFn: async () => {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			const devices = await navigator.mediaDevices.enumerateDevices();
+			stream.getTracks().forEach((track) => track.stop());
 			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
 			return audioInputDevices;
 		},
@@ -173,7 +175,7 @@ function Settings() {
 					Paste contents from clipboard after successful transcription
 				</Label>
 			</div>
-			{/* <div className="grid gap-2">
+			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="recording-device">
 					Recording Device
 				</Label>
@@ -191,28 +193,29 @@ function Settings() {
 						</SelectTrigger>
 					</Select>
 				)}
-				<Select
-					value={settings.selectedAudioInputDeviceId}
-					onValueChange={(value) =>
-						setSettings.mutate({
-							...settings,
-							selectedAudioInputDeviceId: value,
-						})
-					}
-				>
-					<SelectTrigger className="w-full">
-						<SelectValue placeholder="Select a device" />
-					</SelectTrigger>
-					<SelectContent>
-						{mediaDevices &&
-							mediaDevices.map((device) => (
+				{mediaDevices && (
+					<Select
+						value={settings.selectedAudioInputDeviceId}
+						onValueChange={(value) =>
+							setSettings.mutate({
+								...settings,
+								selectedAudioInputDeviceId: value,
+							})
+						}
+					>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select a device" />
+						</SelectTrigger>
+						<SelectContent>
+							{mediaDevices.map((device) => (
 								<SelectItem key={device.deviceId} value={device.deviceId}>
 									{device.label}
 								</SelectItem>
 							))}
-					</SelectContent>
-				</Select>
-			</div> */}
+						</SelectContent>
+					</Select>
+				)}
+			</div>
 			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="output-language">
 					Output Language
