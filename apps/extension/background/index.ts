@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {
 		if (details.reason !== 'install') return;
 		yield* openOptionsPage;
-	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+	}).pipe(Effect.catchAll(renderErrorAsToast('bgsw')), Effect.runPromise),
 );
 
 chrome.commands.onCommand.addListener((command) =>
@@ -17,7 +17,7 @@ chrome.commands.onCommand.addListener((command) =>
 		if (command !== 'toggleRecording') return false;
 		yield* toggleRecording;
 		return true;
-	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+	}).pipe(Effect.catchAll(renderErrorAsToast('bgsw')), Effect.runPromise),
 );
 
 registerExternalListener();
