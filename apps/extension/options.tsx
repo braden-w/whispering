@@ -263,8 +263,12 @@ function Settings() {
 						autoComplete="off"
 						disabled
 					/>
-					<Button className="absolute inset-0 backdrop-blur" variant="link" asChild>
-						<a href="chrome://extensions/shortcuts">Enable Global Shortcut</a>
+					<Button
+						className="absolute inset-0 backdrop-blur"
+						variant="link"
+						onClick={() => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })}
+					>
+						Enable Global Shortcut
 					</Button>
 				</div>
 			</div>
