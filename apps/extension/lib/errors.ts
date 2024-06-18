@@ -15,8 +15,6 @@ export const renderErrorAsToast =
 				description: error.description,
 				action: error.action,
 			});
-			yield* Console.error(error.error instanceof Error ? error.error.message : error.error);
+			yield* Console.error(error);
 			return yield* error;
-		}).pipe(
-			Effect.provide(context === 'bgsw' ? ToastServiceBgswLive : ToastServiceCsLive),
-		)
+		}).pipe(Effect.provide(context === 'bgsw' ? ToastServiceBgswLive : ToastServiceCsLive));
