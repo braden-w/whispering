@@ -44,6 +44,6 @@ export const extensionCommands = {
 			body: { toastOptions },
 		}),
 } as const satisfies Record<
-	ExternalMessage['message'],
+	ExternalMessage['name'],
 	(...args: any[]) => Effect.Effect<any, WhisperingError>
 >;

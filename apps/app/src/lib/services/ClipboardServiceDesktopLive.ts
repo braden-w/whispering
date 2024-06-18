@@ -1,3 +1,4 @@
+import { WhisperingError } from '@repo/shared';
 import { writeText } from '@tauri-apps/api/clipboard';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Effect, Layer } from 'effect';
