@@ -12,11 +12,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 					title,
 					message: description,
 					type: 'basic',
-					buttons: [
-						action && {
-							title: action.label,
-						},
-					],
+					buttons: action ? [{ title: action.label }] : undefined,
 				});
 				if (action) {
 					chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
