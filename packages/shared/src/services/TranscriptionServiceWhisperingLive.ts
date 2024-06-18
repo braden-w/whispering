@@ -1,6 +1,6 @@
 import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { TranscriptionService } from './TranscriptionService';
+import { TranscriptionService } from './TranscriptionService.js';
 
 function isString(input: unknown): input is string {
 	return typeof input === 'string';
