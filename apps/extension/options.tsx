@@ -38,18 +38,6 @@ function IndexPopup() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="container flex items-center justify-center">
-				<Button
-					onClick={() =>
-						sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
-							name: 'getSettings',
-						}).then((response) => {
-							if (!response.isSuccess) throw response.error;
-							return response.data;
-						})
-					}
-				>
-					Hello
-				</Button>
 				<Card className="w-full max-w-xl">
 					<CardHeader>
 						<CardTitle className="text-xl">Settings</CardTitle>
