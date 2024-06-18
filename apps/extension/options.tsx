@@ -37,21 +37,19 @@ const queryClient = new QueryClient();
 function IndexPopup() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<main className="flex min-h-screen flex-col justify-center">
-				<div className="container flex items-center justify-center">
-					<Card className="w-full max-w-xl">
-						<CardHeader>
-							<CardTitle className="text-xl">Settings</CardTitle>
-							<CardDescription>Customize your Whispering experience</CardDescription>
-						</CardHeader>
-						<Settings />
-						<CardFooter>
-							<Button asChild className="w-full" variant="secondary">
-								<a href="/">Go Back</a>
-							</Button>
-						</CardFooter>
-					</Card>
-				</div>
+			<main className="flex min-h-screen items-center justify-center">
+				<Card className="w-full max-w-xl">
+					<CardHeader>
+						<CardTitle className="text-xl">Settings</CardTitle>
+						<CardDescription>Customize your Whispering experience</CardDescription>
+					</CardHeader>
+					<Settings />
+					<CardFooter>
+						<Button asChild className="w-full" variant="secondary">
+							<a href="/">Go Back</a>
+						</Button>
+					</CardFooter>
+				</Card>
 			</main>
 		</QueryClientProvider>
 	);
