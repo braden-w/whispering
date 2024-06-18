@@ -1,5 +1,10 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { TranscriptionService, TranscriptionServiceWhisperLive, type Settings } from '@repo/shared';
+import {
+	TranscriptionService,
+	TranscriptionServiceWhisperLive,
+	WHISPERING_URL,
+	type Settings,
+} from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -41,7 +46,13 @@ function IndexPopup() {
 				<Card className="w-full max-w-xl">
 					<CardHeader>
 						<CardTitle className="text-xl">Settings</CardTitle>
-						<CardDescription>Customize your Whispering experience</CardDescription>
+						<CardDescription>
+							Customize your Whispering experience. Synced with the{' '}
+							<Button variant="link" onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}>
+								Whispering website
+							</Button>
+							!
+						</CardDescription>
 					</CardHeader>
 					<Settings />
 					<CardFooter>
