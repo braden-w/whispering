@@ -1,7 +1,5 @@
 import { Schema as S } from '@effect/schema';
 import {
-	RegisterShortcutsService,
-	RegisterShortcutsWebLive,
 	WhisperingError,
 	resultToEffect,
 	settingsSchema,
@@ -86,21 +84,18 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	),
 );
 
-const KEY = 'whispering-settings';
+const SETTINGS_KEY = 'whispering-settings' as const;
 
-const DEFAULT_VALUE = Effect.gen(function* () {
-	const registerShortcutsService = yield* RegisterShortcutsService;
-	return {
-		isPlaySoundEnabled: true,
-		isCopyToClipboardEnabled: true,
-		isPasteContentsOnSuccessEnabled: true,
-		selectedAudioInputDeviceId: '',
-		currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
-		currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
-		apiKey: '',
-		outputLanguage: 'en',
-	};
-}).pipe(Effect.provide(RegisterShortcutsWebLive), Effect.runSync);
+const DEFAULT_VALUE = {
+	isPlaySoundEnabled: true,
+	isCopyToClipboardEnabled: true,
+	isPasteContentsOnSuccessEnabled: true,
+	selectedAudioInputDeviceId: '',
+	currentLocalShortcut: 'space',
+	currentGlobalShortcut: '',
+	apiKey: '',
+	outputLanguage: 'en',
+} satisfies Settings;
 
 export const contentCommands = {
 	getSettings: () =>
@@ -108,12 +103,12 @@ export const contentCommands = {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
 			const [injectionResult] = yield* Effect.tryPromise({
 				try: () =>
-					chrome.scripting.executeScript<[], Result<string | null>>({
+					chrome.scripting.executeScript<[typeof SETTINGS_KEY], Result<string | null>>({
 						target: { tabId: whisperingTabId },
 						world: 'MAIN',
-						func: () => {
+						func: (settingsKey) => {
 							try {
-								const valueFromStorage = localStorage.getItem(KEY);
+								const valueFromStorage = localStorage.getItem(settingsKey);
 								return { isSuccess: true, data: valueFromStorage } as const;
 							} catch (error) {
 								return {
@@ -129,7 +124,7 @@ export const contentCommands = {
 								} as const;
 							}
 						},
-						args: [],
+						args: [SETTINGS_KEY],
 					}),
 				catch: (error) =>
 					new WhisperingError({
@@ -167,12 +162,12 @@ export const contentCommands = {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
 			const [injectionResult] = yield* Effect.tryPromise({
 				try: () =>
-					chrome.scripting.executeScript<[Settings], Result<Settings>>({
+					chrome.scripting.executeScript<[typeof SETTINGS_KEY, Settings], Result<Settings>>({
 						target: { tabId: whisperingTabId },
 						world: 'MAIN',
-						func: (settings) => {
+						func: (settingsKey, settings) => {
 							try {
-								localStorage.setItem(KEY, JSON.stringify(settings));
+								localStorage.setItem(settingsKey, JSON.stringify(settings));
 								return { isSuccess: true, data: settings } as const;
 							} catch (error) {
 								return {
@@ -188,7 +183,7 @@ export const contentCommands = {
 								} as const;
 							}
 						},
-						args: [settings],
+						args: [SETTINGS_KEY, settings],
 					}),
 				catch: (error) =>
 					new WhisperingError({
