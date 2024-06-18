@@ -55,7 +55,8 @@
 			"tabs",
 			"clipboardWrite",
 			"storage",
-			"scripting"
+			"scripting",
+			"notifications"
 		],
 		"commands": {
 			"toggleRecording": {
