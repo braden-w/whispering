@@ -28,8 +28,8 @@ export function createPersistedState<A, I>({
 		window.addEventListener('storage', (event: StorageEvent) => {
 			if (event.key !== key) return;
 			try {
-				const isStorageEmpty = event.newValue === null;
-				if (isStorageEmpty) {
+				const isEmpty = event.newValue === null;
+				if (isEmpty) {
 					value = defaultValue;
 					return;
 				}
