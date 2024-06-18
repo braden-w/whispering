@@ -24,7 +24,7 @@ export function createPersistedState<A, I>({
 }) {
 	let value = $state(defaultValue);
 
-	const convertValueFromStorage = (valueFromStorage: string | null) => {
+	const parseValueFromStorage = (valueFromStorage: string | null) => {
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
@@ -34,15 +34,13 @@ export function createPersistedState<A, I>({
 	};
 
 	if (!disableLocalStorage) {
-		const valueFromStorage = localStorage.getItem(key);
-		value = convertValueFromStorage(valueFromStorage);
+		value = parseValueFromStorage(localStorage.getItem(key));
 		window.addEventListener('storage', (event: StorageEvent) => {
 			if (event.key !== key) return;
-			value = convertValueFromStorage(event.newValue);
+			value = parseValueFromStorage(event.newValue);
 		});
 		window.addEventListener('focus', () => {
-			const valueFromStorage = localStorage.getItem(key);
-			value = convertValueFromStorage(valueFromStorage);
+			value = parseValueFromStorage(localStorage.getItem(key));
 		});
 	}
 
