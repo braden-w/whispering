@@ -1,7 +1,14 @@
 import { Schema as S } from '@effect/schema';
-import { WhisperingError, type Settings } from '@repo/shared';
+import {
+	RegisterShortcutsService,
+	RegisterShortcutsWebLive,
+	WhisperingError,
+	resultToEffect,
+	settingsSchema,
+	type Result,
+	type Settings,
+} from '@repo/shared';
 import { Console, Effect, Either, Option, pipe } from 'effect';
-import type { WhisperingMessage } from '~contents/whispering';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
