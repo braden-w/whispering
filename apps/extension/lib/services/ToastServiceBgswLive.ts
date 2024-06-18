@@ -1,7 +1,6 @@
 import { ToastService } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
-import { extensionStorageService } from './extension-storage';
 
 export const ToastServiceBgswLive = Layer.succeed(
 	ToastService,
@@ -9,14 +8,25 @@ export const ToastServiceBgswLive = Layer.succeed(
 		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) =>
 			Effect.gen(function* () {
 				const id = maybeId ?? nanoid();
-				extensionStorageService['whispering-toast'].set({
-					variant,
-					id,
+				chrome.notifications.create(id, {
 					title,
-					description,
-					descriptionClass,
-					action,
+					message: description,
+					type: 'basic',
+					buttons: [
+						action && {
+							title: action.label,
+						},
+					],
 				});
+				if (action) {
+					chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
+						if (buttonIndex === 0) {
+							chrome.notifications.clear(id);
+							chrome.tabs.create({ url: action.goto });
+						}
+					});
+				}
+
 				return id;
 			}),
 	}),
