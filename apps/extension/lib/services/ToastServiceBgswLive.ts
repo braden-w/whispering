@@ -8,13 +8,19 @@ export const ToastServiceBgswLive = Layer.succeed(
 		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) =>
 			Effect.gen(function* () {
 				const id = maybeId ?? nanoid();
-				chrome.notifications.create(id, {
-					title,
-					message: description,
-					type: 'basic',
-					buttons: action ? [{ title: action.label }] : undefined,
-				});
-				if (action) {
+				if (!action) {
+					chrome.notifications.create(id, {
+						title,
+						message: description,
+						type: 'basic',
+					});
+				} else {
+					chrome.notifications.create(id, {
+						title,
+						message: description,
+						type: 'basic',
+						buttons: [{ title: action.label }],
+					});
 					chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
 						if (buttonIndex === 0) {
 							chrome.notifications.clear(id);
