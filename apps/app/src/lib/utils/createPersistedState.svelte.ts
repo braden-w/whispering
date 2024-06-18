@@ -40,6 +40,10 @@ export function createPersistedState<A, I>({
 			if (event.key !== key) return;
 			value = convertValueFromStorage(event.newValue);
 		});
+		window.addEventListener('focus', () => {
+			const valueFromStorage = localStorage.getItem(key);
+			value = convertValueFromStorage(valueFromStorage);
+		});
 	}
 
 	return {
