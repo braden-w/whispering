@@ -4,6 +4,7 @@ import { Effect } from 'effect';
 
 const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 	Effect.async<T, WhisperingError>((resume) => {
+		if (window.__TAURI__ || !chrome) return;
 		chrome.runtime.sendMessage<ExternalMessage>(
 			WHISPERING_EXTENSION_ID,
 			message,
