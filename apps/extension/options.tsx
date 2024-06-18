@@ -204,9 +204,12 @@ function Settings() {
 						<SelectValue placeholder="Select a device" />
 					</SelectTrigger>
 					<SelectContent>
-						{mediaDevices.map((device) => (
-							<SelectItem value={device.deviceId}>{device.label}</SelectItem>
-						))}
+						{mediaDevices &&
+							mediaDevices.map((device) => (
+								<SelectItem key={device.deviceId} value={device.deviceId}>
+									{device.label}
+								</SelectItem>
+							))}
 					</SelectContent>
 				</Select>
 			</div>
@@ -216,9 +219,7 @@ function Settings() {
 				</Label>
 				<Select
 					value={settings.outputLanguage}
-					onValueChange={(value) => {
-						settings.outputLanguage = value;
-					}}
+					onValueChange={(value) => setSettings.mutate({ ...settings, outputLanguage: value })}
 				>
 					<SelectTrigger className="w-full">
 						<SelectValue placeholder="Select a device" />
@@ -248,29 +249,18 @@ function Settings() {
 				<Label className="text-sm" htmlFor="global-shortcut">
 					Global Shortcut
 				</Label>
-				{settings.isGlobalShortcutEnabled ? (
+				<div className="relative">
 					<Input
 						id="global-shortcut"
 						placeholder="Global Shortcut to toggle recording"
-						value={settings.currentGlobalShortcut}
 						type="text"
 						autoComplete="off"
+						disabled
 					/>
-				) : (
-					<div className="relative">
-						<Input
-							id="global-shortcut"
-							placeholder="Global Shortcut to toggle recording"
-							value={settings.currentGlobalShortcut}
-							type="text"
-							autoComplete="off"
-							disabled
-						/>
-						<Button className="absolute inset-0 backdrop-blur" variant="link" asChild>
-							<a href="/global-shortcut">Enable Global Shortcut</a>
-						</Button>
-					</div>
-				)}
+					<Button className="absolute inset-0 backdrop-blur" variant="link" asChild>
+						<a href="chrome://extensions/shortcuts">Enable Global Shortcut</a>
+					</Button>
+				</div>
 			</div>
 			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="api-key">
