@@ -12,7 +12,7 @@ import {
 	TranscriptionServiceWhisperLive,
 	WhisperingError,
 } from '@repo/shared';
-import { Effect, Either, Option } from 'effect';
+import { Console, Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
@@ -114,7 +114,7 @@ const createRecordings = Effect.gen(function* () {
 				return transcribedText;
 			}).pipe(
 				Effect.catchAll((error) => renderErrorAsToast(error, { toastId })),
-				Effect.map((transcribedText) =>
+				Effect.andThen((transcribedText) =>
 					Effect.gen(function* () {
 						if (transcribedText === '') return;
 
