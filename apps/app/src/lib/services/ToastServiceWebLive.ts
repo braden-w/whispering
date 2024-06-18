@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { extensionCommands } from '$lib/messaging';
+import { extensionCommands } from '$lib/extensionCommands';
 import { ToastService } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { toast } from 'svelte-sonner';

@@ -1,4 +1,4 @@
-import { extensionCommands } from '$lib/messaging';
+import { extensionCommands } from '$lib/extensionCommands';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { recordings, settings } from '$lib/stores';

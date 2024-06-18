@@ -1,4 +1,4 @@
-import { extensionCommands } from '$lib/messaging';
+import { extensionCommands } from '$lib/extensionCommands';
 import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { ClipboardService } from './ClipboardService';
