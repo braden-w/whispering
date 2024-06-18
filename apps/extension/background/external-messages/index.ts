@@ -22,7 +22,7 @@ export const registerExternalListener = () =>
 					case 'writeTextToCursor':
 						return yield* writeTextToCursor(body.transcribedText);
 					case 'toast':
-						return toast(body.toastOptions);
+						return yield* toast(body.toastOptions);
 					case 'playSound':
 						return yield* playSound(body.sound);
 				}
