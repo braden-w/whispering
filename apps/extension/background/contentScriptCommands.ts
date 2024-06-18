@@ -78,7 +78,7 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		(error) =>
 			new WhisperingError({
 				title: 'Whispering tab not found',
-				description: `Could not find or create a Whispering tab to call command`,
+				description: 'Could not find or create a Whispering tab to call command',
 				error,
 			}),
 	),
