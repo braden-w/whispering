@@ -25,16 +25,4 @@ export const setRecorderState = (recorderState: RecorderState) =>
 					error,
 				}),
 		});
-	}).pipe(
-		Effect.catchTags({
-			SetExtensionStorageError: (error) =>
-				new WhisperingError({
-					title: `Error setting recorder state to ${recorderState}`,
-					description:
-						error instanceof Error
-							? error.message
-							: 'An error occurred while setting the recorder state via the Chrome storage API.',
-					error,
-				}),
-		}),
-	);
+	});

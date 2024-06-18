@@ -62,14 +62,5 @@ export const setClipboardText = (text: string): Effect.Effect<void, WhisperingEr
 					description:
 						'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
 				}),
-			SetExtensionStorageError: (error) =>
-				new WhisperingError({
-					title: 'Unable to set transcribed text in popup via extension storage',
-					description:
-						error instanceof Error
-							? error.message
-							: `Unknown error writing to extension storage: ${error}`,
-					error,
-				}),
 		}),
 	);
