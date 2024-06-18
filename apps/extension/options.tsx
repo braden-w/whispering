@@ -213,7 +213,7 @@ function Settings() {
 					</SelectContent>
 				</Select>
 			</div> */}
-			{/* <div className="grid gap-2">
+			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="output-language">
 					Output Language
 				</Label>
@@ -232,7 +232,7 @@ function Settings() {
 						))}
 					</SelectContent>
 				</Select>
-			</div> */}
+			</div>
 			<div className="grid gap-2">
 				<Label className="text-sm" htmlFor="local-shortcut">
 					Local Shortcut
