@@ -1,4 +1,5 @@
 import { Schema as S } from '@effect/schema';
+import { Option } from 'effect';
 
 /**
  * Creates a persisted state tied to local storage.
@@ -24,14 +25,12 @@ export function createPersistedState<A, I>({
 	let value = $state(defaultValue);
 
 	const convertValueFromStorage = (valueFromStorage: string | null) => {
-		try {
-			const isEmpty = valueFromStorage === null;
-			if (isEmpty) return defaultValue;
-			const jsonSchema = S.parseJson(schema);
-			return S.decodeUnknownSync(jsonSchema)(valueFromStorage);
-		} catch {
-			return defaultValue;
-		}
+		const isEmpty = valueFromStorage === null;
+		if (isEmpty) return defaultValue;
+		const jsonSchema = S.parseJson(schema);
+		return S.decodeUnknownOption(jsonSchema)(valueFromStorage).pipe(
+			Option.getOrElse(() => defaultValue),
+		);
 	};
 
 	if (!disableLocalStorage) {
