@@ -16,6 +16,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 								title,
 								message: description,
 								type: 'basic',
+								iconUrl: 'icon.png',
 							});
 						} else {
 							chrome.notifications.create(id, {
@@ -23,6 +24,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 								message: description,
 								type: 'basic',
 								buttons: [{ title: action.label }],
+								iconUrl: 'icon.png',
 							});
 							chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
 								if (buttonIndex === 0) {
