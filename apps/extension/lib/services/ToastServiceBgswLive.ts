@@ -2,9 +2,6 @@ import { ToastService, WhisperingError } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-import studioMicrophone2 from 'data-text:~assets/studio_microphone.png';
-console.log('🚀 ~ studioMicrophone:', studioMicrophone);
-console.log('🚀 ~ studioMicrophone2:', studioMicrophone2);
 
 export const ToastServiceBgswLive = Layer.succeed(
 	ToastService,
