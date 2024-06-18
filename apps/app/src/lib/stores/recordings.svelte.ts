@@ -79,7 +79,8 @@ const createRecordings = Effect.gen(function* () {
 				if (recorderState.value !== 'RECORDING') {
 					recorderState.value = 'LOADING';
 				}
-				return Effect.gen(function* () {
+
+				const transcribedText = yield* Effect.gen(function* () {
 					const maybeRecording = yield* recordingsDb.getRecording(id);
 					if (Option.isNone(maybeRecording)) {
 						return yield* new WhisperingError({
@@ -113,39 +114,32 @@ const createRecordings = Effect.gen(function* () {
 						},
 					});
 					return transcribedText;
-				}).pipe(
-					Effect.catchAll((error) => renderErrorAsToast(error, { toastId })),
-					Effect.andThen((transcribedText) =>
-						Effect.gen(function* () {
-							if (transcribedText === '') return;
+				}).pipe(Effect.catchAll((error) => renderErrorAsToast(error, { toastId })));
 
-							// Copy transcription to clipboard if enabled
-							if (settings.isCopyToClipboardEnabled) {
-								yield* clipboardService.setClipboardText(transcribedText);
-								yield* toast({
-									variant: 'success',
-									title: 'Copied transcription to clipboard!',
-									description: transcribedText,
-									descriptionClass: 'line-clamp-2',
-								});
-							}
+				if (transcribedText === '') return;
 
-							// Paste transcription if enabled
-							if (settings.isPasteContentsOnSuccessEnabled) {
-								yield* clipboardService.writeText(transcribedText);
-								yield* toast({
-									variant: 'success',
-									title: 'Pasted transcription!',
-									description: transcribedText,
-									descriptionClass: 'line-clamp-2',
-								});
-							}
-						}),
-					),
-					Effect.catchAll(renderErrorAsToast),
-					Effect.runPromise,
-				);
-			}).pipe(Effect.runPromise),
+				// Copy transcription to clipboard if enabled
+				if (settings.isCopyToClipboardEnabled) {
+					yield* clipboardService.setClipboardText(transcribedText);
+					yield* toast({
+						variant: 'success',
+						title: 'Copied transcription to clipboard!',
+						description: transcribedText,
+						descriptionClass: 'line-clamp-2',
+					});
+				}
+
+				// Paste transcription if enabled
+				if (settings.isPasteContentsOnSuccessEnabled) {
+					yield* clipboardService.writeText(transcribedText);
+					yield* toast({
+						variant: 'success',
+						title: 'Pasted transcription!',
+						description: transcribedText,
+						descriptionClass: 'line-clamp-2',
+					});
+				}
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
