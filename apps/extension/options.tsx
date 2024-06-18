@@ -74,7 +74,6 @@ function Settings() {
 	});
 
 	const setSettings = useMutation({
-		onSuccess: (data) => queryClient.setQueryData(['settings'], data),
 		mutationFn: (settings: Settings) =>
 			sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
 				name: 'setSettings',
@@ -83,6 +82,19 @@ function Settings() {
 				if (!response.isSuccess) throw response.error;
 				return response.data;
 			}),
+		onMutate: async (newSettings) => {
+			await queryClient.cancelQueries({ queryKey: ['settings'] });
+			const previousSettingsSnapshot = queryClient.getQueryData(['settings']) as Settings;
+			queryClient.setQueryData(['settings'], newSettings);
+			return { previousSettingsSnapshot, newSettings };
+		},
+		onError: (err, newSettings, context) => {
+			if (!context) return;
+			queryClient.setQueryData(['settings'], context.previousSettingsSnapshot);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ['settings'] });
+		},
 	});
 
 	const {
