@@ -1,3 +1,6 @@
+import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
+import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
+import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/errors';
@@ -5,14 +8,7 @@ import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
-import {
-	RegisterShortcutsDesktopLive,
-	RegisterShortcutsService,
-	RegisterShortcutsWebLive,
-	ToastService,
-	WhisperingError,
-	settingsSchema,
-} from '@repo/shared';
+import { ToastService, WhisperingError, settingsSchema } from '@repo/shared';
 import { Effect } from 'effect';
 
 type RegisterShortcutJob = Effect.Effect<void, WhisperingError>;
