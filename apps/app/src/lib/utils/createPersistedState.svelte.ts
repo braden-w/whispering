@@ -23,22 +23,23 @@ export function createPersistedState<A, I>({
 }) {
 	let value = $state(defaultValue);
 
+	const convertValueFromStorage = (valueFromStorage: string | null) => {
+		try {
+			const isEmpty = valueFromStorage === null;
+			if (isEmpty) return defaultValue;
+			const jsonSchema = S.parseJson(schema);
+			return S.decodeUnknownSync(jsonSchema)(valueFromStorage);
+		} catch {
+			return defaultValue;
+		}
+	};
+
 	if (!disableLocalStorage) {
-		value = loadFromStorage({ key, schema, defaultValue });
+		const valueFromStorage = localStorage.getItem(key);
+		value = convertValueFromStorage(valueFromStorage);
 		window.addEventListener('storage', (event: StorageEvent) => {
 			if (event.key !== key) return;
-			try {
-				const isEmpty = event.newValue === null;
-				if (isEmpty) {
-					value = defaultValue;
-					return;
-				}
-				const jsonSchema = S.parseJson(schema);
-				const validValue = S.decodeUnknownSync(jsonSchema)(event.newValue);
-				value = validValue;
-			} catch {
-				value = defaultValue;
-			}
+			value = convertValueFromStorage(event.newValue);
 		});
 	}
 
@@ -51,24 +52,4 @@ export function createPersistedState<A, I>({
 			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
 		},
 	};
-}
-
-function loadFromStorage<A, I>({
-	key,
-	schema,
-	defaultValue,
-}: {
-	key: string;
-	schema: S.Schema<A, I>;
-	defaultValue: A;
-}): A {
-	try {
-		const valueFromStorageStringified = localStorage.getItem(key);
-		const isEmpty = valueFromStorageStringified === null;
-		if (isEmpty) return defaultValue;
-		const jsonSchema = S.parseJson(schema);
-		return S.decodeUnknownSync(jsonSchema)(valueFromStorageStringified);
-	} catch {
-		return defaultValue;
-	}
 }
