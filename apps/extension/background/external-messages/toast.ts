@@ -6,5 +6,5 @@ import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 export const toast = (toastOptions: ToastOptions) =>
 	Effect.gen(function* () {
 		const { toast } = yield* ToastService;
-		return toast(toastOptions);
+		return yield* toast(toastOptions);
 	}).pipe(Effect.provide(ToastServiceBgswLive));
