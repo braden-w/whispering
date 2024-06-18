@@ -1,14 +1,10 @@
 import { extensionCommands } from '$lib/extensionCommands';
+import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 import { recordings, settings } from '$lib/stores';
-import {
-	MediaRecorderService,
-	MediaRecorderServiceWebLive,
-	ToastService,
-	WhisperingError,
-	type RecorderState,
-} from '@repo/shared';
+import { ToastService, WhisperingError, type RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid';
 import type { Recording } from '../services/RecordingDbService';
