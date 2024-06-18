@@ -14,8 +14,11 @@
 		"@plasmohq/messaging": "^0.6.2",
 		"@plasmohq/storage": "^1.10.0",
 		"@radix-ui/react-label": "^2.0.2",
+		"@radix-ui/react-select": "^2.0.0",
 		"@radix-ui/react-slot": "^1.0.2",
+		"@radix-ui/react-switch": "^1.0.3",
 		"@radix-ui/react-tooltip": "^1.0.7",
+		"@tanstack/react-query": "^5.45.1",
 		"audio-recorder-polyfill": "^0.4.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
@@ -44,6 +47,7 @@
 	},
 	"manifest": {
 		"host_permissions": [
+			"http://localhost:5173",
 			"http://localhost:5173/*",
 			"https://*/*"
 		],
