@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { Option, Effect, Console } from 'effect';
-import { getOrCreateWhisperingTabId } from '~background/sendMessage';
+import { getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
 import { renderErrorAsToast } from '~lib/errors';
 import { WhisperingError, effectToResult } from '@repo/shared';
 
@@ -16,14 +16,7 @@ export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
-		const maybeWhisperingTabId = yield* getOrCreateWhisperingTabId;
-		if (Option.isNone(maybeWhisperingTabId)) {
-			return yield* new WhisperingError({
-				title: 'Whispering tab not found',
-				description: `Could not find a Whispering tab to call "cancelRecording" command`,
-			});
-		}
-		const whisperingTabId = maybeWhisperingTabId.value;
+		const whisperingTabId = yield* getOrCreateWhisperingTabId;
 		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
 				chrome.scripting.executeScript({

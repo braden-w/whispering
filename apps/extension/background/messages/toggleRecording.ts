@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Console, Effect, Option } from 'effect';
-import { getOrCreateWhisperingTabId } from '~background/sendMessage';
+import { getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
 import { renderErrorAsToast } from '~lib/errors';
 
 declare const window: {
@@ -15,14 +15,7 @@ export type RequestBody = {};
 export type ResponseBody = Result<void>;
 
 export const toggleRecording = Effect.gen(function* () {
-	const maybeWhisperingTabId = yield* getOrCreateWhisperingTabId;
-	if (Option.isNone(maybeWhisperingTabId)) {
-		return yield* new WhisperingError({
-			title: 'Whispering tab not found',
-			description: `Could not find a Whispering tab to call "toggleRecording" command`,
-		});
-	}
-	const whisperingTabId = maybeWhisperingTabId.value;
+	const whisperingTabId = yield* getOrCreateWhisperingTabId;
 	yield* Console.info('Whispering tab ID:', whisperingTabId);
 	const [injectionResult] = yield* Effect.tryPromise({
 		try: () =>
