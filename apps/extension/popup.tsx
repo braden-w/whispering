@@ -19,6 +19,7 @@ import { renderErrorAsToast } from '~lib/errors';
 import type * as CancelRecording from './background/messages/cancelRecording';
 import type * as ToggleRecording from './background/messages/toggleRecording';
 import './style.css';
+import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
 
 function IndexPopup() {
 	return (
@@ -49,7 +50,8 @@ const toggleRecording = () =>
 			}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsToast('content')),
+		Effect.catchAll(renderErrorAsToast),
+		Effect.provide(ToastServiceCsLive),
 		Effect.runPromise,
 	);
 
@@ -70,7 +72,8 @@ const cancelRecording = () =>
 			}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsToast('content')),
+		Effect.catchAll(renderErrorAsToast),
+		Effect.provide(ToastServiceCsLive),
 		Effect.runPromise,
 	);
 
