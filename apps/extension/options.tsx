@@ -37,7 +37,7 @@ const queryClient = new QueryClient();
 function IndexPopup() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<main class="flex flex-1 justify-center p-4">
+			<main className="flex min-h-screen flex-col justify-center">
 				<div className="container flex items-center justify-center">
 					<Card className="w-full max-w-xl">
 						<CardHeader>
