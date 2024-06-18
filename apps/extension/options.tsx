@@ -1,11 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import {
-	MediaRecorderService,
-	MediaRecorderServiceWebLive,
-	TranscriptionService,
-	TranscriptionServiceWhisperLive,
-	type Settings,
-} from '@repo/shared';
+import { TranscriptionService, TranscriptionServiceWhisperLive, type Settings } from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -44,6 +38,18 @@ function IndexPopup() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="container flex items-center justify-center">
+				<Button
+					onClick={() =>
+						sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
+							name: 'getSettings',
+						}).then((response) => {
+							if (!response.isSuccess) throw response.error;
+							return response.data;
+						})
+					}
+				>
+					Hello
+				</Button>
 				<Card className="w-full max-w-xl">
 					<CardHeader>
 						<CardTitle className="text-xl">Settings</CardTitle>
@@ -97,18 +103,11 @@ function Settings() {
 		data: mediaDevices,
 	} = useQuery({
 		queryKey: ['media-devices'],
-		queryFn: () =>
-			Effect.gen(function* () {
-				const mediaRecorderService = yield* MediaRecorderService;
-				return yield* mediaRecorderService.enumerateRecordingDevices;
-			}).pipe(
-				Effect.catchAll((error) => {
-					renderErrorAsToast(error);
-					return Effect.succeed([] as MediaDeviceInfo[]);
-				}),
-				Effect.provide(MediaRecorderServiceWebLive),
-				Effect.runPromise,
-			),
+		queryFn: async () => {
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+			return audioInputDevices;
+		},
 	});
 
 	const supportedLanguagesOptions = Effect.gen(function* () {
