@@ -9,7 +9,7 @@ export const renderErrorAsToast = (
 ) =>
 	Effect.gen(function* () {
 		const { toast } = yield* ToastService;
-		toast({
+		yield* toast({
 			variant: 'error',
 			id: options?.toastId,
 			title: error.title,

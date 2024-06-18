@@ -7,27 +7,28 @@ import { toast } from 'svelte-sonner';
 export const ToastServiceWebLive = Layer.succeed(
 	ToastService,
 	ToastService.of({
-		toast: ({ variant, id, title, description, descriptionClass, action }) => {
-			const toastId = toast[variant](title, {
-				id,
-				description,
-				descriptionClass,
-				action: action && {
-					label: action.label,
-					onClick: () => goto(action.goto),
-				},
-			});
-			extensionCommands
-				.toast({
-					variant,
+		toast: ({ variant, id, title, description, descriptionClass, action }) =>
+			Effect.gen(function* () {
+				const toastId = toast[variant](title, {
 					id,
-					title,
 					description,
 					descriptionClass,
-					action,
-				})
-				.pipe(Effect.runPromise);
-			return toastId;
-		},
+					action: action && {
+						label: action.label,
+						onClick: () => goto(action.goto),
+					},
+				});
+				yield* extensionCommands
+					.toast({
+						variant,
+						id,
+						title,
+						description,
+						descriptionClass,
+						action,
+					})
+					.pipe(Effect.catchAll(() => Effect.succeed(toastId)));
+				return toastId;
+			}),
 	}),
 );

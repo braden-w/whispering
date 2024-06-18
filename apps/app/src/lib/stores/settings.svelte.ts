@@ -86,7 +86,7 @@ const createSettings = Effect.gen(function* () {
 						shortcut: settings.value.currentLocalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast({
+					yield* toast({
 						variant: 'success',
 						title: `Local shortcut set to ${settings.value.currentLocalShortcut}`,
 						description: 'Press the shortcut to start recording',
@@ -111,7 +111,7 @@ const createSettings = Effect.gen(function* () {
 						shortcut: settings.value.currentGlobalShortcut,
 						callback: recorder.toggleRecording,
 					});
-					toast({
+					yield* toast({
 						variant: 'success',
 						title: `Global shortcut set to ${settings.value.currentGlobalShortcut}`,
 						description: 'Press the shortcut to start recording',

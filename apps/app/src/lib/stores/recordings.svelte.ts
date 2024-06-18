@@ -43,7 +43,7 @@ const createRecordings = Effect.gen(function* () {
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
-				toast({
+				yield* toast({
 					variant: 'success',
 					title: 'Recording updated!',
 					description: 'Your recording has been updated successfully.',
@@ -53,7 +53,7 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
-				toast({
+				yield* toast({
 					variant: 'success',
 					title: 'Recording deleted!',
 					description: 'Your recording has been deleted successfully.',
@@ -63,93 +63,94 @@ const createRecordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
 				recordings = recordings.filter((recording) => !ids.includes(recording.id));
-				toast({
+				yield* toast({
 					variant: 'success',
 					title: 'Recordings deleted!',
 					description: 'Your recordings have been deleted successfully.',
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast)),
-		transcribeRecording: (id: string) => {
-			const toastId = toast({
-				variant: 'loading',
-				title: 'Transcribing recording...',
-				description: 'Your recording is being transcribed.',
-			});
-			if (recorderState.value !== 'RECORDING') {
-				recorderState.value = 'LOADING';
-			}
-			return Effect.gen(function* () {
-				const maybeRecording = yield* recordingsDb.getRecording(id);
-				if (Option.isNone(maybeRecording)) {
-					return yield* new WhisperingError({
-						title: `Recording with id ${id} not found`,
-						description: 'Please try again.',
-					});
-				}
-				const recording = maybeRecording.value;
-				yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
-				const transcriptionResult = yield* Effect.either(
-					transcriptionService.transcribe(recording.blob, settings),
-				);
-				if (Either.isLeft(transcriptionResult)) {
-					yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });
-					const error = transcriptionResult.left;
-					return yield* error;
-				}
-				const transcribedText = transcriptionResult.right;
-				yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
-				if (recorderState.value !== 'RECORDING') {
-					recorderState.value = 'IDLE';
-				}
-				toast({
-					variant: 'success',
-					id: toastId,
-					title: 'Transcription complete!',
-					description: 'Check it out in your recordings',
-					action: {
-						label: 'Go to recordings',
-						goto: '/recordings',
-					},
+		transcribeRecording: (id: string) =>
+			Effect.gen(function* () {
+				const toastId = yield* toast({
+					variant: 'loading',
+					title: 'Transcribing recording...',
+					description: 'Your recording is being transcribed.',
 				});
-				return transcribedText;
-			}).pipe(
-				Effect.catchAll((error) => renderErrorAsToast(error, { toastId })),
-				Effect.andThen((transcribedText) =>
-					Effect.gen(function* () {
-						if (transcribedText === '') return;
+				if (recorderState.value !== 'RECORDING') {
+					recorderState.value = 'LOADING';
+				}
+				return Effect.gen(function* () {
+					const maybeRecording = yield* recordingsDb.getRecording(id);
+					if (Option.isNone(maybeRecording)) {
+						return yield* new WhisperingError({
+							title: `Recording with id ${id} not found`,
+							description: 'Please try again.',
+						});
+					}
+					const recording = maybeRecording.value;
+					yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
+					const transcriptionResult = yield* Effect.either(
+						transcriptionService.transcribe(recording.blob, settings),
+					);
+					if (Either.isLeft(transcriptionResult)) {
+						yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });
+						const error = transcriptionResult.left;
+						return yield* error;
+					}
+					const transcribedText = transcriptionResult.right;
+					yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
+					if (recorderState.value !== 'RECORDING') {
+						recorderState.value = 'IDLE';
+					}
+					yield* toast({
+						variant: 'success',
+						id: toastId,
+						title: 'Transcription complete!',
+						description: 'Check it out in your recordings',
+						action: {
+							label: 'Go to recordings',
+							goto: '/recordings',
+						},
+					});
+					return transcribedText;
+				}).pipe(
+					Effect.catchAll((error) => renderErrorAsToast(error, { toastId })),
+					Effect.andThen((transcribedText) =>
+						Effect.gen(function* () {
+							if (transcribedText === '') return;
 
-						// Copy transcription to clipboard if enabled
-						if (settings.isCopyToClipboardEnabled) {
-							yield* clipboardService.setClipboardText(transcribedText);
-							toast({
-								variant: 'success',
-								title: 'Copied transcription to clipboard!',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-							});
-						}
+							// Copy transcription to clipboard if enabled
+							if (settings.isCopyToClipboardEnabled) {
+								yield* clipboardService.setClipboardText(transcribedText);
+								yield* toast({
+									variant: 'success',
+									title: 'Copied transcription to clipboard!',
+									description: transcribedText,
+									descriptionClass: 'line-clamp-2',
+								});
+							}
 
-						// Paste transcription if enabled
-						if (settings.isPasteContentsOnSuccessEnabled) {
-							yield* clipboardService.writeText(transcribedText);
-							toast({
-								variant: 'success',
-								title: 'Pasted transcription!',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-							});
-						}
-					}),
-				),
-				Effect.catchAll(renderErrorAsToast),
-				Effect.runPromise,
-			);
-		},
+							// Paste transcription if enabled
+							if (settings.isPasteContentsOnSuccessEnabled) {
+								yield* clipboardService.writeText(transcribedText);
+								yield* toast({
+									variant: 'success',
+									title: 'Pasted transcription!',
+									description: transcribedText,
+									descriptionClass: 'line-clamp-2',
+								});
+							}
+						}),
+					),
+					Effect.catchAll(renderErrorAsToast),
+					Effect.runPromise,
+				);
+			}).pipe(Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				toast({
+				yield* toast({
 					variant: 'success',
 					title: 'Copied transcription to clipboard!',
 					description: recording.transcribedText,
