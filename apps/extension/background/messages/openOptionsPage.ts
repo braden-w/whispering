@@ -21,7 +21,6 @@ export type ResponseBody = Result<number>;
 const handler: PlasmoMessaging.MessageHandler<RequestBody, RequestBody> = (req, res) =>
 	Effect.gen(function* () {
 		yield* openOptionsPage;
-		return true as const;
 	}).pipe(
 		Effect.tapError(renderErrorAsToast('bgsw')),
 		effectToResult,
