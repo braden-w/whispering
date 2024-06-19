@@ -1,22 +1,21 @@
-import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type { ExternalMessage, RecorderState, Result, ToastOptions } from '@repo/shared';
-import { WhisperingError, resultToEffect } from '@repo/shared';
+import { WHISPERING_EXTENSION_ID, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 
-const sendMessageToExtension = <T>(message: ExternalMessage) =>
-	Effect.gen(function* () {
+const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
+	Effect.async<T, WhisperingError>((resume) => {
 		if (window.__TAURI__ || !chrome) return;
-		const response = yield* Effect.tryPromise({
-			try: () =>
-				sendToBackgroundViaRelay({ name: message.name, body: message.body }) as Promise<Result<T>>,
-			catch: (error) =>
-				new WhisperingError({
-					title: 'Unable to send message to extension',
-					description: 'There was likely an issue sending the message to the extension.',
-					error,
-				}),
-		}).pipe(Effect.flatMap(resultToEffect));
-		return response;
+		chrome.runtime.sendMessage<ExternalMessage>(
+			WHISPERING_EXTENSION_ID,
+			message,
+			function (response: Result<T>) {
+				if (!response.isSuccess) {
+					const whisperingError = new WhisperingError(response.error);
+					return resume(Effect.fail(whisperingError));
+				}
+				return resume(Effect.succeed(response.data));
+			},
+		);
 	});
 
 export const extensionCommands = {

@@ -29,7 +29,6 @@
 	"dependencies": {
 		"@effect/platform": "^0.56.0",
 		"@effect/schema": "^0.67.23",
-		"@plasmohq/messaging": "^0.6.2",
 		"@repo/shared": "workspace:*",
 		"@repo/svelte-table": "workspace:*",
 		"@tanstack/table-core": "^8.17.3",
