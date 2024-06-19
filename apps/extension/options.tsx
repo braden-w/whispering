@@ -13,8 +13,8 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { Effect } from 'effect';
-import * as GetSettings from '~background/messages/getSettings';
-import * as SetSettings from '~background/messages/setSettings';
+import * as GetSettings from '~background/messages/contents/getSettings';
+import * as SetSettings from '~background/messages/contents/setSettings';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -80,7 +80,7 @@ function Settings() {
 		queryKey: ['settings'],
 		queryFn: () =>
 			sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
-				name: 'getSettings',
+				name: 'contents/getSettings',
 			}).then((response) => {
 				if (!response.isSuccess) throw response.error;
 				return response.data;
@@ -90,7 +90,7 @@ function Settings() {
 	const setSettings = useMutation({
 		mutationFn: (settings: Settings) =>
 			sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
-				name: 'setSettings',
+				name: 'contents/setSettings',
 				body: { settings },
 			}).then((response) => {
 				if (!response.isSuccess) throw response.error;
