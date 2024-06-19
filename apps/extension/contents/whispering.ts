@@ -4,6 +4,8 @@ import { Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
 import * as WhisperingTabContentReady from '~background/messages/whisperingTabContentReady';
+import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
 
 export const config: PlasmoCSConfig = {
 	matches: ['https://whispering.bradenwong.com/*', 'http://localhost:5173/*'],
@@ -52,4 +54,4 @@ Effect.gen(function* () {
 				error,
 			}),
 	});
-}).pipe(Effect.runPromise);
+}).pipe(Effect.catchAll(renderErrorAsToast), Effect.provide(ToastServiceCsLive), Effect.runPromise);
