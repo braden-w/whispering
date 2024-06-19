@@ -42,6 +42,7 @@ export const mountShadowHost: PlasmoMountShadowHost = ({ shadowHost, anchor, mou
 	wrapper.style.display = 'flex';
 	wrapper.style.alignItems = 'center';
 
+	wrapper.style.width = '100%';
 	editableElement.style.width = '100%';
 
 	editableElement.parentNode?.insertBefore(wrapper, editableElement);
