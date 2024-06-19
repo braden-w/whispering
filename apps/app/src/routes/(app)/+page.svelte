@@ -4,9 +4,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { recorder, recorderState, recordings, settings } from '$lib/stores';
+	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { onMount } from 'svelte';
 
 	const PLACEHOLDER_RECORDING = {
 		id: '',
@@ -27,19 +26,6 @@
 	);
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
-
-	const registerOnCloseTabCancelRecording = () => {
-		window.addEventListener('beforeunload', () => {
-			if (recorderState.value === 'RECORDING') {
-				recorderState.value = 'IDLE';
-			}
-		});
-	};
-
-	onMount(() => {
-		window.toggleRecording = recorder.toggleRecording;
-		registerOnCloseTabCancelRecording();
-	});
 </script>
 
 <svelte:head>
