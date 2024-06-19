@@ -1,12 +1,11 @@
-import { relayMessage, sendToBackground } from '@plasmohq/messaging';
+import { sendToBackground } from '@plasmohq/messaging';
 import { WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
-import { WHISPERING_URL_WILDCARD } from '~lib/constants';
 
 export const config: PlasmoCSConfig = {
-	matches: [WHISPERING_URL_WILDCARD],
+	matches: ['https://whispering.bradenwong.com/*', 'http://localhost:5173/*'],
 };
 
 const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {

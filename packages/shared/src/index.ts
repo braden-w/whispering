@@ -2,6 +2,12 @@ import { Schema as S } from '@effect/schema';
 import { Context, Data, Effect } from 'effect';
 import type { ToasterProps } from 'sonner';
 
+export const WHISPERING_URL =
+	process.env.NODE_ENV === 'production'
+		? 'https://whispering.bradenwong.com'
+		: 'http://localhost:5173';
+export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
+
 const BaseError = S.Struct({
 	title: S.String,
 	description: S.String,
