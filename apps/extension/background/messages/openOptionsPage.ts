@@ -19,7 +19,7 @@ export type RequestBody = {};
 
 export type ResponseBody = Result<number>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, RequestBody> = (req, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
 		yield* openOptionsPage;
 	}).pipe(

@@ -25,7 +25,9 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			extensionCommands.setRecorderState(newValue).pipe(Effect.runPromise);
+			extensionCommands
+				.setRecorderState(newValue)
+				.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},
 	};
 })();

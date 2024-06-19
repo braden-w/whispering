@@ -1,8 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { WhisperingError, effectToResult } from '@repo/shared';
-import { Console, Effect } from 'effect';
+import { effectToResult } from '@repo/shared';
+import { Effect } from 'effect';
 import { getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
+import { injectScript } from '~background/injectScript';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
@@ -17,22 +18,26 @@ export type ResponseBody = Result<void>;
 
 export const toggleRecording = Effect.gen(function* () {
 	const whisperingTabId = yield* getOrCreateWhisperingTabId;
-	yield* Console.info('Whispering tab ID:', whisperingTabId);
-	const [injectionResult] = yield* Effect.tryPromise({
-		try: () =>
-			chrome.scripting.executeScript({
-				target: { tabId: whisperingTabId },
-				world: 'MAIN',
-				func: () => window.toggleRecording(),
-			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to execute "toggleRecording" script in Whispering tab',
-				description: error instanceof Error ? error.message : `Unknown error: ${error}`,
-				error,
-			}),
+	yield* injectScript<undefined, []>({
+		tabId: whisperingTabId,
+		commandName: 'toggleRecording',
+		func: () => {
+			try {
+				window.toggleRecording();
+				return { isSuccess: true, data: undefined } as const;
+			} catch (error) {
+				return {
+					isSuccess: false,
+					error: {
+						title: 'Unable to cancel recording',
+						description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+						error,
+					},
+				} as const;
+			}
+		},
+		args: [],
 	});
-	yield* Console.info('Injection result "toggleRecording" script:', injectionResult);
 });
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>

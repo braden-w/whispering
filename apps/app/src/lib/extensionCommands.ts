@@ -33,30 +33,27 @@ const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 export const extensionCommands = {
 	setRecorderState: (recorderState: RecorderState) =>
 		sendMessageToExtension<void>({
-			name: 'setRecorderState',
+			name: 'external/setRecorderState',
 			body: { recorderState },
 		}),
 	playSound: (sound: 'start' | 'stop' | 'cancel') =>
 		sendMessageToExtension<void>({
-			name: 'playSound',
+			name: 'external/playSound',
 			body: { sound },
 		}),
 	setClipboardText: (text: string) =>
 		sendMessageToExtension<void>({
-			name: 'setClipboardText',
+			name: 'external/setClipboardText',
 			body: { transcribedText: text },
 		}),
 	writeTextToCursor: (text: string) =>
 		sendMessageToExtension<void>({
-			name: 'writeTextToCursor',
+			name: 'external/writeTextToCursor',
 			body: { transcribedText: text },
 		}),
 	toast: (toastOptions: ToastOptions) =>
 		sendMessageToExtension<string | number>({
-			name: 'toast',
+			name: 'external/toast',
 			body: { toastOptions },
 		}),
-} as const satisfies Record<
-	ExternalMessage['name'],
-	(...args: any[]) => Effect.Effect<any, WhisperingError>
->;
+} as const;

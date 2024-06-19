@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { recorder, recorderState } from '$lib/stores';
 	import { TOASTER_SETTINGS } from '@repo/shared';
 	import { ModeWatcher } from 'mode-watcher';
+	import { onMount } from 'svelte';
 	import '../app.pcss';
 
 	onNavigate((navigation) => {
@@ -13,6 +15,16 @@
 				resolve();
 				await navigation.complete;
 			});
+		});
+	});
+
+	onMount(() => {
+		window.toggleRecording = recorder.toggleRecording;
+		window.cancelRecording = recorder.cancelRecording;
+		window.addEventListener('beforeunload', () => {
+			if (recorderState.value === 'RECORDING') {
+				recorderState.value = 'IDLE';
+			}
 		});
 	});
 </script>
