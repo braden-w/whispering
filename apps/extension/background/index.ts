@@ -1,9 +1,9 @@
 import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 import { registerExternalListener } from './external-messages';
 import { openOptionsPage } from './messages/openOptionsPage';
 import { toggleRecording } from './messages/toggleRecording';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
 chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {
