@@ -47,7 +47,11 @@ function IndexPopup() {
 						<CardTitle className="text-xl">Settings</CardTitle>
 						<CardDescription>
 							Customize your Whispering experience. Synced with the{' '}
-							<Button variant="link" onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}>
+							<Button
+								variant="link"
+								className="h-fit px-0.5 py-0"
+								onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}
+							>
 								Whispering website
 							</Button>
 							!
