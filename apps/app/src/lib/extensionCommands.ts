@@ -5,17 +5,29 @@ import { Effect } from 'effect';
 const sendMessageToExtension = <T extends unknown>(message: ExternalMessage) =>
 	Effect.async<T, WhisperingError>((resume) => {
 		if (window.__TAURI__ || !chrome) return;
-		chrome.runtime.sendMessage<ExternalMessage>(
-			WHISPERING_EXTENSION_ID,
-			message,
-			function (response: Result<T>) {
-				if (!response.isSuccess) {
-					const whisperingError = new WhisperingError(response.error);
-					return resume(Effect.fail(whisperingError));
-				}
-				return resume(Effect.succeed(response.data));
-			},
-		);
+		try {
+			chrome.runtime.sendMessage<ExternalMessage>(
+				WHISPERING_EXTENSION_ID,
+				message,
+				function (response: Result<T>) {
+					if (!response.isSuccess) {
+						const whisperingError = new WhisperingError(response.error);
+						return resume(Effect.fail(whisperingError));
+					}
+					return resume(Effect.succeed(response.data));
+				},
+			);
+		} catch (error) {
+			return resume(
+				Effect.fail(
+					new WhisperingError({
+						title: 'Unable to send message to extension',
+						description: 'An error occurred while trying to send a message to the extension.',
+						error,
+					}),
+				),
+			);
+		}
 	});
 
 export const extensionCommands = {
