@@ -1,5 +1,6 @@
 {
 	"name": "@repo/svelte-table",
+	"private": true,
 	"description": "Svelte integration to Tanstack Table, copied from https://github.com/wlockiv/tanstack-table/tree/feat-svelte-5-adapter",
 	"exports": {
 		".": "./src/index.ts"
