@@ -27,7 +27,7 @@
 		"idb": "^8.0.0",
 		"lucide-react": "^0.383.0",
 		"nanoid": "^5.0.7",
-		"plasmo": "^0.87.2",
+		"plasmo": "^0.88.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-draggable": "^4.4.6",
@@ -70,7 +70,7 @@
 		"externally_connectable": {
 			"matches": [
 				"http://localhost:5173/*",
-				"https://whispering.bradenwong.com"
+				"https://whispering.bradenwong.com/*"
 			]
 		}
 	}
