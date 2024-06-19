@@ -3,10 +3,10 @@ import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { ClipboardService } from './ClipboardService';
 
-export const ClipboardServiceWebLive = Layer.effect(
+export const ClipboardServiceWebLive = Layer.succeed(
 	ClipboardService,
-	Effect.gen(function* () {
-		const setClipboardText = (text: string) =>
+	ClipboardService.of({
+		setClipboardText: (text) =>
 			Effect.tryPromise({
 				try: () => navigator.clipboard.writeText(text),
 				catch: (error) =>
@@ -15,13 +15,7 @@ export const ClipboardServiceWebLive = Layer.effect(
 						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
-			}).pipe(Effect.catchAll(() => extensionCommands.setClipboardText(text)));
-
-		const writeText = (text: string) => extensionCommands.writeTextToCursor(text);
-
-		return {
-			setClipboardText,
-			writeText,
-		};
+			}).pipe(Effect.catchAll(() => extensionCommands.setClipboardText(text))),
+		writeText: (text) => extensionCommands.writeTextToCursor(text),
 	}),
 );

@@ -112,7 +112,7 @@ function IndexPage() {
 							{recorderStateAsIcon}
 						</span>
 					</Button>
-					{recorderState === 'RECORDING' ?? (
+					{recorderState === 'RECORDING' && (
 						<Button
 							className="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
 							onClick={cancelRecording}

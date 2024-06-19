@@ -239,7 +239,10 @@ function Settings() {
 					</SelectTrigger>
 					<SelectContent className="max-h-96 overflow-auto">
 						{supportedLanguagesOptions.map((supportedLanguagesOption) => (
-							<SelectItem value={supportedLanguagesOption.value}>
+							<SelectItem
+								key={supportedLanguagesOption.value}
+								value={supportedLanguagesOption.value}
+							>
 								{supportedLanguagesOption.label}
 							</SelectItem>
 						))}
