@@ -44,3 +44,9 @@ const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {
 	});
 });
 onLoadSendWhisperingLoadedMessageProgram.pipe(Effect.runPromise);
+
+relayMessage({ name: 'external/playSound' });
+relayMessage({ name: 'external/setClipboardText' });
+relayMessage({ name: 'external/setRecorderState' });
+relayMessage({ name: 'external/toast' });
+relayMessage({ name: 'external/writeTextToCursor' });
