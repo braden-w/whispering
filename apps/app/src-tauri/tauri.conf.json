@@ -1,0 +1,79 @@
+{
+	"$schema": "../node_modules/@tauri-apps/cli/schema.json",
+	"build": {
+		"beforeBuildCommand": "pnpm run build",
+		"beforeDevCommand": "pnpm run dev",
+		"devPath": "http://localhost:5173",
+		"distDir": "../build"
+	},
+	"package": {
+		"productName": "whispering",
+		"version": "4.0.0"
+	},
+	"tauri": {
+		"allowlist": {
+			"all": false,
+			"clipboard": {
+				"writeText": true
+			},
+			"globalShortcut": {
+				"all": true
+			},
+			"shell": {
+				"all": false,
+				"execute": false,
+				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/)",
+				"scope": [],
+				"sidecar": false
+			}
+		},
+		"bundle": {
+			"active": true,
+			"category": "DeveloperTool",
+			"copyright": "",
+			"deb": {
+				"depends": []
+			},
+			"externalBin": [],
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"identifier": "com.bradenwong.whispering",
+			"longDescription": "",
+			"macOS": {
+				"entitlements": "entitlements.plist",
+				"exceptionDomain": "",
+				"frameworks": [],
+				"providerShortName": null,
+				"signingIdentity": null
+			},
+			"resources": [],
+			"shortDescription": "",
+			"targets": "all",
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
+			}
+		},
+		"security": {
+			"csp": null
+		},
+		"updater": {
+			"active": false
+		},
+		"windows": [
+			{
+				"fullscreen": false,
+				"height": 600,
+				"resizable": true,
+				"title": "Whispering",
+				"width": 800
+			}
+		]
+	}
+}

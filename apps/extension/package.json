@@ -1,50 +1,77 @@
 {
-	"name": "whispering",
+	"name": "extension",
 	"displayName": "Whispering",
-	"version": "3.4.1",
+	"version": "4.0.0",
+	"private": true,
 	"description": "Seamlessly integrate voice-to-text transcriptions on ChatGPT and anywhere on the web—powered by OpenAI's Whisper API.",
-	"author": "Braden Wong",
-	"packageManager": "pnpm@7.5.0",
+	"author": "Braden Wong <whispering@bradenwong.com>",
 	"scripts": {
 		"dev": "plasmo dev",
 		"build": "plasmo build",
 		"package": "plasmo package"
 	},
 	"dependencies": {
-		"@plasmohq/storage": "^1.9.3",
-		"@repo/ui": "workspace:*",
-		"mode-watcher": "^0.2.1",
-		"plasmo": "^0.84.2",
-		"svelte": "^3.59.2",
-		"svelte-french-toast": "^1.2.0",
-		"svelte-preprocess": "^5.1.3"
+		"@effect/schema": "^0.67.23",
+		"@plasmohq/messaging": "^0.6.2",
+		"@plasmohq/storage": "^1.10.0",
+		"@radix-ui/react-label": "^2.0.2",
+		"@radix-ui/react-select": "^2.0.0",
+		"@radix-ui/react-slot": "^1.0.2",
+		"@radix-ui/react-switch": "^1.0.3",
+		"@radix-ui/react-tooltip": "^1.0.7",
+		"@tanstack/react-query": "^5.45.1",
+		"audio-recorder-polyfill": "^0.4.1",
+		"class-variance-authority": "^0.7.0",
+		"clsx": "^2.1.1",
+		"effect": "^3.3.2",
+		"idb": "^8.0.0",
+		"lucide-react": "^0.383.0",
+		"nanoid": "^5.0.7",
+		"plasmo": "^0.87.2",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-draggable": "^4.4.6",
+		"sonner": "^1.5.0",
+		"tailwind-merge": "^2.3.0",
+		"tailwindcss": "^3.4.3",
+		"tailwindcss-animate": "^1.0.7",
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
-		"@iconify/json": "^2.2.187",
-		"@types/chrome": "^0.0.237",
-		"@types/node": "^20.11.22",
-		"autoprefixer": "^10.4.17",
-		"eslint-config-custom": "workspace:*",
-		"postcss": "^8.4.35",
-		"tailwindcss": "^3.4.1",
-		"typescript": "^5.3.3",
-		"unplugin-icons": "^0.18.5"
+		"@types/chrome": "^0.0.268",
+		"@types/node": "^20.14.0",
+		"@types/react": "^18.3.3",
+		"@types/react-dom": "^18.3.0",
+		"autoprefixer": "^10.4.19",
+		"postcss": "^8.4.38",
+		"typescript": "^5.4.5"
 	},
 	"manifest": {
 		"host_permissions": [
-			"https://*/*"
+			"http://localhost:5173/*",
+			"https://*/"
 		],
 		"permissions": [
-			"clipboardWrite"
+			"tabs",
+			"clipboardWrite",
+			"storage",
+			"scripting",
+			"notifications"
 		],
 		"commands": {
-			"toggle-recording": {
+			"toggleRecording": {
 				"suggested_key": {
 					"default": "Ctrl+Shift+X",
 					"mac": "Command+Shift+X"
 				},
 				"description": "Toggle recording"
 			}
+		},
+		"externally_connectable": {
+			"matches": [
+				"http://localhost:5173/*",
+				"https://whispering.bradenwong.com"
+			]
 		}
 	}
 }
