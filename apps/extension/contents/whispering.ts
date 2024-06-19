@@ -1,12 +1,11 @@
-import { Schema as S } from '@effect/schema';
 import { sendToBackground } from '@plasmohq/messaging';
-import { WhisperingError, settingsSchema } from '@repo/shared';
+import { WHISPERING_URL_WILDCARD, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
 
 export const config: PlasmoCSConfig = {
-	matches: ['http://localhost:5173/*'],
+	matches: [WHISPERING_URL_WILDCARD],
 };
 
 const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {

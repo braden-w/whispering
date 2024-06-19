@@ -47,9 +47,8 @@
 	},
 	"manifest": {
 		"host_permissions": [
-			"http://localhost:5173",
 			"http://localhost:5173/*",
-			"https://*/*"
+			"https://*/"
 		],
 		"permissions": [
 			"tabs",
@@ -69,7 +68,8 @@
 		},
 		"externally_connectable": {
 			"matches": [
-				"http://localhost:5173/*"
+				"http://localhost:5173/*",
+				"https://whispering.bradenwong.com"
 			]
 		}
 	}

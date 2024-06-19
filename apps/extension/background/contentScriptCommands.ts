@@ -1,5 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import {
+	WHISPERING_URL,
+	WHISPERING_URL_WILDCARD,
 	WhisperingError,
 	resultToEffect,
 	settingsSchema,
@@ -39,7 +41,7 @@ const waitForContentScriptLoaded = <T>(action: () => Promise<T>) =>
 
 const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(function* () {
 	const whisperingTabs = yield* Effect.promise(() =>
-		chrome.tabs.query({ url: 'http://localhost:5173/*' }),
+		chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
 	);
 	if (whisperingTabs.length === 0) return Option.none();
 
@@ -63,7 +65,7 @@ const getWhisperingTabId: Effect.Effect<Option.Option<number>> = Effect.gen(func
 
 const createWhisperingTabId = Effect.gen(function* () {
 	const newTabId = yield* waitForContentScriptLoaded(() =>
-		chrome.tabs.create({ url: 'http://localhost:5173', active: false, pinned: true }),
+		chrome.tabs.create({ url: WHISPERING_URL, active: false, pinned: true }),
 	);
 	return Option.some(newTabId);
 });
