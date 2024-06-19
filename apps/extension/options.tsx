@@ -1,10 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import {
-	TranscriptionService,
-	TranscriptionServiceWhisperLive,
-	WHISPERING_URL,
-	type Settings,
-} from '@repo/shared';
+import { TranscriptionService, TranscriptionServiceWhisperLive, type Settings } from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -34,6 +29,7 @@ import {
 	SelectValue,
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
+import { WHISPERING_URL } from '~lib/constants';
 import './style.css';
 
 const queryClient = new QueryClient();

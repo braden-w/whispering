@@ -6,7 +6,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import {
-	WHISPERING_URL,
 	WhisperingError,
 	recorderStateToIcons,
 	resultToEffect,
@@ -15,11 +14,12 @@ import {
 import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
+import { WHISPERING_URL } from '~lib/constants';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
 import type * as CancelRecording from './background/messages/cancelRecording';
 import type * as ToggleRecording from './background/messages/toggleRecording';
 import './style.css';
-import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
 
 function IndexPopup() {
 	return (

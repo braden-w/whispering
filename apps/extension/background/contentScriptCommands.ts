@@ -1,15 +1,8 @@
 import { Schema as S } from '@effect/schema';
-import {
-	WHISPERING_URL,
-	WHISPERING_URL_WILDCARD,
-	WhisperingError,
-	resultToEffect,
-	settingsSchema,
-	type Result,
-	type Settings,
-} from '@repo/shared';
-import { Console, Effect, Either, Option, pipe } from 'effect';
+import { WhisperingError, settingsSchema, type Settings } from '@repo/shared';
+import { Effect, Either, Option, pipe } from 'effect';
 import { injectScript } from './injectScript';
+import { WHISPERING_URL_WILDCARD, WHISPERING_URL } from '~lib/constants';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
