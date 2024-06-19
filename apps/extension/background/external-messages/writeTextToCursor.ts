@@ -3,57 +3,53 @@ import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
 import { WhisperingError } from '@repo/shared';
 
-const isTextarea = (element: Element): element is HTMLTextAreaElement =>
-	element.tagName === 'TEXTAREA';
-
-const isInput = (element: Element): element is HTMLInputElement => element.tagName === 'INPUT';
-
-const handler = (text: string) =>
+export const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		const [injectionResult] = yield* Effect.tryPromise({
 			try: () =>
-				chrome.scripting.executeScript<[string], Result<string, unknown>>({
+				chrome.scripting.executeScript<[string], Result<string>>({
 					target: { tabId: activeTabId },
 					world: 'MAIN',
 					func: (text: string) => {
 						const activeElement = document.activeElement;
 						if (!activeElement)
-							return { isSuccess: false, error: new Error('No active element found') };
+							return {
+								isSuccess: false,
+								error: {
+									title: 'Unable to write transcribed text to active tab',
+									description: 'No active element found in the document',
+								},
+							};
 
-						if (isTextarea(activeElement) || isInput(activeElement)) {
-							const startPos = activeElement.selectionStart;
-							const endPos = activeElement.selectionEnd;
-							const value = activeElement.value;
-
-							// Using execCommand to insert text and ensure it is registered in undo/redo stack
-							if (document.queryCommandSupported('insertText')) {
-								activeElement.focus();
+						if (activeElement.isContentEditable) {
+							try {
 								document.execCommand('insertText', false, text);
-							} else {
-								activeElement.value = value.substring(0, startPos) + text + value.substring(endPos);
-								activeElement.selectionStart = activeElement.selectionEnd = startPos + text.length;
-							}
-						} else if (activeElement.isContentEditable) {
-							const selection = window.getSelection();
-							if (selection.rangeCount > 0) {
-								const range = selection.getRangeAt(0);
+							} catch (e) {
+								// Fallback for older browsers
+								let range = document.getSelection().getRangeAt(0);
 								range.deleteContents();
-
-								// Create a new text node and insert it
-								const textNode = document.createTextNode(text);
-								range.insertNode(textNode);
-
-								// Move the cursor to the end of the inserted text node
-								range.setStartAfter(textNode);
-								range.setEndAfter(textNode);
-								selection.removeAllRanges();
-								selection.addRange(range);
-
-								// Using execCommand to make the insertion undoable
-								document.execCommand('insertText', false, textNode.nodeValue);
+								range.insertNode(document.createTextNode(text));
 							}
+						} else if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+							let start = activeElement.selectionStart;
+							let end = activeElement.selectionEnd;
+
+							// Insert text at the cursor position
+							let value = activeElement.value;
+							activeElement.value = value.slice(0, start) + text + value.slice(end);
+
+							// Update the cursor position
+							activeElement.selectionStart = start + text.length;
+							activeElement.selectionEnd = start + text.length;
+
+							// Trigger the input event for undo/redo functionality
+							let event = new Event('input', { bubbles: true });
+							activeElement.dispatchEvent(event);
+						} else {
+							console.warn('The active element is not editable.');
 						}
+
 						return { isSuccess: true, data: text } as const;
 					},
 					args: [text],
@@ -66,23 +62,22 @@ const handler = (text: string) =>
 				}),
 		});
 		yield* Console.info('Injection result "writeTextToCursor" script:', injectionResult);
-		if (!injectionResult) {
+		if (!injectionResult || !injectionResult.result) {
 			return yield* new WhisperingError({
-				title: 'Unable to copy transcribed text to clipboard in active tab',
+				title: 'Unable to write transcribed text to active tab',
 				description: 'The result of the script injection is undefined',
 			});
 		}
 		const { result } = injectionResult;
 		yield* Console.info('writeTextToCursor result:', result);
-		if (!result || !result.isSuccess) {
+		if (!result.isSuccess) {
 			return yield* new WhisperingError({
-				title: 'Unable to copy transcribed text to clipboard in active tab',
+				title: 'Unable to write transcribed text to active tab',
 				description:
-					result?.error instanceof Error ? result.error.message : `Unknown error: ${result?.error}`,
-				error: result?.error,
+					result.error instanceof Error ? result.error.message : `Unknown error: ${result.error}`,
+				error: result.error,
 			});
 		}
-		return result.data;
 	}).pipe(
 		Effect.catchTags({
 			GetActiveTabIdError: () =>
@@ -93,5 +88,3 @@ const handler = (text: string) =>
 				}),
 		}),
 	);
-
-export default handler;
