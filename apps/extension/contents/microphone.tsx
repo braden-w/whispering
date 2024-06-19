@@ -78,7 +78,11 @@ const toggleRecordingFromContentScript = () =>
 						: 'There was likely an issue sending the message to the background service worker from the contentscript.',
 				error,
 			}),
-	}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+	}).pipe(
+		Effect.catchAll(renderErrorAsToast),
+		Effect.provide(ToastServiceCsLive),
+		Effect.runPromise,
+	);
 
 function RecorderStateAsIcon() {
 	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
