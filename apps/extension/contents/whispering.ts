@@ -9,7 +9,13 @@ export const config: PlasmoCSConfig = {
 	matches: ['https://whispering.bradenwong.com/*', 'http://localhost:5173/*'],
 };
 
-const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {
+relayMessage({ name: 'external/playSound' });
+relayMessage({ name: 'external/setClipboardText' });
+relayMessage({ name: 'external/setRecorderState' });
+relayMessage({ name: 'external/toast' });
+relayMessage({ name: 'external/writeTextToCursor' });
+
+Effect.gen(function* () {
 	const activeTabIdResult = yield* Effect.tryPromise({
 		try: () =>
 			sendToBackground<GetActiveTabId.RequestBody, GetActiveTabId.ResponseBody>({
@@ -46,11 +52,4 @@ const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {
 				error,
 			}),
 	});
-});
-onLoadSendWhisperingLoadedMessageProgram.pipe(Effect.runPromise);
-
-relayMessage({ name: 'external/playSound' });
-relayMessage({ name: 'external/setClipboardText' });
-relayMessage({ name: 'external/setRecorderState' });
-relayMessage({ name: 'external/toast' });
-relayMessage({ name: 'external/writeTextToCursor' });
+}).pipe(Effect.runPromise);
