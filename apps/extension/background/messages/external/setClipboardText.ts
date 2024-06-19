@@ -68,19 +68,19 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 		}),
 	);
 
-export type RequestBody = { text: string };
+export type RequestBody = { transcribedText: string };
 
 export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
-		if (!body?.text) {
+		if (!body?.transcribedText) {
 			return yield* new WhisperingError({
 				title: 'Error invoking setClipboardText command',
 				description: 'Text must be provided in the request body of the message',
 			});
 		}
-		yield* setClipboardText(body.text);
+		yield* setClipboardText(body.transcribedText);
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),
 		Effect.provide(ToastServiceBgswLive),

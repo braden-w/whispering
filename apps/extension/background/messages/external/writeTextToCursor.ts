@@ -92,19 +92,19 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 		}),
 	);
 
-export type RequestBody = { text: string };
+export type RequestBody = { transcribedText: string };
 
 export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
-		if (!body?.text) {
+		if (!body?.transcribedText) {
 			return yield* new WhisperingError({
 				title: 'Error invoking writeTextToCursor command',
 				description: 'Text must be provided in the request body of the message',
 			});
 		}
-		yield* writeTextToCursor(body.text);
+		yield* writeTextToCursor(body.transcribedText);
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),
 		Effect.provide(ToastServiceBgswLive),
