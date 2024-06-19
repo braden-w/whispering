@@ -1,8 +1,9 @@
-import { sendToBackground } from '@plasmohq/messaging';
+import { sendToBackground, relayMessage } from '@plasmohq/messaging';
 import { WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 import type { PlasmoCSConfig } from 'plasmo';
 import * as GetActiveTabId from '~background/messages/getActiveTabId';
+import * as WhisperingTabContentReady from '~background/messages/whisperingTabContentReady';
 
 export const config: PlasmoCSConfig = {
 	matches: ['https://whispering.bradenwong.com/*', 'http://localhost:5173/*'],
@@ -28,7 +29,10 @@ const onLoadSendWhisperingLoadedMessageProgram = Effect.gen(function* () {
 	const activeTabId = activeTabIdResult.data;
 	yield* Effect.tryPromise({
 		try: () =>
-			sendToBackground({
+			sendToBackground<
+				WhisperingTabContentReady.RequestBody,
+				WhisperingTabContentReady.ResponseBody
+			>({
 				name: 'whisperingTabContentReady',
 				body: { tabId: activeTabId },
 			}),
