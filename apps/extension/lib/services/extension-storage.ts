@@ -1,6 +1,6 @@
 import { Schema as S } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
-import { RecorderState, WhisperingError } from '@repo/shared';
+import { WhisperingError, recorderStateSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from './ToastServiceBgswLive';
@@ -49,7 +49,7 @@ const createSetWatch = <A, I>({ key, schema }: { key: string; schema: S.Schema<A
 export const extensionStorageService = {
 	'whispering-recording-state': createSetWatch({
 		key: 'whispering-recording-state',
-		schema: RecorderState,
+		schema: recorderStateSchema,
 	}),
 	'whispering-latest-recording-transcribed-text': createSetWatch({
 		key: 'whispering-latest-recording-transcribed-text',

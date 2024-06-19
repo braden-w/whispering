@@ -51,7 +51,7 @@ const WhisperingErrorProperties = S.Struct({
 	error: S.optional(S.Unknown),
 });
 
-export type WhisperingErrorProperties = S.Schema.Type<typeof WhisperingErrorProperties>;
+type WhisperingErrorProperties = S.Schema.Type<typeof WhisperingErrorProperties>;
 
 export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
@@ -78,9 +78,9 @@ export const effectToResult = <T>(
 export const resultToEffect = <T>(result: Result<T>): Effect.Effect<T, WhisperingError> =>
 	result.isSuccess ? Effect.succeed(result.data) : Effect.fail(new WhisperingError(result.error));
 
-export const RecorderState = S.Literal('IDLE', 'RECORDING', 'LOADING');
+export const recorderStateSchema = S.Literal('IDLE', 'RECORDING', 'LOADING');
 
-export type RecorderState = S.Schema.Type<typeof RecorderState>;
+export type RecorderState = S.Schema.Type<typeof recorderStateSchema>;
 
 export const recorderStateToIcons = {
 	RECORDING: '🔲',
@@ -91,7 +91,7 @@ export const recorderStateToIcons = {
 export const externalMessageSchema = S.Union(
 	S.Struct({
 		name: S.Literal('external/setRecorderState'),
-		body: S.Struct({ recorderState: RecorderState }),
+		body: S.Struct({ recorderState: recorderStateSchema }),
 	}),
 	S.Struct({
 		name: S.Literal('external/setClipboardText'),

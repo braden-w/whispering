@@ -1,6 +1,6 @@
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type { ExternalMessage, RecorderState, Result, ToastOptions } from '@repo/shared';
-import { WhisperingError, resultToEffect } from '@repo/shared';
+import { resultToEffect, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 
 const sendMessageToExtension = <T>(message: ExternalMessage) =>
