@@ -1,9 +1,12 @@
+import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
+import { WhisperingError, effectToResult } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~background/messages/getActiveTabId';
-import { WhisperingError } from '@repo/shared';
+import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
-export const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =>
+const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =>
 	Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		const [injectionResult] = yield* Effect.tryPromise({
@@ -88,3 +91,26 @@ export const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingE
 				}),
 		}),
 	);
+
+export type RequestBody = { text: string };
+
+export type ResponseBody = Result<void>;
+
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+	Effect.gen(function* () {
+		if (!body?.text) {
+			return yield* new WhisperingError({
+				title: 'Error invoking writeTextToCursor command',
+				description: 'Text must be provided in the request body of the message',
+			});
+		}
+		yield* writeTextToCursor(body.text);
+	}).pipe(
+		Effect.tapError(renderErrorAsToast),
+		Effect.provide(ToastServiceBgswLive),
+		effectToResult,
+		Effect.map(res.send),
+		Effect.runPromise,
+	);
+
+export default handler;
