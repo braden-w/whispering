@@ -45,7 +45,7 @@ export type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
 export class ToastService extends Context.Tag('ToastService')<
 	ToastService,
 	{
-		toast: (options: ToastOptions) => ToastId;
+		toast: (options: ToastOptions) => Effect.Effect<ToastId>;
 	}
 >() {}
 
