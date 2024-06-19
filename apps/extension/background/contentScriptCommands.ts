@@ -9,6 +9,7 @@ import {
 	type Settings,
 } from '@repo/shared';
 import { Console, Effect, Either, Option, pipe } from 'effect';
+import { injectScript } from './injectScript';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
@@ -103,48 +104,29 @@ export const contentCommands = {
 	getSettings: () =>
 		Effect.gen(function* () {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			const [injectionResult] = yield* Effect.tryPromise({
-				try: () =>
-					chrome.scripting.executeScript<[typeof SETTINGS_KEY], Result<string | null>>({
-						target: { tabId: whisperingTabId },
-						world: 'MAIN',
-						func: (settingsKey) => {
-							try {
-								const valueFromStorage = localStorage.getItem(settingsKey);
-								return { isSuccess: true, data: valueFromStorage } as const;
-							} catch (error) {
-								return {
-									isSuccess: false,
-									error: {
-										title: 'Unable to get Whispering settings',
-										description:
-											error instanceof Error
-												? error.message
-												: 'An error occurred while getting Whispering settings.',
-										error,
-									},
-								} as const;
-							}
-						},
-						args: [SETTINGS_KEY],
-					}),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to execute "getSettings" script in Whispering tab',
-						description: error instanceof Error ? error.message : `Unknown error: ${error}`,
-						error,
-					}),
+			const valueFromStorage = yield* injectScript<string | null, [typeof SETTINGS_KEY]>({
+				tabId: whisperingTabId,
+				commandName: 'setSettings',
+				func: (settingsKey) => {
+					try {
+						const valueFromStorage = localStorage.getItem(settingsKey);
+						return { isSuccess: true, data: valueFromStorage } as const;
+					} catch (error) {
+						return {
+							isSuccess: false,
+							error: {
+								title: 'Unable to get Whispering settings',
+								description:
+									error instanceof Error
+										? error.message
+										: 'An error occurred while getting Whispering settings.',
+								error,
+							},
+						} as const;
+					}
+				},
+				args: [SETTINGS_KEY],
 			});
-			yield* Console.info('Injection result "getSettings" script:', injectionResult);
-			if (!injectionResult || !injectionResult.result) {
-				return yield* new WhisperingError({
-					title: 'Unable to "getSettings" in Whispering tab',
-					description: 'The result of the script injection is undefined',
-				});
-			}
-			const { result } = injectionResult;
-			yield* Console.info('getSettings result:', result);
-			const valueFromStorage = yield* resultToEffect(result);
 			const isEmpty = valueFromStorage === null;
 			if (isEmpty) return DEFAULT_VALUE;
 			const settings = yield* S.decodeUnknown(S.parseJson(settingsSchema))(valueFromStorage).pipe(
@@ -162,47 +144,28 @@ export const contentCommands = {
 	setSettings: (settings: Settings) =>
 		Effect.gen(function* () {
 			const whisperingTabId = yield* getOrCreateWhisperingTabId;
-			const [injectionResult] = yield* Effect.tryPromise({
-				try: () =>
-					chrome.scripting.executeScript<[typeof SETTINGS_KEY, Settings], Result<Settings>>({
-						target: { tabId: whisperingTabId },
-						world: 'MAIN',
-						func: (settingsKey, settings) => {
-							try {
-								localStorage.setItem(settingsKey, JSON.stringify(settings));
-								return { isSuccess: true, data: settings } as const;
-							} catch (error) {
-								return {
-									isSuccess: false,
-									error: {
-										title: 'Unable to set Whispering settings',
-										description:
-											error instanceof Error
-												? error.message
-												: 'An error occurred while setting Whispering settings.',
-										error,
-									},
-								} as const;
-							}
-						},
-						args: [SETTINGS_KEY, settings],
-					}),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to execute "setSettings" script in Whispering tab',
-						description: error instanceof Error ? error.message : `Unknown error: ${error}`,
-						error,
-					}),
+			const returnedSettings = yield* injectScript<Settings, [typeof SETTINGS_KEY, Settings]>({
+				tabId: whisperingTabId,
+				commandName: 'setSettings',
+				func: (settingsKey, settings) => {
+					try {
+						localStorage.setItem(settingsKey, JSON.stringify(settings));
+						return { isSuccess: true, data: settings } as const;
+					} catch (error) {
+						return {
+							isSuccess: false,
+							error: {
+								title: 'Unable to set Whispering settings',
+								description:
+									error instanceof Error
+										? error.message
+										: 'An error occurred while setting Whispering settings.',
+								error,
+							},
+						} as const;
+					}
+				},
+				args: [SETTINGS_KEY, settings],
 			});
-			yield* Console.info('Injection result "setSettings" script:', injectionResult);
-			if (!injectionResult || !injectionResult.result) {
-				return yield* new WhisperingError({
-					title: 'Unable to "setSettings" in Whispering tab',
-					description: 'The result of the script injection is undefined',
-				});
-			}
-			const { result } = injectionResult;
-			yield* Console.info('setSettings result:', result);
-			const returnedSettings = yield* resultToEffect(result);
 		}),
 };
