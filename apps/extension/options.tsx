@@ -59,8 +59,8 @@ function IndexPopup() {
 					</CardHeader>
 					<Settings />
 					<CardFooter>
-						<Button asChild className="w-full" variant="secondary">
-							<a href="/">Go Back</a>
+						<Button onClick={() => window.close()} className="w-full" variant="secondary">
+							Submit
 						</Button>
 					</CardFooter>
 				</Card>
