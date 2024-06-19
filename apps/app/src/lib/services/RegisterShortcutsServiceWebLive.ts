@@ -15,7 +15,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -24,7 +24,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -38,8 +38,11 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new WhisperingError({
-							title: 'Error registering shortcut',
-							description: error instanceof Error ? error.message : undefined,
+							title: 'Error registering local shortcut',
+							description:
+								error instanceof Error
+									? error.message
+									: 'Please make sure it is a valid keyboard shortcut.',
 							error,
 						}),
 				}),
@@ -53,7 +56,7 @@ export const RegisterShortcutsWebLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new WhisperingError({
-							title: 'Error registering shortcut',
+							title: 'Error registering global shortcut',
 							description:
 								error instanceof Error
 									? error.message

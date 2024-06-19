@@ -16,7 +16,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -25,7 +25,7 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error unregistering all shortcuts',
-						description: error instanceof Error ? error.message : undefined,
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -39,8 +39,11 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 						}),
 					catch: (error) =>
 						new WhisperingError({
-							title: 'Error registering shortcut',
-							description: error instanceof Error ? error.message : undefined,
+							title: 'Error registering local shortcut',
+							description:
+								error instanceof Error
+									? error.message
+									: 'Please make sure it is a valid keyboard shortcut.',
 							error,
 						}),
 				}),
@@ -49,10 +52,12 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 					try: () => register(shortcut, callback),
 					catch: (error) =>
 						new WhisperingError({
-							title: window.__TAURI__
-								? 'Error registering shortcut. Please make sure it is a valid Electron keyboard shortcut.'
-								: 'Error registering shortcut.',
-							description: error instanceof Error ? error.message : undefined,
+							title:
+								'Error registering global shortcut. Please make sure it is a valid Electron keyboard shortcut.',
+							description:
+								error instanceof Error
+									? error.message
+									: 'You can find more information in the console.',
 							error,
 						}),
 				}),
