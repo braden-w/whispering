@@ -10,6 +10,7 @@ import type {
 	PlasmoMountShadowHost,
 } from 'plasmo';
 import { renderErrorAsToast } from '~lib/errors';
+import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
 import type * as ToggleRecording from '../background/messages/toggleRecording';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
