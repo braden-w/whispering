@@ -20,7 +20,7 @@
 
 	onMount(() => {
 		window.toggleRecording = recorder.toggleRecording;
-		window.c = recorder.c;
+		window.cancelRecording = recorder.cancelRecording;
 		window.addEventListener('beforeunload', () => {
 			if (recorderState.value === 'RECORDING') {
 				recorderState.value = 'IDLE';
