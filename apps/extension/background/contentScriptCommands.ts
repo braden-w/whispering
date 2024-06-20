@@ -19,19 +19,23 @@ const isNotifyWhisperingTabReadyMessage = (
 	return externalMessage.name === 'external/notifyWhisperingTabReady';
 };
 
-const getTabIdAfterActionComplete = <T>({
-	specificTabId,
+/**
+ * Executes the provided action that reloads or creates a new page, then waits
+ * for a specific tab's content script to send a message indicating that it's
+ * ready to toggle recording, cancel recording, etc.
+ */
+const getTabIdAfterCsReady = <T>({
+	isExpectedTabId,
 	action,
 }: {
-	specificTabId?: number;
+	isExpectedTabId: (tabId: number) => boolean;
 	action: () => Promise<T>;
 }) =>
 	Effect.async<number>((resume) => {
 		chrome.runtime.onMessage.addListener(
 			function contentReadyListener(message, sender, sendResponse) {
 				if (!isNotifyWhisperingTabReadyMessage(message)) return;
-				const isReadyTabValid = specificTabId === undefined || message.body.tabId === specificTabId;
-				if (!isReadyTabValid) return;
+				if (!isExpectedTabId(message.body.tabId)) return;
 				resume(Effect.succeed(message.body.tabId));
 				chrome.runtime.onMessage.removeListener(contentReadyListener);
 			},
@@ -45,8 +49,9 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
 	);
 	if (whisperingTabs.length === 0) {
-		const newTabId = yield* getTabIdAfterActionComplete({
+		const newTabId = yield* getTabIdAfterCsReady({
 			action: () => chrome.tabs.create({ url: WHISPERING_URL, active: false, pinned: true }),
+			isExpectedTabId: (tabId) => tabId > 0,
 		});
 		return yield* Option.some(newTabId);
 	}
@@ -62,9 +67,9 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 
 	const someDiscardedTabId = whisperingTabs[0]?.id;
 	if (!someDiscardedTabId) return yield* Option.none();
-	const reloadedTabId = yield* getTabIdAfterActionComplete({
-		specificTabId: someDiscardedTabId,
+	const reloadedTabId = yield* getTabIdAfterCsReady({
 		action: () => chrome.tabs.reload(someDiscardedTabId),
+		isExpectedTabId: (tabId) => tabId === someDiscardedTabId,
 	});
 	yield* pinTab(reloadedTabId);
 	return yield* Option.some(reloadedTabId);
