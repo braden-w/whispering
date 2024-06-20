@@ -96,40 +96,40 @@ export const recorderStateToIcons = {
 
 export const externalMessageSchema = S.Union(
 	S.Struct({
-		name: S.Literal('external/setRecorderState'),
-		body: S.Struct({ recorderState: recorderStateSchema }),
-	}),
-	S.Struct({
-		name: S.Literal('external/setClipboardText'),
-		body: S.Struct({ transcribedText: S.String }),
-	}),
-	S.Struct({
-		name: S.Literal('external/writeTextToCursor'),
-		body: S.Struct({ transcribedText: S.String }),
+		name: S.Literal('external/notifyWhisperingTabReady'),
+		body: S.Struct({}),
 	}),
 	S.Struct({
 		name: S.Literal('external/playSound'),
 		body: S.Struct({ sound: S.Literal('start', 'stop', 'cancel') }),
 	}),
 	S.Struct({
+		name: S.Literal('external/setClipboardText'),
+		body: S.Struct({ transcribedText: S.String }),
+	}),
+	S.Struct({
+		name: S.Literal('external/setRecorderState'),
+		body: S.Struct({ recorderState: recorderStateSchema }),
+	}),
+	S.Struct({
 		name: S.Literal('external/toast'),
 		body: S.Struct({ toastOptions: toastOptionsSchema }),
 	}),
 	S.Struct({
-		name: S.Literal('external/notifyWhisperingTabReady'),
-		body: S.Struct({}),
+		name: S.Literal('external/writeTextToCursor'),
+		body: S.Struct({ transcribedText: S.String }),
 	}),
 );
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
 
 export type ExternalMessageNameToReturnType = {
-	'external/setRecorderState': void;
-	'external/setClipboardText': void;
-	'external/writeTextToCursor': void;
-	'external/playSound': void;
-	'external/toast': string | number;
 	'external/notifyWhisperingTabReady': void;
+	'external/playSound': void;
+	'external/setClipboardText': void;
+	'external/setRecorderState': void;
+	'external/toast': string | number;
+	'external/writeTextToCursor': void;
 };
 
 export const TOASTER_SETTINGS = {
