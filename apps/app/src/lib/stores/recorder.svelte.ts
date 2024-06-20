@@ -68,8 +68,8 @@ export const recorder = Effect.gen(function* () {
 				if (!isSelectedDeviceExists) {
 					yield* toast({
 						variant: 'info',
-						title: 'Default audio input device not found',
-						description: 'Selecting the first available device',
+						title: 'Defaulting to first available audio input device...',
+						description: 'No device selected or selected device is not available',
 					});
 					const firstAudioInput = recordingDevices[0].deviceId;
 					settings.selectedAudioInputDeviceId = firstAudioInput;
