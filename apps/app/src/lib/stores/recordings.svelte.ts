@@ -114,7 +114,10 @@ const createRecordings = Effect.gen(function* () {
 						},
 					});
 					return transcribedText;
-				}).pipe(Effect.catchAll((error) => renderErrorAsToast(error, { toastId })));
+				}).pipe(
+					Effect.tapError((error) => renderErrorAsToast(error, { toastId })),
+					Effect.catchAll(() => Effect.succeed('')),
+				);
 
 				if (transcribedText === '') return;
 

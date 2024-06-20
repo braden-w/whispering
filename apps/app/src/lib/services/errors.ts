@@ -17,5 +17,4 @@ export const renderErrorAsToast = (
 			action: error.action,
 		});
 		yield* Console.error({ ...error });
-		return yield* error;
 	}).pipe(Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive));

@@ -1,6 +1,6 @@
 import { Effect, Option, Queue } from 'effect';
 
-export const createJobQueue = <T extends Effect.Effect<any, any>>() =>
+export const createJobQueue = <T extends Effect.Effect<any>>() =>
 	Effect.gen(function* (_) {
 		const queue = yield* Queue.unbounded<T>();
 

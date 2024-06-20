@@ -15,5 +15,4 @@ export const renderErrorAsToast = (
 			action: error.action,
 		});
 		yield* Console.error({ ...error });
-		return yield* error;
 	});
