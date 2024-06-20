@@ -17,6 +17,7 @@ import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 
 import GithubIcon from 'react:./components/icons/github.svg';
 import { renderErrorAsToast } from '~lib/errors';
 import type * as CancelRecording from './background/messages/contents/cancelRecording';
+import type * as OpenOptionsPage from './background/messages/openOptionsPage';
 import type * as ToggleRecording from './background/messages/contents/toggleRecording';
 import './style.css';
 import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
@@ -65,6 +66,28 @@ const cancelRecording = () =>
 		catch: (error) =>
 			new WhisperingError({
 				title: `Unable to cancel recording via background service worker`,
+				description:
+					error instanceof Error
+						? error.message
+						: 'There was likely an issue sending the message to the background service worker from the popup.',
+				error,
+			}),
+	}).pipe(
+		Effect.flatMap(resultToEffect),
+		Effect.catchAll(renderErrorAsToast),
+		Effect.provide(ToastServiceCsLive),
+		Effect.runPromise,
+	);
+
+const openOptionsPage = () =>
+	Effect.tryPromise({
+		try: () =>
+			sendToBackground<OpenOptionsPage.RequestBody, OpenOptionsPage.ResponseBody>({
+				name: 'openOptionsPage',
+			}),
+		catch: (error) =>
+			new WhisperingError({
+				title: `Unable to open options page via background service worker`,
 				description:
 					error instanceof Error
 						? error.message
@@ -218,13 +241,7 @@ function NavItems() {
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button
-							onClick={() => {
-								chrome.tabs.create({ url: `${WHISPERING_URL}/settings` });
-							}}
-							variant="ghost"
-							size="icon"
-						>
+						<Button onClick={openOptionsPage} variant="ghost" size="icon">
 							<SlidersVerticalIcon className="h-4 w-4" aria-hidden="true" />
 							<span className="sr-only">Settings</span>
 						</Button>
