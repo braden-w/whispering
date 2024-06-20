@@ -116,12 +116,8 @@ export const externalMessageSchema = S.Union(
 		body: S.Struct({ toastOptions: toastOptionsSchema }),
 	}),
 	S.Struct({
-		name: S.Literal('external/getTabSenderId'),
-		body: S.Struct({}),
-	}),
-	S.Struct({
 		name: S.Literal('external/notifyWhisperingTabReady'),
-		body: S.Struct({ tabId: S.Number }),
+		body: S.Struct({}),
 	}),
 );
 
@@ -133,7 +129,6 @@ export type ExternalMessageNameToReturnType = {
 	'external/writeTextToCursor': void;
 	'external/playSound': void;
 	'external/toast': string | number;
-	'external/getTabSenderId': number;
 	'external/notifyWhisperingTabReady': void;
 };
 

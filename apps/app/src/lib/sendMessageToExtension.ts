@@ -1,9 +1,5 @@
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
-import type {
-	ExternalMessage,
-	ExternalMessageNameToReturnType,
-	Result
-} from '@repo/shared';
+import type { ExternalMessage, ExternalMessageNameToReturnType, Result } from '@repo/shared';
 import { WhisperingError, resultToEffect } from '@repo/shared';
 import { Effect } from 'effect';
 
@@ -15,7 +11,6 @@ export const sendMessageToExtension = <
 	message: M,
 ) =>
 	Effect.gen(function* () {
-		if (window.__TAURI__) return;
 		const response = yield* Effect.tryPromise({
 			try: () =>
 				sendToBackgroundViaRelay({ name: message.name as never, body: message.body }) as Promise<

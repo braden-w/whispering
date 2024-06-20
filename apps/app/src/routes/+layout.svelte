@@ -32,13 +32,9 @@
 			}
 		});
 		Effect.gen(function* () {
-			const tabId = yield* sendMessageToExtension({
-				name: 'external/getTabSenderId',
-				body: {},
-			});
 			yield* sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
-				body: { tabId },
+				body: {  },
 			});
 		}).pipe(
 			Effect.catchAll(renderErrorAsToast),

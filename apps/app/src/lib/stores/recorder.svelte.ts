@@ -1,4 +1,4 @@
-import { extensionCommands, sendMessageToExtension } from '$lib/sendMessageToExtension';
+import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
