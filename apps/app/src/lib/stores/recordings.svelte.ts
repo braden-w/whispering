@@ -12,7 +12,7 @@ import {
 	TranscriptionServiceWhisperLive,
 	WhisperingError,
 } from '@repo/shared';
-import { Console, Effect, Either, Option } from 'effect';
+import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
