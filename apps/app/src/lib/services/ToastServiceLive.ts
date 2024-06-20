@@ -17,7 +17,7 @@ export const ToastServiceLive = Layer.succeed(
 						onClick: () => goto(action.goto),
 					},
 				});
-				return toastId;
+				return String(toastId);
 			}),
 	}),
 );

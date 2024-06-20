@@ -5,8 +5,8 @@ import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Effect } from 'effect';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS, extensionStorageService } from '~lib/services/extension-storage';
 
 const iconPaths = {
@@ -44,8 +44,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		yield* setRecorderState(body.recorderState);
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.tapError(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

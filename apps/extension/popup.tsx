@@ -15,12 +15,12 @@ import {
 import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
-import { renderErrorAsToast } from '~lib/errors';
+import { renderErrorAsNotification } from '~lib/errors';
 import type * as CancelRecording from './background/messages/contents/cancelRecording';
 import type * as OpenOptionsPage from './background/messages/openOptionsPage';
 import type * as ToggleRecording from './background/messages/contents/toggleRecording';
 import './style.css';
-import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
+import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 function IndexPopup() {
@@ -39,7 +39,7 @@ const toggleRecording = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
-				name: 'toggleRecording',
+				name: 'contents/toggleRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({
@@ -52,8 +52,8 @@ const toggleRecording = () =>
 			}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceCsLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceContentLive),
 		Effect.runPromise,
 	);
 
@@ -61,7 +61,7 @@ const cancelRecording = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<CancelRecording.RequestBody, CancelRecording.ResponseBody>({
-				name: 'cancelRecording',
+				name: 'contents/cancelRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({
@@ -74,8 +74,8 @@ const cancelRecording = () =>
 			}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceCsLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceContentLive),
 		Effect.runPromise,
 	);
 
@@ -96,8 +96,8 @@ const openOptionsPage = () =>
 			}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceCsLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceContentLive),
 		Effect.runPromise,
 	);
 

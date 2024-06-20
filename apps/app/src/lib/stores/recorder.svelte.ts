@@ -3,14 +3,21 @@ import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
-import { ToastService, WhisperingError, type RecorderState } from '@repo/shared';
+import {
+	NotificationService,
+	ToastService,
+	WhisperingError,
+	type RecorderState,
+} from '@repo/shared';
 import { Effect } from 'effect';
-import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
 import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
+import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -32,9 +39,12 @@ export let recorderState = (() => {
 	};
 })();
 
+const IS_RECORDING_NOTIFICATION_ID = 'whispering-is-recording';
+
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
 	const { toast } = yield* ToastService;
+	const notificationService = yield* NotificationService;
 
 	return {
 		get recorderState() {
@@ -90,6 +100,11 @@ export const recorder = Effect.gen(function* () {
 						}
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
+						yield* notificationService.notify({
+							id: IS_RECORDING_NOTIFICATION_ID,
+							title: 'Whispering is recording...',
+							description: '',
+						});
 						return;
 					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
@@ -104,6 +119,8 @@ export const recorder = Effect.gen(function* () {
 							}
 						}
 						yield* Effect.logInfo('Recording stopped');
+						recorderState.value = 'IDLE';
+						yield* notificationService.clear(IS_RECORDING_NOTIFICATION_ID);
 						const newRecording: Recording = {
 							id: nanoid(),
 							title: '',
@@ -113,7 +130,6 @@ export const recorder = Effect.gen(function* () {
 							blob: audioBlob,
 							transcriptionStatus: 'UNPROCESSED',
 						};
-						recorderState.value = 'IDLE';
 						yield* recordings.addRecording(newRecording);
 						recordings.transcribeRecording(newRecording.id);
 						return;
@@ -139,5 +155,6 @@ export const recorder = Effect.gen(function* () {
 }).pipe(
 	Effect.provide(MediaRecorderServiceWebLive),
 	Effect.provide(ToastServiceLive),
+	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
 );

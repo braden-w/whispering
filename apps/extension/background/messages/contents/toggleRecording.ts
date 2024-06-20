@@ -4,8 +4,8 @@ import { effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 declare const window: {
 	toggleRecording: () => void;
@@ -42,8 +42,8 @@ export const toggleRecording = Effect.gen(function* () {
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	toggleRecording.pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.tapError(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

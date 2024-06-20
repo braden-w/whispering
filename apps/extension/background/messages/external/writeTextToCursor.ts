@@ -4,8 +4,8 @@ import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/background/external/getActiveTabId';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =>
 	Effect.gen(function* () {
@@ -81,8 +81,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		yield* writeTextToCursor(body.transcribedText);
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.tapError(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

@@ -9,10 +9,10 @@ import type {
 	PlasmoGetStyle,
 	PlasmoMountShadowHost,
 } from 'plasmo';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
-import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(
@@ -69,7 +69,7 @@ const toggleRecordingFromContentScript = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
-				name: 'toggleRecording',
+				name: 'contents/toggleRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({
@@ -81,8 +81,8 @@ const toggleRecordingFromContentScript = () =>
 				error,
 			}),
 	}).pipe(
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceCsLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceContentLive),
 		Effect.runPromise,
 	);
 

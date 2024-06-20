@@ -1,15 +1,14 @@
-import { ToastService, WhisperingError } from '@repo/shared';
+import { NotificationService, WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
 
-export const renderErrorAsToast = (
+export const renderErrorAsNotification = (
 	error: WhisperingError,
-	options?: { toastId?: number | string },
+	options?: { notificationId?: string },
 ) =>
 	Effect.gen(function* () {
-		const { toast } = yield* ToastService;
-		yield* toast({
-			variant: 'error',
-			id: options?.toastId,
+		const { notify } = yield* NotificationService;
+		yield* notify({
+			id: options?.notificationId,
 			title: error.title,
 			description: error.description,
 			action: error.action,

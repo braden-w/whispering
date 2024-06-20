@@ -6,6 +6,7 @@ import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServi
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { renderErrorAsToast } from '$lib/services/errors';
 import {
+	NotificationService,
 	ToastService,
 	TranscriptionService,
 	TranscriptionServiceWhisperLive,
@@ -14,9 +15,12 @@ import {
 import { Effect, Either, Option } from 'effect';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
+import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
+import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 
 const createRecordings = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
+	const { notify } = yield* NotificationService;
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
 	const clipboardService = yield* ClipboardService;
@@ -78,6 +82,15 @@ const createRecordings = Effect.gen(function* () {
 				if (recorderState.value !== 'RECORDING') {
 					recorderState.value = 'LOADING';
 				}
+				const isVisible = !document.hidden;
+
+				if (!isVisible) {
+					yield* notify({
+						id: toastId,
+						title: 'Transcribing recording...',
+						description: 'Your recording is being transcribed.',
+					});
+				}
 
 				const transcribedText = yield* Effect.gen(function* () {
 					const maybeRecording = yield* recordingsDb.getRecording(id);
@@ -112,6 +125,17 @@ const createRecordings = Effect.gen(function* () {
 							goto: '/recordings',
 						},
 					});
+					if (!isVisible) {
+						yield* notify({
+							id: toastId,
+							title: 'Transcription complete!',
+							description: 'Check it out in your recordings',
+							action: {
+								label: 'Go to recordings',
+								goto: '/recordings',
+							},
+						});
+					}
 					return transcribedText;
 				}).pipe(
 					Effect.tapError((error) => renderErrorAsToast(error, { toastId })),
@@ -155,6 +179,7 @@ export const recordings = createRecordings.pipe(
 	Effect.provide(TranscriptionServiceWhisperLive),
 	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
+	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
 );
 

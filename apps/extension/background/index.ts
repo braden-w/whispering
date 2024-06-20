@@ -1,6 +1,6 @@
 import { Console, Effect } from 'effect';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { openOptionsPage } from './messages/openOptionsPage';
 import { toggleRecording } from './messages/contents/toggleRecording';
 
@@ -9,8 +9,8 @@ chrome.runtime.onInstalled.addListener((details) =>
 		if (details.reason !== 'install') return;
 		yield* openOptionsPage;
 	}).pipe(
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		Effect.runPromise,
 	),
 );
@@ -21,8 +21,8 @@ chrome.commands.onCommand.addListener((command) =>
 		if (command !== 'toggleRecording') return false;
 		yield* toggleRecording;
 	}).pipe(
-		Effect.catchAll(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.catchAll(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		Effect.runPromise,
 	),
 );

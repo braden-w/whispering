@@ -1,12 +1,12 @@
-import { ToastService, WHISPERING_URL, WhisperingError } from '@repo/shared';
+import { NotificationService, WHISPERING_URL, WhisperingError } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 
-export const ToastServiceBgswLive = Layer.succeed(
-	ToastService,
-	ToastService.of({
-		toast: ({ variant, id: maybeId, title, description, descriptionClass, action }) =>
+export const NotificationServiceBgswLive = Layer.succeed(
+	NotificationService,
+	NotificationService.of({
+		notify: ({ id: maybeId, title, description, action }) =>
 			Effect.gen(function* () {
 				const id = maybeId ?? nanoid();
 
@@ -14,6 +14,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 					try: async () => {
 						if (!action) {
 							chrome.notifications.create(id, {
+								requireInteraction: true,
 								title,
 								message: description,
 								type: 'basic',
@@ -37,7 +38,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 					},
 					catch: (error) =>
 						new WhisperingError({
-							title: 'Failed to show toast',
+							title: 'Failed to show notification',
 							description: error instanceof Error ? error.message : `Unknown error: ${error}`,
 							error,
 						}),
@@ -48,5 +49,6 @@ export const ToastServiceBgswLive = Layer.succeed(
 
 				return id;
 			}),
+		clear: (id: string) => Effect.sync(() => chrome.notifications.clear(id)),
 	}),
 );

@@ -2,8 +2,8 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { WhisperingError, effectToResult, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~lib/background/external/getActiveTabId';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
@@ -47,8 +47,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		yield* playSound(body.sound);
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.tapError(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

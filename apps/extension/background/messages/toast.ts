@@ -7,12 +7,12 @@ import {
 	type ToastOptions,
 } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { renderErrorAsToast } from '~lib/errors';
-import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { renderErrorAsNotification } from '~lib/errors';
+import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody = { toastOptions: ToastOptions };
 
-export type ResponseBody = Result<number | string>;
+export type ResponseBody = Result<string>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
@@ -27,8 +27,8 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		const toastId = yield* toast(body.toastOptions);
 		return toastId;
 	}).pipe(
-		Effect.tapError(renderErrorAsToast),
-		Effect.provide(ToastServiceBgswLive),
+		Effect.tapError(renderErrorAsNotification),
+		Effect.provide(NotificationServiceBgswLive),
 		effectToResult,
 		Effect.map(res.send),
 		Effect.runPromise,

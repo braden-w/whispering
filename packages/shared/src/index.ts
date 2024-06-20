@@ -32,23 +32,34 @@ export const settingsSchema = S.Struct({
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
-const ToastId = S.Union(S.String, S.Number);
-
 export const toastOptionsSchema = S.Struct({
 	variant: S.Literal('success', 'info', 'loading', 'error'),
-	id: S.optional(ToastId),
+	id: S.optional(S.String),
 	...BaseError.fields,
 	descriptionClass: S.optional(S.String),
 });
-
-type ToastId = S.Schema.Type<typeof ToastId>;
 
 export type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
 
 export class ToastService extends Context.Tag('ToastService')<
 	ToastService,
 	{
-		toast: (options: ToastOptions) => Effect.Effect<ToastId>;
+		toast: (options: ToastOptions) => Effect.Effect<string>;
+	}
+>() {}
+
+export const notificationOptionsSchema = S.Struct({
+	id: S.optional(S.String),
+	...BaseError.fields,
+});
+
+type NotificationOptions = S.Schema.Type<typeof notificationOptionsSchema>;
+
+export class NotificationService extends Context.Tag('NotificationService')<
+	NotificationService,
+	{
+		notify: (options: NotificationOptions) => Effect.Effect<string>;
+		clear: (id: string) => Effect.Effect<void>;
 	}
 >() {}
 
@@ -112,8 +123,12 @@ export const externalMessageSchema = S.Union(
 		body: S.Struct({ recorderState: recorderStateSchema }),
 	}),
 	S.Struct({
-		name: S.Literal('external/toast'),
-		body: S.Struct({ toastOptions: toastOptionsSchema }),
+		name: S.Literal('external/notifications/create'),
+		body: S.Struct({ notifyOptions: notificationOptionsSchema }),
+	}),
+	S.Struct({
+		name: S.Literal('external/notifications/clear'),
+		body: S.Struct({ notificationId: S.String }),
 	}),
 	S.Struct({
 		name: S.Literal('external/writeTextToCursor'),
@@ -128,7 +143,8 @@ export type ExternalMessageNameToReturnType = {
 	'external/playSound': void;
 	'external/setClipboardText': void;
 	'external/setRecorderState': void;
-	'external/toast': string | number;
+	'external/notifications/create': string;
+	'external/notifications/clear': void;
 	'external/writeTextToCursor': void;
 };
 
