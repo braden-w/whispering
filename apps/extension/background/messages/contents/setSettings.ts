@@ -2,7 +2,8 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result, Settings } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
-import { contentCommands } from '~background/contentScriptCommands';
+import { SETTINGS_KEY, getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
+import { injectScript } from '~background/injectScript';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 
@@ -18,7 +19,31 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 				description: 'Settings must be provided in the message request body',
 			});
 		}
-		yield* contentCommands.setSettings(body.settings);
+		const { settings } = body;
+		const whisperingTabId = yield* getOrCreateWhisperingTabId;
+		const returnedSettings = yield* injectScript<Settings, [typeof SETTINGS_KEY, Settings]>({
+			tabId: whisperingTabId,
+			commandName: 'setSettings',
+			func: (settingsKey, settings) => {
+				try {
+					localStorage.setItem(settingsKey, JSON.stringify(settings));
+					return { isSuccess: true, data: settings } as const;
+				} catch (error) {
+					return {
+						isSuccess: false,
+						error: {
+							title: 'Unable to set Whispering settings',
+							description:
+								error instanceof Error
+									? error.message
+									: 'An error occurred while setting Whispering settings.',
+							error,
+						},
+					} as const;
+				}
+			},
+			args: [SETTINGS_KEY, settings],
+		});
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),
 		Effect.provide(ToastServiceBgswLive),
