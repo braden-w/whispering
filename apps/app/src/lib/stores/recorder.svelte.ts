@@ -135,7 +135,7 @@ export const recorder = Effect.gen(function* () {
 				}
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
-			}).pipe(Effect.runSync),
+			}).pipe(Effect.runPromise),
 	};
 }).pipe(
 	Effect.provide(MediaRecorderServiceWebLive),
