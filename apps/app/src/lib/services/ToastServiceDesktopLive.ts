@@ -1,6 +1,7 @@
 import { goto } from '$app/navigation';
 import { ToastService } from '@repo/shared';
-import { Effect, Layer } from 'effect';
+import { Console, Effect, Layer } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 import { toast } from 'svelte-sonner';
 
 export const ToastServiceDesktopLive = Layer.succeed(
@@ -18,6 +19,9 @@ export const ToastServiceDesktopLive = Layer.succeed(
 					},
 				});
 				return toastId;
-			}),
+			}).pipe(
+				// Effect.tapError((error) => Console.error({ ...error })),
+				Effect.catchAll(() => Effect.succeed(id ?? nanoid())),
+			),
 	}),
 );

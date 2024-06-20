@@ -1,6 +1,7 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { ToastService, WhisperingError, resultToEffect } from '@repo/shared';
-import { Effect, Layer } from 'effect';
+import { Console, Effect, Layer } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 import type * as Toast from '~background/messages/toast';
 
 export const ToastServiceCsLive = Layer.succeed(
@@ -24,7 +25,8 @@ export const ToastServiceCsLive = Layer.succeed(
 					}),
 			}).pipe(
 				Effect.flatMap(resultToEffect),
-				Effect.catchAll(() => Effect.succeed(0)),
+				Effect.tapError((error) => Console.error({ ...error })),
+				Effect.catchAll(() => Effect.succeed(toastOptions.id ?? nanoid())),
 			),
 	}),
 );

@@ -41,7 +41,10 @@ export const ToastServiceBgswLive = Layer.succeed(
 							description: error instanceof Error ? error.message : `Unknown error: ${error}`,
 							error,
 						}),
-				}).pipe(Effect.catchAll((error) => Console.error({ ...error })));
+				}).pipe(
+					Effect.tapError((error) => Console.error({ ...error })),
+					Effect.catchAll(() => Effect.succeed(maybeId ?? nanoid())),
+				);
 
 				return id;
 			}),
