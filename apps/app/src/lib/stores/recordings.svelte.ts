@@ -135,12 +135,6 @@ const createRecordings = Effect.gen(function* () {
 				// Paste transcription if enabled
 				if (settings.isPasteContentsOnSuccessEnabled) {
 					yield* clipboardService.writeText(transcribedText);
-					yield* toast({
-						variant: 'success',
-						title: 'Pasted transcription!',
-						description: transcribedText,
-						descriptionClass: 'line-clamp-2',
-					});
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>
