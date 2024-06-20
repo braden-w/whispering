@@ -47,4 +47,14 @@ export const extensionCommands = {
 			name: 'external/toast',
 			body: { toastOptions },
 		}),
+	getTabSenderId: () =>
+		sendMessageToExtension<number>({
+			name: 'external/getTabSenderId',
+			body: {},
+		}),
+	notifyWhisperingTabReady: (tabId: number) =>
+		sendMessageToExtension<void>({
+			name: 'external/notifyWhisperingTabReady',
+			body: { tabId },
+		}),
 } as const;

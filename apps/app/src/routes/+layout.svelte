@@ -1,8 +1,13 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { extensionCommands } from '$lib/extensionCommands';
+	import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
+	import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
+	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recorder, recorderState } from '$lib/stores';
 	import { TOASTER_SETTINGS } from '@repo/shared';
+	import { Effect } from 'effect';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import '../app.pcss';
@@ -26,6 +31,14 @@
 				recorderState.value = 'IDLE';
 			}
 		});
+		Effect.gen(function* () {
+			const tabId = yield* extensionCommands.getTabSenderId();
+			yield* extensionCommands.notifyWhisperingTabReady(tabId);
+		}).pipe(
+			Effect.catchAll(renderErrorAsToast),
+			Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
+			Effect.runPromise,
+		);
 	});
 </script>
 

@@ -115,6 +115,14 @@ export const externalMessageSchema = S.Union(
 		name: S.Literal('external/toast'),
 		body: S.Struct({ toastOptions: toastOptionsSchema }),
 	}),
+	S.Struct({
+		name: S.Literal('external/getTabSenderId'),
+		body: S.Struct({}),
+	}),
+	S.Struct({
+		name: S.Literal('external/notifyWhisperingTabReady'),
+		body: S.Struct({tabId: S.Number}),
+	}),
 );
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
