@@ -7,7 +7,7 @@ import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
-import { extensionStorageService } from '~lib/services/extension-storage';
+import { STORAGE_KEYS, extensionStorageService } from '~lib/services/extension-storage';
 
 const iconPaths = {
 	IDLE: studioMicrophone,
@@ -17,7 +17,7 @@ const iconPaths = {
 
 const setRecorderState = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
-		yield* extensionStorageService['whispering-recording-state'].set(recorderState);
+		yield* extensionStorageService[STORAGE_KEYS.RECORDER_STATE].set(recorderState);
 		const path = iconPaths[recorderState];
 		yield* Effect.tryPromise({
 			try: () => chrome.action.setIcon({ path }),

@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { WhisperingError, effectToResult } from '@repo/shared';
+import { effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';

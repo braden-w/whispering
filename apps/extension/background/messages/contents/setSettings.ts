@@ -2,10 +2,11 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result, Settings } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
-import { SETTINGS_KEY, getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
 import { injectScript } from '~background/injectScript';
+import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 export type RequestBody = { settings: Settings };
 
@@ -21,7 +22,10 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 		}
 		const { settings } = body;
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		const returnedSettings = yield* injectScript<Settings, [typeof SETTINGS_KEY, Settings]>({
+		const returnedSettings = yield* injectScript<
+			Settings,
+			[typeof STORAGE_KEYS.SETTINGS, Settings]
+		>({
 			tabId: whisperingTabId,
 			commandName: 'setSettings',
 			func: (settingsKey, settings) => {
@@ -42,7 +46,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ bo
 					} as const;
 				}
 			},
-			args: [SETTINGS_KEY, settings],
+			args: [STORAGE_KEYS.SETTINGS, settings],
 		});
 	}).pipe(
 		Effect.tapError(renderErrorAsToast),

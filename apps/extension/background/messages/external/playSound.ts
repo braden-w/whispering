@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { WhisperingError, effectToResult, type Result } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { getActiveTabId } from '~background/messages/getActiveTabId';
+import { getActiveTabId } from '~lib/background/external/getActiveTabId';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 

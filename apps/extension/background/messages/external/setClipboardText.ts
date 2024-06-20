@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
-import { getActiveTabId } from '~background/getActiveTabId';
+import { getActiveTabId } from '~lib/background/external/getActiveTabId';
 import { injectScript } from '~background/injectScript';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';

@@ -83,5 +83,3 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 			}),
 	),
 );
-
-export const SETTINGS_KEY = 'whispering-settings' as const;

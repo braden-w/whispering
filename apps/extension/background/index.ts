@@ -2,7 +2,7 @@ import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
 import { openOptionsPage } from './messages/openOptionsPage';
-import { toggleRecording } from './messages/toggleRecording';
+import { toggleRecording } from './messages/contents/toggleRecording';
 
 chrome.runtime.onInstalled.addListener((details) =>
 	Effect.gen(function* () {

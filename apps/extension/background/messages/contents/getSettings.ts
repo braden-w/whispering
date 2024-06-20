@@ -8,10 +8,11 @@ import {
 	type Settings,
 } from '@repo/shared';
 import { Effect } from 'effect';
-import { SETTINGS_KEY, getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
 import { injectScript } from '~background/injectScript';
+import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
+import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 const DEFAULT_VALUE = {
 	isPlaySoundEnabled: true,
@@ -31,7 +32,7 @@ export type ResponseBody = Result<Settings>;
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		const valueFromStorage = yield* injectScript<string | null, [typeof SETTINGS_KEY]>({
+		const valueFromStorage = yield* injectScript<string | null, [typeof STORAGE_KEYS.SETTINGS]>({
 			tabId: whisperingTabId,
 			commandName: 'setSettings',
 			func: (settingsKey) => {
@@ -52,7 +53,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 					} as const;
 				}
 			},
-			args: [SETTINGS_KEY],
+			args: [STORAGE_KEYS.SETTINGS],
 		});
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return DEFAULT_VALUE;

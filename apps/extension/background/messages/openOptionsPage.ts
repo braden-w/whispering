@@ -17,7 +17,7 @@ export const openOptionsPage = Effect.tryPromise({
 
 export type RequestBody = {};
 
-export type ResponseBody = Result<number>;
+export type ResponseBody = Result<void>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
 	Effect.gen(function* () {
