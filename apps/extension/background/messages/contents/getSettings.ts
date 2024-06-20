@@ -8,7 +8,7 @@ import {
 	type Settings,
 } from '@repo/shared';
 import { Effect } from 'effect';
-import { SETTINGS_KEY, getOrCreateWhisperingTabId } from '~background/contentScriptCommands';
+import { SETTINGS_KEY, getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
 import { injectScript } from '~background/injectScript';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from '~lib/services/ToastServiceBgswLive';
