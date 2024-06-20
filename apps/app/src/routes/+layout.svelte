@@ -2,8 +2,7 @@
 	import { onNavigate } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
-	import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
+	import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recorder, recorderState } from '$lib/stores';
 	import { TOASTER_SETTINGS } from '@repo/shared';
@@ -34,11 +33,11 @@
 		Effect.gen(function* () {
 			yield* sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
-				body: {  },
+				body: {},
 			});
 		}).pipe(
 			Effect.catchAll(renderErrorAsToast),
-			Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
+			Effect.provide(ToastServiceLive),
 			Effect.runPromise,
 		);
 	});

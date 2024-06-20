@@ -1,8 +1,7 @@
 import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
-import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
-import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { renderErrorAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
@@ -132,6 +131,6 @@ const createSettings = Effect.gen(function* () {
 
 export const settings = createSettings.pipe(
 	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
-	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
+	Effect.provide(ToastServiceLive),
 	Effect.runSync,
 );

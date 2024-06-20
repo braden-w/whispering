@@ -1,7 +1,6 @@
 import { ToastService, WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { ToastServiceDesktopLive } from './ToastServiceDesktopLive';
-import { ToastServiceWebLive } from './ToastServiceWebLive';
+import { ToastServiceLive } from './ToastServiceLive';
 
 export const renderErrorAsToast = (
 	error: WhisperingError,
@@ -17,4 +16,4 @@ export const renderErrorAsToast = (
 			action: error.action,
 		});
 		yield* Console.error({ ...error });
-	}).pipe(Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive));
+	}).pipe(Effect.provide(ToastServiceLive));

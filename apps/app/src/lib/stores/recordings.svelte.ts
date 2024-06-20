@@ -3,8 +3,7 @@ import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDeskt
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
-import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
-import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { renderErrorAsToast } from '$lib/services/errors';
 import {
 	ToastService,
@@ -154,7 +153,7 @@ const createRecordings = Effect.gen(function* () {
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceWhisperLive),
-	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
+	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.runSync,
 );

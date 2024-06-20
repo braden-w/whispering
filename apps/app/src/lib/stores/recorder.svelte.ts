@@ -1,8 +1,7 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
-import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
-import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
+import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
 import { ToastService, WhisperingError, type RecorderState } from '@repo/shared';
 import { Effect } from 'effect';
@@ -139,6 +138,6 @@ export const recorder = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(MediaRecorderServiceWebLive),
-	Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),
+	Effect.provide(ToastServiceLive),
 	Effect.runSync,
 );
