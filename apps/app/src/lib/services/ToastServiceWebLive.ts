@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { ToastService, type ToastOptions } from '@repo/shared';
+import { ToastService } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from 'svelte-sonner';
