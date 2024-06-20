@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { extensionCommands } from '$lib/extensionCommands';
+	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
 	import { ToastServiceWebLive } from '$lib/services/ToastServiceWebLive';
 	import { renderErrorAsToast } from '$lib/services/errors';
@@ -32,8 +32,14 @@
 			}
 		});
 		Effect.gen(function* () {
-			const tabId = yield* extensionCommands.getTabSenderId();
-			yield* extensionCommands.notifyWhisperingTabReady(tabId);
+			const tabId = yield* sendMessageToExtension({
+				name: 'external/getTabSenderId',
+				body: {},
+			});
+			yield* sendMessageToExtension({
+				name: 'external/notifyWhisperingTabReady',
+				body: { tabId },
+			});
 		}).pipe(
 			Effect.catchAll(renderErrorAsToast),
 			Effect.provide(window.__TAURI__ ? ToastServiceDesktopLive : ToastServiceWebLive),

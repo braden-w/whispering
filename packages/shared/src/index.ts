@@ -121,11 +121,21 @@ export const externalMessageSchema = S.Union(
 	}),
 	S.Struct({
 		name: S.Literal('external/notifyWhisperingTabReady'),
-		body: S.Struct({tabId: S.Number}),
+		body: S.Struct({ tabId: S.Number }),
 	}),
 );
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
+
+export type ExternalMessageNameToReturnType = {
+	'external/setRecorderState': void;
+	'external/setClipboardText': void;
+	'external/writeTextToCursor': void;
+	'external/playSound': void;
+	'external/toast': string | number;
+	'external/getTabSenderId': number;
+	'external/notifyWhisperingTabReady': void;
+};
 
 export const TOASTER_SETTINGS = {
 	position: 'bottom-right',

@@ -1,4 +1,4 @@
-import { extensionCommands } from '$lib/extensionCommands';
+import { extensionCommands, sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { ToastServiceDesktopLive } from '$lib/services/ToastServiceDesktopLive';
@@ -25,9 +25,10 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			extensionCommands
-				.setRecorderState(newValue)
-				.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+			sendMessageToExtension({
+				name: 'external/setRecorderState',
+				body: { recorderState: newValue },
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},
 	};
 })();
@@ -82,7 +83,10 @@ export const recorder = Effect.gen(function* () {
 							if (!document.hidden) {
 								startSound.play();
 							} else {
-								yield* extensionCommands.playSound('start');
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'start' },
+								});
 							}
 						}
 						yield* Effect.logInfo('Recording started');
@@ -94,7 +98,10 @@ export const recorder = Effect.gen(function* () {
 							if (!document.hidden) {
 								stopSound.play();
 							} else {
-								yield* extensionCommands.playSound('stop');
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'stop' },
+								});
 							}
 						}
 						yield* Effect.logInfo('Recording stopped');
@@ -120,7 +127,10 @@ export const recorder = Effect.gen(function* () {
 					if (!document.hidden) {
 						cancelSound.play();
 					} else {
-						yield* extensionCommands.playSound('cancel');
+						yield* sendMessageToExtension({
+							name: 'external/playSound',
+							body: { sound: 'cancel' },
+						});
 					}
 				}
 				yield* Effect.logInfo('Recording cancelled');
