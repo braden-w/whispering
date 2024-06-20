@@ -30,8 +30,8 @@ const getTabIdAfterActionComplete = <T>({
 		chrome.runtime.onMessage.addListener(
 			function contentReadyListener(message, sender, sendResponse) {
 				if (!isNotifyWhisperingTabReadyMessage(message)) return;
-				const isMessageValid = specificTabId === undefined || message.body.tabId === specificTabId;
-				if (!isMessageValid) return;
+				const isReadyTabValid = specificTabId === undefined || message.body.tabId === specificTabId;
+				if (!isReadyTabValid) return;
 				resume(Effect.succeed(message.body.tabId));
 				chrome.runtime.onMessage.removeListener(contentReadyListener);
 			},
