@@ -1,16 +1,18 @@
 import { Schema as S } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
-import { WhisperingError, recorderStateSchema } from '@repo/shared';
+import {
+	WhisperingError,
+	recorderStateSchema
+} from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceBgswLive } from './ToastServiceBgswLive';
 
-const keys = [
-	'whispering-recording-state',
-	'whispering-latest-recording-transcribed-text',
-] as const;
-
-type Key = (typeof keys)[number];
+export const STORAGE_KEYS = {
+	RECORDER_STATE: 'whispering-recorder-state',
+	LATEST_RECORDING_TRANSCRIBED_TEXT: 'whispering-latest-recording-transcribed-text',
+	SETTINGS: 'whispering-settings',
+} as const;
 
 const storage = new Storage();
 
@@ -47,12 +49,12 @@ const createSetWatch = <A, I>({ key, schema }: { key: string; schema: S.Schema<A
 };
 
 export const extensionStorageService = {
-	'whispering-recording-state': createSetWatch({
-		key: 'whispering-recording-state',
+	[STORAGE_KEYS.RECORDER_STATE]: createSetWatch({
+		key: STORAGE_KEYS.RECORDER_STATE,
 		schema: recorderStateSchema,
 	}),
-	'whispering-latest-recording-transcribed-text': createSetWatch({
-		key: 'whispering-latest-recording-transcribed-text',
+	[STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]: createSetWatch({
+		key: STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
 		schema: S.String,
 	}),
 } as const;

@@ -16,10 +16,11 @@ import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
 import { renderErrorAsToast } from '~lib/errors';
-import type * as CancelRecording from './background/messages/cancelRecording';
-import type * as ToggleRecording from './background/messages/toggleRecording';
+import type * as CancelRecording from './background/messages/contents/cancelRecording';
+import type * as ToggleRecording from './background/messages/contents/toggleRecording';
 import './style.css';
 import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
+import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 function IndexPopup() {
 	return (
@@ -78,9 +79,9 @@ const cancelRecording = () =>
 	);
 
 function IndexPage() {
-	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
+	const [recorderState] = useStorage<RecorderState>(STORAGE_KEYS.RECORDER_STATE, 'IDLE');
 	const [latestRecordingTranscribedText] = useStorage<string>(
-		'whispering-latest-recording-transcribed-text',
+		STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
 	);
 
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];

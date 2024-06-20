@@ -11,7 +11,8 @@ import type {
 } from 'plasmo';
 import { renderErrorAsToast } from '~lib/errors';
 import { ToastServiceCsLive } from '~lib/services/ToastServiceCsLive';
-import type * as ToggleRecording from '../background/messages/toggleRecording';
+import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
+import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(
@@ -86,7 +87,7 @@ const toggleRecordingFromContentScript = () =>
 	);
 
 function RecorderStateAsIcon() {
-	const [recorderState] = useStorage<RecorderState>('whispering-recording-state', 'IDLE');
+	const [recorderState] = useStorage<RecorderState>(STORAGE_KEYS.RECORDER_STATE, 'IDLE');
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
