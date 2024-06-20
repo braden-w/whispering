@@ -3,20 +3,21 @@ import {
 	WHISPERING_URL,
 	WHISPERING_URL_WILDCARD,
 	WhisperingError,
-	externalMessageSchema
+	externalMessageSchema,
+	type ExternalMessage,
 } from '@repo/shared';
-import { Effect, Either, Option, pipe } from 'effect';
+import { Effect, Either, Option } from 'effect';
 
 const pinTab = (tabId: number) => Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
 
-const notifyWhisperingTabReadyMessageSchema = externalMessageSchema.members['6'];
-
-type NotifyWhisperingTabReadyMessage = S.Schema.Type<typeof notifyWhisperingTabReadyMessageSchema>;
-
 const isNotifyWhisperingTabReadyMessage = (
 	message: unknown,
-): message is NotifyWhisperingTabReadyMessage =>
-	pipe(message, S.decodeUnknownEither(notifyWhisperingTabReadyMessageSchema), Either.isRight);
+): message is Extract<ExternalMessage, { name: 'external/notifyWhisperingTabReady' }> => {
+	const externalMessageResult = S.decodeUnknownEither(externalMessageSchema)(message);
+	if (Either.isLeft(externalMessageResult)) return false;
+	const externalMessage = externalMessageResult.right;
+	return externalMessage.name === 'external/notifyWhisperingTabReady';
+};
 
 const getTabIdAfterActionComplete = <T>({
 	specificTabId,
