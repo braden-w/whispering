@@ -43,7 +43,7 @@
 				"icons/icon.ico"
 			],
 			"identifier": "com.bradenwong.whispering",
-			"longDescription": "",
+			"longDescription": "Seamlessly integrate speech-to-text transcriptions anywhere on your desktop. Powered by OpenAI's Whisper API.",
 			"macOS": {
 				"entitlements": "entitlements.plist",
 				"exceptionDomain": "",
