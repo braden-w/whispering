@@ -1,4 +1,4 @@
-import { ToastService, WhisperingError } from '@repo/shared';
+import { ToastService, WHISPERING_URL, WhisperingError } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
@@ -30,7 +30,7 @@ export const ToastServiceBgswLive = Layer.succeed(
 							chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
 								if (buttonIndex === 0) {
 									chrome.notifications.clear(id);
-									chrome.tabs.create({ url: action.goto });
+									chrome.tabs.create({ url: `${WHISPERING_URL}${action.goto}` });
 								}
 							});
 						}
