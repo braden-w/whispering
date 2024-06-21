@@ -1,5 +1,10 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { RecorderState, Result } from '@repo/shared';
+import type {
+	ExternalMessage,
+	ExternalMessageNameToReturnType,
+	RecorderState,
+	Result,
+} from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
@@ -30,9 +35,9 @@ const setRecorderState = (recorderState: RecorderState) =>
 		});
 	});
 
-export type RequestBody = { recorderState: RecorderState };
+export type RequestBody = Extract<ExternalMessage, { name: 'external/setRecorderState' }>['body'];
 
-export type ResponseBody = Result<void>;
+export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setRecorderState']>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

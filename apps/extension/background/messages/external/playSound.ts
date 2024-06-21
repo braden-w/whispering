@@ -1,5 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { WhisperingError, effectToResult, type Result } from '@repo/shared';
+import {
+	WhisperingError,
+	effectToResult,
+	type ExternalMessage,
+	type ExternalMessageNameToReturnType,
+	type Result,
+} from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { getActiveTabId } from '~lib/background/external/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
@@ -33,9 +39,9 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 		}),
 	);
 
-export type RequestBody = { sound: 'start' | 'stop' | 'cancel' };
+export type RequestBody = Extract<ExternalMessage, { name: 'external/playSound' }>['body'];
 
-export type ResponseBody = Result<void>;
+export type ResponseBody = Result<ExternalMessageNameToReturnType['external/playSound']>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

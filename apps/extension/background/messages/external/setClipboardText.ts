@@ -1,5 +1,5 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { Result } from '@repo/shared';
+import type { ExternalMessage, ExternalMessageNameToReturnType, Result } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { getActiveTabId } from '~lib/background/external/getActiveTabId';
@@ -43,9 +43,9 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 		}),
 	);
 
-export type RequestBody = { transcribedText: string };
+export type RequestBody = Extract<ExternalMessage, { name: 'external/setClipboardText' }>['body'];
 
-export type ResponseBody = Result<void>;
+export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setClipboardText']>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
