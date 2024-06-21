@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onNavigate } from '$app/navigation';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { ToastServiceLive } from '$lib/services/ToastServiceLive';
@@ -6,7 +7,7 @@
 	import { recorder, recorderState } from '$lib/stores';
 	import { Effect } from 'effect';
 	import { ModeWatcher, mode } from 'mode-watcher';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
@@ -22,7 +23,9 @@
 		});
 	});
 
-	onMount(() => {
+	let unlisten: UnlistenFn;
+
+	onMount(async () => {
 		window.toggleRecording = recorder.toggleRecording;
 		window.cancelRecording = recorder.cancelRecording;
 		window.addEventListener('beforeunload', () => {
@@ -30,16 +33,26 @@
 				recorderState.value = 'IDLE';
 			}
 		});
-		Effect.gen(function* () {
-			yield* sendMessageToExtension({
+		if (window.__TAURI__) {
+			unlisten = await listen('toggle-recording', () => {
+				recorder.toggleRecording();
+			});
+		} else {
+			sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
 				body: {},
-			});
-		}).pipe(
-			Effect.catchAll(renderErrorAsToast),
-			Effect.provide(ToastServiceLive),
-			Effect.runPromise,
-		);
+			}).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.provide(ToastServiceLive),
+				Effect.runPromise,
+			);
+		}
+	});
+
+	onDestroy(() => {
+		if (window.__TAURI__) {
+			unlisten();
+		}
 	});
 
 	const TOASTER_SETTINGS = {
