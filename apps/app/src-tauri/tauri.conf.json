@@ -28,8 +28,10 @@
 			}
 		},
 		"systemTray": {
+			"title": "Toggle Whispering",
 			"iconPath": "icons/recorder_state/studio_microphone.png",
-			"iconAsTemplate": true
+			"iconAsTemplate": true,
+			"menuOnLeftClick": false
 		},
 		"bundle": {
 			"active": true,
