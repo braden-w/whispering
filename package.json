@@ -16,7 +16,7 @@
 	"devDependencies": {
 		"@parcel/optimizer-data-url": "2.9.3",
 		"@parcel/transformer-inline-string": "2.9.3",
-		"typescript": "^5.4.5",
+		"typescript": "^5.5.2",
 		"@changesets/cli": "^2.27.5",
 		"eslint": "latest",
 		"prettier": "latest",
