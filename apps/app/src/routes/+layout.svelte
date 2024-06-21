@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
-	import { Toaster } from '$lib/components/ui/sonner';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recorder, recorderState } from '$lib/stores';
 	import { Effect } from 'effect';
-	import { ModeWatcher } from 'mode-watcher';
+	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
+	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
 
 	onNavigate((navigation) => {
@@ -59,5 +59,5 @@
 	<slot />
 </div>
 
-<Toaster {...TOASTER_SETTINGS} />
+<Toaster theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />
