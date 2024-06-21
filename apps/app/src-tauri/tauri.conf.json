@@ -27,6 +27,10 @@
 				"sidecar": false
 			}
 		},
+		"systemTray": {
+			"iconPath": "icons/recorder_state/studio_microphone.png",
+			"iconAsTemplate": true
+		},
 		"bundle": {
 			"active": true,
 			"category": "Productivity",
@@ -72,7 +76,8 @@
 				"height": 600,
 				"resizable": true,
 				"title": "Whispering",
-				"width": 800
+				"width": 800,
+				"alwaysOnTop": true
 			}
 		]
 	}
