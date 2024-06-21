@@ -17,6 +17,7 @@ import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
+import { nanoid } from 'nanoid/non-secure';
 
 const createRecordings = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
@@ -74,7 +75,9 @@ const createRecordings = Effect.gen(function* () {
 			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* () {
-				const toastId = yield* toast({
+				const toastId = nanoid();
+				yield* toast({
+					id: toastId,
 					variant: 'loading',
 					title: 'Transcribing recording...',
 					description: 'Your recording is being transcribed.',
