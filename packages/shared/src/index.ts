@@ -1,6 +1,5 @@
 import { Schema as S } from '@effect/schema';
 import { Context, Data, Effect } from 'effect';
-import type { ToasterProps } from 'sonner';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -147,13 +146,5 @@ export type ExternalMessageNameToReturnType = {
 	'external/notifications/clear': void;
 	'external/writeTextToCursor': void;
 };
-
-export const TOASTER_SETTINGS = {
-	position: 'bottom-right',
-	richColors: true,
-	expand: true,
-	duration: 5000,
-	visibleToasts: 5,
-} satisfies ToasterProps;
 
 export * from './services/index.js';

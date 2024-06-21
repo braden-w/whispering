@@ -5,10 +5,10 @@
 	import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recorder, recorderState } from '$lib/stores';
-	import { TOASTER_SETTINGS } from '@repo/shared';
 	import { Effect } from 'effect';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount } from 'svelte';
+	import type { ToasterProps } from 'svelte-sonner';
 	import '../app.pcss';
 
 	onNavigate((navigation) => {
@@ -41,6 +41,14 @@
 			Effect.runPromise,
 		);
 	});
+
+	const TOASTER_SETTINGS = {
+		position: 'bottom-right',
+		richColors: true,
+		expand: true,
+		duration: 5000,
+		visibleToasts: 5,
+	} satisfies ToasterProps;
 </script>
 
 <svelte:head>
