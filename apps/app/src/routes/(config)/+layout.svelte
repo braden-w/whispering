@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { recorder } from '$lib/stores';
+	import NavItems from '$lib/components/NavItems.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { recorder } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
-	import { NavItems } from '$lib/components/shared';
 </script>
 
 <header

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ClipboardIcon } from '$lib/components/icons';
-	import { NavItems } from '$lib/components/shared';
+	import NavItems from '$lib/components/NavItems.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
