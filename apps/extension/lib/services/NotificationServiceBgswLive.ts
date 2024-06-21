@@ -14,6 +14,7 @@ export const NotificationServiceBgswLive = Layer.succeed(
 					try: async () => {
 						if (!action) {
 							chrome.notifications.create(id, {
+								priority: 2,
 								requireInteraction: true,
 								title,
 								message: description,
@@ -22,6 +23,7 @@ export const NotificationServiceBgswLive = Layer.succeed(
 							});
 						} else {
 							chrome.notifications.create(id, {
+								priority: 2,
 								title,
 								message: description,
 								type: 'basic',
