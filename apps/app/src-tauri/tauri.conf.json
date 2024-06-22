@@ -31,6 +31,9 @@
 				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/)",
 				"scope": [],
 				"sidecar": false
+			},
+			"window": {
+				"setSize": true
 			}
 		},
 		"systemTray": {

@@ -2,6 +2,7 @@
 	import {
 		GithubIcon,
 		ListIcon,
+		Minimize2Icon,
 		MoonIcon,
 		SlidersVerticalIcon,
 		SunIcon,
@@ -9,6 +10,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { cn } from '$lib/utils';
+	import { appWindow, LogicalSize } from '@tauri-apps/api/window';
 	import { toggleMode } from 'mode-watcher';
 
 	let { class: className }: { class?: string } = $props();
@@ -71,4 +73,24 @@
 			<p>Toggle dark mode</p>
 		</Tooltip.Content>
 	</Tooltip.Root>
+	{#if window.__TAURI__}
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild let:builder>
+				<Button
+					builders={[builder]}
+					on:click={() => {
+						appWindow.setSize(new LogicalSize(72, 84));
+					}}
+					variant="ghost"
+					size="icon"
+				>
+					<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
+					<span class="sr-only">Minimize</span>
+				</Button>
+			</Tooltip.Trigger>
+			<Tooltip.Content>
+				<p>Minimize</p>
+			</Tooltip.Content>
+		</Tooltip.Root>
+	{/if}
 </nav>
