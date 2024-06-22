@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { ClipboardIcon } from '$lib/components/icons';
+	import { ClipboardIcon, Minimize2Icon } from '$lib/components/icons';
 	import NavItems from '$lib/components/NavItems.svelte';
+	import IconTooltip from '$lib/components/IconTooltip.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { appWindow, LogicalSize } from '@tauri-apps/api/window';
 
 	const PLACEHOLDER_RECORDING = {
 		id: '',
@@ -128,7 +130,18 @@
 					class="h-8 w-full"
 				/>
 			{/if}
-			<NavItems class="xs:flex hidden" />
+			<NavItems class="xs:flex hidden">
+				{#if window.__TAURI__}
+					<IconTooltip
+						text="Minimize"
+						onclick={() => {
+							appWindow.setSize(new LogicalSize(72, 84));
+						}}
+					>
+						<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
+					</IconTooltip>
+				{/if}
+			</NavItems>
 		</div>
 	</div>
 
