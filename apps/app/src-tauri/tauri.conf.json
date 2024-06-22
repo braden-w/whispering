@@ -16,6 +16,12 @@
 			"clipboard": {
 				"writeText": true
 			},
+			"dialog": {
+				"save": true
+			},
+			"fs": {
+				"writeFile": true
+			},
 			"globalShortcut": {
 				"all": true
 			},

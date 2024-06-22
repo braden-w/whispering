@@ -249,9 +249,7 @@
 					size="icon"
 					on:click={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings
-							.deleteRecordingsById(ids)
-							.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+						recordings.deleteRecordingsById(ids);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />

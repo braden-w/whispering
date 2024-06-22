@@ -1,3 +1,5 @@
+import { writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { save } from '@tauri-apps/api/dialog';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
@@ -52,7 +54,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recording updated!',
 					description: 'Your recording has been updated successfully.',
 				});
-			}).pipe(Effect.catchAll(renderErrorAsToast)),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		deleteRecordingById: (id: string) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
@@ -62,7 +64,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recording deleted!',
 					description: 'Your recording has been deleted successfully.',
 				});
-			}).pipe(Effect.catchAll(renderErrorAsToast)),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		deleteRecordingsById: (ids: string[]) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
@@ -72,7 +74,7 @@ const createRecordings = Effect.gen(function* () {
 					title: 'Recordings deleted!',
 					description: 'Your recordings have been deleted successfully.',
 				});
-			}).pipe(Effect.catchAll(renderErrorAsToast)),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		transcribeRecording: (id: string) =>
 			Effect.gen(function* () {
 				const toastId = nanoid();
@@ -161,6 +163,57 @@ const createRecordings = Effect.gen(function* () {
 				// Paste transcription if enabled
 				if (settings.isPasteContentsOnSuccessEnabled) {
 					yield* clipboardService.writeText(transcribedText);
+				}
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+		downloadRecording: (id: string) =>
+			Effect.gen(function* () {
+				const maybeRecording = yield* recordingsDb.getRecording(id);
+				if (Option.isNone(maybeRecording)) {
+					return yield* new WhisperingError({
+						title: `Recording with id ${id} not found`,
+						description: 'Please try again.',
+					});
+				}
+				const recording = maybeRecording.value;
+				if (window.__TAURI__) {
+					const path = yield* Effect.promise(() =>
+						save({
+							filters: [
+								{
+									name: `whispering_recording_${recording.id}`,
+									extensions: ['ogg'],
+								},
+							],
+						}),
+					);
+					if (path === null) return;
+					const contents = new Uint8Array(
+						yield* Effect.promise(() => recording.blob.arrayBuffer()),
+					);
+					yield* Effect.tryPromise({
+						try: () => writeBinaryFile({ path, contents }),
+						catch: (error) =>
+							new WhisperingError({
+								title: 'Error saving recording',
+								description: 'Please try again.',
+								error: error,
+							}),
+					});
+				} else {
+					if (recording.blob) {
+						const url = URL.createObjectURL(recording.blob);
+						const a = document.createElement('a');
+						a.style.display = 'none';
+						a.href = url;
+						a.download = `whispering_recording_${recording.id}.wav`; // Adjust the file extension if needed
+
+						document.body.appendChild(a);
+						a.click();
+
+						// Clean up
+						window.URL.revokeObjectURL(url);
+						document.body.removeChild(a);
+					}
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>

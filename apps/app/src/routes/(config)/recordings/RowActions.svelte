@@ -6,6 +6,7 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
+		DownloadIcon,
 	} from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import type { Recording } from '$lib/services/RecordingDbService';
@@ -53,10 +54,16 @@
 	<Button
 		variant="ghost"
 		size="icon"
-		on:click={() =>
-			recordings
-				.deleteRecordingById(recording.id)
-				.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise)}
+		on:click={() => recordings.downloadRecording(recording.id)}
+		title="Download Recording"
+	>
+		<DownloadIcon class="h-4 w-4" />
+	</Button>
+
+	<Button
+		variant="ghost"
+		size="icon"
+		on:click={() => recordings.deleteRecordingById(recording.id)}
 		title="Delete Recording"
 	>
 		<TrashIcon class="h-4 w-4" />

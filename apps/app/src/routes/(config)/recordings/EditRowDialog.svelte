@@ -35,9 +35,7 @@
 			onsubmit={async (e) => {
 				e.preventDefault();
 				isSaving = true;
-				await recordings
-					.updateRecording(recording)
-					.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+				await recordings.updateRecording(recording);
 				isSaving = false;
 				isDialogOpen = false;
 			}}
@@ -71,9 +69,7 @@
 					class="mr-auto"
 					on:click={async () => {
 						isDeleting = true;
-						await recordings
-							.deleteRecordingById(recording.id)
-							.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+						await recordings.deleteRecordingById(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}
