@@ -14,21 +14,21 @@
 </script>
 
 <nav class={cn('flex items-center', className)} style="view-transition-name: nav">
-	<IconTooltip text="Recordings" href="/recordings">
+	<IconTooltip tooltipText="Recordings" href="/recordings">
 		<ListIcon class="h-4 w-4" aria-hidden="true" />
 	</IconTooltip>
-	<IconTooltip text="Settings" href="/settings">
+	<IconTooltip tooltipText="Settings" href="/settings">
 		<SlidersVerticalIcon class="h-4 w-4" aria-hidden="true" />
 	</IconTooltip>
 	<IconTooltip
-		text="View project on GitHub"
+		tooltipText="View project on GitHub"
 		href="https://github.com/braden-w/whispering"
 		target="_blank"
 		rel="noopener noreferrer"
 	>
 		<GithubIcon class="h-4 w-4" aria-hidden="true" />
 	</IconTooltip>
-	<IconTooltip text="Toggle dark mode" onclick={toggleMode}>
+	<IconTooltip tooltipText="Toggle dark mode" onclick={toggleMode}>
 		<SunIcon
 			class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 		/>

@@ -17,10 +17,10 @@
 
 	let {
 		children,
-		text,
+		tooltipText,
 		...restProps
 	}: {
-		text: string;
+		tooltipText: string;
 	} & ButtonProps = $props();
 </script>
 
@@ -30,10 +30,10 @@
 			{#if children}
 				{@render children()}
 			{/if}
-			<span class="sr-only">{text}</span>
+			<span class="sr-only">{tooltipText}</span>
 		</Button>
 	</Tooltip.Trigger>
 	<Tooltip.Content>
-		<p>{text}</p>
+		<p>{tooltipText}</p>
 	</Tooltip.Content>
 </Tooltip.Root>

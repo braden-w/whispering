@@ -133,7 +133,7 @@
 			<NavItems class="xs:flex hidden">
 				{#if window.__TAURI__}
 					<IconTooltip
-						text="Minimize"
+						tooltipText="Minimize"
 						onclick={() => {
 							appWindow.setSize(new LogicalSize(72, 84));
 						}}
