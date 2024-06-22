@@ -32,6 +32,18 @@
 	<title>Whispering</title>
 </svelte:head>
 
+{#snippet emoji()}
+	<div
+		class="inline-flex h-full max-h-full w-full max-w-full items-center justify-center overflow-hidden"
+	>
+		<div
+			class="scale-100 transform select-none text-[100px] leading-none transition-transform duration-300 ease-in-out hover:scale-110"
+		>
+			🎙️
+		</div>
+	</div>
+{/snippet}
+
 <div class="flex flex-col items-center justify-center gap-2 text-center">
 	<div class="xs:flex hidden flex-col gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
@@ -43,12 +55,15 @@
 	<div class="flex flex-col items-center justify-center gap-2">
 		<div class="relative">
 			<Button
-				class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
+				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 				on:click={recorder.toggleRecording}
 				aria-label="Toggle recording"
 				variant="ghost"
 			>
-				<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
+				<span
+					style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+					class="text-[100px] leading-none"
+				>
 					{#if recorder.recorderState === 'RECORDING'}
 						🔲
 					{:else}
