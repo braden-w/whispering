@@ -1,11 +1,20 @@
 <script lang="ts">
+	import {
+		GithubIcon,
+		ListIcon,
+		MoonIcon,
+		SlidersVerticalIcon,
+		SunIcon,
+	} from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { SlidersVerticalIcon, SunIcon, MoonIcon, ListIcon, GithubIcon } from '$lib/components/icons';
+	import { cn } from '$lib/utils';
 	import { toggleMode } from 'mode-watcher';
+
+	let { class: className }: { class?: string } = $props();
 </script>
 
-<nav class="flex items-center" style="view-transition-name: nav">
+<nav class={cn('flex items-center', className)} style="view-transition-name: nav">
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button builders={[builder]} href="/recordings" variant="ghost" size="icon">

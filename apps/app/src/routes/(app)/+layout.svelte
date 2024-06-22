@@ -1,3 +1,3 @@
-<main class="flex flex-1 justify-center p-4">
+<main class="flex flex-1 flex-col justify-center">
 	<slot />
 </main>

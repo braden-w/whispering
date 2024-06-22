@@ -6,13 +6,6 @@ const config: Config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	safelist: ['dark'],
 	theme: {
-		screens: {
-			xs: '128px',
-			sm: '640px',
-			md: '768px',
-			lg: '1024px',
-			xl: '1280px',
-		},
 		container: {
 			center: true,
 			padding: '2rem',
@@ -63,6 +56,10 @@ const config: Config = {
 			},
 			fontFamily: {
 				sans: [...fontFamily.sans],
+			},
+			screens: {
+				xxs: '196px',
+				xs: '320px',
 			},
 		},
 	},

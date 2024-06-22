@@ -72,5 +72,5 @@
 	<slot />
 </div>
 
-<Toaster theme={$mode} {...TOASTER_SETTINGS} />
+<Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />

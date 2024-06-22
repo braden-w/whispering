@@ -32,8 +32,24 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<div class="flex flex-col items-center justify-center gap-2 text-center">
-	<div class="xs:flex hidden flex-col gap-4">
+<button
+	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
+	on:click={recorder.toggleRecording}
+	aria-label="Toggle recording"
+>
+	<span
+		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+		class="text-[48px] leading-none"
+	>
+		{#if recorder.recorderState === 'RECORDING'}
+			🔲
+		{:else}
+			🎙️
+		{/if}
+	</span>
+</button>
+<div class="xxs:flex hidden flex-col items-center justify-center gap-2 text-center">
+	<div class="xs:block hidden flex-col gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
 			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
@@ -72,12 +88,12 @@
 			{/if}
 		</div>
 
-		<div class="xs:flex hidden flex-col items-center justify-center gap-2">
+		<div class="xxs:flex hidden flex-col items-center justify-center gap-2">
 			<div class="flex items-center gap-2">
 				<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 				<Input
 					id="transcribed-text"
-					class="w-64"
+					class="max-w-64 w-full"
 					placeholder="Transcribed text will appear here..."
 					style="view-transition-name: {createRecordingViewTransitionName({
 						recordingId: latestRecording.id,
@@ -112,11 +128,11 @@
 					class="h-8 w-full"
 				/>
 			{/if}
-			<NavItems />
+			<NavItems class="xs:flex hidden" />
 		</div>
 	</div>
 
-	<div class="hidden flex-col items-center justify-center gap-1 sm:flex">
+	<div class="xs:flex hidden flex-col items-center justify-center gap-1">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
 			{' '}<Button
