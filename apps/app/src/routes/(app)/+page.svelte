@@ -32,42 +32,42 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<div class="flex flex-col items-center justify-center gap-4 text-center">
+<div class="flex flex-col items-center justify-center gap-2 text-center">
 	<div class="flex flex-col gap-4">
-		<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
+		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
 			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
 			access to your microphone.
 		</p>
 	</div>
-	<div class="relative">
-		<Button
-			class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-			on:click={recorder.toggleRecording}
-			aria-label="Toggle recording"
-			variant="ghost"
-		>
-			<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
-				{#if recorder.recorderState === 'RECORDING'}
-					🔲
-				{:else}
-					🎙️
-				{/if}
-			</span>
-		</Button>
-		{#if recorder.recorderState === 'RECORDING'}
+	<div class="flex flex-col items-center justify-center gap-2">
+		<div class="relative">
 			<Button
-				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-				on:click={recorder.cancelRecording}
-				aria-label="Cancel recording"
-				size="icon"
+				class="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
+				on:click={recorder.toggleRecording}
+				aria-label="Toggle recording"
 				variant="ghost"
 			>
-				🚫
+				<span style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));">
+					{#if recorder.recorderState === 'RECORDING'}
+						🔲
+					{:else}
+						🎙️
+					{/if}
+				</span>
 			</Button>
-		{/if}
-	</div>
-	<div class="flex flex-col gap-2">
+			{#if recorder.recorderState === 'RECORDING'}
+				<Button
+					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+					on:click={recorder.cancelRecording}
+					aria-label="Cancel recording"
+					size="icon"
+					variant="ghost"
+				>
+					🚫
+				</Button>
+			{/if}
+		</div>
 		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 		<div class="flex items-center gap-2">
 			<Input
@@ -107,10 +107,10 @@
 				class="h-8 w-full"
 			/>
 		{/if}
+		<NavItems />
 	</div>
 
-	<div class="flex flex-col items-center justify-center gap-2">
-		<NavItems />
+	<div class="flex flex-col items-center justify-center gap-1">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
 			{' '}<Button
