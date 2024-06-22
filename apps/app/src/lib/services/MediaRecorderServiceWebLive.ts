@@ -44,8 +44,11 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 							navigator.mediaDevices.getUserMedia({
 								audio: {
 									deviceId: { exact: recordingDeviceId },
-									sampleRate: 16000,
-									channelCount: 1,
+									channelCount: 1, // Mono audio is usually sufficient for voice recording
+									sampleRate: 16000, // 16 kHz is a good balance for voice
+									echoCancellation: true,
+									noiseSuppression: true,
+									autoGainControl: true,
 								},
 							}),
 						catch: (error) =>
@@ -59,7 +62,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					recordedChunks.length = 0;
 					mediaRecorder = new AudioRecorder(stream!, {
 						mimeType: 'audio/webm;codecs=opus',
-						audioBitsPerSecond: 24000,
+						sampleRate: 16000,
 					});
 					mediaRecorder!.addEventListener('dataavailable', (event: BlobEvent) => {
 						if (!event.data.size) return;
