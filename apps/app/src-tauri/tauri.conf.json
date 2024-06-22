@@ -90,7 +90,8 @@
 				"width": 800,
 				"alwaysOnTop": true,
 				"minHeight": 84,
-				"minWidth": 72
+				"minWidth": 72,
+				"minimizable": false
 			}
 		]
 	}
