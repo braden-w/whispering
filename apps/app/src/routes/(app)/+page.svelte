@@ -32,18 +32,6 @@
 	<title>Whispering</title>
 </svelte:head>
 
-{#snippet emoji()}
-	<div
-		class="inline-flex h-full max-h-full w-full max-w-full items-center justify-center overflow-hidden"
-	>
-		<div
-			class="scale-100 transform select-none text-[100px] leading-none transition-transform duration-300 ease-in-out hover:scale-110"
-		>
-			🎙️
-		</div>
-	</div>
-{/snippet}
-
 <div class="flex flex-col items-center justify-center gap-2 text-center">
 	<div class="xs:flex hidden flex-col gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
