@@ -7,7 +7,7 @@ const config: Config = {
 	safelist: ['dark'],
 	theme: {
 		screens: {
-			xs: '375px',
+			xs: '128px',
 			sm: '640px',
 			md: '768px',
 			lg: '1024px',

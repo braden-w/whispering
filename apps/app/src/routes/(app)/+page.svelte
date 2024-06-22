@@ -33,7 +33,7 @@
 </svelte:head>
 
 <div class="flex flex-col items-center justify-center gap-2 text-center">
-	<div class="flex flex-col gap-4">
+	<div class="xs:flex hidden flex-col gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
 			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
@@ -68,49 +68,52 @@
 				</Button>
 			{/if}
 		</div>
-		<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
-		<div class="flex items-center gap-2">
-			<Input
-				id="transcribed-text"
-				class="w-64"
-				placeholder="Transcribed text will appear here..."
-				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}"
-				readonly
-				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
-					? '...'
-					: latestRecording.transcribedText}
-			/>
-			<Button
-				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				on:click={copyRecordingTextFromLatestRecording}
-				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}-copy-button"
-			>
-				<ClipboardIcon class="h-6 w-6" />
-				<span class="sr-only">Copy transcribed text</span>
-			</Button>
+
+		<div class="xs:flex hidden flex-col items-center justify-center gap-2">
+			<div class="flex items-center gap-2">
+				<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
+				<Input
+					id="transcribed-text"
+					class="w-64"
+					placeholder="Transcribed text will appear here..."
+					style="view-transition-name: {createRecordingViewTransitionName({
+						recordingId: latestRecording.id,
+						propertyName: 'transcribedText',
+					})}"
+					readonly
+					value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
+						? '...'
+						: latestRecording.transcribedText}
+				/>
+				<Button
+					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+					on:click={copyRecordingTextFromLatestRecording}
+					style="view-transition-name: {createRecordingViewTransitionName({
+						recordingId: latestRecording.id,
+						propertyName: 'transcribedText',
+					})}-copy-button"
+				>
+					<ClipboardIcon class="h-6 w-6" />
+					<span class="sr-only">Copy transcribed text</span>
+				</Button>
+			</div>
+			{#if maybeLatestAudioSrc}
+				{@const latestAudioSrc = maybeLatestAudioSrc}
+				<audio
+					style="view-transition-name: {createRecordingViewTransitionName({
+						recordingId: latestRecording.id,
+						propertyName: 'blob',
+					})}"
+					src={latestAudioSrc}
+					controls
+					class="h-8 w-full"
+				/>
+			{/if}
+			<NavItems />
 		</div>
-		{#if maybeLatestAudioSrc}
-			{@const latestAudioSrc = maybeLatestAudioSrc}
-			<audio
-				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
-					propertyName: 'blob',
-				})}"
-				src={latestAudioSrc}
-				controls
-				class="h-8 w-full"
-			/>
-		{/if}
-		<NavItems />
 	</div>
 
-	<div class="flex flex-col items-center justify-center gap-1">
+	<div class="hidden flex-col items-center justify-center gap-1 sm:flex">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
 			{' '}<Button
