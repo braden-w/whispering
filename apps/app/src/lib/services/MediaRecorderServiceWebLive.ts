@@ -42,7 +42,11 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					stream = yield* Effect.tryPromise({
 						try: () =>
 							navigator.mediaDevices.getUserMedia({
-								audio: { deviceId: { exact: recordingDeviceId } },
+								audio: {
+									deviceId: { exact: recordingDeviceId },
+									sampleRate: 16000,
+									channelCount: 1,
+								},
 							}),
 						catch: (error) =>
 							new WhisperingError({
@@ -53,7 +57,10 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 							}),
 					});
 					recordedChunks.length = 0;
-					mediaRecorder = new AudioRecorder(stream!);
+					mediaRecorder = new AudioRecorder(stream!, {
+						mimeType: 'audio/webm;codecs=opus',
+						audioBitsPerSecond: 24000,
+					});
 					mediaRecorder!.addEventListener('dataavailable', (event: BlobEvent) => {
 						if (!event.data.size) return;
 						recordedChunks.push(event.data);
