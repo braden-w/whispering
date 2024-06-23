@@ -70,9 +70,26 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<div class="relative flex min-h-screen flex-col">
+
+
+<button
+	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
+	on:click={recorder.toggleRecording}
+>
+	<span
+		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+		class="text-[48px] leading-none"
+	>
+		{#if recorder.recorderState === 'RECORDING'}
+			🔲
+		{:else}
+			🎙️
+		{/if}
+	</span>
+</button>
+
+<div class="xxs:flex relative hidden min-h-screen flex-col">
 	<slot />
 </div>
-
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />

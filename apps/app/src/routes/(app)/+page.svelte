@@ -33,22 +33,7 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<button
-	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	on:click={recorder.toggleRecording}
->
-	<span
-		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
-		class="text-[48px] leading-none"
-	>
-		{#if recorder.recorderState === 'RECORDING'}
-			🔲
-		{:else}
-			🎙️
-		{/if}
-	</span>
-</button>
-<div class="xxs:flex hidden flex-col items-center justify-center gap-2 text-center">
+<div class="flex-col items-center justify-center gap-2 text-center">
 	<div class="xs:block hidden flex-col gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground">
