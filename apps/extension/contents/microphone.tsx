@@ -16,7 +16,19 @@ import type * as ToggleRecording from '../background/messages/contents/toggleRec
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(
-		"input[type='text'], input[type='search'], input[type='email'], input[type='url'], input[type='tel'], input[type='password'], input[type='number'], input:not([type]), textarea, [contenteditable='true'], [contenteditable='']",
+		[
+			// "input[type='text']",
+			// "input[type='search']",
+			// "input[type='email']",
+			// "input[type='url']",
+			// "input[type='tel']",
+			// "input[type='password']",
+			// "input[type='number']",
+			// 'input:not([type])',
+			'textarea',
+			"[contenteditable='true']",
+			"[contenteditable='']",
+		].join(', '),
 	) as NodeListOf<HTMLElement>;
 
 	const editableElements = Array.from(allEditableElements).filter((element) => {
