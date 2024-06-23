@@ -48,7 +48,6 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 									sampleRate: 16000, // 16 kHz is a good balance for voice
 									echoCancellation: true,
 									noiseSuppression: true,
-									autoGainControl: true,
 								},
 							}),
 						catch: (error) =>
