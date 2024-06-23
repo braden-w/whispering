@@ -18,23 +18,23 @@
 		</p>
 		<div class="flex flex-col gap-2 md:flex-row">
 			<WhisperingButton
-				size="lg"
-				variant="default"
+				tooltipText="Check out the Chrome Extension"
 				href="https://github.com/braden-w/whispering/releases"
 				target="_blank"
 				rel="noopener noreferrer"
-				tooltipText="Check out the Chrome Extension"
+				variant="default"
+				size="lg"
 			>
 				<DesktopIcon class="mr-2 h-6 w-6" />
 				Download for Desktop
 			</WhisperingButton>
 			<WhisperingButton
-				size="lg"
-				variant="outline"
+				tooltipText="Check out the desktop app"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				target="_blank"
 				rel="noopener noreferrer"
-				tooltipText="Check out the desktop app"
+				variant="outline"
+				size="lg"
 			>
 				<ChromeWebStoreIcon class="mr-2 h-6 w-6" />
 				Get Chrome Extension

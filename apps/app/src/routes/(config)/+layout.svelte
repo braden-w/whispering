@@ -13,14 +13,14 @@
 	style="view-transition-name: header"
 >
 	<div class="flex gap-2">
-		<WhisperingButton variant="ghost" href="/" tooltipText="Go home">
+		<WhisperingButton tooltipText="Go home" href="/" variant="ghost">
 			<span class="text-lg font-bold">whispering</span>
 		</WhisperingButton>
 		<WhisperingButton
 			tooltipText="Toggle recording"
+			onclick={recorder.toggleRecording}
 			variant="ghost"
 			size="icon"
-			onclick={recorder.toggleRecording}
 			style="view-transition-name: microphone-icon"
 		>
 			{#if recorder.recorderState === 'RECORDING'}

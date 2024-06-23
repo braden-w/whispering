@@ -59,10 +59,10 @@
 	<div class="flex flex-col items-center justify-center gap-2">
 		<div class="relative">
 			<WhisperingButton
-				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-				onclick={recorder.toggleRecording}
 				tooltipText="Toggle recording"
+				onclick={recorder.toggleRecording}
 				variant="ghost"
+				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 			>
 				<span
 					style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
@@ -77,11 +77,11 @@
 			</WhisperingButton>
 			{#if recorder.recorderState === 'RECORDING'}
 				<WhisperingButton
-					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-					onclick={recorder.cancelRecording}
 					tooltipText="Cancel recording"
-					size="icon"
+					onclick={recorder.cancelRecording}
 					variant="ghost"
+					size="icon"
+					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
 				>
 					🚫
 				</WhisperingButton>
@@ -105,13 +105,13 @@
 						: latestRecording.transcribedText}
 				/>
 				<WhisperingButton
-					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+					tooltipText="Copy transcribed text"
 					onclick={copyRecordingTextFromLatestRecording}
+					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 					style="view-transition-name: {createRecordingViewTransitionName({
 						recordingId: latestRecording.id,
 						propertyName: 'transcribedText',
 					})}-copy-button"
-					tooltipText="Copy transcribed text"
 				>
 					<ClipboardIcon class="h-6 w-6" />
 				</WhisperingButton>
@@ -149,8 +149,8 @@
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
 			{' '}<WhisperingButton
-				href="/settings#local-shortcut"
 				tooltipText="Go to local shortcut in settings"
+				href="/settings#local-shortcut"
 				variant="link"
 				class="px-0.5"
 			>
@@ -166,8 +166,8 @@
 			<p class="text-foreground/75 pb-1 text-sm">
 				Press
 				{' '}<WhisperingButton
-					href="/settings#global-shortcut"
 					tooltipText="Go to global shortcut in settings"
+					href="/settings#global-shortcut"
 					variant="link"
 					class="px-0.5"
 				>
@@ -182,23 +182,23 @@
 		{/if}
 		<p class="text-muted-foreground text-sm font-light">
 			Check out the {' '}<WhisperingButton
+				tooltipText="Check out the Chrome Extension"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
-				variant="link"
-				class="h-fit px-0.5 py-0"
 				target="_blank"
 				rel="noopener noreferrer"
-				tooltipText="Check out the Chrome Extension"
+				variant="link"
+				class="h-fit px-0.5 py-0"
 			>
 				extension
 			</WhisperingButton>{' '}
 			{#if !window.__TAURI__}
 				and {' '}<WhisperingButton
+					tooltipText="Check out the desktop app"
 					href="https://github.com/braden-w/whispering/releases"
-					variant="link"
-					class="h-fit px-0.5 py-0"
 					target="_blank"
 					rel="noopener noreferrer"
-					tooltipText="Check out the desktop app"
+					variant="link"
+					class="h-fit px-0.5 py-0"
 				>
 					app
 				</WhisperingButton>{' '}
