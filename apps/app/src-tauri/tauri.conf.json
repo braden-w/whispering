@@ -25,6 +25,9 @@
 			"globalShortcut": {
 				"all": true
 			},
+			"notification": {
+				"all": true
+			},
 			"shell": {
 				"all": false,
 				"execute": false,
