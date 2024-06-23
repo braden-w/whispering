@@ -35,8 +35,13 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 					element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
 				};
 
-				const insertTextIntoElement = (element: Element, text: string) => {
-					if (isContentEditableDiv(element)) {
+				const insertTextIntoEditableElement = (
+					element: HTMLDivElement | HTMLInputElement | HTMLTextAreaElement,
+					text: string,
+				) => {
+					if (isInput(element) || isTextarea(element)) {
+						insertTextIntoInputOrTextarea(element, text);
+					} else if (isContentEditableDiv(element)) {
 						try {
 							document.execCommand('insertText', false, text);
 						} catch (e) {
@@ -45,10 +50,6 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 							range.deleteContents();
 							range.insertNode(document.createTextNode(text));
 						}
-					} else if (isInput(element) || isTextarea(element)) {
-						insertTextIntoInputOrTextarea(element, text);
-					} else {
-						console.warn('The active element is not editable.');
 					}
 				};
 
@@ -60,19 +61,15 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 						!isInput(activeElement) &&
 						!isTextarea(activeElement))
 				) {
-					const textareas = document.getElementsByTagName('textarea');
-					if (textareas.length === 1) {
-						insertTextIntoElement(textareas[0]!, text);
-						return {
-							isSuccess: true,
-							data: text,
-						};
-					}
-					const contentEditables = document.querySelectorAll(
-						'[contenteditable="true"], [contenteditable=""]',
+					const textareas = Array.from(document.getElementsByTagName('textarea')).filter(
+						isTextarea,
 					);
-					if (contentEditables.length === 1) {
-						insertTextIntoElement(contentEditables[0]!, text);
+					const contentEditableDivs = Array.from(
+						document.querySelectorAll('div[contenteditable="true"], div[contenteditable=""]'),
+					).filter(isContentEditableDiv);
+					const editables = [...textareas, ...contentEditableDivs];
+					if (editables.length === 1) {
+						insertTextIntoEditableElement(editables[0]!, text);
 						return {
 							isSuccess: true,
 							data: text,
@@ -81,12 +78,12 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 					return {
 						isSuccess: false,
 						error: {
-							title: 'Unable to write transcribed text',
-							description: 'No suitable element found in the document',
+							title: 'Please paste the transcribed text manually',
+							description: 'There are multiple text areas or content editable divs on the page.',
 						},
 					};
 				}
-				insertTextIntoElement(activeElement, text);
+				insertTextIntoEditableElement(activeElement, text);
 				return { isSuccess: true, data: text } as const;
 			},
 			args: [text],
