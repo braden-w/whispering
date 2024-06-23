@@ -39,13 +39,12 @@ export let recorderState = (() => {
 	};
 })();
 
-const IS_RECORDING_NOTIFICATION_ID = 'whispering-is-recording';
-
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
 	const { toast } = yield* ToastService;
 	const { notify, clear } = yield* NotificationService;
 
+	let isRecordingNotificationId: string;
 	return {
 		get recorderState() {
 			return recorderState.value;
@@ -100,10 +99,13 @@ export const recorder = Effect.gen(function* () {
 						}
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
-						yield* notify({
-							id: IS_RECORDING_NOTIFICATION_ID,
+						isRecordingNotificationId = yield* notify({
 							title: 'Whispering is recording...',
-							description: '',
+							description: 'Click to go to recorder',
+							action: {
+								label: 'Go to recorder',
+								goto: '/',
+							},
 						});
 						return;
 					case 'recording':
@@ -120,7 +122,7 @@ export const recorder = Effect.gen(function* () {
 						}
 						yield* Effect.logInfo('Recording stopped');
 						recorderState.value = 'IDLE';
-						yield* clear(IS_RECORDING_NOTIFICATION_ID);
+						yield* clear(isRecordingNotificationId);
 						const newRecording: Recording = {
 							id: nanoid(),
 							title: '',

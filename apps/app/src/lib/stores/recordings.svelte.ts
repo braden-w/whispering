@@ -142,7 +142,7 @@ const createRecordings = Effect.gen(function* () {
 							notify({
 								id: nanoid(),
 								title: 'Transcription complete!',
-								description: 'Check it out in your recordings',
+								description: 'Click to check it out in your recordings',
 								action: {
 									label: 'Go to recordings',
 									goto: '/recordings',
