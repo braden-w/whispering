@@ -137,6 +137,8 @@
 						onclick={() => {
 							appWindow.setSize(new LogicalSize(72, 84));
 						}}
+						variant="ghost"
+						size="icon"
 					>
 						<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
 					</IconTooltip>
