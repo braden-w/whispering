@@ -1,19 +1,17 @@
 <script lang="ts">
-	import EditRowDialog from './EditRowDialog.svelte';
+	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 	import {
 		ClipboardIcon,
+		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
-		DownloadIcon,
 	} from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Effect } from 'effect';
+	import EditRowDialog from './EditRowDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -21,11 +19,11 @@
 </script>
 
 <div class="flex items-center">
-	<Button
+	<WhisperingTooltip
+		tooltipText="Transcribe Recording"
+		onclick={() => recordings.transcribeRecording(recording.id)}
 		variant="ghost"
 		size="icon"
-		on:click={() => recordings.transcribeRecording(recording.id)}
-		title="Transcribe Recording"
 	>
 		{#if recording.transcriptionStatus === 'UNPROCESSED'}
 			<StartTranscriptionIcon class="h-4 w-4" />
@@ -34,38 +32,38 @@
 		{:else}
 			<RetryTranscriptionIcon class="h-4 w-4" />
 		{/if}
-	</Button>
+	</WhisperingTooltip>
 
 	<EditRowDialog {recording}></EditRowDialog>
 
-	<Button
+	<WhisperingTooltip
+		tooltipText="Copy Transcript"
+		onclick={copyThisRecording}
 		variant="ghost"
 		size="icon"
-		on:click={copyThisRecording}
 		style="view-transition-name: {createRecordingViewTransitionName({
 			recordingId: recording.id,
 			propertyName: 'transcribedText',
 		})}-copy-button"
-		title="Copy Transcript"
 	>
 		<ClipboardIcon class="h-4 w-4" />
-	</Button>
+	</WhisperingTooltip>
 
-	<Button
+	<WhisperingTooltip
+		tooltipText="Download Recording"
+		onclick={() => recordings.downloadRecording(recording.id)}
 		variant="ghost"
 		size="icon"
-		on:click={() => recordings.downloadRecording(recording.id)}
-		title="Download Recording"
 	>
 		<DownloadIcon class="h-4 w-4" />
-	</Button>
+	</WhisperingTooltip>
 
-	<Button
+	<WhisperingTooltip
+		tooltipText="Delete Recording"
+		onclick={() => recordings.deleteRecordingById(recording.id)}
 		variant="ghost"
 		size="icon"
-		on:click={() => recordings.deleteRecordingById(recording.id)}
-		title="Delete Recording"
 	>
 		<TrashIcon class="h-4 w-4" />
-	</Button>
+	</WhisperingTooltip>
 </div>
