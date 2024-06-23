@@ -26,8 +26,8 @@ export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 			// "input[type='number']",
 			// 'input:not([type])',
 			'textarea',
-			"[contenteditable='true']",
-			"[contenteditable='']",
+			'[contenteditable="true"]',
+			'[contenteditable=""]',
 		].join(', '),
 	) as NodeListOf<HTMLElement>;
 

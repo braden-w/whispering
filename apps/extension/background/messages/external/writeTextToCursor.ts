@@ -14,44 +14,57 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 			tabId: activeTabId,
 			commandName: 'writeTextToCursor',
 			func: (text) => {
+				const insertTextIntoElement = (element: Element, text: string) => {
+					if (element.isContentEditable) {
+						try {
+							document.execCommand('insertText', false, text);
+						} catch (e) {
+							// Fallback for older browsers
+							let range = document.getSelection().getRangeAt(0);
+							range.deleteContents();
+							range.insertNode(document.createTextNode(text));
+						}
+					} else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+						let start = element.selectionStart;
+						let end = element.selectionEnd;
+
+						// Insert text at the cursor position
+						let value = element.value;
+						element.value = value.slice(0, start) + text + value.slice(end);
+
+						// Update the cursor position
+						element.selectionStart = start + text.length;
+						element.selectionEnd = start + text.length;
+
+						// Trigger the input event for undo/redo functionality
+						let event = new Event('input', { bubbles: true });
+						element.dispatchEvent(event);
+					} else {
+						console.warn('The active element is not editable.');
+					}
+				};
+
 				const activeElement = document.activeElement;
-				if (!activeElement)
+				if (!activeElement) {
+					const textareas = document.getElementsByTagName('textarea');
+					if (textareas.length === 1) {
+						return insertTextIntoElement(textareas[0]!, text);
+					}
+					const contentEditables = document.querySelectorAll(
+						'[contenteditable="true"], [contenteditable=""]',
+					);
+					if (contentEditables.length === 1) {
+						return insertTextIntoElement(contentEditables[0]!, text);
+					}
 					return {
 						isSuccess: false,
 						error: {
-							title: 'Unable to write transcribed text to active tab',
-							description: 'No active element found in the document',
+							title: 'Unable to write transcribed text',
+							description: 'No suitable element found in the document',
 						},
 					};
-
-				if (activeElement.isContentEditable) {
-					try {
-						document.execCommand('insertText', false, text);
-					} catch (e) {
-						// Fallback for older browsers
-						let range = document.getSelection().getRangeAt(0);
-						range.deleteContents();
-						range.insertNode(document.createTextNode(text));
-					}
-				} else if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
-					let start = activeElement.selectionStart;
-					let end = activeElement.selectionEnd;
-
-					// Insert text at the cursor position
-					let value = activeElement.value;
-					activeElement.value = value.slice(0, start) + text + value.slice(end);
-
-					// Update the cursor position
-					activeElement.selectionStart = start + text.length;
-					activeElement.selectionEnd = start + text.length;
-
-					// Trigger the input event for undo/redo functionality
-					let event = new Event('input', { bubbles: true });
-					activeElement.dispatchEvent(event);
-				} else {
-					console.warn('The active element is not editable.');
 				}
-
+				insertTextIntoElement(activeElement, text);
 				return { isSuccess: true, data: text } as const;
 			},
 			args: [text],
