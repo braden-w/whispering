@@ -32,7 +32,7 @@ export let recorderState = (() => {
 		set value(newValue: RecorderState) {
 			value = newValue;
 			sendMessageToExtension({
-				name: 'external/setRecorderState',
+				name: 'external/setTrayIcon',
 				body: { recorderState: newValue },
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},

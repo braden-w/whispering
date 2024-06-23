@@ -20,7 +20,7 @@ const iconPaths = {
 	LOADING: arrowsCounterclockwise,
 } as const satisfies Record<RecorderState, string>;
 
-const setRecorderState = (recorderState: RecorderState) =>
+const setTrayIcon = (recorderState: RecorderState) =>
 	Effect.gen(function* () {
 		yield* extensionStorageService[STORAGE_KEYS.RECORDER_STATE].set(recorderState);
 		const path = iconPaths[recorderState];
@@ -35,19 +35,19 @@ const setRecorderState = (recorderState: RecorderState) =>
 		});
 	});
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/setRecorderState' }>['body'];
+export type RequestBody = Extract<ExternalMessage, { name: 'external/setTrayIcon' }>['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setRecorderState']>;
+export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setTrayIcon']>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
 		if (!body?.recorderState) {
 			return yield* new WhisperingError({
-				title: 'Error invoking setRecorderState command',
+				title: 'Error invoking setTrayIcon command',
 				description: 'RecorderState must be provided in the request body of the message',
 			});
 		}
-		yield* setRecorderState(body.recorderState);
+		yield* setTrayIcon(body.recorderState);
 	}).pipe(
 		Effect.tapError(renderErrorAsNotification),
 		Effect.provide(NotificationServiceBgswLive),

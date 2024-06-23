@@ -118,7 +118,7 @@ export const externalMessageSchema = S.Union(
 		body: S.Struct({ transcribedText: S.String }),
 	}),
 	S.Struct({
-		name: S.Literal('external/setRecorderState'),
+		name: S.Literal('external/setTrayIcon'),
 		body: S.Struct({ recorderState: recorderStateSchema }),
 	}),
 	S.Struct({
@@ -141,7 +141,7 @@ export type ExternalMessageNameToReturnType = {
 	'external/notifyWhisperingTabReady': void;
 	'external/playSound': void;
 	'external/setClipboardText': void;
-	'external/setRecorderState': void;
+	'external/setTrayIcon': void;
 	'external/notifications/create': string;
 	'external/notifications/clear': void;
 	'external/writeTextToCursor': void;

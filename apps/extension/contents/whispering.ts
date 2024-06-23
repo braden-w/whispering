@@ -9,5 +9,5 @@ relayMessage({ name: 'external/notifications/clear' });
 relayMessage({ name: 'external/notifications/create' });
 relayMessage({ name: 'external/playSound' });
 relayMessage({ name: 'external/setClipboardText' });
-relayMessage({ name: 'external/setRecorderState' });
+relayMessage({ name: 'external/setTrayIcon' });
 relayMessage({ name: 'external/writeTextToCursor' });
