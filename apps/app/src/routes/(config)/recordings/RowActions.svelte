@@ -1,5 +1,5 @@
 <script lang="ts">
-	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ClipboardIcon,
 		DownloadIcon,
@@ -17,7 +17,7 @@
 </script>
 
 <div class="flex items-center">
-	<WhisperingTooltip
+	<WhisperingButton
 		tooltipText="Transcribe recording"
 		onclick={() => recordings.transcribeRecording(recording.id)}
 		variant="ghost"
@@ -30,11 +30,11 @@
 		{:else}
 			<RetryTranscriptionIcon class="h-4 w-4" />
 		{/if}
-	</WhisperingTooltip>
+	</WhisperingButton>
 
 	<EditRowDialog {recording}></EditRowDialog>
 
-	<WhisperingTooltip
+	<WhisperingButton
 		tooltipText="Copy transcribed text"
 		onclick={() => recordings.copyRecordingText(recording)}
 		variant="ghost"
@@ -45,23 +45,23 @@
 		})}-copy-button"
 	>
 		<ClipboardIcon class="h-4 w-4" />
-	</WhisperingTooltip>
+	</WhisperingButton>
 
-	<WhisperingTooltip
+	<WhisperingButton
 		tooltipText="Download recording"
 		onclick={() => recordings.downloadRecording(recording.id)}
 		variant="ghost"
 		size="icon"
 	>
 		<DownloadIcon class="h-4 w-4" />
-	</WhisperingTooltip>
+	</WhisperingButton>
 
-	<WhisperingTooltip
+	<WhisperingButton
 		tooltipText="Delete recording"
 		onclick={() => recordings.deleteRecordingById(recording.id)}
 		variant="ghost"
 		size="icon"
 	>
 		<TrashIcon class="h-4 w-4" />
-	</WhisperingTooltip>
+	</WhisperingButton>
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -20,9 +20,9 @@
 
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Trigger>
-		<WhisperingTooltip tooltipText="Edit recording" variant="ghost" size="icon">
+		<WhisperingButton tooltipText="Edit recording" variant="ghost" size="icon">
 			<EditIcon class="h-4 w-4" />
-		</WhisperingTooltip>
+		</WhisperingButton>
 	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ClipboardIcon, Minimize2Icon } from '$lib/components/icons';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { recorder, recordings, settings } from '$lib/stores';
@@ -58,7 +58,7 @@
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<div class="relative">
-			<WhisperingTooltip
+			<WhisperingButton
 				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 				onclick={recorder.toggleRecording}
 				tooltipText="Toggle recording"
@@ -74,9 +74,9 @@
 						🎙️
 					{/if}
 				</span>
-			</WhisperingTooltip>
+			</WhisperingButton>
 			{#if recorder.recorderState === 'RECORDING'}
-				<WhisperingTooltip
+				<WhisperingButton
 					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
 					onclick={recorder.cancelRecording}
 					tooltipText="Cancel recording"
@@ -84,7 +84,7 @@
 					variant="ghost"
 				>
 					🚫
-				</WhisperingTooltip>
+				</WhisperingButton>
 			{/if}
 		</div>
 
@@ -104,7 +104,7 @@
 						? '...'
 						: latestRecording.transcribedText}
 				/>
-				<WhisperingTooltip
+				<WhisperingButton
 					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 					onclick={copyRecordingTextFromLatestRecording}
 					style="view-transition-name: {createRecordingViewTransitionName({
@@ -114,7 +114,7 @@
 					tooltipText="Copy transcribed text"
 				>
 					<ClipboardIcon class="h-6 w-6" />
-				</WhisperingTooltip>
+				</WhisperingButton>
 			</div>
 			{#if maybeLatestAudioSrc}
 				{@const latestAudioSrc = maybeLatestAudioSrc}
@@ -130,7 +130,7 @@
 			{/if}
 			<NavItems class="xs:flex hidden">
 				{#if window.__TAURI__}
-					<WhisperingTooltip
+					<WhisperingButton
 						tooltipText="Minimize"
 						onclick={() => {
 							appWindow.setSize(new LogicalSize(72, 84));
@@ -139,7 +139,7 @@
 						size="icon"
 					>
 						<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
-					</WhisperingTooltip>
+					</WhisperingButton>
 				{/if}
 			</NavItems>
 		</div>
@@ -148,7 +148,7 @@
 	<div class="xs:flex hidden flex-col items-center justify-center gap-1">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
-			{' '}<WhisperingTooltip
+			{' '}<WhisperingButton
 				href="/settings#local-shortcut"
 				tooltipText="Go to local shortcut in settings"
 				variant="link"
@@ -159,13 +159,13 @@
 				>
 					{settings.currentLocalShortcut}
 				</kbd>
-			</WhisperingTooltip>{' '}
+			</WhisperingButton>{' '}
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
 			<p class="text-foreground/75 pb-1 text-sm">
 				Press
-				{' '}<WhisperingTooltip
+				{' '}<WhisperingButton
 					href="/settings#global-shortcut"
 					tooltipText="Go to global shortcut in settings"
 					variant="link"
@@ -176,12 +176,12 @@
 					>
 						{settings.currentGlobalShortcut}
 					</kbd>
-				</WhisperingTooltip>{' '}
+				</WhisperingButton>{' '}
 				to start recording anywhere.
 			</p>
 		{/if}
 		<p class="text-muted-foreground text-sm font-light">
-			Check out the {' '}<WhisperingTooltip
+			Check out the {' '}<WhisperingButton
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				variant="link"
 				class="h-fit px-0.5 py-0"
@@ -190,9 +190,9 @@
 				tooltipText="Check out the Chrome Extension"
 			>
 				extension
-			</WhisperingTooltip>{' '}
+			</WhisperingButton>{' '}
 			{#if !window.__TAURI__}
-				and {' '}<WhisperingTooltip
+				and {' '}<WhisperingButton
 					href="https://github.com/braden-w/whispering/releases"
 					variant="link"
 					class="h-fit px-0.5 py-0"
@@ -201,7 +201,7 @@
 					tooltipText="Check out the desktop app"
 				>
 					app
-				</WhisperingTooltip>{' '}
+				</WhisperingButton>{' '}
 			{/if} for more integrations!
 		</p>
 	</div>

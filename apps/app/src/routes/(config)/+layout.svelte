@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
-	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { recorder } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
 </script>
@@ -13,10 +13,10 @@
 	style="view-transition-name: header"
 >
 	<div class="flex gap-2">
-		<WhisperingTooltip variant="ghost" href="/" tooltipText="Go home">
+		<WhisperingButton variant="ghost" href="/" tooltipText="Go home">
 			<span class="text-lg font-bold">whispering</span>
-		</WhisperingTooltip>
-		<WhisperingTooltip
+		</WhisperingButton>
+		<WhisperingButton
 			tooltipText="Toggle recording"
 			variant="ghost"
 			size="icon"
@@ -28,7 +28,7 @@
 			{:else}
 				🎙️
 			{/if}
-		</WhisperingTooltip>
+		</WhisperingButton>
 	</div>
 	<NavItems />
 </header>
