@@ -20,7 +20,7 @@
 
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Trigger>
-		<WhisperingTooltip tooltipText="Edit Recording" variant="ghost" size="icon">
+		<WhisperingTooltip tooltipText="Edit recording" variant="ghost" size="icon">
 			<EditIcon class="h-4 w-4" />
 		</WhisperingTooltip>
 	</Dialog.Trigger>

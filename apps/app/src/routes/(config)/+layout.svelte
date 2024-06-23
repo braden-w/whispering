@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 	import { recorder } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
 </script>
@@ -13,14 +13,14 @@
 	style="view-transition-name: header"
 >
 	<div class="flex gap-2">
-		<Button variant="ghost" href="/">
+		<WhisperingTooltip variant="ghost" href="/" tooltipText="Go home">
 			<span class="text-lg font-bold">whispering</span>
-		</Button>
-		<Button
+		</WhisperingTooltip>
+		<WhisperingTooltip
+			tooltipText="Toggle recording"
 			variant="ghost"
 			size="icon"
-			aria-label="Toggle recording"
-			on:click={recorder.toggleRecording}
+			onclick={recorder.toggleRecording}
 			style="view-transition-name: microphone-icon"
 		>
 			{#if recorder.recorderState === 'RECORDING'}
@@ -28,7 +28,7 @@
 			{:else}
 				🎙️
 			{/if}
-		</Button>
+		</WhisperingTooltip>
 	</div>
 	<NavItems />
 </header>
