@@ -10,7 +10,7 @@
 	import { toggleMode } from 'mode-watcher';
 	import WhisperingTooltip from './WhisperingTooltip.svelte';
 
-	let { children, class: className = undefined }: { class: string | undefined } = $props();
+	let { children, class: className }: { class?: string } = $props();
 </script>
 
 <nav class={cn('flex items-center', className)} style="view-transition-name: nav">
