@@ -32,20 +32,14 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 							range.insertNode(document.createTextNode(text));
 						}
 					} else if (isInput(element) || isTextarea(element)) {
-						const start = element.selectionStart;
-						const end = element.selectionEnd;
+						const start = element.selectionStart ?? element.value.length;
+						const end = element.selectionEnd ?? element.value.length;
 
-						if (start === null || end === null) {
-							element.value += text;
-							element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
-							return;
-						}
-
-						element.value = `${element.value.slice(0, start)}${text}${element.value.slice(end)}`;
+						element.value = element.value.slice(0, start) + text + element.value.slice(end);
 						element.selectionStart = start + text.length;
 						element.selectionEnd = start + text.length;
-							element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
-						return;
+
+						element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
 					} else {
 						console.warn('The active element is not editable.');
 					}
