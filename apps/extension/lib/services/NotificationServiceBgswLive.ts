@@ -2,6 +2,7 @@ import { NotificationService, WHISPERING_URL, WhisperingError } from '@repo/shar
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
+import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
 
 export const NotificationServiceBgswLive = Layer.succeed(
 	NotificationService,
@@ -30,12 +31,20 @@ export const NotificationServiceBgswLive = Layer.succeed(
 								buttons: [{ title: action.label }],
 								iconUrl: studioMicrophone,
 							});
-							chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
-								if (buttonIndex === 0) {
-									chrome.notifications.clear(id);
-									chrome.tabs.create({ url: `${WHISPERING_URL}${action.goto}` });
-								}
-							});
+							chrome.notifications.onButtonClicked.addListener((id, buttonIndex) =>
+								Effect.gen(function* () {
+									if (buttonIndex === 0) {
+										chrome.notifications.clear(id);
+										const whisperingTabId = yield* getOrCreateWhisperingTabId;
+										yield* Effect.promise(() =>
+											chrome.tabs.update(whisperingTabId, {
+												active: true,
+												url: `${WHISPERING_URL}${action.goto}`,
+											}),
+										);
+									}
+								}).pipe(Effect.runPromise),
+							);
 						}
 					},
 					catch: (error) =>
