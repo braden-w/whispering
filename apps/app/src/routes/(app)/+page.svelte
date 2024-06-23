@@ -2,7 +2,6 @@
 	import { ClipboardIcon, Minimize2Icon } from '$lib/components/icons';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { recorder, recordings, settings } from '$lib/stores';
@@ -37,7 +36,7 @@
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
 	on:click={recorder.toggleRecording}
-	aria-label="Toggle recording"
+	tooltipText="Toggle recording"
 >
 	<span
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
@@ -60,10 +59,10 @@
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<div class="relative">
-			<Button
+			<WhisperingTooltip
 				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-				on:click={recorder.toggleRecording}
-				aria-label="Toggle recording"
+				onclick={recorder.toggleRecording}
+				tooltipText="Toggle recording"
 				variant="ghost"
 			>
 				<span
@@ -76,17 +75,17 @@
 						🎙️
 					{/if}
 				</span>
-			</Button>
+			</WhisperingTooltip>
 			{#if recorder.recorderState === 'RECORDING'}
-				<Button
+				<WhisperingTooltip
 					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-					on:click={recorder.cancelRecording}
-					aria-label="Cancel recording"
+					onclick={recorder.cancelRecording}
+					tooltipText="Cancel recording"
 					size="icon"
 					variant="ghost"
 				>
 					🚫
-				</Button>
+				</WhisperingTooltip>
 			{/if}
 		</div>
 
@@ -106,17 +105,17 @@
 						? '...'
 						: latestRecording.transcribedText}
 				/>
-				<Button
+				<WhisperingTooltip
 					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-					on:click={copyRecordingTextFromLatestRecording}
+					onclick={copyRecordingTextFromLatestRecording}
 					style="view-transition-name: {createRecordingViewTransitionName({
 						recordingId: latestRecording.id,
 						propertyName: 'transcribedText',
 					})}-copy-button"
+					tooltipText="Copy Transcribed Text"
 				>
 					<ClipboardIcon class="h-6 w-6" />
-					<span class="sr-only">Copy transcribed text</span>
-				</Button>
+				</WhisperingTooltip>
 			</div>
 			{#if maybeLatestAudioSrc}
 				{@const latestAudioSrc = maybeLatestAudioSrc}
@@ -150,10 +149,9 @@
 	<div class="xs:flex hidden flex-col items-center justify-center gap-1">
 		<p class="text-foreground/75 text-sm">
 			Click the microphone or press
-			{' '}<Button
+			{' '}<WhisperingTooltip
 				href="/settings#local-shortcut"
-				aria-label="Go to local shortcut in settings"
-				title="Go to local shortcut in settings"
+				tooltipText="Go to local shortcut in settings"
 				variant="link"
 				class="px-0.5"
 			>
@@ -162,16 +160,15 @@
 				>
 					{settings.currentLocalShortcut}
 				</kbd>
-			</Button>{' '}
+			</WhisperingTooltip>{' '}
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
 			<p class="text-foreground/75 pb-1 text-sm">
 				Press
-				{' '}<Button
+				{' '}<WhisperingTooltip
 					href="/settings#global-shortcut"
-					aria-label="Go to global shortcut in settings"
-					title="Go to global shortcut in settings"
+					tooltipText="Go to global shortcut in settings"
 					variant="link"
 					class="px-0.5"
 				>
@@ -180,34 +177,32 @@
 					>
 						{settings.currentGlobalShortcut}
 					</kbd>
-				</Button>{' '}
+				</WhisperingTooltip>{' '}
 				to start recording anywhere.
 			</p>
 		{/if}
 		<p class="text-muted-foreground text-sm font-light">
-			Check out the {' '}<Button
+			Check out the {' '}<WhisperingTooltip
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				variant="link"
 				class="h-fit px-0.5 py-0"
 				target="_blank"
 				rel="noopener noreferrer"
-				title="Check out the Chrome Extension"
-				aria-label="Check out the Chrome Extension"
+				tooltipText="Check out the Chrome Extension"
 			>
 				extension
-			</Button>{' '}
+			</WhisperingTooltip>{' '}
 			{#if !window.__TAURI__}
-				and {' '}<Button
+				and {' '}<WhisperingTooltip
 					href="https://github.com/braden-w/whispering/releases"
 					variant="link"
 					class="h-fit px-0.5 py-0"
 					target="_blank"
 					rel="noopener noreferrer"
-					title="Check out the desktop app"
-					aria-label="Check out the desktop app"
+					tooltipText="Check out the desktop app"
 				>
 					app
-				</Button>{' '}
+				</WhisperingTooltip>{' '}
 			{/if} for more integrations!
 		</p>
 	</div>

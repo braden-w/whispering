@@ -14,8 +14,6 @@
 	import EditRowDialog from './EditRowDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
-
-	const copyThisRecording = () => recordings.copyRecordingText(recording);
 </script>
 
 <div class="flex items-center">
@@ -37,8 +35,8 @@
 	<EditRowDialog {recording}></EditRowDialog>
 
 	<WhisperingTooltip
-		tooltipText="Copy Transcript"
-		onclick={copyThisRecording}
+		tooltipText="Copy Transcribed Text"
+		onclick={() => recordings.copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({
