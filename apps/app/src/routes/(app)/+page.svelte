@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ClipboardIcon, Minimize2Icon } from '$lib/components/icons';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import IconTooltip from '$lib/components/IconTooltip.svelte';
+	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -132,7 +132,7 @@
 			{/if}
 			<NavItems class="xs:flex hidden">
 				{#if window.__TAURI__}
-					<IconTooltip
+					<WhisperingTooltip
 						tooltipText="Minimize"
 						onclick={() => {
 							appWindow.setSize(new LogicalSize(72, 84));
@@ -141,7 +141,7 @@
 						size="icon"
 					>
 						<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
-					</IconTooltip>
+					</WhisperingTooltip>
 				{/if}
 			</NavItems>
 		</div>
