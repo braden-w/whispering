@@ -7,8 +7,8 @@ import { getActiveTabId } from '~lib/background/external/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =>
-	Effect.gen(function* () {
+const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> => {
+	return Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		yield* injectScript<string, [string]>({
 			tabId: activeTabId,
@@ -21,6 +21,20 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 					element.tagName === 'INPUT';
 				const isTextarea = (element: Element): element is HTMLTextAreaElement =>
 					element.tagName === 'TEXTAREA';
+				const insertTextIntoInputOrTextarea = (
+					element: HTMLInputElement | HTMLTextAreaElement,
+					text: string,
+				): void => {
+					const start = element.selectionStart ?? element.value.length;
+					const end = element.selectionEnd ?? element.value.length;
+
+					element.value = element.value.slice(0, start) + text + element.value.slice(end);
+					element.selectionStart = start;
+					element.selectionEnd = start + text.length;
+
+					element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+				};
+
 				const insertTextIntoElement = (element: Element, text: string) => {
 					if (isContentEditableDiv(element)) {
 						try {
@@ -32,14 +46,7 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 							range.insertNode(document.createTextNode(text));
 						}
 					} else if (isInput(element) || isTextarea(element)) {
-						const start = element.selectionStart ?? element.value.length;
-						const end = element.selectionEnd ?? element.value.length;
-
-						element.value = element.value.slice(0, start) + text + element.value.slice(end);
-						element.selectionStart = start + text.length;
-						element.selectionEnd = start + text.length;
-
-						element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+						insertTextIntoInputOrTextarea(element, text);
 					} else {
 						console.warn('The active element is not editable.');
 					}
@@ -94,6 +101,7 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 				}),
 		}),
 	);
+};
 
 export type RequestBody = Extract<ExternalMessage, { name: 'external/writeTextToCursor' }>['body'];
 
