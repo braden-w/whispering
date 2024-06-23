@@ -1,5 +1,6 @@
 import { Schema as S } from '@effect/schema';
 import { Context, Data, Effect } from 'effect';
+import { notificationOptionsSchema } from './services/index.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -7,7 +8,7 @@ export const WHISPERING_URL =
 		: 'http://localhost:5173';
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-const BaseError = S.Struct({
+export const BaseError = S.Struct({
 	title: S.String,
 	description: S.String,
 	action: S.optional(
@@ -44,21 +45,6 @@ export class ToastService extends Context.Tag('ToastService')<
 	ToastService,
 	{
 		toast: (options: ToastOptions) => Effect.Effect<string>;
-	}
->() {}
-
-export const notificationOptionsSchema = S.Struct({
-	id: S.optional(S.String),
-	...BaseError.fields,
-});
-
-type NotificationOptions = S.Schema.Type<typeof notificationOptionsSchema>;
-
-export class NotificationService extends Context.Tag('NotificationService')<
-	NotificationService,
-	{
-		notify: (options: NotificationOptions) => Effect.Effect<string>;
-		clear: (id: string) => Effect.Effect<void>;
 	}
 >() {}
 
