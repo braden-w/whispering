@@ -14,47 +14,68 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 			tabId: activeTabId,
 			commandName: 'writeTextToCursor',
 			func: (text) => {
+				const isDiv = (element: Element): element is HTMLDivElement => element.tagName === 'DIV';
+				const isContentEditableDiv = (element: Element): element is HTMLDivElement =>
+					isDiv(element) && element.isContentEditable;
+				const isInput = (element: Element): element is HTMLInputElement =>
+					element.tagName === 'INPUT';
+				const isTextarea = (element: Element): element is HTMLTextAreaElement =>
+					element.tagName === 'TEXTAREA';
 				const insertTextIntoElement = (element: Element, text: string) => {
-					if (element.isContentEditable) {
+					if (isContentEditableDiv(element)) {
 						try {
 							document.execCommand('insertText', false, text);
 						} catch (e) {
 							// Fallback for older browsers
-							let range = document.getSelection().getRangeAt(0);
+							const range = document.getSelection().getRangeAt(0);
 							range.deleteContents();
 							range.insertNode(document.createTextNode(text));
 						}
-					} else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-						let start = element.selectionStart;
-						let end = element.selectionEnd;
+					} else if (isInput(element) || isTextarea(element)) {
+						const start = element.selectionStart;
+						const end = element.selectionEnd;
 
-						// Insert text at the cursor position
-						let value = element.value;
-						element.value = value.slice(0, start) + text + value.slice(end);
+						if (start === null || end === null) {
+							element.value += text;
+							element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+							return;
+						}
 
-						// Update the cursor position
+						element.value = `${element.value.slice(0, start)}${text}${element.value.slice(end)}`;
 						element.selectionStart = start + text.length;
 						element.selectionEnd = start + text.length;
-
-						// Trigger the input event for undo/redo functionality
-						let event = new Event('input', { bubbles: true });
-						element.dispatchEvent(event);
+							element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+						return;
 					} else {
 						console.warn('The active element is not editable.');
 					}
 				};
 
 				const activeElement = document.activeElement;
-				if (!activeElement) {
+				if (
+					!activeElement ||
+					(activeElement &&
+						!isContentEditableDiv(activeElement) &&
+						!isInput(activeElement) &&
+						!isTextarea(activeElement))
+				) {
 					const textareas = document.getElementsByTagName('textarea');
 					if (textareas.length === 1) {
-						return insertTextIntoElement(textareas[0]!, text);
+						insertTextIntoElement(textareas[0]!, text);
+						return {
+							isSuccess: true,
+							data: text,
+						};
 					}
 					const contentEditables = document.querySelectorAll(
 						'[contenteditable="true"], [contenteditable=""]',
 					);
 					if (contentEditables.length === 1) {
-						return insertTextIntoElement(contentEditables[0]!, text);
+						insertTextIntoElement(contentEditables[0]!, text);
+						return {
+							isSuccess: true,
+							data: text,
+						};
 					}
 					return {
 						isSuccess: false,
