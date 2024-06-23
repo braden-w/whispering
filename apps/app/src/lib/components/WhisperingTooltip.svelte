@@ -3,25 +3,13 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-	type AnchorElement = HTMLAnchorAttributes & {
-		href?: HTMLAnchorAttributes['href'];
-		type?: never;
-	} & Props;
-
-	type ButtonElement = HTMLButtonAttributes & {
-		type?: HTMLButtonAttributes['type'];
-		href?: never;
-	} & Props;
-
-	type ButtonProps = AnchorElement | ButtonElement;
-
 	let {
 		children,
 		tooltipText,
 		...restProps
 	}: {
 		tooltipText: string;
-	} & ButtonProps = $props();
+	} & Props = $props();
 </script>
 
 <Tooltip.Root>
