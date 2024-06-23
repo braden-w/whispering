@@ -7,11 +7,6 @@ import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreate
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-declare const window: {
-	toggleRecording: () => void;
-	cancelRecording: () => void;
-} & Window;
-
 export type RequestBody = {};
 
 export type ResponseBody = Result<void>;

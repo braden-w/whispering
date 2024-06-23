@@ -11,6 +11,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
+	import { goto } from '$app/navigation';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -28,6 +29,7 @@
 	onMount(async () => {
 		window.toggleRecording = recorder.toggleRecording;
 		window.cancelRecording = recorder.cancelRecording;
+		window.goto = goto;
 		window.addEventListener('beforeunload', () => {
 			if (recorderState.value === 'RECORDING') {
 				recorderState.value = 'IDLE';
