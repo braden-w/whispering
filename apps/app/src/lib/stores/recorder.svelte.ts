@@ -131,7 +131,6 @@ export const recorder = Effect.gen(function* () {
 						}
 						yield* Effect.logInfo('Recording stopped');
 						recorderState.value = 'IDLE';
-						yield* clear(isRecordingNotificationId);
 						const newRecording: Recording = {
 							id: nanoid(),
 							title: '',
