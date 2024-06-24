@@ -12,7 +12,7 @@ export const SetTrayIconServiceDesktopLive = Layer.succeed(
 				catch: (error) =>
 					new WhisperingError({
 						variant: 'warning',
-						title: `Could not set tray icon to ${recorderState} icon..`,
+						title: `Could not set tray icon to ${recorderState} icon...`,
 						description: error instanceof Error ? error.message : `Error: ${error}`,
 						error,
 					}),
