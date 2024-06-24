@@ -38,7 +38,9 @@ export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 			style.visibility !== 'hidden' &&
 			!element.disabled &&
 			!element.readOnly &&
-			element.offsetParent !== null
+			element.offsetParent !== null &&
+			element.getAttribute('aria-readonly') !== 'true' &&
+			element.getAttribute('aria-disabled') !== 'true'
 		);
 	});
 
