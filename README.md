@@ -48,7 +48,7 @@
 
 ## Project Overview
 
-Whispering is an open-source project designed to streamline your voice-to-text experience by leveraging the OpenAI Whisper API.
+Whispering is an open-source project designed to streamline your speech-to-text experience by leveraging the OpenAI Whisper API.
 
 Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.
 
@@ -148,6 +148,7 @@ The Whispering Chrome extension is built using:
 - [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
+- [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
 
 ## Development
 

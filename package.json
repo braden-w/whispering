@@ -1,7 +1,7 @@
 {
 	"name": "whispering",
-	"version": "1.0.0",
 	"private": true,
+	"version": "4.0.0",
 	"description": "",
 	"keywords": [],
 	"license": "ISC",
@@ -10,18 +10,24 @@
 		"build": "turbo run build",
 		"dev": "turbo run dev",
 		"format": "prettier --write .",
-		"postinstall": "manypkg check",
 		"lint": "turbo run lint"
 	},
-	"packageManager": "pnpm@7.15.0",
-	"dependencies": {
-		"@manypkg/cli": "latest",
-		"eslint": "^8.40.0",
-		"eslint-config-custom": "0.0.0",
-		"prettier": "^2.8.8",
-		"prettier-plugin-svelte": "^2.10.0",
-		"prettier-plugin-tailwindcss": "^0.2.5",
-		"tailwind-config": "0.0.0",
+	"packageManager": "pnpm@8.6.5",
+	"devDependencies": {
+		"@parcel/optimizer-data-url": "2.9.3",
+		"@parcel/transformer-inline-string": "2.9.3",
+		"typescript": "^5.5.2",
+		"@changesets/cli": "^2.27.5",
+		"eslint": "latest",
+		"prettier": "latest",
+		"prettier-plugin-svelte": "latest",
+		"prettier-plugin-tailwindcss": "latest",
+		"@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
+		"eslint-config-prettier": "latest",
+		"eslint-config-turbo": "latest",
+		"eslint-plugin-prettier": "latest",
+		"eslint-plugin-svelte": "latest",
 		"turbo": "latest"
 	}
 }

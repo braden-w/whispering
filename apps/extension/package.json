@@ -1,0 +1,78 @@
+{
+	"name": "extension",
+	"displayName": "Whispering",
+	"version": "4.0.0",
+	"private": true,
+	"description": "Seamlessly integrate speech-to-text transcriptions on ChatGPT and anywhere on the web. Powered by OpenAI's Whisper API.",
+	"author": "Braden Wong <whispering@bradenwong.com>",
+	"scripts": {
+		"dev": "plasmo dev",
+		"build": "plasmo build",
+		"package": "plasmo package"
+	},
+	"dependencies": {
+		"@effect/schema": "^0.67.23",
+		"@plasmohq/messaging": "^0.6.2",
+		"@plasmohq/storage": "^1.10.0",
+		"@radix-ui/react-label": "^2.0.2",
+		"@radix-ui/react-select": "^2.0.0",
+		"@radix-ui/react-slot": "^1.0.2",
+		"@radix-ui/react-switch": "^1.0.3",
+		"@radix-ui/react-tooltip": "^1.0.7",
+		"@tanstack/react-query": "^5.45.1",
+		"audio-recorder-polyfill": "^0.4.1",
+		"class-variance-authority": "^0.7.0",
+		"clsx": "^2.1.1",
+		"effect": "^3.3.2",
+		"idb": "^8.0.0",
+		"lucide-react": "^0.383.0",
+		"nanoid": "^5.0.7",
+		"plasmo": "^0.88.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-draggable": "^4.4.6",
+		"sonner": "^1.5.0",
+		"tailwind-merge": "^2.3.0",
+		"tailwindcss": "^3.4.3",
+		"tailwindcss-animate": "^1.0.7",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@types/chrome": "^0.0.268",
+		"@types/node": "^20.14.0",
+		"@types/react": "^18.3.3",
+		"@types/react-dom": "^18.3.0",
+		"autoprefixer": "^10.4.19",
+		"postcss": "^8.4.38",
+		"typescript": "^5.5.2"
+	},
+	"manifest": {
+		"host_permissions": [
+			"http://localhost:5173/*",
+			"http://localhost:4173/*",
+			"https://*/"
+		],
+		"permissions": [
+			"tabs",
+			"clipboardWrite",
+			"storage",
+			"scripting",
+			"notifications"
+		],
+		"commands": {
+			"toggleRecording": {
+				"suggested_key": {
+					"default": "Ctrl+Shift+X",
+					"mac": "Command+Shift+X"
+				},
+				"description": "Toggle recording"
+			}
+		},
+		"externally_connectable": {
+			"matches": [
+				"http://localhost:5173/*",
+				"https://whispering.bradenwong.com/*"
+			]
+		}
+	}
+}

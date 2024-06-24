@@ -1,0 +1,101 @@
+{
+	"$schema": "../node_modules/@tauri-apps/cli/schema.json",
+	"build": {
+		"beforeBuildCommand": "pnpm run build",
+		"beforeDevCommand": "pnpm run dev",
+		"devPath": "http://localhost:5173",
+		"distDir": "../build"
+	},
+	"package": {
+		"productName": "Whispering",
+		"version": "4.0.0"
+	},
+	"tauri": {
+		"allowlist": {
+			"all": false,
+			"clipboard": {
+				"writeText": true
+			},
+			"dialog": {
+				"save": true
+			},
+			"fs": {
+				"writeFile": true
+			},
+			"globalShortcut": {
+				"all": true
+			},
+			"notification": {
+				"all": true
+			},
+			"shell": {
+				"all": false,
+				"execute": false,
+				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/)",
+				"scope": [],
+				"sidecar": false
+			},
+			"window": {
+				"setSize": true
+			}
+		},
+		"systemTray": {
+			"title": "Toggle Whispering",
+			"iconPath": "icons/recorder_state/studio_microphone.png",
+			"iconAsTemplate": true,
+			"menuOnLeftClick": false
+		},
+		"bundle": {
+			"active": true,
+			"category": "Productivity",
+			"copyright": "",
+			"deb": {
+				"depends": []
+			},
+			"externalBin": [],
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"identifier": "com.bradenwong.whispering",
+			"longDescription": "Seamlessly integrate speech-to-text transcriptions anywhere on your desktop. Powered by OpenAI's Whisper API.",
+			"macOS": {
+				"entitlements": "entitlements.plist",
+				"exceptionDomain": "",
+				"frameworks": [],
+				"providerShortName": null,
+				"signingIdentity": null
+			},
+			"resources": [],
+			"shortDescription": "",
+			"targets": "all",
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
+			}
+		},
+		"security": {
+			"csp": null
+		},
+		"updater": {
+			"active": false
+		},
+		"windows": [
+			{
+				"fullscreen": false,
+				"height": 600,
+				"resizable": true,
+				"title": "Whispering",
+				"width": 800,
+				"alwaysOnTop": true,
+				"minHeight": 84,
+				"minWidth": 72,
+				"minimizable": false
+			}
+		]
+	}
+}

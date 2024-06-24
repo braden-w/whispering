@@ -1,0 +1,18 @@
+{
+	"name": "@repo/shared",
+	"private": true,
+	"version": "0.0.0",
+	"description": "Shared constants for use Whispering web app, desktop app, and Chrome extension",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"devDependencies": {
+		"typescript": "^5.5.2"
+	},
+	"dependencies": {
+		"@effect/schema": "^0.67.23",
+		"effect": "^3.3.2",
+		"zod": "^3.23.8"
+	}
+}
