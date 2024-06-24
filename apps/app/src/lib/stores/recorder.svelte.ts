@@ -48,12 +48,13 @@ export let recorderState = (() => {
 	};
 })();
 
+const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
+
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
 	const { toast } = yield* ToastService;
 	const { notify, clear } = yield* NotificationService;
 
-	let isRecordingNotificationId: string;
 	return {
 		get recorderState() {
 			return recorderState.value;
@@ -108,7 +109,8 @@ export const recorder = Effect.gen(function* () {
 						}
 						yield* Effect.logInfo('Recording started');
 						recorderState.value = 'RECORDING';
-						isRecordingNotificationId = yield* notify({
+						yield* notify({
+							id: IS_RECORDING_NOTIFICATION_ID,
 							title: 'Whispering is recording...',
 							description: 'Click to go to recorder',
 							action: {
