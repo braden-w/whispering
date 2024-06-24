@@ -18,13 +18,11 @@ jobs:
           node-version: lts/*
       - name: install pnpm
         uses: pnpm/action-setup@v4
-      - name: Set up project folder
+      - name: Install dependencies and build artifact
         run: |
           cd apps/extension
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build and zip extension artifact
-        run: pnpm build -- --zip
+          pnpm install
+          pnpm build -- --zip
       - name: Browser Platform Publish
         uses: PlasmoHQ/bpp@v2
         with:
