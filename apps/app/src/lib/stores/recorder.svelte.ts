@@ -1,6 +1,11 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
+import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
+import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
+import { SetTrayIconService } from '$lib/services/SetTrayIconService';
+import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
+import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
 import {
@@ -16,8 +21,6 @@ import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
-import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -31,10 +34,16 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			sendMessageToExtension({
-				name: 'external/setTrayIcon',
-				body: { recorderState: newValue },
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+			Effect.gen(function* () {
+				const { setTrayIcon } = yield* SetTrayIconService;
+				yield* setTrayIcon(newValue);
+			}).pipe(
+				Effect.provide(
+					window.__TAURI__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive,
+				),
+				Effect.catchAll(renderErrorAsToast),
+				Effect.runPromise,
+			);
 		},
 	};
 })();
