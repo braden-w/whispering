@@ -70,8 +70,6 @@
 	<title>Whispering</title>
 </svelte:head>
 
-
-
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
 	on:click={recorder.toggleRecording}
