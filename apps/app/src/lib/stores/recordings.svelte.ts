@@ -1,8 +1,8 @@
-import { writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
-import { save } from '@tauri-apps/api/dialog';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
+import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
+import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
@@ -14,12 +14,12 @@ import {
 	TranscriptionServiceWhisperLive,
 	WhisperingError,
 } from '@repo/shared';
+import { save } from '@tauri-apps/api/dialog';
+import { writeBinaryFile } from '@tauri-apps/api/fs';
 import { Effect, Either, Option } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
-import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
-import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
-import { nanoid } from 'nanoid/non-secure';
 
 const createRecordings = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
