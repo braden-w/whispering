@@ -8,7 +8,7 @@
 	<title>Change Global Keyboard Shortcut</title>
 </svelte:head>
 
-<div class="flex items-center justify-center">
+<main class="flex flex-1 items-center justify-center">
 	<section class="container flex flex-col items-center gap-4 text-center">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
 			Change Your Global Keyboard Shortcut
@@ -42,4 +42,4 @@
 		</div>
 		<Button onclick={() => window.history.back()} variant="link">Go back</Button>
 	</section>
-</div>
+</main>

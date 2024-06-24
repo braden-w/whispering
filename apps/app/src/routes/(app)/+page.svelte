@@ -32,101 +32,101 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<div class="flex flex-col items-center justify-center gap-2 text-center">
-	<div class="xs:flex hidden flex-col gap-4">
+<main class="flex flex-1 flex-col items-center justify-center gap-4">
+	<div class="xs:flex hidden flex-col items-center gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
-		<p class="text-muted-foreground">
+		<p class="text-muted-foreground line-clamp-1">
 			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
 			access to your microphone.
 		</p>
 	</div>
-	<div class="flex flex-col items-center justify-center gap-2">
-		<div class="relative">
-			<WhisperingButton
-				tooltipText="Toggle recording"
-				onclick={recorder.toggleRecording}
-				variant="ghost"
-				class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-			>
-				<span
-					style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
-					class="text-[100px] leading-none"
-				>
-					{#if recorder.recorderState === 'RECORDING'}
-						🔲
-					{:else}
-						🎙️
-					{/if}
-				</span>
-			</WhisperingButton>
-			{#if recorder.recorderState === 'RECORDING'}
-				<WhisperingButton
-					tooltipText="Cancel recording"
-					onclick={recorder.cancelRecording}
-					variant="ghost"
-					size="icon"
-					class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-				>
-					🚫
-				</WhisperingButton>
-			{/if}
-		</div>
 
-		<div class="xxs:flex hidden flex-col items-center justify-center gap-2">
-			<div class="flex items-center gap-2">
-				<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
-				<Input
-					id="transcribed-text"
-					class="max-w-64 w-full"
-					placeholder="Transcribed text will appear here..."
-					style="view-transition-name: {createRecordingViewTransitionName({
-						recordingId: latestRecording.id,
-						propertyName: 'transcribedText',
-					})}"
-					readonly
-					value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
-						? '...'
-						: latestRecording.transcribedText}
-				/>
-				<WhisperingButton
-					tooltipText="Copy transcribed text"
-					onclick={copyRecordingTextFromLatestRecording}
-					class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-					style="view-transition-name: {createRecordingViewTransitionName({
-						recordingId: latestRecording.id,
-						propertyName: 'transcribedText',
-					})}-copy-button"
-				>
-					<ClipboardIcon class="h-6 w-6" />
-				</WhisperingButton>
-			</div>
-			{#if maybeLatestAudioSrc}
-				{@const latestAudioSrc = maybeLatestAudioSrc}
-				<audio
-					style="view-transition-name: {createRecordingViewTransitionName({
-						recordingId: latestRecording.id,
-						propertyName: 'blob',
-					})}"
-					src={latestAudioSrc}
-					controls
-					class="h-8 w-full"
-				/>
-			{/if}
-			<NavItems class="xs:flex hidden" />
-		</div>
+	<div class="relative">
+		<WhisperingButton
+			tooltipText="Toggle recording"
+			onclick={recorder.toggleRecording}
+			variant="ghost"
+			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
+		>
+			<span
+				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+				class="text-[100px] leading-none"
+			>
+				{#if recorder.recorderState === 'RECORDING'}
+					🔲
+				{:else}
+					🎙️
+				{/if}
+			</span>
+		</WhisperingButton>
+		{#if recorder.recorderState === 'RECORDING'}
+			<WhisperingButton
+				tooltipText="Cancel recording"
+				onclick={recorder.cancelRecording}
+				variant="ghost"
+				size="icon"
+				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+			>
+				🚫
+			</WhisperingButton>
+		{/if}
 	</div>
 
-	<div class="xs:flex hidden flex-col items-center justify-center gap-1">
-		<p class="text-foreground/75 text-sm">
+	<div class="xxs:flex max-w-80 hidden w-full flex-col items-center gap-2">
+		<div class="flex w-full items-center gap-2">
+			<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
+			<Input
+				id="transcribed-text"
+				class="w-full"
+				placeholder="Transcribed text will appear here..."
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'transcribedText',
+				})}"
+				readonly
+				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
+					? '...'
+					: latestRecording.transcribedText}
+			/>
+			<WhisperingButton
+				tooltipText="Copy transcribed text"
+				onclick={copyRecordingTextFromLatestRecording}
+				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'transcribedText',
+				})}-copy-button"
+			>
+				<ClipboardIcon class="h-6 w-6" />
+			</WhisperingButton>
+		</div>
+		{#if maybeLatestAudioSrc}
+			{@const latestAudioSrc = maybeLatestAudioSrc}
+			<audio
+				style="view-transition-name: {createRecordingViewTransitionName({
+					recordingId: latestRecording.id,
+					propertyName: 'blob',
+				})}"
+				src={latestAudioSrc}
+				controls
+				class="h-8 w-full"
+			/>
+		{/if}
+	</div>
+
+	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />
+
+	<div class="xs:flex hidden flex-col items-center gap-3">
+		<p class="text-foreground/75 truncate text-sm">
 			Click the microphone or press
 			{' '}<WhisperingButton
 				tooltipText="Go to local shortcut in settings"
 				href="/settings#local-shortcut"
 				variant="link"
-				class="px-0.5"
+				class="h-fit px-0.5 py-0"
 			>
 				<kbd
-					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
 				>
 					{settings.currentLocalShortcut}
 				</kbd>
@@ -134,16 +134,16 @@
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
-			<p class="text-foreground/75 pb-1 text-sm">
+			<p class="text-foreground/75 truncate text-sm">
 				Press
 				{' '}<WhisperingButton
 					tooltipText="Go to global shortcut in settings"
 					href="/settings#global-shortcut"
 					variant="link"
-					class="px-0.5"
+					class="h-fit px-0.5 py-0"
 				>
 					<kbd
-						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+						class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
 					>
 						{settings.currentGlobalShortcut}
 					</kbd>
@@ -151,7 +151,7 @@
 				to start recording anywhere.
 			</p>
 		{/if}
-		<p class="text-muted-foreground text-sm font-light">
+		<p class="text-muted-foreground truncate text-sm font-light">
 			Check out the {' '}<WhisperingButton
 				tooltipText="Check out the Chrome Extension"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
@@ -176,4 +176,4 @@
 			{/if} for more integrations!
 		</p>
 	</div>
-</div>
+</main>

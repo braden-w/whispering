@@ -86,8 +86,9 @@
 	</span>
 </button>
 
-<div class="xxs:flex relative hidden min-h-screen flex-col">
+<div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
 	<slot />
 </div>
+
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />

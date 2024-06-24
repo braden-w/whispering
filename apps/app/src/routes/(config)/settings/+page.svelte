@@ -26,7 +26,7 @@
 	<title>Settings</title>
 </svelte:head>
 
-<div class="container flex items-center justify-center">
+<main class="flex w-full flex-1 items-center justify-center">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="text-xl">Settings</Card.Title>
@@ -176,4 +176,4 @@
 			<Button href="/" class="w-full" variant="secondary">Go Back</Button>
 		</Card.Footer>
 	</Card.Root>
-</div>
+</main>
