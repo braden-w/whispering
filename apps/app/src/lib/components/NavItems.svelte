@@ -1,16 +1,18 @@
 <script lang="ts">
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		GithubIcon,
 		ListIcon,
+		Minimize2Icon,
 		MoonIcon,
 		SlidersVerticalIcon,
 		SunIcon,
 	} from '$lib/components/icons';
 	import { cn } from '$lib/utils';
+	import { LogicalSize, appWindow } from '@tauri-apps/api/window';
 	import { toggleMode } from 'mode-watcher';
-	import WhisperingButton from './WhisperingButton.svelte';
 
-	let { children, class: className }: { class?: string } = $props();
+	let { class: className }: { class?: string } = $props();
 </script>
 
 <nav class={cn('flex items-center', className)} style="view-transition-name: nav">
@@ -38,7 +40,16 @@
 			class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
 		/>
 	</WhisperingButton>
-	{#if children}
-		{@render children()}
+	{#if window.__TAURI__}
+		<WhisperingButton
+			tooltipText="Minimize"
+			onclick={() => {
+				appWindow.setSize(new LogicalSize(72, 84));
+			}}
+			variant="ghost"
+			size="icon"
+		>
+			<Minimize2Icon class="h-4 w-4" aria-hidden="true" />
+		</WhisperingButton>
 	{/if}
 </nav>
