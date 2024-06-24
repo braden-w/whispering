@@ -23,6 +23,7 @@ export const settingsSchema = S.Struct({
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
 export type WhisperingErrorProperties = {
+	variant?: 'error' | 'warning';
 	title: string;
 	description: string;
 	action?:
@@ -36,7 +37,15 @@ export type WhisperingErrorProperties = {
 
 export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
-)<WhisperingErrorProperties> {}
+)<Required<Pick<WhisperingErrorProperties, 'variant'>> & Omit<WhisperingErrorProperties, 'variant'>
+> {
+	constructor(properties: WhisperingErrorProperties) {
+		super({
+			...properties,
+			variant: properties.variant ?? 'error',
+		});
+	}
+}
 
 export type Result<T> =
 	| {

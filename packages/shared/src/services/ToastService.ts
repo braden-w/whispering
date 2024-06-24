@@ -2,7 +2,7 @@ import type { Effect } from 'effect';
 import { Context } from 'effect';
 
 export type ToastOptions = {
-	variant: 'success' | 'info' | 'loading' | 'error';
+	variant: 'success' | 'info' | 'loading' | 'error' | 'warning';
 	id?: string | undefined;
 	title: string;
 	description: string;

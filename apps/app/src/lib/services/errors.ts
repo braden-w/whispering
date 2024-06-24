@@ -6,7 +6,7 @@ export const renderErrorAsToast = (error: WhisperingError, options?: { toastId?:
 	Effect.gen(function* () {
 		const { toast } = yield* ToastService;
 		yield* toast({
-			variant: 'error',
+			variant: error.variant,
 			id: options?.toastId,
 			title: error.title,
 			description: error.description,
