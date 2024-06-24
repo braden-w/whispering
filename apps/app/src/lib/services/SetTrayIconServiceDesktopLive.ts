@@ -8,12 +8,12 @@ export const SetTrayIconServiceDesktopLive = Layer.succeed(
 	SetTrayIconService.of({
 		setTrayIcon: (recorderState) =>
 			Effect.tryPromise({
-				try: () => invoke('setTrayIcon', { recorderState }),
+				try: () => invoke('set_tray_icon', { recorderState }),
 				catch: (error) =>
 					new WhisperingError({
 						variant: 'warning',
-						title: `Could not set tray icon to ${recorderState} icon`,
-						description: 'Continuing without setting the tray icon...',
+						title: `Could not set tray icon to ${recorderState} icon..`,
+						description: error instanceof Error ? error.message : `Error: ${error}`,
 						error,
 					}),
 			}),
