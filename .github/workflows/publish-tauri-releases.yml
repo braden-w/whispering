@@ -1,4 +1,4 @@
-name: 'publish'
+name: 'Publish Tauri Build to GitHub Releases 🛠️'
 
 on:
   workflow_dispatch:
