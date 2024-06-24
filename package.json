@@ -16,18 +16,17 @@
 	"devDependencies": {
 		"@parcel/optimizer-data-url": "2.9.3",
 		"@parcel/transformer-inline-string": "2.9.3",
-		"typescript": "^5.5.2",
-		"@changesets/cli": "^2.27.5",
-		"eslint": "latest",
-		"prettier": "latest",
-		"prettier-plugin-svelte": "latest",
-		"prettier-plugin-tailwindcss": "latest",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
+		"eslint": "latest",
 		"eslint-config-prettier": "latest",
 		"eslint-config-turbo": "latest",
 		"eslint-plugin-prettier": "latest",
 		"eslint-plugin-svelte": "latest",
-		"turbo": "latest"
+		"prettier": "latest",
+		"prettier-plugin-svelte": "latest",
+		"prettier-plugin-tailwindcss": "latest",
+		"turbo": "latest",
+		"typescript": "^5.5.2"
 	}
 }
