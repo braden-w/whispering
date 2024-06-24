@@ -78,6 +78,7 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 					return {
 						isSuccess: false,
 						error: {
+							variant: 'warning',
 							title: 'Please paste the transcribed text manually',
 							description: 'There are multiple text areas or content editable divs on the page.',
 						},
