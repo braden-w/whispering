@@ -82,7 +82,10 @@
 			"csp": null
 		},
 		"updater": {
-			"active": false
+			"active": true,
+			"endpoints": ["https://github.com/braden-w/whispering/releases/latest/download/latest.json"],
+			"dialog": true,
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2MjUxOEI1RkI5MTFCREMKUldUY0c1SDd0UmdseGpZV25yUHNLc0RCVzUwTGdpbkJHRUE3N2NIQkNSRGtnbWZydUNkVmhZd20K"
 		},
 		"windows": [
 			{
