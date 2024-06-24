@@ -2,7 +2,7 @@ import vercelAdapter from '@sveltejs/adapter-vercel';
 import staticAdapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-const isInVercelEnvironment = !!process.env.VERCEL;
+const isInVercelEnvironment = !!process.env.VERCEL_ENV;
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
