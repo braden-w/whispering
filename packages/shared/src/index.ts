@@ -1,23 +1,13 @@
 import { Schema as S } from '@effect/schema';
-import { Context, Data, Effect } from 'effect';
-import { notificationOptionsSchema } from './services/index.js';
+import { Data, Effect } from 'effect';
+import { notificationOptionsSchema } from './services/NotificationService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
 		? 'https://whispering.bradenwong.com'
 		: 'http://localhost:5173';
-export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-export const BaseError = S.Struct({
-	title: S.String,
-	description: S.String,
-	action: S.optional(
-		S.Struct({
-			label: S.String,
-			goto: S.String,
-		}),
-	),
-});
+export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
 export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
@@ -32,28 +22,17 @@ export const settingsSchema = S.Struct({
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
-export const toastOptionsSchema = S.Struct({
-	variant: S.Literal('success', 'info', 'loading', 'error'),
-	id: S.optional(S.String),
-	...BaseError.fields,
-	descriptionClass: S.optional(S.String),
-});
-
-export type ToastOptions = S.Schema.Type<typeof toastOptionsSchema>;
-
-export class ToastService extends Context.Tag('ToastService')<
-	ToastService,
-	{
-		toast: (options: ToastOptions) => Effect.Effect<string>;
-	}
->() {}
-
-const WhisperingErrorProperties = S.Struct({
-	...BaseError.fields,
-	error: S.optional(S.Unknown),
-});
-
-type WhisperingErrorProperties = S.Schema.Type<typeof WhisperingErrorProperties>;
+export type WhisperingErrorProperties = {
+	title: string;
+	description: string;
+	action?:
+		| {
+				label: string;
+				goto: string;
+		  }
+		| undefined;
+	error?: unknown;
+};
 
 export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
