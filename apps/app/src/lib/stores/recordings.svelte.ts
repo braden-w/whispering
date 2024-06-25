@@ -188,7 +188,7 @@ const createRecordings = Effect.gen(function* () {
 						return;
 					}
 					const isAccessibilityEnabled = yield* Effect.tryPromise({
-						try: () => invoke<boolean>('is_accessibility_enabled', { askIfNotAllowed: true }),
+						try: () => invoke<boolean>('is_accessibility_enabled'),
 						catch: (error) =>
 							new WhisperingError({
 								title: 'Unable to ensure accessibility is enabled',

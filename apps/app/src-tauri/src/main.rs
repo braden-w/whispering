@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::ptr;
+
 use tauri::{CustomMenuItem, Manager};
 use tauri::{SystemTray, SystemTrayEvent, SystemTrayMenu};
 
@@ -61,39 +63,37 @@ async fn set_tray_icon(recorder_state: String, app_handle: tauri::AppHandle) -> 
 
 use accessibility_sys::{kAXTrustedCheckOptionPrompt, AXIsProcessTrustedWithOptions};
 use core_foundation_sys::base::{CFRelease, TCFTypeRef};
-use core_foundation_sys::dictionary::{CFDictionaryAddValue, CFDictionaryCreateMutable};
-use core_foundation_sys::number::{kCFBooleanFalse, kCFBooleanTrue};
+use core_foundation_sys::dictionary::{
+    CFDictionaryAddValue, CFDictionaryCreateMutable, __CFDictionary,
+};
+use core_foundation_sys::number::kCFBooleanFalse;
 
 #[tauri::command]
-fn is_accessibility_enabled(ask_if_not_allowed: bool) -> bool {
-    (|| -> Result<bool, String> {
-        unsafe {
-            let options = CFDictionaryCreateMutable(
-                std::ptr::null_mut(),
-                0,
-                std::ptr::null(),
-                std::ptr::null(),
-            );
+fn is_accessibility_enabled() -> bool {
+    create_options_dictionary().map_or(false, |options| {
+        let is_allowed = unsafe { AXIsProcessTrustedWithOptions(options) };
+        release_options_dictionary(options);
+        is_allowed
+    })
+}
 
-            if options.is_null() {
-                return Err("Failed to create options dictionary".into());
-            }
-
-            let key = kAXTrustedCheckOptionPrompt;
-            let value = if ask_if_not_allowed {
-                kCFBooleanTrue
-            } else {
-                kCFBooleanFalse
-            };
-
-            CFDictionaryAddValue(options, key.as_void_ptr(), value.as_void_ptr());
-
-            let is_allowed = AXIsProcessTrustedWithOptions(options);
-
-            CFRelease(options as *const _);
-
-            Ok(is_allowed)
+fn create_options_dictionary() -> Result<*mut __CFDictionary, &'static str> {
+    unsafe {
+        let options = CFDictionaryCreateMutable(ptr::null_mut(), 0, ptr::null(), ptr::null());
+        if options.is_null() {
+            return Err("Failed to create options dictionary");
         }
-    })()
-    .unwrap_or(false)
+        CFDictionaryAddValue(
+            options,
+            kAXTrustedCheckOptionPrompt.as_void_ptr(),
+            kCFBooleanFalse.as_void_ptr(),
+        );
+        Ok(options)
+    }
+}
+
+fn release_options_dictionary(options: *mut __CFDictionary) {
+    unsafe {
+        CFRelease(options as *const _);
+    }
 }
