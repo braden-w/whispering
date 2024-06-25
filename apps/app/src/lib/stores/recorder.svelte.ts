@@ -72,7 +72,7 @@ export const recorder = Effect.gen(function* () {
 						description: 'Please enter your OpenAI API key in the settings',
 						action: {
 							label: 'Go to settings',
-							onClick: () => goto('/settings'),
+							goto: '/settings',
 						},
 					});
 				}
