@@ -27,7 +27,11 @@ fn main() {
             },
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![write_text, set_tray_icon])
+        .invoke_handler(tauri::generate_handler![
+            write_text,
+            set_tray_icon,
+            is_accessibility_enabled
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -53,4 +57,43 @@ async fn set_tray_icon(recorder_state: String, app_handle: tauri::AppHandle) -> 
         .set_icon(tauri::Icon::Raw(icon))
         .unwrap();
     Ok(())
+}
+
+use accessibility_sys::{kAXTrustedCheckOptionPrompt, AXIsProcessTrustedWithOptions};
+use core_foundation_sys::base::{CFRelease, TCFTypeRef};
+use core_foundation_sys::dictionary::{CFDictionaryAddValue, CFDictionaryCreateMutable};
+use core_foundation_sys::number::{kCFBooleanFalse, kCFBooleanTrue};
+
+#[tauri::command]
+fn is_accessibility_enabled(ask_if_not_allowed: bool) -> bool {
+    (|| -> Result<bool, String> {
+        unsafe {
+            let options = CFDictionaryCreateMutable(
+                std::ptr::null_mut(),
+                0,
+                std::ptr::null(),
+                std::ptr::null(),
+            );
+
+            if options.is_null() {
+                return Err("Failed to create options dictionary".into());
+            }
+
+            let key = kAXTrustedCheckOptionPrompt;
+            let value = if ask_if_not_allowed {
+                kCFBooleanTrue
+            } else {
+                kCFBooleanFalse
+            };
+
+            CFDictionaryAddValue(options, key.as_void_ptr(), value.as_void_ptr());
+
+            let is_allowed = AXIsProcessTrustedWithOptions(options);
+
+            CFRelease(options as *const _);
+
+            Ok(is_allowed)
+        }
+    })()
+    .unwrap_or(false)
 }

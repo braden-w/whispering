@@ -28,6 +28,9 @@
 			"notification": {
 				"all": true
 			},
+			"os": {
+				"all": true
+			},
 			"shell": {
 				"all": false,
 				"execute": false,

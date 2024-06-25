@@ -16,6 +16,8 @@ import {
 } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
+import { type } from '@tauri-apps/api/os';
+import { invoke } from '@tauri-apps/api/tauri';
 import { Effect, Either, Option } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
@@ -174,7 +176,44 @@ const createRecordings = Effect.gen(function* () {
 
 				// Paste transcription if enabled
 				if (settings.isPasteContentsOnSuccessEnabled) {
+					const isMacos = window.__TAURI__ && (yield* Effect.promise(type)) === 'Darwin';
+					if (!isMacos) {
+						yield* clipboardService.writeText(transcribedText);
+						yield* toast({
+							variant: 'success',
+							title: 'Pasted transcription!',
+							description: transcribedText,
+							descriptionClass: 'line-clamp-2',
+						});
+						return;
+					}
+					const isAccessibilityEnabled = yield* Effect.tryPromise({
+						try: () => invoke<boolean>('is_accessibility_enabled', { askIfNotAllowed: true }),
+						catch: (error) =>
+							new WhisperingError({
+								title: 'Unable to ensure accessibility is enabled',
+								description: error instanceof Error ? error.message : `Error: ${error}`,
+								error,
+							}),
+					});
+					if (!isAccessibilityEnabled)
+						return yield* new WhisperingError({
+							variant: 'warning',
+							title: 'Please enable accessibility to paste transcription in macOS!',
+							description:
+								'You can enable Whispering in System Preferences > Privacy & Security > Accessibility.',
+							action: {
+								label: 'More directions',
+								goto: '/macos-accessibility',
+							},
+						});
 					yield* clipboardService.writeText(transcribedText);
+					yield* toast({
+						variant: 'success',
+						title: 'Pasted transcription!',
+						description: transcribedText,
+						descriptionClass: 'line-clamp-2',
+					});
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		downloadRecording: (id: string) =>
