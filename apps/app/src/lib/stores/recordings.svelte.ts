@@ -1,3 +1,4 @@
+import { goto } from '$app/navigation';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
@@ -5,11 +6,11 @@ import { NotificationServiceDesktopLive } from '$lib/services/NotificationServic
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
+import { ToastService } from '$lib/services/ToastService';
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { renderErrorAsToast } from '$lib/services/errors';
 import {
 	NotificationService,
-	ToastService,
 	TranscriptionService,
 	TranscriptionServiceWhisperLive,
 	WhisperingError,
@@ -17,6 +18,7 @@ import {
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
 import { type } from '@tauri-apps/api/os';
+import { open } from '@tauri-apps/api/shell';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Effect, Either, Option } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
@@ -137,7 +139,7 @@ const createRecordings = Effect.gen(function* () {
 								description: 'Check it out in your recordings',
 								action: {
 									label: 'Go to recordings',
-									goto: '/recordings',
+									onClick: () => goto('/recordings'),
 								},
 							}),
 							clear(transcribingInProgressId),
@@ -196,17 +198,22 @@ const createRecordings = Effect.gen(function* () {
 								error,
 							}),
 					});
-					if (!isAccessibilityEnabled)
-						return yield* new WhisperingError({
+					if (!isAccessibilityEnabled) {
+						yield* toast({
 							variant: 'warning',
 							title: 'Please enable accessibility to paste transcription in macOS!',
 							description:
 								'You can enable Whispering in System Preferences > Privacy & Security > Accessibility.',
 							action: {
-								label: 'More directions',
-								goto: '/macos-accessibility',
+								label: 'Open Accessibility',
+								onClick: () =>
+									open(
+										'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility',
+									),
 							},
 						});
+						return;
+					}
 					yield* clipboardService.writeText(transcribedText);
 					yield* toast({
 						variant: 'success',

@@ -7,10 +7,11 @@ export type ToastOptions = {
 	title: string;
 	description: string;
 	descriptionClass?: string;
+
 	action?:
 		| {
 				label: string;
-				goto: string;
+				onClick: (event: MouseEvent) => void;
 		  }
 		| undefined;
 };

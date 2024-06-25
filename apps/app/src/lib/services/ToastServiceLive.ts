@@ -1,5 +1,4 @@
-import { goto } from '$app/navigation';
-import { ToastService } from '@repo/shared';
+import { ToastService } from '$lib/services/ToastService';
 import { Effect, Layer } from 'effect';
 import { toast } from 'svelte-sonner';
 
@@ -12,10 +11,7 @@ export const ToastServiceLive = Layer.succeed(
 					id: maybeId,
 					description,
 					descriptionClass,
-					action: action && {
-						label: action.label,
-						onClick: () => goto(action.goto),
-					},
+					action,
 				});
 				return String(toastId);
 			}),
