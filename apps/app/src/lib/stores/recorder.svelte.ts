@@ -50,7 +50,7 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
 	const { toast } = yield* ToastService;
-	const { notify, clear } = yield* NotificationService;
+	const { notify } = yield* NotificationService;
 
 	return {
 		get recorderState() {
