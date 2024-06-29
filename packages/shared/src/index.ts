@@ -1,6 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
+import { SUPPORTED_LANGUAGES } from './services/TranscriptionServiceWhisperingLive.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -17,7 +18,7 @@ export const settingsSchema = S.Struct({
 	currentLocalShortcut: S.String,
 	currentGlobalShortcut: S.String,
 	apiKey: S.String,
-	outputLanguage: S.String,
+	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
 });
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
@@ -35,9 +36,8 @@ export type WhisperingErrorProperties = {
 	error?: unknown;
 };
 
-export class WhisperingError extends Data.TaggedError(
-	'WhisperingError',
-)<Required<Pick<WhisperingErrorProperties, 'variant'>> & Omit<WhisperingErrorProperties, 'variant'>
+export class WhisperingError extends Data.TaggedError('WhisperingError')<
+	Required<Pick<WhisperingErrorProperties, 'variant'>> & Omit<WhisperingErrorProperties, 'variant'>
 > {
 	constructor(properties: WhisperingErrorProperties) {
 		super({

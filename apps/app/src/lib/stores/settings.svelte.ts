@@ -27,7 +27,7 @@ const createSettings = Effect.gen(function* () {
 			currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
-			outputLanguage: 'en',
+			outputLanguage: 'auto',
 		},
 	});
 
