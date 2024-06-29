@@ -1,8 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(target_os = "macos")]
 mod accessibility;
+
+#[cfg(target_os = "macos")]
 use accessibility::is_macos_accessibility_enabled;
+
 use tauri::{CustomMenuItem, Manager};
 use tauri::{SystemTray, SystemTrayEvent, SystemTrayMenu};
 
@@ -11,7 +15,7 @@ fn main() {
 
     let tray_menu = SystemTrayMenu::new().add_item(quit);
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .system_tray(SystemTray::new().with_menu(tray_menu))
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::LeftClick {
@@ -28,12 +32,19 @@ fn main() {
                 _ => {}
             },
             _ => {}
-        })
-        .invoke_handler(tauri::generate_handler![
-            write_text,
-            set_tray_icon,
-            is_macos_accessibility_enabled
-        ])
+        });
+
+    #[cfg(target_os = "macos")]
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        write_text,
+        set_tray_icon,
+        is_macos_accessibility_enabled,
+    ]);
+
+    #[cfg(not(target_os = "macos"))]
+    let builder = builder.invoke_handler(tauri::generate_handler![write_text, set_tray_icon,]);
+
+    builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
