@@ -1,5 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import { MediaRecorderService, MediaStreamService } from '$lib/services/MediaRecorderService';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
@@ -136,7 +136,11 @@ export const recorder = Effect.gen(function* () {
 						]);
 						return;
 				}
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+			}).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.provide(ToastServiceLive),
+				Effect.runPromise,
+			),
 		cancelRecording: (settings: Settings) =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
