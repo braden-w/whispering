@@ -4,6 +4,7 @@ use core_foundation_sys::dictionary::{
     CFDictionaryAddValue, CFDictionaryCreateMutable, __CFDictionary,
 };
 use core_foundation_sys::number::kCFBooleanFalse;
+use std::process::Command;
 use std::ptr;
 
 #[tauri::command]
@@ -34,4 +35,19 @@ fn release_options_dictionary(options: *mut __CFDictionary) {
     unsafe {
         CFRelease(options as *const _);
     }
+}
+
+#[tauri::command]
+pub async fn open_apple_accessibility() -> Result<(), String> {
+    Command::new("open")
+        .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
+        .status()
+        .map_err(|e| format!("Failed to execute command: {}", e))
+        .and_then(|status| {
+            if status.success() {
+                Ok(())
+            } else {
+                Err(format!("Command failed with status: {}", status))
+            }
+        })
 }

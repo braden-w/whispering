@@ -5,10 +5,7 @@
 mod accessibility;
 
 #[cfg(target_os = "macos")]
-use accessibility::is_macos_accessibility_enabled;
-
-#[cfg(target_os = "macos")]
-use std::process::Command;
+use accessibility::{is_macos_accessibility_enabled, open_apple_accessibility};
 
 use tauri::{CustomMenuItem, Manager};
 use tauri::{SystemTray, SystemTrayEvent, SystemTrayMenu};
@@ -74,20 +71,4 @@ async fn set_tray_icon(recorder_state: String, app_handle: tauri::AppHandle) -> 
         .set_icon(tauri::Icon::Raw(icon))
         .unwrap();
     Ok(())
-}
-
-#[cfg(target_os = "macos")]
-#[tauri::command]
-async fn open_apple_accessibility() -> Result<(), String> {
-    Command::new("open")
-        .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
-        .status()
-        .map_err(|e| format!("Failed to execute command: {}", e))
-        .and_then(|status| {
-            if status.success() {
-                Ok(())
-            } else {
-                Err(format!("Command failed with status: {}", status))
-            }
-        })
 }
