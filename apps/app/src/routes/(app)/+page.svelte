@@ -44,7 +44,7 @@
 	<div class="relative">
 		<WhisperingButton
 			tooltipText="Toggle recording"
-			onclick={recorder.toggleRecording}
+			onclick={() => recorder.toggleRecording(settings)}
 			variant="ghost"
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>
@@ -62,7 +62,7 @@
 		{#if recorder.recorderState === 'RECORDING'}
 			<WhisperingButton
 				tooltipText="Cancel recording"
-				onclick={recorder.cancelRecording}
+				onclick={() => recorder.cancelRecording(settings)}
 				variant="ghost"
 				size="icon"
 				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"

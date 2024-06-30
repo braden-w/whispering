@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { recorder } from '$lib/stores';
+	import { recorder, settings } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
 </script>
 
@@ -18,7 +18,7 @@
 		</WhisperingButton>
 		<WhisperingButton
 			tooltipText="Toggle recording"
-			onclick={recorder.toggleRecording}
+			onclick={() => recorder.toggleRecording(settings)}
 			variant="ghost"
 			size="icon"
 			style="view-transition-name: microphone-icon"

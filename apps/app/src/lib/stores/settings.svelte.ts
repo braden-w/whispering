@@ -13,7 +13,7 @@ import { Effect } from 'effect';
 
 type RegisterShortcutJob = Effect.Effect<void>;
 
-const createSettings = Effect.gen(function* () {
+export const settings = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const settings = createPersistedState({
@@ -38,11 +38,11 @@ const createSettings = Effect.gen(function* () {
 		yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 		yield* registerShortcutsService.registerLocalShortcut({
 			shortcut: settings.value.currentLocalShortcut,
-			callback: recorder.toggleRecording,
+			callback: () => recorder.toggleRecording(settings.value),
 		});
 		yield* registerShortcutsService.registerGlobalShortcut({
 			shortcut: settings.value.currentGlobalShortcut,
-			callback: recorder.toggleRecording,
+			callback: () => recorder.toggleRecording(settings.value),
 		});
 	}).pipe(Effect.catchAll(renderErrorAsToast));
 	jobQueue.addJobToQueue(initialSilentJob).pipe(Effect.runPromise);
@@ -82,7 +82,7 @@ const createSettings = Effect.gen(function* () {
 				yield* registerShortcutsService.unregisterAllLocalShortcuts;
 				yield* registerShortcutsService.registerLocalShortcut({
 					shortcut: settings.value.currentLocalShortcut,
-					callback: recorder.toggleRecording,
+					callback: () => recorder.toggleRecording(settings.value),
 				});
 				yield* toast({
 					variant: 'success',
@@ -105,7 +105,7 @@ const createSettings = Effect.gen(function* () {
 				yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 				yield* registerShortcutsService.registerGlobalShortcut({
 					shortcut: settings.value.currentGlobalShortcut,
-					callback: recorder.toggleRecording,
+					callback: () => recorder.toggleRecording(settings.value),
 				});
 				yield* toast({
 					variant: 'success',
@@ -128,9 +128,7 @@ const createSettings = Effect.gen(function* () {
 			settings.value = { ...settings.value, outputLanguage: newValue };
 		},
 	};
-});
-
-export const settings = createSettings.pipe(
+}).pipe(
 	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
 	Effect.provide(ToastServiceLive),
 	Effect.runSync,
