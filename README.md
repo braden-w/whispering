@@ -7,13 +7,8 @@
 </p>
 
 <p align="center">
-  <!-- Development Status Banner -->
-  <img src="https://img.shields.io/badge/Development%20Status-On%20Hold%20(Back%20in%20School)-yellow?style=flat-square">
-  <!-- Wait for Svelte 5 -->
-  <img src="https://img.shields.io/badge/Upcoming-Svelte%205%20Integration-blue?style=flat-square">
-</p>
-
-<p align="center">
+  <!-- Latest Version Badge -->
+  <img src="https://img.shields.io/github/v/release/braden-w/whispering?style=flat-square&label=Latest%20Version&color=brightgreen" />
   <!-- License Badge -->
   <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/github/license/braden-w/whispering.svg?style=flat-square" />
@@ -21,24 +16,16 @@
   <!-- Badges for Technologies -->
   <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
   <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
-
   <!-- Platform Support Badges -->
   <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
     <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
   </a>
-
-<!--   <a href="https://addons.mozilla.org/en-US/firefox/addon/whispering/" target="_blank">
-    <img alt="Firefox" src="https://img.shields.io/amo/stars/whispering?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
-  </a>
- -->
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
   </a>
-
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
   </a>
-
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
@@ -48,21 +35,9 @@
 
 ## Project Overview
 
-Whispering is an open-source project designed to streamline your speech-to-text experience by leveraging the OpenAI Whisper API.
+Whispering is an open-source, cross-platform transcription app that leverages the OpenAI Whisper API for efficient speech-to-text conversion.
 
-Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.
-
-### Current Development Status
-
-🚧 **On Hold:** Currently, development is paused due to academic commitments.
-
-👀 **Awaiting Svelte 5:** Planning to implement changes with the new Svelte 5 API once released.
-
-### Future Plans
-
-🔜 **More Details on Contribution:** Detailed contribution guidelines will be provided after the resumption of development.
-
----
+With Whispering, you can seamlessly integrate speech-to-text capabilities into your workflow, eliminating the need for manual transcription and reducing unnecessary clicks. This boosts productivity and saves time.
 
 ## Features
 
@@ -76,36 +51,72 @@ Whispering offers two key functionalities:
 
 After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
 
-<!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
-
 ## Demo
 
 https://github.com/braden-w/whispering/assets/13159333/e9d72422-a743-468f-858d-4ecde0dfe238
 
+Sure, here's a revised version of the README with a more professional tone and best practices for the installation steps:
+
+---
+
 ## Installation
-
-### Chrome Extension
-
-You can install the Chrome Extension from the Chrome web store here:
-
-<a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
-  <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
-</a>
 
 ### Web App
 
-To start using the Whispering web app, click the button below:
+Visit [whispering.bradenwong.com](https://whispering.bradenwong.com/), which has the latest version of the `apps/app` folder hosted on Vercel.
 
-[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
+### Chrome Extension
 
-### Download Desktop App
+Install the Chrome Extension from the Chrome Web Store [here](https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo).
 
-To download the Whispering desktop app:
+### Desktop App
 
-1. Go to the [latest releases page](https://github.com/braden-w/whispering/releases) and download the corresponding installation file `.msi` file for Windows and `.dmg` for MacOS.
-2. Double click the downloaded file to install it.
-3. For Windows, if prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation (I was unable to sign the app due to my lack of a Windows laptop for development, but the app is safe to use).
-4. Ready to use!
+To download and install the Whispering desktop app, follow the steps for your operating system:
+
+#### Windows
+
+1. Download the installation package ending in `.msi` from the [latest releases page](https://github.com/braden-w/whispering/releases).
+2. Open the downloaded `.msi` file to run the installer.
+3. If prompted as unsafe, click on `More Info` -> `Run Anyway` to proceed with the installation.
+4. Follow the on-screen instructions to complete the installation.
+
+#### MacOS
+
+1. Download the installation package ending in `.dmg` from the [latest releases page](https://github.com/braden-w/whispering/releases).
+2. Open the downloaded `.dmg` file to run the installer.
+3. Drag the Whispering app to the Applications folder.
+4. If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
+
+After installation, the app will be ready to use.
+
+#### Linux
+
+For Linux, there are multiple installation options available. Choose the one that suits your environment:
+
+1. **AppImage**:
+
+   - Download the `.AppImage` file from the [latest releases page](https://github.com/braden-w/whispering/releases).
+   - Make the file executable:
+     ```bash
+     chmod +x whispering_x.x.x_amd64.AppImage
+     ```
+   - Run the AppImage:
+     ```bash
+     ./whispering_x.x.x_amd64.AppImage
+     ```
+
+2. **DEB Package (Debian/Ubuntu)**:
+   - Download the `.deb` file from the [latest releases page](https://github.com/braden-w/whispering/releases).
+   - Install the package using `dpkg`:
+     ```bash
+     sudo dpkg -i whispering_x.x.x_amd64.deb
+     ```
+   - Resolve any dependency issues:
+     ```bash
+     sudo apt-get install -f
+     ```
+
+After installation, the app will be ready to use.
 
 ## Usage
 
@@ -150,33 +161,54 @@ The Whispering Chrome extension is built using:
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
 - [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
 
-## Development
+## Run Whispering in Local Development Mode
 
 To set up the project on your local machine, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/braden-w/whispering.git`
 2. Change into the project directory: `cd whispering`
 3. Install the necessary dependencies: `pnpm i`
-4. Run the development server: `pnpm dev`
-5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
 
-The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/browser-extension`.
+To run the Whispering desktop app and website in development mode:
 
-## Build Instructions
+4. Change into the app directory: `cd apps/app`
+5. Run the development server: `pnpm tauri dev`
+
+The desktop app should automatically open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
+
+To run the Whispering Chrome extension in development mode:
+
+4. Change into the extension directory: `cd apps/extension`
+5. Run the development server: `pnpm dev --target=chrome-mv3`
+
+To develop the chrome extension, load it into Chrome by navigating to `chrome://extensions`, enabling developer mode, and loading the `apps/extension/build/{platform}-{manifest-version}-dev` folder as an unpacked extension.
+
+## Build The Executable Yourself
+
+If you ever have concerns regarding the trustworthiness of the installers or would like more control, you can always build the executable yourself. This requires more setup, but it ensures that you are running the code you expect. Such is the beauty of open-source software!
 
 ### Chrome
 
-1. `cd apps/browser-extension`
-2. `pnpm i`
-3. `pnpm plasmo build --zip`
-4. Output should be found in `apps/browser-extension/build`
+1. Change into the extension directory: `cd apps/extension`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Plasmo build: `pnpm plasmo build --target=chrome-mv3`
+4. Output should be found in `apps/extension/build/chrome-mv3-prod`, which can be loaded into Chrome as an unpacked extension.
+5. Alternatively, you can build the extension for the Chrome Web Store: `pnpm plasmo build --target=chrome-mv3 --release`
 
 ### Firefox
 
-1. `cd apps/browser-extension`
-2. `pnpm i`
-3. `pnpm plasmo build --target=firefox-mv2 --zip`
-4. Output should be found in `apps/browser-extension/build`
+1. Change into the extension directory: `cd apps/extension`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Plasmo build: `pnpm plasmo build --target=firefox-mv3`
+4. Output should be found in `apps/extension/build/firefox-mv3-prod`, which can be loaded into Chrome as an unpacked extension.
+5. Alternatively, you can build the extension for the Chrome Web Store: `pnpm plasmo build --target=firefox-mv3 --release`
+
+### Desktop
+
+1. Change into the app directory: `cd apps/app`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Tauri Build: `pnpm tauri build`
+4. You can find the executable in the `apps/app/target/release` directory.
 
 ## Contributing
 
@@ -196,6 +228,6 @@ Whispering is released under the [MIT License](https://opensource.org/licenses/M
 
 ## Support and Feedback
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/braden-w/whispering/issues). We appreciate your feedback!
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub iusses tab](https://github.com/braden-w/whispering/issues). I really appreciate your feedback!
 
 Thank you for using Whispering and happy writing!
