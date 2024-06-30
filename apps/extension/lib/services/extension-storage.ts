@@ -4,6 +4,7 @@ import { WhisperingError, recorderStateSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from './NotificationServiceBgswLive';
+import type { ParseError } from '@effect/schema/ParseResult';
 
 export const STORAGE_KEYS = {
 	RECORDER_STATE: 'whispering-recorder-state',
@@ -13,17 +14,23 @@ export const STORAGE_KEYS = {
 
 const storage = new Storage();
 
-const createSetWatch = <A, I>({ key, schema }: { key: string; schema: S.Schema<A, I> }) => {
+const createSetWatch = <TSchema extends S.Schema.AnyNoContext, A = S.Schema.Type<TSchema>>({
+	key,
+	schema,
+}: {
+	key: string;
+	schema: TSchema;
+}) => {
 	const parseValueFromStorage = (valueFromStorage: unknown) => {
 		const jsonSchema = S.parseJson(schema);
-		return S.decodeUnknown(jsonSchema)(valueFromStorage);
+		return S.decodeUnknown(jsonSchema)(valueFromStorage) satisfies Effect.Effect<A, ParseError>;
 	};
 	return {
 		set: (value: A) => Effect.promise(() => storage.set(key, value)),
 		watch: (callback: (newValue: A) => void) => {
 			const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
 				Effect.gen(function* () {
-					const newValue = yield* parseValueFromStorage(newValueUnparsed).pipe(
+					const newValue: A = yield* parseValueFromStorage(newValueUnparsed).pipe(
 						Effect.mapError(
 							(error) =>
 								new WhisperingError({

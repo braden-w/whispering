@@ -11,20 +11,20 @@ import { Option } from 'effect';
  * @returns {Object} The persisted state.
  * @returns {S.Schema.Type<Schema>} value - The reactive value of the persisted state.
  */
-export function createPersistedState<A, I>({
+export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 	key,
 	schema,
 	defaultValue,
 	disableLocalStorage = false,
 }: {
 	key: string;
-	schema: S.Schema<A, I>;
-	defaultValue: A;
+	schema: TSchema;
+	defaultValue: S.Schema.Type<TSchema>;
 	disableLocalStorage?: boolean;
 }) {
 	let value = $state(defaultValue);
 
-	const parseValueFromStorage = (valueFromStorage: string | null) => {
+	const parseValueFromStorage = (valueFromStorage: string | null): S.Schema.Type<TSchema> => {
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
@@ -48,7 +48,7 @@ export function createPersistedState<A, I>({
 		get value() {
 			return value;
 		},
-		set value(newValue: A) {
+		set value(newValue: S.Schema.Type<TSchema>) {
 			value = newValue;
 			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
 		},
