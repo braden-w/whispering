@@ -76,14 +76,16 @@ To download and install the Whispering desktop app, follow the steps for your op
 #### Windows
 
 1. Download the installation package ending in `.msi` from the [latest releases page](https://github.com/braden-w/whispering/releases).
-2. Double-click the downloaded file to install it.
+2. Open the downloaded `.msi` file to run the installer.
 3. If prompted as unsafe, click on `More Info` -> `Run Anyway` to proceed with the installation.
+4. Follow the on-screen instructions to complete the installation.
 
 #### MacOS
 
 1. Download the installation package ending in `.dmg` from the [latest releases page](https://github.com/braden-w/whispering/releases).
-2. Double-click the downloaded file to install it.
-3. If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
+2. Open the downloaded `.dmg` file to run the installer.
+3. Drag the Whispering app to the Applications folder.
+4. If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
 
 After installation, the app will be ready to use.
 
