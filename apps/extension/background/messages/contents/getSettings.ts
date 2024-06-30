@@ -34,7 +34,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
 		const valueFromStorage = yield* injectScript<string | null, [typeof STORAGE_KEYS.SETTINGS]>({
 			tabId: whisperingTabId,
-			commandName: 'setSettings',
+			commandName: 'getSettings',
 			func: (settingsKey) => {
 				try {
 					const valueFromStorage = localStorage.getItem(settingsKey);
