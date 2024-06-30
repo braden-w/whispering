@@ -69,9 +69,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					stream = yield* getStreamForDeviceId(recordingDeviceId).pipe(
 						Effect.catchAll(() =>
 							Effect.gen(function* () {
-								const enumeratingDevicesToast = nanoid();
+								const defaultingToFirstAvailableDeviceToastId = nanoid();
 								yield* toast({
-									id: enumeratingDevicesToast,
+									id: defaultingToFirstAvailableDeviceToastId,
 									variant: 'loading',
 									title: 'No device selected or selected device is not available',
 									description: 'Defaulting to first available audio input device...',
@@ -82,7 +82,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 									if (Either.isRight(deviceStream)) {
 										settings.selectedAudioInputDeviceId = device.deviceId;
 										yield* toast({
-											id: enumeratingDevicesToast,
+											id: defaultingToFirstAvailableDeviceToastId,
 											variant: 'info',
 											title: 'Defaulted to first available audio input device',
 											description: device.label,
