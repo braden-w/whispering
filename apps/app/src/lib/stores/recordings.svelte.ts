@@ -206,10 +206,7 @@ const createRecordings = Effect.gen(function* () {
 								'You can enable Whispering in System Preferences > Privacy & Security > Accessibility.',
 							action: {
 								label: 'Open Accessibility',
-								onClick: () =>
-									open(
-										'x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility',
-									),
+								onClick: () => invoke('open_apple_accessibility'),
 							},
 						});
 						return;

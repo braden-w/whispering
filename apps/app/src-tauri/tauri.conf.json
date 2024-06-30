@@ -34,8 +34,16 @@
 			"shell": {
 				"all": false,
 				"execute": false,
-				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/)",
-				"scope": [],
+				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/|x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility)",
+				"scope": [
+					{
+						"name": "open-system-preferences",
+						"cmd": "open",
+						"args": [
+							"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+						]
+					}
+				],
 				"sidecar": false
 			},
 			"window": {

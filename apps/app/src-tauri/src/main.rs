@@ -5,7 +5,7 @@
 mod accessibility;
 
 #[cfg(target_os = "macos")]
-use accessibility::is_macos_accessibility_enabled;
+use accessibility::{is_macos_accessibility_enabled, open_apple_accessibility};
 
 use tauri::{CustomMenuItem, Manager};
 use tauri::{SystemTray, SystemTrayEvent, SystemTrayMenu};
@@ -38,6 +38,7 @@ fn main() {
     let builder = builder.invoke_handler(tauri::generate_handler![
         write_text,
         set_tray_icon,
+        open_apple_accessibility,
         is_macos_accessibility_enabled,
     ]);
 
