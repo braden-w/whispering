@@ -66,7 +66,23 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			enumerateRecordingDevices,
 			startRecording: (recordingDeviceId: string) =>
 				Effect.gen(function* () {
-					stream = yield* getStreamForDeviceId(recordingDeviceId).pipe(
+					stream = yield* Effect.gen(function* () {
+						const connectingToRecordingDeviceToastId = nanoid();
+						yield* toast({
+							id: connectingToRecordingDeviceToastId,
+							variant: 'loading',
+							title: 'Connecting to audio input device...',
+							description: 'Please allow access to your microphone if prompted.',
+						});
+						const stream = yield* getStreamForDeviceId(recordingDeviceId);
+						yield* toast({
+							id: connectingToRecordingDeviceToastId,
+							variant: 'success',
+							title: 'Connected to audio input device',
+							description: 'Successfully connected to your microphone stream.',
+						});
+						return stream;
+					}).pipe(
 						Effect.catchAll(() =>
 							Effect.gen(function* () {
 								const defaultingToFirstAvailableDeviceToastId = nanoid();
