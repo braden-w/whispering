@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://whispering.bradenwong.com">
-    <img width="180" src="./apps/app/static/studio_microphone.png" alt="Whispering">
+    <img width="180" src="./apps/web-desktop-app/static/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
   <p align="center"><em>Seamless speech-to-text at your fingertips, powered by OpenAI</em></p>
@@ -161,7 +161,7 @@ The Whispering Chrome extension is built using:
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
 - [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
 
-## Development
+## Run Whispering in Local Development Mode
 
 To set up the project on your local machine, follow these steps:
 
@@ -169,25 +169,39 @@ To set up the project on your local machine, follow these steps:
 2. Change into the project directory: `cd whispering`
 3. Install the necessary dependencies: `pnpm i`
 4. Run the development server: `pnpm dev`
-5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
+
+- The desktop app should automatically open for local development.
+- To develop the web app, open your browser and navigate to `http://localhost:5173`.
+- To develop the chrome extension, load it into Chrome by navigating to `chrome://extensions`, enabling developer mode, and loading the `apps/extension/build/{platform}-{manifest-version}-dev` folder as an unpacked extension.
 
 The Whispering web and desktop app can be found under `apps/app`, and the extension can be found under `apps/extension`.
 
-## Build Instructions
+## Build The Executable Yourself
+
+If you ever have concerns regarding the trustworthiness of the installers or would like more control, you can always build the executable yourself. This requires more setup, but it ensures that you are running the code you expect. Such is the beauty of open-source software!
 
 ### Chrome
 
-1. `cd apps/extension`
-2. `pnpm i`
-3. `pnpm plasmo build --zip`
-4. Output should be found in `apps/extension/build`
+1. Change into the extension directory: `cd apps/extension`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Plasmo build: `pnpm plasmo build --target=chrome-mv3`
+4. Output should be found in `apps/extension/build/chrome-mv3-prod`, which can be loaded into Chrome as an unpacked extension.
+5. Alternatively, you can build the extension for the Chrome Web Store: `pnpm plasmo build --target=chrome-mv3 --release`
 
 ### Firefox
 
-1. `cd apps/extension`
-2. `pnpm i`
-3. `pnpm plasmo build --target=firefox-mv2 --zip`
-4. Output should be found in `apps/extension/build`
+1. Change into the extension directory: `cd apps/extension`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Plasmo build: `pnpm plasmo build --target=firefox-mv3`
+4. Output should be found in `apps/extension/build/firefox-mv3-prod`, which can be loaded into Chrome as an unpacked extension.
+5. Alternatively, you can build the extension for the Chrome Web Store: `pnpm plasmo build --target=firefox-mv3 --release`
+
+### Desktop
+
+1. Change into the app directory: `cd apps/app`
+2. Install the necessary dependencies: `pnpm i`
+3. Run Tauri Build: `pnpm tauri build`
+4. You can find the executable in the `apps/app/target/release` directory.
 
 ## Contributing
 
