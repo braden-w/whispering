@@ -10,23 +10,6 @@ class GetStreamError extends Data.TaggedError('GetStreamError')<{
 	recordingDeviceId: string;
 }> {}
 
-const getStreamForDeviceId = (recordingDeviceId: string) =>
-	Effect.tryPromise({
-		try: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
-					echoCancellation: true,
-					noiseSuppression: true,
-				},
-			});
-			return stream;
-		},
-		catch: () => new GetStreamError({ recordingDeviceId }),
-	});
-
 export const MediaRecorderServiceWebLive = Layer.effect(
 	MediaRecorderService,
 	Effect.gen(function* () {
@@ -58,6 +41,51 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 				}),
 		});
 
+		const getStreamForDeviceId = (recordingDeviceId: string) =>
+			Effect.tryPromise({
+				try: async () => {
+					const stream = await navigator.mediaDevices.getUserMedia({
+						audio: {
+							deviceId: { exact: recordingDeviceId },
+							channelCount: 1, // Mono audio is usually sufficient for voice recording
+							sampleRate: 16000, // 16 kHz is a good balance for voice
+							echoCancellation: true,
+							noiseSuppression: true,
+						},
+					});
+					return stream;
+				},
+				catch: () => new GetStreamError({ recordingDeviceId }),
+			});
+
+		const getFirstAvailableStream = Effect.gen(function* () {
+			const defaultingToFirstAvailableDeviceToastId = nanoid();
+			yield* toast({
+				id: defaultingToFirstAvailableDeviceToastId,
+				variant: 'loading',
+				title: 'No device selected or selected device is not available',
+				description: 'Defaulting to first available audio input device...',
+			});
+			const recordingDevices = yield* enumerateRecordingDevices;
+			for (const device of recordingDevices) {
+				const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
+				if (Either.isRight(deviceStream)) {
+					settings.selectedAudioInputDeviceId = device.deviceId;
+					yield* toast({
+						id: defaultingToFirstAvailableDeviceToastId,
+						variant: 'info',
+						title: 'Defaulted to first available audio input device',
+						description: device.label,
+					});
+					return deviceStream.right;
+				}
+			}
+			return yield* new WhisperingError({
+				title: 'No available audio input devices',
+				description: 'Please make sure you have a microphone connected',
+			});
+		});
+
 		return {
 			get recordingState() {
 				if (!mediaRecorder) return 'inactive';
@@ -67,35 +95,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			startRecording: (preferredRecordingDeviceId: string) =>
 				Effect.gen(function* () {
 					stream = yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
-						Effect.catchAll(() =>
-							Effect.gen(function* () {
-								const defaultingToFirstAvailableDeviceToastId = nanoid();
-								yield* toast({
-									id: defaultingToFirstAvailableDeviceToastId,
-									variant: 'loading',
-									title: 'No device selected or selected device is not available',
-									description: 'Defaulting to first available audio input device...',
-								});
-								const recordingDevices = yield* enumerateRecordingDevices;
-								for (const device of recordingDevices) {
-									const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
-									if (Either.isRight(deviceStream)) {
-										settings.selectedAudioInputDeviceId = device.deviceId;
-										yield* toast({
-											id: defaultingToFirstAvailableDeviceToastId,
-											variant: 'info',
-											title: 'Defaulted to first available audio input device',
-											description: device.label,
-										});
-										return deviceStream.right;
-									}
-								}
-								return yield* new WhisperingError({
-									title: 'No available audio input devices',
-									description: 'Please make sure you have a microphone connected',
-								});
-							}),
-						),
+						Effect.catchAll(() => getFirstAvailableStream),
 					);
 					recordedChunks.length = 0;
 					mediaRecorder = new AudioRecorder(stream!, {
