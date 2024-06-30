@@ -2,6 +2,8 @@
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
@@ -37,8 +39,7 @@
 	<div class="xs:flex hidden flex-col items-center gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
 		<p class="text-muted-foreground line-clamp-1">
-			Click the <span style="view-transition-name: microphone-icon">🎙</span> button to start. Allow
-			access to your microphone.
+			Click the 🎙 button to start. Allow access to your microphone.
 		</p>
 	</div>
 
@@ -50,7 +51,7 @@
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>
 			<span
-				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon"
 				class="text-[100px] leading-none"
 			>
 				{#if recorder.recorderState === 'RECORDING'}
@@ -71,14 +72,43 @@
 				🚫
 			</WhisperingButton>
 		{:else if mediaStream.isStreamOpen}
-			<!-- Reusing media stream for faster rerecording. Click to close stream (tab will also no longer show that it's recording) -->
 			<WhisperingButton
-				tooltipText="Quick re-record enabled. Click to end stream."
 				onclick={mediaStream.destroy}
 				variant="ghost"
 				size="icon"
 				class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
 			>
+				{#snippet tooltipText()}
+					End recording session
+					<Dialog.Root>
+						<Dialog.Trigger>
+							<Button class="h-fit px-0.5 py-0" variant="link">(What's that?)</Button>
+						</Dialog.Trigger>
+						<Dialog.Content class="sm:max-w-[425px]">
+							<Dialog.Header>
+								<Dialog.Title>About recording sessions</Dialog.Title>
+								<Dialog.Description>Much faster re-recording</Dialog.Description>
+							</Dialog.Header>
+							<p>
+								To enable quick re-recording, Whispering keeps the media stream open after your
+								first `startRecording` and attempts to reuse it in future `startRecording`
+								invocations.
+							</p>
+							<p>
+								This significantly reduces latency between invoking `startRecording` and actual
+								audio processing.
+							</p>
+							<p>
+								During your session, your computer should show that this tab is still accessing the
+								device microphone.
+							</p>
+							<p>
+								Once you are done, click the 🔴 button to dispose of the media stream. This will
+								also end the tab's microphone access.
+							</p>
+						</Dialog.Content>
+					</Dialog.Root>
+				{/snippet}
 				🔴
 			</WhisperingButton>
 		{/if}
