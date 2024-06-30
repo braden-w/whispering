@@ -89,42 +89,6 @@ To download and install the Whispering desktop app, follow the steps for your op
 
 After installation, the app will be ready to use.
 
-Certainly! Here’s the revised README including the installation steps for Linux:
-
----
-
-## Installation
-
-### Chrome Extension
-
-Install the Chrome Extension from the Chrome Web Store: [Whispering Chrome Extension](https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo)
-
-### Web App
-
-To use the Whispering web app, click here: [Open Whispering Web App](https://whispering.bradenwong.com/)
-
-### Desktop App
-
-To download and install the Whispering desktop app, follow the steps for your operating system:
-
-#### Windows
-
-1. Download the installation package ending in `.msi` from the [latest releases page](https://github.com/braden-w/whispering/releases).
-2. Double-click the downloaded file to install it.
-3. If prompted with a security warning, click on `More Info` -> `Run Anyway` to proceed with the installation.
-
-#### MacOS
-
-1. Download the installation package ending in `.dmg` from the [latest releases page](https://github.com/braden-w/whispering/releases).
-2. Double-click the downloaded file to install it.
-3. If you encounter a warning that the developer cannot be verified:
-   - Click `Cancel`.
-   - Go to `System Preferences` -> `Security & Privacy` -> `General` tab.
-   - Click `Open Anyway` and then click `Open` in the pop-up window.
-   - Alternatively, right-click the app in Finder and select `Open`.
-
-After installation, the app will be ready to use.
-
 #### Linux
 
 For Linux, there are multiple installation options available. Choose the one that suits your environment:
