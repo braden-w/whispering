@@ -55,30 +55,37 @@ After transcription is completed, it is automatically copied into your clipboard
 
 https://github.com/braden-w/whispering/assets/13159333/e9d72422-a743-468f-858d-4ecde0dfe238
 
+Sure, here's a revised version of the README with a more professional tone and best practices for the installation steps:
+
+---
+
 ## Installation
-
-### Chrome Extension
-
-You can install the Chrome Extension from the Chrome web store here:
-
-<a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
-  <img alt="Download Chrome Extension" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
-</a>
 
 ### Web App
 
-To start using the Whispering web app, click the button below:
+Visit [whispering.bradenwong.com](https://whispering.bradenwong.com/), which has the latest version of the `apps/app` folder hosted on Vercel.
 
-[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
+### Chrome Extension
 
-### Download Desktop App
+Install the Chrome Extension from the Chrome Web Store [here](https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo).
 
-To download the Whispering desktop app:
+### Desktop App
 
-1. Go to the [latest releases page](https://github.com/braden-w/whispering/releases) and download the corresponding installation file `.msi` file for Windows and `.dmg` for MacOS.
-2. Double click the downloaded file to install it.
-3. For Windows, if prompted as unsafe, you can click on `More Info` -> `Run Anyway` to proceed with the installation (I was unable to sign the app due to my lack of a Windows laptop for development, but the app is safe to use).
-4. Ready to use!
+To download and install the Whispering desktop app, follow the steps for your operating system:
+
+#### Windows
+
+1. Download the installation package ending in `.msi` from the [latest releases page](https://github.com/braden-w/whispering/releases).
+2. Double-click the downloaded file to install it.
+3. If prompted as unsafe, click on `More Info` -> `Run Anyway` to proceed with the installation.
+
+#### MacOS
+
+1. Download the installation package ending in `.dmg` from the [latest releases page](https://github.com/braden-w/whispering/releases).
+2. Double-click the downloaded file to install it.
+3. If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
+
+After installation, the app will be ready to use.
 
 ## Usage
 
