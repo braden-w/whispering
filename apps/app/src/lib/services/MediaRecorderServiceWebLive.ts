@@ -95,11 +95,24 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			enumerateRecordingDevices,
 			startRecording: (preferredRecordingDeviceId: string) =>
 				Effect.gen(function* () {
+					const connectingToRecordingDeviceToastId = nanoid();
+					yield* toast({
+						id: connectingToRecordingDeviceToastId,
+						variant: 'loading',
+						title: 'Connecting to audio input device...',
+						description: 'Please allow access to your microphone if prompted.',
+					});
 					const maybeResusedStream =
 						stream ??
 						(yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
 							Effect.catchAll(() => getFirstAvailableStream),
 						));
+					yield* toast({
+						id: connectingToRecordingDeviceToastId,
+						variant: 'success',
+						title: 'Connected to audio input device',
+						description: 'Successfully connected to your microphone stream.',
+					});
 					if (mediaRecorder) {
 						return yield* new WhisperingError({
 							title: 'Unexpected media recorder already exists',
