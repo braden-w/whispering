@@ -97,7 +97,6 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 					stream = yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
 						Effect.catchAll(() => getFirstAvailableStream),
 					);
-					recordedChunks.length = 0;
 					mediaRecorder = new AudioRecorder(stream!, {
 						mimeType: 'audio/webm;codecs=opus',
 						sampleRate: 16000,
