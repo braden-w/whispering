@@ -13,7 +13,7 @@ class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
 
 export const MediaRecorderService = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
-	let stream: MediaStream | null = null;
+	const mediaStreamService = yield* MediaStreamService;
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
@@ -24,73 +24,11 @@ export const MediaRecorderService = Effect.gen(function* () {
 		mediaRecorder = null;
 	};
 
-	const enumerateRecordingDevices = Effect.tryPromise({
-		try: async () => {
-			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			allAudioDevicesStream.getTracks().forEach((track) => track.stop());
-			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-			return audioInputDevices;
-		},
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error enumerating recording devices',
-				description: 'Please make sure you have given permission to access your audio devices',
-				error: error,
-			}),
-	});
-
-	const getStreamForDeviceId = (recordingDeviceId: string) =>
-		Effect.tryPromise({
-			try: async () => {
-				const stream = await navigator.mediaDevices.getUserMedia({
-					audio: {
-						deviceId: { exact: recordingDeviceId },
-						channelCount: 1, // Mono audio is usually sufficient for voice recording
-						sampleRate: 16000, // 16 kHz is a good balance for voice
-						echoCancellation: true,
-						noiseSuppression: true,
-					},
-				});
-				return stream;
-			},
-			catch: () => new GetStreamError({ recordingDeviceId }),
-		});
-
-	const getFirstAvailableStream = Effect.gen(function* () {
-		const defaultingToFirstAvailableDeviceToastId = nanoid();
-		yield* toast({
-			id: defaultingToFirstAvailableDeviceToastId,
-			variant: 'loading',
-			title: 'No device selected or selected device is not available',
-			description: 'Defaulting to first available audio input device...',
-		});
-		const recordingDevices = yield* enumerateRecordingDevices;
-		for (const device of recordingDevices) {
-			const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
-			if (Either.isRight(deviceStream)) {
-				settings.selectedAudioInputDeviceId = device.deviceId;
-				yield* toast({
-					id: defaultingToFirstAvailableDeviceToastId,
-					variant: 'info',
-					title: 'Defaulted to first available audio input device',
-					description: device.label,
-				});
-				return deviceStream.right;
-			}
-		}
-		return yield* new WhisperingError({
-			title: 'No available audio input devices',
-			description: 'Please make sure you have a microphone connected',
-		});
-	});
-
 	return {
 		get recordingState() {
 			if (!mediaRecorder) return 'inactive';
 			return mediaRecorder.state;
 		},
-		enumerateRecordingDevices,
 		startRecording: (preferredRecordingDeviceId: string) =>
 			Effect.gen(function* () {
 				const connectingToRecordingDeviceToastId = nanoid();
@@ -100,11 +38,10 @@ export const MediaRecorderService = Effect.gen(function* () {
 					title: 'Connecting to audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
-				const maybeResusedStream =
-					stream ??
-					(yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
-						Effect.catchAll(() => getFirstAvailableStream),
-					));
+				const maybeResusedStream = yield* mediaStreamService.init({
+					shouldReuseStream: true,
+					preferredRecordingDeviceId,
+				});
 				yield* toast({
 					id: connectingToRecordingDeviceToastId,
 					variant: 'success',
@@ -115,7 +52,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 					return yield* new WhisperingError({
 						title: 'Unexpected media recorder already exists',
 						description:
-							'It seems like it was not properly deinitialized after the previous recording session',
+							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
 					});
 				}
 				const newMediaRecorder = yield* Effect.try({
@@ -133,7 +70,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 								title: 'Error initializing media recorder with preferred device',
 								description: 'Trying to find another available audio input device...',
 							});
-							const stream = yield* getFirstAvailableStream;
+							const stream = yield* mediaStreamService.init({ shouldReuseStream: false });
 							return new AudioRecorder(stream, {
 								mimeType: 'audio/webm;codecs=opus',
 								sampleRate: 16000,
@@ -146,7 +83,6 @@ export const MediaRecorderService = Effect.gen(function* () {
 					recordedChunks.push(event.data);
 				});
 				newMediaRecorder.start();
-				stream = maybeResusedStream;
 				mediaRecorder = newMediaRecorder;
 			}),
 		stopRecording: Effect.async<Blob, Error>((resume) => {
@@ -184,5 +120,98 @@ export const MediaRecorderService = Effect.gen(function* () {
 				});
 			}),
 		),
+	};
+});
+
+export const MediaStreamService = Effect.gen(function* () {
+	let internalStream: MediaStream | null = null;
+
+	const enumerateRecordingDevices = Effect.tryPromise({
+		try: async () => {
+			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			allAudioDevicesStream.getTracks().forEach((track) => track.stop());
+			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+			return audioInputDevices;
+		},
+		catch: (error) =>
+			new WhisperingError({
+				title: 'Error enumerating recording devices',
+				description: 'Please make sure you have given permission to access your audio devices',
+				error: error,
+			}),
+	});
+
+	const getStreamForDeviceId = (recordingDeviceId: string) =>
+		Effect.tryPromise({
+			try: async () => {
+				const stream = await navigator.mediaDevices.getUserMedia({
+					audio: {
+						deviceId: { exact: recordingDeviceId },
+						channelCount: 1, // Mono audio is usually sufficient for voice recording
+						sampleRate: 16000, // 16 kHz is a good balance for voice
+						echoCancellation: true,
+						noiseSuppression: true,
+					},
+				});
+				return stream;
+			},
+			catch: () => new GetStreamError({ recordingDeviceId }),
+		});
+
+	const getFirstAvailableStream = Effect.gen(function* () {
+		const { toast } = yield* ToastService;
+		const defaultingToFirstAvailableDeviceToastId = nanoid();
+		yield* toast({
+			id: defaultingToFirstAvailableDeviceToastId,
+			variant: 'loading',
+			title: 'No device selected or selected device is not available',
+			description: 'Defaulting to first available audio input device...',
+		});
+		const recordingDevices = yield* enumerateRecordingDevices;
+		for (const device of recordingDevices) {
+			const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
+			if (Either.isRight(deviceStream)) {
+				settings.selectedAudioInputDeviceId = device.deviceId;
+				yield* toast({
+					id: defaultingToFirstAvailableDeviceToastId,
+					variant: 'info',
+					title: 'Defaulted to first available audio input device',
+					description: device.label,
+				});
+				return deviceStream.right;
+			}
+		}
+		return yield* new WhisperingError({
+			title: 'No available audio input devices',
+			description: 'Please make sure you have a microphone connected',
+		});
+	});
+
+	return {
+		get isStreamOpen() {
+			return internalStream !== null;
+		},
+		init: ({
+			shouldReuseStream,
+			preferredRecordingDeviceId,
+		}: {
+			shouldReuseStream: boolean;
+			preferredRecordingDeviceId?: string;
+		}) =>
+			Effect.gen(function* () {
+				if (shouldReuseStream && internalStream) {
+					const reusedStream = internalStream;
+					return reusedStream;
+				}
+				const newStream = preferredRecordingDeviceId
+					? yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
+							Effect.catchAll(() => getFirstAvailableStream),
+						)
+					: yield* getFirstAvailableStream;
+				internalStream = newStream;
+				return newStream;
+			}),
+		enumerateRecordingDevices,
 	};
 });

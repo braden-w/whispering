@@ -46,6 +46,7 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
+	const mediaStreamService = yield* MediaStreamService;
 	const { notify } = yield* NotificationService;
 
 	return {
@@ -53,7 +54,7 @@ export const recorder = Effect.gen(function* () {
 			return recorderState.value;
 		},
 		enumerateRecordingDevices: () =>
-			mediaRecorderService.enumerateRecordingDevices.pipe(
+			mediaStreamService.enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
 					renderErrorAsToast(error);
 					return Effect.succeed([] as MediaDeviceInfo[]);
