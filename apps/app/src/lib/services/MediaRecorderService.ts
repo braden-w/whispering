@@ -34,9 +34,8 @@ export const MediaRecorderService = Effect.gen(function* () {
 
 	const resetRecorder = () => {
 		recordedChunks.length = 0;
-		// stream?.getTracks().forEach((track) => track.stop());
-		// stream = null;
 		mediaRecorder = null;
+		mediaStreamService.destroy();
 	};
 
 	return {
@@ -211,6 +210,10 @@ export const MediaStreamService = Effect.gen(function* () {
 				internalStream = newStream;
 				return newStream;
 			}),
+		destroy: () => {
+			internalStream?.getTracks().forEach((track) => track.stop());
+			internalStream = null;
+		},
 		enumerateRecordingDevices,
 	};
 });
