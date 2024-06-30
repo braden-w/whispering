@@ -4,6 +4,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
 	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
@@ -65,9 +66,20 @@
 				onclick={() => recorder.cancelRecording(settings)}
 				variant="ghost"
 				size="icon"
-				class="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+				class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
 			>
 				🚫
+			</WhisperingButton>
+		{:else if mediaStream.isStreamOpen}
+			<!-- Reusing media stream for faster rerecording. Click to close stream (tab will also no longer show that it's recording) -->
+			<WhisperingButton
+				tooltipText="Quick re-record enabled. Click to end stream."
+				onclick={mediaStream.destroy}
+				variant="ghost"
+				size="icon"
+				class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+			>
+				🔴
 			</WhisperingButton>
 		{/if}
 	</div>

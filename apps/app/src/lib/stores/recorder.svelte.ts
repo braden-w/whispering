@@ -1,6 +1,8 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { MediaRecorderService } from '$lib/services/MediaRecorderService';
-import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
+import {
+	MediaRecorderService,
+	enumerateRecordingDevices,
+} from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
@@ -54,7 +56,7 @@ export const recorder = Effect.gen(function* () {
 			return recorderState.value;
 		},
 		enumerateRecordingDevices: () =>
-			mediaRecorderService.enumerateRecordingDevices.pipe(
+			enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
 					renderErrorAsToast(error);
 					return Effect.succeed([] as MediaDeviceInfo[]);
@@ -136,7 +138,11 @@ export const recorder = Effect.gen(function* () {
 						]);
 						return;
 				}
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+			}).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.provide(ToastServiceLive),
+				Effect.runPromise,
+			),
 		cancelRecording: (settings: Settings) =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
@@ -155,7 +161,6 @@ export const recorder = Effect.gen(function* () {
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(MediaRecorderServiceWebLive),
 	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
