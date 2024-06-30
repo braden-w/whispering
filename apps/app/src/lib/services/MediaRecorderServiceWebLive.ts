@@ -44,9 +44,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 
 		const enumerateRecordingDevices = Effect.tryPromise({
 			try: async () => {
-				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+				const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 				const devices = await navigator.mediaDevices.enumerateDevices();
-				stream.getTracks().forEach((track) => track.stop());
+				allAudioDevicesStream.getTracks().forEach((track) => track.stop());
 				const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
 				return audioInputDevices;
 			},
