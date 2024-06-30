@@ -64,9 +64,9 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 				return mediaRecorder.state;
 			},
 			enumerateRecordingDevices,
-			startRecording: (recordingDeviceId: string) =>
+			startRecording: (preferredRecordingDeviceId: string) =>
 				Effect.gen(function* () {
-					stream = yield* getStreamForDeviceId(recordingDeviceId).pipe(
+					stream = yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
 						Effect.catchAll(() =>
 							Effect.gen(function* () {
 								const defaultingToFirstAvailableDeviceToastId = nanoid();
