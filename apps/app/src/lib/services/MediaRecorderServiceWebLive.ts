@@ -10,9 +10,10 @@ class GetStreamError extends Data.TaggedError('GetStreamError')<{
 	recordingDeviceId: string;
 }> {}
 
+class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
+
 export const MediaRecorderServiceWebLive = Layer.effect(
 	MediaRecorderService,
-	// @ts-ignore
 	Effect.gen(function* () {
 		const { toast } = yield* ToastService;
 		let stream: MediaStream | null = null;
@@ -125,8 +126,10 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 							new AudioRecorder(maybeResusedStream, {
 								mimeType: 'audio/webm;codecs=opus',
 								sampleRate: 16000,
-							}),
-						catch: () =>
+							}) as MediaRecorder,
+						catch: () => new TryResuseStreamError(),
+					}).pipe(
+						Effect.catchAll(() =>
 							Effect.gen(function* () {
 								yield* toast({
 									variant: 'loading',
@@ -137,9 +140,10 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 								return new AudioRecorder(stream, {
 									mimeType: 'audio/webm;codecs=opus',
 									sampleRate: 16000,
-								});
+								}) as MediaRecorder;
 							}),
-					});
+						),
+					);
 					newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 						if (!event.data.size) return;
 						recordedChunks.push(event.data);
