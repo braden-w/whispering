@@ -5,7 +5,7 @@ import { Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { ToastService } from './ToastService.js';
 
-const enumerateRecordingDevices = Effect.tryPromise({
+export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {
 		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		const devices = await navigator.mediaDevices.enumerateDevices();
@@ -20,6 +20,7 @@ const enumerateRecordingDevices = Effect.tryPromise({
 			error: error,
 		}),
 });
+
 class GetStreamError extends Data.TaggedError('GetStreamError')<{
 	recordingDeviceId: string;
 }> {}
@@ -28,14 +29,12 @@ class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
 
 export const MediaRecorderService = Effect.gen(function* () {
 	const { toast } = yield* ToastService;
-	const mediaStreamService = yield* MediaStreamService;
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
 	const resetRecorder = () => {
 		recordedChunks.length = 0;
 		mediaRecorder = null;
-		mediaStreamService.destroy();
 	};
 
 	return {
@@ -52,7 +51,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 					title: 'Connecting to audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
-				const maybeResusedStream = yield* mediaStreamService.init({
+				const maybeResusedStream = yield* mediaStream.init({
 					shouldReuseStream: true,
 					preferredRecordingDeviceId,
 				});
@@ -84,7 +83,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 								title: 'Error initializing media recorder with preferred device',
 								description: 'Trying to find another available audio input device...',
 							});
-							const stream = yield* mediaStreamService.init({ shouldReuseStream: false });
+							const stream = yield* mediaStream.init({ shouldReuseStream: false });
 							return new AudioRecorder(stream, {
 								mimeType: 'audio/webm;codecs=opus',
 								sampleRate: 16000,
@@ -137,8 +136,8 @@ export const MediaRecorderService = Effect.gen(function* () {
 	};
 });
 
-export const MediaStreamService = Effect.gen(function* () {
-	let internalStream: MediaStream | null = null;
+export const mediaStream = Effect.gen(function* () {
+	let internalStream = $state<MediaStream | null>(null);
 
 	const getStreamForDeviceId = (recordingDeviceId: string) =>
 		Effect.tryPromise({
@@ -216,4 +215,4 @@ export const MediaStreamService = Effect.gen(function* () {
 		},
 		enumerateRecordingDevices,
 	};
-});
+}).pipe(Effect.runSync);

@@ -1,5 +1,8 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { MediaRecorderService, MediaStreamService } from '$lib/services/MediaRecorderService';
+import {
+	MediaRecorderService,
+	enumerateRecordingDevices,
+} from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
@@ -46,7 +49,6 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
-	const mediaStreamService = yield* MediaStreamService;
 	const { notify } = yield* NotificationService;
 
 	return {
@@ -54,7 +56,7 @@ export const recorder = Effect.gen(function* () {
 			return recorderState.value;
 		},
 		enumerateRecordingDevices: () =>
-			mediaStreamService.enumerateRecordingDevices.pipe(
+			enumerateRecordingDevices.pipe(
 				Effect.catchAll((error) => {
 					renderErrorAsToast(error);
 					return Effect.succeed([] as MediaDeviceInfo[]);
