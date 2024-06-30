@@ -77,19 +77,6 @@ export const recorder = Effect.gen(function* () {
 					});
 				}
 
-				const recordingDevices = yield* mediaRecorderService.enumerateRecordingDevices;
-				const isSelectedDeviceExists = recordingDevices.some(
-					({ deviceId }) => deviceId === settings.selectedAudioInputDeviceId,
-				);
-				if (!isSelectedDeviceExists) {
-					yield* toast({
-						variant: 'info',
-						title: 'Defaulting to first available audio input device...',
-						description: 'No device selected or selected device is not available',
-					});
-					const firstAudioInput = recordingDevices[0].deviceId;
-					settings.selectedAudioInputDeviceId = firstAudioInput;
-				}
 
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
