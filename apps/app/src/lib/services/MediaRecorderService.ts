@@ -5,6 +5,21 @@ import { Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { ToastService } from './ToastService.js';
 
+const enumerateRecordingDevices = Effect.tryPromise({
+	try: async () => {
+		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		const devices = await navigator.mediaDevices.enumerateDevices();
+		allAudioDevicesStream.getTracks().forEach((track) => track.stop());
+		const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+		return audioInputDevices;
+	},
+	catch: (error) =>
+		new WhisperingError({
+			title: 'Error enumerating recording devices',
+			description: 'Please make sure you have given permission to access your audio devices',
+			error: error,
+		}),
+});
 class GetStreamError extends Data.TaggedError('GetStreamError')<{
 	recordingDeviceId: string;
 }> {}
@@ -125,22 +140,6 @@ export const MediaRecorderService = Effect.gen(function* () {
 
 export const MediaStreamService = Effect.gen(function* () {
 	let internalStream: MediaStream | null = null;
-
-	const enumerateRecordingDevices = Effect.tryPromise({
-		try: async () => {
-			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			allAudioDevicesStream.getTracks().forEach((track) => track.stop());
-			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-			return audioInputDevices;
-		},
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error enumerating recording devices',
-				description: 'Please make sure you have given permission to access your audio devices',
-				error: error,
-			}),
-	});
 
 	const getStreamForDeviceId = (recordingDeviceId: string) =>
 		Effect.tryPromise({
