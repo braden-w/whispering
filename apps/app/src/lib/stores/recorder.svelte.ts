@@ -21,7 +21,8 @@ const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
-export let recorderState = (() => {
+export let recorderState = Effect.gen(function* () {
+	const { setTrayIcon } = yield* SetTrayIconService;
 	let value = $state<RecorderState>('IDLE');
 	return {
 		get value() {
@@ -29,19 +30,13 @@ export let recorderState = (() => {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			Effect.gen(function* () {
-				const { setTrayIcon } = yield* SetTrayIconService;
-				yield* setTrayIcon(newValue);
-			}).pipe(
-				Effect.provide(
-					window.__TAURI__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive,
-				),
-				Effect.catchAll(renderErrorAsToast),
-				Effect.runPromise,
-			);
+			setTrayIcon(newValue).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		},
 	};
-})();
+}).pipe(
+	Effect.provide(window.__TAURI__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive),
+	Effect.runSync,
+);
 
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
