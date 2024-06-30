@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://whispering.bradenwong.com">
-    <img width="180" src="./apps/web-desktop-app/static/studio_microphone.png" alt="Whispering">
+    <img width="180" src="./apps/app/static/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
   <p align="center"><em>Seamless speech-to-text at your fingertips, powered by OpenAI</em></p>
@@ -207,23 +207,23 @@ To set up the project on your local machine, follow these steps:
 4. Run the development server: `pnpm dev`
 5. The desktop app should open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
 
-The Whispering web and desktop app can be found under `apps/web-desktop-app`, and the extension can be found under `apps/browser-extension`.
+The Whispering web and desktop app can be found under `apps/app`, and the extension can be found under `apps/extension`.
 
 ## Build Instructions
 
 ### Chrome
 
-1. `cd apps/browser-extension`
+1. `cd apps/extension`
 2. `pnpm i`
 3. `pnpm plasmo build --zip`
-4. Output should be found in `apps/browser-extension/build`
+4. Output should be found in `apps/extension/build`
 
 ### Firefox
 
-1. `cd apps/browser-extension`
+1. `cd apps/extension`
 2. `pnpm i`
 3. `pnpm plasmo build --target=firefox-mv2 --zip`
-4. Output should be found in `apps/browser-extension/build`
+4. Output should be found in `apps/extension/build`
 
 ## Contributing
 
@@ -243,6 +243,6 @@ Whispering is released under the [MIT License](https://opensource.org/licenses/M
 
 ## Support and Feedback
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/braden-w/whispering/issues). We appreciate your feedback!
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub iusses tab](https://github.com/braden-w/whispering/issues). I really appreciate your feedback!
 
 Thank you for using Whispering and happy writing!
