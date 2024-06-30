@@ -12,6 +12,7 @@ class GetStreamError extends Data.TaggedError('GetStreamError')<{
 
 export const MediaRecorderServiceWebLive = Layer.effect(
 	MediaRecorderService,
+	// @ts-ignore
 	Effect.gen(function* () {
 		const { toast } = yield* ToastService;
 		let stream: MediaStream | null = null;
@@ -94,18 +95,44 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 			enumerateRecordingDevices,
 			startRecording: (preferredRecordingDeviceId: string) =>
 				Effect.gen(function* () {
-					stream = yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
-						Effect.catchAll(() => getFirstAvailableStream),
-					);
-					mediaRecorder = new AudioRecorder(stream!, {
-						mimeType: 'audio/webm;codecs=opus',
-						sampleRate: 16000,
+					const maybeResusedStream =
+						stream ??
+						(yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
+							Effect.catchAll(() => getFirstAvailableStream),
+						));
+					if (mediaRecorder) {
+						return yield* new WhisperingError({
+							title: 'Unexpected media recorder already exists',
+							description:
+								'It seems like it was not properly deinitialized after the previous recording session',
+						});
+					}
+					const newMediaRecorder = yield* Effect.try({
+						try: () =>
+							new AudioRecorder(maybeResusedStream, {
+								mimeType: 'audio/webm;codecs=opus',
+								sampleRate: 16000,
+							}),
+						catch: () =>
+							Effect.gen(function* () {
+								yield* toast({
+									variant: 'loading',
+									title: 'Error initializing media recorder with preferred device',
+									description: 'Trying to find another available audio input device...',
+								});
+								const stream = yield* getFirstAvailableStream;
+								return new AudioRecorder(stream, {
+									mimeType: 'audio/webm;codecs=opus',
+									sampleRate: 16000,
+								});
+							}),
 					});
-					mediaRecorder!.addEventListener('dataavailable', (event: BlobEvent) => {
+					newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 						if (!event.data.size) return;
 						recordedChunks.push(event.data);
 					});
-					mediaRecorder!.start();
+					newMediaRecorder.start();
+					mediaRecorder = newMediaRecorder;
 				}),
 			stopRecording: Effect.async<Blob, Error>((resume) => {
 				if (!mediaRecorder) return;
