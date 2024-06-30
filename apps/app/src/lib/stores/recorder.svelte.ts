@@ -9,7 +9,6 @@ import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLi
 import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings, settings } from '$lib/stores';
 import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
-import { ToastService } from '$lib/services/ToastService';
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
@@ -17,7 +16,6 @@ import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { goto } from '$app/navigation';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -49,7 +47,6 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = Effect.gen(function* () {
 	const mediaRecorderService = yield* MediaRecorderService;
-	const { toast } = yield* ToastService;
 	const { notify } = yield* NotificationService;
 
 	return {
@@ -76,7 +73,6 @@ export const recorder = Effect.gen(function* () {
 						},
 					});
 				}
-
 
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
