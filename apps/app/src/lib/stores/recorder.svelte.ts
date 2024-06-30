@@ -1,6 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
-import { MediaRecorderServiceWebLive } from '$lib/services/MediaRecorderServiceWebLive';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
@@ -155,7 +154,6 @@ export const recorder = Effect.gen(function* () {
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(MediaRecorderServiceWebLive),
 	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
