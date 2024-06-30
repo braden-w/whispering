@@ -7,13 +7,8 @@
 </p>
 
 <p align="center">
-  <!-- Development Status Banner -->
-  <img src="https://img.shields.io/badge/Development%20Status-On%20Hold%20(Back%20in%20School)-yellow?style=flat-square">
-  <!-- Wait for Svelte 5 -->
-  <img src="https://img.shields.io/badge/Upcoming-Svelte%205%20Integration-blue?style=flat-square">
-</p>
-
-<p align="center">
+  <!-- Latest Version Badge -->
+  <img src="https://img.shields.io/github/v/release/braden-w/whispering?style=flat-square&label=Latest%20Version&color=brightgreen" />
   <!-- License Badge -->
   <a href="LICENSE" target="_blank">
     <img alt="MIT License" src="https://img.shields.io/github/license/braden-w/whispering.svg?style=flat-square" />
@@ -21,24 +16,16 @@
   <!-- Badges for Technologies -->
   <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-blue?style=flat-square&logo=typescript&logoColor=white" />
   <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
-
   <!-- Platform Support Badges -->
   <a href="https://chrome.google.com/webstore/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo" target="_blank">
     <img alt="Chrome" src="https://img.shields.io/chrome-web-store/stars/oilbfihknpdbpfkcncojikmooipnlglo?color=blue&label=Chrome&style=flat-square&logo=google-chrome&logoColor=white" />
   </a>
-
-<!--   <a href="https://addons.mozilla.org/en-US/firefox/addon/whispering/" target="_blank">
-    <img alt="Firefox" src="https://img.shields.io/amo/stars/whispering?color=orange&label=Firefox&style=flat-square&logo=firefox&logoColor=white" />
-  </a>
- -->
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
   </a>
-
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
   </a>
-
   <a href="https://github.com/braden-w/whispering/releases" target="_blank">
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
@@ -48,21 +35,9 @@
 
 ## Project Overview
 
-Whispering is an open-source project designed to streamline your speech-to-text experience by leveraging the OpenAI Whisper API.
+Whispering is an open-source, cross-platform transcription app that leverages the OpenAI Whisper API for efficient speech-to-text conversion.
 
-Whispering enables you to bring seamless speech-to-text capabilities to your workflow without context switching between websites. By eliminating manual transcribing and excessive button clicks, you can save time, boost productivity, and type faster.
-
-### Current Development Status
-
-🚧 **On Hold:** Currently, development is paused due to academic commitments.
-
-👀 **Awaiting Svelte 5:** Planning to implement changes with the new Svelte 5 API once released.
-
-### Future Plans
-
-🔜 **More Details on Contribution:** Detailed contribution guidelines will be provided after the resumption of development.
-
----
+With Whispering, you can seamlessly integrate speech-to-text capabilities into your workflow, eliminating the need for manual transcription and reducing unnecessary clicks. This boosts productivity and saves time.
 
 ## Features
 
@@ -75,8 +50,6 @@ Whispering offers two key functionalities:
 2. **Record and transcribe across any website**: Access Whisper's speech-to-text anywhere with a global keyboard shortcut, enabling seamless transcription in any website.
 
 After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
-
-<!-- ![Whispering Banner](https://whispering.bradenwong.com/assets/Banner.png) -->
 
 ## Demo
 
