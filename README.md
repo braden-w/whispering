@@ -168,13 +168,20 @@ To set up the project on your local machine, follow these steps:
 1. Clone the repository: `git clone https://github.com/braden-w/whispering.git`
 2. Change into the project directory: `cd whispering`
 3. Install the necessary dependencies: `pnpm i`
-4. Run the development server: `pnpm dev`
 
-- The desktop app should automatically open for local development.
-- To develop the web app, open your browser and navigate to `http://localhost:5173`.
-- To develop the chrome extension, load it into Chrome by navigating to `chrome://extensions`, enabling developer mode, and loading the `apps/extension/build/{platform}-{manifest-version}-dev` folder as an unpacked extension.
+To run the Whispering desktop app and website in development mode:
 
-The Whispering web and desktop app can be found under `apps/app`, and the extension can be found under `apps/extension`.
+4. Change into the app directory: `cd apps/app`
+5. Run the development server: `pnpm tauri dev`
+
+The desktop app should automatically open for local development. To develop the web app, open your browser and navigate to `http://localhost:5173`.
+
+To run the Whispering Chrome extension in development mode:
+
+4. Change into the extension directory: `cd apps/extension`
+5. Run the development server: `pnpm dev --target=chrome-mv3`
+
+To develop the chrome extension, load it into Chrome by navigating to `chrome://extensions`, enabling developer mode, and loading the `apps/extension/build/{platform}-{manifest-version}-dev` folder as an unpacked extension.
 
 ## Build The Executable Yourself
 
