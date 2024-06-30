@@ -21,8 +21,8 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 
 		const resetRecorder = () => {
 			recordedChunks.length = 0;
-			stream?.getTracks().forEach((track) => track.stop());
-			stream = null;
+			// stream?.getTracks().forEach((track) => track.stop());
+			// stream = null;
 			mediaRecorder = null;
 		};
 
@@ -145,6 +145,7 @@ export const MediaRecorderServiceWebLive = Layer.effect(
 						recordedChunks.push(event.data);
 					});
 					newMediaRecorder.start();
+					stream = maybeResusedStream;
 					mediaRecorder = newMediaRecorder;
 				}),
 			stopRecording: Effect.async<Blob, Error>((resume) => {
