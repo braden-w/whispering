@@ -42,34 +42,13 @@ function IndexPopup() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<main className="flex min-h-screen items-center justify-center">
-				<Card className="w-full max-w-xl">
-					<CardHeader>
-						<CardTitle className="text-xl">Settings</CardTitle>
-						<CardDescription>
-							Customize your Whispering experience. Synced with the{' '}
-							<Button
-								variant="link"
-								className="h-fit px-0.5 py-0"
-								onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}
-							>
-								Whispering website
-							</Button>
-							!
-						</CardDescription>
-					</CardHeader>
-					<Settings />
-					<CardFooter>
-						<Button onClick={() => window.close()} className="w-full" variant="secondary">
-							Submit
-						</Button>
-					</CardFooter>
-				</Card>
+				<SettingsCard />
 			</main>
 		</QueryClientProvider>
 	);
 }
 
-function Settings() {
+function SettingsCard() {
 	const queryClient = useQueryClient();
 
 	const {
@@ -145,166 +124,208 @@ function Settings() {
 	}
 
 	return (
-		<CardContent className="space-y-6">
-			<div className="flex items-center gap-2">
-				<Switch
-					id="play-sound-enabled"
-					aria-labelledby="play-sound-enabled"
-					checked={settings.isPlaySoundEnabled}
-					onCheckedChange={(newValue) =>
-						setSettings.mutate({ ...settings, isPlaySoundEnabled: newValue })
-					}
-				/>
-				<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
-			</div>
-			<div className="flex items-center gap-2">
-				<Switch
-					id="copy-to-clipboard"
-					aria-labelledby="copy-to-clipboard"
-					checked={settings.isCopyToClipboardEnabled}
-					onCheckedChange={(newValue) =>
-						setSettings.mutate({
-							...settings,
-							isCopyToClipboardEnabled: newValue,
-						})
-					}
-				/>
-				<Label htmlFor="copy-to-clipboard">
-					Copy text to clipboard on successful transcription
-				</Label>
-			</div>
-			<div className="flex items-center gap-2">
-				<Switch
-					id="paste-from-clipboard"
-					aria-labelledby="paste-from-clipboard"
-					checked={settings.isPasteContentsOnSuccessEnabled}
-					onCheckedChange={(newValue) =>
-						setSettings.mutate({
-							...settings,
-							isPasteContentsOnSuccessEnabled: newValue,
-						})
-					}
-				/>
-				<Label htmlFor="paste-from-clipboard">
-					Paste contents from clipboard after successful transcription
-				</Label>
-			</div>
-			<div className="grid gap-2">
-				<Label className="text-sm" htmlFor="recording-device">
-					Recording Device
-				</Label>
-				{isMediaDevicesLoading && (
-					<Select disabled>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Loading devices..." />
-						</SelectTrigger>
-					</Select>
-				)}
-				{isMediaDevicesError && (
-					<Select disabled>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Error loading devices" />
-						</SelectTrigger>
-					</Select>
-				)}
-				{mediaDevices && (
-					<Select
-						value={settings.selectedAudioInputDeviceId}
-						onValueChange={(value) =>
+		<Card className="w-full max-w-xl">
+			<CardHeader>
+				<CardTitle className="text-xl">Settings</CardTitle>
+				<CardDescription>
+					Customize your Whispering experience. Synced with the{' '}
+					<Button
+						variant="link"
+						className="h-fit px-0.5 py-0"
+						onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}
+					>
+						Whispering website
+					</Button>
+					!
+				</CardDescription>
+			</CardHeader>
+			<CardContent className="space-y-6">
+				<div className="flex items-center gap-2">
+					<Switch
+						id="play-sound-enabled"
+						aria-labelledby="play-sound-enabled"
+						checked={settings.isPlaySoundEnabled}
+						onCheckedChange={(newValue) =>
+							setSettings.mutate({ ...settings, isPlaySoundEnabled: newValue })
+						}
+					/>
+					<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
+				</div>
+				<div className="flex items-center gap-2">
+					<Switch
+						id="copy-to-clipboard"
+						aria-labelledby="copy-to-clipboard"
+						checked={settings.isCopyToClipboardEnabled}
+						onCheckedChange={(newValue) =>
 							setSettings.mutate({
 								...settings,
-								selectedAudioInputDeviceId: value,
+								isCopyToClipboardEnabled: newValue,
 							})
 						}
+					/>
+					<Label htmlFor="copy-to-clipboard">
+						Copy text to clipboard on successful transcription
+					</Label>
+				</div>
+				<div className="flex items-center gap-2">
+					<Switch
+						id="paste-from-clipboard"
+						aria-labelledby="paste-from-clipboard"
+						checked={settings.isPasteContentsOnSuccessEnabled}
+						onCheckedChange={(newValue) =>
+							setSettings.mutate({
+								...settings,
+								isPasteContentsOnSuccessEnabled: newValue,
+							})
+						}
+					/>
+					<Label htmlFor="paste-from-clipboard">
+						Paste contents from clipboard after successful transcription
+					</Label>
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="recording-device">
+						Recording Device
+					</Label>
+					{isMediaDevicesLoading && (
+						<Select disabled>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Loading devices..." />
+							</SelectTrigger>
+						</Select>
+					)}
+					{isMediaDevicesError && (
+						<Select disabled>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Error loading devices" />
+							</SelectTrigger>
+						</Select>
+					)}
+					{mediaDevices && (
+						<Select
+							value={settings.selectedAudioInputDeviceId}
+							onValueChange={(value) =>
+								setSettings.mutate({
+									...settings,
+									selectedAudioInputDeviceId: value,
+								})
+							}
+						>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Select a device" />
+							</SelectTrigger>
+							<SelectContent>
+								{mediaDevices.map((device) => (
+									<SelectItem key={device.deviceId} value={device.deviceId}>
+										{device.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					)}
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="output-language">
+						Output Language
+					</Label>
+					<Select
+						value={settings.outputLanguage}
+						onValueChange={(value) => setSettings.mutate({ ...settings, outputLanguage: value })}
 					>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select a device" />
 						</SelectTrigger>
-						<SelectContent>
-							{mediaDevices.map((device) => (
-								<SelectItem key={device.deviceId} value={device.deviceId}>
-									{device.label}
+						<SelectContent className="max-h-96 overflow-auto">
+							{supportedLanguagesOptions.map((supportedLanguagesOption) => (
+								<SelectItem
+									key={supportedLanguagesOption.value}
+									value={supportedLanguagesOption.value}
+								>
+									{supportedLanguagesOption.label}
 								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
-				)}
-			</div>
-			<div className="grid gap-2">
-				<Label className="text-sm" htmlFor="output-language">
-					Output Language
-				</Label>
-				<Select
-					value={settings.outputLanguage}
-					onValueChange={(value) => setSettings.mutate({ ...settings, outputLanguage: value })}
-				>
-					<SelectTrigger className="w-full">
-						<SelectValue placeholder="Select a device" />
-					</SelectTrigger>
-					<SelectContent className="max-h-96 overflow-auto">
-						{supportedLanguagesOptions.map((supportedLanguagesOption) => (
-							<SelectItem
-								key={supportedLanguagesOption.value}
-								value={supportedLanguagesOption.value}
-							>
-								{supportedLanguagesOption.label}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</div>
-			<div className="grid gap-2">
-				<Label className="text-sm" htmlFor="local-shortcut">
-					Local Shortcut
-				</Label>
-				<Input
-					id="local-shortcut"
-					placeholder="Local Shortcut to toggle recording"
-					value={settings.currentLocalShortcut}
-					onChange={(e) => {
-						setSettings.mutate({
-							...settings,
-							currentLocalShortcut: e.target.value,
-						});
-					}}
-					type="text"
-					autoComplete="off"
-				/>
-			</div>
-			<div className="grid gap-2">
-				<Label className="text-sm" htmlFor="global-shortcut">
-					Global Shortcut
-				</Label>
-				<div className="relative">
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="local-shortcut">
+						Local Shortcut
+					</Label>
 					<Input
-						id="global-shortcut"
-						placeholder="Global Shortcut to toggle recording"
+						id="local-shortcut"
+						placeholder="Local Shortcut to toggle recording"
+						value={settings.currentLocalShortcut}
+						onChange={(e) => {
+							setSettings.mutate({
+								...settings,
+								currentLocalShortcut: e.target.value,
+							});
+						}}
 						type="text"
 						autoComplete="off"
-						disabled
 					/>
-					<Button
-						className="absolute inset-0 backdrop-blur"
-						variant="link"
-						onClick={() => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })}
-					>
-						Edit Global Shortcut in Extension Settings
-					</Button>
 				</div>
-			</div>
-			<div className="grid gap-2">
-				<Label className="text-sm" htmlFor="api-key">
-					API Key
-				</Label>
-				<Input
-					id="api-key"
-					placeholder="Your OpenAI API Key"
-					value={settings.apiKey}
-					type="text"
-					autoComplete="off"
-				/>
-			</div>
-		</CardContent>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="global-shortcut">
+						Global Shortcut
+					</Label>
+					<div className="relative">
+						<Input
+							id="global-shortcut"
+							placeholder="Global Shortcut to toggle recording"
+							type="text"
+							autoComplete="off"
+							disabled
+						/>
+						<Button
+							className="absolute inset-0 backdrop-blur"
+							variant="link"
+							onClick={() => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })}
+						>
+							Edit Global Shortcut in Extension Settings
+						</Button>
+					</div>
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="api-key">
+						API Key
+					</Label>
+					<Input
+						id="api-key"
+						placeholder="Your OpenAI API Key"
+						value={settings.apiKey}
+						type="text"
+						autoComplete="off"
+					/>
+					<div className="text-muted-foreground text-sm">
+						You can find your OpenAI API key in your{' '}
+						<Button
+							variant="link"
+							className="px-0.3 py-0.2 h-fit"
+							onClick={() => chrome.tabs.create({ url: 'https://platform.openai.com/api-keys' })}
+						>
+							OpenAI account settings
+						</Button>
+						.
+					</div>
+				</div>
+			</CardContent>
+			<CardFooter>
+				<Button
+					onClick={() => {
+						if (settings.apiKey === '') {
+							alert('Please enter an API Key');
+							return;
+						}
+						window.close();
+					}}
+					className="w-full"
+					variant="secondary"
+				>
+					Submit
+				</Button>
+			</CardFooter>
+		</Card>
 	);
 }
 
