@@ -2,10 +2,11 @@
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
 	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
@@ -74,13 +75,20 @@
 				🚫
 			</WhisperingButton>
 		{:else if mediaStream.isStreamOpen}
-			<WhisperingButton
-				onclick={mediaStream.destroy}
-				variant="ghost"
-				size="icon"
-				class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-			>
-				{#snippet tooltipText()}
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild let:builder>
+					<Button
+						builders={[builder]}
+						onclick={mediaStream.destroy}
+						variant="ghost"
+						size="icon"
+						class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+					>
+						<span class="sr-only">End recording session</span>
+						🔴
+					</Button>
+				</Tooltip.Trigger>
+				<Tooltip.Content>
 					End recording session
 					<Button
 						variant="link"
@@ -89,9 +97,8 @@
 					>
 						(What's that?)
 					</Button>
-				{/snippet}
-				🔴
-			</WhisperingButton>
+				</Tooltip.Content>
+			</Tooltip.Root>
 			<Dialog.Root bind:open={isAboutRecordingSessionDialogOpen}>
 				<Dialog.Content class="sm:max-w-[425px]">
 					<Dialog.Header>
