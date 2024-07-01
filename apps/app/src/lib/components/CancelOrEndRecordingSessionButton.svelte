@@ -17,6 +17,7 @@
 		variant="ghost"
 		size="icon"
 		class={className}
+		style="view-transition-name: cancel-icon;"
 	>
 		🚫
 	</WhisperingButton>
@@ -29,6 +30,7 @@
 				variant="ghost"
 				size="icon"
 				class={className}
+				style="view-transition-name: end-session-icon;"
 			>
 				<span class="sr-only">End recording session</span>
 				🔴

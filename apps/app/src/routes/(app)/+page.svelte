@@ -51,7 +51,7 @@
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>
 			<span
-				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon"
+				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
 				class="text-[100px] leading-none"
 			>
 				{#if recorder.recorderState === 'RECORDING'}
