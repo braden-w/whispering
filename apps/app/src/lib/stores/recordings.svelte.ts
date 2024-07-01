@@ -6,8 +6,7 @@ import { NotificationServiceDesktopLive } from '$lib/services/NotificationServic
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
-import { ToastService } from '$lib/services/ToastService';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
+import { toast } from '$lib/services/ToastService';
 import { renderErrorAsToast } from '$lib/services/errors';
 import {
 	NotificationService,
@@ -26,7 +25,6 @@ import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
 const createRecordings = Effect.gen(function* () {
-	const { toast } = yield* ToastService;
 	const { notify, clear } = yield* NotificationService;
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
@@ -288,7 +286,6 @@ const createRecordings = Effect.gen(function* () {
 export const recordings = createRecordings.pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceWhisperLive),
-	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,

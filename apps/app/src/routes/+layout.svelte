@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto, onNavigate } from '$app/navigation';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recorder, recorderState, settings } from '$lib/stores';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
@@ -40,11 +39,7 @@
 			sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
 				body: {},
-			}).pipe(
-				Effect.catchAll(renderErrorAsToast),
-				Effect.provide(ToastServiceLive),
-				Effect.runPromise,
-			);
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
 	});
 

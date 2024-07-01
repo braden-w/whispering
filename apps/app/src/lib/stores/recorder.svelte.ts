@@ -8,7 +8,6 @@ import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWeb
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
 import { recordings } from '$lib/stores';
 import {
 	NotificationService,
@@ -138,11 +137,7 @@ export const recorder = Effect.gen(function* () {
 						]);
 						return;
 				}
-			}).pipe(
-				Effect.catchAll(renderErrorAsToast),
-				Effect.provide(ToastServiceLive),
-				Effect.runPromise,
-			),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		cancelRecording: (settings: Settings) =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
@@ -161,7 +156,6 @@ export const recorder = Effect.gen(function* () {
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(ToastServiceLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
 );

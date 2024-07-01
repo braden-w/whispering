@@ -1,7 +1,7 @@
-import type { Effect } from 'effect';
-import { Context } from 'effect';
+import { Effect } from 'effect';
+import { toast as sonnerToast } from 'svelte-sonner';
 
-export type ToastOptions = {
+type ToastOptions = {
 	variant: 'success' | 'info' | 'loading' | 'error' | 'warning';
 	id?: string | undefined;
 	title: string;
@@ -16,9 +16,20 @@ export type ToastOptions = {
 		| undefined;
 };
 
-export class ToastService extends Context.Tag('ToastService')<
-	ToastService,
-	{
-		toast: (options: ToastOptions) => Effect.Effect<string>;
-	}
->() {}
+export const toast = ({
+	variant,
+	id: maybeId,
+	title,
+	description,
+	descriptionClass,
+	action,
+}: ToastOptions) =>
+	Effect.gen(function* () {
+		const toastId = sonnerToast[variant](title, {
+			id: maybeId,
+			description,
+			descriptionClass,
+			action,
+		});
+		return String(toastId);
+	});
