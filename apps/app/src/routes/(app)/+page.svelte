@@ -2,7 +2,7 @@
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -81,30 +81,23 @@
 				{#snippet tooltipText()}
 					End recording session
 					<Dialog.Root>
-						<Dialog.Trigger>
-							<Button class="h-fit px-0.5 py-0" variant="link">(What's that?)</Button>
+						<Dialog.Trigger
+							class={buttonVariants({ variant: 'link', class: 'h-fit px-0.5 py-0 ' })}
+						>
+							(What's that?)
 						</Dialog.Trigger>
 						<Dialog.Content class="sm:max-w-[425px]">
 							<Dialog.Header>
 								<Dialog.Title>About recording sessions</Dialog.Title>
-								<Dialog.Description>Much faster re-recording</Dialog.Description>
+								<Dialog.Description>Faster re-recording explained</Dialog.Description>
 							</Dialog.Header>
 							<p>
-								To enable quick re-recording, Whispering keeps the media stream open after your
-								first `startRecording` and attempts to reuse it in future `startRecording`
-								invocations.
+								Whispering keeps the media stream open after you start recording, enabling quick
+								re-recording with reduced latency.
 							</p>
+							<p>This means your computer will show this tab is still using the microphone.</p>
 							<p>
-								This significantly reduces latency between invoking `startRecording` and actual
-								audio processing.
-							</p>
-							<p>
-								During your session, your computer should show that this tab is still accessing the
-								device microphone.
-							</p>
-							<p>
-								Once you are done, click the 🔴 button to dispose of the media stream. This will
-								also end the tab's microphone access.
+								When finished, click the 🔴 button to close the stream and end microphone access.
 							</p>
 						</Dialog.Content>
 					</Dialog.Root>
