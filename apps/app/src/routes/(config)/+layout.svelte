@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { recorder, settings } from '$lib/stores';
@@ -24,11 +25,12 @@
 			style="view-transition-name: microphone-icon"
 		>
 			{#if recorder.recorderState === 'RECORDING'}
-				🟥
+				🔲
 			{:else}
 				🎙️
 			{/if}
 		</WhisperingButton>
+		<CancelOrEndRecordingSessionButton />
 	</div>
 	<NavItems />
 </header>
