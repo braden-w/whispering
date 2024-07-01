@@ -170,6 +170,17 @@
 					type="text"
 					autocomplete="off"
 				/>
+				<div class="text-muted-foreground text-sm">
+					You can find your OpenAI API key in your <Button
+						variant="link"
+						class="px-0.3 py-0.2 h-fit"
+						href="https://platform.openai.com/api-keys"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						OpenAI account settings
+					</Button>.
+				</div>
 			</div>
 		</Card.Content>
 		<Card.Footer>
