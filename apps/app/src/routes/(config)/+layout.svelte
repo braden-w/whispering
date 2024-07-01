@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { recorder, settings } from '$lib/stores';
@@ -29,6 +30,7 @@
 				🎙️
 			{/if}
 		</WhisperingButton>
+		<CancelOrEndRecordingSessionButton />
 	</div>
 	<NavItems />
 </header>

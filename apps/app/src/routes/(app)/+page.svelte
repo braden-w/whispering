@@ -1,13 +1,10 @@
 <script lang="ts">
+	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
 	import { recorder, recordings, settings } from '$lib/stores';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
@@ -64,56 +61,9 @@
 				{/if}
 			</span>
 		</WhisperingButton>
-		{#if recorder.recorderState === 'RECORDING'}
-			<WhisperingButton
-				tooltipText="Cancel recording"
-				onclick={() => recorder.cancelRecording(settings)}
-				variant="ghost"
-				size="icon"
-				class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-			>
-				🚫
-			</WhisperingButton>
-		{:else if mediaStream.isStreamOpen}
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild let:builder>
-					<Button
-						builders={[builder]}
-						onclick={mediaStream.destroy}
-						variant="ghost"
-						size="icon"
-						class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-					>
-						<span class="sr-only">End recording session</span>
-						🔴
-					</Button>
-				</Tooltip.Trigger>
-				<Tooltip.Content>
-					End recording session
-					<Button
-						variant="link"
-						class="h-fit px-0.5 py-0"
-						on:click={() => (isAboutRecordingSessionDialogOpen = true)}
-					>
-						(What's that?)
-					</Button>
-				</Tooltip.Content>
-			</Tooltip.Root>
-			<Dialog.Root bind:open={isAboutRecordingSessionDialogOpen}>
-				<Dialog.Content class="sm:max-w-[425px]">
-					<Dialog.Header>
-						<Dialog.Title>About recording sessions</Dialog.Title>
-						<Dialog.Description>Faster re-recording explained</Dialog.Description>
-					</Dialog.Header>
-					<p>
-						Whispering keeps the media stream open after you start recording, enabling quick
-						re-recording with reduced latency.
-					</p>
-					<p>This means your computer will show this tab is still using the microphone.</p>
-					<p>When finished, click the 🔴 button to close the stream and end microphone access.</p>
-				</Dialog.Content>
-			</Dialog.Root>
-		{/if}
+		<CancelOrEndRecordingSessionButton
+			class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+		/>
 	</div>
 
 	<div class="xxs:flex max-w-80 hidden w-full flex-col items-center gap-2">
