@@ -24,7 +24,7 @@
 			style="view-transition-name: microphone-icon"
 		>
 			{#if recorder.recorderState === 'RECORDING'}
-				🟥
+				🔲
 			{:else}
 				🎙️
 			{/if}
