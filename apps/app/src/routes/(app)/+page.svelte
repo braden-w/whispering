@@ -29,6 +29,8 @@
 	);
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
+
+	let isAboutRecordingSessionDialogOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -80,30 +82,30 @@
 			>
 				{#snippet tooltipText()}
 					End recording session
-					<Dialog.Root>
-						<Dialog.Trigger
-							class={buttonVariants({ variant: 'link', class: 'h-fit px-0.5 py-0 ' })}
-						>
-							(What's that?)
-						</Dialog.Trigger>
-						<Dialog.Content class="sm:max-w-[425px]">
-							<Dialog.Header>
-								<Dialog.Title>About recording sessions</Dialog.Title>
-								<Dialog.Description>Faster re-recording explained</Dialog.Description>
-							</Dialog.Header>
-							<p>
-								Whispering keeps the media stream open after you start recording, enabling quick
-								re-recording with reduced latency.
-							</p>
-							<p>This means your computer will show this tab is still using the microphone.</p>
-							<p>
-								When finished, click the 🔴 button to close the stream and end microphone access.
-							</p>
-						</Dialog.Content>
-					</Dialog.Root>
+					<Button
+						variant="link"
+						class="h-fit px-0.5 py-0"
+						on:click={() => (isAboutRecordingSessionDialogOpen = true)}
+					>
+						(What's that?)
+					</Button>
 				{/snippet}
 				🔴
 			</WhisperingButton>
+			<Dialog.Root bind:open={isAboutRecordingSessionDialogOpen}>
+				<Dialog.Content class="sm:max-w-[425px]">
+					<Dialog.Header>
+						<Dialog.Title>About recording sessions</Dialog.Title>
+						<Dialog.Description>Faster re-recording explained</Dialog.Description>
+					</Dialog.Header>
+					<p>
+						Whispering keeps the media stream open after you start recording, enabling quick
+						re-recording with reduced latency.
+					</p>
+					<p>This means your computer will show this tab is still using the microphone.</p>
+					<p>When finished, click the 🔴 button to close the stream and end microphone access.</p>
+				</Dialog.Content>
+			</Dialog.Root>
 		{/if}
 	</div>
 
