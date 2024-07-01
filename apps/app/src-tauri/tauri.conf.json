@@ -34,7 +34,7 @@
 			"shell": {
 				"all": false,
 				"execute": false,
-				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/|x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility|https://platform.openai.com/api-keys)",
+				"open": "^(https://github.com/|https://chromewebstore.google.com/|https://www.electronjs.org/|https://platform.openai.com/api-keys)",
 				"scope": [
 					{
 						"name": "open-system-preferences",
