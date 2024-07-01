@@ -1,3 +1,4 @@
+import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
 import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
@@ -71,6 +72,10 @@ export const settings = Effect.gen(function* () {
 		},
 		set selectedAudioInputDeviceId(newValue) {
 			settings.value = { ...settings.value, selectedAudioInputDeviceId: newValue };
+			mediaStream.init({
+				shouldReuseStream: false,
+				preferredRecordingDeviceId: newValue,
+			}).pipe(Effect.runPromise)
 		},
 		get currentLocalShortcut() {
 			return settings.value.currentLocalShortcut;
