@@ -27,8 +27,6 @@
 	);
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
-
-	let isAboutRecordingSessionDialogOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -38,7 +36,7 @@
 <main class="flex flex-1 flex-col items-center justify-center gap-4">
 	<div class="xs:flex hidden flex-col items-center gap-4">
 		<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Start recording</h1>
-		<p class="text-muted-foreground line-clamp-1">
+		<p class="text-muted-foreground text-center">
 			Click the 🎙 button to start. Allow access to your microphone.
 		</p>
 	</div>
@@ -111,7 +109,7 @@
 	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />
 
 	<div class="xs:flex hidden flex-col items-center gap-3">
-		<p class="text-foreground/75 truncate text-sm">
+		<p class="text-foreground/75 text-center text-sm">
 			Click the microphone or press
 			{' '}<WhisperingButton
 				tooltipText="Go to local shortcut in settings"
@@ -128,7 +126,7 @@
 			to start recording here.
 		</p>
 		{#if window.__TAURI__}
-			<p class="text-foreground/75 truncate text-sm">
+			<p class="text-foreground/75 text-sm">
 				Press
 				{' '}<WhisperingButton
 					tooltipText="Go to global shortcut in settings"
@@ -145,7 +143,7 @@
 				to start recording anywhere.
 			</p>
 		{/if}
-		<p class="text-muted-foreground truncate text-sm font-light">
+		<p class="text-muted-foreground text-center text-sm font-light">
 			Check out the {' '}<WhisperingButton
 				tooltipText="Check out the Chrome Extension"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"

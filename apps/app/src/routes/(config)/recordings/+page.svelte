@@ -203,11 +203,11 @@
 	<title>All Recordings</title>
 </svelte:head>
 
-<main class="flex w-full flex-1 flex-col gap-2 px-8 py-4">
+<main class="flex w-full flex-1 flex-col gap-2 px-4 py-4 md:px-8">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex items-center gap-2">
+		<div class="flex items-center gap-2 overflow-auto">
 			<form
 				class="flex max-w-sm gap-2"
 				on:submit={(e) => {
