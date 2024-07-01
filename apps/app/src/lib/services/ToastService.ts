@@ -7,7 +7,6 @@ type ToastOptions = {
 	title: string;
 	description: string;
 	descriptionClass?: string;
-
 	action?:
 		| {
 				label: string;
@@ -25,7 +24,13 @@ export const toast = ({
 	action,
 }: ToastOptions) =>
 	Effect.gen(function* () {
+		const durationToMs = (() => {
+			if (variant === 'loading') return Infinity;
+			if (action) return 4000;
+			return 1000;
+		})();
 		const toastId = sonnerToast[variant](title, {
+			duration: durationToMs,
 			id: maybeId,
 			description,
 			descriptionClass,
