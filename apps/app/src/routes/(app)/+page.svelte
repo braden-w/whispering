@@ -27,8 +27,6 @@
 	);
 
 	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
-
-	let isAboutRecordingSessionDialogOpen = $state(false);
 </script>
 
 <svelte:head>
