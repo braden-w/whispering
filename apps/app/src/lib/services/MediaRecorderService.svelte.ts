@@ -4,6 +4,8 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { ToastService } from './ToastService.js';
+import { ToastServiceLive } from './ToastServiceLive.js';
+import { renderErrorAsToast } from './errors.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {
@@ -208,7 +210,7 @@ export const mediaStream = Effect.gen(function* () {
 					: yield* getFirstAvailableStream;
 				internalStream = newStream;
 				return newStream;
-			}),
+			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.provide(ToastServiceLive)),
 		destroy: () => {
 			internalStream?.getTracks().forEach((track) => track.stop());
 			internalStream = null;
