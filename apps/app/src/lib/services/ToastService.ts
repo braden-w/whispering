@@ -26,8 +26,9 @@ export const toast = ({
 	Effect.gen(function* () {
 		const durationToMs = (() => {
 			if (variant === 'loading') return Infinity;
+			if (variant === 'error' || variant === 'warning') return 5000;
 			if (action) return 4000;
-			return 1000;
+			return 3000;
 		})();
 		const toastId = sonnerToast[variant](title, {
 			duration: durationToMs,
