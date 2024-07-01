@@ -2,8 +2,7 @@ import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
 import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
-import { ToastService } from '$lib/services/ToastService';
-import { ToastServiceLive } from '$lib/services/ToastServiceLive';
+import { toast } from '$lib/services/ToastService';
 import { renderErrorAsToast } from '$lib/services/errors';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
@@ -15,7 +14,6 @@ import { Effect } from 'effect';
 type RegisterShortcutJob = Effect.Effect<void>;
 
 export const settings = Effect.gen(function* () {
-	const { toast } = yield* ToastService;
 	const registerShortcutsService = yield* RegisterShortcutsService;
 	const settings = createPersistedState({
 		key: 'whispering-settings',
@@ -72,10 +70,12 @@ export const settings = Effect.gen(function* () {
 		},
 		set selectedAudioInputDeviceId(newValue) {
 			settings.value = { ...settings.value, selectedAudioInputDeviceId: newValue };
-			mediaStream.init({
-				shouldReuseStream: false,
-				preferredRecordingDeviceId: newValue,
-			}).pipe(Effect.runPromise)
+			mediaStream
+				.init({
+					shouldReuseStream: false,
+					preferredRecordingDeviceId: newValue,
+				})
+				.pipe(Effect.runPromise);
 		},
 		get currentLocalShortcut() {
 			return settings.value.currentLocalShortcut;
@@ -135,6 +135,5 @@ export const settings = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(window.__TAURI__ ? RegisterShortcutsDesktopLive : RegisterShortcutsWebLive),
-	Effect.provide(ToastServiceLive),
 	Effect.runSync,
 );

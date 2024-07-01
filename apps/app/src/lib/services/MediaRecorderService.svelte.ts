@@ -3,8 +3,7 @@ import { WhisperingError } from '@repo/shared';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
-import { ToastService } from './ToastService.js';
-import { ToastServiceLive } from './ToastServiceLive.js';
+import { toast } from './ToastService.js';
 import { renderErrorAsToast } from './errors.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
@@ -30,7 +29,6 @@ class GetStreamError extends Data.TaggedError('GetStreamError')<{
 class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
 
 export const MediaRecorderService = Effect.gen(function* () {
-	const { toast } = yield* ToastService;
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
@@ -159,7 +157,6 @@ export const mediaStream = Effect.gen(function* () {
 		});
 
 	const getFirstAvailableStream = Effect.gen(function* () {
-		const { toast } = yield* ToastService;
 		const defaultingToFirstAvailableDeviceToastId = nanoid();
 		yield* toast({
 			id: defaultingToFirstAvailableDeviceToastId,
@@ -210,7 +207,7 @@ export const mediaStream = Effect.gen(function* () {
 					: yield* getFirstAvailableStream;
 				internalStream = newStream;
 				return newStream;
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.provide(ToastServiceLive)),
+			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		destroy: () => {
 			internalStream?.getTracks().forEach((track) => track.stop());
 			internalStream = null;
