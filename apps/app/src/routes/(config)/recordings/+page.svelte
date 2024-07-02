@@ -255,7 +255,7 @@
 					<TrashIcon class="h-4 w-4" />
 				</Button>
 			{/if}
-			<div class="text-muted-foreground text-sm">
+			<div class="text-muted-foreground hidden text-sm sm:block">
 				{selectedRecordingRows.length} of
 				{table.getFilteredRowModel().rows.length} row(s) selected.
 			</div>
