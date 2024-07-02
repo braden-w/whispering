@@ -226,6 +226,12 @@ Please ensure your code follows established conventions and is well-documented.
 
 Whispering is released under the [MIT License](https://opensource.org/licenses/MIT).
 
+## Sponsors
+
+This project is supported by the following amazing people and organizations:
+
+<!-- sponsors --><!-- sponsors -->
+
 ## Support and Feedback
 
 If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub iusses tab](https://github.com/braden-w/whispering/issues). I really appreciate your feedback!
