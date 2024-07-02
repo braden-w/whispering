@@ -102,7 +102,7 @@
 				src={latestAudioSrc}
 				controls
 				class="h-8 w-full"
-			/>
+			></audio>
 		{/if}
 	</div>
 
