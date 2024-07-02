@@ -184,7 +184,9 @@
 			</div>
 		</Card.Content>
 		<Card.Footer>
-			<Button href="/" class="w-full" variant="secondary">Go Back</Button>
+			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
+				Go Back
+			</Button>
 		</Card.Footer>
 	</Card.Root>
 </main>
