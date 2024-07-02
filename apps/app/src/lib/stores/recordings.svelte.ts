@@ -35,13 +35,16 @@ export const recordings = Effect.gen(function* () {
 			yield* recordingsDb.updateRecording(recording);
 			recordings = recordings.map((r) => (r.id === recording.id ? recording : r));
 		});
+
+	const syncDbToRecordingsState = Effect.gen(function* () {
+		recordings = yield* recordingsDb.getAllRecordings;
+	}).pipe(Effect.catchAll(renderErrorAsToast));
+	syncDbToRecordingsState.pipe(Effect.runPromise);
+
 	return {
 		get value() {
 			return recordings;
 		},
-		sync: Effect.gen(function* () {
-			recordings = yield* recordingsDb.getAllRecordings;
-		}).pipe(Effect.catchAll(renderErrorAsToast)),
 		addRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.addRecording(recording);
@@ -287,5 +290,3 @@ export const recordings = Effect.gen(function* () {
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
 );
-
-recordings.sync.pipe(Effect.runPromise);
