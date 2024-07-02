@@ -23,7 +23,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
-const createRecordings = Effect.gen(function* () {
+export const recordings = Effect.gen(function* () {
 	const { notify, clear } = yield* NotificationService;
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
@@ -280,9 +280,7 @@ const createRecordings = Effect.gen(function* () {
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
-});
-
-export const recordings = createRecordings.pipe(
+}).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceWhisperLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
