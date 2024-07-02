@@ -17,7 +17,6 @@ import {
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
 import { type } from '@tauri-apps/api/os';
-import { open } from '@tauri-apps/api/shell';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Effect, Either, Option } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
