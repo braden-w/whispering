@@ -190,7 +190,7 @@ export const recordings = Effect.gen(function* () {
 						return;
 					}
 					const isAccessibilityEnabled = yield* Effect.tryPromise({
-						try: () => invoke<boolean>('is_macos_accessibility_enabled'),
+						try: () => invoke<boolean>('is_macos_accessibility_enabled', { askIfNotAllowed: true }),
 						catch: (error) =>
 							new WhisperingError({
 								title: 'Unable to ensure accessibility is enabled',

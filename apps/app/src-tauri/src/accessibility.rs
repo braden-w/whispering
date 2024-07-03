@@ -3,29 +3,30 @@ use core_foundation_sys::base::{CFRelease, TCFTypeRef};
 use core_foundation_sys::dictionary::{
     CFDictionaryAddValue, CFDictionaryCreateMutable, __CFDictionary,
 };
-use core_foundation_sys::number::kCFBooleanFalse;
+use core_foundation_sys::number::{kCFBooleanTrue,kCFBooleanFalse};
 use std::process::Command;
 use std::ptr;
 
 #[tauri::command]
-pub fn is_macos_accessibility_enabled() -> bool {
-    create_options_dictionary().map_or(false, |options| {
-        let is_allowed = unsafe { AXIsProcessTrustedWithOptions(options) };
-        release_options_dictionary(options);
-        is_allowed
-    })
+pub fn is_macos_accessibility_enabled(ask_if_not_allowed: bool) -> Result<bool, &'static str> {
+    let options = create_options_dictionary(ask_if_not_allowed)?;
+    let is_allowed = unsafe { AXIsProcessTrustedWithOptions(options) };
+    release_options_dictionary(options);
+    Ok(is_allowed)
 }
 
-fn create_options_dictionary() -> Result<*mut __CFDictionary, &'static str> {
+fn create_options_dictionary(ask_if_not_allowed: bool) -> Result<*mut __CFDictionary, &'static str> {
     unsafe {
         let options = CFDictionaryCreateMutable(ptr::null_mut(), 0, ptr::null(), ptr::null());
         if options.is_null() {
             return Err("Failed to create options dictionary");
         }
+        let key = kAXTrustedCheckOptionPrompt;
+        let value = if ask_if_not_allowed {kCFBooleanTrue} else {kCFBooleanFalse};
         CFDictionaryAddValue(
             options,
-            kAXTrustedCheckOptionPrompt.as_void_ptr(),
-            kCFBooleanFalse.as_void_ptr(),
+            key.as_void_ptr(),
+            value.as_void_ptr(),
         );
         Ok(options)
     }
