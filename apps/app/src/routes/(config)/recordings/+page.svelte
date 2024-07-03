@@ -1,4 +1,5 @@
 <script lang="ts">
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
@@ -6,7 +7,6 @@
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
 	} from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
@@ -24,6 +24,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { Button } from '$lib/components/ui/button';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -219,10 +220,11 @@
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
 			{#if selectedRecordingRows.length > 0}
-				<Button
+				<WhisperingButton
+					tooltipText="Transcribe selected recordings"
 					variant="outline"
 					size="icon"
-					on:click={() => {
+					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recording) =>
 								recordings.transcribeRecording(recording.id),
@@ -243,17 +245,18 @@
 					{:else}
 						<StartTranscriptionIcon class="h-4 w-4" />
 					{/if}
-				</Button>
-				<Button
+				</WhisperingButton>
+				<WhisperingButton
+					tooltipText="Delete selected recordings"
 					variant="outline"
 					size="icon"
-					on:click={() => {
+					onclick={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
 						recordings.deleteRecordingsById(ids);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />
-				</Button>
+				</WhisperingButton>
 			{/if}
 			<div class="text-muted-foreground hidden text-sm sm:block">
 				{selectedRecordingRows.length} of
