@@ -105,10 +105,8 @@
 				"resizable": true,
 				"title": "Whispering",
 				"width": 800,
-				"alwaysOnTop": true,
 				"minHeight": 84,
-				"minWidth": 72,
-				"minimizable": false
+				"minWidth": 72
 			}
 		]
 	}
