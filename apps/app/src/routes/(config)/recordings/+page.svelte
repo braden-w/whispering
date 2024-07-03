@@ -1,6 +1,8 @@
 <script lang="ts">
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
+		ClipboardIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
@@ -12,14 +14,12 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
-	import { Effect } from 'effect';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -219,10 +219,11 @@
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
 			{#if selectedRecordingRows.length > 0}
-				<Button
+				<WhisperingButton
+					tooltipText="Transcribe selected recordings"
 					variant="outline"
 					size="icon"
-					on:click={() => {
+					onclick={() => {
 						Promise.all(
 							selectedRecordingRows.map((recording) =>
 								recordings.transcribeRecording(recording.id),
@@ -243,17 +244,29 @@
 					{:else}
 						<StartTranscriptionIcon class="h-4 w-4" />
 					{/if}
-				</Button>
-				<Button
+				</WhisperingButton>
+				<WhisperingButton
+					tooltipText="Copy transcribed text from selected recordings"
+					onclick={() =>
+						recordings.copyRecordingsTextById(
+							selectedRecordingRows.map(({ id }) => id),
+						)}
 					variant="outline"
 					size="icon"
-					on:click={() => {
+				>
+					<ClipboardIcon class="h-4 w-4" />
+				</WhisperingButton>
+				<WhisperingButton
+					tooltipText="Delete selected recordings"
+					variant="outline"
+					size="icon"
+					onclick={() => {
 						const ids = selectedRecordingRows.map(({ id }) => id);
 						recordings.deleteRecordingsById(ids);
 					}}
 				>
 					<TrashIcon class="h-4 w-4" />
-				</Button>
+				</WhisperingButton>
 			{/if}
 			<div class="text-muted-foreground hidden text-sm sm:block">
 				{selectedRecordingRows.length} of
