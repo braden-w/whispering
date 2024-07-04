@@ -13,16 +13,22 @@
 	<Card.Root class="w-full max-w-2xl">
 		<Card.Header>
 			<Card.Title class="text-xl">MacOS Accessibility</Card.Title>
-			<Card.Description>
+			<Card.Description class="leading-7">
 				Follow the steps below to re-enable Whispering in your MacOS Accessibility settings. This
 				often is needed after installing a new version of Whispering to get pasting to work, as
-				detailed in this this <Button
+				detailed in this
+				<Button
 					variant="link"
 					size="inline"
 					href="https://github.com/enigo-rs/enigo/issues/174"
 					target="_blank"
 					rel="noopener noreferrer">Github issue</Button
-				>.
+				> for the
+				<code
+					class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
+				>
+					enigo
+				</code> crate.
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
@@ -34,11 +40,11 @@
 					loop
 					controls
 				></video>
-				<ol class="text-muted-foreground max-w-2xl list-inside list-decimal space-y-2 text-left">
+				<ol class="text-muted-foreground list-inside list-decimal space-y-1 leading-7">
 					<li>
 						Go to <span class="text-primary font-semibold tracking-tight">
 							System Preferences > Privacy & Security > Accessibility
-						</span> or use the button below.
+						</span> or click the button below.
 					</li>
 
 					<li>
