@@ -5,6 +5,7 @@ import {
 } from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
@@ -18,7 +19,6 @@ import {
 import { Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
-import { renderErrorAsToast } from '../services/errors';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';

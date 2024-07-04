@@ -7,7 +7,7 @@ import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWeb
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { toast } from '$lib/services/ToastService';
-import { renderErrorAsToast } from '$lib/services/errors';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import {
 	NotificationService,
 	TranscriptionService,

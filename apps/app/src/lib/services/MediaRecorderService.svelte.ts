@@ -4,7 +4,7 @@ import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
-import { renderErrorAsToast } from './errors.js';
+import { renderErrorAsToast } from './renderErrorAsToast.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {

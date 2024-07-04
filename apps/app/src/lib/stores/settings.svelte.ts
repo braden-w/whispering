@@ -3,7 +3,7 @@ import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
 import { toast } from '$lib/services/ToastService';
-import { renderErrorAsToast } from '$lib/services/errors';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';

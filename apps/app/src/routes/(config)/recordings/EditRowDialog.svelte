@@ -7,9 +7,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { renderErrorAsToast } from '$lib/services/errors';
 	import { recordings } from '$lib/stores';
-	import { Effect } from 'effect';
 
 	let { recording }: { recording: Recording } = $props();
 

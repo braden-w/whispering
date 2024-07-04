@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto, onNavigate } from '$app/navigation';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { renderErrorAsToast } from '$lib/services/errors';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder, recorderState, settings } from '$lib/stores';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { Effect } from 'effect';
