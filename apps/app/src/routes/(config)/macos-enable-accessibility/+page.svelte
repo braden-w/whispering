@@ -13,7 +13,7 @@
 	<Card.Root class="w-full max-w-2xl">
 		<Card.Header>
 			<Card.Title class="text-xl">MacOS Accessibility</Card.Title>
-			<Card.Description class="leading-7">
+			<Card.Description class="text-base leading-7">
 				Follow the steps below to re-enable Whispering in your MacOS Accessibility settings. This
 				often is needed after installing a new version of Whispering to get pasting to work, as
 				detailed in this
