@@ -201,12 +201,12 @@ export const recordings = Effect.gen(function* () {
 					if (!isAccessibilityEnabled) {
 						yield* toast({
 							variant: 'warning',
-							title: 'Please enable accessibility to paste transcription in macOS!',
+							title: 'Please enable or re-enable accessibility to paste transcriptions!',
 							description:
-								'You can enable Whispering in System Preferences > Privacy & Security > Accessibility.',
+								'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
 							action: {
-								label: 'Open Accessibility',
-								onClick: () => invoke('open_apple_accessibility'),
+								label: 'Open Directions',
+								onClick: () => goto('/macos-enable-accessibility'),
 							},
 						});
 						return;
