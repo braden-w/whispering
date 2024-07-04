@@ -115,7 +115,7 @@
 				tooltipText="Go to local shortcut in settings"
 				href="/settings#local-shortcut"
 				variant="link"
-				class="h-fit px-0.5 py-0"
+				size="inline"
 			>
 				<kbd
 					class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
@@ -132,7 +132,7 @@
 					tooltipText="Go to global shortcut in settings"
 					href="/settings#global-shortcut"
 					variant="link"
-					class="h-fit px-0.5 py-0"
+					size="inline"
 				>
 					<kbd
 						class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
@@ -150,7 +150,7 @@
 				target="_blank"
 				rel="noopener noreferrer"
 				variant="link"
-				class="h-fit px-0.5 py-0"
+				size="inline"
 			>
 				extension
 			</WhisperingButton>{' '}
@@ -161,7 +161,7 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					variant="link"
-					class="h-fit px-0.5 py-0"
+					size="inline"
 				>
 					app
 				</WhisperingButton>{' '}

@@ -194,7 +194,7 @@ function IndexPage() {
 						<Button
 							asChild
 							variant="link"
-							className="h-fit px-0.5 py-0"
+							size="inline"
 							title="Check out the desktop app"
 							aria-label="Check out the desktop app"
 						>
