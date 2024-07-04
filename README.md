@@ -33,23 +33,31 @@
 
 ---
 
-## Project Overview
+## Introduction
 
-Whispering is an open-source, cross-platform transcription app that leverages the OpenAI Whisper API for efficient speech-to-text conversion.
-
-With Whispering, you can seamlessly integrate speech-to-text capabilities into your workflow, eliminating the need for manual transcription and reducing unnecessary clicks. This boosts productivity and saves time.
+Whispering is an open-source, cross-platform transcription app that harnesses the power of the OpenAI Whisper API to provide efficient speech-to-text conversion. It's designed to seamlessly integrate into your workflow, eliminating the need for manual transcription and streamlining your productivity.
 
 ## Features
 
-Whispering offers two key functionalities:
+1. **Global Transcription**: Access Whisper's speech-to-text functionality anywhere with a global keyboard shortcut or within two button clicks.
 
-1. **Seamless integration with ChatGPT**: The extension adds a handy recording button in the ChatGPT website, enabling you to record and generate transcriptions from your voice directly in the chat.
+2. **Cross-Platform Experience**: 
+   - Desktop App: Enables global transcription across all applications.
+   - Browser Extension: Provides global transcription in the browser by communicating with the web app.
 
-![ChatGPT Box](./images/chat_box.jpg)
+3. **Chat Integration**: The browser extension adds a recording button to ChatGPT and Claude websites, allowing direct voice input and transcription in the chat interface.
 
-2. **Record and transcribe across any website**: Access Whisper's speech-to-text anywhere with a global keyboard shortcut, enabling seamless transcription in any website.
+4. **Transcription Management**: Review and edit transcriptions within the Whispering app to ensure accuracy and clarity.
 
-After transcription is completed, it is automatically copied into your clipboard and can be configured to automatically paste.
+5. **Automatic Clipboard Integration**: Once transcription is complete, the text is automatically copied to your clipboard. An option for automatic pasting is also available.
+
+## How It Works
+
+1. Trigger Whispering using the global shortcut or button.
+2. Speak your message.
+3. Whispering transcribes your speech using the OpenAI Whisper API.
+4. The transcription is copied to your clipboard and optionally pasted automatically.
+5. Review and edit the transcription in the Whispering app if needed.
 
 ## Demo
 
