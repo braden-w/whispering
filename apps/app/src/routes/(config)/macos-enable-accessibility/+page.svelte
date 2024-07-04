@@ -34,13 +34,9 @@
 					loop
 					controls
 				></video>
-				<ol
-					class="text-muted-foreground max-w-2xl list-inside list-decimal space-y-2 text-left lg:text-xl"
-				>
+				<ol class="text-muted-foreground max-w-2xl list-inside list-decimal space-y-2 text-left">
 					<li>
-						Go to <span
-							class="text-primary whitespace-normal px-1 text-base font-semibold tracking-normal lg:text-xl"
-						>
+						Go to <span class="text-primary font-semibold tracking-tight">
 							System Preferences > Privacy & Security > Accessibility
 						</span> or use the button below.
 					</li>
