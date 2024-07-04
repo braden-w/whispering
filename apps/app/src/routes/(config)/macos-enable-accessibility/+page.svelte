@@ -60,8 +60,13 @@
 			</div>
 		</Card.Content>
 		<Card.Footer>
-			<Button onclick={() => invoke('open_apple_accessibility')} variant="default" class="w-full">
-				<SettingsIcon class="mr-2 h-6 w-6" />
+			<Button
+				onclick={() => invoke('open_apple_accessibility')}
+				variant="default"
+				size="sm"
+				class="w-full text-sm"
+			>
+				<SettingsIcon class="mr-2 h-4 w-4" />
 				Open MacOS Accessibility Settings
 			</Button>
 		</Card.Footer>
