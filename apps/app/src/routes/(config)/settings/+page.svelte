@@ -167,7 +167,7 @@
 					id="api-key"
 					placeholder="Your OpenAI API Key"
 					bind:value={settings.apiKey}
-					type="text"
+					type="password"
 					autocomplete="off"
 				/>
 				<div class="text-muted-foreground text-sm">
