@@ -131,7 +131,7 @@ function SettingsCard() {
 					Customize your Whispering experience. Synced with the{' '}
 					<Button
 						variant="link"
-						className="h-fit px-0.5 py-0"
+						size="inline"
 						onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}
 					>
 						Whispering website

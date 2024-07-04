@@ -40,7 +40,7 @@
 			End recording session
 			<Button
 				variant="link"
-				class="h-fit px-0.5 py-0"
+				size="inline"
 				on:click={() => (isAboutRecordingSessionDialogOpen = true)}
 			>
 				(What's that?)
