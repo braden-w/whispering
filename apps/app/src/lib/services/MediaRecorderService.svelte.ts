@@ -1,7 +1,7 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { WhisperingError } from '@repo/shared';
 import AudioRecorder from 'audio-recorder-polyfill';
-import { Data, Effect, Either } from 'effect';
+import { Option, Data, Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 import { renderErrorAsToast } from './renderErrorAsToast.js';
@@ -152,10 +152,10 @@ export const mediaStream = Effect.gen(function* () {
 								noiseSuppression: true,
 							},
 						});
-						return stream;
+						return Option.some(stream);
 					},
 					catch: () => new GetStreamError({ recordingDeviceId }),
-				});
+				}).pipe(Effect.catchAll(() => Effect.succeed(Option.none<MediaStream>())));
 
 			const getFirstAvailableStream = Effect.gen(function* () {
 				yield* toast({
@@ -166,10 +166,10 @@ export const mediaStream = Effect.gen(function* () {
 				});
 				const recordingDevices = yield* enumerateRecordingDevices;
 				for (const device of recordingDevices) {
-					const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
-					if (Either.isRight(deviceStream)) {
+					const maybeStream = yield* getStreamForDeviceId(device.deviceId);
+					if (Option.isSome(maybeStream)) {
 						settings.selectedAudioInputDeviceId = device.deviceId;
-						return deviceStream.right;
+						return maybeStream.value;
 					}
 				}
 				return yield* new WhisperingError({
@@ -208,22 +208,20 @@ export const mediaStream = Effect.gen(function* () {
 						id: toastId,
 						variant: 'info',
 						title: 'Defaulted to first available audio input device',
-						description: device.label,
+						description: 'You can select a specific device in the settings.',
 					});
 					return firstAvailableStream;
 				}
-				const maybeNewStream = yield* Effect.either(
-					getStreamForDeviceId(preferredRecordingDeviceId),
-				);
-				if (Either.isRight(maybeNewStream)) {
-					internalStream = maybeNewStream.right;
+				const maybeStream = yield* getStreamForDeviceId(preferredRecordingDeviceId);
+				if (Option.isSome(maybeStream)) {
+					internalStream = maybeStream.value;
 					yield* toast({
 						id: toastId,
 						variant: 'success',
 						title: 'Connected to selected audio input device',
 						description: 'Successfully connected to your microphone stream.',
 					});
-					return maybeNewStream.right;
+					return maybeStream.value;
 				}
 				yield* toast({
 					id: toastId,
@@ -235,11 +233,11 @@ export const mediaStream = Effect.gen(function* () {
 				internalStream = firstAvailableStream;
 				yield* toast({
 					id: toastId,
-					variant: 'success',
-					title: 'Connected to audio input device',
-					description: 'Successfully connected to your microphone stream.',
+					variant: 'info',
+					title: 'Defaulted to first available audio input device',
+					description: 'You can select a specific device in the settings.',
 				});
-				return maybeNewStream;
+				return maybeStream;
 			}).pipe(Effect.catchAll(renderErrorAsToast));
 		},
 		destroy: () => {
