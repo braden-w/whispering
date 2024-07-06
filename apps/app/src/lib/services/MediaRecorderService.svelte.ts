@@ -45,21 +45,10 @@ export const MediaRecorderService = Effect.gen(function* () {
 		startRecording: (preferredRecordingDeviceId: string) =>
 			Effect.gen(function* () {
 				const connectingToRecordingDeviceToastId = nanoid();
-				yield* toast({
-					id: connectingToRecordingDeviceToastId,
-					variant: 'loading',
-					title: 'Connecting to audio input device...',
-					description: 'Please allow access to your microphone if prompted.',
-				});
 				const maybeReusedStream = yield* mediaStream.init({
 					shouldReuseStream: true,
 					preferredRecordingDeviceId,
-				});
-				yield* toast({
-					id: connectingToRecordingDeviceToastId,
-					variant: 'success',
-					title: 'Connected to audio input device',
-					description: 'Successfully connected to your microphone stream.',
+					toastId: connectingToRecordingDeviceToastId,
 				});
 				if (mediaRecorder) {
 					return yield* new WhisperingError({
@@ -191,11 +180,19 @@ export const mediaStream = Effect.gen(function* () {
 		init: ({
 			shouldReuseStream,
 			preferredRecordingDeviceId,
+			toastId,
 		}: {
 			shouldReuseStream: boolean;
 			preferredRecordingDeviceId?: string;
+			toastId: string;
 		}) =>
 			Effect.gen(function* () {
+				yield* toast({
+					id: toastId,
+					variant: 'loading',
+					title: 'Connecting to audio input device...',
+					description: 'Please allow access to your microphone if prompted.',
+				});
 				if (shouldReuseStream && internalStream) {
 					const reusedStream = internalStream;
 					return reusedStream;
@@ -206,6 +203,12 @@ export const mediaStream = Effect.gen(function* () {
 						)
 					: yield* getFirstAvailableStream;
 				internalStream = newStream;
+				yield* toast({
+					id: toastId,
+					variant: 'success',
+					title: 'Connected to audio input device',
+					description: 'Successfully connected to your microphone stream.',
+				});
 				return newStream;
 			}).pipe(Effect.catchAll(renderErrorAsToast)),
 		destroy: () => {
