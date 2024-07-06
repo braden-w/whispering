@@ -70,12 +70,7 @@ export const settings = Effect.gen(function* () {
 		},
 		set selectedAudioInputDeviceId(newValue) {
 			settings.value = { ...settings.value, selectedAudioInputDeviceId: newValue };
-			mediaStream
-				.init({
-					shouldReuseStream: false,
-					preferredRecordingDeviceId: newValue,
-				})
-				.pipe(Effect.runPromise);
+			mediaStream.init({ preferredRecordingDeviceId: newValue }).pipe(Effect.runPromise);
 		},
 		get currentLocalShortcut() {
 			return settings.value.currentLocalShortcut;

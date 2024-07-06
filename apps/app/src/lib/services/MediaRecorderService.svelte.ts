@@ -66,14 +66,9 @@ export const mediaStream = Effect.gen(function* () {
 		get stream() {
 			return internalStream;
 		},
-		init: ({
-			preferredRecordingDeviceId,
-			toastId,
-		}: {
-			preferredRecordingDeviceId?: string;
-			toastId: string;
-		}) =>
+		init: ({ preferredRecordingDeviceId }: { preferredRecordingDeviceId?: string }) =>
 			Effect.gen(function* () {
+				const toastId = nanoid();
 				yield* toast({
 					id: toastId,
 					variant: 'loading',
@@ -128,7 +123,6 @@ export const mediaStream = Effect.gen(function* () {
 			internalStream?.getTracks().forEach((track) => track.stop());
 			internalStream = null;
 		},
-		enumerateRecordingDevices,
 	};
 }).pipe(Effect.runSync);
 
