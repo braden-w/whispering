@@ -51,7 +51,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 					title: 'Connecting to audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
-				const maybeResusedStream = yield* mediaStream.init({
+				const maybeReusedStream = yield* mediaStream.init({
 					shouldReuseStream: true,
 					preferredRecordingDeviceId,
 				});
@@ -70,7 +70,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 				}
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
-						new AudioRecorder(maybeResusedStream, {
+						new AudioRecorder(maybeReusedStream, {
 							mimeType: 'audio/webm;codecs=opus',
 							sampleRate: 16000,
 						}) as MediaRecorder,
