@@ -237,7 +237,7 @@ export const mediaStream = Effect.gen(function* () {
 					title: 'Defaulted to first available audio input device',
 					description: 'You can select a specific device in the settings.',
 				});
-				return maybeStream;
+				return firstAvailableStream;
 			}).pipe(Effect.catchAll(renderErrorAsToast));
 		},
 		destroy: () => {
