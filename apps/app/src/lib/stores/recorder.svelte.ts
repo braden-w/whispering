@@ -1,8 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import {
-	MediaRecorderService,
-	enumerateRecordingDevices,
-} from '$lib/services/MediaRecorderService.svelte';
+import { MediaRecorderService } from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
