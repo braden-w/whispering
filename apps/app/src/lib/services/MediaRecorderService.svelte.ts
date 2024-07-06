@@ -60,115 +60,19 @@ const getFirstAvailableStream = Effect.gen(function* () {
 	});
 });
 
-export const MediaRecorderService = Effect.gen(function* () {
-	let mediaRecorder: MediaRecorder | null = null;
-	const recordedChunks: Blob[] = [];
-
-	const resetRecorder = () => {
-		recordedChunks.length = 0;
-		mediaRecorder = null;
-	};
-
-	return {
-		get recordingState() {
-			if (!mediaRecorder) return 'inactive';
-			return mediaRecorder.state;
-		},
-		startRecording: (preferredRecordingDeviceId: string) =>
-			Effect.gen(function* () {
-				const connectingToRecordingDeviceToastId = nanoid();
-				const maybeReusedStream = yield* mediaStream.init({
-					shouldReuseStream: true,
-					preferredRecordingDeviceId,
-					toastId: connectingToRecordingDeviceToastId,
-				});
-				if (mediaRecorder) {
-					return yield* new WhisperingError({
-						title: 'Unexpected media recorder already exists',
-						description:
-							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
-					});
-				}
-				const newMediaRecorder = yield* Effect.try({
-					try: () =>
-						new AudioRecorder(maybeReusedStream, {
-							mimeType: 'audio/webm;codecs=opus',
-							sampleRate: 16000,
-						}) as MediaRecorder,
-					catch: () => new TryResuseStreamError(),
-				}).pipe(
-					Effect.catchAll(() =>
-						Effect.gen(function* () {
-							yield* toast({
-								variant: 'loading',
-								title: 'Error initializing media recorder with preferred device',
-								description: 'Trying to find another available audio input device...',
-							});
-							const stream = yield* mediaStream.init({ shouldReuseStream: false });
-							return new AudioRecorder(stream, {
-								mimeType: 'audio/webm;codecs=opus',
-								sampleRate: 16000,
-							}) as MediaRecorder;
-						}),
-					),
-				);
-				newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-					if (!event.data.size) return;
-					recordedChunks.push(event.data);
-				});
-				newMediaRecorder.start();
-				mediaRecorder = newMediaRecorder;
-			}),
-		stopRecording: Effect.async<Blob, Error>((resume) => {
-			if (!mediaRecorder) return;
-			mediaRecorder.addEventListener('stop', () => {
-				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-				resume(Effect.succeed(audioBlob));
-				resetRecorder();
-			});
-			mediaRecorder.stop();
-		}).pipe(
-			Effect.catchAll((error) => {
-				resetRecorder();
-				return new WhisperingError({
-					title: 'Error canceling media recorder',
-					description: error instanceof Error ? error.message : 'Please try again',
-					error: error,
-				});
-			}),
-		),
-		cancelRecording: Effect.async<undefined, Error>((resume) => {
-			if (!mediaRecorder) return;
-			mediaRecorder.addEventListener('stop', () => {
-				resetRecorder();
-				resume(Effect.succeed(undefined));
-			});
-			mediaRecorder.stop();
-		}).pipe(
-			Effect.catchAll((error) => {
-				resetRecorder();
-				return new WhisperingError({
-					title: 'Error stopping media recorder',
-					description: error instanceof Error ? error.message : 'Please try again',
-					error: error,
-				});
-			}),
-		),
-	};
-});
-
 export const mediaStream = Effect.gen(function* () {
 	let internalStream = $state<MediaStream | null>(null);
 	return {
+		get stream() {
+			return internalStream;
+		},
 		get isStreamOpen() {
 			return internalStream !== null;
 		},
 		init: ({
-			shouldReuseStream,
 			preferredRecordingDeviceId,
 			toastId,
 		}: {
-			shouldReuseStream: boolean;
 			preferredRecordingDeviceId?: string;
 			toastId: string;
 		}) =>
@@ -179,16 +83,6 @@ export const mediaStream = Effect.gen(function* () {
 					title: 'Connecting to selected audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
-				if (shouldReuseStream && internalStream) {
-					const reusedStream = internalStream;
-					yield* toast({
-						id: toastId,
-						variant: 'success',
-						title: 'Connected to selected audio input device',
-						description: 'Successfully reused your microphone stream.',
-					});
-					return reusedStream;
-				}
 				if (!preferredRecordingDeviceId) {
 					yield* toast({
 						id: toastId,
@@ -240,3 +134,101 @@ export const mediaStream = Effect.gen(function* () {
 		enumerateRecordingDevices,
 	};
 }).pipe(Effect.runSync);
+
+export const MediaRecorderService = Effect.gen(function* () {
+	let mediaRecorder: MediaRecorder | null = null;
+	const recordedChunks: Blob[] = [];
+
+	const resetRecorder = () => {
+		recordedChunks.length = 0;
+		mediaRecorder = null;
+	};
+
+	return {
+		get recordingState() {
+			if (!mediaRecorder) return 'inactive';
+			return mediaRecorder.state;
+		},
+		startRecording: (preferredRecordingDeviceId: string) =>
+			Effect.gen(function* () {
+				if (mediaRecorder) {
+					return yield* new WhisperingError({
+						title: 'Unexpected media recorder already exists',
+						description:
+							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+					});
+				}
+				const connectingToRecordingDeviceToastId = nanoid();
+				const newOrExistingStream =
+					mediaStream.stream ??
+					(yield* mediaStream.init({ toastId: connectingToRecordingDeviceToastId }));
+				const newMediaRecorder = yield* Effect.try({
+					try: () =>
+						new AudioRecorder(newOrExistingStream, {
+							mimeType: 'audio/webm;codecs=opus',
+							sampleRate: 16000,
+						}) as MediaRecorder,
+					catch: () => new TryResuseStreamError(),
+				}).pipe(
+					Effect.catchAll(() =>
+						Effect.gen(function* () {
+							yield* toast({
+								id: connectingToRecordingDeviceToastId,
+								variant: 'loading',
+								title: 'Error initializing media recorder with preferred device',
+								description: 'Trying to find another available audio input device...',
+							});
+							const stream = yield* mediaStream.init({
+								toastId: connectingToRecordingDeviceToastId,
+							});
+							return new AudioRecorder(stream, {
+								mimeType: 'audio/webm;codecs=opus',
+								sampleRate: 16000,
+							}) as MediaRecorder;
+						}),
+					),
+				);
+				newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+					if (!event.data.size) return;
+					recordedChunks.push(event.data);
+				});
+				newMediaRecorder.start();
+				mediaRecorder = newMediaRecorder;
+			}),
+		stopRecording: Effect.async<Blob, Error>((resume) => {
+			if (!mediaRecorder) return;
+			mediaRecorder.addEventListener('stop', () => {
+				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+				resume(Effect.succeed(audioBlob));
+				resetRecorder();
+			});
+			mediaRecorder.stop();
+		}).pipe(
+			Effect.catchAll((error) => {
+				resetRecorder();
+				return new WhisperingError({
+					title: 'Error canceling media recorder',
+					description: error instanceof Error ? error.message : 'Please try again',
+					error: error,
+				});
+			}),
+		),
+		cancelRecording: Effect.async<undefined, Error>((resume) => {
+			if (!mediaRecorder) return;
+			mediaRecorder.addEventListener('stop', () => {
+				resetRecorder();
+				resume(Effect.succeed(undefined));
+			});
+			mediaRecorder.stop();
+		}).pipe(
+			Effect.catchAll((error) => {
+				resetRecorder();
+				return new WhisperingError({
+					title: 'Error stopping media recorder',
+					description: error instanceof Error ? error.message : 'Please try again',
+					error: error,
+				});
+			}),
+		),
+	};
+});
