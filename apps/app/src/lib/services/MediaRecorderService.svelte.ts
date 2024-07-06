@@ -150,9 +150,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 					});
 				}
 				const connectingToRecordingDeviceToastId = nanoid();
-				const newOrExistingStream =
-					mediaStream.stream ??
-					(yield* mediaStream.init({ toastId: connectingToRecordingDeviceToastId }));
+				const newOrExistingStream = mediaStream.stream ?? (yield* mediaStream.init({}));
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
 						new AudioRecorder(newOrExistingStream, {
@@ -169,9 +167,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 								title: 'Error initializing media recorder with preferred device',
 								description: 'Trying to find another available audio input device...',
 							});
-							const stream = yield* mediaStream.init({
-								toastId: connectingToRecordingDeviceToastId,
-							});
+							const stream = yield* mediaStream.init({});
 							return new AudioRecorder(stream, {
 								mimeType: 'audio/webm;codecs=opus',
 								sampleRate: 16000,
