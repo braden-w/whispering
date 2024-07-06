@@ -8,10 +8,13 @@ import { renderErrorAsToast } from './renderErrorAsToast.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {
-		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		// const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		const devices = await navigator.mediaDevices.enumerateDevices();
-		allAudioDevicesStream.getTracks().forEach((track) => track.stop());
+		// allAudioDevicesStream.getTracks().forEach((track) => track.stop()); // 5. Force a new audio context
 		const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+		// const audioContext = new window.AudioContext();
+		// await audioContext.resume();
+		// audioContext.close();
 		return audioInputDevices;
 	},
 	catch: (error) =>
@@ -62,12 +65,17 @@ const getFirstAvailableStream = Effect.gen(function* () {
 
 export const mediaStream = Effect.gen(function* () {
 	let internalStream = $state<MediaStream | null>(null);
+	const destroy = () => {
+		internalStream?.getTracks().forEach((track) => track.stop());
+		internalStream = null;
+	};
 	return {
 		get stream() {
 			return internalStream;
 		},
 		init: ({ preferredRecordingDeviceId }: { preferredRecordingDeviceId?: string }) =>
 			Effect.gen(function* () {
+				destroy();
 				const toastId = nanoid();
 				yield* toast({
 					id: toastId,
@@ -119,10 +127,7 @@ export const mediaStream = Effect.gen(function* () {
 				});
 				return firstAvailableStream;
 			}).pipe(Effect.catchAll(renderErrorAsToast)),
-		destroy: () => {
-			internalStream?.getTracks().forEach((track) => track.stop());
-			internalStream = null;
-		},
+		destroy: destroy,
 	};
 }).pipe(Effect.runSync);
 
