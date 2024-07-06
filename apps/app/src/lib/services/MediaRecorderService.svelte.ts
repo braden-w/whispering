@@ -127,52 +127,6 @@ export const MediaRecorderService = Effect.gen(function* () {
 
 export const mediaStream = Effect.gen(function* () {
 	let internalStream = $state<MediaStream | null>(null);
-
-	const getStreamForDeviceId = (recordingDeviceId: string) =>
-		Effect.tryPromise({
-			try: async () => {
-				const stream = await navigator.mediaDevices.getUserMedia({
-					audio: {
-						deviceId: { exact: recordingDeviceId },
-						channelCount: 1, // Mono audio is usually sufficient for voice recording
-						sampleRate: 16000, // 16 kHz is a good balance for voice
-						echoCancellation: true,
-						noiseSuppression: true,
-					},
-				});
-				return stream;
-			},
-			catch: () => new GetStreamError({ recordingDeviceId }),
-		});
-
-	const getFirstAvailableStream = Effect.gen(function* () {
-		const defaultingToFirstAvailableDeviceToastId = nanoid();
-		yield* toast({
-			id: defaultingToFirstAvailableDeviceToastId,
-			variant: 'loading',
-			title: 'No device selected or selected device is not available',
-			description: 'Defaulting to first available audio input device...',
-		});
-		const recordingDevices = yield* enumerateRecordingDevices;
-		for (const device of recordingDevices) {
-			const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
-			if (Either.isRight(deviceStream)) {
-				settings.selectedAudioInputDeviceId = device.deviceId;
-				yield* toast({
-					id: defaultingToFirstAvailableDeviceToastId,
-					variant: 'info',
-					title: 'Defaulted to first available audio input device',
-					description: device.label,
-				});
-				return deviceStream.right;
-			}
-		}
-		return yield* new WhisperingError({
-			title: 'No available audio input devices',
-			description: 'Please make sure you have a microphone connected',
-		});
-	});
-
 	return {
 		get isStreamOpen() {
 			return internalStream !== null;
@@ -185,32 +139,109 @@ export const mediaStream = Effect.gen(function* () {
 			shouldReuseStream: boolean;
 			preferredRecordingDeviceId?: string;
 			toastId: string;
-		}) =>
-			Effect.gen(function* () {
+		}) => {
+			const getStreamForDeviceId = (recordingDeviceId: string) =>
+				Effect.tryPromise({
+					try: async () => {
+						const stream = await navigator.mediaDevices.getUserMedia({
+							audio: {
+								deviceId: { exact: recordingDeviceId },
+								channelCount: 1, // Mono audio is usually sufficient for voice recording
+								sampleRate: 16000, // 16 kHz is a good balance for voice
+								echoCancellation: true,
+								noiseSuppression: true,
+							},
+						});
+						return stream;
+					},
+					catch: () => new GetStreamError({ recordingDeviceId }),
+				});
+
+			const getFirstAvailableStream = Effect.gen(function* () {
 				yield* toast({
 					id: toastId,
 					variant: 'loading',
-					title: 'Connecting to audio input device...',
+					title: 'No device selected or selected device is not available',
+					description: 'Defaulting to first available audio input device...',
+				});
+				const recordingDevices = yield* enumerateRecordingDevices;
+				for (const device of recordingDevices) {
+					const deviceStream = yield* Effect.either(getStreamForDeviceId(device.deviceId));
+					if (Either.isRight(deviceStream)) {
+						settings.selectedAudioInputDeviceId = device.deviceId;
+						return deviceStream.right;
+					}
+				}
+				return yield* new WhisperingError({
+					title: 'No available audio input devices',
+					description: 'Please make sure you have a microphone connected',
+				});
+			});
+
+			return Effect.gen(function* () {
+				yield* toast({
+					id: toastId,
+					variant: 'loading',
+					title: 'Connecting to selected audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
 				if (shouldReuseStream && internalStream) {
 					const reusedStream = internalStream;
+					yield* toast({
+						id: toastId,
+						variant: 'success',
+						title: 'Connected to selected audio input device',
+						description: 'Successfully reused your microphone stream.',
+					});
 					return reusedStream;
 				}
-				const newStream = preferredRecordingDeviceId
-					? yield* getStreamForDeviceId(preferredRecordingDeviceId).pipe(
-							Effect.catchAll(() => getFirstAvailableStream),
-						)
-					: yield* getFirstAvailableStream;
-				internalStream = newStream;
+				if (!preferredRecordingDeviceId) {
+					yield* toast({
+						id: toastId,
+						variant: 'loading',
+						title: 'No device selected',
+						description: 'Defaulting to first available audio input device...',
+					});
+					const firstAvailableStream = yield* getFirstAvailableStream;
+					internalStream = firstAvailableStream;
+					yield* toast({
+						id: toastId,
+						variant: 'info',
+						title: 'Defaulted to first available audio input device',
+						description: device.label,
+					});
+					return firstAvailableStream;
+				}
+				const maybeNewStream = yield* Effect.either(
+					getStreamForDeviceId(preferredRecordingDeviceId),
+				);
+				if (Either.isRight(maybeNewStream)) {
+					internalStream = maybeNewStream.right;
+					yield* toast({
+						id: toastId,
+						variant: 'success',
+						title: 'Connected to selected audio input device',
+						description: 'Successfully connected to your microphone stream.',
+					});
+					return maybeNewStream.right;
+				}
+				yield* toast({
+					id: toastId,
+					variant: 'loading',
+					title: 'Error connecting to selected audio input device',
+					description: 'Trying to find another available audio input device...',
+				});
+				const firstAvailableStream = yield* getFirstAvailableStream;
+				internalStream = firstAvailableStream;
 				yield* toast({
 					id: toastId,
 					variant: 'success',
 					title: 'Connected to audio input device',
 					description: 'Successfully connected to your microphone stream.',
 				});
-				return newStream;
-			}).pipe(Effect.catchAll(renderErrorAsToast)),
+				return maybeNewStream;
+			}).pipe(Effect.catchAll(renderErrorAsToast));
+		},
 		destroy: () => {
 			internalStream?.getTracks().forEach((track) => track.stop());
 			internalStream = null;
