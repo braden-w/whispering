@@ -66,7 +66,8 @@ const getFirstAvailableStream = Effect.gen(function* () {
 export const mediaStream = Effect.gen(function* () {
 	let internalStream = $state<MediaStream | null>(null);
 	const destroy = () => {
-		internalStream?.getTracks().forEach((track) => track.stop());
+		if (internalStream === null) return;
+		internalStream.getTracks().forEach((track) => track.stop());
 		internalStream = null;
 	};
 	return {
