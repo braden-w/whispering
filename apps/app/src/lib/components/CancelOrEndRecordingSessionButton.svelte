@@ -21,7 +21,7 @@
 	>
 		🚫
 	</WhisperingButton>
-{:else if mediaStream.isStreamOpen}
+{:else if mediaStream.stream}
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button

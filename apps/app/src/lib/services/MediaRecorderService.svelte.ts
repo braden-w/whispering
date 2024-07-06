@@ -66,9 +66,6 @@ export const mediaStream = Effect.gen(function* () {
 		get stream() {
 			return internalStream;
 		},
-		get isStreamOpen() {
-			return internalStream !== null;
-		},
 		init: ({
 			preferredRecordingDeviceId,
 			toastId,
