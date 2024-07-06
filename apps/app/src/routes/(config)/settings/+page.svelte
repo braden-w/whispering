@@ -5,11 +5,19 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
-	import { recorder, settings } from '$lib/stores';
+	import { enumerateRecordingDevices } from '$lib/services/MediaRecorderService.svelte';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { settings } from '$lib/stores';
 	import { TranscriptionService, TranscriptionServiceWhisperLive } from '@repo/shared';
 	import { Effect } from 'effect';
 
-	const getMediaDevicesPromise = recorder.enumerateRecordingDevices();
+	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
+		Effect.catchAll((error) => {
+			renderErrorAsToast(error);
+			return Effect.succeed([] as MediaDeviceInfo[]);
+		}),
+		Effect.runPromise,
+	);
 
 	const supportedLanguagesOptions = Effect.gen(function* () {
 		const transcriptionService = yield* TranscriptionService;

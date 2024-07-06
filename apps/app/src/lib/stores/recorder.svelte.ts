@@ -54,14 +54,6 @@ export const recorder = Effect.gen(function* () {
 		get recorderState() {
 			return recorderState.value;
 		},
-		enumerateRecordingDevices: () =>
-			enumerateRecordingDevices.pipe(
-				Effect.catchAll((error) => {
-					renderErrorAsToast(error);
-					return Effect.succeed([] as MediaDeviceInfo[]);
-				}),
-				Effect.runPromise,
-			),
 		toggleRecording: (settings: Settings) =>
 			Effect.gen(function* () {
 				if (!settings.apiKey) {
