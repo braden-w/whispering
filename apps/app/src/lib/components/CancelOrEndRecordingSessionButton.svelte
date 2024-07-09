@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { mediaStream } from '$lib/services/MediaRecorderService.svelte';
+	import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 	import { recorder, settings } from '$lib/stores';
 
 	let isAboutRecordingSessionDialogOpen = $state(false);
@@ -21,12 +21,12 @@
 	>
 		🚫
 	</WhisperingButton>
-{:else if mediaStream.isStreamOpen}
+{:else if mediaStreamManager.stream}
 	<Tooltip.Root>
 		<Tooltip.Trigger asChild let:builder>
 			<Button
 				builders={[builder]}
-				onclick={mediaStream.destroy}
+				onclick={mediaStreamManager.release}
 				variant="ghost"
 				size="icon"
 				class={className}

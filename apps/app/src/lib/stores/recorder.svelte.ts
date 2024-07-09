@@ -1,8 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import {
-	MediaRecorderService,
-	enumerateRecordingDevices,
-} from '$lib/services/MediaRecorderService.svelte';
+import { MediaRecorderService } from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
@@ -54,14 +51,6 @@ export const recorder = Effect.gen(function* () {
 		get recorderState() {
 			return recorderState.value;
 		},
-		enumerateRecordingDevices: () =>
-			enumerateRecordingDevices.pipe(
-				Effect.catchAll((error) => {
-					renderErrorAsToast(error);
-					return Effect.succeed([] as MediaDeviceInfo[]);
-				}),
-				Effect.runPromise,
-			),
 		toggleRecording: (settings: Settings) =>
 			Effect.gen(function* () {
 				if (!settings.apiKey) {
