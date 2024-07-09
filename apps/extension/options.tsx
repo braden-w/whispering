@@ -294,7 +294,13 @@ function SettingsCard() {
 						id="api-key"
 						placeholder="Your OpenAI API Key"
 						value={settings.apiKey}
-						type="text"
+						onChange={(e) => {
+							setSettings.mutate({
+								...settings,
+								apiKey: e.target.value,
+							});
+						}}
+						type="password"
 						autoComplete="off"
 					/>
 					<div className="text-muted-foreground text-sm">
