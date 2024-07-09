@@ -8,13 +8,10 @@ import { renderErrorAsToast } from './renderErrorAsToast.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {
-		// const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		const devices = await navigator.mediaDevices.enumerateDevices();
-		// allAudioDevicesStream.getTracks().forEach((track) => track.stop()); // 5. Force a new audio context
+		allAudioDevicesStream.getTracks().forEach((track) => track.stop());
 		const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-		// const audioContext = new window.AudioContext();
-		// await audioContext.resume();
-		// audioContext.close();
 		return audioInputDevices;
 	},
 	catch: (error) =>
