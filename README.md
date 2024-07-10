@@ -41,7 +41,8 @@ Whispering is an open-source, cross-platform transcription app that harnesses th
 
 1. **Global Transcription**: Access Whisper's speech-to-text functionality anywhere with a global keyboard shortcut or within two button clicks.
 
-2. **Cross-Platform Experience**: 
+2. **Cross-Platform Experience**:
+
    - Desktop App: Enables global transcription across all applications.
    - Browser Extension: Provides global transcription in the browser by communicating with the web app.
 
@@ -242,6 +243,6 @@ This project is supported by the following amazing people and organizations:
 
 ## Support and Feedback
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub iusses tab](https://github.com/braden-w/whispering/issues). I really appreciate your feedback!
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub issues tab](https://github.com/braden-w/whispering/issues) or contact me via [whispering@bradenwong.com](mailto:whispering@bradenwong.com). I really appreciate your feedback!
 
 Thank you for using Whispering and happy writing!
