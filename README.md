@@ -64,8 +64,6 @@ Whispering is an open-source, cross-platform transcription app that harnesses th
 
 https://github.com/braden-w/whispering/assets/13159333/e9d72422-a743-468f-858d-4ecde0dfe238
 
-Sure, here's a revised version of the README with a more professional tone and best practices for the installation steps:
-
 ---
 
 ## Installation
