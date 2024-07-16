@@ -89,18 +89,36 @@ To download and install the Whispering desktop app, follow the steps for your op
 3. If prompted as unsafe, click on `More Info` -> `Run Anyway` to proceed with the installation.
 4. Follow the on-screen instructions to complete the installation.
 
-#### MacOS
+#### macOS
 
-1. Download the installation package from the [latest releases page](https://github.com/braden-w/whispering/releases).
-    - If on Apple Sillicon, please download `Whispering_x.x.x_aarch64.dmg`.
-    - If on Intel, please download `Whispering_x.x.x_x64.dmg`.
-3. Open the downloaded `.dmg` file to run the installer.
-4. Drag the Whispering app to the Applications folder.
-5. Open Whispering from the Applications folder.
-    - If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
-    - If you are on Apple Silicon and get an issue that `"Whispering" is damaged and can't be opened.` as documented [here](https://github.com/braden-w/whispering/issues/115), open Terminal and run `xattr -cr /Applications/Whispering.app`. Then open the application!
+For macOS, follow these steps to install Whispering:
 
-After installation, the app will be ready to use.
+1. **Download the installation package**:
+   - Visit the [latest releases page](https://github.com/braden-w/whispering/releases).
+   - Choose the appropriate package:
+     - For Apple Silicon: `Whispering_x.x.x_aarch64.dmg`
+     - For Intel: `Whispering_x.x.x_x64.dmg`
+
+2. **Install the application**:
+   - Open the downloaded `.dmg` file.
+   - Drag the Whispering app to the Applications folder.
+
+3. **Launch Whispering**:
+   - Open Whispering from the Applications folder.
+   - If you see a warning about unverified developer:
+     - Click `Cancel`
+     - Right-click the app in Finder and select `Open`
+
+4. **Troubleshooting** (Apple Silicon only):
+   If you encounter the error `"Whispering" is damaged and can't be opened`:
+   - Open Terminal
+   - Run the following command:
+     ```bash
+     xattr -cr /Applications/Whispering.app
+     ```
+   - Try opening the application again
+
+After completing these steps, Whispering should be ready to use on your macOS system.
 
 #### Linux
 
