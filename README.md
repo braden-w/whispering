@@ -91,10 +91,14 @@ To download and install the Whispering desktop app, follow the steps for your op
 
 #### MacOS
 
-1. Download the installation package ending in `.dmg` from the [latest releases page](https://github.com/braden-w/whispering/releases).
-2. Open the downloaded `.dmg` file to run the installer.
-3. Drag the Whispering app to the Applications folder.
-4. If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
+1. Download the installation package from the [latest releases page](https://github.com/braden-w/whispering/releases).
+    - If on Apple Sillicon, please download `Whispering_x.x.x_aarch64.dmg`.
+    - If on Intel, please download `Whispering_x.x.x_x64.dmg`.
+3. Open the downloaded `.dmg` file to run the installer.
+4. Drag the Whispering app to the Applications folder.
+5. Open Whispering from the Applications folder.
+    - If you encounter a warning that the developer cannot be verified, click `Cancel`, then right-click the app in Finder and select `Open`.
+    - If you are on Apple Silicon and get an issue that `"Whispering" is damaged and can't be opened.` as documented [here](https://github.com/braden-w/whispering/issues/115), open Terminal and run `xattr -cr /Applications/Whispering.app`. Then open the application!
 
 After installation, the app will be ready to use.
 
