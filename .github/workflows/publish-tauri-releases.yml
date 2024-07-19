@@ -69,7 +69,7 @@ jobs:
           tauriScript: 'pnpm tauri'
           tagName: ${{ github.ref_name }}
           releaseName: 'App ${{ github.ref_name }}'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: 'Full installation instructions can be found [here](https://github.com/braden-w/whispering?tab=readme-ov-file#desktop-app).'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
