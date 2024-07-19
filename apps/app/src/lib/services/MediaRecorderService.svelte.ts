@@ -36,8 +36,9 @@ const getStreamForDeviceId = (recordingDeviceId: string) =>
 					deviceId: { exact: recordingDeviceId },
 					channelCount: 1, // Mono audio is usually sufficient for voice recording
 					sampleRate: 16000, // 16 kHz is a good balance for voice
-					echoCancellation: true,
-					noiseSuppression: true,
+					autoGainControl: false,
+					echoCancellation: false,
+					noiseSuppression: false,
 				},
 			});
 			return Option.some(stream);
