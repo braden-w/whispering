@@ -25,8 +25,8 @@
 	let unlisten: UnlistenFn;
 
 	onMount(async () => {
-		window.toggleRecording = () => recorder.toggleRecording(settings);
-		window.cancelRecording = () => recorder.cancelRecording(settings);
+		window.toggleRecording = recorder.toggleRecording;
+		window.cancelRecording = recorder.cancelRecording;
 		window.goto = goto;
 		window.addEventListener('beforeunload', () => {
 			if (recorderState.value === 'RECORDING') {
@@ -34,7 +34,7 @@
 			}
 		});
 		if (window.__TAURI__) {
-			unlisten = await listen('toggle-recording', () => recorder.toggleRecording(settings));
+			unlisten = await listen('toggle-recording', recorder.toggleRecording);
 		} else {
 			sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
@@ -64,7 +64,7 @@
 
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	onclick={() => recorder.toggleRecording(settings)}
+	onclick={recorder.toggleRecording}
 >
 	<span
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"

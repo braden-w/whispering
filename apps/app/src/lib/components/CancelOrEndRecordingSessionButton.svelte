@@ -4,7 +4,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
-	import { recorder, settings } from '$lib/stores';
+	import { recorder } from '$lib/stores';
 
 	let isAboutRecordingSessionDialogOpen = $state(false);
 	let { class: className }: { class?: string | undefined } = $props();
@@ -13,7 +13,7 @@
 {#if recorder.recorderState === 'RECORDING'}
 	<WhisperingButton
 		tooltipText="Cancel recording"
-		onclick={() => recorder.cancelRecording(settings)}
+		onclick={recorder.cancelRecording}
 		variant="ghost"
 		size="icon"
 		class={className}

@@ -7,13 +7,8 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
 import { toast } from '$lib/services/ToastService';
-import { recordings } from '$lib/stores';
-import {
-	NotificationService,
-	WhisperingError,
-	type RecorderState,
-	type Settings,
-} from '@repo/shared';
+import { recordings, settings } from '$lib/stores';
+import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
 import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
@@ -149,7 +144,7 @@ export const recorder = Effect.gen(function* () {
 		get recorderState() {
 			return recorderState.value;
 		},
-		toggleRecording: (settings: Settings) =>
+		toggleRecording: () =>
 			Effect.gen(function* () {
 				if (!settings.apiKey) {
 					return yield* new WhisperingError({
@@ -225,7 +220,7 @@ export const recorder = Effect.gen(function* () {
 						return;
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
-		cancelRecording: (settings: Settings) =>
+		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
 				if (settings.isPlaySoundEnabled) {
