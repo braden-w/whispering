@@ -1,19 +1,16 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { MediaRecorderService } from '$lib/services/MediaRecorderService.svelte';
+import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
-import { recordings } from '$lib/stores';
-import {
-	NotificationService,
-	WhisperingError,
-	type RecorderState,
-	type Settings,
-} from '@repo/shared';
-import { Effect } from 'effect';
+import { toast } from '$lib/services/ToastService';
+import { recordings, settings } from '$lib/stores';
+import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
+import AudioRecorder from 'audio-recorder-polyfill';
+import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
@@ -23,6 +20,102 @@ import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_shar
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
+
+class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
+const MediaRecorderService = Effect.gen(function* () {
+	let mediaRecorder: MediaRecorder | null = null;
+	const recordedChunks: Blob[] = [];
+
+	const resetRecorder = () => {
+		recordedChunks.length = 0;
+		mediaRecorder = null;
+	};
+
+	return {
+		get recordingState() {
+			if (!mediaRecorder) return 'inactive';
+			return mediaRecorder.state;
+		},
+		startRecording: (preferredRecordingDeviceId: string) =>
+			Effect.gen(function* () {
+				if (mediaRecorder) {
+					return yield* new WhisperingError({
+						title: 'Unexpected media recorder already exists',
+						description:
+							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+					});
+				}
+				const connectingToRecordingDeviceToastId = nanoid();
+				const newOrExistingStream =
+					mediaStreamManager.stream ?? (yield* mediaStreamManager.refreshStream({}));
+				const newMediaRecorder = yield* Effect.try({
+					try: () =>
+						new AudioRecorder(newOrExistingStream, {
+							mimeType: 'audio/webm;codecs=opus',
+							sampleRate: 16000,
+						}) as MediaRecorder,
+					catch: () => new TryResuseStreamError(),
+				}).pipe(
+					Effect.catchAll(() =>
+						Effect.gen(function* () {
+							yield* toast({
+								id: connectingToRecordingDeviceToastId,
+								variant: 'loading',
+								title: 'Error initializing media recorder with preferred device',
+								description: 'Trying to find another available audio input device...',
+							});
+							const stream = yield* mediaStreamManager.refreshStream({});
+							return new AudioRecorder(stream, {
+								mimeType: 'audio/webm;codecs=opus',
+								sampleRate: 16000,
+							}) as MediaRecorder;
+						}),
+					),
+				);
+				newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+					if (!event.data.size) return;
+					recordedChunks.push(event.data);
+				});
+				newMediaRecorder.start();
+				mediaRecorder = newMediaRecorder;
+			}),
+		stopRecording: Effect.async<Blob, Error>((resume) => {
+			if (!mediaRecorder) return;
+			mediaRecorder.addEventListener('stop', () => {
+				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+				resume(Effect.succeed(audioBlob));
+				resetRecorder();
+			});
+			mediaRecorder.stop();
+		}).pipe(
+			Effect.catchAll((error) => {
+				resetRecorder();
+				return new WhisperingError({
+					title: 'Error canceling media recorder',
+					description: error instanceof Error ? error.message : 'Please try again',
+					error: error,
+				});
+			}),
+		),
+		cancelRecording: Effect.async<undefined, Error>((resume) => {
+			if (!mediaRecorder) return;
+			mediaRecorder.addEventListener('stop', () => {
+				resetRecorder();
+				resume(Effect.succeed(undefined));
+			});
+			mediaRecorder.stop();
+		}).pipe(
+			Effect.catchAll((error) => {
+				resetRecorder();
+				return new WhisperingError({
+					title: 'Error stopping media recorder',
+					description: error instanceof Error ? error.message : 'Please try again',
+					error: error,
+				});
+			}),
+		),
+	};
+});
 
 export let recorderState = Effect.gen(function* () {
 	const { setTrayIcon } = yield* SetTrayIconService;
@@ -51,7 +144,7 @@ export const recorder = Effect.gen(function* () {
 		get recorderState() {
 			return recorderState.value;
 		},
-		toggleRecording: (settings: Settings) =>
+		toggleRecording: () =>
 			Effect.gen(function* () {
 				if (!settings.apiKey) {
 					return yield* new WhisperingError({
@@ -127,7 +220,7 @@ export const recorder = Effect.gen(function* () {
 						return;
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
-		cancelRecording: (settings: Settings) =>
+		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
 				if (settings.isPlaySoundEnabled) {

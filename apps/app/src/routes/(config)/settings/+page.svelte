@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
-	import { enumerateRecordingDevices } from '$lib/services/MediaRecorderService.svelte';
+	import { enumerateRecordingDevices, mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores';
 	import { TranscriptionService, TranscriptionServiceWhisperLive } from '@repo/shared';
@@ -89,6 +89,9 @@
 						onSelectedChange={(selected) => {
 							if (!selected) return;
 							settings.selectedAudioInputDeviceId = selected.value;
+							mediaStreamManager
+								.refreshStream()
+								.pipe(Effect.runPromise);
 						}}
 					>
 						<Select.Trigger class="w-full">

@@ -2,7 +2,7 @@
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { recorder, settings } from '$lib/stores';
+	import { recorder } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
 
 	let { children } = $props();
@@ -23,7 +23,7 @@
 	<CancelOrEndRecordingSessionButton />
 	<WhisperingButton
 		tooltipText="Toggle recording"
-		onclick={() => recorder.toggleRecording(settings)}
+		onclick={recorder.toggleRecording}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: microphone-icon"

@@ -66,7 +66,7 @@
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					on:click={async () => {
+					onclick={async () => {
 						isDeleting = true;
 						await recordings.deleteRecordingById(recording.id);
 						isDeleting = false;
@@ -80,7 +80,7 @@
 					{/if}
 					Delete
 				</Button>
-				<Button on:click={() => (isDialogOpen = false)} variant="secondary">Cancel</Button>
+				<Button onclick={() => (isDialogOpen = false)} variant="secondary">Cancel</Button>
 				<Button type="submit" disabled={isSaving}>
 					{#if isSaving}
 						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />

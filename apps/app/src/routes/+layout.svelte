@@ -25,8 +25,8 @@
 	let unlisten: UnlistenFn;
 
 	onMount(async () => {
-		window.toggleRecording = () => recorder.toggleRecording(settings);
-		window.cancelRecording = () => recorder.cancelRecording(settings);
+		window.toggleRecording = recorder.toggleRecording;
+		window.cancelRecording = recorder.cancelRecording;
 		window.goto = goto;
 		window.addEventListener('beforeunload', () => {
 			if (recorderState.value === 'RECORDING') {
@@ -34,7 +34,7 @@
 			}
 		});
 		if (window.__TAURI__) {
-			unlisten = await listen('toggle-recording', () => recorder.toggleRecording(settings));
+			unlisten = await listen('toggle-recording', recorder.toggleRecording);
 		} else {
 			sendMessageToExtension({
 				name: 'external/notifyWhisperingTabReady',
@@ -56,8 +56,6 @@
 		duration: 5000,
 		visibleToasts: 5,
 	} satisfies ToasterProps;
-
-	let { children } = $props();
 </script>
 
 <svelte:head>
@@ -66,7 +64,7 @@
 
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	on:click={() => recorder.toggleRecording(settings)}
+	onclick={recorder.toggleRecording}
 >
 	<span
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
@@ -81,9 +79,7 @@
 </button>
 
 <div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
-	{#if children}
-		{@render children()}
-	{/if}
+	<slot />
 </div>
 
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />

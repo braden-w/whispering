@@ -44,7 +44,7 @@
 	<div class="relative">
 		<WhisperingButton
 			tooltipText="Toggle recording"
-			onclick={() => recorder.toggleRecording(settings)}
+			onclick={recorder.toggleRecording}
 			variant="ghost"
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>
@@ -64,7 +64,7 @@
 		/>
 	</div>
 
-	<div class="xxs:flex max-w-80 hidden w-full flex-col items-center gap-2">
+	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
 		<div class="flex w-full items-center gap-2">
 			<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
 			<Input
