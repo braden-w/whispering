@@ -56,8 +56,6 @@
 		duration: 5000,
 		visibleToasts: 5,
 	} satisfies ToasterProps;
-
-	let { children } = $props();
 </script>
 
 <svelte:head>
@@ -81,9 +79,7 @@
 </button>
 
 <div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
-	{#if children}
-		{@render children()}
-	{/if}
+	<slot />
 </div>
 
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
