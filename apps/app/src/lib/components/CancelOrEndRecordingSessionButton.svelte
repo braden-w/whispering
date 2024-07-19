@@ -41,7 +41,7 @@
 			<Button
 				variant="link"
 				size="inline"
-				on:click={() => (isAboutRecordingSessionDialogOpen = true)}
+				onclick={() => (isAboutRecordingSessionDialogOpen = true)}
 			>
 				(What's that?)
 			</Button>
