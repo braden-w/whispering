@@ -25,7 +25,6 @@ class GetStreamError extends Data.TaggedError('GetStreamError')<{
 	recordingDeviceId: string;
 }> {}
 
-
 const getStreamForDeviceId = (recordingDeviceId: string) =>
 	Effect.tryPromise({
 		try: async () => {
@@ -50,6 +49,7 @@ const getFirstAvailableStream = Effect.gen(function* () {
 		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
 		if (Option.isSome(maybeStream)) {
 			settings.selectedAudioInputDeviceId = device.deviceId;
+			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 			return maybeStream.value;
 		}
 	}
@@ -66,7 +66,7 @@ export const mediaStreamManager = Effect.gen(function* () {
 		currentStream.getTracks().forEach((track) => track.stop());
 		currentStream = null;
 	};
-	const acquireStream = ({ preferredRecordingDeviceId }: { preferredRecordingDeviceId?: string }) =>
+	const acquireStream = (preferredRecordingDeviceId: string) =>
 		Effect.gen(function* () {
 			const toastId = nanoid();
 			yield* toast({
@@ -123,9 +123,9 @@ export const mediaStreamManager = Effect.gen(function* () {
 		get stream() {
 			return currentStream;
 		},
-		refreshStream: ({ preferredRecordingDeviceId }: { preferredRecordingDeviceId?: string }) => {
+		refreshStream: () => {
 			releaseStream();
-			return acquireStream({ preferredRecordingDeviceId });
+			return acquireStream(settings.selectedAudioInputDeviceId);
 		},
 		release: releaseStream,
 	};
