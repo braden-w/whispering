@@ -9,7 +9,6 @@ import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLi
 import { toast } from '$lib/services/ToastService';
 import { recordings, settings } from '$lib/stores';
 import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
-import AudioRecorder from 'audio-recorder-polyfill';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
@@ -17,11 +16,14 @@ import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
+const TIMESLICE_MS = 1000;
+
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
 class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
+
 const MediaRecorderService = Effect.gen(function* () {
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
@@ -49,11 +51,7 @@ const MediaRecorderService = Effect.gen(function* () {
 				const newOrExistingStream =
 					mediaStreamManager.stream ?? (yield* mediaStreamManager.refreshStream());
 				const newMediaRecorder = yield* Effect.try({
-					try: () =>
-						new AudioRecorder(newOrExistingStream, {
-							mimeType: 'audio/webm;codecs=opus',
-							sampleRate: 16000,
-						}) as MediaRecorder,
+					try: () => new MediaRecorder(newOrExistingStream),
 					catch: () => new TryResuseStreamError(),
 				}).pipe(
 					Effect.catchAll(() =>
@@ -65,10 +63,7 @@ const MediaRecorderService = Effect.gen(function* () {
 								description: 'Trying to find another available audio input device...',
 							});
 							const stream = yield* mediaStreamManager.refreshStream();
-							return new AudioRecorder(stream, {
-								mimeType: 'audio/webm;codecs=opus',
-								sampleRate: 16000,
-							}) as MediaRecorder;
+							return new MediaRecorder(stream);
 						}),
 					),
 				);
@@ -76,13 +71,14 @@ const MediaRecorderService = Effect.gen(function* () {
 					if (!event.data.size) return;
 					recordedChunks.push(event.data);
 				});
-				newMediaRecorder.start();
+				newMediaRecorder.start(TIMESLICE_MS);
 				mediaRecorder = newMediaRecorder;
 			}),
 		stopRecording: Effect.async<Blob, Error>((resume) => {
 			if (!mediaRecorder) return;
 			mediaRecorder.addEventListener('stop', () => {
-				const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+				if (!mediaRecorder) return;
+				const audioBlob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
 				resume(Effect.succeed(audioBlob));
 				resetRecorder();
 			});
