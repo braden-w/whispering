@@ -33,9 +33,6 @@ const getStreamForDeviceId = (recordingDeviceId: string) =>
 					deviceId: { exact: recordingDeviceId },
 					channelCount: 1, // Mono audio is usually sufficient for voice recording
 					sampleRate: 16000, // 16 kHz is a good balance for voice
-					autoGainControl: false,
-					echoCancellation: false,
-					noiseSuppression: false,
 				},
 			});
 			return Option.some(stream);
@@ -61,11 +58,13 @@ const getFirstAvailableStream = Effect.gen(function* () {
 
 export const mediaStreamManager = Effect.gen(function* () {
 	let currentStream = $state<MediaStream | null>(null);
+
 	const releaseStream = () => {
 		if (currentStream === null) return;
 		currentStream.getTracks().forEach((track) => track.stop());
 		currentStream = null;
 	};
+
 	const acquireStream = (preferredRecordingDeviceId: string) =>
 		Effect.gen(function* () {
 			const toastId = nanoid();
@@ -118,7 +117,8 @@ export const mediaStreamManager = Effect.gen(function* () {
 				description: 'You can select a specific device in the settings.',
 			});
 			return firstAvailableStream;
-		}).pipe(Effect.catchAll(renderErrorAsToast));
+		}).pipe(Effect.tapError(renderErrorAsToast));
+
 	return {
 		get stream() {
 			return currentStream;
