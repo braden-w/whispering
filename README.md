@@ -54,14 +54,6 @@ https://github.com/user-attachments/assets/a7934f1f-d08b-4037-9bbc-aadd1b13501e
 4. **Transcription Management**: Review and edit transcriptions within the Whispering app to ensure accuracy and clarity.
 5. **Automatic Clipboard Integration**: Once transcription is complete, the text is automatically copied to your clipboard. An option for automatic pasting is also available.
 
-## How It Works
-
-1. Trigger Whispering using the global shortcut or button.
-2. Speak your message.
-3. Whispering transcribes your speech using the OpenAI Whisper API.
-4. The transcription is copied to your clipboard and optionally pasted automatically.
-5. Review and edit the transcription in the Whispering app if needed.
-
 ## Installation
 
 ### Web App
