@@ -37,11 +37,11 @@ export const settings = Effect.gen(function* () {
 		yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 		yield* registerShortcutsService.registerLocalShortcut({
 			shortcut: settings.value.currentLocalShortcut,
-			callback: () => recorder.toggleRecording(settings.value),
+			callback: recorder.toggleRecording,
 		});
 		yield* registerShortcutsService.registerGlobalShortcut({
 			shortcut: settings.value.currentGlobalShortcut,
-			callback: () => recorder.toggleRecording(settings.value),
+			callback: recorder.toggleRecording,
 		});
 	}).pipe(Effect.catchAll(renderErrorAsToast));
 	jobQueue.addJobToQueue(initialSilentJob).pipe(Effect.runPromise);
@@ -81,7 +81,7 @@ export const settings = Effect.gen(function* () {
 				yield* registerShortcutsService.unregisterAllLocalShortcuts;
 				yield* registerShortcutsService.registerLocalShortcut({
 					shortcut: settings.value.currentLocalShortcut,
-					callback: () => recorder.toggleRecording(settings.value),
+					callback: recorder.toggleRecording,
 				});
 				yield* toast({
 					variant: 'success',
@@ -104,7 +104,7 @@ export const settings = Effect.gen(function* () {
 				yield* registerShortcutsService.unregisterAllGlobalShortcuts;
 				yield* registerShortcutsService.registerGlobalShortcut({
 					shortcut: settings.value.currentGlobalShortcut,
-					callback: () => recorder.toggleRecording(settings.value),
+					callback: recorder.toggleRecording,
 				});
 				yield* toast({
 					variant: 'success',
