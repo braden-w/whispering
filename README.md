@@ -3,7 +3,7 @@
     <img width="180" src="./apps/app/src-tauri/icons/recorder_state/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
-  <p align="center"><em>Seamless speech-to-text at your fingertips, powered by OpenAI</em></p>
+  <p align="center">Seamless speech-to-text conveniently attached </p>
 </p>
 
 <p align="center">
@@ -31,38 +31,27 @@
   </a>
 </p>
 
----
 
 ## About
 
-Whispering is an open-source, cross-platform transcription app that I use to access speech-to-text via OpenAI's Whisper on my computer or phone.
+Whispering is an open-source transcription application that provides global speech-to-text functionality, with options such as keyboard shortcuts and automatic copy and paste to make dictating as seamless as possible.
 
-I was tired of recording files and uploading them to get transcriptions, so I designed Whispering to be a lightweight interface to automatically copy and paste my transcriptions for me on shortcut press.
+Under the hood, it's powered by OpenAI's Whisper API, making it significantly more accurate than built-in dictation.
 
-## Demo
+## Demos
 
-### Desktop App
+https://github.com/user-attachments/assets/eca93701-10a0-4d91-b38a-f715bd7e0357
 
-https://github.com/user-attachments/assets/4e201e56-042a-4bf4-936e-3a6e579228a1
+https://github.com/user-attachments/assets/a7934f1f-d08b-4037-9bbc-aadd1b13501e
 
-### Chrome Extensions
-
-https://github.com/user-attachments/assets/6ab809a2-f28b-4b41-ae85-dda82462e80c
-
-
-## Features
+## Key Features
 
 1. **Global Transcription**: Access Whisper's speech-to-text functionality anywhere with a global keyboard shortcut or within two button clicks.
-
 2. **Cross-Platform Experience**:
-
    - Desktop App: Enables global transcription across all applications.
    - Browser Extension: Provides global transcription in the browser by communicating with the web app.
-
 3. **Chat Integration**: The browser extension adds a recording button to ChatGPT and Claude websites, allowing direct voice input and transcription in the chat interface.
-
 4. **Transcription Management**: Review and edit transcriptions within the Whispering app to ensure accuracy and clarity.
-
 5. **Automatic Clipboard Integration**: Once transcription is complete, the text is automatically copied to your clipboard. An option for automatic pasting is also available.
 
 ## How It Works
