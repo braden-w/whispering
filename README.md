@@ -62,12 +62,6 @@ https://github.com/user-attachments/assets/a7934f1f-d08b-4037-9bbc-aadd1b13501e
 4. The transcription is copied to your clipboard and optionally pasted automatically.
 5. Review and edit the transcription in the Whispering app if needed.
 
-## Demo
-
-https://github.com/braden-w/whispering/assets/13159333/e9d72422-a743-468f-858d-4ecde0dfe238
-
----
-
 ## Installation
 
 ### Web App
