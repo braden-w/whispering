@@ -33,9 +33,22 @@
 
 ---
 
-## Introduction
+## About
 
-Whispering is an open-source, cross-platform transcription app that harnesses the power of the OpenAI Whisper API to provide efficient speech-to-text conversion. It's designed to seamlessly integrate into your workflow, eliminating the need for manual transcription and streamlining your productivity.
+Whispering is an open-source, cross-platform transcription app that I use to access speech-to-text via OpenAI's Whisper on my computer or phone.
+
+I was tired of recording files and uploading them to get transcriptions, so I designed Whispering to be a lightweight interface to automatically copy and paste my transcriptions for me on shortcut press.
+
+## Demo
+
+### Desktop App
+
+https://github.com/user-attachments/assets/4e201e56-042a-4bf4-936e-3a6e579228a1
+
+### Chrome Extensions
+
+https://github.com/user-attachments/assets/6ab809a2-f28b-4b41-ae85-dda82462e80c
+
 
 ## Features
 
