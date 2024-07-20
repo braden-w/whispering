@@ -159,21 +159,29 @@ After installing the Whispering desktop app, press <kbd>Control/Command</kbd> + 
 
 #### Web and Desktop
 
-Whispering web and desktop app is built using the following technologies and libraries:
+The Whispering app is built using the following technologies and libraries:
 
-- [Tauri](https://tauri.studio/en/docs/intro/): A framework for building lightweight, secure, and fast cross-platform applications with web technologies.
-- [SvelteKit](https://kit.svelte.dev/docs): A framework for building web applications and the Tauri frontend.
-- [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
+- [Svelte 5](https://svelte.dev): The UI reactivity library of choice.
+- [SvelteKit](https://kit.svelte.dev/docs): For routing and static site generation, used for making both the website and the static frontend for the Tauri app.
+- [Tauri](https://tauri.studio/en/docs/intro/): The desktop app framework.
+- [Effect-TS](https://github.com/Effect-TS/effect): To sprinkle some functional programming and write extremely type-safe functions, where errors are included in the return type of the function signature.
+- [Svelte Sonner](https://svelte-sonner.vercel.app/): A simple, customizable toast library for Svelte applications. Used to capture and display errors bubbled up via Effect-TS using the `renderAsToast` function.
+- [TanStack Table](https://tanstack.com/table): To power all data tables.
+- [ShadCN-Svelte](https://github.com/huntabyte/shadcn-svelte): The UI component library of choice.
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
-- [Cloudflare Pages](https://developers.cloudflare.com/): A global cloud platform for deploying static pages.
+- [Turborepo](https://turborepo.org/): For monorepo management, so that `apps/app` and `apps/extension` can share the same codebase, drastically reducing code duplication and more importantly, keeping a single source of truth.
+- [Rust](https://www.rust-lang.org): For extending desktop app features, such as using the `enigo` crate for handling automatic pasting.
+- [Vercel](https://vercel.com/): Hosting that's decent for a hobby project and has nice Turborepo integrations.
+- [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
 
 #### Extension
 
 The Whispering Chrome extension is built using:
 
-- [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions.
-- [Svelte](https://svelte.dev/): A JavaScript framework for building user interfaces.
-- [svelte-french-toast](https://svelte-french-toast.com): A simple, customizable toast library for Svelte applications.
+- [Plasmo](https://docs.plasmo.com/): A framework for building Chrome extensions. We use the [relay flow](https://docs.plasmo.com/framework/messaging#relay-flow) to communicate to the Whispering website.
+- [Effect-TS](https://github.com/Effect-TS/effect): To sprinkle some functional programming and write extremely type-safe functions, where errors are included in the return type of the function signature.
+- [React](https://reactjs.org): The UI reactivity library for the Chrome extension, as Plasmo unfortunately doesn't support Svelte 5.
+- [ShadCN](https://github.com/shadcn): The UI component library for the Chrome extension.
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Chrome API](https://developer.chrome.com/docs/extensions/reference/): The Chrome extension API.
 - [Zapsplat.com](https://www.zapsplat.com/): A royalty-free sound effects library.
