@@ -139,21 +139,21 @@ After installation, the app will be ready to use.
 
 ### Chrome Extension
 
-After installing the Chrome Extension, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. To use the Whisper API feature, simply click the 'Start Recording' microphone button to record your voice, and then 'Stop Recording' square button when you're done. Your transcription will appear in the text box below.
+After installing the Chrome Extension, you will find a Whispering icon on the Chrome extensions bar. Click on this icon to open the extension. Click the microphone button to record your voice, and then click the square button when you're done. Your transcription will appear in the text box below.
 
-To access the ChatGPT feature, navigate to the ChatGPT web page. You'll see a new recording button in the chat interface. Click this button to start and stop recording, and the transcribed text will be automatically inserted into the chat input field.
+To access the ChatGPT or Claude feature, navigate to the ChatGPT or Claude web page. You'll see a new recording button in the chat interface. Click this button to start and stop recording, and the transcribed text will be automatically inserted into the chat input field.
 
-To access the shortcut feature, press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> to start recording from any website. The transcription will be automatically copied into your clipboard and paste into the current input field.
+To access the shortcut feature, press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd> (later configurable through Chrome extension shortcuts) to start recording from any website. The transcription will be automatically copied into your clipboard and paste into the current input field.
+
+The Chrome Extension communicates with [whispering.bradenwong.com](https://whispering.bradenwong.com), and will automatically attempt to create a tab in the background if it does not find one. Most bugs can be attributed to this communication failing, such as rare instances where the tab falls asleep.
 
 ### Web App
 
-To start using the Whispering web app, click the button below:
-
-[![Open Web App](https://img.shields.io/badge/Open-Web%20App-blue)](https://whispering.bradenwong.com/)
+The web app is accessible via [whispering.bradenwong.com](https://whispering.bradenwong.com). Click the microphone button to record your voice, and then click the square button when you're done. Your transcription will appear in the text box.
 
 ### Desktop App
 
-After installing the Whispering desktop app, press <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> or <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> to start recording from anywhere on your desktop. The application will come into focus while recording, and will minimize when you stop recording. The transcription will be automatically copied into your clipboard and can be configured to automatically paste.
+After installing the Whispering desktop app, press <kbd>Control/Command</kbd> + <kbd>Shift</kbd> + <kbd>;</kbd> (configurable in settings) to start recording from anywhere on your desktop. The transcription will be automatically copied into your clipboard and pasted, though both features can be toggled in the settings.
 
 ## Built With
 
