@@ -36,7 +36,7 @@ const MediaRecorderService = Effect.gen(function* () {
 			if (!mediaRecorder) return 'inactive';
 			return mediaRecorder.state;
 		},
-		startRecording: (preferredRecordingDeviceId: string) =>
+		startRecording: () =>
 			Effect.gen(function* () {
 				if (mediaRecorder) {
 					return yield* new WhisperingError({
@@ -159,7 +159,7 @@ export const recorder = Effect.gen(function* () {
 
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
-						yield* mediaRecorderService.startRecording(settings.selectedAudioInputDeviceId);
+						yield* mediaRecorderService.startRecording();
 						yield* Effect.all([
 							Effect.sync(() => (recorderState.value = 'RECORDING')),
 							Effect.logInfo('Recording started'),
