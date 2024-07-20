@@ -3,7 +3,7 @@
     <img width="180" src="./apps/app/src-tauri/icons/recorder_state/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
-  <p align="center">Seamless speech-to-text conveniently attached </p>
+  <p align="center">Seamless dictation powered by OpenAI Whisper</p>
 </p>
 
 <p align="center">
