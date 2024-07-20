@@ -5,7 +5,10 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
-	import { enumerateRecordingDevices, mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
+	import {
+		enumerateRecordingDevices,
+		mediaStreamManager,
+	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores';
 	import { TranscriptionService, TranscriptionServiceWhisperLive } from '@repo/shared';
@@ -89,9 +92,7 @@
 						onSelectedChange={(selected) => {
 							if (!selected) return;
 							settings.selectedAudioInputDeviceId = selected.value;
-							mediaStreamManager
-								.refreshStream()
-								.pipe(Effect.runPromise);
+							mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 						}}
 					>
 						<Select.Trigger class="w-full">
@@ -182,15 +183,24 @@
 					autocomplete="off"
 				/>
 				<div class="text-muted-foreground text-sm">
-					You can find your OpenAI API key in your <Button
+					You can find your API key in your <Button
 						variant="link"
 						class="px-0.3 py-0.2 h-fit"
 						href="https://platform.openai.com/api-keys"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						OpenAI account settings
-					</Button>.
+						account settings
+					</Button>. Make sure <Button
+						variant="link"
+						class="px-0.3 py-0.2 h-fit"
+						href="https://platform.openai.com/settings/organization/billing/overview"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						billing
+					</Button>
+					is enabled.
 				</div>
 			</div>
 		</Card.Content>
