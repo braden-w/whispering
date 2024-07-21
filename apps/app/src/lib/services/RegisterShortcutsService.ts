@@ -6,8 +6,6 @@ export class RegisterShortcutsService extends Context.Tag('RegisterShortcutsServ
 	RegisterShortcutsService,
 	{
 		readonly isGlobalShortcutEnabled: boolean;
-		readonly defaultLocalShortcut: string;
-		readonly defaultGlobalShortcut: string;
 		readonly unregisterAllLocalShortcuts: Effect.Effect<void, WhisperingError>;
 		readonly unregisterAllGlobalShortcuts: Effect.Effect<void, WhisperingError>;
 		readonly registerLocalShortcut: (args: {

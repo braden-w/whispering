@@ -8,8 +8,6 @@ export const RegisterShortcutsWebLive = Layer.effect(
 	Effect.gen(function* () {
 		return {
 			isGlobalShortcutEnabled: false,
-			defaultLocalShortcut: 'space',
-			defaultGlobalShortcut: '',
 			unregisterAllLocalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>
