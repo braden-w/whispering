@@ -8,7 +8,7 @@ import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
-import { DEFAULT_BITRATE, settingsSchema } from '@repo/shared';
+import { DEFAULT_BITRATE_MS, settingsSchema } from '@repo/shared';
 import { Effect } from 'effect';
 
 type RegisterShortcutJob = Effect.Effect<void>;
@@ -27,7 +27,7 @@ export const settings = Effect.gen(function* () {
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
 			outputLanguage: 'auto',
-			bitRate: DEFAULT_BITRATE,
+			bitRate: DEFAULT_BITRATE_MS,
 		},
 	});
 

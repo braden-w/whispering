@@ -11,7 +11,11 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores';
-	import { TranscriptionService, TranscriptionServiceWhisperLive } from '@repo/shared';
+	import {
+		BITRATE_OPTIONS,
+		TranscriptionService,
+		TranscriptionServiceWhisperLive,
+	} from '@repo/shared';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
@@ -110,6 +114,29 @@
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
 				{/await}
+			</div>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="bit-rate">Bitrate</Label>
+				<Select.Root
+					items={BITRATE_OPTIONS}
+					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitRate)}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.bitRate = selected.value;
+					}}
+				>
+					<Select.Trigger class="w-full">
+						<Select.Value placeholder="Select a device" />
+					</Select.Trigger>
+					<Select.Content>
+						{#each BITRATE_OPTIONS as bitRateOption}
+							<Select.Item value={bitRateOption.value} label={bitRateOption.label}>
+								{bitRateOption.label}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+					<Select.Input name="bit-rate" />
+				</Select.Root>
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="output-language">Output Language</Label>
