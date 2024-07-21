@@ -54,7 +54,7 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 			}).pipe(Effect.runSync);
 			return defaultValue;
 		}
-		return Either.right(parseResult) as S.Schema.Type<TSchema>;
+		return parseResult.right as S.Schema.Type<TSchema>;
 	};
 
 	if (!disableLocalStorage) {
