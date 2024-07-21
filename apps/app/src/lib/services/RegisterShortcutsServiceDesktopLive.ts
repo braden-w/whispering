@@ -9,8 +9,6 @@ export const RegisterShortcutsDesktopLive = Layer.effect(
 	Effect.gen(function* () {
 		return {
 			isGlobalShortcutEnabled: true,
-			defaultLocalShortcut: 'space',
-			defaultGlobalShortcut: 'CommandOrControl+Shift+;',
 			unregisterAllLocalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>

@@ -8,7 +8,12 @@ import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceD
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
 import { toast } from '$lib/services/ToastService';
 import { recordings, settings } from '$lib/stores';
-import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
+import {
+	BITRATE_VALUES,
+	NotificationService,
+	WhisperingError,
+	type RecorderState,
+} from '@repo/shared';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
@@ -51,7 +56,8 @@ const MediaRecorderService = Effect.gen(function* () {
 				const newOrExistingStream =
 					mediaStreamManager.stream ?? (yield* mediaStreamManager.refreshStream());
 				const newMediaRecorder = yield* Effect.try({
-					try: () => new MediaRecorder(newOrExistingStream),
+					try: () =>
+						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.bitsPerSecond }),
 					catch: () => new TryResuseStreamError(),
 				}).pipe(
 					Effect.catchAll(() =>
@@ -63,7 +69,7 @@ const MediaRecorderService = Effect.gen(function* () {
 								description: 'Trying to find another available audio input device...',
 							});
 							const stream = yield* mediaStreamManager.refreshStream();
-							return new MediaRecorder(stream);
+							return new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond });
 						}),
 					),
 				);

@@ -1,5 +1,6 @@
+import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
-import { Option } from 'effect';
+import { Effect, Either } from 'effect';
 
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
@@ -28,7 +29,7 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 	 * context.
 	 *
 	 * @example
-	 * 
+	 *
 	 * ```ts
 	 * import { browser } from '$app/environment';
 	 * ...
@@ -44,9 +45,16 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
-		return S.decodeUnknownOption(jsonSchema)(valueFromStorage).pipe(
-			Option.getOrElse(() => defaultValue),
-		);
+		const parseResult = S.decodeUnknownEither(jsonSchema)(valueFromStorage);
+		if (Either.isLeft(parseResult)) {
+			toast({
+				title: 'Unable to parse storage value',
+				description: parseResult.left.message,
+				variant: 'warning',
+			}).pipe(Effect.runSync);
+			return defaultValue;
+		}
+		return parseResult.right as S.Schema.Type<TSchema>;
 	};
 
 	if (!disableLocalStorage) {

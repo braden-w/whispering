@@ -10,6 +10,13 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
+export const BITRATE_VALUES = [64_000, 96_000, 128_000, 192_000, 256_000, 320_000] as const;
+export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
+	label: `${bitrate / 1_000} kbps`,
+	value: bitrate,
+}));
+export const DEFAULT_BITRATE_MS = 64_000 as const satisfies (typeof BITRATE_VALUES)[number];
+
 export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
 	isCopyToClipboardEnabled: S.Boolean,
@@ -19,7 +26,23 @@ export const settingsSchema = S.Struct({
 	currentGlobalShortcut: S.String,
 	apiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
+	bitsPerSecond: S.optional(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
+		default: () => DEFAULT_BITRATE_MS,
+	}),
 });
+
+export const getDefaultSettings = (platform: 'app' | 'extension') =>
+	({
+		isPlaySoundEnabled: true,
+		isCopyToClipboardEnabled: true,
+		isPasteContentsOnSuccessEnabled: true,
+		selectedAudioInputDeviceId: '',
+		currentLocalShortcut: 'space',
+		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		apiKey: '',
+		outputLanguage: 'auto',
+		bitsPerSecond: DEFAULT_BITRATE_MS,
+	}) satisfies Settings;
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
