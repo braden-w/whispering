@@ -10,6 +10,9 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
+const BITRATE_OPTIONS = [64_000, 96_000, 128_000, 192_000, 256_000, 320_000] as const;
+export const DEFAULT_BITRATE = 64_000 as const satisfies (typeof BITRATE_OPTIONS)[number];
+
 export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
 	isCopyToClipboardEnabled: S.Boolean,
@@ -19,6 +22,9 @@ export const settingsSchema = S.Struct({
 	currentGlobalShortcut: S.String,
 	apiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
+	bitRate: S.optional(S.compose(S.NumberFromString, S.Literal(...BITRATE_OPTIONS)), {
+		default: () => DEFAULT_BITRATE,
+	}),
 });
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
