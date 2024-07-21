@@ -9,7 +9,7 @@ import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLi
 import { toast } from '$lib/services/ToastService';
 import { recordings, settings } from '$lib/stores';
 import {
-	BITRATES_MS,
+	BITRATE_VALUES,
 	NotificationService,
 	WhisperingError,
 	type RecorderState,
@@ -56,7 +56,8 @@ const MediaRecorderService = Effect.gen(function* () {
 				const newOrExistingStream =
 					mediaStreamManager.stream ?? (yield* mediaStreamManager.refreshStream());
 				const newMediaRecorder = yield* Effect.try({
-					try: () => new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.bitRate }),
+					try: () =>
+						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.bitsPerSecond }),
 					catch: () => new TryResuseStreamError(),
 				}).pipe(
 					Effect.catchAll(() =>
@@ -68,7 +69,7 @@ const MediaRecorderService = Effect.gen(function* () {
 								description: 'Trying to find another available audio input device...',
 							});
 							const stream = yield* mediaStreamManager.refreshStream();
-							return new MediaRecorder(stream, { bitsPerSecond: settings.bitRate });
+							return new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond });
 						}),
 					),
 				);

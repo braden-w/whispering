@@ -10,12 +10,12 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-export const BITRATES_MS = [64_000, 96_000, 128_000, 192_000, 256_000, 320_000] as const;
-export const BITRATE_OPTIONS = BITRATES_MS.map((bitrate) => ({
-	label: `${bitrate / 1000} kbps`,
+export const BITRATE_VALUES = [64_000, 96_000, 128_000, 192_000, 256_000, 320_000] as const;
+export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
+	label: `${bitrate / 1_000} kbps`,
 	value: bitrate,
 }));
-export const DEFAULT_BITRATE_MS = 64_000 as const satisfies (typeof BITRATES_MS)[number];
+export const DEFAULT_BITRATE_MS = 64_000 as const satisfies (typeof BITRATE_VALUES)[number];
 
 export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
@@ -26,7 +26,7 @@ export const settingsSchema = S.Struct({
 	currentGlobalShortcut: S.String,
 	apiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
-	bitRate: S.optional(S.compose(S.NumberFromString, S.Literal(...BITRATES_MS)), {
+	bitsPerSecond: S.optional(S.compose(S.NumberFromString, S.Literal(...BITRATE_VALUES)), {
 		default: () => DEFAULT_BITRATE_MS,
 	}),
 });

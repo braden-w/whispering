@@ -119,10 +119,10 @@
 				<Label class="text-sm" for="bit-rate">Bitrate</Label>
 				<Select.Root
 					items={BITRATE_OPTIONS}
-					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitRate)}
+					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitsPerSecond)}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
-						settings.bitRate = selected.value;
+						settings.bitsPerSecond = selected.value;
 					}}
 				>
 					<Select.Trigger class="w-full">

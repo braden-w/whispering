@@ -27,7 +27,7 @@ export const settings = Effect.gen(function* () {
 			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
 			apiKey: '',
 			outputLanguage: 'auto',
-			bitRate: DEFAULT_BITRATE_MS,
+			bitsPerSecond: DEFAULT_BITRATE_MS,
 		},
 	});
 
@@ -127,11 +127,11 @@ export const settings = Effect.gen(function* () {
 		set outputLanguage(newValue) {
 			settings.value = { ...settings.value, outputLanguage: newValue };
 		},
-		get bitRate() {
-			return settings.value.bitRate;
+		get bitsPerSecond() {
+			return settings.value.bitsPerSecond;
 		},
-		set bitRate(newValue) {
-			settings.value = { ...settings.value, bitRate: newValue };
+		set bitsPerSecond(newValue) {
+			settings.value = { ...settings.value, bitsPerSecond: newValue };
 		},
 	};
 }).pipe(
