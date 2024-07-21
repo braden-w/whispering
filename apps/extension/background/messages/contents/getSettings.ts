@@ -3,9 +3,10 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
 	WhisperingError,
 	effectToResult,
+	getDefaultSettings,
 	settingsSchema,
 	type Result,
-	type Settings,
+	type Settings
 } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
@@ -13,17 +14,6 @@ import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreate
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
-
-const DEFAULT_VALUE = {
-	isPlaySoundEnabled: true,
-	isCopyToClipboardEnabled: true,
-	isPasteContentsOnSuccessEnabled: true,
-	selectedAudioInputDeviceId: '',
-	currentLocalShortcut: 'space',
-	currentGlobalShortcut: '',
-	apiKey: '',
-	outputLanguage: 'en',
-} satisfies Settings;
 
 export type RequestBody = {};
 
@@ -56,7 +46,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 			args: [STORAGE_KEYS.SETTINGS],
 		});
 		const isEmpty = valueFromStorage === null;
-		if (isEmpty) return DEFAULT_VALUE;
+		if (isEmpty) return getDefaultSettings('extension');
 		const settings = yield* S.decodeUnknown(S.parseJson(settingsSchema))(valueFromStorage).pipe(
 			Effect.mapError(
 				(error) =>

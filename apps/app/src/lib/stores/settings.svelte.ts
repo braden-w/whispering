@@ -1,4 +1,3 @@
-import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 import { RegisterShortcutsService } from '$lib/services/RegisterShortcutsService';
 import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsServiceDesktopLive';
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
@@ -8,7 +7,7 @@ import { recorder } from '$lib/stores';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
-import { DEFAULT_BITRATE_MS, settingsSchema } from '@repo/shared';
+import { getDefaultSettings, settingsSchema } from '@repo/shared';
 import { Effect } from 'effect';
 
 type RegisterShortcutJob = Effect.Effect<void>;
@@ -18,17 +17,7 @@ export const settings = Effect.gen(function* () {
 	const settings = createPersistedState({
 		key: 'whispering-settings',
 		schema: settingsSchema.pipe(S.mutable),
-		defaultValue: {
-			isPlaySoundEnabled: true,
-			isCopyToClipboardEnabled: true,
-			isPasteContentsOnSuccessEnabled: true,
-			selectedAudioInputDeviceId: '',
-			currentLocalShortcut: registerShortcutsService.defaultLocalShortcut,
-			currentGlobalShortcut: registerShortcutsService.defaultGlobalShortcut,
-			apiKey: '',
-			outputLanguage: 'auto',
-			bitsPerSecond: DEFAULT_BITRATE_MS,
-		},
+		defaultValue: getDefaultSettings('app'),
 	});
 
 	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();

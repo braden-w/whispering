@@ -31,6 +31,19 @@ export const settingsSchema = S.Struct({
 	}),
 });
 
+export const getDefaultSettings = (platform: 'app' | 'extension') =>
+	({
+		isPlaySoundEnabled: true,
+		isCopyToClipboardEnabled: true,
+		isPasteContentsOnSuccessEnabled: true,
+		selectedAudioInputDeviceId: '',
+		currentLocalShortcut: 'space',
+		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		apiKey: '',
+		outputLanguage: 'auto',
+		bitsPerSecond: DEFAULT_BITRATE_MS,
+	}) satisfies Settings;
+
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
 export type WhisperingErrorProperties = {
