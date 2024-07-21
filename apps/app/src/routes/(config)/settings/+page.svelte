@@ -87,12 +87,9 @@
 						value: device.deviceId,
 						label: device.label,
 					}))}
-					{@const selected = items.find(
-						(item) => item.value === settings.selectedAudioInputDeviceId,
-					)}
 					<Select.Root
 						{items}
-						{selected}
+						selected={items.find((item) => item.value === settings.selectedAudioInputDeviceId)}
 						onSelectedChange={(selected) => {
 							if (!selected) return;
 							settings.selectedAudioInputDeviceId = selected.value;
