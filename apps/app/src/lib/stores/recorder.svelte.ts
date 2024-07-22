@@ -53,8 +53,7 @@ const MediaRecorderService = Effect.gen(function* () {
 					});
 				}
 				const connectingToRecordingDeviceToastId = nanoid();
-				const newOrExistingStream =
-					mediaStreamManager.stream ?? (yield* mediaStreamManager.refreshStream());
+				const newOrExistingStream = yield* mediaStreamManager.getOrRefreshStream();
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
 						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.bitsPerSecond }),

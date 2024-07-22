@@ -59,8 +59,23 @@ const getFirstAvailableStream = Effect.gen(function* () {
 export const mediaStreamManager = Effect.gen(function* () {
 	let currentStream = $state<MediaStream | null>(null);
 	return {
-		get stream() {
-			return currentStream;
+		get isStreamValid() {
+			return currentStream !== null && currentStream.active;
+		},
+		getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never> {
+			return Effect.gen(this, function* () {
+				if (currentStream === null) return yield* this.refreshStream();
+				if (!currentStream.active) {
+					yield* toast({
+						variant: 'warning',
+						title: 'Open stream is inactive',
+						description: 'Refreshing recording session...',
+					});
+					return yield* this.refreshStream();
+				}
+				const validStream = currentStream as MediaStream;
+				return validStream;
+			});
 		},
 		refreshStream() {
 			this.release();
