@@ -9,12 +9,12 @@ import { NotificationServiceContentLive } from '~lib/services/NotificationServic
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
 
-export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
+export const getInlineAnchor: PlasmoGetInlineAnchor = () => {
 	const element = document.querySelector('#prompt-textarea')?.closest('div');
-	return {
-		element,
-		insertPosition: 'afterend',
-	};
+	if (!element) {
+		return { element: document.body, insertPosition: 'afterbegin' };
+	}
+	return { element, insertPosition: 'afterend', };
 };
 
 export const config: PlasmoCSConfig = {
