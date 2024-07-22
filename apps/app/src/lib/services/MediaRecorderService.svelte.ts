@@ -59,8 +59,15 @@ const getFirstAvailableStream = Effect.gen(function* () {
 export const mediaStreamManager = Effect.gen(function* () {
 	let currentStream = $state<MediaStream | null>(null);
 	return {
-		get stream() {
-			return currentStream;
+		get isStreamValid() {
+			return currentStream !== null && currentStream.active;
+		},
+		getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never> {
+			if (this.isStreamValid) {
+				const validStream = currentStream as MediaStream;
+				return Effect.succeed(validStream);
+			}
+			return this.refreshStream();
 		},
 		refreshStream() {
 			this.release();
