@@ -58,22 +58,53 @@ const getFirstAvailableStream = Effect.gen(function* () {
 
 export const mediaStreamManager = Effect.gen(function* () {
 	let currentStream = $state<MediaStream | null>(null);
-
-	const acquireStream = (preferredRecordingDeviceId: string) =>
-		Effect.gen(function* () {
+	return {
+		get stream() {
+			return currentStream;
+		},
+		refreshStream() {
+			this.release();
 			const toastId = nanoid();
-			yield* toast({
-				id: toastId,
-				variant: 'loading',
-				title: 'Connecting to selected audio input device...',
-				description: 'Please allow access to your microphone if prompted.',
-			});
-			if (!preferredRecordingDeviceId) {
+			return Effect.gen(function* () {
 				yield* toast({
 					id: toastId,
 					variant: 'loading',
-					title: 'No device selected',
-					description: 'Defaulting to first available audio input device...',
+					title: 'Connecting to selected audio input device...',
+					description: 'Please allow access to your microphone if prompted.',
+				});
+				if (!settings.selectedAudioInputDeviceId) {
+					yield* toast({
+						id: toastId,
+						variant: 'loading',
+						title: 'No device selected',
+						description: 'Defaulting to first available audio input device...',
+					});
+					const firstAvailableStream = yield* getFirstAvailableStream;
+					currentStream = firstAvailableStream;
+					yield* toast({
+						id: toastId,
+						variant: 'info',
+						title: 'Defaulted to first available audio input device',
+						description: 'You can select a specific device in the settings.',
+					});
+					return firstAvailableStream;
+				}
+				const maybeStream = yield* getStreamForDeviceId(settings.selectedAudioInputDeviceId);
+				if (Option.isSome(maybeStream)) {
+					currentStream = maybeStream.value;
+					yield* toast({
+						id: toastId,
+						variant: 'success',
+						title: 'Connected to selected audio input device',
+						description: 'Successfully connected to your microphone stream.',
+					});
+					return maybeStream.value;
+				}
+				yield* toast({
+					id: toastId,
+					variant: 'loading',
+					title: 'Error connecting to selected audio input device',
+					description: 'Trying to find another available audio input device...',
 				});
 				const firstAvailableStream = yield* getFirstAvailableStream;
 				currentStream = firstAvailableStream;
@@ -84,42 +115,7 @@ export const mediaStreamManager = Effect.gen(function* () {
 					description: 'You can select a specific device in the settings.',
 				});
 				return firstAvailableStream;
-			}
-			const maybeStream = yield* getStreamForDeviceId(preferredRecordingDeviceId);
-			if (Option.isSome(maybeStream)) {
-				currentStream = maybeStream.value;
-				yield* toast({
-					id: toastId,
-					variant: 'success',
-					title: 'Connected to selected audio input device',
-					description: 'Successfully connected to your microphone stream.',
-				});
-				return maybeStream.value;
-			}
-			yield* toast({
-				id: toastId,
-				variant: 'loading',
-				title: 'Error connecting to selected audio input device',
-				description: 'Trying to find another available audio input device...',
-			});
-			const firstAvailableStream = yield* getFirstAvailableStream;
-			currentStream = firstAvailableStream;
-			yield* toast({
-				id: toastId,
-				variant: 'info',
-				title: 'Defaulted to first available audio input device',
-				description: 'You can select a specific device in the settings.',
-			});
-			return firstAvailableStream;
-		}).pipe(Effect.tapError(renderErrorAsToast));
-
-	return {
-		get stream() {
-			return currentStream;
-		},
-		refreshStream() {
-			this.release();
-			return acquireStream(settings.selectedAudioInputDeviceId);
+			}).pipe(Effect.tapError(renderErrorAsToast));
 		},
 		release() {
 			if (currentStream === null) return;
