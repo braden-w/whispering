@@ -69,7 +69,7 @@ export const mountShadowHost: PlasmoMountShadowHost = ({ shadowHost, anchor, mou
 };
 
 export const config: PlasmoCSConfig = {
-	matches: ['https://claude.ai/*'],
+	matches: ['https://github.com/*'],
 	all_frames: true,
 };
 
