@@ -9,16 +9,23 @@ import { NotificationServiceContentLive } from '~lib/services/NotificationServic
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
 
-export const getInlineAnchor: PlasmoGetInlineAnchor = () => {
-	const element = document.querySelector('#prompt-textarea')?.closest('div');
+export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
+	const selector = 'div[aria-label="Write your prompt to Claude"]';
+	const element = document.querySelector(selector);
 	if (!element) {
-		return { element: document.body, insertPosition: 'afterbegin' };
+		return {
+			element: document.body,
+			insertPosition: 'afterbegin',
+		};
 	}
-	return { element, insertPosition: 'afterend', };
+	return {
+		element,
+		insertPosition: 'afterend',
+	};
 };
 
 export const config: PlasmoCSConfig = {
-	matches: ['https://chatgpt.com/*'],
+	matches: ['https://claude.ai/*'],
 	all_frames: true,
 };
 
@@ -54,7 +61,7 @@ function RecorderStateAsIcon() {
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
-			className="group relative z-10 h-10 w-10 rounded-md text-2xl"
+			className="group relative z-10 h-8 w-8 rounded-md text-xl"
 			onClick={toggleRecordingFromContentScript}
 		>
 			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10"></div>
