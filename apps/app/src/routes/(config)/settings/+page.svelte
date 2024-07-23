@@ -58,7 +58,7 @@
 	<title>Settings</title>
 </svelte:head>
 
-<main class="flex w-full flex-1 items-center justify-center">
+<main class="flex w-full flex-1 items-center justify-center pb-4 pt-2">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="text-xl">Settings</Card.Title>
