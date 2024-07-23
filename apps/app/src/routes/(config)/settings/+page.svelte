@@ -68,7 +68,7 @@
 				{:then v}
 					{#if v.isOutdated}
 						{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
-						Customize your Whispering experience for {currentVersion} (latest
+						Customize your experience for Whispering {currentVersion} (latest
 						<Button
 							class="px-0"
 							variant="link"
@@ -81,7 +81,7 @@
 						</Button>).
 					{:else}
 						{@const { version } = v}
-						Customize your Whispering experience for {version}.
+						Customize your experience for Whispering {version}.
 					{/if}
 				{:catch error}
 					Customize your Whispering experience.
