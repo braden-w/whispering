@@ -16,6 +16,7 @@
 		TranscriptionService,
 		TranscriptionServiceWhisperLive,
 	} from '@repo/shared';
+	import { getTauriVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
@@ -35,6 +36,21 @@
 	const selectedLanguageOption = $derived(
 		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
 	);
+
+	const isString = (value: unknown): value is string => typeof value === 'string';
+	const versionStringPromise = (async () => {
+		const { html_url: latestReleaseUrl, tag_name: latestVersion } = await fetch(
+			'https://api.github.com/repos/braden-w/whispering/releases/latest',
+		).then((response) => response.json());
+		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
+			throw new Error('Failed to fetch latest version');
+		}
+		const currentVersion = await getTauriVersion();
+		if (latestVersion === currentVersion) {
+			return `You are using the latest version of Whispering (${currentVersion})`;
+		}
+		return `A new version of Whispering (${latestVersion}) is available. You can download it from <a href="${latestReleaseUrl}" target="_blank" rel="noopener noreferrer">here</a>.`;
+	})();
 </script>
 
 <svelte:head>
