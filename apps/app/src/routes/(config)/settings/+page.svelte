@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -16,7 +17,7 @@
 		TranscriptionService,
 		TranscriptionServiceWhisperLive,
 	} from '@repo/shared';
-	import { getTauriVersion } from '@tauri-apps/api/app';
+	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
@@ -38,18 +39,19 @@
 	);
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
-	const versionStringPromise = (async () => {
+	const versionPromise = (async () => {
 		const { html_url: latestReleaseUrl, tag_name: latestVersion } = await fetch(
 			'https://api.github.com/repos/braden-w/whispering/releases/latest',
 		).then((response) => response.json());
 		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
 			throw new Error('Failed to fetch latest version');
 		}
-		const currentVersion = await getTauriVersion();
+		if (!window.__TAURI__) return { isOutdated: false, version: latestVersion } as const;
+		const currentVersion = `v${await getVersion()}`;
 		if (latestVersion === currentVersion) {
-			return `You are using the latest version of Whispering (${currentVersion})`;
+			return { isOutdated: false, version: currentVersion } as const;
 		}
-		return `A new version of Whispering (${latestVersion}) is available. You can download it from <a href="${latestReleaseUrl}" target="_blank" rel="noopener noreferrer">here</a>.`;
+		return { isOutdated: true, latestVersion, currentVersion, latestReleaseUrl } as const;
 	})();
 </script>
 
@@ -61,7 +63,31 @@
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="text-xl">Settings</Card.Title>
-			<Card.Description>Customize your Whispering experience</Card.Description>
+			<Card.Description>
+				{#await versionPromise}
+					Customize your Whispering experience.
+				{:then v}
+					{#if v.isOutdated}
+						{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
+						Customize your Whispering experience for {currentVersion} (latest
+						<Button
+							variant="link"
+							size="inline"
+							href={latestReleaseUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{latestVersion}
+						</Button>
+						).
+					{:else}
+						{@const { version } = v}
+						Customize your Whispering experience for {version}.
+					{/if}
+				{:catch error}
+					Customize your Whispering experience.
+				{/await}
+			</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<div class="flex items-center gap-2">
@@ -243,6 +269,10 @@
 					is enabled.
 				</div>
 			</div>
+			<Alert.Root>
+				<Alert.Title>Heads up!</Alert.Title>
+				<Alert.Description>You can add components to your app using the cli.</Alert.Description>
+			</Alert.Root>
 		</Card.Content>
 		<Card.Footer>
 			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
