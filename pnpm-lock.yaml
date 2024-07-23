@@ -116,9 +116,6 @@ importers:
       tailwind-variants:
         specifier: ^0.2.1
         version: 0.2.1(tailwindcss@3.4.4)
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: 3.0.2
@@ -228,9 +225,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.4)
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.268
@@ -262,9 +256,6 @@ importers:
       effect:
         specifier: ^3.4.6
         version: 3.4.6
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       typescript:
         specifier: ^5.5.3
@@ -5246,9 +5237,6 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
-
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -6744,7 +6732,7 @@ snapshots:
       '@parcel/diagnostic': 2.9.3
       '@parcel/logger': 2.9.3
       '@parcel/profiler': 2.9.3
-      '@parcel/types': 2.9.3(@parcel/core@2.9.3)
+      '@parcel/types': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.11))
       '@parcel/utils': 2.9.3
       nullthrows: 1.1.1
 
@@ -10668,5 +10656,3 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.2: {}
-
-  zod@3.23.8: {}

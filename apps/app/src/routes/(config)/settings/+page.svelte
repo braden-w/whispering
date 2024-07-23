@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -269,10 +268,6 @@
 					is enabled.
 				</div>
 			</div>
-			<Alert.Root>
-				<Alert.Title>Heads up!</Alert.Title>
-				<Alert.Description>You can add components to your app using the cli.</Alert.Description>
-			</Alert.Root>
 		</Card.Content>
 		<Card.Footer>
 			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
