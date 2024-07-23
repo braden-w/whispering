@@ -4,8 +4,6 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { recorder } from '$lib/stores';
 	import { cn } from '$lib/utils.js';
-
-	let { children } = $props();
 </script>
 
 <header
@@ -37,6 +35,4 @@
 	<NavItems class="-mr-4" />
 </header>
 
-{#if children}
-	{@render children()}
-{/if}
+<slot />

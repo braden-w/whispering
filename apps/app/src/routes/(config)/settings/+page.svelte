@@ -16,6 +16,7 @@
 		TranscriptionService,
 		TranscriptionServiceWhisperLive,
 	} from '@repo/shared';
+	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
@@ -35,17 +36,57 @@
 	const selectedLanguageOption = $derived(
 		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
 	);
+
+	const isString = (value: unknown): value is string => typeof value === 'string';
+	const versionPromise = (async () => {
+		const { html_url: latestReleaseUrl, tag_name: latestVersion } = await fetch(
+			'https://api.github.com/repos/braden-w/whispering/releases/latest',
+		).then((response) => response.json());
+		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
+			throw new Error('Failed to fetch latest version');
+		}
+		if (!window.__TAURI__) return { isOutdated: false, version: latestVersion } as const;
+		const currentVersion = `v${await getVersion()}`;
+		if (latestVersion === currentVersion) {
+			return { isOutdated: false, version: currentVersion } as const;
+		}
+		return { isOutdated: true, latestVersion, currentVersion, latestReleaseUrl } as const;
+	})();
 </script>
 
 <svelte:head>
 	<title>Settings</title>
 </svelte:head>
 
-<main class="flex w-full flex-1 items-center justify-center">
+<main class="flex w-full flex-1 items-center justify-center pb-4 pt-2">
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="text-xl">Settings</Card.Title>
-			<Card.Description>Customize your Whispering experience</Card.Description>
+			<Card.Description>
+				{#await versionPromise}
+					Customize your Whispering experience.
+				{:then v}
+					{#if v.isOutdated}
+						{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
+						Customize your experience for Whispering {currentVersion} (latest
+						<Button
+							class="px-0"
+							variant="link"
+							size="inline"
+							href={latestReleaseUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{latestVersion}
+						</Button>).
+					{:else}
+						{@const { version } = v}
+						Customize your experience for Whispering {version}.
+					{/if}
+				{:catch error}
+					Customize your Whispering experience.
+				{/await}
+			</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<div class="flex items-center gap-2">
