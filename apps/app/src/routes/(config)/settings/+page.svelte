@@ -71,6 +71,7 @@
 						{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
 						Customize your Whispering experience for {currentVersion} (latest
 						<Button
+							class="px-0"
 							variant="link"
 							size="inline"
 							href={latestReleaseUrl}
@@ -78,8 +79,7 @@
 							rel="noopener noreferrer"
 						>
 							{latestVersion}
-						</Button>
-						).
+						</Button>).
 					{:else}
 						{@const { version } = v}
 						Customize your Whispering experience for {version}.
