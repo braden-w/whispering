@@ -9,15 +9,36 @@ import { NotificationServiceContentLive } from '~lib/services/NotificationServic
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
 
+const waitForElement = (selector: string): Promise<Element> =>
+	new Promise((resolve, reject) => {
+		const element = document.querySelector(selector);
+		if (element) return resolve(element);
+
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach(() => {
+				const element = document.querySelector(selector);
+				if (element) {
+					resolve(element);
+					observer.disconnect();
+				}
+			});
+		});
+
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+		});
+
+		// Optional timeout to prevent indefinite waiting
+		setTimeout(() => {
+			observer.disconnect();
+			reject(new Error(`Element with selector "${selector}" not found within timeout`));
+		}, 10000); // Adjust timeout as needed
+	});
+
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
 	const selector = 'div[aria-label="Write your prompt to Claude"]';
-	const element = document.querySelector(selector);
-	if (!element) {
-		return {
-			element: document.body,
-			insertPosition: 'afterbegin',
-		};
-	}
+	const element = await waitForElement(selector);
 	return {
 		element,
 		insertPosition: 'afterend',
