@@ -7,8 +7,7 @@ import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromCon
 import { waitForElement } from './utils/waitForElement';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
-	const selector = 'div[aria-label="Write your prompt to Claude"]';
-	const element = await waitForElement(selector);
+	const element = await waitForElement('div[aria-label="Write your prompt to Claude"]');
 	return {
 		element,
 		insertPosition: 'afterend',

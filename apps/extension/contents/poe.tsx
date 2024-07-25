@@ -4,16 +4,10 @@ import cssText from 'data-text:~/style.css';
 import type { PlasmoCSConfig, PlasmoGetInlineAnchor, PlasmoGetStyle } from 'plasmo';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
+import { waitForElement } from './utils/waitForElement';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
-	const selector = 'div.GrowingTextArea_growWrap__im5W3';
-	const element = document.querySelector(selector);
-	if (!element) {
-		return {
-			element: document.body,
-			insertPosition: 'afterbegin',
-		};
-	}
+	const element = await waitForElement('div.GrowingTextArea_growWrap__im5W3');
 	return {
 		element,
 		insertPosition: 'afterend',
