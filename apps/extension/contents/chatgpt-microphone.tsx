@@ -8,13 +8,14 @@ import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import type * as ToggleRecording from '../background/messages/contents/toggleRecording';
+import { waitForElement } from './waitForElement';
 
-export const getInlineAnchor: PlasmoGetInlineAnchor = () => {
-	const element = document.querySelector('#prompt-textarea')?.closest('div');
+export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
+	const element = (await waitForElement('#prompt-textarea')).closest('div');
 	if (!element) {
 		return { element: document.body, insertPosition: 'afterbegin' };
 	}
-	return { element, insertPosition: 'afterend', };
+	return { element, insertPosition: 'afterend' };
 };
 
 export const config: PlasmoCSConfig = {
