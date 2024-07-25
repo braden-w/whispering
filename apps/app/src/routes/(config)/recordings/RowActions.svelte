@@ -9,7 +9,7 @@
 		TrashIcon,
 	} from '$lib/components/icons';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { recordings } from '$lib/stores';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import EditRowDialog from './EditRowDialog.svelte';
 

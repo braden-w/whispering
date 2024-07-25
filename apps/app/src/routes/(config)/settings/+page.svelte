@@ -10,7 +10,7 @@
 		mediaStreamManager,
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-	import { settings } from '$lib/stores';
+	import { settings } from '$lib/stores/settings.svelte';
 	import {
 		BITRATE_OPTIONS,
 		TranscriptionService,

@@ -14,7 +14,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { recordings } from '$lib/stores';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
@@ -248,9 +248,7 @@
 				<WhisperingButton
 					tooltipText="Copy transcribed text from selected recordings"
 					onclick={() =>
-						recordings.copyRecordingsTextById(
-							selectedRecordingRows.map(({ id }) => id),
-						)}
+						recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
 					variant="outline"
 					size="icon"
 				>
