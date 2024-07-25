@@ -5,7 +5,9 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { recorder, recordings, settings } from '$lib/stores';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
 	const PLACEHOLDER_RECORDING = {

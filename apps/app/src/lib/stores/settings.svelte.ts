@@ -3,7 +3,7 @@ import { RegisterShortcutsDesktopLive } from '$lib/services/RegisterShortcutsSer
 import { RegisterShortcutsWebLive } from '$lib/services/RegisterShortcutsServiceWebLive';
 import { toast } from '$lib/services/ToastService';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-import { recorder } from '$lib/stores';
+import { recorder } from '$lib/stores/recorder.svelte';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';

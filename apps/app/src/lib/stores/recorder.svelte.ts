@@ -7,13 +7,9 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
 import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
 import { toast } from '$lib/services/ToastService';
-import { recordings, settings } from '$lib/stores';
-import {
-	BITRATE_VALUES,
-	NotificationService,
-	WhisperingError,
-	type RecorderState,
-} from '@repo/shared';
+import { recordings } from '$lib/stores/recordings.svelte';
+import { settings } from '$lib/stores/settings.svelte';
+import { NotificationService, WhisperingError, type RecorderState } from '@repo/shared';
 import { Data, Effect } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
