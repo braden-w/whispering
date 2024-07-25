@@ -3881,7 +3881,7 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash.sortby@4.7.0:
+  lodash.sortby@4.7.1:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
 
   lodash@4.17.21:
@@ -9253,7 +9253,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash.sortby@4.7.0: {}
+  lodash.sortby@4.7.1: {}
 
   lodash@4.17.21: {}
 
@@ -10609,7 +10609,7 @@ snapshots:
 
   whatwg-url@7.1.0:
     dependencies:
-      lodash.sortby: 4.7.0
+      lodash.sortby: 4.7.1
       tr46: 1.0.1
       webidl-conversions: 4.0.2
 
