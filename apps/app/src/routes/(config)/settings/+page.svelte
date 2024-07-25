@@ -39,9 +39,8 @@
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
 	const versionPromise = (async () => {
-		const { html_url: latestReleaseUrl, tag_name: latestVersion } = await fetch(
-			'https://api.github.com/repos/braden-w/whispering/releases/latest',
-		).then((response) => response.json());
+		const res = await fetch('https://api.github.com/repos/braden-w/whispering/releases/latest');
+		const { html_url: latestReleaseUrl, tag_name: latestVersion } = await res.json();
 		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
 			throw new Error('Failed to fetch latest version');
 		}
