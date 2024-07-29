@@ -1,10 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import {
-	TranscriptionService,
-	TranscriptionServiceWhisperLive,
-	WHISPERING_URL,
-	type Settings,
-} from '@repo/shared';
+import { supportedLanguagesOptions, WHISPERING_URL, type Settings } from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -12,7 +7,6 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import { Effect } from 'effect';
 import * as GetSettings from '~background/messages/contents/getSettings';
 import * as SetSettings from '~background/messages/contents/setSettings';
 import { Button } from '~components/ui/button';
@@ -104,12 +98,6 @@ function SettingsCard() {
 			return audioInputDevices;
 		},
 	});
-
-	const supportedLanguagesOptions = Effect.gen(function* () {
-		const transcriptionService = yield* TranscriptionService;
-		const languages = transcriptionService.supportedLanguages;
-		return languages;
-	}).pipe(Effect.provide(TranscriptionServiceWhisperLive), Effect.runSync);
 
 	if (isSettingsLoading) {
 		return <CardContent>Loading...</CardContent>;
@@ -236,12 +224,9 @@ function SettingsCard() {
 							<SelectValue placeholder="Select a device" />
 						</SelectTrigger>
 						<SelectContent className="max-h-96 overflow-auto">
-							{supportedLanguagesOptions.map((supportedLanguagesOption) => (
-								<SelectItem
-									key={supportedLanguagesOption.value}
-									value={supportedLanguagesOption.value}
-								>
-									{supportedLanguagesOption.label}
+							{supportedLanguagesOptions.map(({ value, label }) => (
+								<SelectItem key={value} value={value}>
+									{label}
 								</SelectItem>
 							))}
 						</SelectContent>

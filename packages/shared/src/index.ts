@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
-import { SUPPORTED_LANGUAGES } from './services/TranscriptionServiceWhisperingLive.js';
+import { SUPPORTED_LANGUAGES } from './services/TranscriptionService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'

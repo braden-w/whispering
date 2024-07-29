@@ -11,7 +11,7 @@ import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import {
 	NotificationService,
 	TranscriptionService,
-	TranscriptionServiceWhisperLive,
+	TranscriptionServiceWhisperingLive,
 	WhisperingError,
 } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
@@ -302,7 +302,7 @@ export const recordings = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(TranscriptionServiceWhisperLive),
+	Effect.provide(TranscriptionServiceWhisperingLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,

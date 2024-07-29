@@ -11,11 +11,7 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import {
-		BITRATE_OPTIONS,
-		TranscriptionService,
-		TranscriptionServiceWhisperLive,
-	} from '@repo/shared';
+	import { BITRATE_OPTIONS, supportedLanguagesOptions } from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
@@ -26,12 +22,6 @@
 		}),
 		Effect.runPromise,
 	);
-
-	const supportedLanguagesOptions = Effect.gen(function* () {
-		const transcriptionService = yield* TranscriptionService;
-		const languages = transcriptionService.supportedLanguages;
-		return languages;
-	}).pipe(Effect.provide(TranscriptionServiceWhisperLive), Effect.runSync);
 
 	const selectedLanguageOption = $derived(
 		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
@@ -189,12 +179,9 @@
 						<Select.Value placeholder="Select a device" />
 					</Select.Trigger>
 					<Select.Content class="max-h-96 overflow-auto">
-						{#each supportedLanguagesOptions as supportedLanguagesOption}
-							<Select.Item
-								value={supportedLanguagesOption.value}
-								label={supportedLanguagesOption.label}
-							>
-								{supportedLanguagesOption.label}
+						{#each supportedLanguagesOptions as { value, label }}
+							<Select.Item {value} {label}>
+								{label}
 							</Select.Item>
 						{/each}
 					</Select.Content>
