@@ -150,10 +150,10 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 			Effect.gen(function* () {
 				if (!apiKey.startsWith('sk-')) {
 					return yield* new WhisperingError({
-						title: 'Invalid API Key',
-						description: 'The API Key must start with "sk-"',
+						title: 'Invalid OpenAI API Key',
+						description: 'The OpenAI API Key must start with "sk-"',
 						action: {
-							label: 'Update API Key',
+							label: 'Update OpenAI API Key',
 							goto: '/settings',
 						},
 					});

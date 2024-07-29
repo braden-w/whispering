@@ -150,8 +150,8 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 			Effect.gen(function* () {
 				if (!apiKey.startsWith('gsk_')) {
 					return yield* new WhisperingError({
-						title: 'Invalid API Key',
-						description: 'The API Key must start with "gsk_"',
+						title: 'Invalid Groq API Key',
+						description: 'The Groq API Key must start with "gsk_"',
 						action: {
 							label: 'Update API Key',
 							goto: '/settings',
@@ -204,7 +204,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				);
 				if ('error' in data) {
 					return yield* new WhisperingError({
-						title: 'Server error from Whisper API',
+						title: 'Server error from Groq API',
 						description: data.error.message,
 						error: data.error,
 					});
