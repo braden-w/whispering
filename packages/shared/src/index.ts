@@ -26,7 +26,7 @@ export const settingsSchema = S.Struct({
 	currentGlobalShortcut: S.String,
 	apiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
-	bitsPerSecond: S.optional(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
+	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
 		default: () => DEFAULT_BITRATE_MS,
 	}),
 });
