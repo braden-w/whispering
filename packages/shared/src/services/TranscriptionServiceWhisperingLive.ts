@@ -1,5 +1,7 @@
+import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
+import { Schema } from '@effect/schema';
 import { WhisperingError } from '@repo/shared';
-import { Effect, Layer, Option } from 'effect';
+import { Effect, Layer } from 'effect';
 import { TranscriptionService } from './TranscriptionService.js';
 
 function isString(input: unknown): input is string {
@@ -168,31 +170,43 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				formData.append('file', wavFile);
 				formData.append('model', 'whisper-1');
 				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
-				const data = yield* Effect.tryPromise({
-					try: () =>
-						fetch('https://api.openai.com/v1/audio/transcriptions', {
-							method: 'POST',
-							headers: { Authorization: `Bearer ${apiKey}` },
-							body: formData,
-						}).then((res) => res.json()),
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Failed to fetch transcription from Whisper API',
-							description: error instanceof Error ? error.message : 'Please try again.',
-							error,
-						}),
-				});
-				if (data?.error?.message) {
+				const data = yield* HttpClientRequest.post(
+					'https://api.openai.com/v1/audio/transcriptions',
+				).pipe(
+					HttpClientRequest.setHeaders({
+						Authorization: `Bearer ${apiKey}`,
+					}),
+					HttpClientRequest.formDataBody(formData),
+					HttpClient.fetch,
+					Effect.andThen(
+						HttpClientResponse.schemaBodyJson(
+							Schema.Union(
+								Schema.Struct({
+									text: Schema.String,
+								}),
+								Schema.Struct({
+									error: Schema.Struct({
+										message: Schema.String,
+									}),
+								}),
+							),
+						),
+					),
+					Effect.scoped,
+					Effect.mapError(
+						(error) =>
+							new WhisperingError({
+								title: 'Error transcribing audio',
+								description: error.message,
+								error,
+							}),
+					),
+				);
+				if ('error' in data) {
 					return yield* new WhisperingError({
 						title: 'Server error from Whisper API',
 						description: data.error.message,
-						error: data?.error,
-					});
-				}
-				if (!isString(data.text)) {
-					return yield* new WhisperingError({
-						title: 'Transcription from Whisper API is invalid or not a string',
-						description: 'This is likely a server error on their part. Please try again.',
+						error: data.error,
 					});
 				}
 				return data.text;
