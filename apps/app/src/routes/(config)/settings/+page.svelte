@@ -11,7 +11,7 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, supportedLanguagesOptions } from '@repo/shared';
+	import { BITRATE_OPTIONS, SUPPORTED_LANGUAGES_OPTIONS } from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
@@ -24,7 +24,7 @@
 	);
 
 	const selectedLanguageOption = $derived(
-		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
+		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.outputLanguage),
 	);
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
@@ -168,7 +168,7 @@
 			<div class="grid gap-2">
 				<Label class="text-sm" for="output-language">Output Language</Label>
 				<Select.Root
-					items={supportedLanguagesOptions}
+					items={SUPPORTED_LANGUAGES_OPTIONS}
 					selected={selectedLanguageOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
@@ -179,7 +179,7 @@
 						<Select.Value placeholder="Select a device" />
 					</Select.Trigger>
 					<Select.Content class="max-h-96 overflow-auto">
-						{#each supportedLanguagesOptions as { value, label }}
+						{#each SUPPORTED_LANGUAGES_OPTIONS as { value, label }}
 							<Select.Item {value} {label}>
 								{label}
 							</Select.Item>

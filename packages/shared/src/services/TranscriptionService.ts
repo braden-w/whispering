@@ -66,7 +66,7 @@ export const SUPPORTED_LANGUAGES = [
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const SUPPORTED_LANGUAGES_TO_LABEL = {
+const SUPPORTED_LANGUAGES_TO_LABEL = {
 	auto: 'Auto',
 	af: 'Afrikaans',
 	ar: 'Arabic',
@@ -127,7 +127,7 @@ export const SUPPORTED_LANGUAGES_TO_LABEL = {
 	cy: 'Welsh',
 } as const satisfies Record<SupportedLanguage, string>;
 
-export const supportedLanguagesOptions = SUPPORTED_LANGUAGES.map(
+export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
 	(lang) => ({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
 );
 

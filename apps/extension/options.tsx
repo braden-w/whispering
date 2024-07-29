@@ -1,5 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { supportedLanguagesOptions, WHISPERING_URL, type Settings } from '@repo/shared';
+import { SUPPORTED_LANGUAGES_OPTIONS, WHISPERING_URL, type Settings } from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -224,7 +224,7 @@ function SettingsCard() {
 							<SelectValue placeholder="Select a device" />
 						</SelectTrigger>
 						<SelectContent className="max-h-96 overflow-auto">
-							{supportedLanguagesOptions.map(({ value, label }) => (
+							{SUPPORTED_LANGUAGES_OPTIONS.map(({ value, label }) => (
 								<SelectItem key={value} value={value}>
 									{label}
 								</SelectItem>
