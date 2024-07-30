@@ -136,12 +136,12 @@
 	let columnVisibility = createPersistedState({
 		key: 'whispering-data-table-column-visibility',
 		defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
-		schema: S.Record(S.String, S.Boolean).pipe(S.mutable),
+		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
 	});
 	let rowSelection = createPersistedState({
 		key: 'whispering-data-table-row-selection',
 		defaultValue: {},
-		schema: S.Record(S.String, S.Boolean).pipe(S.mutable),
+		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
 	});
 
 	function createUpdater<T>(state: { value: T }) {

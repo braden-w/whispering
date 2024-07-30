@@ -8,10 +8,11 @@
 		".": "./src/index.ts"
 	},
 	"devDependencies": {
-		"typescript": "^5.5.3"
+		"typescript": "^5.5.4"
 	},
 	"dependencies": {
-		"@effect/schema": "^0.68.15",
-		"effect": "^3.4.6"
+		"@effect/platform": "^0.60.2",
+		"@effect/schema": "^0.69.2",
+		"effect": "^3.5.8"
 	}
 }
