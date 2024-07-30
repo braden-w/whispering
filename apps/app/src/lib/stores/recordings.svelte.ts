@@ -220,7 +220,7 @@ export const recordings = Effect.gen(function* () {
 						descriptionClass: 'line-clamp-2',
 					});
 				}
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+			}),
 		downloadRecording: (id: string) =>
 			Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);

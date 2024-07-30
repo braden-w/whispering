@@ -185,36 +185,32 @@ export const recorder = Effect.gen(function* () {
 						return;
 					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
-						yield* Effect.all([
-							Effect.sync(() => (recorderState.value = 'IDLE')),
-							Effect.logInfo('Recording stopped'),
-							Effect.gen(function* () {
-								if (settings.isPlaySoundEnabled) {
-									if (!document.hidden) {
-										stopSound.play();
-									} else {
-										yield* sendMessageToExtension({
-											name: 'external/playSound',
-											body: { sound: 'stop' },
-										});
-									}
-								}
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-							Effect.gen(function* () {
-								const newRecording: Recording = {
-									id: nanoid(),
-									title: '',
-									subtitle: '',
-									timestamp: new Date().toISOString(),
-									transcribedText: '',
-									blob: audioBlob,
-									transcriptionStatus: 'UNPROCESSED',
-								};
-								yield* recordings.addRecording(newRecording);
-								recordings.transcribeRecording(newRecording.id);
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-						]);
-						return;
+						recorderState.value = 'IDLE';
+						yield* Effect.logInfo('Recording stopped');
+
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								stopSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'stop' },
+								});
+							}
+						}
+
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob: audioBlob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+						yield* recordings.addRecording(newRecording);
+
+						yield* recordings.transcribeRecording(newRecording.id);
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		cancelRecording: () =>

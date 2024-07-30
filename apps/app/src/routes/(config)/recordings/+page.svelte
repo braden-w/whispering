@@ -14,12 +14,14 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
+	import { Effect } from 'effect';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -223,13 +225,15 @@
 					tooltipText="Transcribe selected recordings"
 					variant="outline"
 					size="icon"
-					onclick={() => {
-						Promise.all(
+					onclick={() =>
+						Effect.all(
 							selectedRecordingRows.map((recording) =>
-								recordings.transcribeRecording(recording.id),
+								recordings
+									.transcribeRecording(recording.id)
+									.pipe(Effect.catchAll(renderErrorAsToast)),
 							),
-						);
-					}}
+							{ concurrency: 'unbounded' },
+						).pipe(Effect.runPromise)}
 				>
 					{#if selectedRecordingRows.some(({ id }) => {
 						const currentRow = recordings.value.find((r) => r.id === id);
