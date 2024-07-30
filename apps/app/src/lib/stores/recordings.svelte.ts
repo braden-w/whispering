@@ -288,8 +288,8 @@ export const recordings = Effect.gen(function* () {
 				const transcriptions = recordingIds
 					.map((id) => recordings.find((r) => r.id === id))
 					.filter((recording) => recording !== undefined)
-					.map((recording) => recording.transcribedText)
-					.filter((transcription) => transcription !== '');
+					.filter((recording) => recording.transcribedText !== '')
+					.map((recording) => `${recording.timestamp}\n\n${recording.transcribedText}`);
 				const text = transcriptions.join('\n\n');
 				yield* clipboardService.setClipboardText(text);
 				yield* toast({
