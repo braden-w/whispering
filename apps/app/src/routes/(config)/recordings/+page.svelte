@@ -207,9 +207,9 @@
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex items-center gap-2 overflow-auto">
+		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
 			<form
-				class="flex max-w-sm gap-2"
+				class="flex w-full max-w-sm gap-2"
 				on:submit={(e) => {
 					e.preventDefault();
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
@@ -218,6 +218,7 @@
 				<Input placeholder="Filter transcripts..." type="text" bind:value={filterQuery} />
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
+
 			{#if selectedRecordingRows.length > 0}
 				<WhisperingButton
 					tooltipText="Transcribe selected recordings"
@@ -266,10 +267,12 @@
 					<TrashIcon class="h-4 w-4" />
 				</WhisperingButton>
 			{/if}
+
 			<div class="text-muted-foreground hidden text-sm sm:block">
 				{selectedRecordingRows.length} of
 				{table.getFilteredRowModel().rows.length} row(s) selected.
 			</div>
+
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
 					<Button
@@ -292,6 +295,7 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		</div>
+
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup}
