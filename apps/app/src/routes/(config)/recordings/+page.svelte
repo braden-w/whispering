@@ -15,6 +15,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recordings } from '$lib/stores/recordings.svelte';
+	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
@@ -207,9 +208,9 @@
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex items-center gap-2 overflow-auto">
+		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
 			<form
-				class="flex max-w-sm gap-2"
+				class="flex w-full max-w-sm gap-2"
 				on:submit={(e) => {
 					e.preventDefault();
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
@@ -218,80 +219,91 @@
 				<Input placeholder="Filter transcripts..." type="text" bind:value={filterQuery} />
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
-			{#if selectedRecordingRows.length > 0}
-				<WhisperingButton
-					tooltipText="Transcribe selected recordings"
-					variant="outline"
-					size="icon"
-					onclick={() => {
-						Promise.all(
-							selectedRecordingRows.map((recording) =>
-								recordings.transcribeRecording(recording.id),
-							),
-						);
-					}}
-				>
-					{#if selectedRecordingRows.some(({ id }) => {
-						const currentRow = recordings.value.find((r) => r.id === id);
-						return currentRow?.transcriptionStatus === 'TRANSCRIBING';
-					})}
-						<LoadingTranscriptionIcon class="h-4 w-4" />
-					{:else if selectedRecordingRows.some(({ id }) => {
-						const currentRow = recordings.value.find((r) => r.id === id);
-						return currentRow?.transcriptionStatus === 'DONE';
-					})}
-						<RetryTranscriptionIcon class="h-4 w-4" />
-					{:else}
-						<StartTranscriptionIcon class="h-4 w-4" />
-					{/if}
-				</WhisperingButton>
-				<WhisperingButton
-					tooltipText="Copy transcribed text from selected recordings"
-					onclick={() =>
-						recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
-					variant="outline"
-					size="icon"
-				>
-					<ClipboardIcon class="h-4 w-4" />
-				</WhisperingButton>
-				<WhisperingButton
-					tooltipText="Delete selected recordings"
-					variant="outline"
-					size="icon"
-					onclick={() => {
-						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings.deleteRecordingsById(ids);
-					}}
-				>
-					<TrashIcon class="h-4 w-4" />
-				</WhisperingButton>
-			{/if}
-			<div class="text-muted-foreground hidden text-sm sm:block">
-				{selectedRecordingRows.length} of
-				{table.getFilteredRowModel().rows.length} row(s) selected.
-			</div>
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild let:builder>
-					<Button
+
+			<div class="flex w-full items-center justify-between gap-2">
+				{#if selectedRecordingRows.length > 0}
+					<WhisperingButton
+						tooltipText="Transcribe selected recordings"
 						variant="outline"
-						class="ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180"
-						builders={[builder]}
+						size="icon"
+						onclick={() => {
+							Promise.all(
+								selectedRecordingRows.map((recording) =>
+									recordings.transcribeRecording(recording.id),
+								),
+							);
+						}}
 					>
-						Columns <ChevronDownIcon class="ml-2 h-4 w-4 transition-transform duration-200" />
-					</Button>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content>
-					{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
-						<DropdownMenu.CheckboxItem
-							checked={column.getIsVisible()}
-							onCheckedChange={(value) => column.toggleVisibility(!!value)}
+						{#if selectedRecordingRows.some(({ id }) => {
+							const currentRow = recordings.value.find((r) => r.id === id);
+							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
+						})}
+							<LoadingTranscriptionIcon class="h-4 w-4" />
+						{:else if selectedRecordingRows.some(({ id }) => {
+							const currentRow = recordings.value.find((r) => r.id === id);
+							return currentRow?.transcriptionStatus === 'DONE';
+						})}
+							<RetryTranscriptionIcon class="h-4 w-4" />
+						{:else}
+							<StartTranscriptionIcon class="h-4 w-4" />
+						{/if}
+					</WhisperingButton>
+					<WhisperingButton
+						tooltipText="Copy transcribed text from selected recordings"
+						onclick={() =>
+							recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
+						variant="outline"
+						size="icon"
+					>
+						<ClipboardIcon class="h-4 w-4" />
+					</WhisperingButton>
+					<WhisperingButton
+						tooltipText="Delete selected recordings"
+						variant="outline"
+						size="icon"
+						onclick={() => {
+							const ids = selectedRecordingRows.map(({ id }) => id);
+							recordings.deleteRecordingsById(ids);
+						}}
+					>
+						<TrashIcon class="h-4 w-4" />
+					</WhisperingButton>
+				{/if}
+
+				<div
+					class={cn(
+						'text-muted-foreground text-sm sm:block',
+						selectedRecordingRows.length > 0 && 'hidden',
+					)}
+				>
+					{selectedRecordingRows.length} of
+					{table.getFilteredRowModel().rows.length} row(s) selected.
+				</div>
+
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button
+							variant="outline"
+							class="ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180"
+							builders={[builder]}
 						>
-							{column.columnDef.meta?.headerText}
-						</DropdownMenu.CheckboxItem>
-					{/each}
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+							Columns <ChevronDownIcon class="ml-2 h-4 w-4 transition-transform duration-200" />
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content>
+						{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
+							<DropdownMenu.CheckboxItem
+								checked={column.getIsVisible()}
+								onCheckedChange={(value) => column.toggleVisibility(!!value)}
+							>
+								{column.columnDef.meta?.headerText}
+							</DropdownMenu.CheckboxItem>
+						{/each}
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 		</div>
+
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup}
