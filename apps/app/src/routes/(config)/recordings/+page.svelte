@@ -211,6 +211,8 @@
 	let template = $state('${transcribedText}');
 	let delimiter = $state('\n\n');
 
+	let isDialogOpen = $state(false);
+
 	let text = $derived.by(() => {
 		const transcriptions = selectedRecordingRows
 			.map(({ original }) => original)
@@ -287,7 +289,7 @@
 						{/if}
 					</WhisperingButton>
 
-					<Dialog.Root>
+					<Dialog.Root open={isDialogOpen} onOpenChange={(v) => (isDialogOpen = v)}>
 						<Dialog.Trigger>
 							<WhisperingButton
 								tooltipText="Copy transcribed text from selected recordings"
@@ -328,6 +330,7 @@
 												description: text,
 												descriptionClass: 'line-clamp-2',
 											});
+											isDialogOpen = false;
 										}).pipe(
 											Effect.catchAll(renderErrorAsToast),
 											Effect.provide(
