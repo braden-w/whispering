@@ -10,10 +10,10 @@ importers:
     devDependencies:
       '@parcel/optimizer-data-url':
         specifier: 2.9.3
-        version: 2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)
+        version: 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
       '@parcel/transformer-inline-string':
         specifier: 2.9.3
-        version: 2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)
+        version: 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
       '@typescript-eslint/eslint-plugin':
         specifier: latest
         version: 7.17.0(@typescript-eslint/parser@7.17.0(eslint@9.8.0)(typescript@5.5.4))(eslint@9.8.0)(typescript@5.5.4)
@@ -104,9 +104,6 @@ importers:
       nanoid:
         specifier: ^5.0.7
         version: 5.0.7
-      svelte-french-toast:
-        specifier: ^1.2.0
-        version: 1.2.0(svelte@5.0.0-next.191)
       svelte-sonner:
         specifier: ^0.3.27
         version: 0.3.27(svelte@5.0.0-next.191)
@@ -146,7 +143,7 @@ importers:
         version: 5.0.0-next.191
       svelte-check:
         specifier: ^3.8.4
-        version: 3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)
+        version: 3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)
       tailwindcss:
         specifier: ^3.4.7
         version: 3.4.7
@@ -281,10 +278,10 @@ importers:
         version: 5.0.0-next.169
       svelte-check:
         specifier: ^3.8.4
-        version: 3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)
+        version: 3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)
       svelte-eslint-parser:
         specifier: ^0.39.2
-        version: 0.41.0(svelte@5.0.0-next.169)
+        version: 0.39.2(svelte@5.0.0-next.169)
 
 packages:
 
@@ -1052,10 +1049,6 @@ packages:
     resolution: {integrity: sha512-RK1QwcSdWDNUsFvuLy0hgnYKtPQebzCb0vPPzqs6LhL+vqUu9utOyRycGaQffHCkHVQP6zGlN+KFssd7YtFGhA==}
     engines: {node: '>= 12.0.0', parcel: ^2.9.3}
 
-  '@parcel/optimizer-data-url@2.12.0':
-    resolution: {integrity: sha512-9g7+1bXZkLFFQ2cLm+CsiJzxMMSDxdo3w3xcqzIj5hcha22jaPP6N1weCAbfxkd6D8wgmljeNUzewFMT0Ob2FQ==}
-    engines: {node: '>= 12.0.0', parcel: ^2.12.0}
-
   '@parcel/optimizer-data-url@2.9.3':
     resolution: {integrity: sha512-k8lOKLzgZ24JKOuyrNe5PptoH8GJ78AwnumG1xEOKZ77gZnUgdrn3XdjzE28ZqTI4LFkT3jApUiBKBmqnWDe7Q==}
     engines: {node: '>= 12.0.0', parcel: ^2.9.3}
@@ -1197,10 +1190,6 @@ packages:
     engines: {node: '>= 12.0.0', parcel: ^2.9.3}
     peerDependencies:
       '@parcel/core': ^2.9.3
-
-  '@parcel/transformer-inline-string@2.12.0':
-    resolution: {integrity: sha512-FawH7Hgc7E8/Uc0t1UlFT2AdKdEQysu6OJp88NJixAqNhZT7G24OtKltM+VyayPxQZyLblPcp6TnYpY+Tz9VGA==}
-    engines: {node: '>= 12.0.0', parcel: ^2.12.0}
 
   '@parcel/transformer-inline-string@2.9.3':
     resolution: {integrity: sha512-IZNd0Ksl32psX1M41KbUc4BmvVSoLVnlpaMrh9C/l+piFSkDXWMnF0PONX/RcxYMBIwB2jYllheIKH54naeNaA==}
@@ -4303,24 +4292,6 @@ packages:
       ts-node:
         optional: true
 
-  postcss-load-config@6.0.1:
-    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      jiti: '>=1.21.0'
-      postcss: '>=8.0.9'
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      jiti:
-        optional: true
-      postcss:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
-        optional: true
-
   postcss-nested@6.2.0:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
     engines: {node: '>=12.0'}
@@ -4781,6 +4752,15 @@ packages:
     peerDependencies:
       svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0 || ^5.0.0-next.0
 
+  svelte-eslint-parser@0.39.2:
+    resolution: {integrity: sha512-87UwLuWTtDIuzWOhOi1zBL5wYVd07M5BK1qZ57YmXJB5/UmjUNJqGy3XSOhPqjckY1dATNV9y+mx+nI0WH6HPA==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0-next.115
+    peerDependenciesMeta:
+      svelte:
+        optional: true
+
   svelte-eslint-parser@0.41.0:
     resolution: {integrity: sha512-L6f4hOL+AbgfBIB52Z310pg1d2QjRqm7wy3kI1W6hhdhX5bvu7+f0R6w4ykp5HoDdzq+vGhIJmsisaiJDGmVfA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -4789,11 +4769,6 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
-
-  svelte-french-toast@1.2.0:
-    resolution: {integrity: sha512-5PW+6RFX3xQPbR44CngYAP1Sd9oCq9P2FOox4FZffzJuZI2mHOB7q5gJBVnOiLF5y3moVGZ7u2bYt7+yPAgcEQ==}
-    peerDependencies:
-      svelte: ^3.57.0 || ^4.0.0
 
   svelte-hmr@0.16.0:
     resolution: {integrity: sha512-Gyc7cOS3VJzLlfj7wKS0ZnzDVdv3Pn2IuVeJPk9m2skfhcu5bq3wtIZyQGggr7/Iim5rH5cncyQft/kRLupcnA==}
@@ -4842,11 +4817,6 @@ packages:
     resolution: {integrity: sha512-+PvbuePNTyTNCepCWqKcFeu+Lo27yYuwfSc7zJvrWjCRMJrWAmccPg3j7jO1W13QoN3TySXU5Trb956VBQiM5Q==}
     peerDependencies:
       svelte: ^3.0.0 || ^4.0.0 || ^5.0.0-next.1
-
-  svelte-writable-derived@3.1.1:
-    resolution: {integrity: sha512-w4LR6/bYZEuCs7SGr+M54oipk/UQKtiMadyOhW0PTwAtJ/Ai12QS77sLngEcfBx2q4H8ZBQucc9ktSA5sUGZWw==}
-    peerDependencies:
-      svelte: ^3.2.1 || ^4.0.0-next.1 || ^5.0.0-next.94
 
   svelte2tsx@0.7.13:
     resolution: {integrity: sha512-aObZ93/kGAiLXA/I/kP+x9FriZM+GboB/ReOIGmLNbVGEd2xC+aTCppm3mk1cc9I/z60VQf7b2QDxC3jOXu3yw==}
@@ -5750,6 +5720,14 @@ snapshots:
       '@parcel/utils': 2.8.3
       lmdb: 2.5.2
 
+  '@parcel/cache@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/core': 2.12.0(@swc/helpers@0.5.12)
+      '@parcel/fs': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/logger': 2.9.3
+      '@parcel/utils': 2.9.3
+      lmdb: 2.7.11
+
   '@parcel/cache@2.9.3(@parcel/core@2.9.3)':
     dependencies:
       '@parcel/core': 2.9.3
@@ -5925,6 +5903,15 @@ snapshots:
       '@parcel/watcher': 2.2.0
       '@parcel/workers': 2.8.3(@parcel/core@2.9.3)
 
+  '@parcel/fs@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/core': 2.12.0(@swc/helpers@0.5.12)
+      '@parcel/fs-search': 2.9.3
+      '@parcel/types': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/utils': 2.9.3
+      '@parcel/watcher': 2.2.0
+      '@parcel/workers': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+
   '@parcel/fs@2.9.3(@parcel/core@2.9.3)':
     dependencies:
       '@parcel/core': 2.9.3
@@ -5986,6 +5973,17 @@ snapshots:
     transitivePeerDependencies:
       - '@parcel/core'
 
+  '@parcel/node-resolver-core@3.0.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@mischnic/json-sourcemap': 0.1.1
+      '@parcel/diagnostic': 2.9.3
+      '@parcel/fs': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/utils': 2.9.3
+      nullthrows: 1.1.1
+      semver: 7.5.4
+    transitivePeerDependencies:
+      - '@parcel/core'
+
   '@parcel/node-resolver-core@3.0.3(@parcel/core@2.9.3)':
     dependencies:
       '@mischnic/json-sourcemap': 0.1.1
@@ -6021,15 +6019,14 @@ snapshots:
     transitivePeerDependencies:
       - '@parcel/core'
 
-  '@parcel/optimizer-data-url@2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)':
+  '@parcel/optimizer-data-url@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
     dependencies:
-      '@parcel/plugin': 2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)
-      '@parcel/utils': 2.12.0
+      '@parcel/plugin': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/utils': 2.9.3
       isbinaryfile: 4.0.10
       mime: 2.6.0
     transitivePeerDependencies:
       - '@parcel/core'
-      - '@swc/helpers'
 
   '@parcel/optimizer-data-url@2.9.3(@parcel/core@2.9.3)':
     dependencies:
@@ -6113,6 +6110,18 @@ snapshots:
       '@parcel/workers': 2.8.3(@parcel/core@2.9.3)
       semver: 5.7.2
 
+  '@parcel/package-manager@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/core': 2.12.0(@swc/helpers@0.5.12)
+      '@parcel/diagnostic': 2.9.3
+      '@parcel/fs': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/logger': 2.9.3
+      '@parcel/node-resolver-core': 3.0.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/types': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/utils': 2.9.3
+      '@parcel/workers': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      semver: 7.5.4
+
   '@parcel/package-manager@2.9.3(@parcel/core@2.9.3)':
     dependencies:
       '@parcel/core': 2.9.3
@@ -6182,6 +6191,12 @@ snapshots:
   '@parcel/plugin@2.8.3(@parcel/core@2.9.3)':
     dependencies:
       '@parcel/types': 2.8.3(@parcel/core@2.9.3)
+    transitivePeerDependencies:
+      - '@parcel/core'
+
+  '@parcel/plugin@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/types': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
     transitivePeerDependencies:
       - '@parcel/core'
 
@@ -6325,12 +6340,11 @@ snapshots:
       '@parcel/workers': 2.9.3(@parcel/core@2.9.3)
       nullthrows: 1.1.1
 
-  '@parcel/transformer-inline-string@2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)':
+  '@parcel/transformer-inline-string@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
     dependencies:
-      '@parcel/plugin': 2.12.0(@parcel/core@2.12.0(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)
+      '@parcel/plugin': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
     transitivePeerDependencies:
       - '@parcel/core'
-      - '@swc/helpers'
 
   '@parcel/transformer-inline-string@2.9.3(@parcel/core@2.9.3)':
     dependencies:
@@ -6464,6 +6478,18 @@ snapshots:
       '@parcel/package-manager': 2.8.3(@parcel/core@2.9.3)
       '@parcel/source-map': 2.1.1
       '@parcel/workers': 2.8.3(@parcel/core@2.9.3)
+      utility-types: 3.11.0
+    transitivePeerDependencies:
+      - '@parcel/core'
+
+  '@parcel/types@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/cache': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/diagnostic': 2.9.3
+      '@parcel/fs': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/package-manager': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/source-map': 2.1.1
+      '@parcel/workers': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
       utility-types: 3.11.0
     transitivePeerDependencies:
       - '@parcel/core'
@@ -6636,6 +6662,16 @@ snapshots:
       '@parcel/types': 2.8.3(@parcel/core@2.9.3)
       '@parcel/utils': 2.8.3
       chrome-trace-event: 1.0.4
+      nullthrows: 1.1.1
+
+  '@parcel/workers@2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))':
+    dependencies:
+      '@parcel/core': 2.12.0(@swc/helpers@0.5.12)
+      '@parcel/diagnostic': 2.9.3
+      '@parcel/logger': 2.9.3
+      '@parcel/profiler': 2.9.3
+      '@parcel/types': 2.9.3(@parcel/core@2.12.0(@swc/helpers@0.5.12))
+      '@parcel/utils': 2.9.3
       nullthrows: 1.1.1
 
   '@parcel/workers@2.9.3(@parcel/core@2.9.3)':
@@ -9601,13 +9637,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.40
 
-  postcss-load-config@6.0.1(postcss@8.4.40):
-    dependencies:
-      lilconfig: 3.1.2
-    optionalDependencies:
-      postcss: 8.4.40
-    optional: true
-
   postcss-nested@6.2.0(postcss@8.4.40):
     dependencies:
       postcss: 8.4.40
@@ -10024,14 +10053,14 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169):
+  svelte-check@3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       chokidar: 3.6.0
       picocolors: 1.0.1
       sade: 1.8.1
       svelte: 5.0.0-next.169
-      svelte-preprocess: 5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)(typescript@5.5.4)
+      svelte-preprocess: 5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)(typescript@5.5.4)
       typescript: 5.5.4
     transitivePeerDependencies:
       - '@babel/core'
@@ -10044,14 +10073,14 @@ snapshots:
       - stylus
       - sugarss
 
-  svelte-check@3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191):
+  svelte-check@3.8.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       chokidar: 3.6.0
       picocolors: 1.0.1
       sade: 1.8.1
       svelte: 5.0.0-next.191
-      svelte-preprocess: 5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)(typescript@5.5.4)
+      svelte-preprocess: 5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)(typescript@5.5.4)
       typescript: 5.5.4
     transitivePeerDependencies:
       - '@babel/core'
@@ -10064,7 +10093,7 @@ snapshots:
       - stylus
       - sugarss
 
-  svelte-eslint-parser@0.41.0(svelte@5.0.0-next.169):
+  svelte-eslint-parser@0.39.2(svelte@5.0.0-next.169):
     dependencies:
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
@@ -10084,11 +10113,6 @@ snapshots:
     optionalDependencies:
       svelte: 5.0.0-next.191
 
-  svelte-french-toast@1.2.0(svelte@5.0.0-next.191):
-    dependencies:
-      svelte: 5.0.0-next.191
-      svelte-writable-derived: 3.1.1(svelte@5.0.0-next.191)
-
   svelte-hmr@0.16.0(svelte@5.0.0-next.169):
     dependencies:
       svelte: 5.0.0-next.169
@@ -10097,7 +10121,7 @@ snapshots:
     dependencies:
       svelte: 5.0.0-next.191
 
-  svelte-preprocess@5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)(typescript@5.5.4):
+  svelte-preprocess@5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.169)(typescript@5.5.4):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
@@ -10109,11 +10133,11 @@ snapshots:
       '@babel/core': 7.24.9
       less: 4.2.0
       postcss: 8.4.40
-      postcss-load-config: 6.0.1(postcss@8.4.40)
+      postcss-load-config: 4.0.2(postcss@8.4.40)
       sass: 1.77.8
       typescript: 5.5.4
 
-  svelte-preprocess@5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)(typescript@5.5.4):
+  svelte-preprocess@5.1.4(@babel/core@7.24.9)(less@4.2.0)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@5.0.0-next.191)(typescript@5.5.4):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
@@ -10125,15 +10149,11 @@ snapshots:
       '@babel/core': 7.24.9
       less: 4.2.0
       postcss: 8.4.40
-      postcss-load-config: 6.0.1(postcss@8.4.40)
+      postcss-load-config: 4.0.2(postcss@8.4.40)
       sass: 1.77.8
       typescript: 5.5.4
 
   svelte-sonner@0.3.27(svelte@5.0.0-next.191):
-    dependencies:
-      svelte: 5.0.0-next.191
-
-  svelte-writable-derived@3.1.1(svelte@5.0.0-next.191):
     dependencies:
       svelte: 5.0.0-next.191
 
