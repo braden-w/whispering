@@ -273,16 +273,16 @@ function SettingsCard() {
 				</div>
 				<div className="grid gap-2">
 					<Label className="text-sm" htmlFor="api-key">
-						API Key
+						OpenAI API Key
 					</Label>
 					<Input
-						id="api-key"
+						id="openai-api-key"
 						placeholder="Your OpenAI API Key"
-						value={settings.apiKey}
+						value={settings.openAiApiKey}
 						onChange={(e) => {
 							setSettings.mutate({
 								...settings,
-								apiKey: e.target.value,
+								openAiApiKey: e.target.value,
 							});
 						}}
 						type="password"
@@ -297,6 +297,47 @@ function SettingsCard() {
 						>
 							OpenAI account settings
 						</Button>
+						. Make sure{' '}
+						<Button
+							variant="link"
+							className="px-0.3 py-0.2 h-fit"
+							onClick={() =>
+								chrome.tabs.create({
+									url: 'https://platform.openai.com/settings/organization/billing/overview',
+								})
+							}
+						>
+							billing
+						</Button>{' '}
+						is enabled.
+					</div>
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="api-key">
+						Groq API Key
+					</Label>
+					<Input
+						id="groq-api-key"
+						placeholder="Your Groq API Key"
+						value={settings.groqApiKey}
+						onChange={(e) => {
+							setSettings.mutate({
+								...settings,
+								groqApiKey: e.target.value,
+							});
+						}}
+						type="password"
+						autoComplete="off"
+					/>
+					<div className="text-muted-foreground text-sm">
+						You can find your Groq API key in your{' '}
+						<Button
+							variant="link"
+							className="px-0.3 py-0.2 h-fit"
+							onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
+						>
+							Groq console
+						</Button>
 						.
 					</div>
 				</div>
@@ -304,7 +345,7 @@ function SettingsCard() {
 			<CardFooter>
 				<Button
 					onClick={() => {
-						if (settings.apiKey === '') {
+						if (settings.openAiApiKey === '') {
 							alert('Please enter an API Key');
 							return;
 						}

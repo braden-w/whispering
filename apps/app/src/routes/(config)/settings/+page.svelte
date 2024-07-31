@@ -225,11 +225,11 @@
 				{/if}
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="api-key">API Key</Label>
+				<Label class="text-sm" for="openai-api-key">OpenAI API Key</Label>
 				<Input
-					id="api-key"
+					id="openai-api-key"
 					placeholder="Your OpenAI API Key"
-					bind:value={settings.apiKey}
+					bind:value={settings.openAiApiKey}
 					type="password"
 					autocomplete="off"
 				/>
@@ -252,6 +252,27 @@
 						billing
 					</Button>
 					is enabled.
+				</div>
+			</div>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="groq-api-key">Groq API Key</Label>
+				<Input
+					id="groq-api-key"
+					placeholder="Your Groq API Key"
+					bind:value={settings.groqApiKey}
+					type="password"
+					autocomplete="off"
+				/>
+				<div class="text-muted-foreground text-sm">
+					You can find your Groq API key in your <Button
+						variant="link"
+						class="px-0.3 py-0.2 h-fit"
+						href="https://console.groq.com/keys"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Groq console
+					</Button>.
 				</div>
 			</div>
 		</Card.Content>

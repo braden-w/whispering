@@ -7,13 +7,9 @@ import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWeb
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { toast } from '$lib/services/ToastService';
+import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-import {
-	NotificationService,
-	TranscriptionService,
-	TranscriptionServiceGroqLive,
-	WhisperingError,
-} from '@repo/shared';
+import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
 import { type } from '@tauri-apps/api/os';
@@ -116,7 +112,7 @@ export const recordings = Effect.gen(function* () {
 					const recording = maybeRecording.value;
 					yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
 					const transcriptionResult = yield* Effect.either(
-						transcriptionService.transcribe(recording.blob, settings),
+						transcriptionService.transcribe(recording.blob),
 					);
 					if (Either.isLeft(transcriptionResult)) {
 						yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });

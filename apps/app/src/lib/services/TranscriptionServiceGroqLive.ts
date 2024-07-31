@@ -1,8 +1,8 @@
+import { settings } from '$lib/stores/settings.svelte.js';
 import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
 import { Schema } from '@effect/schema';
-import { WhisperingError } from '@repo/shared';
+import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { TranscriptionService } from './TranscriptionService.js';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 const FILE_NAME = 'recording.wav';
@@ -10,8 +10,9 @@ const FILE_NAME = 'recording.wav';
 export const TranscriptionServiceGroqLive = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
-		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
+		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
+				const { groqApiKey: apiKey, outputLanguage } = settings;
 				if (!apiKey.startsWith('gsk_')) {
 					return yield* new WhisperingError({
 						title: 'Invalid Groq API Key',

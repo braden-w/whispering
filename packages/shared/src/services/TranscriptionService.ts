@@ -134,9 +134,6 @@ export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
 	{
-		readonly transcribe: (
-			blob: Blob,
-			options: { apiKey: string; outputLanguage: SupportedLanguage },
-		) => Effect.Effect<string, WhisperingError>;
+		readonly transcribe: (blob: Blob) => Effect.Effect<string, WhisperingError>;
 	}
 >() {}

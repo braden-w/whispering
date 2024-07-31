@@ -24,7 +24,8 @@ export const settingsSchema = S.Struct({
 	selectedAudioInputDeviceId: S.String,
 	currentLocalShortcut: S.String,
 	currentGlobalShortcut: S.String,
-	apiKey: S.String,
+	openAiApiKey: S.String,
+	groqApiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
 	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
 		default: () => DEFAULT_BITRATE_MS,
@@ -39,7 +40,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		selectedAudioInputDeviceId: '',
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
-		apiKey: '',
+		openAiApiKey: '',
+		groqApiKey: '',
 		outputLanguage: 'auto',
 		bitsPerSecond: DEFAULT_BITRATE_MS,
 	}) satisfies Settings;

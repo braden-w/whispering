@@ -104,11 +104,17 @@ export const settings = Effect.gen(function* () {
 			}).pipe(Effect.catchAll(renderErrorAsToast));
 			jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
 		},
-		get apiKey() {
-			return settings.value.apiKey;
+		get groqApiKey() {
+			return settings.value.groqApiKey;
 		},
-		set apiKey(newValue) {
-			settings.value = { ...settings.value, apiKey: newValue };
+		set groqApiKey(newValue) {
+			settings.value = { ...settings.value, groqApiKey: newValue };
+		},
+		get openAiApiKey() {
+			return settings.value.openAiApiKey;
+		},
+		set openAiApiKey(newValue) {
+			settings.value = { ...settings.value, openAiApiKey: newValue };
 		},
 		get outputLanguage() {
 			return settings.value.outputLanguage;
