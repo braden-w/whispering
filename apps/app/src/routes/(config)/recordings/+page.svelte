@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
 		ClipboardIcon,
@@ -11,10 +9,18 @@
 	} from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
+	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -22,12 +28,11 @@
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
+	import { Effect } from 'effect';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Label } from '$lib/components/ui/label';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -313,9 +318,20 @@
 								<WhisperingButton
 									tooltipText="Copy transcriptions"
 									onclick={() =>
-										recordings.copyRecordingsTextById(
-											selectedRecordingRows.map(({ id }) => id),
-											{ template, delimiter },
+										Effect.gen(function* () {
+											const clipboardService = yield* ClipboardService;
+											yield* clipboardService.setClipboardText(text);
+											yield* toast({
+												variant: 'success',
+												title: 'Copied transcriptions to clipboard!',
+												description: text,
+												descriptionClass: 'line-clamp-2',
+											});
+										}).pipe(
+											Effect.provide(
+												window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
+											),
+											Effect.runPromise,
 										)}
 									type="submit"
 								>
