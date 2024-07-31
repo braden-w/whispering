@@ -1,5 +1,4 @@
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
 		ClipboardIcon,
@@ -10,10 +9,18 @@
 	} from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
+	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -21,10 +28,12 @@
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
+	import { Effect } from 'effect';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -198,6 +207,37 @@
 	}
 	let filterQuery = $state(getInitialFilterValue());
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
+
+	let template = $state('${transcribedText}');
+	let delimiter = $state('\n\n');
+
+	let isDialogOpen = $state(false);
+
+	let text = $derived.by(() => {
+		const transcriptions = selectedRecordingRows
+			.map(({ original }) => original)
+			.filter((recording) => recording.transcribedText !== '')
+			.map((recording) =>
+				template.replace(/\$\{(\w+)\}/g, (_, key) => {
+					switch (key) {
+						case 'id':
+							return recording.id;
+						case 'title':
+							return recording.title;
+						case 'subtitle':
+							return recording.subtitle;
+						case 'timestamp':
+							return recording.timestamp;
+						case 'transcribedText':
+							return recording.transcribedText;
+						default:
+							return '';
+					}
+				}),
+			);
+		const text = transcriptions.join('\n\n');
+		return text;
+	});
 </script>
 
 <svelte:head>
@@ -248,15 +288,64 @@
 							<StartTranscriptionIcon class="h-4 w-4" />
 						{/if}
 					</WhisperingButton>
-					<WhisperingButton
-						tooltipText="Copy transcribed text from selected recordings"
-						onclick={() =>
-							recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
-						variant="outline"
-						size="icon"
-					>
-						<ClipboardIcon class="h-4 w-4" />
-					</WhisperingButton>
+
+					<Dialog.Root open={isDialogOpen} onOpenChange={(v) => (isDialogOpen = v)}>
+						<Dialog.Trigger>
+							<WhisperingButton
+								tooltipText="Copy transcribed text from selected recordings"
+								variant="outline"
+								size="icon"
+							>
+								<ClipboardIcon class="h-4 w-4" />
+							</WhisperingButton>
+						</Dialog.Trigger>
+						<Dialog.Content class="sm:max-w-[425px]">
+							<Dialog.Header>
+								<Dialog.Title>Copy Transcripts</Dialog.Title>
+								<Dialog.Description>
+									Make changes to your profile here. Click save when you're done.
+								</Dialog.Description>
+							</Dialog.Header>
+							<div class="grid gap-4 py-4">
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="template" class="text-right">Template</Label>
+									<Input id="template" bind:value={template} class="col-span-3" />
+								</div>
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="delimiter" class="text-right">Delimiter</Label>
+									<Input id="delimiter" bind:value={delimiter} class="col-span-3" />
+								</div>
+							</div>
+							<Textarea placeholder="Preview of copied text" readonly class="h-32" value={text} />
+							<Dialog.Footer>
+								<WhisperingButton
+									tooltipText="Copy transcriptions"
+									onclick={() =>
+										Effect.gen(function* () {
+											const clipboardService = yield* ClipboardService;
+											yield* clipboardService.setClipboardText(text);
+											yield* toast({
+												variant: 'success',
+												title: 'Copied transcriptions to clipboard!',
+												description: text,
+												descriptionClass: 'line-clamp-2',
+											});
+											isDialogOpen = false;
+										}).pipe(
+											Effect.catchAll(renderErrorAsToast),
+											Effect.provide(
+												window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
+											),
+											Effect.runPromise,
+										)}
+									type="submit"
+								>
+									Copy Transcriptions
+								</WhisperingButton>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+
 					<WhisperingButton
 						tooltipText="Delete selected recordings"
 						variant="outline"
