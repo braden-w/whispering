@@ -25,6 +25,8 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Label } from '$lib/components/ui/label';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -198,6 +200,9 @@
 	}
 	let filterQuery = $state(getInitialFilterValue());
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
+
+	let template = $state('${transcribedText}');
+	let delimiter = $state('\n\n');
 </script>
 
 <svelte:head>
@@ -248,15 +253,50 @@
 							<StartTranscriptionIcon class="h-4 w-4" />
 						{/if}
 					</WhisperingButton>
-					<WhisperingButton
-						tooltipText="Copy transcribed text from selected recordings"
-						onclick={() =>
-							recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
-						variant="outline"
-						size="icon"
-					>
-						<ClipboardIcon class="h-4 w-4" />
-					</WhisperingButton>
+
+					<Dialog.Root>
+						<Dialog.Trigger>
+							<WhisperingButton
+								tooltipText="Copy transcribed text from selected recordings"
+								variant="outline"
+								size="icon"
+							>
+								<ClipboardIcon class="h-4 w-4" />
+							</WhisperingButton>
+						</Dialog.Trigger>
+						<Dialog.Content class="sm:max-w-[425px]">
+							<Dialog.Header>
+								<Dialog.Title>Copy Transcripts</Dialog.Title>
+								<Dialog.Description>
+									Make changes to your profile here. Click save when you're done.
+								</Dialog.Description>
+							</Dialog.Header>
+							<div class="grid gap-4 py-4">
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="template" class="text-right">Template</Label>
+									<Input id="template" bind:value={template} class="col-span-3" />
+								</div>
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="delimiter" class="text-right">Delimiter</Label>
+									<Input id="delimiter" bind:value={delimiter} class="col-span-3" />
+								</div>
+							</div>
+							<Dialog.Footer>
+								<WhisperingButton
+									tooltipText="Copy transcriptions"
+									onclick={() =>
+										recordings.copyRecordingsTextById(
+											selectedRecordingRows.map(({ id }) => id),
+											{ template, delimiter },
+										)}
+									type="submit"
+								>
+									Copy Transcriptions
+								</WhisperingButton>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+
 					<WhisperingButton
 						tooltipText="Delete selected recordings"
 						variant="outline"
