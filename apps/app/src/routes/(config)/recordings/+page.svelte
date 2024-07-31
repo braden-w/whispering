@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
@@ -203,6 +204,32 @@
 
 	let template = $state('${transcribedText}');
 	let delimiter = $state('\n\n');
+
+	let text = $derived.by(() => {
+		const transcriptions = selectedRecordingRows
+			.map(({ original }) => original)
+			.filter((recording) => recording.transcribedText !== '')
+			.map((recording) =>
+				template.replace(/\$\{(\w+)\}/g, (_, key) => {
+					switch (key) {
+						case 'id':
+							return recording.id;
+						case 'title':
+							return recording.title;
+						case 'subtitle':
+							return recording.subtitle;
+						case 'timestamp':
+							return recording.timestamp;
+						case 'transcribedText':
+							return recording.transcribedText;
+						default:
+							return '';
+					}
+				}),
+			);
+		const text = transcriptions.join('\n\n');
+		return text;
+	});
 </script>
 
 <svelte:head>
@@ -281,6 +308,7 @@
 									<Input id="delimiter" bind:value={delimiter} class="col-span-3" />
 								</div>
 							</div>
+							<Textarea placeholder="Preview of copied text" readonly class="h-32" value={text} />
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipText="Copy transcriptions"
