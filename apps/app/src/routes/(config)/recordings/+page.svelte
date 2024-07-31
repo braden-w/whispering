@@ -1,5 +1,4 @@
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
 		ClipboardIcon,
@@ -10,12 +9,21 @@
 	} from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
+	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
+	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
 	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
@@ -199,6 +207,37 @@
 	}
 	let filterQuery = $state(getInitialFilterValue());
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
+
+	let template = $state('${transcribedText}');
+	let delimiter = $state('\n\n');
+
+	let isDialogOpen = $state(false);
+
+	let text = $derived.by(() => {
+		const transcriptions = selectedRecordingRows
+			.map(({ original }) => original)
+			.filter((recording) => recording.transcribedText !== '')
+			.map((recording) =>
+				template.replace(/\$\{(\w+)\}/g, (_, key) => {
+					switch (key) {
+						case 'id':
+							return recording.id;
+						case 'title':
+							return recording.title;
+						case 'subtitle':
+							return recording.subtitle;
+						case 'timestamp':
+							return recording.timestamp;
+						case 'transcribedText':
+							return recording.transcribedText;
+						default:
+							return '';
+					}
+				}),
+			);
+		const text = transcriptions.join(delimiter);
+		return text;
+	});
 </script>
 
 <svelte:head>
@@ -209,9 +248,9 @@
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
 	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
 	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex items-center gap-2 overflow-auto">
+		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
 			<form
-				class="flex max-w-sm gap-2"
+				class="flex w-full max-w-sm gap-2"
 				on:submit={(e) => {
 					e.preventDefault();
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
@@ -220,82 +259,141 @@
 				<Input placeholder="Filter transcripts..." type="text" bind:value={filterQuery} />
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
-			{#if selectedRecordingRows.length > 0}
-				<WhisperingButton
-					tooltipText="Transcribe selected recordings"
-					variant="outline"
-					size="icon"
-					onclick={() =>
-						Effect.all(
-							selectedRecordingRows.map((recording) =>
-								recordings
-									.transcribeRecording(recording.id)
-									.pipe(Effect.catchAll(renderErrorAsToast)),
-							),
-							{ concurrency: 'unbounded' },
-						).pipe(Effect.runPromise)}
-				>
-					{#if selectedRecordingRows.some(({ id }) => {
-						const currentRow = recordings.value.find((r) => r.id === id);
-						return currentRow?.transcriptionStatus === 'TRANSCRIBING';
-					})}
-						<LoadingTranscriptionIcon class="h-4 w-4" />
-					{:else if selectedRecordingRows.some(({ id }) => {
-						const currentRow = recordings.value.find((r) => r.id === id);
-						return currentRow?.transcriptionStatus === 'DONE';
-					})}
-						<RetryTranscriptionIcon class="h-4 w-4" />
-					{:else}
-						<StartTranscriptionIcon class="h-4 w-4" />
-					{/if}
-				</WhisperingButton>
-				<WhisperingButton
-					tooltipText="Copy transcribed text from selected recordings"
-					onclick={() =>
-						recordings.copyRecordingsTextById(selectedRecordingRows.map(({ id }) => id))}
-					variant="outline"
-					size="icon"
-				>
-					<ClipboardIcon class="h-4 w-4" />
-				</WhisperingButton>
-				<WhisperingButton
-					tooltipText="Delete selected recordings"
-					variant="outline"
-					size="icon"
-					onclick={() => {
-						const ids = selectedRecordingRows.map(({ id }) => id);
-						recordings.deleteRecordingsById(ids);
-					}}
-				>
-					<TrashIcon class="h-4 w-4" />
-				</WhisperingButton>
-			{/if}
-			<div class="text-muted-foreground hidden text-sm sm:block">
-				{selectedRecordingRows.length} of
-				{table.getFilteredRowModel().rows.length} row(s) selected.
-			</div>
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild let:builder>
-					<Button
+			<div class="flex w-full items-center justify-between gap-2">
+				{#if selectedRecordingRows.length > 0}
+					<WhisperingButton
+						tooltipText="Transcribe selected recordings"
 						variant="outline"
-						class="ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180"
-						builders={[builder]}
+						size="icon"
+						onclick={() =>
+							Effect.all(
+								selectedRecordingRows.map((recording) =>
+									recordings
+										.transcribeRecording(recording.id)
+										.pipe(Effect.catchAll(renderErrorAsToast)),
+								),
+								{ concurrency: 'unbounded' },
+							).pipe(Effect.runPromise)}
 					>
-						Columns <ChevronDownIcon class="ml-2 h-4 w-4 transition-transform duration-200" />
-					</Button>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content>
-					{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
-						<DropdownMenu.CheckboxItem
-							checked={column.getIsVisible()}
-							onCheckedChange={(value) => column.toggleVisibility(!!value)}
+						{#if selectedRecordingRows.some(({ id }) => {
+							const currentRow = recordings.value.find((r) => r.id === id);
+							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
+						})}
+							<LoadingTranscriptionIcon class="h-4 w-4" />
+						{:else if selectedRecordingRows.some(({ id }) => {
+							const currentRow = recordings.value.find((r) => r.id === id);
+							return currentRow?.transcriptionStatus === 'DONE';
+						})}
+							<RetryTranscriptionIcon class="h-4 w-4" />
+						{:else}
+							<StartTranscriptionIcon class="h-4 w-4" />
+						{/if}
+					</WhisperingButton>
+
+					<Dialog.Root open={isDialogOpen} onOpenChange={(v) => (isDialogOpen = v)}>
+						<Dialog.Trigger>
+							<WhisperingButton
+								tooltipText="Copy transcribed text from selected recordings"
+								variant="outline"
+								size="icon"
+							>
+								<ClipboardIcon class="h-4 w-4" />
+							</WhisperingButton>
+						</Dialog.Trigger>
+						<Dialog.Content class="sm:max-w-[425px]">
+							<Dialog.Header>
+								<Dialog.Title>Copy Transcripts</Dialog.Title>
+								<Dialog.Description>
+									Make changes to your profile here. Click save when you're done.
+								</Dialog.Description>
+							</Dialog.Header>
+							<div class="grid gap-4 py-4">
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="template" class="text-right">Template</Label>
+									<Input id="template" bind:value={template} class="col-span-3" />
+								</div>
+								<div class="grid grid-cols-4 items-center gap-4">
+									<Label for="delimiter" class="text-right">Delimiter</Label>
+									<Input id="delimiter" bind:value={delimiter} class="col-span-3" />
+								</div>
+							</div>
+							<Textarea placeholder="Preview of copied text" readonly class="h-32" value={text} />
+							<Dialog.Footer>
+								<WhisperingButton
+									tooltipText="Copy transcriptions"
+									onclick={() =>
+										Effect.gen(function* () {
+											const clipboardService = yield* ClipboardService;
+											yield* clipboardService.setClipboardText(text);
+											yield* toast({
+												variant: 'success',
+												title: 'Copied transcriptions to clipboard!',
+												description: text,
+												descriptionClass: 'line-clamp-2',
+											});
+											isDialogOpen = false;
+										}).pipe(
+											Effect.catchAll(renderErrorAsToast),
+											Effect.provide(
+												window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
+											),
+											Effect.runPromise,
+										)}
+									type="submit"
+								>
+									Copy Transcriptions
+								</WhisperingButton>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+
+					<WhisperingButton
+						tooltipText="Delete selected recordings"
+						variant="outline"
+						size="icon"
+						onclick={() => {
+							const ids = selectedRecordingRows.map(({ id }) => id);
+							recordings.deleteRecordingsById(ids);
+						}}
+					>
+						<TrashIcon class="h-4 w-4" />
+					</WhisperingButton>
+				{/if}
+
+				<div
+					class={cn(
+						'text-muted-foreground text-sm sm:block',
+						selectedRecordingRows.length > 0 && 'hidden',
+					)}
+				>
+					{selectedRecordingRows.length} of
+					{table.getFilteredRowModel().rows.length} row(s) selected.
+				</div>
+
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button
+							variant="outline"
+							class="ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180"
+							builders={[builder]}
 						>
-							{column.columnDef.meta?.headerText}
-						</DropdownMenu.CheckboxItem>
-					{/each}
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+							Columns <ChevronDownIcon class="ml-2 h-4 w-4 transition-transform duration-200" />
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content>
+						{#each table.getAllColumns().filter((c) => c.getCanHide()) as column (column.id)}
+							<DropdownMenu.CheckboxItem
+								checked={column.getIsVisible()}
+								onCheckedChange={(value) => column.toggleVisibility(!!value)}
+							>
+								{column.columnDef.meta?.headerText}
+							</DropdownMenu.CheckboxItem>
+						{/each}
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 		</div>
+
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup}

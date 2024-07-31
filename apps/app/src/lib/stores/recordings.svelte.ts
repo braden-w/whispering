@@ -11,7 +11,7 @@ import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import {
 	NotificationService,
 	TranscriptionService,
-	TranscriptionServiceWhisperingLive,
+	TranscriptionServiceWhisperLive,
 	WhisperingError,
 } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
@@ -283,26 +283,10 @@ export const recordings = Effect.gen(function* () {
 					descriptionClass: 'line-clamp-2',
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
-		copyRecordingsTextById: (recordingIds: string[]) =>
-			Effect.gen(function* () {
-				const transcriptions = recordingIds
-					.map((id) => recordings.find((r) => r.id === id))
-					.filter((recording) => recording !== undefined)
-					.map((recording) => recording.transcribedText)
-					.filter((transcription) => transcription !== '');
-				const text = transcriptions.join('\n\n');
-				yield* clipboardService.setClipboardText(text);
-				yield* toast({
-					variant: 'success',
-					title: 'Copied transcriptions to clipboard!',
-					description: text,
-					descriptionClass: 'line-clamp-2',
-				});
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
 }).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(TranscriptionServiceWhisperingLive),
+	Effect.provide(TranscriptionServiceWhisperLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,

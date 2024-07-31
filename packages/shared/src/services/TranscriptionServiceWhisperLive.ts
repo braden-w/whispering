@@ -7,7 +7,7 @@ import { TranscriptionService } from './TranscriptionService.js';
 const MAX_FILE_SIZE_MB = 25 as const;
 const FILE_NAME = 'recording.wav';
 
-export const TranscriptionServiceWhisperingLive = Layer.succeed(
+export const TranscriptionServiceWhisperLive = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
 		transcribe: (audioBlob, { apiKey, outputLanguage }) =>
