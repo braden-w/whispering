@@ -33,6 +33,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -328,6 +329,7 @@
 												descriptionClass: 'line-clamp-2',
 											});
 										}).pipe(
+											Effect.catchAll(renderErrorAsToast),
 											Effect.provide(
 												window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
 											),

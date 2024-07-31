@@ -283,45 +283,6 @@ export const recordings = Effect.gen(function* () {
 					descriptionClass: 'line-clamp-2',
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
-		copyRecordingsTextById: (
-			recordingIds: string[],
-			config: {
-				template: string;
-				delimiter: string;
-			},
-		) =>
-			Effect.gen(function* () {
-				const transcriptions = recordingIds
-					.map((id) => recordings.find((r) => r.id === id))
-					.filter((recording) => recording !== undefined)
-					.filter((recording) => recording.transcribedText !== '')
-					.map((recording) =>
-						config.template.replace(/\$\{(\w+)\}/g, (_, key) => {
-							switch (key) {
-								case 'id':
-									return recording.id;
-								case 'title':
-									return recording.title;
-								case 'subtitle':
-									return recording.subtitle;
-								case 'timestamp':
-									return recording.timestamp;
-								case 'transcribedText':
-									return recording.transcribedText;
-								default:
-									return '';
-							}
-						}),
-					);
-				const text = transcriptions.join('\n\n');
-				yield* clipboardService.setClipboardText(text);
-				yield* toast({
-					variant: 'success',
-					title: 'Copied transcriptions to clipboard!',
-					description: text,
-					descriptionClass: 'line-clamp-2',
-				});
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
 }).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
