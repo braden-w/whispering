@@ -1,5 +1,10 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { SUPPORTED_LANGUAGES_OPTIONS, WHISPERING_URL, type Settings } from '@repo/shared';
+import {
+	SUPPORTED_LANGUAGES_OPTIONS,
+	TRANSCRIPTION_SERVICE_OPTIONS,
+	WHISPERING_URL,
+	type Settings,
+} from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -60,7 +65,7 @@ function SettingsCard() {
 			}),
 	});
 
-	const setSettings = useMutation({
+	const { mutate: setSettings } = useMutation({
 		mutationFn: (settings: Settings) =>
 			sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
 				name: 'contents/setSettings',
@@ -134,7 +139,7 @@ function SettingsCard() {
 						aria-labelledby="play-sound-enabled"
 						checked={settings.isPlaySoundEnabled}
 						onCheckedChange={(newValue) =>
-							setSettings.mutate({ ...settings, isPlaySoundEnabled: newValue })
+							setSettings({ ...settings, isPlaySoundEnabled: newValue })
 						}
 					/>
 					<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
@@ -145,7 +150,7 @@ function SettingsCard() {
 						aria-labelledby="copy-to-clipboard"
 						checked={settings.isCopyToClipboardEnabled}
 						onCheckedChange={(newValue) =>
-							setSettings.mutate({
+							setSettings({
 								...settings,
 								isCopyToClipboardEnabled: newValue,
 							})
@@ -161,7 +166,7 @@ function SettingsCard() {
 						aria-labelledby="paste-from-clipboard"
 						checked={settings.isPasteContentsOnSuccessEnabled}
 						onCheckedChange={(newValue) =>
-							setSettings.mutate({
+							setSettings({
 								...settings,
 								isPasteContentsOnSuccessEnabled: newValue,
 							})
@@ -193,7 +198,7 @@ function SettingsCard() {
 						<Select
 							value={settings.selectedAudioInputDeviceId}
 							onValueChange={(value) =>
-								setSettings.mutate({
+								setSettings({
 									...settings,
 									selectedAudioInputDeviceId: value,
 								})
@@ -218,7 +223,7 @@ function SettingsCard() {
 					</Label>
 					<Select
 						value={settings.outputLanguage}
-						onValueChange={(value) => setSettings.mutate({ ...settings, outputLanguage: value })}
+						onValueChange={(value) => setSettings({ ...settings, outputLanguage: value })}
 					>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select a device" />
@@ -241,7 +246,7 @@ function SettingsCard() {
 						placeholder="Local Shortcut to toggle recording"
 						value={settings.currentLocalShortcut}
 						onChange={(e) => {
-							setSettings.mutate({
+							setSettings({
 								...settings,
 								currentLocalShortcut: e.target.value,
 							});
@@ -272,75 +277,48 @@ function SettingsCard() {
 					</div>
 				</div>
 				<div className="grid gap-2">
-					<Label className="text-sm" htmlFor="api-key">
-						OpenAI API Key
+					<Label className="text-sm" htmlFor="selected-transcription-service">
+						Transcription Service
 					</Label>
-					<Input
-						id="openai-api-key"
-						placeholder="Your OpenAI API Key"
+					<Select
+						value={settings.selectedTranscriptionService}
+						onValueChange={(value) =>
+							setSettings({ ...settings, selectedTranscriptionService: value })
+						}
+					>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select a transcription service" />
+						</SelectTrigger>
+						<SelectContent className="max-h-96 overflow-auto">
+							{TRANSCRIPTION_SERVICE_OPTIONS.map(({ value, label }) => (
+								<SelectItem key={value} value={value}>
+									{label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+				{settings.selectedTranscriptionService === 'OpenAI' ? (
+					<OpenAiSettings
 						value={settings.openAiApiKey}
-						onChange={(e) => {
-							setSettings.mutate({
+						onChange={(value) =>
+							setSettings({
 								...settings,
-								openAiApiKey: e.target.value,
-							});
-						}}
-						type="password"
-						autoComplete="off"
+								openAiApiKey: value,
+							})
+						}
 					/>
-					<div className="text-muted-foreground text-sm">
-						You can find your OpenAI API key in your{' '}
-						<Button
-							variant="link"
-							className="px-0.3 py-0.2 h-fit"
-							onClick={() => chrome.tabs.create({ url: 'https://platform.openai.com/api-keys' })}
-						>
-							OpenAI account settings
-						</Button>
-						. Make sure{' '}
-						<Button
-							variant="link"
-							className="px-0.3 py-0.2 h-fit"
-							onClick={() =>
-								chrome.tabs.create({
-									url: 'https://platform.openai.com/settings/organization/billing/overview',
-								})
-							}
-						>
-							billing
-						</Button>{' '}
-						is enabled.
-					</div>
-				</div>
-				<div className="grid gap-2">
-					<Label className="text-sm" htmlFor="api-key">
-						Groq API Key
-					</Label>
-					<Input
-						id="groq-api-key"
-						placeholder="Your Groq API Key"
+				) : settings.selectedTranscriptionService === 'Groq' ? (
+					<GroqSettings
 						value={settings.groqApiKey}
-						onChange={(e) => {
-							setSettings.mutate({
+						onChange={(value) => {
+							setSettings({
 								...settings,
-								groqApiKey: e.target.value,
+								groqApiKey: value,
 							});
 						}}
-						type="password"
-						autoComplete="off"
 					/>
-					<div className="text-muted-foreground text-sm">
-						You can find your Groq API key in your{' '}
-						<Button
-							variant="link"
-							className="px-0.3 py-0.2 h-fit"
-							onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
-						>
-							Groq console
-						</Button>
-						.
-					</div>
-				</div>
+				) : null}
 			</CardContent>
 			<CardFooter>
 				<Button
@@ -358,6 +336,76 @@ function SettingsCard() {
 				</Button>
 			</CardFooter>
 		</Card>
+	);
+}
+
+function OpenAiSettings({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+	return (
+		<div className="grid gap-2">
+			<Label className="text-sm" htmlFor="api-key">
+				OpenAI API Key
+			</Label>
+			<Input
+				id="openai-api-key"
+				placeholder="Your OpenAI API Key"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				type="password"
+				autoComplete="off"
+			/>
+			<div className="text-muted-foreground text-sm">
+				You can find your OpenAI API key in your{' '}
+				<Button
+					variant="link"
+					className="px-0.3 py-0.2 h-fit"
+					onClick={() => chrome.tabs.create({ url: 'https://platform.openai.com/api-keys' })}
+				>
+					OpenAI account settings
+				</Button>
+				. Make sure{' '}
+				<Button
+					variant="link"
+					className="px-0.3 py-0.2 h-fit"
+					onClick={() =>
+						chrome.tabs.create({
+							url: 'https://platform.openai.com/settings/organization/billing/overview',
+						})
+					}
+				>
+					billing
+				</Button>{' '}
+				is enabled.
+			</div>
+		</div>
+	);
+}
+
+function GroqSettings({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+	return (
+		<div className="grid gap-2">
+			<Label className="text-sm" htmlFor="api-key">
+				Groq API Key
+			</Label>
+			<Input
+				id="groq-api-key"
+				placeholder="Your Groq API Key"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				type="password"
+				autoComplete="off"
+			/>
+			<div className="text-muted-foreground text-sm">
+				You can find your Groq API key in your{' '}
+				<Button
+					variant="link"
+					className="px-0.3 py-0.2 h-fit"
+					onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
+				>
+					Groq console
+				</Button>
+				.
+			</div>
+		</div>
 	);
 }
 
