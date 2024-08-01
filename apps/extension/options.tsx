@@ -90,7 +90,7 @@ function SettingsCard() {
 	});
 
 	const {
-		isLoading: isMediaDevicesLoading,
+		isPending: isMediaDevicesPending,
 		isError: isMediaDevicesError,
 		data: mediaDevices,
 	} = useQuery({
@@ -176,67 +176,41 @@ function SettingsCard() {
 						Paste contents from clipboard after successful transcription
 					</Label>
 				</div>
-				<div className="grid gap-2">
-					<Label className="text-sm" htmlFor="recording-device">
-						Recording Device
-					</Label>
-					{isMediaDevicesLoading && (
-						<Select disabled>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Loading devices..." />
-							</SelectTrigger>
-						</Select>
-					)}
-					{isMediaDevicesError && (
-						<Select disabled>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Error loading devices" />
-							</SelectTrigger>
-						</Select>
-					)}
-					{mediaDevices && (
-						<Select
-							value={settings.selectedAudioInputDeviceId}
-							onValueChange={(value) =>
-								setSettings({
-									...settings,
-									selectedAudioInputDeviceId: value,
-								})
-							}
-						>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select a device" />
-							</SelectTrigger>
-							<SelectContent>
-								{mediaDevices.map((device) => (
-									<SelectItem key={device.deviceId} value={device.deviceId}>
-										{device.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
-				</div>
-				<div className="grid gap-2">
-					<Label className="text-sm" htmlFor="output-language">
-						Output Language
-					</Label>
-					<Select
-						value={settings.outputLanguage}
-						onValueChange={(value) => setSettings({ ...settings, outputLanguage: value })}
-					>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Select a device" />
-						</SelectTrigger>
-						<SelectContent className="max-h-96 overflow-auto">
-							{SUPPORTED_LANGUAGES_OPTIONS.map(({ value, label }) => (
-								<SelectItem key={value} value={value}>
-									{label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
+
+				<SettingsSelect
+					id="recording-device"
+					label="Recording Device"
+					placeholder={
+						isMediaDevicesPending
+							? 'Loading devices...'
+							: isMediaDevicesError
+								? 'Error loading devices'
+								: 'Select a device'
+					}
+					options={
+						mediaDevices?.map((mediaDevice) => ({
+							label: mediaDevice.label,
+							value: mediaDevice.deviceId,
+						})) ?? []
+					}
+					disabled={isMediaDevicesPending || isMediaDevicesError}
+					value={settings.selectedAudioInputDeviceId}
+					onValueChange={(value) =>
+						setSettings({
+							...settings,
+							selectedAudioInputDeviceId: value,
+						})
+					}
+				/>
+
+				<SettingsSelect
+					id="output-language"
+					label="Output Language"
+					options={SUPPORTED_LANGUAGES_OPTIONS}
+					value={settings.outputLanguage}
+					onValueChange={(value) => setSettings({ ...settings, outputLanguage: value })}
+				/>
+
 				<div className="grid gap-2">
 					<Label className="text-sm" htmlFor="local-shortcut">
 						Local Shortcut
@@ -276,28 +250,17 @@ function SettingsCard() {
 						</Button>
 					</div>
 				</div>
-				<div className="grid gap-2">
-					<Label className="text-sm" htmlFor="selected-transcription-service">
-						Transcription Service
-					</Label>
-					<Select
-						value={settings.selectedTranscriptionService}
-						onValueChange={(value) =>
-							setSettings({ ...settings, selectedTranscriptionService: value })
-						}
-					>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Select a transcription service" />
-						</SelectTrigger>
-						<SelectContent className="max-h-96 overflow-auto">
-							{TRANSCRIPTION_SERVICE_OPTIONS.map(({ value, label }) => (
-								<SelectItem key={value} value={value}>
-									{label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
+
+				<SettingsSelect
+					id="selected-transcription-service"
+					label="Transcription Service"
+					options={TRANSCRIPTION_SERVICE_OPTIONS}
+					value={settings.selectedTranscriptionService}
+					onValueChange={(value) =>
+						setSettings({ ...settings, selectedTranscriptionService: value })
+					}
+				/>
+
 				{settings.selectedTranscriptionService === 'OpenAI' ? (
 					<OpenAiSettings
 						value={settings.openAiApiKey}
@@ -409,6 +372,47 @@ function GroqSettings({ value, onChange }: { value: string; onChange: (value: st
 				</Button>
 				.
 			</div>
+		</div>
+	);
+}
+
+function SettingsSelect({
+	id,
+	label,
+	options,
+	value,
+	onValueChange,
+	placeholder = 'Select an option',
+	disabled = false,
+}: {
+	id: string;
+	label: string;
+	options: {
+		value: string;
+		label: string;
+	}[];
+	value: string;
+	onValueChange: (value: string) => void;
+	placeholder?: string;
+	disabled?: boolean;
+}) {
+	return (
+		<div className="grid gap-2">
+			<Label className="text-sm" htmlFor={id}>
+				{label}
+			</Label>
+			<Select value={value} onValueChange={onValueChange} disabled={disabled}>
+				<SelectTrigger id={id} className="w-full">
+					<SelectValue placeholder={placeholder} />
+				</SelectTrigger>
+				<SelectContent>
+					{options.map((option) => (
+						<SelectItem key={option.value} value={option.value}>
+							{option.label}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
 		</div>
 	);
 }
