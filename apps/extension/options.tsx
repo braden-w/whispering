@@ -323,8 +323,12 @@ function SettingsCard() {
 			<CardFooter>
 				<Button
 					onClick={() => {
-						if (settings.openAiApiKey === '') {
-							alert('Please enter an API Key');
+						if (settings.selectedTranscriptionService === 'OpenAI' && !settings.openAiApiKey) {
+							alert('Please enter an OpenAI API Key');
+							return;
+						}
+						if (settings.selectedTranscriptionService === 'Groq' && !settings.groqApiKey) {
+							alert('Please enter an Groq API Key');
 							return;
 						}
 						window.close();
