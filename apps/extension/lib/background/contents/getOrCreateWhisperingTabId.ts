@@ -1,4 +1,4 @@
-import { Schema as S } from '@effect/schema';
+import { Schema } from '@effect/schema';
 import {
 	WHISPERING_URL,
 	WHISPERING_URL_WILDCARD,
@@ -11,7 +11,7 @@ import { Effect, Either } from 'effect';
 const isNotifyWhisperingTabReadyMessage = (
 	message: unknown,
 ): message is Extract<ExternalMessage, { name: 'external/notifyWhisperingTabReady' }> => {
-	const externalMessageResult = S.decodeUnknownEither(externalMessageSchema)(message);
+	const externalMessageResult = Schema.decodeUnknownEither(externalMessageSchema)(message);
 	if (Either.isLeft(externalMessageResult)) return false;
 	const externalMessage = externalMessageResult.right;
 	return externalMessage.name === 'external/notifyWhisperingTabReady';

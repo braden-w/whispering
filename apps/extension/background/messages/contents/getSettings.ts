@@ -1,4 +1,4 @@
-import { Schema as S } from '@effect/schema';
+import { Schema } from '@effect/schema';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
 	WhisperingError,
@@ -6,7 +6,7 @@ import {
 	getDefaultSettings,
 	settingsSchema,
 	type Result,
-	type Settings
+	type Settings,
 } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
@@ -47,7 +47,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 		});
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return getDefaultSettings('extension');
-		const settings = yield* S.decodeUnknown(S.parseJson(settingsSchema))(valueFromStorage).pipe(
+		const settings = yield* Schema.decodeUnknown(Schema.parseJson(settingsSchema))(
+			valueFromStorage,
+		).pipe(
 			Effect.mapError(
 				(error) =>
 					new WhisperingError({
