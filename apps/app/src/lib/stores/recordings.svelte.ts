@@ -12,10 +12,6 @@ import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
-import { type } from '@tauri-apps/api/os';
-import { invoke } from '@tauri-apps/api/tauri';
-import { Effect, Either, Option } from 'effect';
-import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
@@ -174,40 +170,6 @@ export const recordings = Effect.gen(function* () {
 
 				// Paste transcription if enabled
 				if (settings.isPasteContentsOnSuccessEnabled) {
-					const isMacos = window.__TAURI__ && (yield* Effect.promise(type)) === 'Darwin';
-					if (!isMacos) {
-						yield* clipboardService.writeText(transcribedText);
-						yield* toast({
-							variant: 'success',
-							title: 'Pasted transcription!',
-							description: transcribedText,
-							descriptionClass: 'line-clamp-2',
-						});
-						return;
-					}
-					const isAccessibilityEnabled = yield* Effect.tryPromise({
-						try: () =>
-							invoke<boolean>('is_macos_accessibility_enabled', { askIfNotAllowed: false }),
-						catch: (error) =>
-							new WhisperingError({
-								title: 'Unable to ensure accessibility is enabled',
-								description: error instanceof Error ? error.message : `Error: ${error}`,
-								error,
-							}),
-					});
-					if (!isAccessibilityEnabled) {
-						yield* toast({
-							variant: 'warning',
-							title: 'Please enable or re-enable accessibility to paste transcriptions!',
-							description:
-								'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
-							action: {
-								label: 'Open Directions',
-								onClick: () => goto('/macos-enable-accessibility'),
-							},
-						});
-						return;
-					}
 					yield* clipboardService.writeText(transcribedText);
 					yield* toast({
 						variant: 'success',
