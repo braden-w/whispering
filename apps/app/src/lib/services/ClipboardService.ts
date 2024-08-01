@@ -16,6 +16,6 @@ export class ClipboardService extends Context.Tag('ClipboardService')<
 		 * - Desktop: This function should trigger a paste action, as if the user had pressed `Ctrl` + `V`.
 		 * - Mobile: This function should trigger a paste action, as if the user had pressed `Paste` in the context menu.
 		 */
-		readonly writeText: (text: string) => Effect.Effect<void, WhisperingError>;
+		readonly writeTextToCursor: (text: string) => Effect.Effect<void, WhisperingError>;
 	}
 >() {}

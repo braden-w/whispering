@@ -178,7 +178,7 @@ export const recordings = Effect.gen(function* () {
 
 				// Paste transcription if enabled
 				if (settings.isPasteContentsOnSuccessEnabled) {
-					yield* clipboardService.writeText(transcribedText);
+					yield* clipboardService.writeTextToCursor(transcribedText);
 					yield* toast({
 						variant: 'success',
 						title: 'Pasted transcription!',
