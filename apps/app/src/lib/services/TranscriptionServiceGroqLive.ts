@@ -13,6 +13,18 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
 				const { groqApiKey: apiKey, outputLanguage } = settings;
+
+				if (!apiKey) {
+					return yield* new WhisperingError({
+						title: 'Groq API Key not provided.',
+						description: 'Please enter your Groq API key in the settings',
+						action: {
+							label: 'Go to settings',
+							goto: '/settings',
+						},
+					});
+				}
+
 				if (!apiKey.startsWith('gsk_')) {
 					return yield* new WhisperingError({
 						title: 'Invalid Groq API Key',

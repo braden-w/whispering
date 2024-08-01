@@ -13,6 +13,18 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
 				const { openAiApiKey: apiKey, outputLanguage } = settings;
+
+				if (!apiKey) {
+					return yield* new WhisperingError({
+						title: 'OpenAI API Key not provided.',
+						description: 'Please enter your OpenAI API key in the settings',
+						action: {
+							label: 'Go to settings',
+							goto: '/settings',
+						},
+					});
+				}
+
 				if (!apiKey.startsWith('sk-')) {
 					return yield* new WhisperingError({
 						title: 'Invalid OpenAI API Key',

@@ -143,17 +143,6 @@ export const recorder = Effect.gen(function* () {
 		},
 		toggleRecording: () =>
 			Effect.gen(function* () {
-				if (!settings.apiKey) {
-					return yield* new WhisperingError({
-						title: 'API Key not provided.',
-						description: 'Please enter your OpenAI API key in the settings',
-						action: {
-							label: 'Go to settings',
-							goto: '/settings',
-						},
-					});
-				}
-
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
 						yield* mediaRecorderService.startRecording();
