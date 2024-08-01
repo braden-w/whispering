@@ -362,7 +362,7 @@ function SettingsCard() {
 	);
 }
 
-function SettingsLabelSelect({
+function SettingsLabelSelect<T extends string>({
 	id,
 	label,
 	options,
@@ -377,8 +377,8 @@ function SettingsLabelSelect({
 		value: string;
 		label: string;
 	}[];
-	value: string;
-	onValueChange: (value: string) => void;
+	value: T;
+	onValueChange: (value: T) => void;
 	placeholder?: string;
 	disabled?: boolean;
 }) {
