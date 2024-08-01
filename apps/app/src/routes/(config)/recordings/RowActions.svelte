@@ -11,7 +11,9 @@
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { Effect } from 'effect';
 	import EditRowDialog from './EditRowDialog.svelte';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 
 	let { recording }: { recording: Recording } = $props();
 </script>
@@ -19,7 +21,10 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipText="Transcribe recording"
-		onclick={() => recordings.transcribeRecording(recording.id)}
+		onclick={() =>
+			recordings
+				.transcribeRecording(recording.id)
+				.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise)}
 		variant="ghost"
 		size="icon"
 	>

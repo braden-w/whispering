@@ -13,11 +13,13 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import {
 		BITRATE_OPTIONS,
-		TranscriptionService,
-		TranscriptionServiceWhisperLive,
+		SUPPORTED_LANGUAGES_OPTIONS,
+		TRANSCRIPTION_SERVICES,
 	} from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
+	import GroqSettings from './GroqSettings.svelte';
+	import OpenAiSettings from './OpenAiSettings.svelte';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
 		Effect.catchAll((error) => {
@@ -27,14 +29,19 @@
 		Effect.runPromise,
 	);
 
-	const supportedLanguagesOptions = Effect.gen(function* () {
-		const transcriptionService = yield* TranscriptionService;
-		const languages = transcriptionService.supportedLanguages;
-		return languages;
-	}).pipe(Effect.provide(TranscriptionServiceWhisperLive), Effect.runSync);
-
 	const selectedLanguageOption = $derived(
-		supportedLanguagesOptions.find((option) => option.value === settings.outputLanguage),
+		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.outputLanguage),
+	);
+
+	const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map((service) => ({
+		value: service,
+		label: service,
+	}));
+
+	const selectedTranscriptionServiceOption = $derived(
+		TRANSCRIPTION_SERVICE_OPTIONS.find(
+			(option) => option.value === settings.selectedTranscriptionService,
+		),
 	);
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
@@ -146,7 +153,7 @@
 								</Select.Item>
 							{/each}
 						</Select.Content>
-						<Select.Input name="recording-device" />
+						<Select.Input id="recording-device" />
 					</Select.Root>
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
@@ -172,13 +179,13 @@
 							</Select.Item>
 						{/each}
 					</Select.Content>
-					<Select.Input name="bit-rate" />
+					<Select.Input id="bit-rate" />
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="output-language">Output Language</Label>
 				<Select.Root
-					items={supportedLanguagesOptions}
+					items={SUPPORTED_LANGUAGES_OPTIONS}
 					selected={selectedLanguageOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
@@ -189,16 +196,13 @@
 						<Select.Value placeholder="Select a device" />
 					</Select.Trigger>
 					<Select.Content class="max-h-96 overflow-auto">
-						{#each supportedLanguagesOptions as supportedLanguagesOption}
-							<Select.Item
-								value={supportedLanguagesOption.value}
-								label={supportedLanguagesOption.label}
-							>
-								{supportedLanguagesOption.label}
+						{#each SUPPORTED_LANGUAGES_OPTIONS as { value, label }}
+							<Select.Item {value} {label}>
+								{label}
 							</Select.Item>
 						{/each}
 					</Select.Content>
-					<Select.Input name="output-language" />
+					<Select.Input id="output-language" />
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
@@ -238,35 +242,33 @@
 				{/if}
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="api-key">API Key</Label>
-				<Input
-					id="api-key"
-					placeholder="Your OpenAI API Key"
-					bind:value={settings.apiKey}
-					type="password"
-					autocomplete="off"
-				/>
-				<div class="text-muted-foreground text-sm">
-					You can find your API key in your <Button
-						variant="link"
-						class="px-0.3 py-0.2 h-fit"
-						href="https://platform.openai.com/api-keys"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						account settings
-					</Button>. Make sure <Button
-						variant="link"
-						class="px-0.3 py-0.2 h-fit"
-						href="https://platform.openai.com/settings/organization/billing/overview"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						billing
-					</Button>
-					is enabled.
-				</div>
+				<Label class="text-sm" for="selected-transcription-service">Transcription Service</Label>
+				<Select.Root
+					items={TRANSCRIPTION_SERVICE_OPTIONS}
+					selected={selectedTranscriptionServiceOption}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.selectedTranscriptionService = selected.value;
+					}}
+				>
+					<Select.Trigger class="w-full">
+						<Select.Value placeholder="Select a transcription service" />
+					</Select.Trigger>
+					<Select.Content class="max-h-96 overflow-auto">
+						{#each TRANSCRIPTION_SERVICE_OPTIONS as { value, label }}
+							<Select.Item {value} {label}>
+								{label}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+					<Select.Input id="selected-transcription-service" />
+				</Select.Root>
 			</div>
+			{#if settings.selectedTranscriptionService === 'OpenAI'}
+				<OpenAiSettings />
+			{:else if settings.selectedTranscriptionService === 'Groq'}
+				<GroqSettings />
+			{/if}
 		</Card.Content>
 		<Card.Footer>
 			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">

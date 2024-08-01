@@ -1,10 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import {
-	TranscriptionService,
-	TranscriptionServiceWhisperLive,
-	WHISPERING_URL,
-	type Settings,
-} from '@repo/shared';
+import { SUPPORTED_LANGUAGES_OPTIONS, WHISPERING_URL, type Settings } from '@repo/shared';
 import {
 	QueryClient,
 	QueryClientProvider,
@@ -12,7 +7,6 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import { Effect } from 'effect';
 import * as GetSettings from '~background/messages/contents/getSettings';
 import * as SetSettings from '~background/messages/contents/setSettings';
 import { Button } from '~components/ui/button';
@@ -104,12 +98,6 @@ function SettingsCard() {
 			return audioInputDevices;
 		},
 	});
-
-	const supportedLanguagesOptions = Effect.gen(function* () {
-		const transcriptionService = yield* TranscriptionService;
-		const languages = transcriptionService.supportedLanguages;
-		return languages;
-	}).pipe(Effect.provide(TranscriptionServiceWhisperLive), Effect.runSync);
 
 	if (isSettingsLoading) {
 		return <CardContent>Loading...</CardContent>;
@@ -236,12 +224,9 @@ function SettingsCard() {
 							<SelectValue placeholder="Select a device" />
 						</SelectTrigger>
 						<SelectContent className="max-h-96 overflow-auto">
-							{supportedLanguagesOptions.map((supportedLanguagesOption) => (
-								<SelectItem
-									key={supportedLanguagesOption.value}
-									value={supportedLanguagesOption.value}
-								>
-									{supportedLanguagesOption.label}
+							{SUPPORTED_LANGUAGES_OPTIONS.map(({ value, label }) => (
+								<SelectItem key={value} value={value}>
+									{label}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -288,16 +273,16 @@ function SettingsCard() {
 				</div>
 				<div className="grid gap-2">
 					<Label className="text-sm" htmlFor="api-key">
-						API Key
+						OpenAI API Key
 					</Label>
 					<Input
-						id="api-key"
+						id="openai-api-key"
 						placeholder="Your OpenAI API Key"
-						value={settings.apiKey}
+						value={settings.openAiApiKey}
 						onChange={(e) => {
 							setSettings.mutate({
 								...settings,
-								apiKey: e.target.value,
+								openAiApiKey: e.target.value,
 							});
 						}}
 						type="password"
@@ -312,6 +297,47 @@ function SettingsCard() {
 						>
 							OpenAI account settings
 						</Button>
+						. Make sure{' '}
+						<Button
+							variant="link"
+							className="px-0.3 py-0.2 h-fit"
+							onClick={() =>
+								chrome.tabs.create({
+									url: 'https://platform.openai.com/settings/organization/billing/overview',
+								})
+							}
+						>
+							billing
+						</Button>{' '}
+						is enabled.
+					</div>
+				</div>
+				<div className="grid gap-2">
+					<Label className="text-sm" htmlFor="api-key">
+						Groq API Key
+					</Label>
+					<Input
+						id="groq-api-key"
+						placeholder="Your Groq API Key"
+						value={settings.groqApiKey}
+						onChange={(e) => {
+							setSettings.mutate({
+								...settings,
+								groqApiKey: e.target.value,
+							});
+						}}
+						type="password"
+						autoComplete="off"
+					/>
+					<div className="text-muted-foreground text-sm">
+						You can find your Groq API key in your{' '}
+						<Button
+							variant="link"
+							className="px-0.3 py-0.2 h-fit"
+							onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
+						>
+							Groq console
+						</Button>
 						.
 					</div>
 				</div>
@@ -319,7 +345,7 @@ function SettingsCard() {
 			<CardFooter>
 				<Button
 					onClick={() => {
-						if (settings.apiKey === '') {
+						if (settings.openAiApiKey === '') {
 							alert('Please enter an API Key');
 							return;
 						}

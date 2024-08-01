@@ -143,78 +143,59 @@ export const recorder = Effect.gen(function* () {
 		},
 		toggleRecording: () =>
 			Effect.gen(function* () {
-				if (!settings.apiKey) {
-					return yield* new WhisperingError({
-						title: 'API Key not provided.',
-						description: 'Please enter your OpenAI API key in the settings',
-						action: {
-							label: 'Go to settings',
-							goto: '/settings',
-						},
-					});
-				}
-
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
 						yield* mediaRecorderService.startRecording();
-						yield* Effect.all([
-							Effect.sync(() => (recorderState.value = 'RECORDING')),
-							Effect.logInfo('Recording started'),
-							Effect.gen(function* () {
-								if (settings.isPlaySoundEnabled) {
-									if (!document.hidden) {
-										startSound.play();
-									} else {
-										yield* sendMessageToExtension({
-											name: 'external/playSound',
-											body: { sound: 'start' },
-										});
-									}
-								}
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-							notify({
-								id: IS_RECORDING_NOTIFICATION_ID,
-								title: 'Whispering is recording...',
-								description: 'Click to go to recorder',
-								action: {
-									label: 'Go to recorder',
-									goto: '/',
-								},
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-						]);
+						recorderState.value = 'RECORDING';
+						yield* Effect.logInfo('Recording started');
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								startSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'start' },
+								}).pipe(Effect.catchAll(renderErrorAsToast));
+							}
+						}
+						notify({
+							id: IS_RECORDING_NOTIFICATION_ID,
+							title: 'Whispering is recording...',
+							description: 'Click to go to recorder',
+							action: {
+								label: 'Go to recorder',
+								goto: '/',
+							},
+						}).pipe(Effect.catchAll(renderErrorAsToast));
 						return;
 					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
-						yield* Effect.all([
-							Effect.sync(() => (recorderState.value = 'IDLE')),
-							Effect.logInfo('Recording stopped'),
-							Effect.gen(function* () {
-								if (settings.isPlaySoundEnabled) {
-									if (!document.hidden) {
-										stopSound.play();
-									} else {
-										yield* sendMessageToExtension({
-											name: 'external/playSound',
-											body: { sound: 'stop' },
-										});
-									}
-								}
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-							Effect.gen(function* () {
-								const newRecording: Recording = {
-									id: nanoid(),
-									title: '',
-									subtitle: '',
-									timestamp: new Date().toISOString(),
-									transcribedText: '',
-									blob: audioBlob,
-									transcriptionStatus: 'UNPROCESSED',
-								};
-								yield* recordings.addRecording(newRecording);
-								recordings.transcribeRecording(newRecording.id);
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-						]);
-						return;
+						recorderState.value = 'IDLE';
+						yield* Effect.logInfo('Recording stopped');
+
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								stopSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'stop' },
+								}).pipe(Effect.catchAll(renderErrorAsToast));
+							}
+						}
+
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob: audioBlob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+						yield* recordings.addRecording(newRecording);
+
+						yield* recordings.transcribeRecording(newRecording.id);
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		cancelRecording: () =>

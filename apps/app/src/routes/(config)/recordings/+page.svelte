@@ -20,6 +20,7 @@
 	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
@@ -33,7 +34,6 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -235,7 +235,7 @@
 					}
 				}),
 			);
-		const text = transcriptions.join('\n\n');
+		const text = transcriptions.join(delimiter);
 		return text;
 	});
 </script>
@@ -259,20 +259,21 @@
 				<Input placeholder="Filter transcripts..." type="text" bind:value={filterQuery} />
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
-
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
 						tooltipText="Transcribe selected recordings"
 						variant="outline"
 						size="icon"
-						onclick={() => {
-							Promise.all(
+						onclick={() =>
+							Effect.all(
 								selectedRecordingRows.map((recording) =>
-									recordings.transcribeRecording(recording.id),
+									recordings
+										.transcribeRecording(recording.id)
+										.pipe(Effect.catchAll(renderErrorAsToast)),
 								),
-							);
-						}}
+								{ concurrency: 'unbounded' },
+							).pipe(Effect.runPromise)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
 							const currentRow = recordings.value.find((r) => r.id === id);

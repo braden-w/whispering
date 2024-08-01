@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
-import { SUPPORTED_LANGUAGES } from './services/TranscriptionServiceWhisperingLive.js';
+import { SUPPORTED_LANGUAGES, TRANSCRIPTION_SERVICES } from './services/TranscriptionService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -24,9 +24,11 @@ export const settingsSchema = S.Struct({
 	selectedAudioInputDeviceId: S.String,
 	currentLocalShortcut: S.String,
 	currentGlobalShortcut: S.String,
-	apiKey: S.String,
+	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
+	openAiApiKey: S.String,
+	groqApiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
-	bitsPerSecond: S.optional(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
+	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
 		default: () => DEFAULT_BITRATE_MS,
 	}),
 });
@@ -36,10 +38,12 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPlaySoundEnabled: true,
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
-		selectedAudioInputDeviceId: '',
+		selectedAudioInputDeviceId: 'default',
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
-		apiKey: '',
+		selectedTranscriptionService: 'OpenAI',
+		openAiApiKey: '',
+		groqApiKey: '',
 		outputLanguage: 'auto',
 		bitsPerSecond: DEFAULT_BITRATE_MS,
 	}) satisfies Settings;
