@@ -11,6 +11,7 @@ import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbSe
 import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { toast } from '$lib/services/ToastService';
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
+import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Option } from 'effect';
@@ -21,7 +22,6 @@ import { settings } from './settings.svelte';
 export const recordings = Effect.gen(function* () {
 	const { notify, clear } = yield* NotificationService;
 	const recordingsDb = yield* RecordingsDbService;
-	const transcriptionService = yield* TranscriptionService;
 	const clipboardService = yield* ClipboardService;
 	const { downloadBlob } = yield* DownloadService;
 
@@ -75,8 +75,14 @@ export const recordings = Effect.gen(function* () {
 					description: 'Your recordings have been deleted successfully.',
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
-		transcribeRecording: (id: string) =>
-			Effect.gen(function* () {
+		transcribeRecording: (id: string) => {
+			const selectedTranscriptionService = {
+				OpenAI: TranscriptionServiceWhisperLive,
+				Groq: TranscriptionServiceGroqLive,
+			}[settings.selectedTranscriptionService];
+
+			return Effect.gen(function* () {
+				const transcriptionService = yield* TranscriptionService;
 				const transcribingInProgressId = nanoid();
 				yield* toast({
 					id: transcribingInProgressId,
@@ -180,7 +186,8 @@ export const recordings = Effect.gen(function* () {
 						descriptionClass: 'line-clamp-2',
 					});
 				}
-			}),
+			}).pipe(Effect.provide(selectedTranscriptionService));
+		},
 		downloadRecording: (id: string) =>
 			Effect.gen(function* () {
 				const maybeRecording = yield* recordingsDb.getRecording(id);
@@ -207,7 +214,6 @@ export const recordings = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(TranscriptionServiceGroqLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
 	Effect.provide(window.__TAURI__ ? DownloadServiceDesktopLive : DownloadServiceWebLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
