@@ -17,7 +17,7 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 			commandName: 'setClipboardText',
 			func: (text) => {
 				try {
-					navigator.clipboard.writeText(text);
+					navigator.clipboard.writeTextToCursor(text);
 					return { isSuccess: true, data: text } as const;
 				} catch (error) {
 					return {

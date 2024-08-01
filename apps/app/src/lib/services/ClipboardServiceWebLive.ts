@@ -8,7 +8,7 @@ export const ClipboardServiceWebLive = Layer.succeed(
 	ClipboardService.of({
 		setClipboardText: (text) =>
 			Effect.tryPromise({
-				try: () => navigator.clipboard.writeText(text),
+				try: () => navigator.clipboard.writeTextToCursor(text),
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
@@ -23,7 +23,7 @@ export const ClipboardServiceWebLive = Layer.succeed(
 					}),
 				),
 			),
-		writeText: (text) =>
+		writeTextToCursor: (text) =>
 			sendMessageToExtension({
 				name: 'external/writeTextToCursor',
 				body: { transcribedText: text },

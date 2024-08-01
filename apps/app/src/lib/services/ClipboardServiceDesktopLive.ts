@@ -5,12 +5,12 @@ import { type } from '@tauri-apps/api/os';
 import { invoke } from '@tauri-apps/api/tauri';
 import { Effect, Layer } from 'effect';
 
-const writeTextToClipboard = (text: string) =>
-	Effect.tryPromise({
-		try: () => writeText(text),
+const writeTextToCursor = (text: string) =>
+	Effect.try({
+		try: () => invoke('write_text', { text }),
 		catch: (error) =>
 			new WhisperingError({
-				title: 'Unable to write to clipboard',
+				title: 'Unable to paste from clipboard',
 				description: error instanceof Error ? error.message : 'Please try again.',
 				error,
 			}),
@@ -19,11 +19,21 @@ const writeTextToClipboard = (text: string) =>
 export const ClipboardServiceDesktopLive = Layer.succeed(
 	ClipboardService,
 	ClipboardService.of({
-		setClipboardText: (text) =>
+		setClipboardText: (text: string) =>
+			Effect.tryPromise({
+				try: () => writeText(text),
+				catch: (error) =>
+					new WhisperingError({
+						title: 'Unable to write to clipboard',
+						description: error instanceof Error ? error.message : 'Please try again.',
+						error,
+					}),
+			}),
+		writeTextToCursor: (text) =>
 			Effect.gen(function* () {
 				const isMacos = (yield* Effect.promise(type)) === 'Darwin';
 
-				if (!isMacos) return yield* writeTextToClipboard(text);
+				if (!isMacos) return yield* writeTextToCursor(text);
 
 				const isAccessibilityEnabled = yield* Effect.tryPromise({
 					try: () =>
@@ -49,17 +59,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 						},
 					});
 				}
-				return yield* writeTextToClipboard(text);
-			}),
-		writeText: (text) =>
-			Effect.try({
-				try: () => invoke('write_text', { text }),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to paste from clipboard',
-						description: error instanceof Error ? error.message : 'Please try again.',
-						error,
-					}),
+				return yield* writeTextToCursor(text);
 			}),
 	}),
 );
