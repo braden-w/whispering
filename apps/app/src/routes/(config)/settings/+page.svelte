@@ -1,8 +1,4 @@
 <script lang="ts">
-	import GroqSettings from './GroqSettings.svelte';
-
-	import OpenAiSettings from './OpenAiSettings.svelte';
-
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -22,6 +18,8 @@
 	} from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
+	import GroqSettings from './GroqSettings.svelte';
+	import OpenAiSettings from './OpenAiSettings.svelte';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
 		Effect.catchAll((error) => {
