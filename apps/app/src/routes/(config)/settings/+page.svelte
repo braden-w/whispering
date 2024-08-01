@@ -11,7 +11,11 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, SUPPORTED_LANGUAGES_OPTIONS } from '@repo/shared';
+	import {
+		BITRATE_OPTIONS,
+		SUPPORTED_LANGUAGES_OPTIONS,
+		TRANSCRIPTION_SERVICES,
+	} from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
 
@@ -25,6 +29,17 @@
 
 	const selectedLanguageOption = $derived(
 		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.outputLanguage),
+	);
+
+	const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map((service) => ({
+		value: service,
+		label: service,
+	}));
+
+	const selectedTranscriptionServiceOption = $derived(
+		TRANSCRIPTION_SERVICE_OPTIONS.find(
+			(option) => option.value === settings.selectedTranscriptionService,
+		),
 	);
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
@@ -136,7 +151,7 @@
 								</Select.Item>
 							{/each}
 						</Select.Content>
-						<Select.Input name="recording-device" />
+						<Select.Input id="recording-device" />
 					</Select.Root>
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
@@ -162,7 +177,7 @@
 							</Select.Item>
 						{/each}
 					</Select.Content>
-					<Select.Input name="bit-rate" />
+					<Select.Input id="bit-rate" />
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
@@ -185,7 +200,7 @@
 							</Select.Item>
 						{/each}
 					</Select.Content>
-					<Select.Input name="output-language" />
+					<Select.Input id="output-language" />
 				</Select.Root>
 			</div>
 			<div class="grid gap-2">
@@ -223,6 +238,29 @@
 						</Button>
 					</div>
 				{/if}
+			</div>
+			<div class="grid gap-2">
+				<Label class="text-sm" for="selected-transcription-service">Transcription Service</Label>
+				<Select.Root
+					items={TRANSCRIPTION_SERVICE_OPTIONS}
+					selected={selectedTranscriptionServiceOption}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.selectedTranscriptionService = selected.value;
+					}}
+				>
+					<Select.Trigger class="w-full">
+						<Select.Value placeholder="Select a transcription service" />
+					</Select.Trigger>
+					<Select.Content class="max-h-96 overflow-auto">
+						{#each TRANSCRIPTION_SERVICE_OPTIONS as { value, label }}
+							<Select.Item {value} {label}>
+								{label}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+					<Select.Input id="selected-transcription-service" />
+				</Select.Root>
 			</div>
 			<div class="grid gap-2">
 				<Label class="text-sm" for="openai-api-key">OpenAI API Key</Label>

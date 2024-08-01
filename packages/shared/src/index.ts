@@ -1,7 +1,7 @@
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
-import { SUPPORTED_LANGUAGES } from './services/TranscriptionService.js';
+import { SUPPORTED_LANGUAGES, TRANSCRIPTION_SERVICES } from './services/TranscriptionService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -24,7 +24,7 @@ export const settingsSchema = S.Struct({
 	selectedAudioInputDeviceId: S.String,
 	currentLocalShortcut: S.String,
 	currentGlobalShortcut: S.String,
-	selectedTranscriptionService: S.Literal('OpenAI', 'Groq'),
+	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
 	openAiApiKey: S.String,
 	groqApiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),

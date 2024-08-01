@@ -131,6 +131,8 @@ export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
 	(lang) => ({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
 );
 
+export const TRANSCRIPTION_SERVICES = ['OpenAI', 'Groq'] as const;
+
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,
 	{
