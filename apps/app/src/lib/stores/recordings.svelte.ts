@@ -2,6 +2,9 @@ import { goto } from '$app/navigation';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
+import { DownloadService } from '$lib/services/DownloadService';
+import { DownloadServiceDesktopLive } from '$lib/services/DownloadServiceDesktopLive';
+import { DownloadServiceWebLive } from '$lib/services/DownloadServiceWebLive';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
@@ -10,8 +13,8 @@ import { toast } from '$lib/services/ToastService';
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
-import { save } from '@tauri-apps/api/dialog';
-import { writeBinaryFile } from '@tauri-apps/api/fs';
+import { Effect, Option } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
@@ -20,6 +23,7 @@ export const recordings = Effect.gen(function* () {
 	const recordingsDb = yield* RecordingsDbService;
 	const transcriptionService = yield* TranscriptionService;
 	const clipboardService = yield* ClipboardService;
+	const { downloadBlob } = yield* DownloadService;
 
 	let recordings = $state<Recording[]>([]);
 	const updateRecording = (recording: Recording) =>
@@ -107,15 +111,13 @@ export const recordings = Effect.gen(function* () {
 					}
 					const recording = maybeRecording.value;
 					yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
-					const transcriptionResult = yield* Effect.either(
-						transcriptionService.transcribe(recording.blob),
-					);
-					if (Either.isLeft(transcriptionResult)) {
-						yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });
-						const error = transcriptionResult.left;
-						return yield* error;
-					}
-					const transcribedText = transcriptionResult.right;
+					const transcribedText = yield* transcriptionService
+						.transcribe(recording.blob)
+						.pipe(
+							Effect.tapError(() =>
+								updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' }),
+							),
+						);
 					yield* Effect.all(
 						[
 							updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }),
@@ -189,46 +191,7 @@ export const recordings = Effect.gen(function* () {
 					});
 				}
 				const recording = maybeRecording.value;
-				if (window.__TAURI__) {
-					const path = yield* Effect.promise(() =>
-						save({
-							filters: [
-								{
-									name: `whispering_recording_${recording.id}`,
-									extensions: ['ogg'],
-								},
-							],
-						}),
-					);
-					if (path === null) return;
-					const contents = new Uint8Array(
-						yield* Effect.promise(() => recording.blob.arrayBuffer()),
-					);
-					yield* Effect.tryPromise({
-						try: () => writeBinaryFile({ path, contents }),
-						catch: (error) =>
-							new WhisperingError({
-								title: 'Error saving recording',
-								description: 'Please try again.',
-								error: error,
-							}),
-					});
-				} else {
-					if (recording.blob) {
-						const url = URL.createObjectURL(recording.blob);
-						const a = document.createElement('a');
-						a.style.display = 'none';
-						a.href = url;
-						a.download = `whispering_recording_${recording.id}.wav`; // Adjust the file extension if needed
-
-						document.body.appendChild(a);
-						a.click();
-
-						// Clean up
-						window.URL.revokeObjectURL(url);
-						document.body.removeChild(a);
-					}
-				}
+				yield* downloadBlob({ blob: recording.blob, name: `whispering_recording_${recording.id}` });
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
@@ -246,6 +209,7 @@ export const recordings = Effect.gen(function* () {
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
 	Effect.provide(TranscriptionServiceGroqLive),
 	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
+	Effect.provide(window.__TAURI__ ? DownloadServiceDesktopLive : DownloadServiceWebLive),
 	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
 	Effect.runSync,
 );
