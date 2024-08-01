@@ -11,7 +11,7 @@
 		"package": "plasmo package"
 	},
 	"dependencies": {
-		"@effect/schema": "^0.69.2",
+		"@effect/schema": "^0.70.1",
 		"@plasmohq/messaging": "^0.6.2",
 		"@plasmohq/storage": "^1.11.0",
 		"@radix-ui/react-label": "^2.1.0",
@@ -19,12 +19,12 @@
 		"@radix-ui/react-slot": "^1.1.0",
 		"@radix-ui/react-switch": "^1.1.0",
 		"@radix-ui/react-tooltip": "^1.1.2",
-		"@tanstack/react-query": "^5.51.15",
+		"@tanstack/react-query": "^5.51.18",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
-		"effect": "^3.5.8",
+		"effect": "^3.6.0",
 		"idb": "^8.0.0",
-		"lucide-react": "^0.417.0",
+		"lucide-react": "^0.419.0",
 		"nanoid": "^5.0.7",
 		"plasmo": "^0.88.0",
 		"react": "^18.3.1",
@@ -35,7 +35,7 @@
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.269",
-		"@types/node": "^22.0.0",
+		"@types/node": "^22.0.2",
 		"@types/react": "^18.3.3",
 		"@types/react-dom": "^18.3.0",
 		"autoprefixer": "^10.4.19",

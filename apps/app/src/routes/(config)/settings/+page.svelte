@@ -14,7 +14,7 @@
 	import {
 		BITRATE_OPTIONS,
 		SUPPORTED_LANGUAGES_OPTIONS,
-		TRANSCRIPTION_SERVICES,
+		TRANSCRIPTION_SERVICE_OPTIONS,
 	} from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
@@ -32,11 +32,6 @@
 	const selectedLanguageOption = $derived(
 		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.outputLanguage),
 	);
-
-	const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map((service) => ({
-		value: service,
-		label: service,
-	}));
 
 	const selectedTranscriptionServiceOption = $derived(
 		TRANSCRIPTION_SERVICE_OPTIONS.find(

@@ -1,10 +1,10 @@
-import { Schema as S } from '@effect/schema';
+import { Schema } from '@effect/schema';
+import type { ParseError } from '@effect/schema/ParseResult';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
 import { WhisperingError, recorderStateSchema } from '@repo/shared';
 import { Console, Effect } from 'effect';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from './NotificationServiceBgswLive';
-import type { ParseError } from '@effect/schema/ParseResult';
 
 export const STORAGE_KEYS = {
 	RECORDER_STATE: 'whispering-recorder-state',
@@ -14,17 +14,18 @@ export const STORAGE_KEYS = {
 
 const storage = new Storage();
 
-const createSetWatch = <TSchema extends S.Schema.AnyNoContext, A = S.Schema.Type<TSchema>>({
+const createSetWatch = <
+	TSchema extends Schema.Schema.AnyNoContext,
+	A = Schema.Schema.Type<TSchema>,
+>({
 	key,
 	schema,
 }: {
 	key: string;
 	schema: TSchema;
 }) => {
-	const parseValueFromStorage = (valueFromStorage: unknown) => {
-		const jsonSchema = S.parseJson(schema);
-		return S.decodeUnknown(jsonSchema)(valueFromStorage) satisfies Effect.Effect<A, ParseError>;
-	};
+	const parseValueFromStorage = (valueFromStorage: unknown): Effect.Effect<A, ParseError> =>
+		Schema.decodeUnknown(Schema.parseJson(schema))(valueFromStorage);
 	return {
 		set: (value: A) => Effect.promise(() => storage.set(key, value)),
 		watch: (callback: (newValue: A) => void) => {
@@ -59,6 +60,6 @@ export const extensionStorageService = {
 	}),
 	[STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]: createSetWatch({
 		key: STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
-		schema: S.String,
+		schema: Schema.String,
 	}),
 } as const;

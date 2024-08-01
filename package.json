@@ -14,8 +14,6 @@
 	},
 	"packageManager": "pnpm@8.6.5",
 	"devDependencies": {
-		"@parcel/optimizer-data-url": "2.9.3",
-		"@parcel/transformer-inline-string": "2.9.3",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
 		"eslint": "latest",
