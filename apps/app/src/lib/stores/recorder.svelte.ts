@@ -146,31 +146,27 @@ export const recorder = Effect.gen(function* () {
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
 						yield* mediaRecorderService.startRecording();
-						yield* Effect.all([
-							Effect.sync(() => (recorderState.value = 'RECORDING')),
-							Effect.logInfo('Recording started'),
-							Effect.gen(function* () {
-								if (settings.isPlaySoundEnabled) {
-									if (!document.hidden) {
-										startSound.play();
-									} else {
-										yield* sendMessageToExtension({
-											name: 'external/playSound',
-											body: { sound: 'start' },
-										});
-									}
-								}
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-							notify({
-								id: IS_RECORDING_NOTIFICATION_ID,
-								title: 'Whispering is recording...',
-								description: 'Click to go to recorder',
-								action: {
-									label: 'Go to recorder',
-									goto: '/',
-								},
-							}).pipe(Effect.catchAll(renderErrorAsToast)),
-						]);
+						recorderState.value = 'RECORDING';
+						yield* Effect.logInfo('Recording started');
+						if (settings.isPlaySoundEnabled) {
+							if (!document.hidden) {
+								startSound.play();
+							} else {
+								yield* sendMessageToExtension({
+									name: 'external/playSound',
+									body: { sound: 'start' },
+								}).pipe(Effect.catchAll(renderErrorAsToast));
+							}
+						}
+						notify({
+							id: IS_RECORDING_NOTIFICATION_ID,
+							title: 'Whispering is recording...',
+							description: 'Click to go to recorder',
+							action: {
+								label: 'Go to recorder',
+								goto: '/',
+							},
+						}).pipe(Effect.catchAll(renderErrorAsToast));
 						return;
 					case 'recording':
 						const audioBlob = yield* mediaRecorderService.stopRecording;
@@ -184,7 +180,7 @@ export const recorder = Effect.gen(function* () {
 								yield* sendMessageToExtension({
 									name: 'external/playSound',
 									body: { sound: 'stop' },
-								});
+								}).pipe(Effect.catchAll(renderErrorAsToast));
 							}
 						}
 
