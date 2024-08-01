@@ -12,6 +12,8 @@ import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
 import { save } from '@tauri-apps/api/dialog';
 import { writeBinaryFile } from '@tauri-apps/api/fs';
+import { Effect, Option } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
@@ -107,15 +109,13 @@ export const recordings = Effect.gen(function* () {
 					}
 					const recording = maybeRecording.value;
 					yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
-					const transcriptionResult = yield* Effect.either(
-						transcriptionService.transcribe(recording.blob),
-					);
-					if (Either.isLeft(transcriptionResult)) {
-						yield* updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' });
-						const error = transcriptionResult.left;
-						return yield* error;
-					}
-					const transcribedText = transcriptionResult.right;
+					const transcribedText = yield* transcriptionService
+						.transcribe(recording.blob)
+						.pipe(
+							Effect.tapError(() =>
+								updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' }),
+							),
+						);
 					yield* Effect.all(
 						[
 							updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }),
