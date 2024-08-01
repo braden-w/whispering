@@ -1,4 +1,8 @@
 <script lang="ts">
+	import GroqSettings from './GroqSettings.svelte';
+
+	import OpenAiSettings from './OpenAiSettings.svelte';
+
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -262,57 +266,11 @@
 					<Select.Input id="selected-transcription-service" />
 				</Select.Root>
 			</div>
-			<div class="grid gap-2">
-				<Label class="text-sm" for="openai-api-key">OpenAI API Key</Label>
-				<Input
-					id="openai-api-key"
-					placeholder="Your OpenAI API Key"
-					bind:value={settings.openAiApiKey}
-					type="password"
-					autocomplete="off"
-				/>
-				<div class="text-muted-foreground text-sm">
-					You can find your API key in your <Button
-						variant="link"
-						class="px-0.3 py-0.2 h-fit"
-						href="https://platform.openai.com/api-keys"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						account settings
-					</Button>. Make sure <Button
-						variant="link"
-						class="px-0.3 py-0.2 h-fit"
-						href="https://platform.openai.com/settings/organization/billing/overview"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						billing
-					</Button>
-					is enabled.
-				</div>
-			</div>
-			<div class="grid gap-2">
-				<Label class="text-sm" for="groq-api-key">Groq API Key</Label>
-				<Input
-					id="groq-api-key"
-					placeholder="Your Groq API Key"
-					bind:value={settings.groqApiKey}
-					type="password"
-					autocomplete="off"
-				/>
-				<div class="text-muted-foreground text-sm">
-					You can find your Groq API key in your <Button
-						variant="link"
-						class="px-0.3 py-0.2 h-fit"
-						href="https://console.groq.com/keys"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Groq console
-					</Button>.
-				</div>
-			</div>
+			{#if settings.selectedTranscriptionService === 'OpenAI'}
+				<OpenAiSettings />
+			{:else if settings.selectedTranscriptionService === 'Groq'}
+				<GroqSettings />
+			{/if}
 		</Card.Content>
 		<Card.Footer>
 			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
