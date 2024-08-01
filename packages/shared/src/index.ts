@@ -38,7 +38,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPlaySoundEnabled: true,
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
-		selectedAudioInputDeviceId: '',
+		selectedAudioInputDeviceId: 'default',
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 		selectedTranscriptionService: 'OpenAI',
