@@ -158,7 +158,7 @@ export const recorder = Effect.gen(function* () {
 								}).pipe(Effect.catchAll(renderErrorAsToast));
 							}
 						}
-						notify({
+						yield* notify({
 							id: IS_RECORDING_NOTIFICATION_ID,
 							title: 'Whispering is recording...',
 							description: 'Click to go to recorder',
