@@ -177,7 +177,10 @@
 					id="local-shortcut"
 					label="Local Shortcut"
 					placeholder="Local Shortcut to toggle recording"
-					bind:value={settings.currentLocalShortcut}
+					value={settings.currentLocalShortcut}
+					onchange={(event) => {
+						settings.currentLocalShortcut = event.currentTarget.value;
+					}}
 				/>
 			</div>
 			<div class="grid gap-2">
@@ -186,7 +189,10 @@
 						id="global-shortcut"
 						label="Global Shortcut"
 						placeholder="Global Shortcut to toggle recording"
-						bind:value={settings.currentGlobalShortcut}
+						value={settings.currentGlobalShortcut}
+						onchange={(event) => {
+							settings.currentGlobalShortcut = event.currentTarget.value;
+						}}
 					/>
 				{:else}
 					<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
@@ -194,7 +200,10 @@
 						<Input
 							id="global-shortcut"
 							placeholder="Global Shortcut to toggle recording"
-							bind:value={settings.currentGlobalShortcut}
+							value={settings.currentGlobalShortcut}
+							onchange={(event) => {
+								settings.currentGlobalShortcut = event.currentTarget.value;
+							}}
 							type="text"
 							autocomplete="off"
 							disabled
