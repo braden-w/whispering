@@ -6,8 +6,7 @@
 	let {
 		id,
 		label,
-		value,
-		onchange,
+		value = $bindable(),
 		placeholder = '',
 		type = 'text',
 		disabled = false,
@@ -21,4 +20,4 @@
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>
-<Input {id} {placeholder} {value} {onchange} {type} {disabled} autocomplete="off" />
+<Input {id} {placeholder} bind:value {onchange} {type} {disabled} autocomplete="off" />
