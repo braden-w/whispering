@@ -3,7 +3,6 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
 	import {
 		enumerateRecordingDevices,
@@ -20,6 +19,8 @@
 	import { Effect } from 'effect';
 	import GroqSettings from './GroqSettings.svelte';
 	import OpenAiSettings from './OpenAiSettings.svelte';
+	import SettingsLabelInput from './SettingsLabelInput.svelte';
+	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
 	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
 		Effect.catchAll((error) => {
@@ -117,19 +118,21 @@
 				</Label>
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="recording-device">Recording Device</Label>
 				{#await getMediaDevicesPromise}
-					<Select.Root disabled>
-						<Select.Trigger class="w-full">
-							<Select.Value placeholder="Loading devices..." />
-						</Select.Trigger>
-					</Select.Root>
+					<SettingsLabelSelect
+						id="recording-device"
+						label="Recording Device"
+						placeholder="Loading devices..."
+						disabled
+					/>
 				{:then mediaDevices}
 					{@const items = mediaDevices.map((device) => ({
 						value: device.deviceId,
 						label: device.label,
 					}))}
-					<Select.Root
+					<SettingsLabelSelect
+						id="recording-device"
+						label="Recording Device"
 						{items}
 						selected={items.find((item) => item.value === settings.selectedAudioInputDeviceId)}
 						onSelectedChange={(selected) => {
@@ -137,90 +140,56 @@
 							settings.selectedAudioInputDeviceId = selected.value;
 							mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 						}}
-					>
-						<Select.Trigger class="w-full">
-							<Select.Value placeholder="Select a device" />
-						</Select.Trigger>
-						<Select.Content>
-							{#each mediaDevices as device}
-								<Select.Item value={device.deviceId} label={device.label}>
-									{device.label}
-								</Select.Item>
-							{/each}
-						</Select.Content>
-						<Select.Input id="recording-device" />
-					</Select.Root>
+						placeholder="Select a device"
+					/>
 				{:catch error}
 					<p>Error with listing media devices: {error.message}</p>
 				{/await}
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="bit-rate">Bitrate</Label>
-				<Select.Root
+				<SettingsLabelSelect
+					id="bit-rate"
+					label="Bitrate"
 					items={BITRATE_OPTIONS}
 					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitsPerSecond)}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
 						settings.bitsPerSecond = selected.value;
 					}}
-				>
-					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Select a device" />
-					</Select.Trigger>
-					<Select.Content>
-						{#each BITRATE_OPTIONS as bitRateOption}
-							<Select.Item value={bitRateOption.value} label={bitRateOption.label}>
-								{bitRateOption.label}
-							</Select.Item>
-						{/each}
-					</Select.Content>
-					<Select.Input id="bit-rate" />
-				</Select.Root>
+					placeholder="Select a bitrate"
+				/>
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="output-language">Output Language</Label>
-				<Select.Root
+				<SettingsLabelSelect
+					id="output-language"
+					label="Output Language"
 					items={SUPPORTED_LANGUAGES_OPTIONS}
 					selected={selectedLanguageOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
 						settings.outputLanguage = selected.value;
 					}}
-				>
-					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Select a device" />
-					</Select.Trigger>
-					<Select.Content class="max-h-96 overflow-auto">
-						{#each SUPPORTED_LANGUAGES_OPTIONS as { value, label }}
-							<Select.Item {value} {label}>
-								{label}
-							</Select.Item>
-						{/each}
-					</Select.Content>
-					<Select.Input id="output-language" />
-				</Select.Root>
-			</div>
-			<div class="grid gap-2">
-				<Label class="text-sm" for="local-shortcut">Local Shortcut</Label>
-				<Input
-					id="local-shortcut"
-					placeholder="Local Shortcut to toggle recording"
-					bind:value={settings.currentLocalShortcut}
-					type="text"
-					autocomplete="off"
+					placeholder="Select a language"
 				/>
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
+				<SettingsLabelInput
+					id="local-shortcut"
+					label="Local Shortcut"
+					placeholder="Local Shortcut to toggle recording"
+					bind:value={settings.currentLocalShortcut}
+				/>
+			</div>
+			<div class="grid gap-2">
 				{#if settings.isGlobalShortcutEnabled}
-					<Input
+					<SettingsLabelInput
 						id="global-shortcut"
+						label="Global Shortcut"
 						placeholder="Global Shortcut to toggle recording"
 						bind:value={settings.currentGlobalShortcut}
-						type="text"
-						autocomplete="off"
 					/>
 				{:else}
+					<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
 					<div class="relative">
 						<Input
 							id="global-shortcut"
@@ -237,27 +206,17 @@
 				{/if}
 			</div>
 			<div class="grid gap-2">
-				<Label class="text-sm" for="selected-transcription-service">Transcription Service</Label>
-				<Select.Root
+				<SettingsLabelSelect
+					id="selected-transcription-service"
+					label="Transcription Service"
 					items={TRANSCRIPTION_SERVICE_OPTIONS}
 					selected={selectedTranscriptionServiceOption}
 					onSelectedChange={(selected) => {
 						if (!selected) return;
 						settings.selectedTranscriptionService = selected.value;
 					}}
-				>
-					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Select a transcription service" />
-					</Select.Trigger>
-					<Select.Content class="max-h-96 overflow-auto">
-						{#each TRANSCRIPTION_SERVICE_OPTIONS as { value, label }}
-							<Select.Item {value} {label}>
-								{label}
-							</Select.Item>
-						{/each}
-					</Select.Content>
-					<Select.Input id="selected-transcription-service" />
-				</Select.Root>
+					placeholder="Select a transcription service"
+				/>
 			</div>
 			{#if settings.selectedTranscriptionService === 'OpenAI'}
 				<OpenAiSettings />
