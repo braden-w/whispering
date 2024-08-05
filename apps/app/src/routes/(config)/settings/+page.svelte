@@ -17,8 +17,6 @@
 	} from '@repo/shared';
 	import { getVersion } from '@tauri-apps/api/app';
 	import { Effect } from 'effect';
-	import GroqSettings from './GroqSettings.svelte';
-	import OpenAiSettings from './OpenAiSettings.svelte';
 	import SettingsLabelInput from './SettingsLabelInput.svelte';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
@@ -219,9 +217,54 @@
 				/>
 			</div>
 			{#if settings.selectedTranscriptionService === 'OpenAI'}
-				<OpenAiSettings />
+				<div class="grid gap-2">
+					<SettingsLabelInput
+						id="openai-api-key"
+						label="OpenAI API Key"
+						placeholder="Your OpenAI API Key"
+						bind:value={settings.openAiApiKey}
+					/>
+					<div class="text-muted-foreground text-sm">
+						You can find your API key in your <Button
+							variant="link"
+							class="px-0.3 py-0.2 h-fit"
+							href="https://platform.openai.com/api-keys"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							account settings
+						</Button>. Make sure <Button
+							variant="link"
+							class="px-0.3 py-0.2 h-fit"
+							href="https://platform.openai.com/settings/organization/billing/overview"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							billing
+						</Button>
+						is enabled.
+					</div>
+				</div>
 			{:else if settings.selectedTranscriptionService === 'Groq'}
-				<GroqSettings />
+				<div class="grid gap-2">
+					<SettingsLabelInput
+						id="groq-api-key"
+						label="Groq API Key"
+						placeholder="Your Groq API Key"
+						bind:value={settings.groqApiKey}
+					/>
+					<div class="text-muted-foreground text-sm">
+						You can find your Groq API key in your <Button
+							variant="link"
+							class="px-0.3 py-0.2 h-fit"
+							href="https://console.groq.com/keys"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Groq console
+						</Button>.
+					</div>
+				</div>
 			{/if}
 		</Card.Content>
 		<Card.Footer>
