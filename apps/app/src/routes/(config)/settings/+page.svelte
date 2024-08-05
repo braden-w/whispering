@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Switch } from '$lib/components/ui/switch';
+	import { Separator } from '$lib/components/ui/separator';
 	import {
 		enumerateRecordingDevices,
 		mediaStreamManager,
@@ -58,35 +59,39 @@
 	<title>Settings</title>
 </svelte:head>
 
-<main class="flex w-full flex-1 items-center justify-center pb-4 pt-2">
+<main class="container flex w-full flex-1 flex-col justify-center pb-4 pt-2">
+	<div class="space-y-0.5">
+		<h2 class="text-2xl font-bold tracking-tight">Settings</h2>
+		<p class="text-muted-foreground">
+			{#await versionPromise}
+				Customize your Whispering experience.
+			{:then v}
+				{#if v.isOutdated}
+					{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
+					Customize your experience for Whispering {currentVersion} (latest
+					<Button
+						class="px-0"
+						variant="link"
+						size="inline"
+						href={latestReleaseUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{latestVersion}
+					</Button>).
+				{:else}
+					{@const { version } = v}
+					Customize your experience for Whispering {version}.
+				{/if}
+			{:catch error}
+				Customize your Whispering experience.
+			{/await}
+		</p>
+	</div>
+	<Separator class="my-6" />
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title class="text-xl">Settings</Card.Title>
-			<Card.Description>
-				{#await versionPromise}
-					Customize your Whispering experience.
-				{:then v}
-					{#if v.isOutdated}
-						{@const { latestVersion, currentVersion, latestReleaseUrl } = v}
-						Customize your experience for Whispering {currentVersion} (latest
-						<Button
-							class="px-0"
-							variant="link"
-							size="inline"
-							href={latestReleaseUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{latestVersion}
-						</Button>).
-					{:else}
-						{@const { version } = v}
-						Customize your experience for Whispering {version}.
-					{/if}
-				{:catch error}
-					Customize your Whispering experience.
-				{/await}
-			</Card.Description>
+			<Card.Title class="text-xl">General Settings</Card.Title>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<div class="flex items-center gap-2">
@@ -115,94 +120,13 @@
 					Paste contents from clipboard after successful transcription
 				</Label>
 			</div>
-			<div class="grid gap-2">
-				{#await getMediaDevicesPromise}
-					<SettingsLabelSelect
-						id="recording-device"
-						label="Recording Device"
-						placeholder="Loading devices..."
-						disabled
-					/>
-				{:then mediaDevices}
-					{@const items = mediaDevices.map((device) => ({
-						value: device.deviceId,
-						label: device.label,
-					}))}
-					<SettingsLabelSelect
-						id="recording-device"
-						label="Recording Device"
-						{items}
-						selected={items.find((item) => item.value === settings.selectedAudioInputDeviceId)}
-						onSelectedChange={(selected) => {
-							if (!selected) return;
-							settings.selectedAudioInputDeviceId = selected.value;
-							mediaStreamManager.refreshStream().pipe(Effect.runPromise);
-						}}
-						placeholder="Select a device"
-					/>
-				{:catch error}
-					<p>Error with listing media devices: {error.message}</p>
-				{/await}
-			</div>
-			<div class="grid gap-2">
-				<SettingsLabelSelect
-					id="bit-rate"
-					label="Bitrate"
-					items={BITRATE_OPTIONS}
-					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitsPerSecond)}
-					onSelectedChange={(selected) => {
-						if (!selected) return;
-						settings.bitsPerSecond = selected.value;
-					}}
-					placeholder="Select a bitrate"
-				/>
-			</div>
-			<div class="grid gap-2">
-				<SettingsLabelSelect
-					id="output-language"
-					label="Output Language"
-					items={SUPPORTED_LANGUAGES_OPTIONS}
-					selected={selectedLanguageOption}
-					onSelectedChange={(selected) => {
-						if (!selected) return;
-						settings.outputLanguage = selected.value;
-					}}
-					placeholder="Select a language"
-				/>
-			</div>
-			<div class="grid gap-2">
-				<SettingsLabelInput
-					id="local-shortcut"
-					label="Local Shortcut"
-					placeholder="Local Shortcut to toggle recording"
-					bind:value={settings.currentLocalShortcut}
-				/>
-			</div>
-			<div class="grid gap-2">
-				{#if settings.isGlobalShortcutEnabled}
-					<SettingsLabelInput
-						id="global-shortcut"
-						label="Global Shortcut"
-						placeholder="Global Shortcut to toggle recording"
-						bind:value={settings.currentGlobalShortcut}
-					/>
-				{:else}
-					<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
-					<div class="relative">
-						<Input
-							id="global-shortcut"
-							placeholder="Global Shortcut to toggle recording"
-							bind:value={settings.currentGlobalShortcut}
-							type="text"
-							autocomplete="off"
-							disabled
-						/>
-						<Button class="absolute inset-0 backdrop-blur" href="/global-shortcut" variant="link">
-							Enable Global Shortcut
-						</Button>
-					</div>
-				{/if}
-			</div>
+		</Card.Content>
+	</Card.Root>
+	<Card.Root class="w-full max-w-xl">
+		<Card.Header>
+			<Card.Title class="text-xl">Transcription Settings</Card.Title>
+		</Card.Header>
+		<Card.Content class="space-y-6">
 			<div class="grid gap-2">
 				<SettingsLabelSelect
 					id="selected-transcription-service"
@@ -266,6 +190,113 @@
 					</div>
 				</div>
 			{/if}
+			<div class="grid gap-2">
+				<SettingsLabelSelect
+					id="output-language"
+					label="Output Language"
+					items={SUPPORTED_LANGUAGES_OPTIONS}
+					selected={selectedLanguageOption}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.outputLanguage = selected.value;
+					}}
+					placeholder="Select a language"
+				/>
+			</div>
+		</Card.Content>
+	</Card.Root>
+	<Card.Root class="w-full max-w-xl">
+		<Card.Header>
+			<Card.Title class="text-xl">Recording</Card.Title>
+		</Card.Header>
+		<Card.Content class="space-y-6"
+			><div class="grid gap-2">
+				{#await getMediaDevicesPromise}
+					<SettingsLabelSelect
+						id="recording-device"
+						label="Recording Device"
+						placeholder="Loading devices..."
+						disabled
+					/>
+				{:then mediaDevices}
+					{@const items = mediaDevices.map((device) => ({
+						value: device.deviceId,
+						label: device.label,
+					}))}
+					<SettingsLabelSelect
+						id="recording-device"
+						label="Recording Device"
+						{items}
+						selected={items.find((item) => item.value === settings.selectedAudioInputDeviceId)}
+						onSelectedChange={(selected) => {
+							if (!selected) return;
+							settings.selectedAudioInputDeviceId = selected.value;
+							mediaStreamManager.refreshStream().pipe(Effect.runPromise);
+						}}
+						placeholder="Select a device"
+					/>
+				{:catch error}
+					<p>Error with listing media devices: {error.message}</p>
+				{/await}
+			</div>
+			<div class="grid gap-2">
+				<SettingsLabelSelect
+					id="bit-rate"
+					label="Bitrate"
+					items={BITRATE_OPTIONS}
+					selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitsPerSecond)}
+					onSelectedChange={(selected) => {
+						if (!selected) return;
+						settings.bitsPerSecond = selected.value;
+					}}
+					placeholder="Select a bitrate"
+				/>
+			</div>
+		</Card.Content>
+		<Card.Footer>
+			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
+				Go Back
+			</Button>
+		</Card.Footer>
+	</Card.Root>
+	<Card.Root class="w-full max-w-xl">
+		<Card.Header>
+			<Card.Title class="text-xl">Shortcuts</Card.Title>
+		</Card.Header>
+		<Card.Content class="space-y-6">
+			<div class="grid gap-2">
+				<SettingsLabelInput
+					id="local-shortcut"
+					label="Local Shortcut"
+					placeholder="Local Shortcut to toggle recording"
+					bind:value={settings.currentLocalShortcut}
+				/>
+			</div>
+			<div class="grid gap-2">
+				{#if settings.isGlobalShortcutEnabled}
+					<SettingsLabelInput
+						id="global-shortcut"
+						label="Global Shortcut"
+						placeholder="Global Shortcut to toggle recording"
+						bind:value={settings.currentGlobalShortcut}
+					/>
+				{:else}
+					<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
+					<div class="relative">
+						<Input
+							id="global-shortcut"
+							placeholder="Global Shortcut to toggle recording"
+							bind:value={settings.currentGlobalShortcut}
+							type="text"
+							autocomplete="off"
+							disabled
+						/>
+						<Button class="absolute inset-0 backdrop-blur" href="/global-shortcut" variant="link">
+							Enable Global Shortcut
+						</Button>
+					</div>
+				{/if}
+			</div>
 		</Card.Content>
 		<Card.Footer>
 			<Button onclick={() => window.history.back()} class="w-full" variant="secondary">
