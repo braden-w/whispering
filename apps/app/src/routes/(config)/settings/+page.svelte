@@ -91,7 +91,7 @@
 	<Separator class="my-6" />
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title class="text-xl">General Settings</Card.Title>
+			<Card.Title class="text-xl">General</Card.Title>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<div class="flex items-center gap-2">
@@ -124,7 +124,7 @@
 	</Card.Root>
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title class="text-xl">Transcription Settings</Card.Title>
+			<Card.Title class="text-xl">Transcription</Card.Title>
 		</Card.Header>
 		<Card.Content class="space-y-6">
 			<div class="grid gap-2">
