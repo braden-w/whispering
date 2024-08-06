@@ -1,4 +1,4 @@
-import '@repo/svelte-table';
+import '@tanstack/svelte-table';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -18,7 +18,7 @@ declare global {
 	}
 }
 
-declare module '@repo/svelte-table' {
+declare module '@tanstack/svelte-table' {
 	interface ColumnMeta<TData extends RowData, TValue> {
 		headerText: string;
 	}
