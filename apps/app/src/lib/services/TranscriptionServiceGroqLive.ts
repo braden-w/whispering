@@ -20,7 +20,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						description: 'Please enter your Groq API key in the settings',
 						action: {
 							label: 'Go to settings',
-							goto: '/settings',
+							goto: '/settings/transcription',
 						},
 					});
 				}
@@ -31,7 +31,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						description: 'The Groq API Key must start with "gsk_"',
 						action: {
 							label: 'Update API Key',
-							goto: '/settings',
+							goto: '/settings/transcription',
 						},
 					});
 				}

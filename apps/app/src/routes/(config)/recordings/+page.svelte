@@ -26,7 +26,7 @@
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { Schema as S } from '@effect/schema';
-	import { FlexRender, createSvelteTable, renderComponent } from '@repo/svelte-table';
+	import { FlexRender, createTable, renderComponent } from '@tanstack/svelte-table';
 	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
 	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
 	import { Effect } from 'effect';
@@ -169,7 +169,7 @@
 	const setVisibility = createUpdater(columnVisibility);
 	const setRowSelection = createUpdater(rowSelection);
 
-	const table = createSvelteTable({
+	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
 			return recordings.value;
