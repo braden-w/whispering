@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
-	import { getVersion } from '@tauri-apps/api/app';
 	import SidebarNav from './SidebarNav.svelte';
 
 	const sidebarNavItems = [
 		{ title: 'General', href: '/settings' },
-		{ title: 'Transcription', href: '/settings/transcription' },
 		{ title: 'Recording', href: '/settings/recording' },
+		{ title: 'Transcription', href: '/settings/transcription' },
 		{ title: 'Shortcuts', href: '/settings/shortcuts' },
 	] as const;
 
@@ -19,6 +18,7 @@
 			throw new Error('Failed to fetch latest version');
 		}
 		if (!window.__TAURI__) return { isOutdated: false, version: latestVersion } as const;
+		const { getVersion } = await import('@tauri-apps/api/app');
 		const currentVersion = `v${await getVersion()}`;
 		if (latestVersion === currentVersion) {
 			return { isOutdated: false, version: currentVersion } as const;
