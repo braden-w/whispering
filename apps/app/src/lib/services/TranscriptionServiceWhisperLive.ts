@@ -20,7 +20,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						description: 'Please enter your OpenAI API key in the settings',
 						action: {
 							label: 'Go to settings',
-							goto: '/settings',
+							goto: '/settings/transcription',
 						},
 					});
 				}
@@ -31,7 +31,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						description: 'The OpenAI API Key must start with "sk-"',
 						action: {
 							label: 'Update OpenAI API Key',
-							goto: '/settings',
+							goto: '/settings/transcription',
 						},
 					});
 				}
