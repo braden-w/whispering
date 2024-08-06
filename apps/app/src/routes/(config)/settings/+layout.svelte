@@ -1,31 +1,31 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { getVersion } from '@tauri-apps/api/app';
-
 	import { Separator } from '$lib/components/ui/separator';
+	import { getVersion } from '@tauri-apps/api/app';
+	import SidebarNav from './SidebarNav.svelte';
 
 	const sidebarNavItems = [
 		{
-			title: 'Profile',
-			href: '/examples/forms',
+			title: 'Settings',
+			href: '/settings',
 		},
 		{
-			title: 'Account',
-			href: '/examples/forms/account',
+			title: 'General',
+			href: '/settings/general',
 		},
 		{
-			title: 'Appearance',
-			href: '/examples/forms/appearance',
+			title: 'Transcription',
+			href: '/settings/transcription',
 		},
 		{
-			title: 'Notifications',
-			href: '/examples/forms/notifications',
+			title: 'Recording',
+			href: '/settings/recording',
 		},
 		{
-			title: 'Display',
-			href: '/examples/forms/display',
+			title: 'Shortcuts',
+			href: '/settings/shortcuts',
 		},
-	];
+	] as const;
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
 	const versionPromise = (async () => {
@@ -73,5 +73,12 @@
 		</p>
 	</div>
 	<Separator class="my-6" />
-	<slot />
+	<div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+		<aside class="-mx-4 lg:w-1/5">
+			<SidebarNav items={sidebarNavItems} />
+		</aside>
+		<div class="flex-1 lg:max-w-2xl">
+			<slot />
+		</div>
+	</div>
 </main>
