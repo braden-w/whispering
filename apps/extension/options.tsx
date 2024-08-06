@@ -218,16 +218,6 @@ function SettingsCard() {
 
 				<div className="grid gap-2">
 					<SettingsLabelInput
-						id="local-shortcut"
-						label="Local Shortcut"
-						value={settings.currentLocalShortcut}
-						onChange={(value) => setSettings({ ...settings, currentLocalShortcut: value })}
-						placeholder="Local Shortcut to toggle recording"
-					/>
-				</div>
-
-				<div className="grid gap-2">
-					<SettingsLabelInput
 						id="global-shortcut"
 						label="Global Shortcut"
 						value={settings.currentGlobalShortcut}
