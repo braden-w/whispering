@@ -52,7 +52,7 @@ function SettingsCard() {
 	const queryClient = useQueryClient();
 
 	const {
-		isLoading: isSettingsLoading,
+		isPending: isSettingsPending,
 		isError: isSettingsError,
 		data: settings,
 	} = useQuery({
@@ -105,7 +105,7 @@ function SettingsCard() {
 		},
 	});
 
-	if (isSettingsLoading) {
+	if (isSettingsPending) {
 		return <CardContent>Loading...</CardContent>;
 	}
 
