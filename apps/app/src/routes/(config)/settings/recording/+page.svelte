@@ -19,6 +19,10 @@
 	);
 </script>
 
+<svelte:head>
+	<title>Recording Settings - Whispering</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<div>
 		<h3 class="text-lg font-medium">Recording</h3>

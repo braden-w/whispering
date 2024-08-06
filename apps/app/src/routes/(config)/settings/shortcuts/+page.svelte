@@ -7,6 +7,10 @@
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 </script>
 
+<svelte:head>
+	<title>Configure Shortcuts - Whispering</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<div>
 		<h3 class="text-lg font-medium">Shortcuts</h3>

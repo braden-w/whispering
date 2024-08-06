@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-	<title>Settings</title>
+	<title>Settings - Whispering</title>
 </svelte:head>
 
 

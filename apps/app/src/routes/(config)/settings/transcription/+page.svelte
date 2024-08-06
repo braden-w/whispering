@@ -17,6 +17,10 @@
 	);
 </script>
 
+<svelte:head>
+	<title>Transcription Settings - Whispering</title>
+</svelte:head>
+
 <div class="space-y-6">
 	<div>
 		<h3 class="text-lg font-medium">Transcription</h3>
