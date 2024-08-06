@@ -6,7 +6,7 @@
 
 	const sidebarNavItems = [
 		{
-			title: '',
+			title: 'General',
 			href: '/settings',
 		},
 		{
