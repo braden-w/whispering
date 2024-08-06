@@ -43,7 +43,7 @@
 	})();
 </script>
 
-<main class="container flex w-full flex-1 flex-col justify-center pb-4 pt-2">
+<main class="container flex w-full flex-1 flex-col pb-4 pt-2">
 	<div class="space-y-0.5">
 		<h2 class="text-2xl font-bold tracking-tight">Settings</h2>
 		<p class="text-muted-foreground">
