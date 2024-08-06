@@ -5,22 +5,10 @@
 	import SidebarNav from './SidebarNav.svelte';
 
 	const sidebarNavItems = [
-		{
-			title: 'General',
-			href: '/settings',
-		},
-		{
-			title: 'Transcription',
-			href: '/settings/transcription',
-		},
-		{
-			title: 'Recording',
-			href: '/settings/recording',
-		},
-		{
-			title: 'Shortcuts',
-			href: '/settings/shortcuts',
-		},
+		{ title: 'General', href: '/settings' },
+		{ title: 'Transcription', href: '/settings/transcription' },
+		{ title: 'Recording', href: '/settings/recording' },
+		{ title: 'Shortcuts', href: '/settings/shortcuts' },
 	] as const;
 
 	const isString = (value: unknown): value is string => typeof value === 'string';
