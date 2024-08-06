@@ -9,8 +9,8 @@
 		items,
 		class: className = undefined,
 	}: {
-		items: { href: string; title: string }[];
-		class: string | undefined | null;
+		items: readonly { href: string; title: string }[];
+		class?: string | undefined | null;
 	} = $props();
 
 	const [send, receive] = crossfade({
