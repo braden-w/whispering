@@ -124,37 +124,34 @@ export const recordings = Effect.gen(function* () {
 								updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' }),
 							),
 						);
-					yield* Effect.all(
-						[
-							updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' }),
-							Effect.sync(() => {
-								if (recorderState.value !== 'RECORDING') {
-									recorderState.value = 'IDLE';
-								}
-							}),
-							toast({
-								variant: 'success',
-								id: transcribingInProgressId,
-								title: 'Transcription complete!',
-								description: 'Check it out in your recordings',
-								action: {
-									label: 'Go to recordings',
-									onClick: () => goto('/recordings'),
-								},
-							}),
-							clear(transcribingInProgressId),
-							notify({
-								id: nanoid(),
-								title: 'Transcription complete!',
-								description: 'Click to check it out in your recordings',
-								action: {
-									label: 'Go to recordings',
-									goto: '/recordings',
-								},
-							}),
-						],
-						{ concurrency: 'unbounded' },
-					);
+
+					yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
+
+					if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
+
+					yield* toast({
+						variant: 'success',
+						id: transcribingInProgressId,
+						title: 'Transcription complete!',
+						description: 'Check it out in your recordings',
+						action: {
+							label: 'Go to recordings',
+							onClick: () => goto('/recordings'),
+						},
+					});
+
+					yield* clear(transcribingInProgressId);
+
+					yield* notify({
+						id: nanoid(),
+						title: 'Transcription complete!',
+						description: 'Click to check it out in your recordings',
+						action: {
+							label: 'Go to recordings',
+							goto: '/recordings',
+						},
+					});
+
 					return transcribedText;
 				}).pipe(
 					Effect.tapError((error) =>
