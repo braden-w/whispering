@@ -20,7 +20,7 @@ import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
 export const recordings = Effect.gen(function* () {
-	const { notify, clear } = yield* NotificationService;
+	const { notify, clear: clearNotification } = yield* NotificationService;
 	const recordingsDb = yield* RecordingsDbService;
 	const clipboardService = yield* ClipboardService;
 	const { downloadBlob } = yield* DownloadService;
@@ -140,7 +140,7 @@ export const recordings = Effect.gen(function* () {
 						},
 					});
 
-					yield* clear(transcribingInProgressId);
+					yield* clearNotification(transcribingInProgressId);
 
 					yield* notify({
 						id: nanoid(),
