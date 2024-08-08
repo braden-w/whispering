@@ -26,7 +26,7 @@
 		/>
 	</div>
 	<div class="grid gap-2">
-		{#if settings.isGlobalShortcutEnabled}
+		{#if window.__TAURI__}
 			<SettingsLabelInput
 				id="global-shortcut"
 				label="Global Shortcut"

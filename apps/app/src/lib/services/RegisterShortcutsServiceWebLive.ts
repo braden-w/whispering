@@ -7,7 +7,6 @@ export const RegisterShortcutsWebLive = Layer.effect(
 	RegisterShortcutsService,
 	Effect.gen(function* () {
 		return {
-			isGlobalShortcutEnabled: false,
 			unregisterAllLocalShortcuts: Effect.try({
 				try: () => hotkeys.unbind(),
 				catch: (error) =>
