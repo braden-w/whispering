@@ -16,6 +16,7 @@ import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { setAlwaysOnTop } from '$lib/services/AlwaysOnTopService';
 
 const TIMESLICE_MS = 1000;
 
@@ -145,6 +146,9 @@ export const recorder = Effect.gen(function* () {
 			Effect.gen(function* () {
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
+						if (settings.value.alwaysOnTop === 'When Recording') {
+							yield* setAlwaysOnTop(true);
+						}
 						yield* mediaRecorderService.startRecording();
 						recorderState.value = 'RECORDING';
 						yield* Effect.logInfo('Recording started');
@@ -196,6 +200,9 @@ export const recorder = Effect.gen(function* () {
 						yield* recordings.addRecording(newRecording);
 
 						yield* recordings.transcribeRecording(newRecording.id);
+						if (settings.value.alwaysOnTop === 'When Recording') {
+							yield* setAlwaysOnTop(false);
+						}
 				}
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		cancelRecording: () =>

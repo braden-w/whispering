@@ -3,6 +3,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Switch } from '$lib/components/ui/switch';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
@@ -47,17 +48,20 @@
 			Paste contents from clipboard after successful transcription
 		</Label>
 	</div>
-	<div class="grid gap-2">
-		<SettingsLabelSelect
-			id="always-on-top"
-			label="Always On Top"
-			items={ALWAYS_ON_TOP_OPTIONS}
-			selected={selectedAlwaysOnTopOption}
-			onSelectedChange={(selected) => {
-				if (!selected) return;
-				settings.value.alwaysOnTop = selected.value;
-			}}
-			placeholder="Select a language"
-		/>
-	</div>
+	{#if window.__TAURI__}
+		<div class="grid gap-2">
+			<SettingsLabelSelect
+				id="always-on-top"
+				label="Always On Top"
+				items={ALWAYS_ON_TOP_OPTIONS}
+				selected={selectedAlwaysOnTopOption}
+				onSelectedChange={async (selected) => {
+					if (!selected) return;
+					settings.value.alwaysOnTop = selected.value;
+					refreshAlwaysOnTopFromSettings();
+				}}
+				placeholder="Select a language"
+			/>
+		</div>
+	{/if}
 </div>

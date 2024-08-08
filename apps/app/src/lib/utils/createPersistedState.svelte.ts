@@ -1,5 +1,7 @@
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
+import { WhisperingError } from '@repo/shared';
 import { Effect, Either } from 'effect';
 
 /**
@@ -45,16 +47,21 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		const isEmpty = valueFromStorage === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
-		const parseResult = S.decodeUnknownEither(jsonSchema)(valueFromStorage);
-		if (Either.isLeft(parseResult)) {
-			toast({
-				title: 'Unable to parse storage value',
-				description: parseResult.left.message,
-				variant: 'warning',
-			}).pipe(Effect.runSync);
-			return defaultValue;
-		}
-		return parseResult.right as S.Schema.Type<TSchema>;
+		const parseResult = S.decodeUnknown(jsonSchema)(valueFromStorage)
+			.pipe(
+				Effect.mapError(
+					(e) =>
+						new WhisperingError({
+							variant: 'warning',
+							title: 'Unable to parse storage value',
+							description: e.message,
+						}),
+				),
+				Effect.tapError(renderErrorAsToast),
+				Effect.catchAll(() => Effect.succeed(defaultValue)),
+			)
+			.pipe(Effect.runSync);
+		return parseResult as S.Schema.Type<TSchema>;
 	};
 
 	if (!disableLocalStorage) {
