@@ -39,17 +39,15 @@ export const TranscriptionServiceWhisperWhisperServerLive = Layer.succeed(
 						}),
 					catch: (error) =>
 						new WhisperingError({
-							title: 'Error transcribing audio',
-							description: error instanceof Error ? error.message : 'Please try again.',
+							title: 'Request to Transcription Server Failed',
+							description: `An error occurred while sending the request to the transcription server. ${error instanceof Error ? error.message : 'Please try again later.'}`,
 							error,
 						}),
 				});
 				if (!response.ok) {
 					return yield* new WhisperingError({
-						title: 'Error sending audio to Faster Whisper Server',
-						description:
-							response.statusText ||
-							'Please try again or check the Faster Whisper Server logs for more information.',
+						title: 'Transcription Server Response Error',
+						description: `The server responded with an error: ${response.status}. Please verify the server status or try again later.`,
 					});
 				}
 				const data = yield* Schema.decodeUnknown(
@@ -67,16 +65,16 @@ export const TranscriptionServiceWhisperWhisperServerLive = Layer.succeed(
 					Effect.mapError(
 						(error) =>
 							new WhisperingError({
-								title: 'Error parsing reponse from Faster Whisper Server',
-								description: error instanceof Error ? error.message : 'Please try again.',
+								title: 'Response Parsing Error',
+								description: `Failed to parse the response from the transcription server. ${error instanceof Error ? error.message : 'Please try again.'}`,
 								error,
 							}),
 					),
 				);
 				if ('error' in data) {
 					return yield* new WhisperingError({
-						title: 'Server error from Whisper API',
-						description: data.error.message,
+						title: 'Transcription API Server Error',
+						description: 
 						error: data.error,
 					});
 				}
