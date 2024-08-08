@@ -7,12 +7,12 @@ import { Effect, Layer } from 'effect';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const TranscriptionServiceWhisperWhisperServerLive = Layer.succeed(
+export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
-				const { outputLanguage } = settings;
+				const { outputLanguage, fasterWhisperServerUrl, fasterWhisperServerModel } = settings;
 
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
@@ -26,12 +26,12 @@ export const TranscriptionServiceWhisperWhisperServerLive = Layer.succeed(
 				});
 				const formData = new FormData();
 				formData.append('file', wavFile);
-				formData.append('model', 'whisper-1');
+				formData.append('model', fasterWhisperServerModel);
 				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
 				const formBody = Body.form(formData);
 				const response = yield* Effect.tryPromise({
 					try: () =>
-						fetch('http://localhost:8000/v1/audio/transcriptions', {
+						fetch(`${fasterWhisperServerUrl}/v1/audio/transcriptions`, {
 							method: 'POST',
 							body: formBody,
 							responseType: ResponseType.JSON,

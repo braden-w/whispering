@@ -92,6 +92,23 @@
 				</Button>.
 			</div>
 		</div>
+	{:else if settings.selectedTranscriptionService === 'faster-whisper-server'}
+		<div class="grid gap-2">
+			<SettingsLabelInput
+				id="faster-whisper-server-url"
+				label="faster-whisper-server URL"
+				placeholder="Your faster-whisper-server URL"
+				bind:value={settings.fasterWhisperServerUrl}
+			/>
+		</div>
+		<div class="grid gap-2">
+			<SettingsLabelInput
+				id="faster-whisper-server-model"
+				label="faster-whisper-server Model"
+				placeholder="Your faster-whisper-server Model"
+				bind:value={settings.fasterWhisperServerModel}
+			/>
+		</div>
 	{/if}
 	<div class="grid gap-2">
 		<SettingsLabelSelect

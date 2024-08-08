@@ -122,6 +122,18 @@ export const settings = Effect.gen(function* () {
 		set groqApiKey(newValue) {
 			settings.value = { ...settings.value, groqApiKey: newValue };
 		},
+		get fasterWhisperServerUrl() {
+			return settings.value.fasterWhisperServerUrl;
+		},
+		set fasterWhisperServerUrl(newValue) {
+			settings.value = { ...settings.value, fasterWhisperServerUrl: newValue };
+		},
+		get fasterWhisperServerModel() {
+			return settings.value.fasterWhisperServerModel;
+		},
+		set fasterWhisperServerModel(newValue) {
+			settings.value = { ...settings.value, fasterWhisperServerModel: newValue };
+		},
 		get outputLanguage() {
 			return settings.value.outputLanguage;
 		},
