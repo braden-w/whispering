@@ -3,6 +3,12 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Switch } from '$lib/components/ui/switch';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
+	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
+
+	const selectedAlwaysOnTopOption = $derived(
+		ALWAYS_ON_TOP_OPTIONS.find((option) => option.value === settings.value.alwaysOnTop),
+	);
 </script>
 
 <svelte:head>
@@ -40,5 +46,18 @@
 		<Label for="paste-from-clipboard">
 			Paste contents from clipboard after successful transcription
 		</Label>
+	</div>
+	<div class="grid gap-2">
+		<SettingsLabelSelect
+			id="always-on-top"
+			label="Always On Top"
+			items={ALWAYS_ON_TOP_OPTIONS}
+			selected={selectedAlwaysOnTopOption}
+			onSelectedChange={(selected) => {
+				if (!selected) return;
+				settings.value.alwaysOnTop = selected.value;
+			}}
+			placeholder="Select a language"
+		/>
 	</div>
 </div>

@@ -17,20 +17,30 @@ export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
 }));
 export const DEFAULT_BITRATE_MS = 64_000 as const satisfies (typeof BITRATE_VALUES)[number];
 
+const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
+export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
+	label: option,
+	value: option,
+}));
+
 export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
 	isCopyToClipboardEnabled: S.Boolean,
 	isPasteContentsOnSuccessEnabled: S.Boolean,
+	alwaysOnTop: S.Literal(...ALWAYS_ON_TOP_VALUES),
+
 	selectedAudioInputDeviceId: S.String,
-	currentLocalShortcut: S.String,
-	currentGlobalShortcut: S.String,
+	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
+		default: () => DEFAULT_BITRATE_MS,
+	}),
+
 	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
 	openAiApiKey: S.String,
 	groqApiKey: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
-	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
-		default: () => DEFAULT_BITRATE_MS,
-	}),
+
+	currentLocalShortcut: S.String,
+	currentGlobalShortcut: S.String,
 });
 
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
@@ -38,14 +48,18 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPlaySoundEnabled: true,
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
+		alwaysOnTop: 'Never',
+
 		selectedAudioInputDeviceId: 'default',
-		currentLocalShortcut: 'space',
-		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		bitsPerSecond: DEFAULT_BITRATE_MS,
+
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
 		groqApiKey: '',
 		outputLanguage: 'auto',
-		bitsPerSecond: DEFAULT_BITRATE_MS,
+
+		currentLocalShortcut: 'space',
+		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
