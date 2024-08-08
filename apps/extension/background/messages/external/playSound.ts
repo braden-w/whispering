@@ -14,7 +14,16 @@ import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBg
 const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
 		yield* Console.info('Playing sound', sound);
-		const activeTabId = yield* getActiveTabId;
+		const activeTabId = yield* getActiveTabId.pipe(
+			Effect.mapError(
+				(error) =>
+					new WhisperingError({
+						title: 'Failed to get active tab ID',
+						description: 'Failed to get active tab ID to play sound',
+						error,
+					}),
+			),
+		);
 		yield* Effect.tryPromise({
 			try: () =>
 				chrome.tabs.sendMessage(activeTabId, {
@@ -29,14 +38,8 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 				}),
 		});
 	}).pipe(
-		Effect.catchTags({
-			GetActiveTabIdError: (error) =>
-				new WhisperingError({
-					title: 'Failed to get active tab ID',
-					description: 'Failed to get active tab ID to play sound',
-					error,
-				}),
-		}),
+		// Silently catch playSound errors and log them to the console instead of render them as toast
+		Effect.catchAll(Console.error)
 	);
 
 export type RequestBody = Extract<ExternalMessage, { name: 'external/playSound' }>['body'];
