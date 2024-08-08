@@ -27,6 +27,8 @@ export const settingsSchema = S.Struct({
 	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
 	openAiApiKey: S.String,
 	groqApiKey: S.String,
+	fasterWhisperServerUrl: S.String,
+	fasterWhisperServerModel: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
 	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
 		default: () => DEFAULT_BITRATE_MS,
@@ -44,6 +46,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
 		groqApiKey: '',
+		fasterWhisperServerUrl: 'http://localhost:8000',
+		fasterWhisperServerModel: 'Systran/faster-distil-whisper-large-v3',
 		outputLanguage: 'auto',
 		bitsPerSecond: DEFAULT_BITRATE_MS,
 	}) satisfies Settings;
