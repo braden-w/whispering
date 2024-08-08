@@ -78,6 +78,7 @@ dependencies = [
  "accessibility-sys",
  "core-foundation-sys",
  "enigo",
+ "reqwest",
  "serde",
  "serde_json",
  "tauri",

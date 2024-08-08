@@ -7,6 +7,9 @@ mod accessibility;
 #[cfg(target_os = "macos")]
 use accessibility::{is_macos_accessibility_enabled, open_apple_accessibility};
 
+mod transcription;
+use transcription::faster_whisper;
+
 use tauri::{CustomMenuItem, Manager};
 use tauri::{SystemTray, SystemTrayEvent, SystemTrayMenu};
 
@@ -38,12 +41,17 @@ fn main() {
     let builder = builder.invoke_handler(tauri::generate_handler![
         write_text,
         set_tray_icon,
+        faster_whisper::transcribe_audio,
         open_apple_accessibility,
         is_macos_accessibility_enabled,
     ]);
 
     #[cfg(not(target_os = "macos"))]
-    let builder = builder.invoke_handler(tauri::generate_handler![write_text, set_tray_icon,]);
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        write_text,
+        set_tray_icon,
+        transcribe_audio,
+    ]);
 
     builder
         .run(tauri::generate_context!())
