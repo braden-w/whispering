@@ -4,7 +4,6 @@ import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
 import { getDefaultSettings, settingsSchema, WhisperingError } from '@repo/shared';
-import { register, unregisterAll } from '@tauri-apps/api/globalShortcut';
 import { Effect } from 'effect';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
@@ -28,7 +27,11 @@ const unregisterAllLocalShortcuts = Effect.try({
 });
 
 const unregisterAllGlobalShortcuts = Effect.tryPromise({
-	try: () => unregisterAll(),
+	try: async () => {
+		if (!window.__TAURI__) return;
+		const { unregisterAll } = await import('@tauri-apps/api/globalShortcut');
+		return await unregisterAll();
+	},
 	catch: (error) =>
 		new WhisperingError({
 			title: 'Error unregistering all shortcuts',
@@ -75,7 +78,11 @@ const registerGlobalShortcut = ({
 	Effect.gen(function* () {
 		yield* unregisterAllGlobalShortcuts;
 		yield* Effect.tryPromise({
-			try: () => register(shortcut, callback),
+			try: async () => {
+				if (!window.__TAURI__) return;
+				const { register } = await import('@tauri-apps/api/globalShortcut');
+				return await register(shortcut, callback);
+			},
 			catch: (error) =>
 				new WhisperingError({
 					title:
@@ -120,9 +127,10 @@ export const registerShortcuts = Effect.gen(function* () {
 					});
 				}).pipe(Effect.catchAll(renderErrorAsToast));
 				jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
-			}),
+			}).pipe(Effect.runSync),
 		registerGlobalShortcut: ({ shortcut, callback }: { shortcut: string; callback: () => void }) =>
 			Effect.gen(function* () {
+				if (!window.__TAURI__) return;
 				const job = Effect.gen(function* () {
 					yield* unregisterAllGlobalShortcuts;
 					yield* registerGlobalShortcut({ shortcut, callback });
@@ -133,6 +141,6 @@ export const registerShortcuts = Effect.gen(function* () {
 					});
 				}).pipe(Effect.catchAll(renderErrorAsToast));
 				jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
-			}),
+			}).pipe(Effect.runSync),
 	};
 }).pipe(Effect.runSync);

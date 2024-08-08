@@ -24,9 +24,9 @@
 			label="Local Shortcut"
 			placeholder="Local Shortcut to toggle recording"
 			value={settings.value.currentLocalShortcut}
-			onchange={(event) => {
+			onValueChange={(value) => {
 				registerShortcuts.registerLocalShortcut({
-					shortcut: event.target.value,
+					shortcut: value,
 					callback: () => recorder.toggleRecording(),
 				});
 			}}
@@ -39,9 +39,9 @@
 				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"
 				value={settings.value.currentGlobalShortcut}
-				onchange={(event) => {
+				onValueChange={(value) => {
 					registerShortcuts.registerGlobalShortcut({
-						shortcut: event.target.value,
+						shortcut: value,
 						callback: () => recorder.toggleRecording(),
 					});
 				}}
