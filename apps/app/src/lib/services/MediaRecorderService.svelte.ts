@@ -45,7 +45,7 @@ const getFirstAvailableStream = Effect.gen(function* () {
 	for (const device of recordingDevices) {
 		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
 		if (Option.isSome(maybeStream)) {
-			settings.selectedAudioInputDeviceId = device.deviceId;
+			settings.value.selectedAudioInputDeviceId = device.deviceId;
 			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 			return maybeStream.value;
 		}
@@ -87,7 +87,7 @@ export const mediaStreamManager = Effect.gen(function* () {
 					title: 'Connecting to selected audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
-				if (!settings.selectedAudioInputDeviceId) {
+				if (!settings.value.selectedAudioInputDeviceId) {
 					yield* toast({
 						id: toastId,
 						variant: 'loading',
@@ -104,7 +104,7 @@ export const mediaStreamManager = Effect.gen(function* () {
 					});
 					return firstAvailableStream;
 				}
-				const maybeStream = yield* getStreamForDeviceId(settings.selectedAudioInputDeviceId);
+				const maybeStream = yield* getStreamForDeviceId(settings.value.selectedAudioInputDeviceId);
 				if (Option.isSome(maybeStream)) {
 					currentStream = maybeStream.value;
 					yield* toast({

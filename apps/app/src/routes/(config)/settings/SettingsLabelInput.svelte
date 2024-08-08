@@ -7,6 +7,7 @@
 		id,
 		label,
 		value = $bindable(),
+		onchange,
 		placeholder = '',
 		type = 'text',
 		disabled = false,

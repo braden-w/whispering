@@ -52,7 +52,7 @@ const MediaRecorderService = Effect.gen(function* () {
 				const newOrExistingStream = yield* mediaStreamManager.getOrRefreshStream();
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
-						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.bitsPerSecond }),
+						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.value.bitsPerSecond }),
 					catch: () => new TryResuseStreamError(),
 				}).pipe(
 					Effect.catchAll(() =>
@@ -64,7 +64,7 @@ const MediaRecorderService = Effect.gen(function* () {
 								description: 'Trying to find another available audio input device...',
 							});
 							const stream = yield* mediaStreamManager.refreshStream();
-							return new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond });
+							return new MediaRecorder(stream, { bitsPerSecond: settings.value.bitsPerSecond });
 						}),
 					),
 				);
@@ -148,7 +148,7 @@ export const recorder = Effect.gen(function* () {
 						yield* mediaRecorderService.startRecording();
 						recorderState.value = 'RECORDING';
 						yield* Effect.logInfo('Recording started');
-						if (settings.isPlaySoundEnabled) {
+						if (settings.value.isPlaySoundEnabled) {
 							if (!document.hidden) {
 								startSound.play();
 							} else {
@@ -173,7 +173,7 @@ export const recorder = Effect.gen(function* () {
 						recorderState.value = 'IDLE';
 						yield* Effect.logInfo('Recording stopped');
 
-						if (settings.isPlaySoundEnabled) {
+						if (settings.value.isPlaySoundEnabled) {
 							if (!document.hidden) {
 								stopSound.play();
 							} else {
@@ -201,7 +201,7 @@ export const recorder = Effect.gen(function* () {
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
-				if (settings.isPlaySoundEnabled) {
+				if (settings.value.isPlaySoundEnabled) {
 					if (!document.hidden) {
 						cancelSound.play();
 					} else {

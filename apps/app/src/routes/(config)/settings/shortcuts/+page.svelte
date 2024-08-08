@@ -3,7 +3,8 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Separator } from '$lib/components/ui/separator';
-	import { settings } from '$lib/stores/settings.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { settings, registerShortcuts } from '$lib/stores/settings.svelte';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 </script>
 
@@ -22,7 +23,13 @@
 			id="local-shortcut"
 			label="Local Shortcut"
 			placeholder="Local Shortcut to toggle recording"
-			bind:value={settings.currentLocalShortcut}
+			value={settings.value.currentLocalShortcut}
+			onchange={(event) => {
+				registerShortcuts.registerLocalShortcut({
+					shortcut: event.target.value,
+					callback: () => recorder.toggleRecording(),
+				});
+			}}
 		/>
 	</div>
 	<div class="grid gap-2">
@@ -31,7 +38,13 @@
 				id="global-shortcut"
 				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"
-				bind:value={settings.currentGlobalShortcut}
+				value={settings.value.currentGlobalShortcut}
+				onchange={(event) => {
+					registerShortcuts.registerGlobalShortcut({
+						shortcut: event.target.value,
+						callback: () => recorder.toggleRecording(),
+					});
+				}}
 			/>
 		{:else}
 			<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
@@ -39,7 +52,7 @@
 				<Input
 					id="global-shortcut"
 					placeholder="Global Shortcut to toggle recording"
-					bind:value={settings.currentGlobalShortcut}
+					value={settings.value.currentGlobalShortcut}
 					type="text"
 					autocomplete="off"
 					disabled

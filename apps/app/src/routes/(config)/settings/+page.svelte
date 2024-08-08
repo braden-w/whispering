@@ -19,7 +19,7 @@
 		<Switch
 			id="play-sound-enabled"
 			aria-labelledby="play-sound-enabled"
-			bind:checked={settings.isPlaySoundEnabled}
+			bind:checked={settings.value.isPlaySoundEnabled}
 		/>
 		<Label for="play-sound-enabled">Play sound on toggle on and off</Label>
 	</div>
@@ -27,7 +27,7 @@
 		<Switch
 			id="copy-to-clipboard"
 			aria-labelledby="copy-to-clipboard"
-			bind:checked={settings.isCopyToClipboardEnabled}
+			bind:checked={settings.value.isCopyToClipboardEnabled}
 		/>
 		<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
 	</div>
@@ -35,7 +35,7 @@
 		<Switch
 			id="paste-from-clipboard"
 			aria-labelledby="paste-from-clipboard"
-			bind:checked={settings.isPasteContentsOnSuccessEnabled}
+			bind:checked={settings.value.isPasteContentsOnSuccessEnabled}
 		/>
 		<Label for="paste-from-clipboard">
 			Paste contents from clipboard after successful transcription
