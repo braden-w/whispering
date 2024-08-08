@@ -31,6 +31,10 @@
 			"os": {
 				"all": true
 			},
+			"http": {
+				"request": true,
+				"scope": ["http://*", "https://*"]
+			},
 			"shell": {
 				"all": false,
 				"execute": false,
