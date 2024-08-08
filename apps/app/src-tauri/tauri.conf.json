@@ -8,7 +8,7 @@
 	},
 	"package": {
 		"productName": "Whispering",
-		"version": "4.8.0"
+		"version": "4.8.1"
 	},
 	"tauri": {
 		"allowlist": {
