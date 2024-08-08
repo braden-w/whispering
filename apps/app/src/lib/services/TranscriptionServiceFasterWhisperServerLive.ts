@@ -73,8 +73,8 @@ export const TranscriptionServiceWhisperWhisperServerLive = Layer.succeed(
 				);
 				if ('error' in data) {
 					return yield* new WhisperingError({
-						title: 'Transcription API Server Error',
-						description: 
+						title: 'Server Error from faster-whisper-server',
+						description: data.error.message,
 						error: data.error,
 					});
 				}
