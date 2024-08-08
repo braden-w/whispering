@@ -46,10 +46,10 @@
 				id="recording-device"
 				label="Recording Device"
 				{items}
-				selected={items.find((item) => item.value === settings.selectedAudioInputDeviceId)}
+				selected={items.find((item) => item.value === settings.value.selectedAudioInputDeviceId)}
 				onSelectedChange={(selected) => {
 					if (!selected) return;
-					settings.selectedAudioInputDeviceId = selected.value;
+					settings.value.selectedAudioInputDeviceId = selected.value;
 					mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 				}}
 				placeholder="Select a device"
@@ -63,10 +63,10 @@
 			id="bit-rate"
 			label="Bitrate"
 			items={BITRATE_OPTIONS}
-			selected={BITRATE_OPTIONS.find((option) => option.value === settings.bitsPerSecond)}
+			selected={BITRATE_OPTIONS.find((option) => option.value === settings.value.bitsPerSecond)}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.bitsPerSecond = selected.value;
+				settings.value.bitsPerSecond = selected.value;
 			}}
 			placeholder="Select a bitrate"
 		/>

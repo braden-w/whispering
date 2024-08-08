@@ -7,17 +7,24 @@
 		id,
 		label,
 		value = $bindable(),
+		onValueChange,
 		placeholder = '',
 		type = 'text',
 		disabled = false,
 	}: HTMLInputAttributes & {
 		label: string;
 		value: string;
+		onValueChange?: (value: string) => void;
 		placeholder?: string;
 		type?: 'text' | 'password';
 		disabled?: boolean;
 	} = $props();
+
+	$effect(() => {
+		// TODO: Move this logic to {onchange} event once it's supported
+		if (onValueChange) onValueChange(value);
+	});
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>
-<Input {id} {placeholder} bind:value {onchange} {type} {disabled} autocomplete="off" />
+<Input {id} {placeholder} bind:value {type} {disabled} autocomplete="off" />
