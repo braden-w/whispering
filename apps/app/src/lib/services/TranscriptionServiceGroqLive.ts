@@ -42,13 +42,13 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					});
 				}
-				const wavFile = new File(
+				const formDataFile = new File(
 					[audioBlob],
 					`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 					{ type: audioBlob.type },
 				);
 				const formData = new FormData();
-				formData.append('file', wavFile);
+				formData.append('file', formDataFile);
 				formData.append('model', 'whisper-large-v3');
 				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
 				const data = yield* HttpClientRequest.post(
