@@ -57,24 +57,24 @@ function SettingsCard() {
 		data: settings,
 	} = useQuery({
 		queryKey: ['settings'],
-		queryFn: () =>
-			sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
+		queryFn: async () => {
+			const response = await sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
 				name: 'contents/getSettings',
-			}).then((response) => {
-				if (!response.isSuccess) throw response.error;
-				return response.data;
-			}),
+			});
+			if (!response.isSuccess) throw response.error;
+			return response.data;
+		},
 	});
 
 	const { mutate: setSettings } = useMutation({
-		mutationFn: (settings: Settings) =>
-			sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
+		mutationFn: async (settings: Settings) => {
+			const response = await sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
 				name: 'contents/setSettings',
 				body: { settings },
-			}).then((response) => {
-				if (!response.isSuccess) throw response.error;
-				return response.data;
-			}),
+			});
+			if (!response.isSuccess) throw response.error;
+			return response.data;
+		},
 		onMutate: async (newSettings) => {
 			await queryClient.cancelQueries({ queryKey: ['settings'] });
 			const previousSettingsSnapshot = queryClient.getQueryData(['settings']) as Settings;
