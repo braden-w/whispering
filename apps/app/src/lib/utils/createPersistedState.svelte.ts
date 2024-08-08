@@ -1,8 +1,7 @@
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
 import { WhisperingError } from '@repo/shared';
-import { Effect, Either } from 'effect';
+import { Effect } from 'effect';
 
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
@@ -53,12 +52,15 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 					(e) =>
 						new WhisperingError({
 							variant: 'warning',
-							title: 'Unable to parse storage value',
+							title: `Invalid value from storage for key "${key}", using default value instead.`,
 							description: e.message,
 						}),
 				),
 				Effect.tapError(renderErrorAsToast),
-				Effect.catchAll(() => Effect.succeed(defaultValue)),
+				Effect.catchAll(() => {
+					localStorage.setItem(key, JSON.stringify(defaultValue));
+					return Effect.succeed(defaultValue);
+				}),
 			)
 			.pipe(Effect.runSync);
 		return parseResult as S.Schema.Type<TSchema>;
