@@ -23,8 +23,8 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 				}),
 			catch: (error) =>
 				new WhisperingError({
-					title: `Failed to play sound ${sound}`,
-					description: `Failed to play sound ${sound} in active tab ${activeTabId}`,
+					title: `Failed to play ${sound} sound`,
+					description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
 					error,
 				}),
 		});
