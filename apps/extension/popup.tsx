@@ -163,7 +163,7 @@ function IndexPage() {
 						<Button
 							className="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 							onClick={() => {
-								navigator.clipboard.writeTextToCursor(copyToClipboardText);
+								navigator.clipboard.writeText(copyToClipboardText);
 							}}
 						>
 							<ClipboardIcon className="h-6 w-6" />
