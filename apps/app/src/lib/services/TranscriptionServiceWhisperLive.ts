@@ -1,11 +1,11 @@
+import { settings } from '$lib/stores/settings.svelte.js';
+import { getExtensionFromAudioBlob } from '$lib/utils';
 import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
 import { Schema } from '@effect/schema';
 import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
-import { settings } from '$lib/stores/settings.svelte.js';
 
 const MAX_FILE_SIZE_MB = 25 as const;
-const FILE_NAME = 'recording.wav';
 
 export const TranscriptionServiceWhisperLive = Layer.succeed(
 	TranscriptionService,
@@ -42,7 +42,9 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					});
 				}
-				const wavFile = new File([audioBlob], FILE_NAME);
+				const wavFile = new File([audioBlob], `recording.${getExtensionFromAudioBlob(audioBlob)}`, {
+					type: audioBlob.type,
+				});
 				const formData = new FormData();
 				formData.append('file', wavFile);
 				formData.append('model', 'whisper-1');
