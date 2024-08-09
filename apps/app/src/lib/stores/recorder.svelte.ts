@@ -220,6 +220,9 @@ export const recorder = Effect.gen(function* () {
 				}
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
+				if (settings.value.alwaysOnTop === 'When Recording') {
+					yield* setAlwaysOnTop(false);
+				}
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
