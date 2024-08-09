@@ -38,7 +38,7 @@
 			selected={selectedTranscriptionServiceOption}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value.selectedTranscriptionService = selected.value;
+				settings.value = { ...settings.value, selectedTranscriptionService: selected.value };
 			}}
 			placeholder="Select a transcription service"
 		/>
@@ -49,7 +49,10 @@
 				id="openai-api-key"
 				label="OpenAI API Key"
 				placeholder="Your OpenAI API Key"
-				bind:value={settings.value.openAiApiKey}
+				value={settings.value.openAiApiKey}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, openAiApiKey: value };
+				}}
 			/>
 			<div class="text-muted-foreground text-sm">
 				You can find your API key in your <Button
@@ -78,7 +81,10 @@
 				id="groq-api-key"
 				label="Groq API Key"
 				placeholder="Your Groq API Key"
-				bind:value={settings.value.groqApiKey}
+				value={settings.value.groqApiKey}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, groqApiKey: value };
+				}}
 			/>
 			<div class="text-muted-foreground text-sm">
 				You can find your Groq API key in your <Button
@@ -101,7 +107,7 @@
 			selected={selectedLanguageOption}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value.outputLanguage = selected.value;
+				settings.value = { ...settings.value, outputLanguage: selected.value };
 			}}
 			placeholder="Select a language"
 		/>

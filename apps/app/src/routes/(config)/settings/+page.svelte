@@ -26,7 +26,10 @@
 		<Switch
 			id="play-sound-enabled"
 			aria-labelledby="play-sound-enabled"
-			bind:checked={settings.value.isPlaySoundEnabled}
+			checked={settings.value.isPlaySoundEnabled}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, isPlaySoundEnabled: v };
+			}}
 		/>
 		<Label for="play-sound-enabled">Play sound on toggle on and off</Label>
 	</div>
@@ -34,7 +37,10 @@
 		<Switch
 			id="copy-to-clipboard"
 			aria-labelledby="copy-to-clipboard"
-			bind:checked={settings.value.isCopyToClipboardEnabled}
+			checked={settings.value.isCopyToClipboardEnabled}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, isCopyToClipboardEnabled: v };
+			}}
 		/>
 		<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
 	</div>
@@ -42,7 +48,10 @@
 		<Switch
 			id="paste-from-clipboard"
 			aria-labelledby="paste-from-clipboard"
-			bind:checked={settings.value.isPasteContentsOnSuccessEnabled}
+			checked={settings.value.isPasteContentsOnSuccessEnabled}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, isPasteContentsOnSuccessEnabled: v };
+			}}
 		/>
 		<Label for="paste-from-clipboard">
 			Paste contents from clipboard after successful transcription
@@ -57,7 +66,7 @@
 				selected={selectedAlwaysOnTopOption}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					settings.value.alwaysOnTop = selected.value;
+					settings.value = { ...settings.value, alwaysOnTop: selected.value };
 					refreshAlwaysOnTopFromSettings();
 				}}
 				placeholder="Select a language"

@@ -49,7 +49,7 @@
 				selected={items.find((item) => item.value === settings.value.selectedAudioInputDeviceId)}
 				onSelectedChange={(selected) => {
 					if (!selected) return;
-					settings.value.selectedAudioInputDeviceId = selected.value;
+					settings.value = { ...settings.value, selectedAudioInputDeviceId: selected.value };
 					mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 				}}
 				placeholder="Select a device"
@@ -66,7 +66,7 @@
 			selected={BITRATE_OPTIONS.find((option) => option.value === settings.value.bitsPerSecond)}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value.bitsPerSecond = selected.value;
+				settings.value = { ...settings.value, bitsPerSecond: selected.value };
 			}}
 			placeholder="Select a bitrate"
 		/>
