@@ -50,7 +50,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
 		isFasterRerecordEnabled: false,
-		alwaysOnTop: 'Never',
+		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
 		bitsPerSecond: DEFAULT_BITRATE_MS,
