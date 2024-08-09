@@ -33,6 +33,9 @@ const MediaRecorderService = Effect.gen(function* () {
 	const resetRecorder = () => {
 		recordedChunks.length = 0;
 		mediaRecorder = null;
+		if (!settings.value.isFasterRerecordEnabled) {
+			mediaStreamManager.release();
+		}
 	};
 
 	return {
@@ -50,7 +53,9 @@ const MediaRecorderService = Effect.gen(function* () {
 					});
 				}
 				const connectingToRecordingDeviceToastId = nanoid();
-				const newOrExistingStream = yield* mediaStreamManager.getOrRefreshStream();
+				const newOrExistingStream = settings.value.isFasterRerecordEnabled
+					? yield* mediaStreamManager.getOrRefreshStream()
+					: yield* mediaStreamManager.refreshStream();
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
 						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.value.bitsPerSecond }),
