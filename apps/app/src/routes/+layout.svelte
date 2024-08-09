@@ -11,6 +11,7 @@
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
 	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
+	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -86,3 +87,4 @@
 
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />
+<FasterRerecordExplainedDialog />

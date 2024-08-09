@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Switch } from '$lib/components/ui/switch';
-	import { settings } from '$lib/stores/settings.svelte';
 	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
+	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
 	const selectedAlwaysOnTopOption = $derived(
@@ -55,6 +57,25 @@
 		/>
 		<Label for="paste-from-clipboard">
 			Paste contents from clipboard after successful transcription
+		</Label>
+	</div>
+	<div class="flex items-center gap-2">
+		<Switch
+			id="faster-rerecord"
+			aria-labelledby="faster-rerecord"
+			checked={settings.value.isFasterRerecordEnabled}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, isFasterRerecordEnabled: v };
+			}}
+		/>
+		<Label for="faster-rerecord">
+			Enable faster rerecord. <Button
+				variant="link"
+				size="inline"
+				onclick={() => (fasterRerecordExplainedDialog.isOpen = true)}
+			>
+				(What's that?)
+			</Button>
 		</Label>
 	</div>
 	{#if window.__TAURI__}
