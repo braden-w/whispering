@@ -47,7 +47,8 @@
 				"sidecar": false
 			},
 			"window": {
-				"setSize": true
+				"setSize": true,
+				"setAlwaysOnTop": true
 			}
 		},
 		"systemTray": {

@@ -6,7 +6,7 @@
 		value = $bindable(),
 		class: className,
 		...restProps
-	}: { value: string; class?: string } & HTMLInputAttributes = $props();
+	}: { value: string; class?: string | undefined | null } & HTMLInputAttributes = $props();
 </script>
 
 <input

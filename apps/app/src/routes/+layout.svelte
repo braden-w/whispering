@@ -10,6 +10,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
+	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -41,6 +42,7 @@
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
+		refreshAlwaysOnTopFromSettings();
 	});
 
 	onDestroy(() => {
