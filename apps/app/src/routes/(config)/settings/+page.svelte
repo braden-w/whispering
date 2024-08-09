@@ -57,6 +57,19 @@
 			Paste contents from clipboard after successful transcription
 		</Label>
 	</div>
+	<div class="flex items-center gap-2">
+		<Switch
+			id="faster-rerecord"
+			aria-labelledby="faster-rerecord""
+			checked={settings.value.isFasterRerecordEnabled}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, isFasterRerecordEnabled: v };
+			}}
+		/>
+		<Label for="faster-rerecord">
+			Enable faster rerecord
+		</Label>
+	</div>
 	{#if window.__TAURI__}
 		<div class="grid gap-2">
 			<SettingsLabelSelect

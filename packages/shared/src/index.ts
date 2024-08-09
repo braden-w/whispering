@@ -27,6 +27,7 @@ export const settingsSchema = S.Struct({
 	isPlaySoundEnabled: S.Boolean,
 	isCopyToClipboardEnabled: S.Boolean,
 	isPasteContentsOnSuccessEnabled: S.Boolean,
+	isFasterRerecordEnabled: S.Boolean,
 	alwaysOnTop: S.Literal(...ALWAYS_ON_TOP_VALUES),
 
 	selectedAudioInputDeviceId: S.String,
@@ -48,6 +49,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPlaySoundEnabled: true,
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
+		isFasterRerecordEnabled: false,
 		alwaysOnTop: 'Never',
 
 		selectedAudioInputDeviceId: 'default',
