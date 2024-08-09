@@ -204,7 +204,18 @@ export const recorder = Effect.gen(function* () {
 							yield* setAlwaysOnTop(false);
 						}
 				}
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
+			}).pipe(
+				Effect.tapError(() =>
+					Effect.gen(function* () {
+						recorderState.value = 'IDLE';
+						if (settings.value.alwaysOnTop === 'When Recording') {
+							yield* setAlwaysOnTop(false);
+						}
+					}),
+				),
+				Effect.catchAll(renderErrorAsToast),
+				Effect.runPromise,
+			),
 		cancelRecording: () =>
 			Effect.gen(function* () {
 				yield* mediaRecorderService.cancelRecording;
@@ -220,6 +231,9 @@ export const recorder = Effect.gen(function* () {
 				}
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
+				if (settings.value.alwaysOnTop === 'When Recording') {
+					yield* setAlwaysOnTop(false);
+				}
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
