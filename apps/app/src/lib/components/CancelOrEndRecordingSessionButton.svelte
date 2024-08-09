@@ -4,8 +4,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import FasterRerecordExplainedDialog from './FasterRerecordExplainedDialog.svelte';
-	import { fasterRerecordExplainedDialog } from './fasterRerecordExplainedDialog.svelte.js';
+	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 
 	let { class: className }: { class?: string | undefined } = $props();
 </script>

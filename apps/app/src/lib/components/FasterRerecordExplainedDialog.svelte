@@ -1,5 +1,18 @@
+<script context="module">
+	export const fasterRerecordExplainedDialog = (() => {
+		let isOpen = $state(false);
+		return {
+			get isOpen() {
+				return isOpen;
+			},
+			set isOpen(v) {
+				isOpen = v;
+			},
+		};
+	})();
+</script>
+
 <script lang="ts">
-	import { fasterRerecordExplainedDialog } from './fasterRerecordExplainedDialog.svelte.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 
 	let { class: className }: { class?: string | undefined } = $props();

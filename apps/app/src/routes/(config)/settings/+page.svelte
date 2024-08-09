@@ -6,7 +6,7 @@
 	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
-	import { fasterRerecordExplainedDialog } from '$lib/components/fasterRerecordExplainedDialog.svelte.js';
+	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
 	const selectedAlwaysOnTopOption = $derived(
