@@ -55,7 +55,6 @@
 	const TOASTER_SETTINGS = {
 		position: 'bottom-right',
 		richColors: true,
-		expand: true,
 		duration: 5000,
 		visibleToasts: 5,
 	} satisfies ToasterProps;
