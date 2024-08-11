@@ -217,17 +217,6 @@ function SettingsCard() {
 				</div>
 
 				<div className="grid gap-2">
-					<SettingsLabelInput
-						id="global-shortcut"
-						label="Global Shortcut"
-						value={settings.currentGlobalShortcut}
-						onChange={(value) => setSettings({ ...settings, currentGlobalShortcut: value })}
-						placeholder="Global Shortcut to toggle recording"
-						disabled
-					/>
-				</div>
-
-				<div className="grid gap-2">
 					<Label className="text-sm" htmlFor="global-shortcut">
 						Global Shortcut
 					</Label>
