@@ -7,15 +7,15 @@
 		id,
 		label,
 		value = $bindable(),
-		placeholder = '',
 		type = 'text',
+		placeholder = '',
 		disabled = false,
 		...restProps
 	}: HTMLInputAttributes & {
 		label: string;
 		value: string;
-		placeholder?: string;
 		type?: 'text' | 'password';
+		placeholder?: string;
 		disabled?: boolean;
 	} = $props();
 </script>

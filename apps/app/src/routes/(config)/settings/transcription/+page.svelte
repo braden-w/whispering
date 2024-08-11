@@ -48,6 +48,7 @@
 			<SettingsLabelInput
 				id="openai-api-key"
 				label="OpenAI API Key"
+				type="password"
 				placeholder="Your OpenAI API Key"
 				value={settings.value.openAiApiKey}
 				oninput={({ currentTarget: { value } }) => {
@@ -80,6 +81,7 @@
 			<SettingsLabelInput
 				id="groq-api-key"
 				label="Groq API Key"
+				type="password"
 				placeholder="Your Groq API Key"
 				value={settings.value.groqApiKey}
 				oninput={({ currentTarget: { value } }) => {
