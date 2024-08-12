@@ -9,7 +9,7 @@ export const toggleRecordingFromContentScript = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
-				name: 'contents/toggleRecording',
+				name: 'whispering-web/toggleRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({

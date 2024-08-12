@@ -59,7 +59,7 @@ function SettingsCard() {
 		queryKey: ['settings'],
 		queryFn: async () => {
 			const response = await sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
-				name: 'contents/getSettings',
+				name: 'whispering-web/getSettings',
 			});
 			if (!response.isSuccess) throw response.error;
 			return response.data;
@@ -69,7 +69,7 @@ function SettingsCard() {
 	const { mutate: setSettings } = useMutation({
 		mutationFn: async (settings: Settings) => {
 			const response = await sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
-				name: 'contents/setSettings',
+				name: 'whispering-web/setSettings',
 				body: { settings },
 			});
 			if (!response.isSuccess) throw response.error;

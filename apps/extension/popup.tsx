@@ -38,7 +38,7 @@ const toggleRecording = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
-				name: 'contents/toggleRecording',
+				name: 'whispering-web/toggleRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({
@@ -60,7 +60,7 @@ const cancelRecording = () =>
 	Effect.tryPromise({
 		try: () =>
 			sendToBackground<CancelRecording.RequestBody, CancelRecording.ResponseBody>({
-				name: 'contents/cancelRecording',
+				name: 'whispering-web/cancelRecording',
 			}),
 		catch: (error) =>
 			new WhisperingError({
