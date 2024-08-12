@@ -57,10 +57,21 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 						}),
 				),
 				Effect.tapError(renderErrorAsToast),
-				Effect.catchAll(() => {
-					localStorage.setItem(key, JSON.stringify(defaultValue));
-					return Effect.succeed(defaultValue);
-				}),
+				Effect.catchAll(() =>
+					Effect.gen(function* () {
+						// Attempt to merge the default value with the value from storage if possible
+						const valueFromStorageParsed = yield* S.decodeUnknown(S.parseJson(S.Any))(
+							valueFromStorage,
+						);
+						const defaultValueMaybeMergedOldValues = yield* S.decodeUnknown(schema)({
+							...defaultValue,
+							...valueFromStorageParsed,
+						}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue)));
+
+						localStorage.setItem(key, JSON.stringify(defaultValueMaybeMergedOldValues));
+						return defaultValueMaybeMergedOldValues;
+					}),
+				),
 			)
 			.pipe(Effect.runSync);
 		return parseResult as S.Schema.Type<TSchema>;
