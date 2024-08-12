@@ -1,7 +1,9 @@
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
 import { WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
@@ -42,34 +44,54 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 }) {
 	let value = $state(defaultValue);
 
-	const parseValueFromStorage = (valueFromStorage: string | null): S.Schema.Type<TSchema> => {
-		const isEmpty = valueFromStorage === null;
+	const parseValueFromStorage = (
+		valueFromStorageUnparsed: string | null,
+	): S.Schema.Type<TSchema> => {
+		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
-		const parseResult = S.decodeUnknown(jsonSchema)(valueFromStorage)
+		const parseResult = S.decodeUnknown(jsonSchema)(valueFromStorageUnparsed)
 			.pipe(
-				Effect.mapError(
-					(e) =>
-						new WhisperingError({
-							variant: 'warning',
-							title: `Invalid value from storage for key "${key}", using default value instead.`,
-							description: e.message,
-						}),
-				),
-				Effect.tapError(renderErrorAsToast),
 				Effect.catchAll(() =>
 					Effect.gen(function* () {
+						const updatingLocalStorageToastId = yield* toast({
+							variant: 'loading',
+							title: `Updating "${key}" in local storage...`,
+							description: 'Please wait...',
+						});
 						// Attempt to merge the default value with the value from storage if possible
-						const valueFromStorageParsed = yield* S.decodeUnknown(S.parseJson(S.Any))(
-							valueFromStorage,
+						const valueFromStorageMaybeInvalid = yield* S.decodeUnknown(S.parseJson(S.Any))(
+							valueFromStorageUnparsed,
 						);
-						const defaultValueMaybeMergedOldValues = yield* S.decodeUnknown(schema)({
+						const defaultValueMergedOldValues = {
 							...defaultValue,
-							...valueFromStorageParsed,
-						}).pipe(Effect.catchAll(() => Effect.succeed(defaultValue)));
+							...valueFromStorageMaybeInvalid,
+						};
 
-						localStorage.setItem(key, JSON.stringify(defaultValueMaybeMergedOldValues));
-						return defaultValueMaybeMergedOldValues;
+						const updatedValue = yield* S.decodeUnknown(schema)(defaultValueMergedOldValues).pipe(
+							Effect.andThen(() =>
+								toast({
+									id: updatingLocalStorageToastId,
+									variant: 'success',
+									title: `Successfully updated "${key}" in local storage`,
+									description: 'The value has been updated.',
+								}),
+							),
+							Effect.catchAll(() =>
+								Effect.gen(function* () {
+									yield* toast({
+										id: updatingLocalStorageToastId,
+										variant: 'error',
+										title: `Error updating "${key}" in local storage`,
+										description: 'Reverting to default value.',
+									});
+									return defaultValue;
+								}),
+							),
+						);
+
+						localStorage.setItem(key, JSON.stringify(updatedValue));
+						return updatedValue;
 					}),
 				),
 			)
