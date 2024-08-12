@@ -1,7 +1,5 @@
-import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
-import { WhisperingError } from '@repo/shared';
 import { Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 
@@ -57,7 +55,8 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		}
 
 		return Effect.gen(function* () {
-			const updatingLocalStorageToastId = yield* toast({
+			const updatingLocalStorageToastId = nanoid();
+			yield* toast({
 				variant: 'loading',
 				title: `Updating "${key}" in local storage...`,
 				description: 'Please wait...',
