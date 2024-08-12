@@ -3,7 +3,7 @@ import type { ExternalMessage, ExternalMessageNameToReturnType, Result } from '@
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { getActiveTabId } from '~lib/background/external/getActiveTabId';
+import { getActiveTabId } from '~lib/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 

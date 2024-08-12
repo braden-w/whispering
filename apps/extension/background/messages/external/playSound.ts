@@ -7,7 +7,7 @@ import {
 	type Result,
 } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { getActiveTabId } from '~lib/background/external/getActiveTabId';
+import { getActiveTabId } from '~lib/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
@@ -39,7 +39,7 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 		});
 	}).pipe(
 		// Silently catch playSound errors and log them to the console instead of render them as toast
-		Effect.catchAll(Console.error)
+		Effect.catchAll(Console.error),
 	);
 
 export type RequestBody = Extract<ExternalMessage, { name: 'external/playSound' }>['body'];
