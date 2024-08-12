@@ -3,7 +3,7 @@ import type { Result, Settings } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';

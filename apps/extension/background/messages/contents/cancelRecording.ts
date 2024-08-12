@@ -3,8 +3,8 @@ import type { Result } from '@repo/shared';
 import { effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody = {};
