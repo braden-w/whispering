@@ -16,12 +16,11 @@ import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
 import { renderErrorAsNotification } from '~lib/errors';
-import type * as CancelRecording from './background/messages/contents/cancelRecording';
-import type * as OpenOptionsPage from './background/messages/openOptionsPage';
-import type * as ToggleRecording from './background/messages/contents/toggleRecording';
-import './style.css';
 import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import type * as CancelRecording from './background/messages/contents/cancelRecording';
+import type * as ToggleRecording from './background/messages/contents/toggleRecording';
+import './style.css';
 
 function IndexPopup() {
 	return (
@@ -66,28 +65,6 @@ const cancelRecording = () =>
 		catch: (error) =>
 			new WhisperingError({
 				title: `Unable to cancel recording via background service worker`,
-				description:
-					error instanceof Error
-						? error.message
-						: 'There was likely an issue sending the message to the background service worker from the popup.',
-				error,
-			}),
-	}).pipe(
-		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
-
-const openOptionsPage = () =>
-	Effect.tryPromise({
-		try: () =>
-			sendToBackground<OpenOptionsPage.RequestBody, OpenOptionsPage.ResponseBody>({
-				name: 'openOptionsPage',
-			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: `Unable to open options page via background service worker`,
 				description:
 					error instanceof Error
 						? error.message
@@ -241,7 +218,7 @@ function NavItems() {
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button onClick={openOptionsPage} variant="ghost" size="icon">
+						<Button onClick={() => chrome.runtime.openOptionsPage()} variant="ghost" size="icon">
 							<SlidersVerticalIcon className="h-4 w-4" aria-hidden="true" />
 							<span className="sr-only">Settings</span>
 						</Button>
