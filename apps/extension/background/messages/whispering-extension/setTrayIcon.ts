@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
-	ExternalMessage,
+	ExternalMessageBody,
 	ExternalMessageNameToReturnType,
 	RecorderState,
 	Result,
@@ -35,10 +35,7 @@ const setTrayIcon = (recorderState: RecorderState) =>
 		});
 	});
 
-export type RequestBody = Extract<
-	ExternalMessage,
-	{ name: 'whispering-extension/setTrayIcon' }
->['body'];
+export type RequestBody = ExternalMessageBody<'whispering-extension/setTrayIcon'>;
 
 export type ResponseBody = Result<
 	ExternalMessageNameToReturnType['whispering-extension/setTrayIcon']

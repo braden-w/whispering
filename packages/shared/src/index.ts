@@ -154,6 +154,11 @@ export const externalMessageSchema = S.Union(
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
 
+export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
+	ExternalMessage,
+	{ name: T }
+>['body'];
+
 export type ExternalMessageNameToReturnType = {
 	'whispering-extension/notifyWhisperingTabReady': void;
 	'whispering-extension/playSound': void;

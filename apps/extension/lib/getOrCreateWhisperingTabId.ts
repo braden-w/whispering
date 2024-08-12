@@ -4,7 +4,7 @@ import {
 	WHISPERING_URL_WILDCARD,
 	WhisperingError,
 	externalMessageSchema,
-	type ExternalMessage,
+	type ExternalMessageBody,
 } from '@repo/shared';
 import { Effect, Either } from 'effect';
 
@@ -74,7 +74,7 @@ function createWhisperingTab() {
 
 function isNotifyWhisperingTabReadyMessage(
 	message: unknown,
-): message is Extract<ExternalMessage, { name: 'whispering-extension/notifyWhisperingTabReady' }> {
+): message is ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'> {
 	const externalMessageResult = Schema.decodeUnknownEither(externalMessageSchema)(message);
 	if (Either.isLeft(externalMessageResult)) return false;
 	const externalMessage = externalMessageResult.right;

@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
 	WhisperingError,
 	effectToResult,
-	type ExternalMessage,
+	type ExternalMessageBody,
 	type ExternalMessageNameToReturnType,
 	type Result,
 } from '@repo/shared';
@@ -42,10 +42,7 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 		Effect.catchAll(Console.error),
 	);
 
-export type RequestBody = Extract<
-	ExternalMessage,
-	{ name: 'whispering-extension/playSound' }
->['body'];
+export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
 export type ResponseBody = Result<
 	ExternalMessageNameToReturnType['whispering-extension/playSound']
