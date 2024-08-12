@@ -159,7 +159,7 @@ export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 	{ name: T }
 >['body'];
 
-export type ExternalMessageNameToReturnType = {
+type ExternalMessageNameToReturnType = {
 	'whispering-extension/notifyWhisperingTabReady': void;
 	'whispering-extension/playSound': void;
 	'whispering-extension/setClipboardText': void;
@@ -168,5 +168,8 @@ export type ExternalMessageNameToReturnType = {
 	'whispering-extension/notifications/clear': void;
 	'whispering-extension/writeTextToCursor': void;
 };
+
+export type ExternalMessageReturnType<T extends ExternalMessage['name']> =
+	ExternalMessageNameToReturnType[T];
 
 export * from './services/index.js';

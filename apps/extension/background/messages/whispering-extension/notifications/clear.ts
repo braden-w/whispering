@@ -1,5 +1,5 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { ExternalMessageBody, ExternalMessageNameToReturnType, Result } from '@repo/shared';
+import type { ExternalMessageBody, ExternalMessageReturnType, Result } from '@repo/shared';
 import { NotificationService, WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { renderErrorAsNotification } from '~lib/errors';
@@ -8,7 +8,7 @@ import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBg
 export type RequestBody = ExternalMessageBody<'whispering-extension/notifications/clear'>;
 
 export type ResponseBody = Result<
-	ExternalMessageNameToReturnType['whispering-extension/notifications/clear']
+	ExternalMessageReturnType<'whispering-extension/notifications/clear'>
 >;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>

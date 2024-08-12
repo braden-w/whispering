@@ -1,5 +1,5 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { ExternalMessageBody, ExternalMessageNameToReturnType, Result } from '@repo/shared';
+import type { ExternalMessageBody, ExternalMessageReturnType, Result } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
@@ -104,7 +104,7 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 export type RequestBody = ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
 
 export type ResponseBody = Result<
-	ExternalMessageNameToReturnType['whispering-extension/writeTextToCursor']
+	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
 >;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>

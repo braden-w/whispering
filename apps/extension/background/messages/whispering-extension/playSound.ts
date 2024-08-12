@@ -3,7 +3,7 @@ import {
 	WhisperingError,
 	effectToResult,
 	type ExternalMessageBody,
-	type ExternalMessageNameToReturnType,
+	type ExternalMessageReturnType,
 	type Result,
 } from '@repo/shared';
 import { Console, Effect } from 'effect';
@@ -44,9 +44,7 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 
 export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
-export type ResponseBody = Result<
-	ExternalMessageNameToReturnType['whispering-extension/playSound']
->;
+export type ResponseBody = Result<ExternalMessageReturnType<'whispering-extension/playSound'>>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
