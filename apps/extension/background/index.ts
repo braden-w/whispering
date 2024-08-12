@@ -1,7 +1,7 @@
 import { Console, Effect } from 'effect';
+import { toggleRecording } from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
-import { toggleRecording } from './messages/contents/toggleRecording';
 
 chrome.runtime.onInstalled.addListener(async (details) => {
 	if (details.reason === 'install') await chrome.runtime.openOptionsPage();

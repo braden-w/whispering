@@ -15,11 +15,11 @@ import {
 import { Effect } from 'effect';
 import { ClipboardIcon, ListIcon, MoonIcon, SlidersVerticalIcon, SunIcon } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
+import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
+import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
-import type * as CancelRecording from './background/messages/contents/cancelRecording';
-import type * as ToggleRecording from './background/messages/contents/toggleRecording';
 import './style.css';
 
 function IndexPopup() {

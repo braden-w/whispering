@@ -12,8 +12,9 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import * as GetSettings from '~background/messages/contents/getSettings';
-import * as SetSettings from '~background/messages/contents/setSettings';
+import { Fragment } from 'react';
+import * as GetSettings from '~background/messages/whispering-web/getSettings';
+import * as SetSettings from '~background/messages/whispering-web/setSettings';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -34,7 +35,6 @@ import {
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
 import './style.css';
-import { Fragment } from 'react';
 
 const queryClient = new QueryClient();
 

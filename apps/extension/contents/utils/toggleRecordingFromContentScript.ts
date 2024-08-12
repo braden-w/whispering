@@ -1,7 +1,7 @@
-import type * as ToggleRecording from '@/background/messages/contents/toggleRecording';
 import { sendToBackground } from '@plasmohq/messaging';
 import { WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
+import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 
