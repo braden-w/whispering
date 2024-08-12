@@ -82,17 +82,15 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 						description: 'The value has been updated.',
 					}),
 				),
-				Effect.catchAll(() =>
-					Effect.gen(function* () {
-						yield* toast({
-							id: updatingLocalStorageToastId,
-							variant: 'error',
-							title: `Error updating "${key}" in local storage`,
-							description: 'Reverting to default value.',
-						});
-						return defaultValue;
+				Effect.tapError(() =>
+					toast({
+						id: updatingLocalStorageToastId,
+						variant: 'error',
+						title: `Error updating "${key}" in local storage`,
+						description: 'Reverting to default value.',
 					}),
 				),
+				Effect.catchAll(() => Effect.succeed(defaultValue)),
 			);
 
 			localStorage.setItem(key, JSON.stringify(updatedValue));
