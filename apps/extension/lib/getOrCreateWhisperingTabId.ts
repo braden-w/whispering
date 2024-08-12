@@ -74,11 +74,11 @@ function createWhisperingTab() {
 
 function isNotifyWhisperingTabReadyMessage(
 	message: unknown,
-): message is Extract<ExternalMessage, { name: 'external/notifyWhisperingTabReady' }> {
+): message is Extract<ExternalMessage, { name: 'whispering-extension/notifyWhisperingTabReady' }> {
 	const externalMessageResult = Schema.decodeUnknownEither(externalMessageSchema)(message);
 	if (Either.isLeft(externalMessageResult)) return false;
 	const externalMessage = externalMessageResult.right;
-	return externalMessage.name === 'external/notifyWhisperingTabReady';
+	return externalMessage.name === 'whispering-extension/notifyWhisperingTabReady';
 }
 
 function makeTabUndiscardableById(tabId: number) {

@@ -101,9 +101,14 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 	);
 };
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/writeTextToCursor' }>['body'];
+export type RequestBody = Extract<
+	ExternalMessage,
+	{ name: 'whispering-extension/writeTextToCursor' }
+>['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/writeTextToCursor']>;
+export type ResponseBody = Result<
+	ExternalMessageNameToReturnType['whispering-extension/writeTextToCursor']
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

@@ -63,7 +63,7 @@ export const recorder = Effect.gen(function* () {
 								startSound.play();
 							} else {
 								yield* sendMessageToExtension({
-									name: 'external/playSound',
+									name: 'whispering-extension/playSound',
 									body: { sound: 'start' },
 								}).pipe(Effect.catchAll(renderErrorAsToast));
 							}
@@ -88,7 +88,7 @@ export const recorder = Effect.gen(function* () {
 								stopSound.play();
 							} else {
 								yield* sendMessageToExtension({
-									name: 'external/playSound',
+									name: 'whispering-extension/playSound',
 									body: { sound: 'stop' },
 								}).pipe(Effect.catchAll(renderErrorAsToast));
 							}
@@ -130,7 +130,7 @@ export const recorder = Effect.gen(function* () {
 						cancelSound.play();
 					} else {
 						yield* sendMessageToExtension({
-							name: 'external/playSound',
+							name: 'whispering-extension/playSound',
 							body: { sound: 'cancel' },
 						});
 					}

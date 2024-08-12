@@ -35,9 +35,14 @@ const setTrayIcon = (recorderState: RecorderState) =>
 		});
 	});
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/setTrayIcon' }>['body'];
+export type RequestBody = Extract<
+	ExternalMessage,
+	{ name: 'whispering-extension/setTrayIcon' }
+>['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setTrayIcon']>;
+export type ResponseBody = Result<
+	ExternalMessageNameToReturnType['whispering-extension/setTrayIcon']
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

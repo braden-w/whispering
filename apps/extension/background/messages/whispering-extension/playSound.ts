@@ -42,9 +42,14 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 		Effect.catchAll(Console.error),
 	);
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/playSound' }>['body'];
+export type RequestBody = Extract<
+	ExternalMessage,
+	{ name: 'whispering-extension/playSound' }
+>['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/playSound']>;
+export type ResponseBody = Result<
+	ExternalMessageNameToReturnType['whispering-extension/playSound']
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

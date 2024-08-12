@@ -7,10 +7,12 @@ import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBg
 
 export type RequestBody = Extract<
 	ExternalMessage,
-	{ name: 'external/notifications/create' }
+	{ name: 'whispering-extension/notifications/create' }
 >['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/notifications/create']>;
+export type ResponseBody = Result<
+	ExternalMessageNameToReturnType['whispering-extension/notifications/create']
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

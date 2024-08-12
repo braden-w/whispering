@@ -43,9 +43,14 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 		}),
 	);
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/setClipboardText' }>['body'];
+export type RequestBody = Extract<
+	ExternalMessage,
+	{ name: 'whispering-extension/setClipboardText' }
+>['body'];
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/setClipboardText']>;
+export type ResponseBody = Result<
+	ExternalMessageNameToReturnType['whispering-extension/setClipboardText']
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {
