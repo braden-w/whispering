@@ -90,21 +90,6 @@ function SettingsCard() {
 		},
 	});
 
-	const {
-		isPending: isMediaDevicesPending,
-		isError: isMediaDevicesError,
-		data: mediaDevices,
-	} = useQuery({
-		queryKey: ['media-devices'],
-		queryFn: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			stream.getTracks().forEach((track) => track.stop());
-			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-			return audioInputDevices;
-		},
-	});
-
 	if (isSettingsPending) {
 		return <CardContent>Loading...</CardContent>;
 	}
@@ -176,34 +161,6 @@ function SettingsCard() {
 					<Label htmlFor="paste-from-clipboard">
 						Paste contents from clipboard after successful transcription
 					</Label>
-				</div>
-
-				<div className="grid-gap-2">
-					<SettingsLabelSelect
-						id="recording-device"
-						label="Recording Device"
-						placeholder={
-							isMediaDevicesPending
-								? 'Loading devices...'
-								: isMediaDevicesError
-									? 'Error loading devices'
-									: 'Select a device'
-						}
-						options={
-							mediaDevices?.map((mediaDevice) => ({
-								label: mediaDevice.label,
-								value: mediaDevice.deviceId,
-							})) ?? []
-						}
-						disabled={isMediaDevicesPending || isMediaDevicesError}
-						value={settings.selectedAudioInputDeviceId}
-						onValueChange={(value) =>
-							setSettings({
-								...settings,
-								selectedAudioInputDeviceId: value,
-							})
-						}
-					/>
 				</div>
 
 				<div className="grid-gap-2">
