@@ -5,6 +5,8 @@
 	import { SUPPORTED_LANGUAGES_OPTIONS, TRANSCRIPTION_SERVICE_OPTIONS } from '@repo/shared';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+	import FasterWhisperServerExplainedDialog from './FasterWhisperServerExplainedDialog.svelte';
+	import { fasterWhisperServerExplainedDialog } from './FasterWhisperServerExplainedDialog.svelte';
 
 	const selectedLanguageOption = $derived(
 		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.value.outputLanguage),
@@ -111,6 +113,21 @@
 					settings.value = { ...settings.value, fasterWhisperServerUrl: value };
 				}}
 			/>
+			<div class="text-muted-foreground text-sm">
+				See directions for how to set up
+				<code
+					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+				>
+					faster-whisper-server
+				</code>
+				<Button
+					variant="link"
+					class="px-0.3 py-0.2 h-fit"
+					onclick={() => {
+						fasterWhisperServerExplainedDialog.isOpen = true;
+					}}>here</Button
+				>.
+			</div>
 		</div>
 		<div class="grid gap-2">
 			<SettingsLabelInput
@@ -138,3 +155,5 @@
 		/>
 	</div>
 </div>
+
+<FasterWhisperServerExplainedDialog />
