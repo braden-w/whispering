@@ -20,14 +20,14 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 		const undiscardedWhisperingTabs = whisperingTabs.filter((tab) => !tab.discarded);
 		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter((tab) => tab.pinned);
 		for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
-			if (!pinnedUndiscardedTab.id) return;
+			if (!pinnedUndiscardedTab.id) continue;
 			const isResponsive = yield* checkTabResponsiveness(pinnedUndiscardedTab.id);
-			if (isResponsive) return pinnedUndiscardedTab;
+			if (isResponsive) return pinnedUndiscardedTab.id;
 		}
 		for (const undiscardedTab of undiscardedWhisperingTabs) {
-			if (!undiscardedTab.id) return;
+			if (!undiscardedTab.id) continue;
 			const isResponsive = yield* checkTabResponsiveness(undiscardedTab.id);
-			if (isResponsive) return undiscardedTab;
+			if (isResponsive) return undiscardedTab.id;
 		}
 		return yield* createAndSetupNewTab();
 	});
