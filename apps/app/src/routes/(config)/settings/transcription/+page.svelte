@@ -104,7 +104,7 @@
 			</div>
 		</div>
 	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
-		<Tabs.Root value="cpu-mode" class="w-[400px]">
+		<Tabs.Root value="cpu-mode">
 			<Tabs.List class="w-full justify-start rounded-none border-b bg-transparent p-0">
 				<Tabs.Trigger
 					value="cpu-mode"
@@ -119,8 +119,23 @@
 					GPU Mode (for computers with CUDA support)</Tabs.Trigger
 				>
 			</Tabs.List>
-			<Tabs.Content value="cpu-mode">Make changes to your account here.</Tabs.Content>
-			<Tabs.Content value="gpu-mode">Change your password here.</Tabs.Content>
+
+			<Tabs.Content value="cpu-mode">
+				<code
+					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+				>
+					docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface
+					fedirz/faster-whisper-server:latest-cpu
+				</code>
+			</Tabs.Content>
+			<Tabs.Content value="gpu-mode">
+				<code
+					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+				>
+					docker run --gpus=all --publish 8000:8000 --volume
+					~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
+				</code>
+			</Tabs.Content>
 		</Tabs.Root>
 
 		<div class="grid gap-2">
