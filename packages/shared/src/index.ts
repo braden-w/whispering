@@ -61,7 +61,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		openAiApiKey: '',
 		groqApiKey: '',
 		fasterWhisperServerUrl: 'http://localhost:8000',
-		fasterWhisperServerModel: 'Systran/faster-distil-whisper-large-v3',
+		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
 		outputLanguage: 'auto',
 
 		currentLocalShortcut: 'space',
