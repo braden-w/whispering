@@ -1,4 +1,6 @@
-import { HttpService } from '$lib/services/HttpService';
+import { HttpService, HttpServiceError } from '$lib/services/HttpService';
+import { HttpClientError } from '@effect/platform';
+import { RequestError } from '@effect/platform/HttpClientError';
 import { Schema } from '@effect/schema';
 import { WhisperingError } from '@repo/shared';
 import { Body, fetch, ResponseType } from '@tauri-apps/api/http';
@@ -19,28 +21,16 @@ export const HttpServiceDesktopLive = Layer.succeed(
 							headers: { 'Content-Type': 'multipart/form-data' },
 						}),
 					catch: (error) =>
-						new WhisperingError({
-							title: 'Request to Transcription Server Failed',
-							description: `An error occurred while sending the request to the transcription server. ${error instanceof Error ? error.message : 'Please try again later.'}`,
-							error,
+						new HttpServiceError({
+							message: error instanceof Error ? error.message : 'Please try again later.',
 						}),
 				});
 				if (!response.ok) {
-					return yield* new WhisperingError({
-						title: 'Transcription Server Response Error',
-						description: `The server responded with an error: ${response.status}. Please verify the server status or try again later.`,
+					return yield* new HttpServiceError({
+						message: `Request failed with status ${response.status}.`,
 					});
 				}
-				const data = yield* Schema.decodeUnknown(schema)(response.data).pipe(
-					Effect.mapError(
-						(error) =>
-							new WhisperingError({
-								title: 'Unable to parse transcription server response',
-								description: `Failed to parse the response from the transcription server. ${error instanceof Error ? error.message : 'Please try again.'}`,
-								error,
-							}),
-					),
-				);
+				const data = yield* Schema.decodeUnknown(schema)(response.data);
 				return data;
 			}),
 	}),

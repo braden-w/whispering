@@ -4,6 +4,8 @@ import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
+import { HttpServiceDesktopLive } from './HttpServiceDesktopLive';
+import { HttpServiceWebLive } from './HttpServiceWebLive';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
@@ -11,7 +13,6 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 	TranscriptionService,
 	TranscriptionService.of({
 		transcribe: (audioBlob) =>
-			// @ts-expect-error
 			Effect.gen(function* () {
 				const httpService = yield* HttpService;
 				const { outputLanguage, fasterWhisperServerUrl, fasterWhisperServerModel } = settings.value;
@@ -32,19 +33,36 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 				formData.append('file', formDataFile);
 				formData.append('model', fasterWhisperServerModel);
 				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
-				const data = yield* httpService.post({
-					url: `${fasterWhisperServerUrl}/v1/audio/transcriptions`,
-					formData,
-					schema: WhisperResponseSchema,
-				});
+				const data = yield* httpService
+					.post({
+						url: `${fasterWhisperServerUrl}/v1/audio/transcriptions`,
+						formData,
+						schema: WhisperResponseSchema,
+					})
+					.pipe(
+						Effect.catchTags({
+							ParseError: (error) =>
+								new WhisperingError({
+									title: 'Unable to parse transcription server response',
+									description: `Failed to parse the response from the transcription server. ${error instanceof Error ? error.message : 'Please try again.'}`,
+									error,
+								}),
+							HttpServiceError: (error) =>
+								new WhisperingError({
+									title: 'An error occurred while sending the request to the transcription server.',
+									description: error.message,
+									error,
+								}),
+						}),
+					);
 				if ('error' in data) {
 					return yield* new WhisperingError({
-						title: 'Server Error from faster-whisper-server',
+						title: 'faster-whisper-server',
 						description: data.error.message,
 						error: data.error,
 					});
 				}
 				return data.text;
-			}),
+			}).pipe(Effect.provide(window.__TAURI__ ? HttpServiceDesktopLive : HttpServiceWebLive)),
 	}),
 );
