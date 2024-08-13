@@ -41,10 +41,10 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 });
 
 function checkTabResponsiveness(tabId: number) {
-	return injectScript<true, []>({
+	return injectScript<'pong', []>({
 		tabId,
 		commandName: 'ping',
-		func: () => ({ isSuccess: true, data: true }),
+		func: () => ({ isSuccess: true, data: 'pong' }),
 		args: [],
 	}).pipe(Effect.catchAll(() => Effect.succeed(false)));
 }
