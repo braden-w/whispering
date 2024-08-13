@@ -7,6 +7,7 @@ import {
 	type ExternalMessageBody,
 } from '@repo/shared';
 import { Effect, Either } from 'effect';
+import { injectScript } from '~background/injectScript';
 
 export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const whisperingTabs = yield* getAllWhisperingTabs();
@@ -40,17 +41,12 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 });
 
 function checkTabResponsiveness(tabId: number) {
-	return Effect.tryPromise({
-		try: () =>
-			new Promise((resolve) => {
-				chrome.tabs.sendMessage(tabId, { type: 'ping' }, (response) => {
-					resolve(response && response.type === 'pong');
-				});
-				// Set a timeout in case the tab doesn't respond
-				setTimeout(() => resolve(false), 2000);
-			}),
-		catch: () => false,
-	});
+	return injectScript<true, []>({
+		tabId,
+		commandName: 'ping',
+		func: () => ({ isSuccess: true, data: true }),
+		args: [],
+	}).pipe(Effect.catchAll(() => Effect.succeed(false)));
 }
 
 function createAndSetupNewTab() {
