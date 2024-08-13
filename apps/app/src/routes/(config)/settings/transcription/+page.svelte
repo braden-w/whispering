@@ -100,13 +100,13 @@
 				</Button>.
 			</div>
 		</div>
-	{:else if settings.selectedTranscriptionService === 'faster-whisper-server'}
+	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="faster-whisper-server-url"
 				label="faster-whisper-server URL"
 				placeholder="Your faster-whisper-server URL"
-				bind:value={settings.fasterWhisperServerUrl}
+				bind:value={settings.value.fasterWhisperServerUrl}
 			/>
 		</div>
 		<div class="grid gap-2">
@@ -114,7 +114,7 @@
 				id="faster-whisper-server-model"
 				label="faster-whisper-server Model"
 				placeholder="Your faster-whisper-server Model"
-				bind:value={settings.fasterWhisperServerModel}
+				bind:value={settings.value.fasterWhisperServerModel}
 			/>
 		</div>
 	{/if}
