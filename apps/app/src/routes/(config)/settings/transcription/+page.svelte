@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CopyableCode from './CopyableCode.svelte';
-
 	import * as Tabs from '$lib/components/ui/tabs';
+	import * as Card from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -10,6 +10,8 @@
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 	import FasterWhisperServerExplainedDialog from './FasterWhisperServerExplainedDialog.svelte';
 	import { fasterWhisperServerExplainedDialog } from './FasterWhisperServerExplainedDialog.svelte';
+	import { invoke } from '@tauri-apps/api';
+	import { SettingsIcon } from 'lucide-svelte';
 
 	const selectedLanguageOption = $derived(
 		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.value.outputLanguage),
@@ -106,33 +108,59 @@
 			</div>
 		</div>
 	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
-		<Tabs.Root value="cpu-mode">
-			<Tabs.List class="w-full justify-start rounded-none border-b bg-transparent p-0">
-				<Tabs.Trigger
-					value="cpu-mode"
-					class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
-				>
-					CPU Mode (for computers without CUDA support)</Tabs.Trigger
-				>
-				<Tabs.Trigger
-					value="gpu-mode"
-					class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
-				>
-					GPU Mode (for computers with CUDA support)</Tabs.Trigger
-				>
-			</Tabs.List>
+		<Card.Root class="w-full">
+			<Card.Header>
+				<Card.Title class="text-xl">Setting Up Local Transcription with Whisper</Card.Title>
+				<Card.Description class="leading-7">
+					How to setup local Whisper API with
+					<code
+						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+					>
+						faster-whisper-server
+					</code>
+				</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<Tabs.Root value="cpu-mode">
+					<Tabs.List class="w-full justify-start rounded-none border-b bg-transparent p-0">
+						<Tabs.Trigger
+							value="cpu-mode"
+							class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
+						>
+							CPU Mode (for computers without CUDA support)</Tabs.Trigger
+						>
+						<Tabs.Trigger
+							value="gpu-mode"
+							class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
+						>
+							GPU Mode (for computers with CUDA support)</Tabs.Trigger
+						>
+					</Tabs.List>
 
-			<Tabs.Content value="cpu-mode">
-				<CopyableCode
-					codeText="docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu"
-				/>
-			</Tabs.Content>
-			<Tabs.Content value="gpu-mode">
-				<CopyableCode
-					codeText="docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda"
-				/>
-			</Tabs.Content>
-		</Tabs.Root>
+					<Tabs.Content value="cpu-mode">
+						<CopyableCode
+							codeText="docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu"
+						/>
+					</Tabs.Content>
+					<Tabs.Content value="gpu-mode">
+						<CopyableCode
+							codeText="docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda"
+						/>
+					</Tabs.Content>
+				</Tabs.Root>
+			</Card.Content>
+			<Card.Footer>
+				<Button
+					onclick={() => invoke('open_apple_accessibility')}
+					variant="default"
+					size="sm"
+					class="w-full text-sm"
+				>
+					<SettingsIcon class="mr-2 h-4 w-4" />
+					Open MacOS Accessibility Settings
+				</Button>
+			</Card.Footer>
+		</Card.Root>
 
 		<div class="grid gap-2">
 			<SettingsLabelInput
