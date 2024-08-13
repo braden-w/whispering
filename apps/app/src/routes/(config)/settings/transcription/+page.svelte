@@ -128,22 +128,24 @@
 							value="cpu-mode"
 							class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
 						>
-							CPU Mode (for computers without CUDA support)
+							CPU Mode
 						</Tabs.Trigger>
 						<Tabs.Trigger
 							value="gpu-mode"
 							class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
 						>
-							GPU Mode (for computers with CUDA support)
+							GPU Mode
 						</Tabs.Trigger>
 					</Tabs.List>
 
 					<Tabs.Content value="cpu-mode">
+						<p class="text-muted-foreground pb-4">For computers without CUDA support:</p>
 						<CopyableCode
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
 						/>
 					</Tabs.Content>
 					<Tabs.Content value="gpu-mode">
+						<p class="text-muted-foreground pb-4">For computers with CUDA support:</p>
 						<CopyableCode
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
 						/>
