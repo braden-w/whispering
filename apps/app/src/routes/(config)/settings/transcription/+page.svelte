@@ -5,7 +5,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { SUPPORTED_LANGUAGES_OPTIONS, TRANSCRIPTION_SERVICE_OPTIONS } from '@repo/shared';
+	import {
+		WHISPERING_URL,
+		SUPPORTED_LANGUAGES_OPTIONS,
+		TRANSCRIPTION_SERVICE_OPTIONS,
+	} from '@repo/shared';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 	import FasterWhisperServerExplainedDialog from './FasterWhisperServerExplainedDialog.svelte';
@@ -139,12 +143,12 @@
 
 					<Tabs.Content value="cpu-mode">
 						<CopyableCode
-							codeText="docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu"
+							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
 						/>
 					</Tabs.Content>
 					<Tabs.Content value="gpu-mode">
 						<CopyableCode
-							codeText="docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda"
+							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
 						/>
 					</Tabs.Content>
 				</Tabs.Root>
