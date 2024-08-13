@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -103,6 +104,25 @@
 			</div>
 		</div>
 	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
+		<Tabs.Root value="cpu-mode" class="w-[400px]">
+			<Tabs.List class="w-full justify-start rounded-none border-b bg-transparent p-0">
+				<Tabs.Trigger
+					value="cpu-mode"
+					class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
+				>
+					CPU Mode (for computers without CUDA support)</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="gpu-mode"
+					class="text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none"
+				>
+					GPU Mode (for computers with CUDA support)</Tabs.Trigger
+				>
+			</Tabs.List>
+			<Tabs.Content value="cpu-mode">Make changes to your account here.</Tabs.Content>
+			<Tabs.Content value="gpu-mode">Change your password here.</Tabs.Content>
+		</Tabs.Root>
+
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="faster-whisper-server-url"
