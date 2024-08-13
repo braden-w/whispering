@@ -10,7 +10,7 @@ export const NotificationServiceWebLive = Layer.succeed(
 			Effect.gen(function* () {
 				const id =
 					(yield* sendMessageToExtension({
-						name: 'external/notifications/create',
+						name: 'whispering-extension/notifications/create',
 						body: { notifyOptions },
 					})) ?? nanoid();
 				return id;
@@ -21,7 +21,7 @@ export const NotificationServiceWebLive = Layer.succeed(
 		clear: (notificationId: string) =>
 			Effect.gen(function* () {
 				yield* sendMessageToExtension({
-					name: 'external/notifications/clear',
+					name: 'whispering-extension/notifications/clear',
 					body: { notificationId },
 				});
 			}).pipe(Effect.catchAll((error) => Console.error({ ...error }))),

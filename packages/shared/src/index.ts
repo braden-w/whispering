@@ -123,45 +123,50 @@ export const recorderStateToIcons = {
 
 export const externalMessageSchema = S.Union(
 	S.Struct({
-		name: S.Literal('external/notifyWhisperingTabReady'),
+		name: S.Literal('whispering-extension/notifyWhisperingTabReady'),
 		body: S.Struct({}),
 	}),
 	S.Struct({
-		name: S.Literal('external/playSound'),
+		name: S.Literal('whispering-extension/playSound'),
 		body: S.Struct({ sound: S.Literal('start', 'stop', 'cancel') }),
 	}),
 	S.Struct({
-		name: S.Literal('external/setClipboardText'),
+		name: S.Literal('whispering-extension/setClipboardText'),
 		body: S.Struct({ transcribedText: S.String }),
 	}),
 	S.Struct({
-		name: S.Literal('external/setTrayIcon'),
+		name: S.Literal('whispering-extension/setTrayIcon'),
 		body: S.Struct({ recorderState: recorderStateSchema }),
 	}),
 	S.Struct({
-		name: S.Literal('external/notifications/create'),
+		name: S.Literal('whispering-extension/notifications/create'),
 		body: S.Struct({ notifyOptions: notificationOptionsSchema }),
 	}),
 	S.Struct({
-		name: S.Literal('external/notifications/clear'),
+		name: S.Literal('whispering-extension/notifications/clear'),
 		body: S.Struct({ notificationId: S.String }),
 	}),
 	S.Struct({
-		name: S.Literal('external/writeTextToCursor'),
+		name: S.Literal('whispering-extension/writeTextToCursor'),
 		body: S.Struct({ transcribedText: S.String }),
 	}),
 );
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
 
-export type ExternalMessageNameToReturnType = {
-	'external/notifyWhisperingTabReady': void;
-	'external/playSound': void;
-	'external/setClipboardText': void;
-	'external/setTrayIcon': void;
-	'external/notifications/create': string;
-	'external/notifications/clear': void;
-	'external/writeTextToCursor': void;
-};
+export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
+	ExternalMessage,
+	{ name: T }
+>['body'];
+
+export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
+	'whispering-extension/notifyWhisperingTabReady': void;
+	'whispering-extension/playSound': void;
+	'whispering-extension/setClipboardText': void;
+	'whispering-extension/setTrayIcon': void;
+	'whispering-extension/notifications/create': string;
+	'whispering-extension/notifications/clear': void;
+	'whispering-extension/writeTextToCursor': void;
+}[T];
 
 export * from './services/index.js';

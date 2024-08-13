@@ -12,8 +12,9 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import * as GetSettings from '~background/messages/contents/getSettings';
-import * as SetSettings from '~background/messages/contents/setSettings';
+import { Fragment } from 'react';
+import * as GetSettings from '~background/messages/whispering-web/getSettings';
+import * as SetSettings from '~background/messages/whispering-web/setSettings';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -34,7 +35,6 @@ import {
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
 import './style.css';
-import { Fragment } from 'react';
 
 const queryClient = new QueryClient();
 
@@ -59,7 +59,7 @@ function SettingsCard() {
 		queryKey: ['settings'],
 		queryFn: async () => {
 			const response = await sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
-				name: 'contents/getSettings',
+				name: 'whispering-web/getSettings',
 			});
 			if (!response.isSuccess) throw response.error;
 			return response.data;
@@ -69,7 +69,7 @@ function SettingsCard() {
 	const { mutate: setSettings } = useMutation({
 		mutationFn: async (settings: Settings) => {
 			const response = await sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
-				name: 'contents/setSettings',
+				name: 'whispering-web/setSettings',
 				body: { settings },
 			});
 			if (!response.isSuccess) throw response.error;
@@ -87,21 +87,6 @@ function SettingsCard() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['settings'] });
-		},
-	});
-
-	const {
-		isPending: isMediaDevicesPending,
-		isError: isMediaDevicesError,
-		data: mediaDevices,
-	} = useQuery({
-		queryKey: ['media-devices'],
-		queryFn: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			stream.getTracks().forEach((track) => track.stop());
-			const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
-			return audioInputDevices;
 		},
 	});
 
@@ -180,50 +165,11 @@ function SettingsCard() {
 
 				<div className="grid-gap-2">
 					<SettingsLabelSelect
-						id="recording-device"
-						label="Recording Device"
-						placeholder={
-							isMediaDevicesPending
-								? 'Loading devices...'
-								: isMediaDevicesError
-									? 'Error loading devices'
-									: 'Select a device'
-						}
-						options={
-							mediaDevices?.map((mediaDevice) => ({
-								label: mediaDevice.label,
-								value: mediaDevice.deviceId,
-							})) ?? []
-						}
-						disabled={isMediaDevicesPending || isMediaDevicesError}
-						value={settings.selectedAudioInputDeviceId}
-						onValueChange={(value) =>
-							setSettings({
-								...settings,
-								selectedAudioInputDeviceId: value,
-							})
-						}
-					/>
-				</div>
-
-				<div className="grid-gap-2">
-					<SettingsLabelSelect
 						id="output-language"
 						label="Output Language"
 						options={SUPPORTED_LANGUAGES_OPTIONS}
 						value={settings.outputLanguage}
 						onValueChange={(value) => setSettings({ ...settings, outputLanguage: value })}
-					/>
-				</div>
-
-				<div className="grid gap-2">
-					<SettingsLabelInput
-						id="global-shortcut"
-						label="Global Shortcut"
-						value={settings.currentGlobalShortcut}
-						onChange={(value) => setSettings({ ...settings, currentGlobalShortcut: value })}
-						placeholder="Global Shortcut to toggle recording"
-						disabled
 					/>
 				</div>
 

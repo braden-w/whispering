@@ -39,7 +39,7 @@
 			unlisten = await listen('toggle-recording', recorder.toggleRecording);
 		} else {
 			sendMessageToExtension({
-				name: 'external/notifyWhisperingTabReady',
+				name: 'whispering-extension/notifyWhisperingTabReady',
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}

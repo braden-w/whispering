@@ -1,12 +1,12 @@
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
-import type { ExternalMessage, ExternalMessageNameToReturnType, Result } from '@repo/shared';
+import type { ExternalMessage, ExternalMessageReturnType, Result } from '@repo/shared';
 import { WhisperingError, resultToEffect } from '@repo/shared';
 import { Effect } from 'effect';
 
 export const sendMessageToExtension = <
 	M extends ExternalMessage,
 	ExternalMessageName extends ExternalMessage['name'] = M['name'],
-	T = ExternalMessageNameToReturnType[ExternalMessageName],
+	T = ExternalMessageReturnType<ExternalMessageName>,
 >(
 	message: M,
 ) =>
