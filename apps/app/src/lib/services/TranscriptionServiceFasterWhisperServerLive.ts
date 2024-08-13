@@ -12,7 +12,7 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 	TranscriptionService.of({
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
-				const { outputLanguage, fasterWhisperServerUrl, fasterWhisperServerModel } = settings;
+				const { outputLanguage, fasterWhisperServerUrl, fasterWhisperServerModel } = settings.value;
 
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
@@ -24,9 +24,7 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 				const formDataFile = new File(
 					[audioBlob],
 					`recording.${getExtensionFromAudioBlob(audioBlob)}`,
-					{
-						type: audioBlob.type,
-					},
+					{ type: audioBlob.type },
 				);
 				const formData = new FormData();
 				formData.append('file', formDataFile);
@@ -69,7 +67,7 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 					Effect.mapError(
 						(error) =>
 							new WhisperingError({
-								title: 'Response Parsing Error',
+								title: 'Unable to parse transcription server response',
 								description: `Failed to parse the response from the transcription server. ${error instanceof Error ? error.message : 'Please try again.'}`,
 								error,
 							}),
