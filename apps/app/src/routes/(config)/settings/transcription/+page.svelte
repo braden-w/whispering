@@ -121,20 +121,16 @@
 			</Tabs.List>
 
 			<Tabs.Content value="cpu-mode">
-				<code
-					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-				>
+				<pre class="bg-muted rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
 					docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface
 					fedirz/faster-whisper-server:latest-cpu
-				</code>
+				</pre>
 			</Tabs.Content>
 			<Tabs.Content value="gpu-mode">
-				<code
-					class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-				>
+				<pre class="bg-muted rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
 					docker run --gpus=all --publish 8000:8000 --volume
 					~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
-				</code>
+				</pre>
 			</Tabs.Content>
 		</Tabs.Root>
 
