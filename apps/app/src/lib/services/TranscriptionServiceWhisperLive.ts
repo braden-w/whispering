@@ -1,3 +1,4 @@
+import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
@@ -61,20 +62,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 					}),
 					HttpClientRequest.formDataBody(formData),
 					HttpClient.fetch,
-					Effect.andThen(
-						HttpClientResponse.schemaBodyJson(
-							Schema.Union(
-								Schema.Struct({
-									text: Schema.String,
-								}),
-								Schema.Struct({
-									error: Schema.Struct({
-										message: Schema.String,
-									}),
-								}),
-							),
-						),
-					),
+					Effect.andThen(HttpClientResponse.schemaBodyJson(WhisperResponseSchema)),
 					Effect.scoped,
 					Effect.mapError(
 						(error) =>

@@ -1,3 +1,4 @@
+import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
@@ -17,25 +18,10 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 
 				const postBodyToTranscriptionServer = (formData: FormData) => {
 					if (!window.__TAURI__)
-						return HttpClientRequest.post(
-							'https://api.groq.com/openai/v1/audio/transcriptions',
-						).pipe(
+						return HttpClientRequest.post(`${fasterWhisperServerUrl}/v1/audio/transcriptions`).pipe(
 							HttpClientRequest.formDataBody(formData),
 							HttpClient.fetch,
-							Effect.andThen(
-								HttpClientResponse.schemaBodyJson(
-									Schema.Union(
-										Schema.Struct({
-											text: Schema.String,
-										}),
-										Schema.Struct({
-											error: Schema.Struct({
-												message: Schema.String,
-											}),
-										}),
-									),
-								),
-							),
+							Effect.andThen(HttpClientResponse.schemaBodyJson(WhisperResponseSchema)),
 							Effect.scoped,
 							Effect.mapError(
 								(error) =>
@@ -69,18 +55,7 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 								description: `The server responded with an error: ${response.status}. Please verify the server status or try again later.`,
 							});
 						}
-						const data = yield* Schema.decodeUnknown(
-							Schema.Union(
-								Schema.Struct({
-									text: Schema.String,
-								}),
-								Schema.Struct({
-									error: Schema.Struct({
-										message: Schema.String,
-									}),
-								}),
-							),
-						)(response.data).pipe(
+						const data = yield* Schema.decodeUnknown(WhisperResponseSchema)(response.data).pipe(
 							Effect.mapError(
 								(error) =>
 									new WhisperingError({
