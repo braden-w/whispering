@@ -3,7 +3,7 @@
     <img width="180" src="./apps/app/src-tauri/icons/recorder_state/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
-  <p align="center">Seamless dictation powered by OpenAI Whisper</p>
+  <p align="center">Seamless dictation powered by OpenAI's Whisper Model</p>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
 
 Whispering is an open-source transcription application that provides global speech-to-text functionality, with options such as keyboard shortcuts and automatic copy and paste to make dictating as seamless as possible.
 
-Under the hood, it's powered by OpenAI's Whisper API, making it significantly more accurate than built-in dictation.
+Under the hood, it's powered by OpenAI's Whisper model, making it significantly more accurate than built-in dictation.
 
 ## Demos
 
@@ -53,6 +53,19 @@ https://github.com/user-attachments/assets/a7934f1f-d08b-4037-9bbc-aadd1b13501e
 3. **Chat Integration**: The browser extension adds a recording button to ChatGPT and Claude websites, allowing direct voice input and transcription in the chat interface.
 4. **Transcription Management**: Review and edit transcriptions within the Whispering app to ensure accuracy and clarity.
 5. **Automatic Clipboard Integration**: Once transcription is complete, the text is automatically copied to your clipboard. An option for automatic pasting is also available.
+
+## How is my data stored?
+
+Whispering stores as much data as possible locally on your device, including recordings and text transcriptions. This approach ensures maximum privacy and data security. Here's an overview of how data is handled:
+
+1. **Local Storage**: Voice recordings and transcriptions are stored in IndexedDB, which is used as a blob storage and a place to store all of your data like text and transcriptions.
+
+2. **Transcription Service**: The only data sent elsewhere is your recording to an external transcription service—if you choose one. You have the following options:
+   - External services like OpenAI or Groq
+   - A local transcription service such as `faster-whisper-server`, which keeps everything on-device
+
+3. **Configurable Settings**: You can change the transcription service in the settings to ensure maximum local functionality.
+
 
 ## Installation
 
