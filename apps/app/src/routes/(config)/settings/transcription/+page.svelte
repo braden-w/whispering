@@ -1,4 +1,6 @@
 <script lang="ts">
+	import CopyableCode from './CopyableCode.svelte';
+
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
@@ -121,14 +123,14 @@
 			</Tabs.List>
 
 			<Tabs.Content value="cpu-mode">
-				<pre class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold">
-docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu
-				</pre>
+				<CopyableCode
+					codeText="docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu"
+				/>
 			</Tabs.Content>
 			<Tabs.Content value="gpu-mode">
-				<pre class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold">
-docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
-				</pre>
+				<CopyableCode
+					codeText="docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda"
+				/>
 			</Tabs.Content>
 		</Tabs.Root>
 
