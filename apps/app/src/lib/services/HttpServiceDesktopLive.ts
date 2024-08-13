@@ -1,8 +1,5 @@
 import { HttpService, HttpServiceError } from '$lib/services/HttpService';
-import { HttpClientError } from '@effect/platform';
-import { RequestError } from '@effect/platform/HttpClientError';
 import { Schema } from '@effect/schema';
-import { WhisperingError } from '@repo/shared';
 import { Body, fetch, ResponseType } from '@tauri-apps/api/http';
 import { Effect, Layer } from 'effect';
 
