@@ -12,33 +12,55 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	const whisperingTabs = yield* getAllWhisperingTabs();
 
 	if (whisperingTabs.length === 0) {
-		const newTabId = yield* createWhisperingTab();
-		yield* makeTabUndiscardableById(newTabId);
-		return newTabId;
+		return yield* createAndSetupNewTab();
 	}
 
 	const selectedTabId = yield* Effect.gen(function* () {
-		const firstPinnedNotDiscardedTabId = whisperingTabs.find(
-			(tab) => tab.pinned && !tab.discarded,
-		)?.id;
-		if (firstPinnedNotDiscardedTabId) return firstPinnedNotDiscardedTabId;
-		const firstNotDiscardedTabId = whisperingTabs.find((tab) => !tab.discarded)?.id;
-		if (firstNotDiscardedTabId) return firstNotDiscardedTabId;
-		const newTabId = yield* createWhisperingTab();
-		return newTabId;
+		const undiscardedWhisperingTabs = whisperingTabs.filter((tab) => !tab.discarded);
+		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter((tab) => tab.pinned);
+		for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
+			if (!pinnedUndiscardedTab.id) return;
+			const isResponsive = yield* checkTabResponsiveness(pinnedUndiscardedTab.id);
+			if (isResponsive) return pinnedUndiscardedTab;
+		}
+		for (const undiscardedTab of undiscardedWhisperingTabs) {
+			if (!undiscardedTab.id) return;
+			const isResponsive = yield* checkTabResponsiveness(undiscardedTab.id);
+			if (isResponsive) return undiscardedTab;
+		}
+		return yield* createAndSetupNewTab();
 	});
-
-	yield* makeTabUndiscardableById(selectedTabId);
-	yield* pinTabById(selectedTabId);
 
 	const otherTabIds = whisperingTabs
 		.map((tab) => tab.id)
 		.filter((tabId) => tabId !== undefined)
 		.filter((tabId) => tabId !== selectedTabId);
-
 	yield* removeTabsById(otherTabIds);
 	return selectedTabId;
 });
+
+function checkTabResponsiveness(tabId: number) {
+	return Effect.tryPromise({
+		try: () =>
+			new Promise((resolve) => {
+				chrome.tabs.sendMessage(tabId, { type: 'ping' }, (response) => {
+					resolve(response && response.type === 'pong');
+				});
+				// Set a timeout in case the tab doesn't respond
+				setTimeout(() => resolve(false), 2000);
+			}),
+		catch: () => false,
+	});
+}
+
+function createAndSetupNewTab() {
+	return Effect.gen(function* () {
+		const newTabId = yield* createWhisperingTab();
+		yield* makeTabUndiscardableById(newTabId);
+		yield* pinTabById(newTabId);
+		return newTabId;
+	});
+}
 
 function getAllWhisperingTabs() {
 	return Effect.tryPromise({
