@@ -114,14 +114,15 @@
 	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
-				<Card.Title class="text-xl">Setting Up Local Transcription with Whisper</Card.Title>
-				<Card.Description class="leading-7">
+				<Card.Title class="text-xl">
 					How to setup local Whisper API with
-					<code
-						class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-					>
+					<code class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono font-semibold">
 						faster-whisper-server
 					</code>
+				</Card.Title>
+				<Card.Description class="leading-7">
+					<p>Ensure Docker or an equivalent (e.g., Orbstack) is installed on your computer.</p>
+					<p>Then run the following command in terminal:</p>
 				</Card.Description>
 			</Card.Header>
 			<Card.Content>
