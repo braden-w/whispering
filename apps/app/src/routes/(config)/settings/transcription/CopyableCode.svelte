@@ -20,12 +20,12 @@
 	});
 </script>
 
-<pre class="bg-muted relative whitespace-normal rounded p-4 font-mono text-sm font-semibold">
+<pre class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
   <WhisperingButton
 		tooltipText="Copy to clipboard"
 		size="icon"
 		variant="ghost"
-		class="absolute right-2 top-2"
+		class="absolute right-4 top-4 h-4 w-4"
 		onclick={() => {
 			Effect.gen(function* () {
 				const clipboardService = yield* ClipboardService;
