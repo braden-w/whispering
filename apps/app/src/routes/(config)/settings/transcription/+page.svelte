@@ -121,16 +121,12 @@
 			</Tabs.List>
 
 			<Tabs.Content value="cpu-mode">
-				<pre
-					class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold
-				">
+				<pre class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold">
 docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu
 				</pre>
 			</Tabs.Content>
 			<Tabs.Content value="gpu-mode">
-				<pre
-					class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold
-				">
+				<pre class="bg-muted whitespace-normal rounded p-4 font-mono text-sm font-semibold">
 docker run --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
 				</pre>
 			</Tabs.Content>
