@@ -1,0 +1,54 @@
+<script lang="ts">
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
+	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/services/ToastService';
+	import { Effect } from 'effect';
+	import { CheckIcon, CopyIcon } from 'lucide-svelte';
+
+	const { codeText }: { codeText: string } = $props();
+	let hasCopied = $state(false);
+
+	$effect(() => {
+		if (hasCopied) {
+			setTimeout(() => {
+				hasCopied = false;
+			}, 2000);
+		}
+	});
+</script>
+
+<pre class="bg-muted relative whitespace-normal rounded p-4 font-mono text-sm font-semibold">
+  <WhisperingButton
+		tooltipText="Copy to clipboard"
+		size="icon"
+		variant="ghost"
+		class="absolute right-2 top-2"
+		onclick={() => {
+			Effect.gen(function* () {
+				const clipboardService = yield* ClipboardService;
+				yield* clipboardService.setClipboardText(codeText);
+				yield* toast({
+					variant: 'success',
+					title: 'Copied transcriptions to clipboard!',
+					description: codeText,
+					descriptionClass: 'line-clamp-2',
+				});
+				hasCopied = true;
+			}).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
+				Effect.runPromise,
+			);
+		}}>
+			<span class="sr-only">Copy</span>
+    {#if hasCopied}
+			<CheckIcon />
+		{:else}
+			<CopyIcon />
+		{/if}
+		</WhisperingButton>
+{codeText}
+</pre>
