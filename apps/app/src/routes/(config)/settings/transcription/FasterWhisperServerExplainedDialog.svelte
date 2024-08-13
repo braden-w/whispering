@@ -37,24 +37,16 @@
 		</p>
 
 		<h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-			2. Select Execution Mode:
-		</h2>
-		<ul>
-			<li>GPU Mode (for computers with CUDA support)</li>
-			<li>CPU Mode (for computers without CUDA support)</li>
-		</ul>
-
-		<h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-			3. Run the Appropriate Command:
+			2. Run the Appropriate Command:
 		</h2>
 
-		<h3>For GPU Mode:</h3>
+		<h3>For GPU Mode (for computers with CUDA support):</h3>
 		<code
 			>docker run --gpus=all --publish 8000:8000 --volume
 			~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda</code
 		>
 
-		<h3>For CPU Mode:</h3>
+		<h3>For CPU Mode (for computers without CUDA support):</h3>
 		<code
 			>docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface
 			fedirz/faster-whisper-server:latest-cpu</code
