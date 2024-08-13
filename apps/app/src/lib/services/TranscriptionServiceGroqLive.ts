@@ -55,9 +55,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 				const data = yield* HttpClientRequest.post(
 					'https://api.groq.com/openai/v1/audio/transcriptions',
 				).pipe(
-					HttpClientRequest.setHeaders({
-						Authorization: `Bearer ${apiKey}`,
-					}),
+					HttpClientRequest.setHeaders({ Authorization: `Bearer ${apiKey}` }),
 					HttpClientRequest.formDataBody(formData),
 					HttpClient.fetch,
 					Effect.andThen(HttpClientResponse.schemaBodyJson(WhisperResponseSchema)),
