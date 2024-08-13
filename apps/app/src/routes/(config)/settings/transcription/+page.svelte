@@ -106,7 +106,10 @@
 				id="faster-whisper-server-url"
 				label="faster-whisper-server URL"
 				placeholder="Your faster-whisper-server URL"
-				bind:value={settings.value.fasterWhisperServerUrl}
+				value={settings.value.fasterWhisperServerUrl}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, fasterWhisperServerUrl: value };
+				}}
 			/>
 		</div>
 		<div class="grid gap-2">
@@ -114,7 +117,10 @@
 				id="faster-whisper-server-model"
 				label="faster-whisper-server Model"
 				placeholder="Your faster-whisper-server Model"
-				bind:value={settings.value.fasterWhisperServerModel}
+				value={settings.value.fasterWhisperServerModel}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, fasterWhisperServerModel: value };
+				}}
 			/>
 		</div>
 	{/if}
