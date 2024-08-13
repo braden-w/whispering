@@ -41,16 +41,16 @@
 		</h2>
 
 		<h3>For GPU Mode (for computers with CUDA support):</h3>
-		<code
-			>docker run --gpus=all --publish 8000:8000 --volume
-			~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda</code
-		>
+		<code class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+			docker run --gpus=all --publish 8000:8000 --volume
+			~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda
+		</code>
 
 		<h3>For CPU Mode (for computers without CUDA support):</h3>
-		<code
-			>docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface
-			fedirz/faster-whisper-server:latest-cpu</code
-		>
+		<code class="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+			docker run --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface
+			fedirz/faster-whisper-server:latest-cpu
+		</code>
 
 		<h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
 			4. Additional Configuration for Web App Users:
