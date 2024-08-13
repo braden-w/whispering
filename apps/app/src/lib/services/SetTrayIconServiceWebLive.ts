@@ -7,7 +7,7 @@ export const SetTrayIconServiceWebLive = Layer.succeed(
 	SetTrayIconService.of({
 		setTrayIcon: (icon) =>
 			sendMessageToExtension({
-				name: 'external/setTrayIcon',
+				name: 'whispering-extension/setTrayIcon',
 				body: { recorderState: icon },
 			}),
 	}),

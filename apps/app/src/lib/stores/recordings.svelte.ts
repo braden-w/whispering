@@ -80,9 +80,8 @@ export const recordings = Effect.gen(function* () {
 			const selectedTranscriptionService = {
 				OpenAI: TranscriptionServiceWhisperLive,
 				Groq: TranscriptionServiceGroqLive,
-				'faster-whisper-server':
-					TranscriptionServiceFasterWhisperServerLive
-			}[settings.selectedTranscriptionService];
+				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
+			}[settings.value.selectedTranscriptionService];
 
 			return Effect.gen(function* () {
 				const transcriptionService = yield* TranscriptionService;
@@ -166,7 +165,7 @@ export const recordings = Effect.gen(function* () {
 				if (transcribedText === '') return;
 
 				// Copy transcription to clipboard if enabled
-				if (settings.isCopyToClipboardEnabled) {
+				if (settings.value.isCopyToClipboardEnabled) {
 					yield* clipboardService.setClipboardText(transcribedText);
 					yield* toast({
 						variant: 'success',
@@ -177,7 +176,7 @@ export const recordings = Effect.gen(function* () {
 				}
 
 				// Paste transcription if enabled
-				if (settings.isPasteContentsOnSuccessEnabled) {
+				if (settings.value.isPasteContentsOnSuccessEnabled) {
 					yield* clipboardService.writeTextToCursor(transcribedText);
 					yield* toast({
 						variant: 'success',

@@ -2,12 +2,12 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
 	WhisperingError,
 	effectToResult,
-	type ExternalMessage,
-	type ExternalMessageNameToReturnType,
+	type ExternalMessageBody,
+	type ExternalMessageReturnType,
 	type Result,
 } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { getActiveTabId } from '~lib/background/external/getActiveTabId';
+import { getActiveTabId } from '~lib/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
@@ -39,12 +39,12 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 		});
 	}).pipe(
 		// Silently catch playSound errors and log them to the console instead of render them as toast
-		Effect.catchAll(Console.error)
+		Effect.catchAll(Console.error),
 	);
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/playSound' }>['body'];
+export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/playSound']>;
+export type ResponseBody = Result<ExternalMessageReturnType<'whispering-extension/playSound'>>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

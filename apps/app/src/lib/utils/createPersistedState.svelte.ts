@@ -1,6 +1,7 @@
 import { toast } from '$lib/services/ToastService';
 import { Schema as S } from '@effect/schema';
 import { Effect, Either } from 'effect';
+import { nanoid } from 'nanoid/non-secure';
 
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
@@ -41,20 +42,59 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 }) {
 	let value = $state(defaultValue);
 
-	const parseValueFromStorage = (valueFromStorage: string | null): S.Schema.Type<TSchema> => {
-		const isEmpty = valueFromStorage === null;
+	const parseValueFromStorage = (
+		valueFromStorageUnparsed: string | null,
+	): S.Schema.Type<TSchema> => {
+		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
-		const parseResult = S.decodeUnknownEither(jsonSchema)(valueFromStorage);
-		if (Either.isLeft(parseResult)) {
-			toast({
-				title: 'Unable to parse storage value',
-				description: parseResult.left.message,
-				variant: 'warning',
-			}).pipe(Effect.runSync);
-			return defaultValue;
+		const maybeParsedValue = S.decodeUnknownEither(jsonSchema)(valueFromStorageUnparsed);
+		if (Either.isRight(maybeParsedValue)) {
+			const parsedValue = maybeParsedValue.right;
+			return parsedValue as S.Schema.Type<TSchema>;
 		}
-		return parseResult.right as S.Schema.Type<TSchema>;
+
+		return Effect.gen(function* () {
+			const updatingLocalStorageToastId = nanoid();
+			yield* toast({
+				variant: 'loading',
+				title: `Updating "${key}" in local storage...`,
+				description: 'Please wait...',
+			});
+			// Attempt to merge the default value with the value from storage if possible
+			const oldValueFromStorageMaybeInvalid = yield* S.decodeUnknown(S.parseJson(S.Any))(
+				valueFromStorageUnparsed,
+			);
+			const defaultValueMergedOldValues = {
+				...defaultValue,
+				...oldValueFromStorageMaybeInvalid,
+			};
+
+			const updatedValue: S.Schema.Type<TSchema> = yield* S.decodeUnknown(schema)(
+				defaultValueMergedOldValues,
+			).pipe(
+				Effect.tap(() =>
+					toast({
+						id: updatingLocalStorageToastId,
+						variant: 'success',
+						title: `Successfully updated "${key}" in local storage`,
+						description: 'The value has been updated.',
+					}),
+				),
+				Effect.tapError(() =>
+					toast({
+						id: updatingLocalStorageToastId,
+						variant: 'error',
+						title: `Error updating "${key}" in local storage`,
+						description: 'Reverting to default value.',
+					}),
+				),
+				Effect.catchAll(() => Effect.succeed(defaultValue)),
+			);
+
+			localStorage.setItem(key, JSON.stringify(updatedValue));
+			return updatedValue;
+		}).pipe(Effect.runSync);
 	};
 
 	if (!disableLocalStorage) {

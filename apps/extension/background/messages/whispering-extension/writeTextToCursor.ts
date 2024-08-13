@@ -1,10 +1,10 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { ExternalMessage, ExternalMessageNameToReturnType, Result } from '@repo/shared';
+import type { ExternalMessageBody, ExternalMessageReturnType, Result } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { getActiveTabId } from '~lib/background/external/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getActiveTabId } from '~lib/getActiveTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> => {
@@ -101,9 +101,11 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 	);
 };
 
-export type RequestBody = Extract<ExternalMessage, { name: 'external/writeTextToCursor' }>['body'];
+export type RequestBody = ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
 
-export type ResponseBody = Result<ExternalMessageNameToReturnType['external/writeTextToCursor']>;
+export type ResponseBody = Result<
+	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
+>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
 	Effect.gen(function* () {

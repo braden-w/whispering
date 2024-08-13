@@ -246,7 +246,9 @@
 
 <main class="flex w-full flex-1 flex-col gap-2 px-4 py-4 md:px-8">
 	<h1 class="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">Recordings</h1>
-	<p class="text-muted-foreground">Your latest recordings and transcriptions</p>
+	<p class="text-muted-foreground">
+		Your latest recordings and transcriptions, stored locally in IndexedDB.
+	</p>
 	<div class="space-y-4 rounded-md border p-6">
 		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
 			<form

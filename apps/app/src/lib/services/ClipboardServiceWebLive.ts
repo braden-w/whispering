@@ -18,14 +18,14 @@ export const ClipboardServiceWebLive = Layer.succeed(
 			}).pipe(
 				Effect.catchAll(() =>
 					sendMessageToExtension({
-						name: 'external/setClipboardText',
+						name: 'whispering-extension/setClipboardText',
 						body: { transcribedText: text },
 					}),
 				),
 			),
 		writeTextToCursor: (text) =>
 			sendMessageToExtension({
-				name: 'external/writeTextToCursor',
+				name: 'whispering-extension/writeTextToCursor',
 				body: { transcribedText: text },
 			}),
 	}),

@@ -7,12 +7,12 @@
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
 	const selectedLanguageOption = $derived(
-		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.outputLanguage),
+		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.value.outputLanguage),
 	);
 
 	const selectedTranscriptionServiceOption = $derived(
 		TRANSCRIPTION_SERVICE_OPTIONS.find(
-			(option) => option.value === settings.selectedTranscriptionService,
+			(option) => option.value === settings.value.selectedTranscriptionService,
 		),
 	);
 </script>
@@ -38,18 +38,22 @@
 			selected={selectedTranscriptionServiceOption}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.selectedTranscriptionService = selected.value;
+				settings.value = { ...settings.value, selectedTranscriptionService: selected.value };
 			}}
 			placeholder="Select a transcription service"
 		/>
 	</div>
-	{#if settings.selectedTranscriptionService === 'OpenAI'}
+	{#if settings.value.selectedTranscriptionService === 'OpenAI'}
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="openai-api-key"
 				label="OpenAI API Key"
+				type="password"
 				placeholder="Your OpenAI API Key"
-				bind:value={settings.openAiApiKey}
+				value={settings.value.openAiApiKey}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, openAiApiKey: value };
+				}}
 			/>
 			<div class="text-muted-foreground text-sm">
 				You can find your API key in your <Button
@@ -72,13 +76,17 @@
 				is enabled.
 			</div>
 		</div>
-	{:else if settings.selectedTranscriptionService === 'Groq'}
+	{:else if settings.value.selectedTranscriptionService === 'Groq'}
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="groq-api-key"
 				label="Groq API Key"
+				type="password"
 				placeholder="Your Groq API Key"
-				bind:value={settings.groqApiKey}
+				value={settings.value.groqApiKey}
+				oninput={({ currentTarget: { value } }) => {
+					settings.value = { ...settings.value, groqApiKey: value };
+				}}
 			/>
 			<div class="text-muted-foreground text-sm">
 				You can find your Groq API key in your <Button
@@ -118,7 +126,7 @@
 			selected={selectedLanguageOption}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.outputLanguage = selected.value;
+				settings.value = { ...settings.value, outputLanguage: selected.value };
 			}}
 			placeholder="Select a language"
 		/>

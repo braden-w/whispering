@@ -12,7 +12,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 	TranscriptionService.of({
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
-				const { openAiApiKey: apiKey, outputLanguage } = settings;
+				const { openAiApiKey: apiKey, outputLanguage } = settings.value;
 
 				if (!apiKey) {
 					return yield* new WhisperingError({

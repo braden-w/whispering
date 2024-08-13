@@ -2,8 +2,8 @@ import { sendToBackground } from '@plasmohq/messaging';
 import { NotificationService, WhisperingError, resultToEffect } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
-import type * as ClearNotification from '~background/messages/external/notifications/clear';
-import type * as CreateNotification from '~background/messages/external/notifications/create';
+import type * as ClearNotification from '~background/messages/whispering-extension/notifications/clear';
+import type * as CreateNotification from '~background/messages/whispering-extension/notifications/create';
 
 export const NotificationServiceContentLive = Layer.succeed(
 	NotificationService,
@@ -12,7 +12,7 @@ export const NotificationServiceContentLive = Layer.succeed(
 			Effect.tryPromise({
 				try: () =>
 					sendToBackground<CreateNotification.RequestBody, CreateNotification.ResponseBody>({
-						name: 'external/notifications/create',
+						name: 'whispering-extension/notifications/create',
 						body: { notifyOptions },
 					}),
 				catch: (error) =>
@@ -33,7 +33,7 @@ export const NotificationServiceContentLive = Layer.succeed(
 			Effect.tryPromise({
 				try: () =>
 					sendToBackground<ClearNotification.RequestBody, ClearNotification.ResponseBody>({
-						name: 'external/notifications/clear',
+						name: 'whispering-extension/notifications/clear',
 						body: { notificationId },
 					}),
 				catch: (error) =>

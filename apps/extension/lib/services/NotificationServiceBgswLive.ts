@@ -3,7 +3,7 @@ import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~lib/background/contents/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
 export const NotificationServiceBgswLive = Layer.succeed(
 	NotificationService,

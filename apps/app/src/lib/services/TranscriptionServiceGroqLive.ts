@@ -12,7 +12,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 	TranscriptionService.of({
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
-				const { groqApiKey: apiKey, outputLanguage } = settings;
+				const { groqApiKey: apiKey, outputLanguage } = settings.value;
 
 				if (!apiKey) {
 					return yield* new WhisperingError({

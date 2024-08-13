@@ -10,6 +10,8 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
+	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
+	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -37,10 +39,11 @@
 			unlisten = await listen('toggle-recording', recorder.toggleRecording);
 		} else {
 			sendMessageToExtension({
-				name: 'external/notifyWhisperingTabReady',
+				name: 'whispering-extension/notifyWhisperingTabReady',
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
+		refreshAlwaysOnTopFromSettings();
 	});
 
 	onDestroy(() => {
@@ -52,7 +55,6 @@
 	const TOASTER_SETTINGS = {
 		position: 'bottom-right',
 		richColors: true,
-		expand: true,
 		duration: 5000,
 		visibleToasts: 5,
 	} satisfies ToasterProps;
@@ -84,3 +86,4 @@
 
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />
+<FasterRerecordExplainedDialog />

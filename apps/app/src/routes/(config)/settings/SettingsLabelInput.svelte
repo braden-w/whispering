@@ -7,17 +7,18 @@
 		id,
 		label,
 		value = $bindable(),
-		placeholder = '',
 		type = 'text',
+		placeholder = '',
 		disabled = false,
+		...restProps
 	}: HTMLInputAttributes & {
 		label: string;
 		value: string;
-		placeholder?: string;
 		type?: 'text' | 'password';
+		placeholder?: string;
 		disabled?: boolean;
 	} = $props();
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>
-<Input {id} {placeholder} bind:value {onchange} {type} {disabled} autocomplete="off" />
+<Input {id} bind:value {placeholder} {type} {disabled} autocomplete="off" {...restProps} />
