@@ -10,7 +10,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
-	import { refreshAlwaysOnTopFromSettings } from '$lib/services/AlwaysOnTopService';
+	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 
 	onNavigate((navigation) => {
@@ -43,7 +43,7 @@
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
-		refreshAlwaysOnTopFromSettings();
+		setAlwaysOnTopToTrueIfAlwaysInSettings();
 	});
 
 	onDestroy(() => {
