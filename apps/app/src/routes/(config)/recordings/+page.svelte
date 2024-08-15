@@ -312,11 +312,11 @@
 							<div class="grid gap-4 py-4">
 								<div class="grid grid-cols-4 items-center gap-4">
 									<Label for="template" class="text-right">Template</Label>
-									<Input id="template" bind:value={template} class="col-span-3" />
+									<Textarea id="template" bind:value={template} class="col-span-3" />
 								</div>
 								<div class="grid grid-cols-4 items-center gap-4">
 									<Label for="delimiter" class="text-right">Delimiter</Label>
-									<Input id="delimiter" bind:value={delimiter} class="col-span-3" />
+									<Textarea id="delimiter" bind:value={delimiter} class="col-span-3" />
 								</div>
 							</div>
 							<Textarea placeholder="Preview of copied text" readonly class="h-32" value={text} />
