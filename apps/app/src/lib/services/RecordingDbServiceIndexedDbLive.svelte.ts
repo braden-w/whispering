@@ -42,7 +42,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 				}
 
-				if (oldVersion < 2) {
+				if (oldVersion === 1 && newVersion === 2) {
 					// Upgrade from v1 to v2
 					const recordingsStore = transaction.objectStore(RECORDING_STORE);
 					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, {
