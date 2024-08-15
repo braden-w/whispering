@@ -38,6 +38,8 @@ export const settingsSchema = S.Struct({
 	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
 	openAiApiKey: S.String,
 	groqApiKey: S.String,
+	fasterWhisperServerUrl: S.String,
+	fasterWhisperServerModel: S.String,
 	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
 
 	currentLocalShortcut: S.String,
@@ -58,6 +60,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
 		groqApiKey: '',
+		fasterWhisperServerUrl: 'http://localhost:8000',
+		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
 		outputLanguage: 'auto',
 
 		currentLocalShortcut: 'space',

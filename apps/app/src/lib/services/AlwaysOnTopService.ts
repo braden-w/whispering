@@ -8,7 +8,7 @@ export const setAlwaysOnTop = (value: boolean) =>
 		yield* Effect.promise(() => appWindow.setAlwaysOnTop(value));
 	});
 
-export const refreshAlwaysOnTopFromSettings = () =>
+export const setAlwaysOnTopToTrueIfAlwaysInSettings = () =>
 	Effect.gen(function* () {
 		if (!window.__TAURI__) return;
 		if (settings.value.alwaysOnTop === 'Always') {

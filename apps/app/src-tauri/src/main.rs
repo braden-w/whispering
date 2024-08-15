@@ -43,7 +43,10 @@ fn main() {
     ]);
 
     #[cfg(not(target_os = "macos"))]
-    let builder = builder.invoke_handler(tauri::generate_handler![write_text, set_tray_icon,]);
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        write_text,
+        set_tray_icon,
+    ]);
 
     builder
         .run(tauri::generate_context!())
