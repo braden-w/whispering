@@ -33,7 +33,7 @@ interface RecordingsDbSchema extends DBSchema {
 export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
 	Effect.sync(() => {
-		const db = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
+		const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion < 1) {
 					// This handles the case of a fresh install
@@ -69,7 +69,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				Effect.tryPromise({
 					try: async () => {
 						const { blob, ...metadata } = recording;
-						const tx = (await db).transaction(
+						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
@@ -93,8 +93,8 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						await Promise.all([
-							(await db).put(RECORDING_METADATA_STORE, metadata),
-							(await db).put(RECORDING_BLOB_STORE, { id: recording.id, blob }),
+							(await dbPromise).put(RECORDING_METADATA_STORE, metadata),
+							(await dbPromise).put(RECORDING_BLOB_STORE, { id: recording.id, blob }),
 						]);
 					},
 					catch: (error) =>
@@ -107,7 +107,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			deleteRecordingById: (id) =>
 				Effect.tryPromise({
 					try: async () => {
-						const tx = (await db).transaction(
+						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
@@ -129,7 +129,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			deleteRecordingsById: (ids) =>
 				Effect.tryPromise({
 					try: async () => {
-						const tx = (await db).transaction(
+						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
@@ -150,7 +150,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				}),
 			getAllRecordings: Effect.tryPromise({
 				try: async () => {
-					const tx = (await db).transaction(
+					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 						'readonly',
 					);
@@ -176,7 +176,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			getRecording: (id) =>
 				Effect.tryPromise({
 					try: async () => {
-						const tx = (await db).transaction(
+						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readonly',
 						);
