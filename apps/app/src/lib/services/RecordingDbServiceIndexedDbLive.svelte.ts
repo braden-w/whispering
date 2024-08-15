@@ -15,7 +15,6 @@ interface RecordingsDbSchemaV2 extends DBSchema {
 	recordingMetadata: {
 		key: Recording['id'];
 		value: Omit<Recording, 'blob'>;
-		indexes: { 'by-createdAt': number };
 	};
 	recordingBlobs: {
 		key: Recording['id'];
