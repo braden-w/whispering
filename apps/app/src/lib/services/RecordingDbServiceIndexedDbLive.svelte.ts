@@ -12,18 +12,18 @@ const RECORDING_BLOB_STORE = 'recordingBlobs' as const;
 const DEPRECATED_RECORDING_STORE = 'recordings' as const;
 
 interface RecordingsDbSchemaV2 extends DBSchema {
-	recordingMetadata: {
+	[RECORDING_METADATA_STORE]: {
 		key: Recording['id'];
 		value: Omit<Recording, 'blob'>;
 	};
-	recordingBlobs: {
+	[RECORDING_BLOB_STORE]: {
 		key: Recording['id'];
 		value: { id: Recording['id']; blob: Blob };
 	};
 }
 
 interface RecordingsDbSchemaV1 extends DBSchema {
-	recordings: {
+	[DEPRECATED_RECORDING_STORE]: {
 		key: Recording['id'];
 		value: Recording;
 	};
