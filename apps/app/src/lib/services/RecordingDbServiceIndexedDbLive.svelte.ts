@@ -38,17 +38,19 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion === 0) {
 					// Fresh install
-					db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
-					db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
+					transaction.db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
+					transaction.db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 				}
 
 				if (oldVersion === 1 && newVersion === 2) {
 					// Upgrade from v1 to v2
 					const recordingsStore = transaction.objectStore(RECORDING_STORE);
-					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, {
+					const metadataStore = transaction.db.createObjectStore(RECORDING_METADATA_STORE, {
 						keyPath: 'id',
 					});
-					const blobStore = db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
+					const blobStore = transaction.db.createObjectStore(RECORDING_BLOB_STORE, {
+						keyPath: 'id',
+					});
 
 					const recordings = await recordingsStore.getAll();
 					await Promise.all(
@@ -62,7 +64,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					);
 
 					// Delete the old store after migration
-					db.deleteObjectStore(RECORDING_STORE);
+					transaction.db.deleteObjectStore(RECORDING_STORE);
 					await transaction.done;
 				}
 			},
