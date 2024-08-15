@@ -7,9 +7,9 @@ import { RecordingsDbService } from './RecordingDbService';
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
 
-const RECORDING_STORE = 'recordings' as const;
 const RECORDING_METADATA_STORE = 'recordingMetadata' as const;
 const RECORDING_BLOB_STORE = 'recordingBlobs' as const;
+const DEPRECATED_RECORDING_STORE = 'recordings' as const;
 
 interface RecordingsDbSchemaV2 extends DBSchema {
 	recordingMetadata: {
@@ -44,7 +44,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 
 				if (oldVersion === 1 && newVersion === 2) {
 					// Upgrade from v1 to v2
-					const recordingsStore = transaction.objectStore(RECORDING_STORE);
+					const recordingsStore = transaction.objectStore(DEPRECATED_RECORDING_STORE);
 					const metadataStore = transaction.db.createObjectStore(RECORDING_METADATA_STORE, {
 						keyPath: 'id',
 					});
@@ -64,7 +64,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					);
 
 					// Delete the old store after migration
-					transaction.db.deleteObjectStore(RECORDING_STORE);
+					transaction.db.deleteObjectStore(DEPRECATED_RECORDING_STORE);
 					await transaction.done;
 				}
 			},
