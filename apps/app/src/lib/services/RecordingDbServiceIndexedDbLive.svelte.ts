@@ -11,7 +11,7 @@ const DB_VERSION = 2 as const;
 const RECORDING_METADATA_STORE = 'recordingMetadata' as const;
 const RECORDING_BLOB_STORE = 'recordingBlobs' as const;
 
-interface RecordingsDbSchema extends DBSchema {
+interface RecordingsDbSchemaV2 extends DBSchema {
 	recordingMetadata: {
 		key: Recording['id'];
 		value: Omit<Recording, 'blob'>;
@@ -23,12 +23,14 @@ interface RecordingsDbSchema extends DBSchema {
 	};
 }
 
-interface RecordingsDbSchema extends DBSchema {
+interface RecordingsDbSchemaV1 extends DBSchema {
 	recordings: {
 		key: Recording['id'];
 		value: Recording;
 	};
 }
+
+type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
 export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
