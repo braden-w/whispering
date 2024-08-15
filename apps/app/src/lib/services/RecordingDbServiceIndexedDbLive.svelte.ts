@@ -36,15 +36,16 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	Effect.sync(() => {
 		const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 			async upgrade(db, oldVersion, newVersion, transaction) {
-				if (oldVersion < 1) {
-					// This handles the case of a fresh install
+				if (oldVersion === 0) {
 					db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
 					db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 				}
 
 				if (oldVersion < 2) {
 					const recordingsStore = transaction.objectStore(RECORDING_STORE);
-					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
+					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, {
+						keyPath: 'id',
+					});
 					const blobStore = db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 
 					const recordings = await recordingsStore.getAll();
