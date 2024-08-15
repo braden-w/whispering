@@ -208,7 +208,7 @@
 	let filterQuery = $state(getInitialFilterValue());
 	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
 
-	let template = $state('${transcribedText}');
+	let template = $state('{{timestamp}} {{transcribedText}}');
 	let delimiter = $state('\n\n');
 
 	let isDialogOpen = $state(false);
@@ -218,7 +218,7 @@
 			.map(({ original }) => original)
 			.filter((recording) => recording.transcribedText !== '')
 			.map((recording) =>
-				template.replace(/\$\{(\w+)\}/g, (_, key) => {
+				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
 					switch (key) {
 						case 'id':
 							return recording.id;
