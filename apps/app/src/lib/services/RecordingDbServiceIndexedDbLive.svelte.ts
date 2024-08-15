@@ -37,11 +37,13 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 		const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion === 0) {
+					// Fresh install
 					db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
 					db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 				}
 
 				if (oldVersion < 2) {
+					// Upgrade from v1 to v2
 					const recordingsStore = transaction.objectStore(RECORDING_STORE);
 					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, {
 						keyPath: 'id',
