@@ -34,7 +34,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 	RecordingsDbService,
 	Effect.sync(() => {
 		const db = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
-			upgrade(db, oldVersion, newVersion, transaction) {
+			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion < 1) {
 					// This handles the case of a fresh install
 					db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
@@ -42,13 +42,24 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				}
 
 				if (oldVersion < 2) {
-					// This handles the upgrade from version 1 to 2
 					const recordingsStore = transaction.objectStore(RECORDING_STORE);
 					const metadataStore = db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
 					const blobStore = db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 
+					const recordings = await recordingsStore.getAll();
+					await Promise.all(
+						recordings.map(async (recording) => {
+							const { blob, ...metadata } = recording;
+							await Promise.all([
+								metadataStore.add(metadata),
+								blobStore.add({ id: recording.id, blob }),
+							]);
+						}),
+					);
+
 					// Delete the old store after migration
 					db.deleteObjectStore(RECORDING_STORE);
+					await transaction.done;
 				}
 			},
 		});
@@ -137,6 +148,31 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							error,
 						}),
 				}),
+			getAllRecordings: Effect.tryPromise({
+				try: async () => {
+					const tx = (await db).transaction(
+						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+						'readonly',
+					);
+					const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
+					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+					const metadata = await recordingMetadataStore.getAll();
+					const blobs = await recordingBlobStore.getAll();
+					await tx.done;
+					return metadata
+						.map((recording) => {
+							const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
+							return blob ? { ...recording, blob } : null;
+						})
+						.filter((r) => r !== null);
+				},
+				catch: (error) =>
+					new WhisperingError({
+						title: 'Error getting recordings from indexedDB',
+						description: error instanceof Error ? error.message : 'Please try again.',
+						error,
+					}),
+			}),
 			getRecording: (id) =>
 				Effect.tryPromise({
 					try: async () => {
