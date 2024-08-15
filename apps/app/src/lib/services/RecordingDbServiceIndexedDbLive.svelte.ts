@@ -5,9 +5,9 @@ import type { Recording } from './RecordingDbService';
 import { RecordingsDbService } from './RecordingDbService';
 
 const DB_NAME = 'RecordingDB' as const;
-const RECORDING_STORE = 'recordings' as const;
-
 const DB_VERSION = 2 as const;
+
+const RECORDING_STORE = 'recordings' as const;
 const RECORDING_METADATA_STORE = 'recordingMetadata' as const;
 const RECORDING_BLOB_STORE = 'recordingBlobs' as const;
 
