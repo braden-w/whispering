@@ -1,6 +1,6 @@
 {
 	"name": "app",
-	"version": "4.8.4",
+	"version": "5.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
