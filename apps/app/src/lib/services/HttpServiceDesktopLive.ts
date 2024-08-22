@@ -1,6 +1,6 @@
 import { HttpService, HttpServiceError } from '$lib/services/HttpService';
 import { Schema } from '@effect/schema';
-import { Body, fetch, ResponseType } from '@tauri-apps/api/http';
+import { fetch } from '@tauri-apps/plugin-http';
 import { Effect, Layer } from 'effect';
 
 export const HttpServiceDesktopLive = Layer.succeed(
@@ -8,13 +8,11 @@ export const HttpServiceDesktopLive = Layer.succeed(
 	HttpService.of({
 		post: ({ formData, url, schema }) =>
 			Effect.gen(function* () {
-				const formBody = Body.form(formData);
 				const response = yield* Effect.tryPromise({
 					try: () =>
 						fetch(url, {
 							method: 'POST',
-							body: formBody,
-							responseType: ResponseType.JSON,
+							body: formData,
 							headers: { 'Content-Type': 'multipart/form-data' },
 						}),
 					catch: (error) =>
@@ -27,7 +25,15 @@ export const HttpServiceDesktopLive = Layer.succeed(
 						message: `Request failed with status ${response.status}.`,
 					});
 				}
-				const data = yield* Schema.decodeUnknown(schema)(response.data);
+				const data = yield* Schema.decodeUnknown(schema)(
+					yield* Effect.tryPromise({
+						try: () => response.json(),
+						catch: (error) =>
+							new HttpServiceError({
+								message: error instanceof Error ? error.message : 'Please try again later.',
+							}),
+					}),
+				);
 				return data;
 			}),
 	}),

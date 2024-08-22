@@ -1,8 +1,8 @@
 import { DownloadService } from '$lib/services/DownloadService';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { WhisperingError } from '@repo/shared';
-import { save } from '@tauri-apps/api/dialog';
-import { writeBinaryFile } from '@tauri-apps/api/fs';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeFile } from '@tauri-apps/plugin-fs';
 import { Effect, Layer } from 'effect';
 
 export const DownloadServiceDesktopLive = Layer.succeed(
@@ -17,7 +17,7 @@ export const DownloadServiceDesktopLive = Layer.succeed(
 				if (path === null) return;
 				const contents = new Uint8Array(yield* Effect.promise(() => blob.arrayBuffer()));
 				yield* Effect.tryPromise({
-					try: () => writeBinaryFile({ path, contents }),
+					try: () => writeFile(path, contents),
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error saving recording',

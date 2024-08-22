@@ -29,7 +29,7 @@ const unregisterAllLocalShortcuts = Effect.try({
 const unregisterAllGlobalShortcuts = Effect.tryPromise({
 	try: async () => {
 		if (!window.__TAURI__) return;
-		const { unregisterAll } = await import('@tauri-apps/api/globalShortcut');
+		const { unregisterAll } = await import('@tauri-apps/plugin-global-shortcut');
 		return await unregisterAll();
 	},
 	catch: (error) =>
@@ -80,7 +80,7 @@ const registerGlobalShortcut = ({
 		yield* Effect.tryPromise({
 			try: async () => {
 				if (!window.__TAURI__) return;
-				const { register } = await import('@tauri-apps/api/globalShortcut');
+				const { register } = await import('@tauri-apps/plugin-global-shortcut');
 				return await register(shortcut, callback);
 			},
 			catch: (error) =>

@@ -1,8 +1,8 @@
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { WhisperingError } from '@repo/shared';
-import { writeText } from '@tauri-apps/api/clipboard';
-import { type } from '@tauri-apps/api/os';
-import { invoke } from '@tauri-apps/api/tauri';
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { type } from '@tauri-apps/plugin-os';
+import { invoke } from '@tauri-apps/api/core';
 import { Effect, Layer } from 'effect';
 
 const writeTextToCursor = (text: string) =>
