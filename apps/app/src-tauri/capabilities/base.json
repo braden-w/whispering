@@ -5,12 +5,13 @@
 	"windows": ["main"],
 	"permissions": [
 		"core:app:default",
-		"global-shortcut:allow-is-registered",
-		"global-shortcut:allow-register",
-		"global-shortcut:allow-register-all",
-		"global-shortcut:allow-unregister",
-		"global-shortcut:allow-unregister-all",
+		"core:menu:allow-new",
 		"core:window:allow-set-size",
+		"global-shortcut:allow-is-registered",
+		"global-shortcut:allow-register-all",
+		"global-shortcut:allow-register",
+		"global-shortcut:allow-unregister-all",
+		"global-shortcut:allow-unregister",
 		{
 			"identifier": "http:default",
 			"allow": [
