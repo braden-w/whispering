@@ -8,6 +8,7 @@
 		"core:menu:allow-new",
 		"core:tray:allow-new",
 		"core:window:allow-set-size",
+		"core:window:allow-set-always-on-top",
 		"global-shortcut:allow-is-registered",
 		"global-shortcut:allow-register-all",
 		"global-shortcut:allow-register",
