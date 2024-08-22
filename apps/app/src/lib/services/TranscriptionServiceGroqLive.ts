@@ -76,7 +76,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						error: data.error,
 					});
 				}
-				return data.text;
+				return data.text.trim();
 			}),
 	}),
 );
