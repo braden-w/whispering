@@ -4,12 +4,13 @@ import { Effect } from 'effect';
 
 export const setAlwaysOnTop = (value: boolean) =>
 	Effect.gen(function* () {
+		if (!window.__TAURI_INTERNALS__) return;
 		yield* Effect.promise(() => getCurrentWindow().setAlwaysOnTop(value));
 	});
 
 export const setAlwaysOnTopToTrueIfAlwaysInSettings = () =>
 	Effect.gen(function* () {
-		if (!window.__TAURI__) return;
+		if (!window.__TAURI_INTERNALS__) return;
 		if (settings.value.alwaysOnTop === 'Always') {
 			yield* setAlwaysOnTop(true);
 		} else {

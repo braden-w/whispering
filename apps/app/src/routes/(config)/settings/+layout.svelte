@@ -17,7 +17,7 @@
 		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
 			throw new Error('Failed to fetch latest version');
 		}
-		if (!window.__TAURI__) return { isOutdated: false, version: latestVersion } as const;
+		if (!window.__TAURI_INTERNALS__) return { isOutdated: false, version: latestVersion } as const;
 		const { getVersion } = await import('@tauri-apps/api/app');
 		const currentVersion = `v${await getVersion()}`;
 		if (latestVersion === currentVersion) {

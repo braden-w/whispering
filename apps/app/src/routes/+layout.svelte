@@ -35,7 +35,7 @@
 				recorderState.value = 'IDLE';
 			}
 		});
-		if (window.__TAURI__) {
+		if (window.__TAURI_INTERNALS__) {
 			unlisten = await listen('toggle-recording', recorder.toggleRecording);
 		} else {
 			sendMessageToExtension({

@@ -28,7 +28,7 @@ const unregisterAllLocalShortcuts = Effect.try({
 
 const unregisterAllGlobalShortcuts = Effect.tryPromise({
 	try: async () => {
-		if (!window.__TAURI__) return;
+		if (!window.__TAURI_INTERNALS__) return;
 		const { unregisterAll } = await import('@tauri-apps/plugin-global-shortcut');
 		return await unregisterAll();
 	},
@@ -79,7 +79,7 @@ const registerGlobalShortcut = ({
 		yield* unregisterAllGlobalShortcuts;
 		yield* Effect.tryPromise({
 			try: async () => {
-				if (!window.__TAURI__) return;
+				if (!window.__TAURI_INTERNALS__) return;
 				const { register } = await import('@tauri-apps/plugin-global-shortcut');
 				return await register(shortcut, callback);
 			},
@@ -130,7 +130,7 @@ export const registerShortcuts = Effect.gen(function* () {
 			}).pipe(Effect.runSync),
 		registerGlobalShortcut: ({ shortcut, callback }: { shortcut: string; callback: () => void }) =>
 			Effect.gen(function* () {
-				if (!window.__TAURI__) return;
+				if (!window.__TAURI_INTERNALS__) return;
 				const job = Effect.gen(function* () {
 					yield* unregisterAllGlobalShortcuts;
 					yield* registerGlobalShortcut({ shortcut, callback });
