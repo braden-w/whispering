@@ -1,0 +1,29 @@
+{
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "main-capability",
+	"description": "Capability for the main window",
+	"windows": ["main"],
+	"permissions": [
+		"core:app:default",
+		"global-shortcut:allow-is-registered",
+		"global-shortcut:allow-register",
+		"global-shortcut:allow-register-all",
+		"global-shortcut:allow-unregister",
+		"global-shortcut:allow-unregister-all",
+		"core:window:allow-set-size",
+		{
+			"identifier": "http:default",
+			"allow": [
+				{
+					"url": "http://*"
+				},
+				{
+					"url": "https://*"
+				}
+			]
+		},
+		"notification:default",
+		"os:default",
+		"dialog:default"
+	]
+}
