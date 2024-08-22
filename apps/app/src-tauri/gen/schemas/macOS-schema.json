@@ -2231,6 +2231,83 @@
           ]
         },
         {
+          "description": "dialog:default -> This permission set configures the types of dialogs\navailable from the dialog plugin.\n\n#### Granted Permissions\n\nAll dialog types are enabled.\n\n\n",
+          "type": "string",
+          "enum": [
+            "dialog:default"
+          ]
+        },
+        {
+          "description": "dialog:allow-ask -> Enables the ask command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:allow-ask"
+          ]
+        },
+        {
+          "description": "dialog:allow-confirm -> Enables the confirm command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:allow-confirm"
+          ]
+        },
+        {
+          "description": "dialog:allow-message -> Enables the message command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:allow-message"
+          ]
+        },
+        {
+          "description": "dialog:allow-open -> Enables the open command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:allow-open"
+          ]
+        },
+        {
+          "description": "dialog:allow-save -> Enables the save command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:allow-save"
+          ]
+        },
+        {
+          "description": "dialog:deny-ask -> Denies the ask command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:deny-ask"
+          ]
+        },
+        {
+          "description": "dialog:deny-confirm -> Denies the confirm command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:deny-confirm"
+          ]
+        },
+        {
+          "description": "dialog:deny-message -> Denies the message command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:deny-message"
+          ]
+        },
+        {
+          "description": "dialog:deny-open -> Denies the open command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:deny-open"
+          ]
+        },
+        {
+          "description": "dialog:deny-save -> Denies the save command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "dialog:deny-save"
+          ]
+        },
+        {
           "description": "global-shortcut:default -> No features are enabled by default, as we believe\nthe shortcuts can be inherently dangerous and it is\napplication specific if specific shortcuts should be\nregistered or unregistered.\n",
           "type": "string",
           "enum": [
@@ -2368,6 +2445,405 @@
           "type": "string",
           "enum": [
             "http:deny-fetch-send"
+          ]
+        },
+        {
+          "description": "notification:default -> This permission set configures which\nnotification features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all notification related features.\n\n",
+          "type": "string",
+          "enum": [
+            "notification:default"
+          ]
+        },
+        {
+          "description": "notification:allow-batch -> Enables the batch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-batch"
+          ]
+        },
+        {
+          "description": "notification:allow-cancel -> Enables the cancel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-cancel"
+          ]
+        },
+        {
+          "description": "notification:allow-check-permissions -> Enables the check_permissions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-check-permissions"
+          ]
+        },
+        {
+          "description": "notification:allow-create-channel -> Enables the create_channel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-create-channel"
+          ]
+        },
+        {
+          "description": "notification:allow-delete-channel -> Enables the delete_channel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-delete-channel"
+          ]
+        },
+        {
+          "description": "notification:allow-get-active -> Enables the get_active command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-get-active"
+          ]
+        },
+        {
+          "description": "notification:allow-get-pending -> Enables the get_pending command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-get-pending"
+          ]
+        },
+        {
+          "description": "notification:allow-is-permission-granted -> Enables the is_permission_granted command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-is-permission-granted"
+          ]
+        },
+        {
+          "description": "notification:allow-list-channels -> Enables the list_channels command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-list-channels"
+          ]
+        },
+        {
+          "description": "notification:allow-notify -> Enables the notify command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-notify"
+          ]
+        },
+        {
+          "description": "notification:allow-permission-state -> Enables the permission_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-permission-state"
+          ]
+        },
+        {
+          "description": "notification:allow-register-action-types -> Enables the register_action_types command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-register-action-types"
+          ]
+        },
+        {
+          "description": "notification:allow-register-listener -> Enables the register_listener command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-register-listener"
+          ]
+        },
+        {
+          "description": "notification:allow-remove-active -> Enables the remove_active command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-remove-active"
+          ]
+        },
+        {
+          "description": "notification:allow-request-permission -> Enables the request_permission command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-request-permission"
+          ]
+        },
+        {
+          "description": "notification:allow-show -> Enables the show command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:allow-show"
+          ]
+        },
+        {
+          "description": "notification:deny-batch -> Denies the batch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-batch"
+          ]
+        },
+        {
+          "description": "notification:deny-cancel -> Denies the cancel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-cancel"
+          ]
+        },
+        {
+          "description": "notification:deny-check-permissions -> Denies the check_permissions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-check-permissions"
+          ]
+        },
+        {
+          "description": "notification:deny-create-channel -> Denies the create_channel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-create-channel"
+          ]
+        },
+        {
+          "description": "notification:deny-delete-channel -> Denies the delete_channel command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-delete-channel"
+          ]
+        },
+        {
+          "description": "notification:deny-get-active -> Denies the get_active command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-get-active"
+          ]
+        },
+        {
+          "description": "notification:deny-get-pending -> Denies the get_pending command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-get-pending"
+          ]
+        },
+        {
+          "description": "notification:deny-is-permission-granted -> Denies the is_permission_granted command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-is-permission-granted"
+          ]
+        },
+        {
+          "description": "notification:deny-list-channels -> Denies the list_channels command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-list-channels"
+          ]
+        },
+        {
+          "description": "notification:deny-notify -> Denies the notify command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-notify"
+          ]
+        },
+        {
+          "description": "notification:deny-permission-state -> Denies the permission_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-permission-state"
+          ]
+        },
+        {
+          "description": "notification:deny-register-action-types -> Denies the register_action_types command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-register-action-types"
+          ]
+        },
+        {
+          "description": "notification:deny-register-listener -> Denies the register_listener command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-register-listener"
+          ]
+        },
+        {
+          "description": "notification:deny-remove-active -> Denies the remove_active command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-remove-active"
+          ]
+        },
+        {
+          "description": "notification:deny-request-permission -> Denies the request_permission command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-request-permission"
+          ]
+        },
+        {
+          "description": "notification:deny-show -> Denies the show command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "notification:deny-show"
+          ]
+        },
+        {
+          "description": "os:default -> This permission set configures which\noperating system information are available\nto gather from the frontend.\n\n#### Granted Permissions\n\nAll information except the host name are available.\n\n",
+          "type": "string",
+          "enum": [
+            "os:default"
+          ]
+        },
+        {
+          "description": "os:allow-arch -> Enables the arch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-arch"
+          ]
+        },
+        {
+          "description": "os:allow-exe-extension -> Enables the exe_extension command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-exe-extension"
+          ]
+        },
+        {
+          "description": "os:allow-family -> Enables the family command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-family"
+          ]
+        },
+        {
+          "description": "os:allow-hostname -> Enables the hostname command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-hostname"
+          ]
+        },
+        {
+          "description": "os:allow-locale -> Enables the locale command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-locale"
+          ]
+        },
+        {
+          "description": "os:allow-os-type -> Enables the os_type command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-os-type"
+          ]
+        },
+        {
+          "description": "os:allow-platform -> Enables the platform command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-platform"
+          ]
+        },
+        {
+          "description": "os:allow-version -> Enables the version command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:allow-version"
+          ]
+        },
+        {
+          "description": "os:deny-arch -> Denies the arch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-arch"
+          ]
+        },
+        {
+          "description": "os:deny-exe-extension -> Denies the exe_extension command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-exe-extension"
+          ]
+        },
+        {
+          "description": "os:deny-family -> Denies the family command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-family"
+          ]
+        },
+        {
+          "description": "os:deny-hostname -> Denies the hostname command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-hostname"
+          ]
+        },
+        {
+          "description": "os:deny-locale -> Denies the locale command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-locale"
+          ]
+        },
+        {
+          "description": "os:deny-os-type -> Denies the os_type command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-os-type"
+          ]
+        },
+        {
+          "description": "os:deny-platform -> Denies the platform command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-platform"
+          ]
+        },
+        {
+          "description": "os:deny-version -> Denies the version command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "os:deny-version"
+          ]
+        },
+        {
+          "description": "window-state:default -> This permission set configures what kind of\noperations are available from the window state plugin.\n\n#### Granted Permissions\n\nAll operations are enabled by default.\n\n",
+          "type": "string",
+          "enum": [
+            "window-state:default"
+          ]
+        },
+        {
+          "description": "window-state:allow-filename -> Enables the filename command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:allow-filename"
+          ]
+        },
+        {
+          "description": "window-state:allow-restore-state -> Enables the restore_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:allow-restore-state"
+          ]
+        },
+        {
+          "description": "window-state:allow-save-window-state -> Enables the save_window_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:allow-save-window-state"
+          ]
+        },
+        {
+          "description": "window-state:deny-filename -> Denies the filename command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:deny-filename"
+          ]
+        },
+        {
+          "description": "window-state:deny-restore-state -> Denies the restore_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:deny-restore-state"
+          ]
+        },
+        {
+          "description": "window-state:deny-save-window-state -> Denies the save_window_state command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "window-state:deny-save-window-state"
           ]
         }
       ]
