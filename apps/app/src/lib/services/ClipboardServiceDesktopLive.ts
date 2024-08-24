@@ -31,7 +31,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 			}),
 		writeTextToCursor: (text) =>
 			Effect.gen(function* () {
-				const isMacos = (yield* Effect.promise(type)) === 'Darwin';
+				const isMacos = type() === 'macos';
 
 				if (!isMacos) return yield* writeTextToCursor(text);
 
