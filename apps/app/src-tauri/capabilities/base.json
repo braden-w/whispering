@@ -9,6 +9,7 @@
 		"core:tray:allow-new",
 		"core:window:allow-set-size",
 		"core:window:allow-set-always-on-top",
+		"clipboard-manager:allow-write-text",
 		"global-shortcut:allow-is-registered",
 		"global-shortcut:allow-register-all",
 		"global-shortcut:allow-register",
@@ -27,6 +28,7 @@
 		},
 		"notification:default",
 		"os:default",
-		"dialog:default"
+		"dialog:default",
+		"clipboard-manager:default"
 	]
 }
