@@ -63,6 +63,8 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 					});
 				}
 				return data.text;
-			}).pipe(Effect.provide(window.__TAURI__ ? HttpServiceDesktopLive : HttpServiceWebLive)),
+			}).pipe(
+				Effect.provide(window.__TAURI_INTERNALS__ ? HttpServiceDesktopLive : HttpServiceWebLive),
+			),
 	}),
 );

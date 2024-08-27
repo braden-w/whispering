@@ -11,7 +11,7 @@ export const sendMessageToExtension = <
 	message: M,
 ) =>
 	Effect.gen(function* () {
-		if (window.__TAURI__) return;
+		if (window.__TAURI_INTERNALS__) return;
 		const response = yield* Effect.tryPromise({
 			try: () =>
 				sendToBackgroundViaRelay({ name: message.name as never, body: message.body }) as Promise<

@@ -11,7 +11,7 @@ declare global {
 		// interface Platform {}
 	}
 	interface Window {
-		__TAURI__: Record<string, unknown>;
+		__TAURI_INTERNALS__: Record<string, unknown>;
 		toggleRecording: () => void;
 		cancelRecording: () => void;
 		goto: (url: string) => Promise<void>;

@@ -213,8 +213,12 @@ export const recordings = Effect.gen(function* () {
 	};
 }).pipe(
 	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive),
-	Effect.provide(window.__TAURI__ ? DownloadServiceDesktopLive : DownloadServiceWebLive),
-	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
+	Effect.provide(
+		window.__TAURI_INTERNALS__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
+	),
+	Effect.provide(window.__TAURI_INTERNALS__ ? DownloadServiceDesktopLive : DownloadServiceWebLive),
+	Effect.provide(
+		window.__TAURI_INTERNALS__ ? NotificationServiceDesktopLive : NotificationServiceWebLive,
+	),
 	Effect.runSync,
 );

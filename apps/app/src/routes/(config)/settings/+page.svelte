@@ -78,7 +78,7 @@
 			</Button>
 		</Label>
 	</div>
-	{#if window.__TAURI__}
+	{#if window.__TAURI_INTERNALS__}
 		<div class="grid gap-2">
 			<SettingsLabelSelect
 				id="always-on-top"

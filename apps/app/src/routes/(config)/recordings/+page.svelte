@@ -337,7 +337,9 @@
 										}).pipe(
 											Effect.catchAll(renderErrorAsToast),
 											Effect.provide(
-												window.__TAURI__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
+												window.__TAURI_INTERNALS__
+													? ClipboardServiceDesktopLive
+													: ClipboardServiceWebLive,
 											),
 											Effect.runPromise,
 										)}

@@ -3,7 +3,7 @@ use core_foundation_sys::base::{CFRelease, TCFTypeRef};
 use core_foundation_sys::dictionary::{
     CFDictionaryAddValue, CFDictionaryCreateMutable, __CFDictionary,
 };
-use core_foundation_sys::number::{kCFBooleanTrue,kCFBooleanFalse};
+use core_foundation_sys::number::{kCFBooleanFalse, kCFBooleanTrue};
 use std::process::Command;
 use std::ptr;
 
@@ -15,19 +15,21 @@ pub fn is_macos_accessibility_enabled(ask_if_not_allowed: bool) -> Result<bool, 
     Ok(is_allowed)
 }
 
-fn create_options_dictionary(ask_if_not_allowed: bool) -> Result<*mut __CFDictionary, &'static str> {
+fn create_options_dictionary(
+    ask_if_not_allowed: bool,
+) -> Result<*mut __CFDictionary, &'static str> {
     unsafe {
         let options = CFDictionaryCreateMutable(ptr::null_mut(), 0, ptr::null(), ptr::null());
         if options.is_null() {
             return Err("Failed to create options dictionary");
         }
         let key = kAXTrustedCheckOptionPrompt;
-        let value = if ask_if_not_allowed {kCFBooleanTrue} else {kCFBooleanFalse};
-        CFDictionaryAddValue(
-            options,
-            key.as_void_ptr(),
-            value.as_void_ptr(),
-        );
+        let value = if ask_if_not_allowed {
+            kCFBooleanTrue
+        } else {
+            kCFBooleanFalse
+        };
+        CFDictionaryAddValue(options, key.as_void_ptr(), value.as_void_ptr());
         Ok(options)
     }
 }

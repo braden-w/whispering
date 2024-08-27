@@ -127,7 +127,7 @@
 			</WhisperingButton>{' '}
 			to start recording here.
 		</p>
-		{#if window.__TAURI__}
+		{#if window.__TAURI_INTERNALS__}
 			<p class="text-foreground/75 text-sm">
 				Press
 				{' '}<WhisperingButton
@@ -156,7 +156,7 @@
 			>
 				extension
 			</WhisperingButton>{' '}
-			{#if !window.__TAURI__}
+			{#if !window.__TAURI_INTERNALS__}
 				and {' '}<WhisperingButton
 					tooltipText="Check out the desktop app"
 					href="https://github.com/braden-w/whispering/releases"

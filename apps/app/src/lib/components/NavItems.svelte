@@ -9,7 +9,7 @@
 		SunIcon,
 	} from '$lib/components/icons';
 	import { cn } from '$lib/utils';
-	import { LogicalSize, appWindow } from '@tauri-apps/api/window';
+	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
 	import { toggleMode } from 'mode-watcher';
 
 	let { class: className }: { class?: string } = $props();
@@ -40,12 +40,10 @@
 			class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
 		/>
 	</WhisperingButton>
-	{#if window.__TAURI__}
+	{#if window.__TAURI_INTERNALS__}
 		<WhisperingButton
 			tooltipText="Minimize"
-			onclick={() => {
-				appWindow.setSize(new LogicalSize(72, 84));
-			}}
+			onclick={() => getCurrentWindow().setSize(new LogicalSize(72, 84))}
 			variant="ghost"
 			size="icon"
 		>

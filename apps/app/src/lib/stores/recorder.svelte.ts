@@ -34,7 +34,9 @@ export let recorderState = Effect.gen(function* () {
 		},
 	};
 }).pipe(
-	Effect.provide(window.__TAURI__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive),
+	Effect.provide(
+		window.__TAURI_INTERNALS__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive,
+	),
 	Effect.runSync,
 );
 
@@ -143,6 +145,8 @@ export const recorder = Effect.gen(function* () {
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(window.__TAURI__ ? NotificationServiceDesktopLive : NotificationServiceWebLive),
+	Effect.provide(
+		window.__TAURI_INTERNALS__ ? NotificationServiceDesktopLive : NotificationServiceWebLive,
+	),
 	Effect.runSync,
 );

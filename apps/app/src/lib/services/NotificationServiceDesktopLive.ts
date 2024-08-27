@@ -3,7 +3,7 @@ import {
 	isPermissionGranted,
 	requestPermission,
 	sendNotification,
-} from '@tauri-apps/api/notification';
+} from '@tauri-apps/plugin-notification';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 

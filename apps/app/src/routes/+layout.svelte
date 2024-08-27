@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { goto, onNavigate } from '$app/navigation';
+	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
-	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { Effect } from 'effect';
 	import { ModeWatcher, mode } from 'mode-watcher';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.pcss';
-	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
-	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -24,8 +23,6 @@
 		});
 	});
 
-	let unlisten: UnlistenFn;
-
 	onMount(async () => {
 		window.toggleRecording = recorder.toggleRecording;
 		window.cancelRecording = recorder.cancelRecording;
@@ -35,21 +32,13 @@
 				recorderState.value = 'IDLE';
 			}
 		});
-		if (window.__TAURI__) {
-			unlisten = await listen('toggle-recording', recorder.toggleRecording);
-		} else {
+		if (!window.__TAURI_INTERNALS__) {
 			sendMessageToExtension({
 				name: 'whispering-extension/notifyWhisperingTabReady',
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
 		setAlwaysOnTopToTrueIfAlwaysInSettings();
-	});
-
-	onDestroy(() => {
-		if (window.__TAURI__) {
-			unlisten();
-		}
 	});
 
 	const TOASTER_SETTINGS = {

@@ -2,7 +2,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { SettingsIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
-	import { invoke } from '@tauri-apps/api/tauri';
+	import { invoke } from '@tauri-apps/api/core';
 </script>
 
 <svelte:head>
