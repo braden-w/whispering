@@ -13,6 +13,7 @@
 		"notification:default",
 		"clipboard-manager:allow-write-text",
 		"dialog:default",
+		"fs:allow-app-write",
 		"global-shortcut:allow-is-registered",
 		"global-shortcut:allow-register-all",
 		"global-shortcut:allow-register",
