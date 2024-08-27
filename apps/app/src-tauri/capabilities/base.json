@@ -11,7 +11,7 @@
 		"core:window:allow-set-always-on-top",
 		"core:window:allow-set-size",
 		"notification:default",
-		"clipboard-manager:default",
+		"clipboard-manager:allow-write-text",
 		"dialog:default",
 		"global-shortcut:allow-is-registered",
 		"global-shortcut:allow-register-all",
