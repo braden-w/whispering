@@ -32,7 +32,7 @@
 			"providerShortName": null,
 			"signingIdentity": null
 		},
-		"resources": [],
+		"resources": ["recorder-state-icons/*"],
 		"shortDescription": "",
 		"linux": {
 			"deb": {
@@ -62,12 +62,6 @@
 				"minWidth": 72
 			}
 		],
-		"trayIcon": {
-			"title": "Toggle Whispering",
-			"iconPath": "icons/recorder_state/studio_microphone.png",
-			"iconAsTemplate": true,
-			"menuOnLeftClick": false
-		},
 		"security": {
 			"csp": null
 		}
