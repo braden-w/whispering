@@ -6,6 +6,7 @@ import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 import { HttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { HttpServiceWebLive } from './HttpServiceWebLive';
+import { MainLive } from '.';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
@@ -64,7 +65,7 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 				}
 				return data.text;
 			}).pipe(
-				Effect.provide(window.__TAURI_INTERNALS__ ? HttpServiceDesktopLive : HttpServiceWebLive),
+				Effect.provide(MainLive),
 			),
 	}),
 );

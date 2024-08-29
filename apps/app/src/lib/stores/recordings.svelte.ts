@@ -1,14 +1,8 @@
 import { goto } from '$app/navigation';
+import { MainLive } from '$lib/services';
 import { ClipboardService } from '$lib/services/ClipboardService';
-import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
-import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { DownloadService } from '$lib/services/DownloadService';
-import { DownloadServiceDesktopLive } from '$lib/services/DownloadServiceDesktopLive';
-import { DownloadServiceWebLive } from '$lib/services/DownloadServiceWebLive';
-import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
-import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
-import { RecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { toast } from '$lib/services/ToastService';
 import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/TranscriptionServiceFasterWhisperServerLive';
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
@@ -212,13 +206,6 @@ export const recordings = Effect.gen(function* () {
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(RecordingsDbServiceLiveIndexedDb),
-	Effect.provide(
-		window.__TAURI_INTERNALS__ ? ClipboardServiceDesktopLive : ClipboardServiceWebLive,
-	),
-	Effect.provide(window.__TAURI_INTERNALS__ ? DownloadServiceDesktopLive : DownloadServiceWebLive),
-	Effect.provide(
-		window.__TAURI_INTERNALS__ ? NotificationServiceDesktopLive : NotificationServiceWebLive,
-	),
+	Effect.provide(MainLive),
 	Effect.runSync,
 );

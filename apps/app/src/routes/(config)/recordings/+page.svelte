@@ -16,9 +16,8 @@
 	import * as Table from '$lib/components/ui/table';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { MainLive } from '$lib/services';
 	import { ClipboardService } from '$lib/services/ClipboardService';
-	import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
-	import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { toast } from '$lib/services/ToastService';
@@ -336,11 +335,7 @@
 											isDialogOpen = false;
 										}).pipe(
 											Effect.catchAll(renderErrorAsToast),
-											Effect.provide(
-												window.__TAURI_INTERNALS__
-													? ClipboardServiceDesktopLive
-													: ClipboardServiceWebLive,
-											),
+											Effect.provide(MainLive),
 											Effect.runPromise,
 										)}
 									type="submit"
