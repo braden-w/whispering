@@ -1,12 +1,11 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+import { MainLive } from '$lib/services';
 import { setAlwaysOnTop } from '$lib/services/AlwaysOnTopService';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
-import { SetTrayIconServiceDesktopLive } from '$lib/services/SetTrayIconServiceDesktopLive';
-import { SetTrayIconServiceWebLive } from '$lib/services/SetTrayIconServiceWebLive';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { NotificationService, type RecorderState } from '@repo/shared';
@@ -34,9 +33,7 @@ export let recorderState = Effect.gen(function* () {
 		},
 	};
 }).pipe(
-	Effect.provide(
-		window.__TAURI_INTERNALS__ ? SetTrayIconServiceDesktopLive : SetTrayIconServiceWebLive,
-	),
+	Effect.provide(MainLive),
 	Effect.runSync,
 );
 
@@ -145,8 +142,6 @@ export const recorder = Effect.gen(function* () {
 			}).pipe(Effect.runPromise),
 	};
 }).pipe(
-	Effect.provide(
-		window.__TAURI_INTERNALS__ ? NotificationServiceDesktopLive : NotificationServiceWebLive,
-	),
+	Effect.provide(MainLive),
 	Effect.runSync,
 );
