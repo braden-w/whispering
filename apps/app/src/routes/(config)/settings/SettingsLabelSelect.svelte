@@ -1,21 +1,19 @@
 <script lang="ts" generics="T">
-	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
-	import type { SelectProps } from 'bits-ui';
+import type { SelectProps } from 'bits-ui';
 
-	let {
-		id,
-		label,
-		items = [],
-		selected,
-		onSelectedChange,
-		placeholder = 'Select an option',
-		disabled = false,
-	}: SelectProps<T> & {
-		id: string;
-		label: string;
-		placeholder?: string;
-	} = $props();
+const {
+	id,
+	label,
+	items = [],
+	selected,
+	onSelectedChange,
+	placeholder = 'Select an option',
+	disabled = false,
+}: SelectProps<T> & {
+	id: string;
+	label: string;
+	placeholder?: string;
+} = $props();
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>

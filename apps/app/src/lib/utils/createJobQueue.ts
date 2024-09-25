@@ -5,19 +5,21 @@ export const createJobQueue = <T extends Effect.Effect<any>>() =>
 		const queue = yield* Queue.unbounded<T>();
 
 		let isProcessing = false;
-		const processJobQueue: Effect.Effect<void, Effect.Effect.Error<T>, never> = Effect.gen(
-			function* () {
-				if (isProcessing) return;
-				isProcessing = true;
-				while (isProcessing) {
-					const job = yield* Queue.take(queue);
-					yield* job;
-					if (Option.isNone(yield* Queue.poll(queue))) {
-						isProcessing = false;
-					}
+		const processJobQueue: Effect.Effect<
+			void,
+			Effect.Effect.Error<T>,
+			never
+		> = Effect.gen(function* () {
+			if (isProcessing) return;
+			isProcessing = true;
+			while (isProcessing) {
+				const job = yield* Queue.take(queue);
+				yield* job;
+				if (Option.isNone(yield* Queue.poll(queue))) {
+					isProcessing = false;
 				}
-			},
-		);
+			}
+		});
 
 		return {
 			queue,

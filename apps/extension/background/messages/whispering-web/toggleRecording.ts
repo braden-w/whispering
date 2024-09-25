@@ -2,9 +2,9 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
 import { effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
-import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { injectScript } from '~background/injectScript';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody = {};
@@ -25,7 +25,10 @@ export const toggleRecording = Effect.gen(function* () {
 					isSuccess: false,
 					error: {
 						title: 'Unable to toggle recording',
-						description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+						description:
+							error instanceof Error
+								? error.message
+								: `Unknown error: ${error}`,
 						error,
 					},
 				} as const;
@@ -35,7 +38,10 @@ export const toggleRecording = Effect.gen(function* () {
 	});
 });
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	req,
+	res,
+) =>
 	toggleRecording.pipe(
 		Effect.tapError(renderErrorAsNotification),
 		Effect.provide(NotificationServiceBgswLive),

@@ -17,7 +17,10 @@ export const HttpServiceDesktopLive = Layer.succeed(
 						}),
 					catch: (error) =>
 						new HttpServiceError({
-							message: error instanceof Error ? error.message : 'Please try again later.',
+							message:
+								error instanceof Error
+									? error.message
+									: 'Please try again later.',
 						}),
 				});
 				if (!response.ok) {
@@ -30,7 +33,10 @@ export const HttpServiceDesktopLive = Layer.succeed(
 						try: () => response.json(),
 						catch: (error) =>
 							new HttpServiceError({
-								message: error instanceof Error ? error.message : 'Please try again later.',
+								message:
+									error instanceof Error
+										? error.message
+										: 'Please try again later.',
 							}),
 					}),
 				);

@@ -21,6 +21,10 @@ export const waitForElement = (selector: string): Promise<Element> =>
 		// Optional timeout to prevent indefinite waiting
 		setTimeout(() => {
 			observer.disconnect();
-			reject(new Error(`Element with selector "${selector}" not found within timeout`));
+			reject(
+				new Error(
+					`Element with selector "${selector}" not found within timeout`,
+				),
+			);
 		}, 10000); // Adjust timeout as needed
 	});

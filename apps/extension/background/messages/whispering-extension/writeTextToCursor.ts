@@ -1,5 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { ExternalMessageBody, ExternalMessageReturnType, Result } from '@repo/shared';
+import type {
+	ExternalMessageBody,
+	ExternalMessageReturnType,
+	Result,
+} from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
@@ -7,15 +11,20 @@ import { renderErrorAsNotification } from '~lib/errors';
 import { getActiveTabId } from '~lib/getActiveTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> => {
+const writeTextToCursor = (
+	text: string,
+): Effect.Effect<void, WhisperingError> => {
 	return Effect.gen(function* () {
 		const activeTabId = yield* getActiveTabId;
 		yield* injectScript<string, [string]>({
 			tabId: activeTabId,
 			commandName: 'writeTextToCursor',
 			func: (text) => {
-				const isDiv = (element: Element): element is HTMLDivElement => element.tagName === 'DIV';
-				const isContentEditableDiv = (element: Element): element is HTMLDivElement =>
+				const isDiv = (element: Element): element is HTMLDivElement =>
+					element.tagName === 'DIV';
+				const isContentEditableDiv = (
+					element: Element,
+				): element is HTMLDivElement =>
 					isDiv(element) && element.isContentEditable;
 				const isInput = (element: Element): element is HTMLInputElement =>
 					element.tagName === 'INPUT';
@@ -28,11 +37,14 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 					const start = element.selectionStart ?? element.value.length;
 					const end = element.selectionEnd ?? element.value.length;
 
-					element.value = element.value.slice(0, start) + text + element.value.slice(end);
+					element.value =
+						element.value.slice(0, start) + text + element.value.slice(end);
 					element.selectionStart = start;
 					element.selectionEnd = start + text.length;
 
-					element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+					element.dispatchEvent(
+						new InputEvent('input', { bubbles: true, cancelable: true }),
+					);
 				};
 
 				const insertTextIntoEditableElement = (
@@ -61,11 +73,13 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 						!isInput(activeElement) &&
 						!isTextarea(activeElement))
 				) {
-					const textareas = Array.from(document.getElementsByTagName('textarea')).filter(
-						isTextarea,
-					);
+					const textareas = Array.from(
+						document.getElementsByTagName('textarea'),
+					).filter(isTextarea);
 					const contentEditableDivs = Array.from(
-						document.querySelectorAll('div[contenteditable="true"], div[contenteditable=""]'),
+						document.querySelectorAll(
+							'div[contenteditable="true"], div[contenteditable=""]',
+						),
 					).filter(isContentEditableDiv);
 					const editables = [...textareas, ...contentEditableDivs];
 					if (editables.length === 1) {
@@ -80,7 +94,8 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 						error: {
 							variant: 'warning',
 							title: 'Please paste the transcribed text manually',
-							description: 'There are multiple text areas or content editable divs on the page.',
+							description:
+								'There are multiple text areas or content editable divs on the page.',
 						},
 					};
 				}
@@ -93,7 +108,8 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 		Effect.catchTags({
 			GetActiveTabIdError: () =>
 				new WhisperingError({
-					title: 'Unable to get active tab ID to write transcribed text to cursor',
+					title:
+						'Unable to get active tab ID to write transcribed text to cursor',
 					description:
 						'Please try pasting or go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
 				}),
@@ -101,13 +117,17 @@ const writeTextToCursor = (text: string): Effect.Effect<void, WhisperingError> =
 	);
 };
 
-export type RequestBody = ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
+export type RequestBody =
+	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
 
 export type ResponseBody = Result<
 	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
 >;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	{ body },
+	res,
+) =>
 	Effect.gen(function* () {
 		if (!body?.transcribedText) {
 			return yield* new WhisperingError({

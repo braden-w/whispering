@@ -11,7 +11,8 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
-						description: error instanceof Error ? error.message : 'Please try again.',
+						description:
+							error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -21,7 +22,8 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Unable to write text to cursor',
-						description: error instanceof Error ? error.message : 'Please try again.',
+						description:
+							error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -83,6 +85,9 @@ function insertTextInInputElement(
  * @param element - The non-input element.
  * @param text - The text to be appended.
  */
-function appendTextToContentEditableElement(element: HTMLElement, text: string): void {
+function appendTextToContentEditableElement(
+	element: HTMLElement,
+	text: string,
+): void {
 	element.innerHTML += text;
 }

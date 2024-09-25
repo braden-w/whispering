@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { toast } from '$lib/services/ToastService';
-import { WhisperingError } from '@repo/shared';
+import type { WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
 
 export const renderErrorAsToast = (

@@ -8,7 +8,8 @@ import { NotificationServiceBgswLive } from './NotificationServiceBgswLive';
 
 export const STORAGE_KEYS = {
 	RECORDER_STATE: 'whispering-recorder-state',
-	LATEST_RECORDING_TRANSCRIBED_TEXT: 'whispering-latest-recording-transcribed-text',
+	LATEST_RECORDING_TRANSCRIBED_TEXT:
+		'whispering-latest-recording-transcribed-text',
 	SETTINGS: 'whispering-settings',
 } as const;
 
@@ -24,19 +25,26 @@ const createSetWatch = <
 	key: string;
 	schema: TSchema;
 }) => {
-	const parseValueFromStorage = (valueFromStorage: unknown): Effect.Effect<A, ParseError> =>
+	const parseValueFromStorage = (
+		valueFromStorage: unknown,
+	): Effect.Effect<A, ParseError> =>
 		Schema.decodeUnknown(Schema.parseJson(schema))(valueFromStorage);
 	return {
 		set: (value: A) => Effect.promise(() => storage.set(key, value)),
 		watch: (callback: (newValue: A) => void) => {
 			const listener: StorageWatchCallback = ({ newValue: newValueUnparsed }) =>
 				Effect.gen(function* () {
-					const newValue: A = yield* parseValueFromStorage(newValueUnparsed).pipe(
+					const newValue: A = yield* parseValueFromStorage(
+						newValueUnparsed,
+					).pipe(
 						Effect.mapError(
 							(error) =>
 								new WhisperingError({
 									title: 'Unable to parse storage value',
-									description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+									description:
+										error instanceof Error
+											? error.message
+											: `Unknown error: ${error}`,
 									error,
 								}),
 						),
