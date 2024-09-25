@@ -16,16 +16,6 @@
 	"packageManager": "pnpm@8.6.5",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.2",
-		"@typescript-eslint/eslint-plugin": "latest",
-		"@typescript-eslint/parser": "latest",
-		"eslint": "latest",
-		"eslint-config-prettier": "latest",
-		"eslint-config-turbo": "latest",
-		"eslint-plugin-prettier": "latest",
-		"eslint-plugin-svelte": "latest",
-		"prettier": "latest",
-		"prettier-plugin-svelte": "latest",
-		"prettier-plugin-tailwindcss": "latest",
 		"turbo": "latest",
 		"typescript": "^5.5.4"
 	}
