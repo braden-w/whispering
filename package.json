@@ -9,11 +9,13 @@
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
-		"format": "prettier --write .",
-		"lint": "turbo run lint"
+		"format": "biome format . --write",
+		"lint": "biome lint . --write",
+		"format-and-lint": "biome check . --write"
 	},
 	"packageManager": "pnpm@8.6.5",
 	"devDependencies": {
+		"@biomejs/biome": "1.9.2",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
 		"eslint": "latest",
