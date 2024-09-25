@@ -81,7 +81,11 @@ const registerGlobalShortcut = ({
 			try: async () => {
 				if (!window.__TAURI_INTERNALS__) return;
 				const { register } = await import('@tauri-apps/plugin-global-shortcut');
-				return await register(shortcut, callback);
+				return await register(shortcut, (event) => {
+					if (event.state === 'Pressed') {
+						callback();
+					}
+				});
 			},
 			catch: (error) =>
 				new WhisperingError({
