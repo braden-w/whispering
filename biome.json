@@ -8,11 +8,16 @@
 	"files": {
 		"ignoreUnknown": false,
 		"ignore": [
+			".DS_Store",
+			".svelte-kit",
 			".turbo",
-			"node_modules",
-			"dist",
+			"apps/app/src-tauri/target",
 			"build",
-			"apps/app/src-tauri/target"
+			"dist",
+			"node_modules",
+			"package-lock.json",
+			"pnpm-lock.yaml",
+			"yarn.lock"
 		]
 	},
 	"formatter": {
