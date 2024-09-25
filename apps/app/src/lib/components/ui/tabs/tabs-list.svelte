@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { Tabs as TabsPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+import type { Tabs as TabsPrimitive } from 'bits-ui';
 
-	type $$Props = TabsPrimitive.ListProps;
+type $$Props = TabsPrimitive.ListProps;
 
-	let className: $$Props["class"] = undefined;
-	export { className as class };
+const className: $$Props['class'] = undefined;
+export { className as class };
 </script>
 
 <TabsPrimitive.List

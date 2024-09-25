@@ -1,8 +1,11 @@
 <script lang="ts">
-	import { cn } from '$lib/utils.js';
-	import type { HTMLTableAttributes } from 'svelte/elements';
+import type { HTMLTableAttributes } from 'svelte/elements';
 
-	let { children, class: className, ...restProps }: HTMLTableAttributes = $props();
+const {
+	children,
+	class: className,
+	...restProps
+}: HTMLTableAttributes = $props();
 </script>
 
 <div class="relative w-full overflow-auto">

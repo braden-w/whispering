@@ -128,14 +128,21 @@ const SUPPORTED_LANGUAGES_TO_LABEL = {
 } as const satisfies Record<SupportedLanguage, string>;
 
 export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
-	(lang) => ({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
+	(lang) =>
+		({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
 );
 
-export const TRANSCRIPTION_SERVICES = ['OpenAI', 'Groq', 'faster-whisper-server'] as const;
-export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map((service) => ({
-	value: service,
-	label: service,
-}));
+export const TRANSCRIPTION_SERVICES = [
+	'OpenAI',
+	'Groq',
+	'faster-whisper-server',
+] as const;
+export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
+	(service) => ({
+		value: service,
+		label: service,
+	}),
+);
 
 export class TranscriptionService extends Context.Tag('TranscriptionService')<
 	TranscriptionService,

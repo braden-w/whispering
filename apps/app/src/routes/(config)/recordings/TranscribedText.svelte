@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-
-	let { recordingId, transcribedText }: { recordingId: string; transcribedText: string } = $props();
+const {
+	recordingId,
+	transcribedText,
+}: { recordingId: string; transcribedText: string } = $props();
 </script>
 
 <p

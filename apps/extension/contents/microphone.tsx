@@ -1,6 +1,6 @@
-import { useStorage } from '@plasmohq/storage/hook';
-import { recorderStateToIcons, type RecorderState } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
+import { useStorage } from '@plasmohq/storage/hook';
+import { type RecorderState, recorderStateToIcons } from '@repo/shared';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchorList,
@@ -46,7 +46,11 @@ export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	}));
 };
 
-export const mountShadowHost: PlasmoMountShadowHost = ({ shadowHost, anchor, mountState }) => {
+export const mountShadowHost: PlasmoMountShadowHost = ({
+	shadowHost,
+	anchor,
+	mountState,
+}) => {
 	if (!anchor?.element) return;
 	const editableElement = anchor.element as HTMLElement;
 
@@ -76,7 +80,10 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 function RecorderStateAsIcon() {
-	const [recorderState] = useStorage<RecorderState>(STORAGE_KEYS.RECORDER_STATE, 'IDLE');
+	const [recorderState] = useStorage<RecorderState>(
+		STORAGE_KEYS.RECORDER_STATE,
+		'IDLE',
+	);
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button

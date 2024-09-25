@@ -2,10 +2,8 @@ import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MainLive } from '$lib/services';
 import { setAlwaysOnTop } from '$lib/services/AlwaysOnTopService';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
-import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
-import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
-import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { NotificationService, type RecorderState } from '@repo/shared';
@@ -20,7 +18,7 @@ const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
-export let recorderState = Effect.gen(function* () {
+export const recorderState = Effect.gen(function* () {
 	const { setTrayIcon } = yield* SetTrayIconService;
 	let value = $state<RecorderState>('IDLE');
 	return {
@@ -29,13 +27,13 @@ export let recorderState = Effect.gen(function* () {
 		},
 		set value(newValue: RecorderState) {
 			value = newValue;
-			setTrayIcon(newValue).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+			setTrayIcon(newValue).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.runPromise,
+			);
 		},
 	};
-}).pipe(
-	Effect.provide(MainLive),
-	Effect.runSync,
-);
+}).pipe(Effect.provide(MainLive), Effect.runSync);
 
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
@@ -141,7 +139,4 @@ export const recorder = Effect.gen(function* () {
 				}
 			}).pipe(Effect.runPromise),
 	};
-}).pipe(
-	Effect.provide(MainLive),
-	Effect.runSync,
-);
+}).pipe(Effect.provide(MainLive), Effect.runSync);

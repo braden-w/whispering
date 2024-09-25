@@ -1,7 +1,10 @@
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
-import { SUPPORTED_LANGUAGES, TRANSCRIPTION_SERVICES } from './services/TranscriptionService.js';
+import {
+	SUPPORTED_LANGUAGES,
+	TRANSCRIPTION_SERVICES,
+} from './services/TranscriptionService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -10,12 +13,15 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-export const BITRATE_VALUES = [64_000, 96_000, 128_000, 192_000, 256_000, 320_000] as const;
+export const BITRATE_VALUES = [
+	64_000, 96_000, 128_000, 192_000, 256_000, 320_000,
+] as const;
 export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
 	label: `${bitrate / 1_000} kbps`,
 	value: bitrate,
 }));
-export const DEFAULT_BITRATE_MS = 64_000 as const satisfies (typeof BITRATE_VALUES)[number];
+export const DEFAULT_BITRATE_MS =
+	64_000 as const satisfies (typeof BITRATE_VALUES)[number];
 
 const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
@@ -31,9 +37,12 @@ export const settingsSchema = S.Struct({
 	alwaysOnTop: S.Literal(...ALWAYS_ON_TOP_VALUES),
 
 	selectedAudioInputDeviceId: S.String,
-	bitsPerSecond: S.optionalWith(S.compose(S.Number, S.Literal(...BITRATE_VALUES)), {
-		default: () => DEFAULT_BITRATE_MS,
-	}),
+	bitsPerSecond: S.optionalWith(
+		S.compose(S.Number, S.Literal(...BITRATE_VALUES)),
+		{
+			default: () => DEFAULT_BITRATE_MS,
+		},
+	),
 
 	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
 	openAiApiKey: S.String,
@@ -84,7 +93,8 @@ export type WhisperingErrorProperties = {
 };
 
 export class WhisperingError extends Data.TaggedError('WhisperingError')<
-	Required<Pick<WhisperingErrorProperties, 'variant'>> & Omit<WhisperingErrorProperties, 'variant'>
+	Required<Pick<WhisperingErrorProperties, 'variant'>> &
+		Omit<WhisperingErrorProperties, 'variant'>
 > {
 	constructor(properties: WhisperingErrorProperties) {
 		super({
@@ -109,11 +119,17 @@ export const effectToResult = <T>(
 ): Effect.Effect<Result<T>> =>
 	effect.pipe(
 		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ isSuccess: false, error } as const)),
+		Effect.catchAll((error) =>
+			Effect.succeed({ isSuccess: false, error } as const),
+		),
 	);
 
-export const resultToEffect = <T>(result: Result<T>): Effect.Effect<T, WhisperingError> =>
-	result.isSuccess ? Effect.succeed(result.data) : Effect.fail(new WhisperingError(result.error));
+export const resultToEffect = <T>(
+	result: Result<T>,
+): Effect.Effect<T, WhisperingError> =>
+	result.isSuccess
+		? Effect.succeed(result.data)
+		: Effect.fail(new WhisperingError(result.error));
 
 export const recorderStateSchema = S.Literal('IDLE', 'RECORDING', 'LOADING');
 

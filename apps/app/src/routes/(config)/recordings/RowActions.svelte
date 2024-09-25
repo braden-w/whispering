@@ -1,21 +1,7 @@
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import {
-		ClipboardIcon,
-		DownloadIcon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
-		TrashIcon,
-	} from '$lib/components/icons';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Effect } from 'effect';
-	import EditRowDialog from './EditRowDialog.svelte';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+import type { Recording } from '$lib/services/RecordingDbService';
 
-	let { recording }: { recording: Recording } = $props();
+const { recording }: { recording: Recording } = $props();
 </script>
 
 <div class="flex items-center">

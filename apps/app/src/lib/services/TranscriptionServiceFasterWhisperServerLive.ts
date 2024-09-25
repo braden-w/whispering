@@ -2,11 +2,9 @@ import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
+import { MainLive } from '.';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
-import { HttpServiceDesktopLive } from './HttpServiceDesktopLive';
-import { HttpServiceWebLive } from './HttpServiceWebLive';
-import { MainLive } from '.';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
@@ -16,7 +14,11 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 		transcribe: (audioBlob) =>
 			Effect.gen(function* () {
 				const httpService = yield* HttpService;
-				const { outputLanguage, fasterWhisperServerUrl, fasterWhisperServerModel } = settings.value;
+				const {
+					outputLanguage,
+					fasterWhisperServerUrl,
+					fasterWhisperServerModel,
+				} = settings.value;
 
 				const blobSizeInMb = audioBlob.size / (1024 * 1024);
 				if (blobSizeInMb > MAX_FILE_SIZE_MB) {
@@ -33,7 +35,8 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 				const formData = new FormData();
 				formData.append('file', formDataFile);
 				formData.append('model', fasterWhisperServerModel);
-				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
+				if (outputLanguage !== 'auto')
+					formData.append('language', outputLanguage);
 				const data = yield* httpService
 					.post({
 						url: `${fasterWhisperServerUrl}/v1/audio/transcriptions`,
@@ -50,7 +53,8 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 								}),
 							HttpServiceError: (error) =>
 								new WhisperingError({
-									title: 'An error occurred while sending the request to the transcription server.',
+									title:
+										'An error occurred while sending the request to the transcription server.',
 									description: error.message,
 									error,
 								}),
@@ -64,8 +68,6 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 					});
 				}
 				return data.text;
-			}).pipe(
-				Effect.provide(MainLive),
-			),
+			}).pipe(Effect.provide(MainLive)),
 	}),
 );

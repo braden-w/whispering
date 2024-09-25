@@ -1,10 +1,10 @@
 import { Schema } from '@effect/schema';
 import {
+	type ExternalMessageBody,
 	WHISPERING_URL,
 	WHISPERING_URL_WILDCARD,
 	WhisperingError,
 	externalMessageSchema,
-	type ExternalMessageBody,
 } from '@repo/shared';
 import { Effect, Either } from 'effect';
 import { injectScript } from '~background/injectScript';
@@ -17,11 +17,17 @@ export const getOrCreateWhisperingTabId = Effect.gen(function* () {
 	}
 
 	const selectedTabId = yield* Effect.gen(function* () {
-		const undiscardedWhisperingTabs = whisperingTabs.filter((tab) => !tab.discarded);
-		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter((tab) => tab.pinned);
+		const undiscardedWhisperingTabs = whisperingTabs.filter(
+			(tab) => !tab.discarded,
+		);
+		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter(
+			(tab) => tab.pinned,
+		);
 		for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
 			if (!pinnedUndiscardedTab.id) continue;
-			const isResponsive = yield* checkTabResponsiveness(pinnedUndiscardedTab.id);
+			const isResponsive = yield* checkTabResponsiveness(
+				pinnedUndiscardedTab.id,
+			);
 			if (isResponsive) return pinnedUndiscardedTab.id;
 		}
 		for (const undiscardedTab of undiscardedWhisperingTabs) {
@@ -93,10 +99,14 @@ function createWhisperingTab() {
 function isNotifyWhisperingTabReadyMessage(
 	message: unknown,
 ): message is ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'> {
-	const externalMessageResult = Schema.decodeUnknownEither(externalMessageSchema)(message);
+	const externalMessageResult = Schema.decodeUnknownEither(
+		externalMessageSchema,
+	)(message);
 	if (Either.isLeft(externalMessageResult)) return false;
 	const externalMessage = externalMessageResult.right;
-	return externalMessage.name === 'whispering-extension/notifyWhisperingTabReady';
+	return (
+		externalMessage.name === 'whispering-extension/notifyWhisperingTabReady'
+	);
 }
 
 function makeTabUndiscardableById(tabId: number) {

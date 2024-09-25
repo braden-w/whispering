@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import type { HeaderContext } from '@tanstack/table-core';
+import type { Recording } from '$lib/services/RecordingDbService';
+import type { HeaderContext } from '@tanstack/table-core';
 
-	let { column }: HeaderContext<Recording, unknown> = $props();
-	let headerText = $derived(column.columnDef.meta?.headerText);
+const { column }: HeaderContext<Recording, unknown> = $props();
+const headerText = $derived(column.columnDef.meta?.headerText);
 </script>
 
 <Button

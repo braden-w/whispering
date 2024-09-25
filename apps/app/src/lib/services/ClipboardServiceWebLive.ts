@@ -12,7 +12,8 @@ export const ClipboardServiceWebLive = Layer.succeed(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
-						description: error instanceof Error ? error.message : 'Please try again.',
+						description:
+							error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}).pipe(

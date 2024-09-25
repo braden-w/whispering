@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -21,7 +21,11 @@ export const flyAndScale = (
 	const style = getComputedStyle(node);
 	const transform = style.transform === 'none' ? '' : style.transform;
 
-	const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
+	const scaleConversion = (
+		valueA: number,
+		scaleA: [number, number],
+		scaleB: [number, number],
+	) => {
 		const [minA, maxA] = scaleA;
 		const [minB, maxB] = scaleB;
 
@@ -31,7 +35,9 @@ export const flyAndScale = (
 		return valueB;
 	};
 
-	const styleToString = (style: Record<string, number | string | undefined>): string => {
+	const styleToString = (
+		style: Record<string, number | string | undefined>,
+	): string => {
 		return Object.keys(style).reduce((str, key) => {
 			if (style[key] === undefined) return str;
 			return str + `${key}:${style[key]};`;
@@ -57,7 +63,8 @@ export const flyAndScale = (
 
 export function getExtensionFromAudioBlob(blob: Blob) {
 	const mimeType = blob.type.toLowerCase();
-	const mimeIncludes = (...types: string[]) => types.some((type) => mimeType.includes(type));
+	const mimeIncludes = (...types: string[]) =>
+		types.some((type) => mimeType.includes(type));
 	if (mimeIncludes('webm')) return 'webm';
 	if (mimeIncludes('mp4', 'mpeg', 'mp4a')) return 'mp4';
 	if (mimeIncludes('ogg', 'opus')) return 'ogg';

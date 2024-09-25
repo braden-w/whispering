@@ -14,6 +14,9 @@ export class HttpService extends Context.Tag('HttpService')<
 			url: string;
 			formData: FormData;
 			schema: TSchema;
-		}) => Effect.Effect<Schema.Schema.Type<TSchema>, HttpServiceError | ParseError>;
+		}) => Effect.Effect<
+			Schema.Schema.Type<TSchema>,
+			HttpServiceError | ParseError
+		>;
 	}
 >() {}

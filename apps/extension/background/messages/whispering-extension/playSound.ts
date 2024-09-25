@@ -1,14 +1,14 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	WhisperingError,
-	effectToResult,
 	type ExternalMessageBody,
 	type ExternalMessageReturnType,
 	type Result,
+	WhisperingError,
+	effectToResult,
 } from '@repo/shared';
 import { Console, Effect } from 'effect';
-import { getActiveTabId } from '~lib/getActiveTabId';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getActiveTabId } from '~lib/getActiveTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 const playSound = (sound: 'start' | 'stop' | 'cancel') =>
@@ -44,14 +44,20 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 
 export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
-export type ResponseBody = Result<ExternalMessageReturnType<'whispering-extension/playSound'>>;
+export type ResponseBody = Result<
+	ExternalMessageReturnType<'whispering-extension/playSound'>
+>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	{ body },
+	res,
+) =>
 	Effect.gen(function* () {
 		if (!body?.sound) {
 			return yield* new WhisperingError({
 				title: 'Error invoking playSound command',
-				description: 'Sound must be provided in the request body of the message',
+				description:
+					'Sound must be provided in the request body of the message',
 			});
 		}
 		yield* playSound(body.sound);

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { onDestroy } from 'svelte';
+import { onDestroy } from 'svelte';
 
-	let { recordingId, audioUrl }: { recordingId: string; audioUrl: string } = $props();
-	onDestroy(() => {
-		URL.revokeObjectURL(audioUrl);
-	});
+const { recordingId, audioUrl }: { recordingId: string; audioUrl: string } =
+	$props();
+onDestroy(() => {
+	URL.revokeObjectURL(audioUrl);
+});
 </script>
 
 <audio

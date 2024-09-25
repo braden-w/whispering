@@ -1,4 +1,4 @@
-import { WhisperingError, resultToEffect, type Result } from '@repo/shared';
+import { type Result, WhisperingError, resultToEffect } from '@repo/shared';
 import { Console, Effect } from 'effect';
 
 export const injectScript = <T, Args extends any[]>({
@@ -24,11 +24,15 @@ export const injectScript = <T, Args extends any[]>({
 			catch: (error) =>
 				new WhisperingError({
 					title: `Unable to execute "${commandName}" script in Whispering tab`,
-					description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+					description:
+						error instanceof Error ? error.message : `Unknown error: ${error}`,
 					error,
 				}),
 		});
-		yield* Console.info(`Injection result "${commandName}" script:`, injectionResult);
+		yield* Console.info(
+			`Injection result "${commandName}" script:`,
+			injectionResult,
+		);
 		if (!injectionResult || !injectionResult.result) {
 			return yield* new WhisperingError({
 				title: `Unable to "${commandName}" in Whispering tab`,
