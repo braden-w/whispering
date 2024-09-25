@@ -33,11 +33,13 @@
 			"recommended": true,
 			"correctness": {
 				"noUnusedImports": {
+					"level": "warn",
 					"fix": "safe"
 				}
 			},
 			"nursery": {
 				"useSortedClasses": {
+					"level": "warn",
 					"fix": "safe"
 				}
 			}
@@ -47,5 +49,6 @@
 		"formatter": {
 			"quoteStyle": "single"
 		}
-	}
+	},
+	"overrides": [{ "include": ["*.svelte"] }]
 }
