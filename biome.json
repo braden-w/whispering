@@ -44,5 +44,17 @@
 			"quoteStyle": "single"
 		}
 	},
-	"overrides": [{ "include": ["*.svelte"] }]
+	"overrides": [
+		{
+			"include": ["*.svelte"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off",
+						"useImportType": "off"
+					}
+				}
+			}
+		}
+	]
 }
