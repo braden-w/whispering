@@ -25,7 +25,7 @@ export const toast = ({
 }: ToastOptions) =>
 	Effect.gen(function* () {
 		const durationToMs = (() => {
-			if (variant === 'loading') return Infinity;
+			if (variant === 'loading') return Number.POSITIVE_INFINITY;
 			if (variant === 'error' || variant === 'warning') return 5000;
 			if (action) return 4000;
 			return 3000;

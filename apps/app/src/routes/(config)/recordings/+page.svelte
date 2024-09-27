@@ -154,7 +154,7 @@
 	});
 
 	function createUpdater<T>(state: { value: T }) {
-		return function (updater: Updater<T>) {
+		return (updater: Updater<T>) => {
 			if (updater instanceof Function) {
 				state.value = updater(state.value);
 			} else {

@@ -13,8 +13,8 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { Fragment } from 'react';
-import * as GetSettings from '~background/messages/whispering-web/getSettings';
-import * as SetSettings from '~background/messages/whispering-web/setSettings';
+import type * as GetSettings from '~background/messages/whispering-web/getSettings';
+import type * as SetSettings from '~background/messages/whispering-web/setSettings';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -226,7 +226,7 @@ function SettingsCard() {
 							You can find your OpenAI API key in your{' '}
 							<Button
 								variant="link"
-								className="px-0.3 py-0.2 h-fit"
+								className='h-fit px-0.3 py-0.2'
 								onClick={() => chrome.tabs.create({ url: 'https://platform.openai.com/api-keys' })}
 							>
 								OpenAI account settings
@@ -234,7 +234,7 @@ function SettingsCard() {
 							. Make sure{' '}
 							<Button
 								variant="link"
-								className="px-0.3 py-0.2 h-fit"
+								className='h-fit px-0.3 py-0.2'
 								onClick={() =>
 									chrome.tabs.create({
 										url: 'https://platform.openai.com/settings/organization/billing/overview',
@@ -265,7 +265,7 @@ function SettingsCard() {
 							You can find your Groq API key in your{' '}
 							<Button
 								variant="link"
-								className="px-0.3 py-0.2 h-fit"
+								className='h-fit px-0.3 py-0.2'
 								onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
 							>
 								Groq console

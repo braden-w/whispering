@@ -20,7 +20,7 @@ const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 
-export let recorderState = Effect.gen(function* () {
+export const recorderState = Effect.gen(function* () {
 	const { setTrayIcon } = yield* SetTrayIconService;
 	let value = $state<RecorderState>('IDLE');
 	return {

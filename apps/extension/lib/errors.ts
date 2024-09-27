@@ -1,4 +1,4 @@
-import { NotificationService, WhisperingError } from '@repo/shared';
+import { NotificationService, type WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
 
 export const renderErrorAsNotification = (

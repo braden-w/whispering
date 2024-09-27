@@ -95,7 +95,7 @@ function IndexPage() {
 		<ThemeProvider defaultTheme="system" storageKey="whispering-theme">
 			<div className="flex h-[28rem] w-96 flex-col items-center justify-center gap-4 text-center">
 				<div className="flex flex-col gap-4">
-					<h1 className="scroll-m=20 text-4xl font-bold tracking-tight lg:text-5xl">
+					<h1 className='scroll-m=20 font-bold text-4xl tracking-tight lg:text-5xl'>
 						Start recording
 					</h1>
 					<p className="text-muted-foreground">
@@ -115,7 +115,7 @@ function IndexPage() {
 					</Button>
 					{recorderState === 'RECORDING' && (
 						<Button
-							className="absolute -right-16 bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+							className='-right-16 absolute bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110'
 							onClick={cancelRecording}
 							aria-label="Cancel recording"
 							size="icon"
@@ -138,7 +138,7 @@ function IndexPage() {
 							value={copyToClipboardText}
 						/>
 						<Button
-							className="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
+							className='px-4 py-2 dark:bg-secondary dark:text-secondary-foreground'
 							onClick={() => {
 								navigator.clipboard.writeText(copyToClipboardText);
 							}}
@@ -160,13 +160,13 @@ function IndexPage() {
 								chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 							}}
 						>
-							<kbd className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+							<kbd className='relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono font-semibold text-sm'>
 								shortcut
 							</kbd>
 						</Button>{' '}
 						to start recording.
 					</p>
-					<p className="text-muted-foreground text-sm font-light">
+					<p className='font-light text-muted-foreground text-sm'>
 						Check out the{' '}
 						<Button
 							asChild
@@ -240,7 +240,7 @@ function NavItems() {
 							variant="ghost"
 							size="icon"
 						>
-							<GithubIcon className="text-foreground h-4 w-4 fill-current" aria-hidden="true" />
+							<GithubIcon className='h-4 w-4 fill-current text-foreground' aria-hidden="true" />
 							<span className="sr-only">View project on GitHub</span>
 						</Button>
 					</TooltipTrigger>
@@ -259,7 +259,7 @@ function NavItems() {
 							variant="ghost"
 							size="icon"
 						>
-							<SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+							<SunIcon className='dark:-rotate-90 h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-0' />
 							<MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 							<span className="sr-only">Toggle dark mode</span>
 						</Button>

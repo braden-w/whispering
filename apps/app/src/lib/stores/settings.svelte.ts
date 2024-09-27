@@ -51,7 +51,7 @@ const registerLocalShortcut = ({
 		yield* unregisterAllLocalShortcuts;
 		yield* Effect.try({
 			try: () =>
-				hotkeys(shortcut, function (event, handler) {
+				hotkeys(shortcut, (event, handler) => {
 					// Prevent the default refresh event under WINDOWS system
 					event.preventDefault();
 					callback();
