@@ -1,5 +1,5 @@
+import { NotificationService, WHISPERING_URL, WhisperingError } from '@repo/shared';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-import { NotificationService, WhisperingError } from '@repo/shared';
 import { Console, Effect, Layer } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { injectScript } from '~background/injectScript';
@@ -48,9 +48,7 @@ export const NotificationServiceBgswLive = Layer.succeed(
 												error: {
 													title: `Unable to go to route ${route} in Whispering tab`,
 													description:
-														error instanceof Error
-															? error.message
-															: `Unknown error: ${error}`,
+														error instanceof Error ? error.message : `Unknown error: ${error}`,
 													error,
 												},
 											} as const;
@@ -58,9 +56,7 @@ export const NotificationServiceBgswLive = Layer.succeed(
 									},
 									args: [action.goto],
 								});
-								yield* Effect.promise(() =>
-									chrome.tabs.update(whisperingTabId, { active: true }),
-								);
+								yield* Effect.promise(() => chrome.tabs.update(whisperingTabId, { active: true }));
 							});
 
 							chrome.notifications.onClicked.addListener((clickedId) =>
@@ -71,24 +67,20 @@ export const NotificationServiceBgswLive = Layer.succeed(
 									}
 								}).pipe(Effect.runPromise),
 							);
-							chrome.notifications.onButtonClicked.addListener(
-								(id, buttonIndex) =>
-									Effect.gen(function* () {
-										if (buttonIndex === 0) {
-											chrome.notifications.clear(id);
-											yield* gotoTargetUrlInWhisperingTab;
-										}
-									}).pipe(Effect.runPromise),
+							chrome.notifications.onButtonClicked.addListener((id, buttonIndex) =>
+								Effect.gen(function* () {
+									if (buttonIndex === 0) {
+										chrome.notifications.clear(id);
+										yield* gotoTargetUrlInWhisperingTab;
+									}
+								}).pipe(Effect.runPromise),
 							);
 						}
 					},
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Failed to show notification',
-							description:
-								error instanceof Error
-									? error.message
-									: `Unknown error: ${error}`,
+							description: error instanceof Error ? error.message : `Unknown error: ${error}`,
 							error,
 						}),
 				}).pipe(

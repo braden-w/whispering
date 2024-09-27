@@ -8,10 +8,7 @@ import { NotificationServiceContentLive } from '~lib/services/NotificationServic
 export const toggleRecordingFromContentScript = () =>
 	Effect.tryPromise({
 		try: () =>
-			sendToBackground<
-				ToggleRecording.RequestBody,
-				ToggleRecording.ResponseBody
-			>({
+			sendToBackground<ToggleRecording.RequestBody, ToggleRecording.ResponseBody>({
 				name: 'whispering-web/toggleRecording',
 			}),
 		catch: (error) =>

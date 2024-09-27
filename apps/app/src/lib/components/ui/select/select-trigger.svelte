@@ -1,11 +1,13 @@
 <script lang="ts">
-import type { Select as SelectPrimitive } from 'bits-ui';
+	import { Select as SelectPrimitive } from 'bits-ui';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import { cn } from '$lib/utils.js';
 
-type $$Props = SelectPrimitive.TriggerProps;
-type $$Events = SelectPrimitive.TriggerEvents;
+	type $$Props = SelectPrimitive.TriggerProps;
+	type $$Events = SelectPrimitive.TriggerEvents;
 
-const className: $$Props['class'] = undefined;
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export { className as class };
 </script>
 
 <SelectPrimitive.Trigger

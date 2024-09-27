@@ -1,11 +1,12 @@
 <script lang="ts">
-import type { Label as LabelPrimitive } from 'bits-ui';
+	import { Label as LabelPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils.js';
 
-type $$Props = LabelPrimitive.Props;
-type $$Events = LabelPrimitive.Events;
+	type $$Props = LabelPrimitive.Props;
+	type $$Events = LabelPrimitive.Events;
 
-const className: $$Props['class'] = undefined;
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export { className as class };
 </script>
 
 <LabelPrimitive.Root

@@ -1,12 +1,13 @@
 <script lang="ts">
-import type { Separator as SeparatorPrimitive } from 'bits-ui';
+	import { Separator as SeparatorPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils.js';
 
-type $$Props = SeparatorPrimitive.Props;
+	type $$Props = SeparatorPrimitive.Props;
 
-const className: $$Props['class'] = undefined;
-export const orientation: $$Props['orientation'] = 'horizontal';
-export const decorative: $$Props['decorative'] = undefined;
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export let orientation: $$Props['orientation'] = 'horizontal';
+	export let decorative: $$Props['decorative'] = undefined;
+	export { className as class };
 </script>
 
 <SeparatorPrimitive.Root

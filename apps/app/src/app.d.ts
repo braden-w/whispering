@@ -23,3 +23,5 @@ declare module '@tanstack/svelte-table' {
 		headerText: string;
 	}
 }
+
+export {};

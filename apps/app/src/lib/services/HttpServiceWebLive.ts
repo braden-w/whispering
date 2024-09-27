@@ -1,9 +1,6 @@
 import { HttpService, HttpServiceError } from '$lib/services/HttpService';
-import {
-	HttpClient,
-	HttpClientRequest,
-	HttpClientResponse,
-} from '@effect/platform';
+import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
+import { WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 
 export const HttpServiceWebLive = Layer.succeed(
@@ -15,9 +12,7 @@ export const HttpServiceWebLive = Layer.succeed(
 				HttpClient.fetch,
 				Effect.andThen(HttpClientResponse.schemaBodyJson(schema)),
 				Effect.scoped,
-				Effect.mapError(
-					(error) => new HttpServiceError({ message: error.message }),
-				),
+				Effect.mapError((error) => new HttpServiceError({ message: error.message })),
 			),
 	}),
 );

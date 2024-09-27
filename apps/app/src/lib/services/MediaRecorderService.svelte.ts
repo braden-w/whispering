@@ -7,21 +7,16 @@ import { renderErrorAsToast } from './renderErrorAsToast.js';
 
 export const enumerateRecordingDevices = Effect.tryPromise({
 	try: async () => {
-		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
-		});
+		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		const devices = await navigator.mediaDevices.enumerateDevices();
 		allAudioDevicesStream.getTracks().forEach((track) => track.stop());
-		const audioInputDevices = devices.filter(
-			(device) => device.kind === 'audioinput',
-		);
+		const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
 		return audioInputDevices;
 	},
 	catch: (error) =>
 		new WhisperingError({
 			title: 'Error enumerating recording devices',
-			description:
-				'Please make sure you have given permission to access your audio devices',
+			description: 'Please make sure you have given permission to access your audio devices',
 			error: error,
 		}),
 });
@@ -109,9 +104,7 @@ export const mediaStreamManager = Effect.gen(function* () {
 					});
 					return firstAvailableStream;
 				}
-				const maybeStream = yield* getStreamForDeviceId(
-					settings.value.selectedAudioInputDeviceId,
-				);
+				const maybeStream = yield* getStreamForDeviceId(settings.value.selectedAudioInputDeviceId);
 				if (Option.isSome(maybeStream)) {
 					currentStream = maybeStream.value;
 					yield* toast({

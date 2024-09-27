@@ -1,11 +1,19 @@
 <script lang="ts">
-import type { Recording } from '$lib/services/RecordingDbService';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import { recordings } from '$lib/stores/recordings.svelte';
 
-const { recording }: { recording: Recording } = $props();
+	let { recording }: { recording: Recording } = $props();
 
-const isDialogOpen = $state(false);
-const isDeleting = $state(false);
-const isSaving = $state(false);
+	let isDialogOpen = $state(false);
+	let isDeleting = $state(false);
+	let isSaving = $state(false);
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>

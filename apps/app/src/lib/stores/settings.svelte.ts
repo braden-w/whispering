@@ -3,11 +3,7 @@ import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
-import {
-	WhisperingError,
-	getDefaultSettings,
-	settingsSchema,
-} from '@repo/shared';
+import { getDefaultSettings, settingsSchema, WhisperingError } from '@repo/shared';
 import { Effect } from 'effect';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
@@ -33,9 +29,7 @@ const unregisterAllLocalShortcuts = Effect.try({
 const unregisterAllGlobalShortcuts = Effect.tryPromise({
 	try: async () => {
 		if (!window.__TAURI_INTERNALS__) return;
-		const { unregisterAll } = await import(
-			'@tauri-apps/plugin-global-shortcut'
-		);
+		const { unregisterAll } = await import('@tauri-apps/plugin-global-shortcut');
 		return await unregisterAll();
 	},
 	catch: (error) =>
@@ -57,7 +51,7 @@ const registerLocalShortcut = ({
 		yield* unregisterAllLocalShortcuts;
 		yield* Effect.try({
 			try: () =>
-				hotkeys(shortcut, (event, handler) => {
+				hotkeys(shortcut, function (event, handler) {
 					// Prevent the default refresh event under WINDOWS system
 					event.preventDefault();
 					callback();
@@ -125,10 +119,7 @@ export const registerShortcuts = Effect.gen(function* () {
 	jobQueue.addJobToQueue(initialSilentJob).pipe(Effect.runPromise);
 
 	return {
-		registerLocalShortcut: ({
-			shortcut,
-			callback,
-		}: { shortcut: string; callback: () => void }) =>
+		registerLocalShortcut: ({ shortcut, callback }: { shortcut: string; callback: () => void }) =>
 			Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* unregisterAllLocalShortcuts;
@@ -141,10 +132,7 @@ export const registerShortcuts = Effect.gen(function* () {
 				}).pipe(Effect.catchAll(renderErrorAsToast));
 				jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
 			}).pipe(Effect.runSync),
-		registerGlobalShortcut: ({
-			shortcut,
-			callback,
-		}: { shortcut: string; callback: () => void }) =>
+		registerGlobalShortcut: ({ shortcut, callback }: { shortcut: string; callback: () => void }) =>
 			Effect.gen(function* () {
 				if (!window.__TAURI_INTERNALS__) return;
 				const job = Effect.gen(function* () {

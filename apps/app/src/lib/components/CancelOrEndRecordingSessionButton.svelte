@@ -1,5 +1,12 @@
 <script lang="ts">
-const { class: className }: { class?: string | undefined } = $props();
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
+
+	let { class: className }: { class?: string | undefined } = $props();
 </script>
 
 {#if recorder.recorderState === 'RECORDING'}

@@ -1,13 +1,14 @@
 <script lang="ts">
-import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
+	import { cn } from '$lib/utils.js';
 
-const {
-	children,
-	class: className,
-	...restProps
-}: HTMLAttributes<HTMLTableRowElement> & {
-	'data-state'?: unknown;
-} = $props();
+	let {
+		children,
+		class: className,
+		...restProps
+	}: HTMLAttributes<HTMLTableRowElement> & {
+		'data-state'?: unknown;
+	} = $props();
 </script>
 
 <tr

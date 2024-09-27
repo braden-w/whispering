@@ -1,10 +1,11 @@
 <script lang="ts">
-import type { Select as SelectPrimitive } from 'bits-ui';
+	import { Select as SelectPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils.js';
 
-type $$Props = SelectPrimitive.LabelProps;
+	type $$Props = SelectPrimitive.LabelProps;
 
-const className: $$Props['class'] = undefined;
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export { className as class };
 </script>
 
 <SelectPrimitive.Label

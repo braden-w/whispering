@@ -2,20 +2,13 @@ import { goto } from '$app/navigation';
 import { MainLive } from '$lib/services';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { DownloadService } from '$lib/services/DownloadService';
-import {
-	type Recording,
-	RecordingsDbService,
-} from '$lib/services/RecordingDbService';
+import { RecordingsDbService, type Recording } from '$lib/services/RecordingDbService';
 import { toast } from '$lib/services/ToastService';
 import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/TranscriptionServiceFasterWhisperServerLive';
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-import {
-	NotificationService,
-	TranscriptionService,
-	WhisperingError,
-} from '@repo/shared';
+import { NotificationService, TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Option } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
@@ -31,9 +24,7 @@ export const recordings = Effect.gen(function* () {
 	const updateRecording = (recording: Recording) =>
 		Effect.gen(function* () {
 			yield* recordingsDb.updateRecording(recording);
-			recordings = recordings.map((r) =>
-				r.id === recording.id ? recording : r,
-			);
+			recordings = recordings.map((r) => (r.id === recording.id ? recording : r));
 		});
 
 	const syncDbToRecordingsState = Effect.gen(function* () {
@@ -72,9 +63,7 @@ export const recordings = Effect.gen(function* () {
 		deleteRecordingsById: (ids: string[]) =>
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingsById(ids);
-				recordings = recordings.filter(
-					(recording) => !ids.includes(recording.id),
-				);
+				recordings = recordings.filter((recording) => !ids.includes(recording.id));
 				yield* toast({
 					variant: 'success',
 					title: 'Recordings deleted!',
@@ -123,26 +112,16 @@ export const recordings = Effect.gen(function* () {
 						});
 					}
 					const recording = maybeRecording.value;
-					yield* updateRecording({
-						...recording,
-						transcriptionStatus: 'TRANSCRIBING',
-					});
+					yield* updateRecording({ ...recording, transcriptionStatus: 'TRANSCRIBING' });
 					const transcribedText = yield* transcriptionService
 						.transcribe(recording.blob)
 						.pipe(
 							Effect.tapError(() =>
-								updateRecording({
-									...recording,
-									transcriptionStatus: 'UNPROCESSED',
-								}),
+								updateRecording({ ...recording, transcriptionStatus: 'UNPROCESSED' }),
 							),
 						);
 
-					yield* updateRecording({
-						...recording,
-						transcribedText,
-						transcriptionStatus: 'DONE',
-					});
+					yield* updateRecording({ ...recording, transcribedText, transcriptionStatus: 'DONE' });
 
 					if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 
@@ -212,10 +191,7 @@ export const recordings = Effect.gen(function* () {
 					});
 				}
 				const recording = maybeRecording.value;
-				yield* downloadBlob({
-					blob: recording.blob,
-					name: `whispering_recording_${recording.id}`,
-				});
+				yield* downloadBlob({ blob: recording.blob, name: `whispering_recording_${recording.id}` });
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 		copyRecordingText: (recording: Recording) =>
 			Effect.gen(function* () {
@@ -229,4 +205,7 @@ export const recordings = Effect.gen(function* () {
 				});
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise),
 	};
-}).pipe(Effect.provide(MainLive), Effect.runSync);
+}).pipe(
+	Effect.provide(MainLive),
+	Effect.runSync,
+);

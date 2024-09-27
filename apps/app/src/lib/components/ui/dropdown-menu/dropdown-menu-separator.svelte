@@ -1,10 +1,11 @@
 <script lang="ts">
-import type { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
+	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils.js';
 
-type $$Props = DropdownMenuPrimitive.SeparatorProps;
+	type $$Props = DropdownMenuPrimitive.SeparatorProps;
 
-const className: $$Props['class'] = undefined;
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export { className as class };
 </script>
 
 <DropdownMenuPrimitive.Separator

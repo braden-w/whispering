@@ -1,6 +1,6 @@
 import { WhisperingError } from '@repo/shared';
 import { Effect, Layer, Option } from 'effect';
-import { type DBSchema, openDB } from 'idb';
+import { openDB, type DBSchema } from 'idb';
 import type { Recording } from './RecordingDbService';
 import { RecordingsDbService } from './RecordingDbService';
 
@@ -38,31 +38,19 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion === 0) {
 					// Fresh install
-					transaction.db.createObjectStore(RECORDING_METADATA_STORE, {
-						keyPath: 'id',
-					});
-					transaction.db.createObjectStore(RECORDING_BLOB_STORE, {
-						keyPath: 'id',
-					});
+					transaction.db.createObjectStore(RECORDING_METADATA_STORE, { keyPath: 'id' });
+					transaction.db.createObjectStore(RECORDING_BLOB_STORE, { keyPath: 'id' });
 				}
 
 				if (oldVersion === 1 && newVersion === 2) {
 					// Upgrade from v1 to v2
-					const recordingsStore = transaction.objectStore(
-						DEPRECATED_RECORDING_STORE,
-					);
-					const metadataStore = transaction.db.createObjectStore(
-						RECORDING_METADATA_STORE,
-						{
-							keyPath: 'id',
-						},
-					);
-					const blobStore = transaction.db.createObjectStore(
-						RECORDING_BLOB_STORE,
-						{
-							keyPath: 'id',
-						},
-					);
+					const recordingsStore = transaction.objectStore(DEPRECATED_RECORDING_STORE);
+					const metadataStore = transaction.db.createObjectStore(RECORDING_METADATA_STORE, {
+						keyPath: 'id',
+					});
+					const blobStore = transaction.db.createObjectStore(RECORDING_BLOB_STORE, {
+						keyPath: 'id',
+					});
 
 					const recordings = await recordingsStore.getAll();
 					await Promise.all(
@@ -91,9 +79,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
+						const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
 						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 						await Promise.all([
 							recordingMetadataStore.add(metadata),
@@ -104,8 +90,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error adding recording to indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -115,17 +100,13 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						const { blob, ...metadata } = recording;
 						await Promise.all([
 							(await dbPromise).put(RECORDING_METADATA_STORE, metadata),
-							(await dbPromise).put(RECORDING_BLOB_STORE, {
-								id: recording.id,
-								blob,
-							}),
+							(await dbPromise).put(RECORDING_BLOB_STORE, { id: recording.id, blob }),
 						]);
 					},
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error updating recording in indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -136,9 +117,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
+						const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
 						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 						await Promise.all([
 							recordingMetadataStore.delete(id),
@@ -149,8 +128,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error deleting recording from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -161,9 +139,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readwrite',
 						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
+						const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
 						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 						for (const id of ids) {
 							await recordingMetadataStore.delete(id);
@@ -174,8 +150,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error deleting recordings from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}),
@@ -185,9 +160,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 						'readonly',
 					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
+					const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
 					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 					const metadata = await recordingMetadataStore.getAll();
 					const blobs = await recordingBlobStore.getAll();
@@ -202,8 +175,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error getting recordings from indexedDB',
-						description:
-							error instanceof Error ? error.message : 'Please try again.',
+						description: error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -214,9 +186,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
 							'readonly',
 						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
+						const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
 						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 						const metadata = await recordingMetadataStore.get(id);
 						const blobData = await recordingBlobStore.get(id);
@@ -229,8 +199,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error getting recording from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
+							description: error instanceof Error ? error.message : 'Please try again.',
 							error,
 						}),
 				}).pipe(Effect.map(Option.fromNullable)),

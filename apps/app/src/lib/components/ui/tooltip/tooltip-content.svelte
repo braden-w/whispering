@@ -1,17 +1,17 @@
 <script lang="ts">
-import { flyAndScale } from '$lib/utils.js';
-import type { Tooltip as TooltipPrimitive } from 'bits-ui';
+	import { Tooltip as TooltipPrimitive } from 'bits-ui';
+	import { cn, flyAndScale } from '$lib/utils.js';
 
-type $$Props = TooltipPrimitive.ContentProps;
+	type $$Props = TooltipPrimitive.ContentProps;
 
-const className: $$Props['class'] = undefined;
-export const sideOffset: $$Props['sideOffset'] = 4;
-export const transition: $$Props['transition'] = flyAndScale;
-export const transitionConfig: $$Props['transitionConfig'] = {
-	y: 8,
-	duration: 150,
-};
-export { className as class };
+	let className: $$Props['class'] = undefined;
+	export let sideOffset: $$Props['sideOffset'] = 4;
+	export let transition: $$Props['transition'] = flyAndScale;
+	export let transitionConfig: $$Props['transitionConfig'] = {
+		y: 8,
+		duration: 150,
+	};
+	export { className as class };
 </script>
 
 <TooltipPrimitive.Content
