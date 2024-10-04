@@ -1,6 +1,6 @@
+import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { Layer } from 'effect';
 import { SetTrayIconService } from './SetTrayIconService';
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 
 export const SetTrayIconServiceWebLive = Layer.succeed(
 	SetTrayIconService,

@@ -1,22 +1,35 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { ExternalMessageBody, ExternalMessageReturnType, Result } from '@repo/shared';
-import { NotificationService, WhisperingError, effectToResult } from '@repo/shared';
+import type {
+	ExternalMessageBody,
+	ExternalMessageReturnType,
+	Result,
+} from '@repo/shared';
+import {
+	NotificationService,
+	WhisperingError,
+	effectToResult,
+} from '@repo/shared';
 import { Effect } from 'effect';
 import { renderErrorAsNotification } from '~lib/errors';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-export type RequestBody = ExternalMessageBody<'whispering-extension/notifications/create'>;
+export type RequestBody =
+	ExternalMessageBody<'whispering-extension/notifications/create'>;
 
 export type ResponseBody = Result<
 	ExternalMessageReturnType<'whispering-extension/notifications/create'>
 >;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	{ body },
+	res,
+) =>
 	Effect.gen(function* () {
 		if (!body?.notifyOptions) {
 			return yield* new WhisperingError({
 				title: 'Error invoking notify command',
-				description: 'ToastOptions must be provided in the request body of the message',
+				description:
+					'ToastOptions must be provided in the request body of the message',
 			});
 		}
 		const { notify } = yield* NotificationService;

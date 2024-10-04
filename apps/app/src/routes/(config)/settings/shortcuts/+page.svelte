@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Separator } from '$lib/components/ui/separator';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { settings, registerShortcuts } from '$lib/stores/settings.svelte';
-	import SettingsLabelInput from '../SettingsLabelInput.svelte';
+import { Button } from '$lib/components/ui/button';
+import { Input } from '$lib/components/ui/input';
+import { Label } from '$lib/components/ui/label';
+import { Separator } from '$lib/components/ui/separator';
+import { recorder } from '$lib/stores/recorder.svelte';
+import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
+import SettingsLabelInput from '../SettingsLabelInput.svelte';
 </script>
 
 <svelte:head>

@@ -1,27 +1,29 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import * as Card from '$lib/components/ui/card';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import { settings } from '$lib/stores/settings.svelte';
-	import {
-		SUPPORTED_LANGUAGES_OPTIONS,
-		TRANSCRIPTION_SERVICE_OPTIONS,
-		WHISPERING_URL,
-	} from '@repo/shared';
-	import SettingsLabelInput from '../SettingsLabelInput.svelte';
-	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import CopyableCode from './CopyableCode.svelte';
+import { Button } from '$lib/components/ui/button';
+import * as Card from '$lib/components/ui/card';
+import { Separator } from '$lib/components/ui/separator';
+import * as Tabs from '$lib/components/ui/tabs';
+import { settings } from '$lib/stores/settings.svelte';
+import {
+	SUPPORTED_LANGUAGES_OPTIONS,
+	TRANSCRIPTION_SERVICE_OPTIONS,
+	WHISPERING_URL,
+} from '@repo/shared';
+import SettingsLabelInput from '../SettingsLabelInput.svelte';
+import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+import CopyableCode from './CopyableCode.svelte';
 
-	const selectedLanguageOption = $derived(
-		SUPPORTED_LANGUAGES_OPTIONS.find((option) => option.value === settings.value.outputLanguage),
-	);
+const selectedLanguageOption = $derived(
+	SUPPORTED_LANGUAGES_OPTIONS.find(
+		(option) => option.value === settings.value.outputLanguage,
+	),
+);
 
-	const selectedTranscriptionServiceOption = $derived(
-		TRANSCRIPTION_SERVICE_OPTIONS.find(
-			(option) => option.value === settings.value.selectedTranscriptionService,
-		),
-	);
+const selectedTranscriptionServiceOption = $derived(
+	TRANSCRIPTION_SERVICE_OPTIONS.find(
+		(option) => option.value === settings.value.selectedTranscriptionService,
+	),
+);
 </script>
 
 <svelte:head>

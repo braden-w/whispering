@@ -1,5 +1,5 @@
-import vercelAdapter from '@sveltejs/adapter-vercel';
 import staticAdapter from '@sveltejs/adapter-static';
+import vercelAdapter from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 const isNative = process.env.BUILD_TARGET === 'native';

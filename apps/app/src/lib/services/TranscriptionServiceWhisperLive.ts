@@ -1,10 +1,14 @@
-import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform';
+import {
+	HttpClient,
+	HttpClientRequest,
+	HttpClientResponse,
+} from '@effect/platform';
 import { Schema } from '@effect/schema';
 import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
+import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
@@ -53,14 +57,17 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				const formData = new FormData();
 				formData.append('file', formDataFile);
 				formData.append('model', 'whisper-1');
-				if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
+				if (outputLanguage !== 'auto')
+					formData.append('language', outputLanguage);
 				const data = yield* HttpClientRequest.post(
 					'https://api.openai.com/v1/audio/transcriptions',
 				).pipe(
 					HttpClientRequest.setHeaders({ Authorization: `Bearer ${apiKey}` }),
 					HttpClientRequest.formDataBody(formData),
 					HttpClient.fetch,
-					Effect.andThen(HttpClientResponse.schemaBodyJson(WhisperResponseSchema)),
+					Effect.andThen(
+						HttpClientResponse.schemaBodyJson(WhisperResponseSchema),
+					),
 					Effect.scoped,
 					Effect.mapError(
 						(error) =>

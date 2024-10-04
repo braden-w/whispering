@@ -15,7 +15,9 @@ export const DownloadServiceDesktopLive = Layer.succeed(
 					save({ filters: [{ name, extensions: [extension] }] }),
 				);
 				if (path === null) return;
-				const contents = new Uint8Array(yield* Effect.promise(() => blob.arrayBuffer()));
+				const contents = new Uint8Array(
+					yield* Effect.promise(() => blob.arrayBuffer()),
+				);
 				yield* Effect.tryPromise({
 					try: () => writeFile(path, contents),
 					catch: (error) =>

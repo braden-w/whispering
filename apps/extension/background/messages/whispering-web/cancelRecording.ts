@@ -11,7 +11,10 @@ export type RequestBody = {};
 
 export type ResponseBody = Result<void>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	req,
+	res,
+) =>
 	Effect.gen(function* () {
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;
 		yield* injectScript<undefined, []>({
@@ -26,7 +29,10 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (req,
 						isSuccess: false,
 						error: {
 							title: 'Unable to cancel recording',
-							description: error instanceof Error ? error.message : `Unknown error: ${error}`,
+							description:
+								error instanceof Error
+									? error.message
+									: `Unknown error: ${error}`,
 							error,
 						},
 					} as const;

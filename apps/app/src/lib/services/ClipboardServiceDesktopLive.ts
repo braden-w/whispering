@@ -1,8 +1,8 @@
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { WhisperingError } from '@repo/shared';
+import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
-import { invoke } from '@tauri-apps/api/core';
 import { Effect, Layer } from 'effect';
 
 const writeTextToCursor = (text: string) =>
@@ -11,7 +11,8 @@ const writeTextToCursor = (text: string) =>
 		catch: (error) =>
 			new WhisperingError({
 				title: 'Unable to paste from clipboard',
-				description: error instanceof Error ? error.message : 'Please try again.',
+				description:
+					error instanceof Error ? error.message : 'Please try again.',
 				error,
 			}),
 	});
@@ -25,7 +26,8 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
-						description: error instanceof Error ? error.message : 'Please try again.',
+						description:
+							error instanceof Error ? error.message : 'Please try again.',
 						error,
 					}),
 			}),
@@ -43,14 +45,16 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Unable to ensure accessibility is enabled',
-							description: error instanceof Error ? error.message : `Error: ${error}`,
+							description:
+								error instanceof Error ? error.message : `Error: ${error}`,
 							error,
 						}),
 				});
 				if (!isAccessibilityEnabled) {
 					return yield* new WhisperingError({
 						variant: 'warning',
-						title: 'Please enable or re-enable accessibility to paste transcriptions!',
+						title:
+							'Please enable or re-enable accessibility to paste transcriptions!',
 						description:
 							'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
 						action: {

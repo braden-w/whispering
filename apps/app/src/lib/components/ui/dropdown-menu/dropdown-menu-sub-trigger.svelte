@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import { cn } from '$lib/utils.js';
+import { cn } from '$lib/utils.js';
+import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
+import ChevronRight from 'lucide-svelte/icons/chevron-right';
 
-	type $$Props = DropdownMenuPrimitive.SubTriggerProps & {
-		inset?: boolean;
-	};
-	type $$Events = DropdownMenuPrimitive.SubTriggerEvents;
+type $$Props = DropdownMenuPrimitive.SubTriggerProps & {
+	inset?: boolean;
+};
+type $$Events = DropdownMenuPrimitive.SubTriggerEvents;
 
-	let className: $$Props['class'] = undefined;
-	export let inset: $$Props['inset'] = undefined;
-	export { className as class };
+let className: $$Props['class'] = undefined;
+export let inset: $$Props['inset'] = undefined;
+export { className as class };
 </script>
 
 <DropdownMenuPrimitive.SubTrigger

@@ -9,7 +9,10 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
 chrome.commands.onCommand.addListener((command) =>
 	Effect.gen(function* () {
-		yield* Console.info('Received command via Chrome Keyboard Shortcut', command);
+		yield* Console.info(
+			'Received command via Chrome Keyboard Shortcut',
+			command,
+		);
 		if (command !== 'toggleRecording') return false;
 		yield* toggleRecording;
 	}).pipe(

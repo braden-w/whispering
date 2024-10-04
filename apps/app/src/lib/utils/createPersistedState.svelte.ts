@@ -48,7 +48,9 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
 		const jsonSchema = S.parseJson(schema);
-		const maybeParsedValue = S.decodeUnknownEither(jsonSchema)(valueFromStorageUnparsed);
+		const maybeParsedValue = S.decodeUnknownEither(jsonSchema)(
+			valueFromStorageUnparsed,
+		);
 		if (Either.isRight(maybeParsedValue)) {
 			const parsedValue = maybeParsedValue.right;
 			return parsedValue as S.Schema.Type<TSchema>;
@@ -62,17 +64,17 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 				description: 'Please wait...',
 			});
 			// Attempt to merge the default value with the value from storage if possible
-			const oldValueFromStorageMaybeInvalid = yield* S.decodeUnknown(S.parseJson(S.Any))(
-				valueFromStorageUnparsed,
-			);
+			const oldValueFromStorageMaybeInvalid = yield* S.decodeUnknown(
+				S.parseJson(S.Any),
+			)(valueFromStorageUnparsed);
 			const defaultValueMergedOldValues = {
 				...defaultValue,
 				...oldValueFromStorageMaybeInvalid,
 			};
 
-			const updatedValue: S.Schema.Type<TSchema> = yield* S.decodeUnknown(schema)(
-				defaultValueMergedOldValues,
-			).pipe(
+			const updatedValue: S.Schema.Type<TSchema> = yield* S.decodeUnknown(
+				schema,
+			)(defaultValueMergedOldValues).pipe(
 				Effect.tap(() =>
 					toast({
 						id: updatingLocalStorageToastId,
@@ -114,7 +116,8 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		},
 		set value(newValue: S.Schema.Type<TSchema>) {
 			value = newValue;
-			if (!disableLocalStorage) localStorage.setItem(key, JSON.stringify(newValue));
+			if (!disableLocalStorage)
+				localStorage.setItem(key, JSON.stringify(newValue));
 		},
 	};
 }
