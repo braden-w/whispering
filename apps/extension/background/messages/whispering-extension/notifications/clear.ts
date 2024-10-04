@@ -30,6 +30,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 				title: 'Error invoking notify command',
 				description:
 					'Notify/clear must be provided notificationId in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		const notificationService = yield* NotificationService;

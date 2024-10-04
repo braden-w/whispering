@@ -22,7 +22,10 @@ export const enumerateRecordingDevices = Effect.tryPromise({
 			title: 'Error enumerating recording devices',
 			description:
 				'Please make sure you have given permission to access your audio devices',
-			error: error,
+			action: {
+				type: 'more-details',
+				error,
+			},
 		}),
 });
 
@@ -58,6 +61,11 @@ const getFirstAvailableStream = Effect.gen(function* () {
 	return yield* new WhisperingError({
 		title: 'No available audio input devices',
 		description: 'Please make sure you have a microphone connected',
+		action: {
+			type: 'link',
+			label: 'Open Settings',
+			goto: '/settings',
+		},
 	});
 });
 

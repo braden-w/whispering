@@ -26,10 +26,11 @@ export const toggleRecording = Effect.gen(function* () {
 					error: {
 						title: 'Unable to toggle recording',
 						description:
-							error instanceof Error
-								? error.message
-								: `Unknown error: ${error}`,
-						error,
+							'There was an error toggling the recording. Please try again.',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					},
 				} as const;
 			}

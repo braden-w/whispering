@@ -112,6 +112,7 @@ const writeTextToCursor = (
 						'Unable to get active tab ID to write transcribed text to cursor',
 					description:
 						'Please try pasting or go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+					action: { type: 'none' },
 				}),
 		}),
 	);
@@ -133,6 +134,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			return yield* new WhisperingError({
 				title: 'Error invoking writeTextToCursor command',
 				description: 'Text must be provided in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		yield* writeTextToCursor(body.transcribedText);

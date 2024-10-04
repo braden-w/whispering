@@ -21,6 +21,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			return yield* new WhisperingError({
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
+				action: { type: 'none' },
 			});
 		}
 		const { settings } = body;
@@ -41,10 +42,11 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 						error: {
 							title: 'Unable to set Whispering settings',
 							description:
-								error instanceof Error
-									? error.message
-									: 'An error occurred while setting Whispering settings.',
-							error,
+								'An error occurred while setting Whispering settings.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						},
 					} as const;
 				}

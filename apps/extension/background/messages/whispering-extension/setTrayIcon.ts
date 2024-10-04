@@ -35,8 +35,8 @@ const setTrayIcon = (recorderState: RecorderState) =>
 				new WhisperingError({
 					title: `Error setting icon to ${recorderState} icon`,
 					description:
-						error instanceof Error ? error.message : `Error: ${error}`,
-					error,
+						"There was an error setting the tray icon using the browser's action API. Please try again.",
+					action: { type: 'more-details', error },
 				}),
 		});
 	});
@@ -58,6 +58,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 				title: 'Error invoking setTrayIcon command',
 				description:
 					'RecorderState must be provided in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		yield* setTrayIcon(body.recorderState);

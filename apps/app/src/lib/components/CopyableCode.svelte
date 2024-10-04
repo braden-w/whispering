@@ -2,8 +2,6 @@
 import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 import { MainLive } from '$lib/services';
 import { ClipboardService } from '$lib/services/ClipboardService';
-import { ClipboardServiceDesktopLive } from '$lib/services/ClipboardServiceDesktopLive';
-import { ClipboardServiceWebLive } from '$lib/services/ClipboardServiceWebLive';
 import { toast } from '$lib/services/ToastService';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { Effect } from 'effect';

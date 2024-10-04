@@ -20,7 +20,7 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 					new WhisperingError({
 						title: 'Failed to get active tab ID',
 						description: 'Failed to get active tab ID to play sound',
-						error,
+						action: { type: 'more-details', error },
 					}),
 			),
 		);
@@ -34,7 +34,7 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 				new WhisperingError({
 					title: `Failed to play ${sound} sound`,
 					description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
-					error,
+					action: { type: 'more-details', error },
 				}),
 		});
 	}).pipe(
@@ -58,6 +58,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		yield* playSound(body.sound);

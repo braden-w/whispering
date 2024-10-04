@@ -42,10 +42,11 @@ const createSetWatch = <
 								new WhisperingError({
 									title: 'Unable to parse storage value',
 									description:
-										error instanceof Error
-											? error.message
-											: `Unknown error: ${error}`,
-									error,
+										'There was an error running Schema.decodeUnknown on the storage value.',
+									action: {
+										type: 'more-details',
+										error,
+									},
 								}),
 						),
 					);

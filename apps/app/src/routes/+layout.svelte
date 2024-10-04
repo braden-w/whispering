@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto, onNavigate } from '$app/navigation';
 import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
+import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
 import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
@@ -76,3 +77,4 @@ const TOASTER_SETTINGS = {
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />
 <FasterRerecordExplainedDialog />
+<MoreDetailsDialog />

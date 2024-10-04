@@ -1,5 +1,4 @@
 import { Layer } from 'effect';
-
 import { ClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
 import { ClipboardServiceWebLive } from './ClipboardServiceWebLive';
 import { DownloadServiceDesktopLive } from './DownloadServiceDesktopLive';

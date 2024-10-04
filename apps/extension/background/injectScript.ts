@@ -25,8 +25,8 @@ export const injectScript = <T, Args extends any[]>({
 				new WhisperingError({
 					title: `Unable to execute "${commandName}" script in Whispering tab`,
 					description:
-						error instanceof Error ? error.message : `Unknown error: ${error}`,
-					error,
+						'This might be due to the tab not being awake or not in the correct domain.',
+					action: { type: 'more-details', error },
 				}),
 		});
 		yield* Console.info(
@@ -35,8 +35,9 @@ export const injectScript = <T, Args extends any[]>({
 		);
 		if (!injectionResult || !injectionResult.result) {
 			return yield* new WhisperingError({
-				title: `Unable to "${commandName}" in Whispering tab`,
+				title: `Unable to execute "${commandName}" script in Whispering tab`,
 				description: 'The result of the script injection is undefined',
+				action: { type: 'none' },
 			});
 		}
 		const { result } = injectionResult;

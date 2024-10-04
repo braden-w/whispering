@@ -1,4 +1,5 @@
 <script lang="ts">
+import CopyableCode from '$lib/components/CopyableCode.svelte';
 import { Button } from '$lib/components/ui/button';
 import * as Card from '$lib/components/ui/card';
 import { Separator } from '$lib/components/ui/separator';
@@ -11,7 +12,6 @@ import {
 } from '@repo/shared';
 import SettingsLabelInput from '../SettingsLabelInput.svelte';
 import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-import CopyableCode from './CopyableCode.svelte';
 
 const selectedLanguageOption = $derived(
 	SUPPORTED_LANGUAGES_OPTIONS.find(

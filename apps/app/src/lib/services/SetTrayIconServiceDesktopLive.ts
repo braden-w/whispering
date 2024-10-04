@@ -53,9 +53,11 @@ export const SetTrayIconServiceDesktopLive = Layer.effect(
 						new WhisperingError({
 							isWarning: true,
 							title: `Could not set tray icon to ${recorderState} icon...`,
-							description:
-								error instanceof Error ? error.message : `Error: ${error}`,
-							error,
+							description: 'Please check your system tray settings',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}),
 		};
