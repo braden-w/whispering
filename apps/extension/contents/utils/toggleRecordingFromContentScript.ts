@@ -16,12 +16,13 @@ export const toggleRecordingFromContentScript = () =>
 			}),
 		catch: (error) =>
 			new WhisperingError({
-				title: `Unable to toggle recording via background service worker`,
+				title: 'Unable to toggle recording via background service worker',
 				description:
-					error instanceof Error
-						? error.message
-						: 'There was likely an issue sending the message to the background service worker from the contentscript.',
-				error,
+					'There was likely an issue sending the message to the background service worker from the contentscript.',
+				action: {
+					type: 'more-details',
+					error,
+				},
 			}),
 	}).pipe(
 		Effect.catchAll(renderErrorAsNotification),

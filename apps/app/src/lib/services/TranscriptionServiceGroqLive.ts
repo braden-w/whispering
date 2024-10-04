@@ -47,6 +47,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 					return yield* new WhisperingError({
 						title: `The file size (${blobSizeInMb}MB) is too large`,
 						description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
+						action: { type: 'none' },
 					});
 				}
 				const formDataFile = new File(
@@ -73,16 +74,22 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						(error) =>
 							new WhisperingError({
 								title: 'Error transcribing audio',
-								description: error.message,
-								error,
+								description: 'Please try again',
+								action: {
+									type: 'more-details',
+									error,
+								},
 							}),
 					),
 				);
 				if ('error' in data) {
 					return yield* new WhisperingError({
 						title: 'Server error from Groq API',
-						description: data.error.message,
-						error: data.error,
+						description: 'This is likely a problem with Groq, not you.',
+						action: {
+							type: 'more-details',
+							error: data.error.message,
+						},
 					});
 				}
 				return data.text.trim();

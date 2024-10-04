@@ -27,7 +27,10 @@ export const sendMessageToExtension = <
 					title: 'Unable to send message to extension',
 					description:
 						'There was likely an issue sending the message to the extension.',
-					error,
+					action: {
+						type: 'more-details',
+						error,
+					},
 				}),
 		}).pipe(Effect.flatMap(resultToEffect));
 		return response;

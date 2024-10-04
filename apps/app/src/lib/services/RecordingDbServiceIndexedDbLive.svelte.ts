@@ -104,9 +104,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error adding recording to indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
-							error,
+							description: 'Please try again',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}),
 			updateRecording: (recording) =>
@@ -124,9 +126,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error updating recording in indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
-							error,
+							description: 'Please try again',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}),
 			deleteRecordingById: (id) =>
@@ -149,9 +153,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error deleting recording from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
-							error,
+							description: 'Please try again',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}),
 			deleteRecordingsById: (ids) =>
@@ -174,9 +180,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error deleting recordings from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
-							error,
+							description: 'Please try again',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}),
 			getAllRecordings: Effect.tryPromise({
@@ -202,9 +210,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 				catch: (error) =>
 					new WhisperingError({
 						title: 'Error getting recordings from indexedDB',
-						description:
-							error instanceof Error ? error.message : 'Please try again.',
-						error,
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			}),
 			getRecording: (id) =>
@@ -229,9 +239,11 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error getting recording from indexedDB',
-							description:
-								error instanceof Error ? error.message : 'Please try again.',
-							error,
+							description: 'Please try again',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}).pipe(Effect.map(Option.fromNullable)),
 		};

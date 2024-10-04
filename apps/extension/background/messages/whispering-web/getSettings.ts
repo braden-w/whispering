@@ -15,12 +15,12 @@ import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
-export type RequestBody = {};
+export type RequestBody = Record<string, never>;
 
 export type ResponseBody = Result<Settings>;
 
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	req,
+	_req,
 	res,
 ) =>
 	Effect.gen(function* () {
@@ -41,10 +41,11 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 						error: {
 							title: 'Unable to get Whispering settings',
 							description:
-								error instanceof Error
-									? error.message
-									: 'An error occurred while getting Whispering settings.',
-							error,
+								'There was an error getting the Whispering settings from localStorage.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						},
 					} as const;
 				}
@@ -61,10 +62,11 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 					new WhisperingError({
 						title: 'Unable to parse Whispering settings',
 						description:
-							error instanceof Error
-								? error.message
-								: `Unknown error: ${error}`,
-						error,
+							'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			),
 		);

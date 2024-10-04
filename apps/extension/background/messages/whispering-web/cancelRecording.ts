@@ -30,10 +30,11 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 						error: {
 							title: 'Unable to cancel recording',
 							description:
-								error instanceof Error
-									? error.message
-									: `Unknown error: ${error}`,
-							error,
+								'There was an error canceling the recording. Please try again.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						},
 					} as const;
 				}

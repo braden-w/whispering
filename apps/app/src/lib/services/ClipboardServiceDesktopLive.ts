@@ -12,8 +12,11 @@ const writeTextToCursor = (text: string) =>
 			new WhisperingError({
 				title: 'Unable to paste from clipboard',
 				description:
-					error instanceof Error ? error.message : 'Please try again.',
-				error,
+					'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
+				action: {
+					type: 'more-details',
+					error,
+				},
 			}),
 	});
 
@@ -27,8 +30,11 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
 						description:
-							error instanceof Error ? error.message : 'Please try again.',
-						error,
+							'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			}),
 		writeTextToCursor: (text) =>
@@ -46,8 +52,11 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 						new WhisperingError({
 							title: 'Unable to ensure accessibility is enabled',
 							description:
-								error instanceof Error ? error.message : `Error: ${error}`,
-							error,
+								'There was an error checking if accessibility is enabled using the Tauri Invoke API. Please try again.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				});
 				if (!isAccessibilityEnabled) {

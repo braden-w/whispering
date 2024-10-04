@@ -25,8 +25,8 @@ const unregisterAllLocalShortcuts = Effect.try({
 	catch: (error) =>
 		new WhisperingError({
 			title: 'Error unregistering all shortcuts',
-			description: error instanceof Error ? error.message : 'Please try again.',
-			error,
+			description: 'Please try again.',
+			action: { type: 'more-details', error },
 		}),
 });
 
@@ -41,8 +41,8 @@ const unregisterAllGlobalShortcuts = Effect.tryPromise({
 	catch: (error) =>
 		new WhisperingError({
 			title: 'Error unregistering all shortcuts',
-			description: error instanceof Error ? error.message : 'Please try again.',
-			error,
+			description: 'Please try again.',
+			action: { type: 'more-details', error },
 		}),
 });
 
@@ -65,11 +65,8 @@ const registerLocalShortcut = ({
 			catch: (error) =>
 				new WhisperingError({
 					title: 'Error registering local shortcut',
-					description:
-						error instanceof Error
-							? error.message
-							: 'Please make sure it is a valid keyboard shortcut.',
-					error,
+					description: 'Please make sure it is a valid keyboard shortcut.',
+					action: { type: 'more-details', error },
 				}),
 		});
 	});
@@ -96,12 +93,10 @@ const registerGlobalShortcut = ({
 			catch: (error) =>
 				new WhisperingError({
 					title:
-						'Error registering global shortcut. Please make sure it is a valid Electron keyboard shortcut.',
+						'Error registering global shortcut.',
 					description:
-						error instanceof Error
-							? error.message
-							: 'You can find more information in the console.',
-					error,
+						'Please make sure it is a valid Electron keyboard shortcut.',
+					action: { type: 'more-details', error },
 				}),
 		});
 	});

@@ -26,7 +26,10 @@ export const NotificationServiceDesktopLive = Layer.succeed(
 					new WhisperingError({
 						title: 'Notification error',
 						description: 'Could not send notification',
-						error,
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			}).pipe(
 				Effect.map(() => nanoid()),

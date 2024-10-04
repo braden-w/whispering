@@ -35,10 +35,8 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 							title:
 								'Unable to copy transcribed text to clipboard in active tab',
 							description:
-								error instanceof Error
-									? error.message
-									: `Unknown error: ${error}`,
-							error,
+								'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
+							action: { type: 'more-details', error },
 						},
 					} as const;
 				}
@@ -53,6 +51,7 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 						'Unable to get active tab ID to copy transcribed text to clipboard',
 					description:
 						'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+					action: { type: 'none' },
 				}),
 		}),
 	);
@@ -73,6 +72,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			return yield* new WhisperingError({
 				title: 'Error invoking setClipboardText command',
 				description: 'Text must be provided in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		yield* setClipboardText(body.transcribedText);

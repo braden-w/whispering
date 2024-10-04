@@ -52,10 +52,11 @@ export const NotificationServiceBgswLive = Layer.succeed(
 												error: {
 													title: `Unable to go to route ${route} in Whispering tab`,
 													description:
-														error instanceof Error
-															? error.message
-															: `Unknown error: ${error}`,
-													error,
+														'There was an error going to the route in the Whispering tab.',
+													action: {
+														type: 'more-details',
+														error,
+													},
 												},
 											} as const;
 										}
@@ -90,10 +91,11 @@ export const NotificationServiceBgswLive = Layer.succeed(
 						new WhisperingError({
 							title: 'Failed to show notification',
 							description:
-								error instanceof Error
-									? error.message
-									: `Unknown error: ${error}`,
-							error,
+								'There was an error showing the notification in the background service worker.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				}).pipe(
 					Effect.tapError((error) => Console.error({ ...error })),

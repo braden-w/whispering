@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
 export const fasterRerecordExplainedDialog = (() => {
 	let isOpen = $state(false);
 	return {

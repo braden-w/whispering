@@ -33,6 +33,7 @@ export const MediaRecorderService = Effect.gen(function* () {
 						title: 'Unexpected media recorder already exists',
 						description:
 							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+						action: { type: 'none' },
 					});
 				}
 				const connectingToRecordingDeviceToastId = nanoid();
@@ -89,9 +90,11 @@ export const MediaRecorderService = Effect.gen(function* () {
 				resetRecorder();
 				return new WhisperingError({
 					title: 'Error canceling media recorder',
-					description:
-						error instanceof Error ? error.message : 'Please try again',
-					error: error,
+					description: 'Please try again',
+					action: {
+						type: 'more-details',
+						error,
+					},
 				});
 			}),
 		),
@@ -107,9 +110,11 @@ export const MediaRecorderService = Effect.gen(function* () {
 				resetRecorder();
 				return new WhisperingError({
 					title: 'Error stopping media recorder',
-					description:
-						error instanceof Error ? error.message : 'Please try again',
-					error: error,
+					description: 'Please try again',
+					action: {
+						type: 'more-details',
+						error,
+					},
 				});
 			}),
 		),

@@ -82,14 +82,17 @@ export type Settings = S.Schema.Type<typeof settingsSchema>;
 export type WhisperingErrorProperties = {
 	title: string;
 	description: string;
-	action?:
+	action:
 		| {
 				type: 'link';
 				label: string;
 				goto: string;
 		  }
-		| undefined;
-	error?: unknown;
+		| {
+				type: 'more-details';
+				error: unknown;
+		  }
+		| { type: 'none' };
 	isWarning?: boolean;
 };
 

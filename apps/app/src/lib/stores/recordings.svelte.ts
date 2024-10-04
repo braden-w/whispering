@@ -121,6 +121,7 @@ export const recordings = Effect.gen(function* () {
 						return yield* new WhisperingError({
 							title: `Recording with id ${id} not found`,
 							description: 'Please try again.',
+							action: { type: 'none' },
 						});
 					}
 					const recording = maybeRecording.value;
@@ -211,6 +212,7 @@ export const recordings = Effect.gen(function* () {
 					return yield* new WhisperingError({
 						title: `Recording with id ${id} not found`,
 						description: 'Please try again.',
+						action: { type: 'none' },
 					});
 				}
 				const recording = maybeRecording.value;

@@ -23,8 +23,12 @@ export const DownloadServiceDesktopLive = Layer.succeed(
 					catch: (error) =>
 						new WhisperingError({
 							title: 'Error saving recording',
-							description: 'Please try again.',
-							error: error,
+							description:
+								'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
+							action: {
+								type: 'more-details',
+								error,
+							},
 						}),
 				});
 			}),

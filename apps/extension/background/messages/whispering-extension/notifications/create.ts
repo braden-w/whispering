@@ -30,6 +30,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 				title: 'Error invoking notify command',
 				description:
 					'ToastOptions must be provided in the request body of the message',
+				action: { type: 'none' },
 			});
 		}
 		const { notify } = yield* NotificationService;

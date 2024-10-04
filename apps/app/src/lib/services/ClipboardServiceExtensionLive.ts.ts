@@ -12,8 +12,11 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 					new WhisperingError({
 						title: 'Unable to write to clipboard',
 						description:
-							error instanceof Error ? error.message : 'Please try again.',
-						error,
+							'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			}),
 		writeTextToCursor: (text) =>
@@ -23,8 +26,11 @@ export const ClipboardServiceExtensionLive = Layer.succeed(
 					new WhisperingError({
 						title: 'Unable to write text to cursor',
 						description:
-							error instanceof Error ? error.message : 'Please try again.',
-						error,
+							'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
 			}),
 	}),

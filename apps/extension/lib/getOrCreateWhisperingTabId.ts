@@ -71,7 +71,10 @@ function getAllWhisperingTabs() {
 			new WhisperingError({
 				title: 'Error getting Whispering tabs',
 				description: 'Error querying for Whispering tabs in the browser.',
-				error,
+				action: {
+					type: 'more-details',
+					error,
+				},
 			}),
 	});
 }
@@ -116,7 +119,7 @@ function makeTabUndiscardableById(tabId: number) {
 			new WhisperingError({
 				title: 'Unable to make Whispering tab undiscardable',
 				description: 'Error updating Whispering tab to make it undiscardable.',
-				error,
+				action: { type: 'more-details', error },
 			}),
 	});
 }
@@ -134,7 +137,7 @@ function removeTabsById(tabIds: number[]) {
 					new WhisperingError({
 						title: `Error closing Whispering tab ${tabId}`,
 						description: `Error closing Whispering tab ${tabId} in the browser.`,
-						error,
+						action: { type: 'more-details', error },
 					}),
 			}),
 		),
