@@ -108,6 +108,7 @@ export const recordings = Effect.gen(function* () {
 						title: 'Transcribing recording...',
 						description: 'Your recording is being transcribed.',
 						action: {
+							type: 'link',
 							label: 'Go to recordings',
 							goto: '/recordings',
 						},
@@ -164,6 +165,7 @@ export const recordings = Effect.gen(function* () {
 						title: 'Transcription complete!',
 						description: 'Click to check it out in your recordings',
 						action: {
+							type: 'link',
 							label: 'Go to recordings',
 							goto: '/recordings',
 						},

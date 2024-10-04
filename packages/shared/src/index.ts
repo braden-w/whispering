@@ -85,6 +85,7 @@ export type WhisperingErrorProperties = {
 	description: string;
 	action?:
 		| {
+				type: 'link';
 				label: string;
 				goto: string;
 		  }

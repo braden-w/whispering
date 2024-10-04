@@ -72,6 +72,7 @@ export const recorder = Effect.gen(function* () {
 							title: 'Whispering is recording...',
 							description: 'Click to go to recorder',
 							action: {
+								type: 'link',
 								label: 'Go to recorder',
 								goto: '/',
 							},

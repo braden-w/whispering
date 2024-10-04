@@ -24,6 +24,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						title: 'OpenAI API Key not provided.',
 						description: 'Please enter your OpenAI API key in the settings',
 						action: {
+							type: 'link',
 							label: 'Go to settings',
 							goto: '/settings/transcription',
 						},
@@ -35,6 +36,7 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 						title: 'Invalid OpenAI API Key',
 						description: 'The OpenAI API Key must start with "sk-"',
 						action: {
+							type: 'link',
 							label: 'Update OpenAI API Key',
 							goto: '/settings/transcription',
 						},

@@ -58,6 +58,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 						description:
 							'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
 						action: {
+							type: 'link',
 							label: 'Open Directions',
 							goto: '/macos-enable-accessibility',
 						},

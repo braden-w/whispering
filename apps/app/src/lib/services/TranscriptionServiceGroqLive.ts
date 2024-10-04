@@ -24,6 +24,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						title: 'Groq API Key not provided.',
 						description: 'Please enter your Groq API key in the settings',
 						action: {
+							type: 'link',
 							label: 'Go to settings',
 							goto: '/settings/transcription',
 						},
@@ -35,6 +36,7 @@ export const TranscriptionServiceGroqLive = Layer.succeed(
 						title: 'Invalid Groq API Key',
 						description: 'The Groq API Key must start with "gsk_"',
 						action: {
+							type: 'link',
 							label: 'Update API Key',
 							goto: '/settings/transcription',
 						},

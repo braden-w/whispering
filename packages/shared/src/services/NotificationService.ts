@@ -8,6 +8,7 @@ export const notificationOptionsSchema = S.Struct({
 	description: S.String,
 	action: S.optional(
 		S.Struct({
+			type: S.Literal('link'),
 			label: S.String,
 			goto: S.String,
 		}),
