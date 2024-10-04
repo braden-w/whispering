@@ -18,13 +18,13 @@
 		"@tauri-apps/cli": "2.0.0-rc.3",
 		"@types/chrome": "^0.0.269",
 		"autoprefixer": "^10.4.20",
-		"postcss": "^8.4.41",
+		"postcss": "^8.4.47",
 		"svelte": "5.0.0-next.216",
-		"svelte-check": "^3.8.5",
-		"tailwindcss": "^3.4.7",
+		"svelte-check": "^4.0.4",
+		"tailwindcss": "^3.4.13",
 		"tslib": "^2.6.3",
 		"typescript": "^5.5.4",
-		"vite": "^5.3.5"
+		"vite": "^5.4.8"
 	},
 	"type": "module",
 	"dependencies": {
