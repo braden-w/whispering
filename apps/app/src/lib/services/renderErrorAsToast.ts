@@ -4,12 +4,13 @@ import type { WhisperingError } from '@repo/shared';
 import { Console, Effect } from 'effect';
 
 export const renderErrorAsToast = (
-	{ variant, title, description, action, ...restError }: WhisperingError,
+	whisperingError: WhisperingError,
 	options?: { toastId?: string },
 ) =>
 	Effect.gen(function* () {
+		const { isWarning, title, description, action } = whisperingError;
 		yield* toast({
-			variant: variant,
+			variant: isWarning ? 'warning' : 'error',
 			id: options?.toastId,
 			title: title,
 			description: description,
@@ -20,5 +21,5 @@ export const renderErrorAsToast = (
 				},
 			},
 		});
-		yield* Console.error({ variant, title, description, action, ...restError });
+		yield* Console.error(whisperingError);
 	});

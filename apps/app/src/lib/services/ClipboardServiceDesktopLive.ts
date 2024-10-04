@@ -52,7 +52,7 @@ export const ClipboardServiceDesktopLive = Layer.succeed(
 				});
 				if (!isAccessibilityEnabled) {
 					return yield* new WhisperingError({
-						variant: 'warning',
+						isWarning: true,
 						title:
 							'Please enable or re-enable accessibility to paste transcriptions!',
 						description:
