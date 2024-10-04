@@ -6,6 +6,9 @@ export const errorMoreDetailsDialog = (() => {
 		get isOpen() {
 			return isOpen;
 		},
+		set isOpen(value: boolean) {
+			isOpen = value;
+		},
 		get error() {
 			if (typeof error === 'string') {
 				return error;
@@ -30,8 +33,8 @@ export const errorMoreDetailsDialog = (() => {
 <Dialog.Root bind:open={errorMoreDetailsDialog.isOpen}>
   <Dialog.Content class="sm:max-w-xl">
     <Dialog.Header>
-      <Dialog.Title>About recording sessions</Dialog.Title>
-      <Dialog.Description>More details</Dialog.Description>
+      <Dialog.Title>More details</Dialog.Title>
+			<Dialog.Description>The following is the raw error message.</Dialog.Description>
     </Dialog.Header>
     <pre class="text-sm leading-7 whitespace-pre-wrap overflow-auto max-h-96">
 			{errorMoreDetailsDialog.error}

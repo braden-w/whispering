@@ -20,8 +20,7 @@ export const renderErrorAsToast = (
 				case 'more-details':
 					return {
 						label: 'More details',
-						onClick: () =>
-							errorMoreDetailsDialog.openWithError(whisperingError),
+						onClick: () => errorMoreDetailsDialog.openWithError(action.error),
 					};
 				default:
 					return undefined;
