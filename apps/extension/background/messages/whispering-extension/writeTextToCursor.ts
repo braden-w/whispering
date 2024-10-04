@@ -92,7 +92,7 @@ const writeTextToCursor = (
 					return {
 						isSuccess: false,
 						error: {
-							variant: 'warning',
+							isWarning: true,
 							title: 'Please paste the transcribed text manually',
 							description:
 								'There are multiple text areas or content editable divs on the page.',

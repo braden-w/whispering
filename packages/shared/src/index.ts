@@ -80,7 +80,6 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
 export type WhisperingErrorProperties = {
-	variant?: 'error' | 'warning';
 	title: string;
 	description: string;
 	action?:
@@ -91,19 +90,12 @@ export type WhisperingErrorProperties = {
 		  }
 		| undefined;
 	error?: unknown;
+	isWarning?: boolean;
 };
 
-export class WhisperingError extends Data.TaggedError('WhisperingError')<
-	Required<Pick<WhisperingErrorProperties, 'variant'>> &
-		Omit<WhisperingErrorProperties, 'variant'>
-> {
-	constructor(properties: WhisperingErrorProperties) {
-		super({
-			...properties,
-			variant: properties.variant ?? 'error',
-		});
-	}
-}
+export class WhisperingError extends Data.TaggedError(
+	'WhisperingError',
+)<WhisperingErrorProperties> {}
 
 export type Result<T> =
 	| {
