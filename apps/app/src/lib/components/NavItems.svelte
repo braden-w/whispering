@@ -1,18 +1,18 @@
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import {
-		GithubIcon,
-		ListIcon,
-		Minimize2Icon,
-		MoonIcon,
-		SlidersVerticalIcon,
-		SunIcon,
-	} from '$lib/components/icons';
-	import { cn } from '$lib/utils';
-	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
-	import { toggleMode } from 'mode-watcher';
+import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+import {
+	GithubIcon,
+	ListIcon,
+	Minimize2Icon,
+	MoonIcon,
+	SlidersVerticalIcon,
+	SunIcon,
+} from '$lib/components/icons';
+import { cn } from '$lib/utils';
+import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
+import { toggleMode } from 'mode-watcher';
 
-	let { class: className }: { class?: string } = $props();
+let { class: className }: { class?: string } = $props();
 </script>
 
 <nav class={cn('flex items-center', className)} style="view-transition-name: nav">

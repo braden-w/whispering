@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Label } from '$lib/components/ui/label';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Switch } from '$lib/components/ui/switch';
-	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
-	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
-	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
+import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
+import { Button } from '$lib/components/ui/button';
+import { Label } from '$lib/components/ui/label';
+import { Separator } from '$lib/components/ui/separator';
+import { Switch } from '$lib/components/ui/switch';
+import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
+import { settings } from '$lib/stores/settings.svelte';
+import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
+import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
-	const selectedAlwaysOnTopOption = $derived(
-		ALWAYS_ON_TOP_OPTIONS.find((option) => option.value === settings.value.alwaysOnTop),
-	);
+const selectedAlwaysOnTopOption = $derived(
+	ALWAYS_ON_TOP_OPTIONS.find(
+		(option) => option.value === settings.value.alwaysOnTop,
+	),
+);
 </script>
 
 <svelte:head>

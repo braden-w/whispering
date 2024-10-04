@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { Checkbox as CheckboxPrimitive } from 'bits-ui';
-	import Check from 'lucide-svelte/icons/check';
-	import Minus from 'lucide-svelte/icons/minus';
-	import { cn } from '$lib/utils.js';
+import { cn } from '$lib/utils.js';
+import { Checkbox as CheckboxPrimitive } from 'bits-ui';
+import Check from 'lucide-svelte/icons/check';
+import Minus from 'lucide-svelte/icons/minus';
 
-	type $$Props = CheckboxPrimitive.Props;
-	type $$Events = CheckboxPrimitive.Events;
+type $$Props = CheckboxPrimitive.Props;
+type $$Events = CheckboxPrimitive.Events;
 
-	let className: $$Props['class'] = undefined;
-	export let checked: $$Props['checked'] = false;
-	export { className as class };
+let className: $$Props['class'] = undefined;
+export let checked: $$Props['checked'] = false;
+export { className as class };
 </script>
 
 <CheckboxPrimitive.Root

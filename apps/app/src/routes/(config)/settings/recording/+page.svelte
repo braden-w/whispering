@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { Separator } from '$lib/components/ui/separator';
-	import {
-		enumerateRecordingDevices,
-		mediaStreamManager,
-	} from '$lib/services/MediaRecorderService.svelte';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS } from '@repo/shared';
-	import { Effect } from 'effect';
-	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+import { Separator } from '$lib/components/ui/separator';
+import {
+	enumerateRecordingDevices,
+	mediaStreamManager,
+} from '$lib/services/MediaRecorderService.svelte';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+import { settings } from '$lib/stores/settings.svelte';
+import { BITRATE_OPTIONS } from '@repo/shared';
+import { Effect } from 'effect';
+import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
-	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
-		Effect.catchAll((error) => {
-			renderErrorAsToast(error);
-			return Effect.succeed([] as MediaDeviceInfo[]);
-		}),
-		Effect.runPromise,
-	);
+const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
+	Effect.catchAll((error) => {
+		renderErrorAsToast(error);
+		return Effect.succeed([] as MediaDeviceInfo[]);
+	}),
+	Effect.runPromise,
+);
 </script>
 
 <svelte:head>

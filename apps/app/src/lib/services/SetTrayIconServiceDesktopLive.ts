@@ -1,10 +1,10 @@
 import { recorder } from '$lib/stores/recorder.svelte';
-import { WhisperingError, type RecorderState } from '@repo/shared';
+import { type RecorderState, WhisperingError } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
+import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 import { Effect, Layer } from 'effect';
 import { SetTrayIconService } from './SetTrayIconService';
-import { resolveResource } from '@tauri-apps/api/path';
 
 async function getIconPath(recorderState: RecorderState) {
 	const iconPaths = {
@@ -53,7 +53,8 @@ export const SetTrayIconServiceDesktopLive = Layer.effect(
 						new WhisperingError({
 							variant: 'warning',
 							title: `Could not set tray icon to ${recorderState} icon...`,
-							description: error instanceof Error ? error.message : `Error: ${error}`,
+							description:
+								error instanceof Error ? error.message : `Error: ${error}`,
 							error,
 						}),
 				}),

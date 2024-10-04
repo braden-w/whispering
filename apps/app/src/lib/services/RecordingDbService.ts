@@ -24,10 +24,20 @@ export class RecordingsDbService extends Context.Tag('RecordingsDbService')<
 	RecordingsDbService,
 	{
 		readonly getAllRecordings: Effect.Effect<Recording[], WhisperingError>;
-		readonly getRecording: (id: string) => Effect.Effect<Option.Option<Recording>, WhisperingError>;
-		readonly addRecording: (recording: Recording) => Effect.Effect<void, WhisperingError>;
-		readonly updateRecording: (recording: Recording) => Effect.Effect<void, WhisperingError>;
-		readonly deleteRecordingById: (id: string) => Effect.Effect<void, WhisperingError>;
-		readonly deleteRecordingsById: (ids: string[]) => Effect.Effect<void, WhisperingError>;
+		readonly getRecording: (
+			id: string,
+		) => Effect.Effect<Option.Option<Recording>, WhisperingError>;
+		readonly addRecording: (
+			recording: Recording,
+		) => Effect.Effect<void, WhisperingError>;
+		readonly updateRecording: (
+			recording: Recording,
+		) => Effect.Effect<void, WhisperingError>;
+		readonly deleteRecordingById: (
+			id: string,
+		) => Effect.Effect<void, WhisperingError>;
+		readonly deleteRecordingsById: (
+			ids: string[],
+		) => Effect.Effect<void, WhisperingError>;
 	}
 >() {}

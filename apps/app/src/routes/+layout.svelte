@@ -1,52 +1,52 @@
 <script lang="ts">
-	import { goto, onNavigate } from '$app/navigation';
-	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
-	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
-	import { Effect } from 'effect';
-	import { ModeWatcher, mode } from 'mode-watcher';
-	import { onMount } from 'svelte';
-	import type { ToasterProps } from 'svelte-sonner';
-	import { Toaster } from 'svelte-sonner';
-	import '../app.pcss';
+import { goto, onNavigate } from '$app/navigation';
+import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
+import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+import { recorder, recorderState } from '$lib/stores/recorder.svelte';
+import { Effect } from 'effect';
+import { ModeWatcher, mode } from 'mode-watcher';
+import { onMount } from 'svelte';
+import type { ToasterProps } from 'svelte-sonner';
+import { Toaster } from 'svelte-sonner';
+import '../app.pcss';
 
-	onNavigate((navigation) => {
-		if (!document.startViewTransition) return;
+onNavigate((navigation) => {
+	if (!document.startViewTransition) return;
 
-		return new Promise((resolve) => {
-			document.startViewTransition(async () => {
-				resolve();
-				await navigation.complete;
-			});
+	return new Promise((resolve) => {
+		document.startViewTransition(async () => {
+			resolve();
+			await navigation.complete;
 		});
 	});
+});
 
-	onMount(async () => {
-		window.toggleRecording = recorder.toggleRecording;
-		window.cancelRecording = recorder.cancelRecording;
-		window.goto = goto;
-		window.addEventListener('beforeunload', () => {
-			if (recorderState.value === 'RECORDING') {
-				recorderState.value = 'IDLE';
-			}
-		});
-		if (!window.__TAURI_INTERNALS__) {
-			sendMessageToExtension({
-				name: 'whispering-extension/notifyWhisperingTabReady',
-				body: {},
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+onMount(async () => {
+	window.toggleRecording = recorder.toggleRecording;
+	window.cancelRecording = recorder.cancelRecording;
+	window.goto = goto;
+	window.addEventListener('beforeunload', () => {
+		if (recorderState.value === 'RECORDING') {
+			recorderState.value = 'IDLE';
 		}
-		setAlwaysOnTopToTrueIfAlwaysInSettings();
 	});
+	if (!window.__TAURI_INTERNALS__) {
+		sendMessageToExtension({
+			name: 'whispering-extension/notifyWhisperingTabReady',
+			body: {},
+		}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+	}
+	setAlwaysOnTopToTrueIfAlwaysInSettings();
+});
 
-	const TOASTER_SETTINGS = {
-		position: 'bottom-right',
-		richColors: true,
-		duration: 5000,
-		visibleToasts: 5,
-	} satisfies ToasterProps;
+const TOASTER_SETTINGS = {
+	position: 'bottom-right',
+	richColors: true,
+	duration: 5000,
+	visibleToasts: 5,
+} satisfies ToasterProps;
 </script>
 
 <svelte:head>

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { Button, type Props } from '$lib/components/ui/button';
-	import * as Tooltip from '$lib/components/ui/tooltip';
+import { Button, type Props } from '$lib/components/ui/button';
+import * as Tooltip from '$lib/components/ui/tooltip';
 
-	let {
-		children,
-		tooltipText,
-		...restProps
-	}: {
-		tooltipText: string;
-	} & Props = $props();
+let {
+	children,
+	tooltipText,
+	...restProps
+}: {
+	tooltipText: string;
+} & Props = $props();
 </script>
 
 <Tooltip.Root>

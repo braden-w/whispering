@@ -3,8 +3,8 @@ import type { Result, Settings } from '@repo/shared';
 import { WhisperingError, effectToResult } from '@repo/shared';
 import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
@@ -12,7 +12,10 @@ export type RequestBody = { settings: Settings };
 
 export type ResponseBody = Result<void>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = ({ body }, res) =>
+const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
+	{ body },
+	res,
+) =>
 	Effect.gen(function* () {
 		if (!body || !body.settings) {
 			return yield* new WhisperingError({

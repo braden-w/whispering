@@ -1,34 +1,35 @@
 <script lang="ts">
-	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
-	import NavItems from '$lib/components/NavItems.svelte';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardIcon } from '$lib/components/icons';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
+import NavItems from '$lib/components/NavItems.svelte';
+import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+import { ClipboardIcon } from '$lib/components/icons';
+import { Input } from '$lib/components/ui/input';
+import { Label } from '$lib/components/ui/label';
+import { recorder } from '$lib/stores/recorder.svelte';
+import { recordings } from '$lib/stores/recordings.svelte';
+import { settings } from '$lib/stores/settings.svelte';
+import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
-	const PLACEHOLDER_RECORDING = {
-		id: '',
-		title: '',
-		subtitle: '',
-		timestamp: '',
-		blob: undefined,
-		transcribedText: '',
-		transcriptionStatus: 'UNPROCESSED',
-	} as const;
+const PLACEHOLDER_RECORDING = {
+	id: '',
+	title: '',
+	subtitle: '',
+	timestamp: '',
+	blob: undefined,
+	transcribedText: '',
+	transcriptionStatus: 'UNPROCESSED',
+} as const;
 
-	const latestRecording = $derived(
-		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING,
-	);
+const latestRecording = $derived(
+	recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING,
+);
 
-	const maybeLatestAudioSrc = $derived(
-		latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined,
-	);
+const maybeLatestAudioSrc = $derived(
+	latestRecording.blob ? URL.createObjectURL(latestRecording.blob) : undefined,
+);
 
-	const copyRecordingTextFromLatestRecording = () => recordings.copyRecordingText(latestRecording);
+const copyRecordingTextFromLatestRecording = () =>
+	recordings.copyRecordingText(latestRecording);
 </script>
 
 <svelte:head>

@@ -1,242 +1,261 @@
 <script lang="ts">
-	import {
-		ChevronDownIcon,
-		ClipboardIcon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
-		TrashIcon,
-	} from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button';
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import * as Table from '$lib/components/ui/table';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { MainLive } from '$lib/services';
-	import { ClipboardService } from '$lib/services/ClipboardService';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-	import { toast } from '$lib/services/ToastService';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { cn } from '$lib/utils';
-	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { Schema as S } from '@effect/schema';
-	import { FlexRender, createTable, renderComponent } from '@tanstack/svelte-table';
-	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
-	import { getCoreRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/table-core';
-	import { Effect } from 'effect';
-	import DataTableHeader from './DataTableHeader.svelte';
-	import RenderAudioUrl from './RenderAudioUrl.svelte';
-	import RowActions from './RowActions.svelte';
-	import TranscribedText from './TranscribedText.svelte';
+import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+import {
+	ChevronDownIcon,
+	ClipboardIcon,
+	EllipsisIcon as LoadingTranscriptionIcon,
+	RepeatIcon as RetryTranscriptionIcon,
+	PlayIcon as StartTranscriptionIcon,
+	TrashIcon,
+} from '$lib/components/icons';
+import { Button } from '$lib/components/ui/button';
+import { Checkbox } from '$lib/components/ui/checkbox';
+import * as Dialog from '$lib/components/ui/dialog';
+import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+import { Input } from '$lib/components/ui/input';
+import { Label } from '$lib/components/ui/label';
+import * as Table from '$lib/components/ui/table';
+import { Textarea } from '$lib/components/ui/textarea/index.js';
+import { MainLive } from '$lib/services';
+import { ClipboardService } from '$lib/services/ClipboardService';
+import type { Recording } from '$lib/services/RecordingDbService';
+import { toast } from '$lib/services/ToastService';
+import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+import { recordings } from '$lib/stores/recordings.svelte';
+import { cn } from '$lib/utils';
+import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+import { Schema as S } from '@effect/schema';
+import {
+	FlexRender,
+	createTable,
+	renderComponent,
+} from '@tanstack/svelte-table';
+import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
+import {
+	getCoreRowModel,
+	getFilteredRowModel,
+	getSortedRowModel,
+} from '@tanstack/table-core';
+import { Effect } from 'effect';
+import DataTableHeader from './DataTableHeader.svelte';
+import RenderAudioUrl from './RenderAudioUrl.svelte';
+import RowActions from './RowActions.svelte';
+import TranscribedText from './TranscribedText.svelte';
 
-	const columns: ColumnDef<Recording>[] = [
-		{
-			id: 'select',
-			header: ({ table }) =>
-				renderComponent(Checkbox, {
-					checked: table.getIsAllPageRowsSelected(),
-					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all',
-				}),
-			cell: ({ row }) =>
-				renderComponent(Checkbox, {
-					checked: row.getIsSelected(),
-					onCheckedChange: (value) => row.toggleSelected(!!value),
-					'aria-label': 'Select row',
-				}),
-			enableSorting: false,
-			enableHiding: false,
+const columns: ColumnDef<Recording>[] = [
+	{
+		id: 'select',
+		header: ({ table }) =>
+			renderComponent(Checkbox, {
+				checked: table.getIsAllPageRowsSelected(),
+				onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
+				'aria-label': 'Select all',
+			}),
+		cell: ({ row }) =>
+			renderComponent(Checkbox, {
+				checked: row.getIsSelected(),
+				onCheckedChange: (value) => row.toggleSelected(!!value),
+				'aria-label': 'Select row',
+			}),
+		enableSorting: false,
+		enableHiding: false,
+	},
+	{
+		accessorKey: 'id',
+		meta: {
+			headerText: 'ID',
 		},
-		{
-			accessorKey: 'id',
-			meta: {
-				headerText: 'ID',
-			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
-			enableSorting: false,
-			enableHiding: false,
+		header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+		enableSorting: false,
+		enableHiding: false,
+	},
+	{
+		accessorKey: 'title',
+		meta: {
+			headerText: 'Title',
 		},
-		{
-			accessorKey: 'title',
-			meta: {
-				headerText: 'Title',
-			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+		header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+	},
+	{
+		accessorKey: 'subtitle',
+		meta: {
+			headerText: 'Subtitle',
 		},
-		{
-			accessorKey: 'subtitle',
-			meta: {
-				headerText: 'Subtitle',
-			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+		header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+	},
+	{
+		accessorKey: 'timestamp',
+		meta: {
+			headerText: 'Timestamp',
 		},
-		{
-			accessorKey: 'timestamp',
-			meta: {
-				headerText: 'Timestamp',
-			},
-			header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+		header: (headerContext) => renderComponent(DataTableHeader, headerContext),
+	},
+	{
+		id: 'transcribedText',
+		filterFn: (row, _columnId, filterValue) => {
+			const { transcribedText } = row.getValue<{
+				id: string;
+				transcribedText: string;
+			}>('transcribedText');
+			return transcribedText.includes(filterValue);
 		},
-		{
-			id: 'transcribedText',
-			filterFn: (row, _columnId, filterValue) => {
-				const { transcribedText } = row.getValue<{ id: string; transcribedText: string }>(
-					'transcribedText',
-				);
-				return transcribedText.includes(filterValue);
-			},
-			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
-			meta: {
-				headerText: 'Transcribed Text',
-			},
-			header: 'Transcribed Text',
-			cell: ({ getValue }) => {
-				const { id, transcribedText } = getValue<{ id: string; transcribedText: string }>();
-				return renderComponent(TranscribedText, { recordingId: id, transcribedText });
-			},
+		accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
+		meta: {
+			headerText: 'Transcribed Text',
 		},
-		{
-			id: 'audio',
-			accessorFn: ({ id, blob }) => ({ id, blob }),
-			meta: {
-				headerText: 'Audio',
-			},
-			header: 'Audio',
-			cell: ({ getValue }) => {
-				const { id, blob } = getValue<{ id: string; blob: Blob }>();
-				const audioUrl = URL.createObjectURL(blob);
-				return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
-			},
+		header: 'Transcribed Text',
+		cell: ({ getValue }) => {
+			const { id, transcribedText } = getValue<{
+				id: string;
+				transcribedText: string;
+			}>();
+			return renderComponent(TranscribedText, {
+				recordingId: id,
+				transcribedText,
+			});
 		},
-		{
-			id: 'actions',
-			accessorFn: (recording) => recording,
-			meta: {
-				headerText: 'Actions',
-			},
-			header: 'Actions',
-			cell: ({ getValue }) => {
-				const recording = getValue<Recording>();
-				return renderComponent(RowActions, { recording });
-			},
+	},
+	{
+		id: 'audio',
+		accessorFn: ({ id, blob }) => ({ id, blob }),
+		meta: {
+			headerText: 'Audio',
 		},
-	];
+		header: 'Audio',
+		cell: ({ getValue }) => {
+			const { id, blob } = getValue<{ id: string; blob: Blob }>();
+			const audioUrl = URL.createObjectURL(blob);
+			return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
+		},
+	},
+	{
+		id: 'actions',
+		accessorFn: (recording) => recording,
+		meta: {
+			headerText: 'Actions',
+		},
+		header: 'Actions',
+		cell: ({ getValue }) => {
+			const recording = getValue<Recording>();
+			return renderComponent(RowActions, { recording });
+		},
+	},
+];
 
-	let sorting = createPersistedState({
-		key: 'whispering-data-table-sorting',
-		defaultValue: [{ id: 'timestamp', desc: true }],
-		schema: S.Struct({ desc: S.Boolean, id: S.String }).pipe(S.mutable, S.Array, S.mutable),
-	});
-	let columnFilters = createPersistedState({
-		key: 'whispering-data-table-column-filters',
-		defaultValue: [],
-		schema: S.Struct({ id: S.String, value: S.Unknown }).pipe(
-			S.filter((data): data is ColumnFilter => data.value !== undefined),
-			S.mutable,
-			S.Array,
-			S.mutable,
-		),
-	});
-	let columnVisibility = createPersistedState({
-		key: 'whispering-data-table-column-visibility',
-		defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
-	});
-	let rowSelection = createPersistedState({
-		key: 'whispering-data-table-row-selection',
-		defaultValue: {},
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
-	});
+let sorting = createPersistedState({
+	key: 'whispering-data-table-sorting',
+	defaultValue: [{ id: 'timestamp', desc: true }],
+	schema: S.Struct({ desc: S.Boolean, id: S.String }).pipe(
+		S.mutable,
+		S.Array,
+		S.mutable,
+	),
+});
+let columnFilters = createPersistedState({
+	key: 'whispering-data-table-column-filters',
+	defaultValue: [],
+	schema: S.Struct({ id: S.String, value: S.Unknown }).pipe(
+		S.filter((data): data is ColumnFilter => data.value !== undefined),
+		S.mutable,
+		S.Array,
+		S.mutable,
+	),
+});
+let columnVisibility = createPersistedState({
+	key: 'whispering-data-table-column-visibility',
+	defaultValue: { id: false, title: false, subtitle: false, timestamp: false },
+	schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+});
+let rowSelection = createPersistedState({
+	key: 'whispering-data-table-row-selection',
+	defaultValue: {},
+	schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+});
 
-	function createUpdater<T>(state: { value: T }) {
-		return (updater: Updater<T>) => {
-			if (updater instanceof Function) {
-				state.value = updater(state.value);
-			} else {
-				state.value = updater;
-			}
-		};
-	}
-
-	const setSorting = createUpdater(sorting);
-	const setFilters = createUpdater(columnFilters);
-	const setVisibility = createUpdater(columnVisibility);
-	const setRowSelection = createUpdater(rowSelection);
-
-	const table = createTable({
-		getRowId: (originalRow) => originalRow.id,
-		get data() {
-			return recordings.value;
-		},
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setFilters,
-		onColumnVisibilityChange: setVisibility,
-		onRowSelectionChange: setRowSelection,
-		state: {
-			get sorting() {
-				return sorting.value;
-			},
-			get columnFilters() {
-				return columnFilters.value;
-			},
-			get columnVisibility() {
-				return columnVisibility.value;
-			},
-			get rowSelection() {
-				return rowSelection.value;
-			},
-		},
-	});
-
-	function getInitialFilterValue() {
-		const filterValue = table.getColumn('transcribedText')?.getFilterValue();
-		if (typeof filterValue === 'string') {
-			return filterValue;
+function createUpdater<T>(state: { value: T }) {
+	return (updater: Updater<T>) => {
+		if (updater instanceof Function) {
+			state.value = updater(state.value);
+		} else {
+			state.value = updater;
 		}
-		return '';
+	};
+}
+
+const setSorting = createUpdater(sorting);
+const setFilters = createUpdater(columnFilters);
+const setVisibility = createUpdater(columnVisibility);
+const setRowSelection = createUpdater(rowSelection);
+
+const table = createTable({
+	getRowId: (originalRow) => originalRow.id,
+	get data() {
+		return recordings.value;
+	},
+	columns,
+	getCoreRowModel: getCoreRowModel(),
+	getSortedRowModel: getSortedRowModel(),
+	getFilteredRowModel: getFilteredRowModel(),
+	onSortingChange: setSorting,
+	onColumnFiltersChange: setFilters,
+	onColumnVisibilityChange: setVisibility,
+	onRowSelectionChange: setRowSelection,
+	state: {
+		get sorting() {
+			return sorting.value;
+		},
+		get columnFilters() {
+			return columnFilters.value;
+		},
+		get columnVisibility() {
+			return columnVisibility.value;
+		},
+		get rowSelection() {
+			return rowSelection.value;
+		},
+	},
+});
+
+function getInitialFilterValue() {
+	const filterValue = table.getColumn('transcribedText')?.getFilterValue();
+	if (typeof filterValue === 'string') {
+		return filterValue;
 	}
-	let filterQuery = $state(getInitialFilterValue());
-	let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
+	return '';
+}
+let filterQuery = $state(getInitialFilterValue());
+let selectedRecordingRows = $derived(table.getFilteredSelectedRowModel().rows);
 
-	let template = $state('{{timestamp}} {{transcribedText}}');
-	let delimiter = $state('\n\n');
+let template = $state('{{timestamp}} {{transcribedText}}');
+let delimiter = $state('\n\n');
 
-	let isDialogOpen = $state(false);
+let isDialogOpen = $state(false);
 
-	let text = $derived.by(() => {
-		const transcriptions = selectedRecordingRows
-			.map(({ original }) => original)
-			.filter((recording) => recording.transcribedText !== '')
-			.map((recording) =>
-				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-					switch (key) {
-						case 'id':
-							return recording.id;
-						case 'title':
-							return recording.title;
-						case 'subtitle':
-							return recording.subtitle;
-						case 'timestamp':
-							return recording.timestamp;
-						case 'transcribedText':
-							return recording.transcribedText;
-						default:
-							return '';
-					}
-				}),
-			);
-		const text = transcriptions.join(delimiter);
-		return text;
-	});
+let text = $derived.by(() => {
+	const transcriptions = selectedRecordingRows
+		.map(({ original }) => original)
+		.filter((recording) => recording.transcribedText !== '')
+		.map((recording) =>
+			template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+				switch (key) {
+					case 'id':
+						return recording.id;
+					case 'title':
+						return recording.title;
+					case 'subtitle':
+						return recording.subtitle;
+					case 'timestamp':
+						return recording.timestamp;
+					case 'transcribedText':
+						return recording.transcribedText;
+					default:
+						return '';
+				}
+			}),
+		);
+	const text = transcriptions.join(delimiter);
+	return text;
+});
 </script>
 
 <svelte:head>

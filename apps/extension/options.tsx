@@ -1,9 +1,9 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import {
 	SUPPORTED_LANGUAGES_OPTIONS,
+	type Settings,
 	TRANSCRIPTION_SERVICE_OPTIONS,
 	WHISPERING_URL,
-	type Settings,
 } from '@repo/shared';
 import {
 	QueryClient,
@@ -58,7 +58,10 @@ function SettingsCard() {
 	} = useQuery({
 		queryKey: ['settings'],
 		queryFn: async () => {
-			const response = await sendToBackground<GetSettings.RequestBody, GetSettings.ResponseBody>({
+			const response = await sendToBackground<
+				GetSettings.RequestBody,
+				GetSettings.ResponseBody
+			>({
 				name: 'whispering-web/getSettings',
 			});
 			if (!response.isSuccess) throw response.error;
@@ -68,7 +71,10 @@ function SettingsCard() {
 
 	const { mutate: setSettings } = useMutation({
 		mutationFn: async (settings: Settings) => {
-			const response = await sendToBackground<SetSettings.RequestBody, SetSettings.ResponseBody>({
+			const response = await sendToBackground<
+				SetSettings.RequestBody,
+				SetSettings.ResponseBody
+			>({
 				name: 'whispering-web/setSettings',
 				body: { settings },
 			});
@@ -77,7 +83,9 @@ function SettingsCard() {
 		},
 		onMutate: async (newSettings) => {
 			await queryClient.cancelQueries({ queryKey: ['settings'] });
-			const previousSettingsSnapshot = queryClient.getQueryData(['settings']) as Settings;
+			const previousSettingsSnapshot = queryClient.getQueryData([
+				'settings',
+			]) as Settings;
 			queryClient.setQueryData(['settings'], newSettings);
 			return { previousSettingsSnapshot, newSettings };
 		},
@@ -128,7 +136,9 @@ function SettingsCard() {
 							setSettings({ ...settings, isPlaySoundEnabled: newValue })
 						}
 					/>
-					<Label htmlFor="play-sound-enabled">Play sound on toggle on and off</Label>
+					<Label htmlFor="play-sound-enabled">
+						Play sound on toggle on and off
+					</Label>
 				</div>
 				<div className="flex items-center gap-2">
 					<Switch
@@ -169,7 +179,9 @@ function SettingsCard() {
 						label="Output Language"
 						options={SUPPORTED_LANGUAGES_OPTIONS}
 						value={settings.outputLanguage}
-						onValueChange={(value) => setSettings({ ...settings, outputLanguage: value })}
+						onValueChange={(value) =>
+							setSettings({ ...settings, outputLanguage: value })
+						}
 					/>
 				</div>
 
@@ -188,7 +200,9 @@ function SettingsCard() {
 						<Button
 							className="absolute inset-0 backdrop-blur"
 							variant="link"
-							onClick={() => chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })}
+							onClick={() =>
+								chrome.tabs.create({ url: 'chrome://extensions/shortcuts' })
+							}
 						>
 							Edit Global Shortcut in Extension Settings
 						</Button>
@@ -226,15 +240,19 @@ function SettingsCard() {
 							You can find your OpenAI API key in your{' '}
 							<Button
 								variant="link"
-								className='h-fit px-0.3 py-0.2'
-								onClick={() => chrome.tabs.create({ url: 'https://platform.openai.com/api-keys' })}
+								className="h-fit px-0.3 py-0.2"
+								onClick={() =>
+									chrome.tabs.create({
+										url: 'https://platform.openai.com/api-keys',
+									})
+								}
 							>
 								OpenAI account settings
 							</Button>
 							. Make sure{' '}
 							<Button
 								variant="link"
-								className='h-fit px-0.3 py-0.2'
+								className="h-fit px-0.3 py-0.2"
 								onClick={() =>
 									chrome.tabs.create({
 										url: 'https://platform.openai.com/settings/organization/billing/overview',
@@ -265,8 +283,10 @@ function SettingsCard() {
 							You can find your Groq API key in your{' '}
 							<Button
 								variant="link"
-								className='h-fit px-0.3 py-0.2'
-								onClick={() => chrome.tabs.create({ url: 'https://console.groq.com/keys' })}
+								className="h-fit px-0.3 py-0.2"
+								onClick={() =>
+									chrome.tabs.create({ url: 'https://console.groq.com/keys' })
+								}
 							>
 								Groq console
 							</Button>
@@ -278,11 +298,17 @@ function SettingsCard() {
 			<CardFooter>
 				<Button
 					onClick={() => {
-						if (settings.selectedTranscriptionService === 'OpenAI' && !settings.openAiApiKey) {
+						if (
+							settings.selectedTranscriptionService === 'OpenAI' &&
+							!settings.openAiApiKey
+						) {
 							alert('Please enter an OpenAI API Key');
 							return;
 						}
-						if (settings.selectedTranscriptionService === 'Groq' && !settings.groqApiKey) {
+						if (
+							settings.selectedTranscriptionService === 'Groq' &&
+							!settings.groqApiKey
+						) {
 							alert('Please enter an Groq API Key');
 							return;
 						}

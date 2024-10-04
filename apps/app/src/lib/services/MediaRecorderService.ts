@@ -41,7 +41,9 @@ export const MediaRecorderService = Effect.gen(function* () {
 					: yield* mediaStreamManager.refreshStream();
 				const newMediaRecorder = yield* Effect.try({
 					try: () =>
-						new MediaRecorder(newOrExistingStream, { bitsPerSecond: settings.value.bitsPerSecond }),
+						new MediaRecorder(newOrExistingStream, {
+							bitsPerSecond: settings.value.bitsPerSecond,
+						}),
 					catch: () => new TryResuseStreamError(),
 				}).pipe(
 					Effect.catchAll(() =>
@@ -49,18 +51,25 @@ export const MediaRecorderService = Effect.gen(function* () {
 							yield* toast({
 								id: connectingToRecordingDeviceToastId,
 								variant: 'loading',
-								title: 'Error initializing media recorder with preferred device',
-								description: 'Trying to find another available audio input device...',
+								title:
+									'Error initializing media recorder with preferred device',
+								description:
+									'Trying to find another available audio input device...',
 							});
 							const stream = yield* mediaStreamManager.refreshStream();
-							return new MediaRecorder(stream, { bitsPerSecond: settings.value.bitsPerSecond });
+							return new MediaRecorder(stream, {
+								bitsPerSecond: settings.value.bitsPerSecond,
+							});
 						}),
 					),
 				);
-				newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-					if (!event.data.size) return;
-					recordedChunks.push(event.data);
-				});
+				newMediaRecorder.addEventListener(
+					'dataavailable',
+					(event: BlobEvent) => {
+						if (!event.data.size) return;
+						recordedChunks.push(event.data);
+					},
+				);
 				newMediaRecorder.start(TIMESLICE_MS);
 				mediaRecorder = newMediaRecorder;
 			}),
@@ -68,7 +77,9 @@ export const MediaRecorderService = Effect.gen(function* () {
 			if (!mediaRecorder) return;
 			mediaRecorder.addEventListener('stop', () => {
 				if (!mediaRecorder) return;
-				const audioBlob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+				const audioBlob = new Blob(recordedChunks, {
+					type: mediaRecorder.mimeType,
+				});
 				resume(Effect.succeed(audioBlob));
 				resetRecorder();
 			});
@@ -78,7 +89,8 @@ export const MediaRecorderService = Effect.gen(function* () {
 				resetRecorder();
 				return new WhisperingError({
 					title: 'Error canceling media recorder',
-					description: error instanceof Error ? error.message : 'Please try again',
+					description:
+						error instanceof Error ? error.message : 'Please try again',
 					error: error,
 				});
 			}),
@@ -95,7 +107,8 @@ export const MediaRecorderService = Effect.gen(function* () {
 				resetRecorder();
 				return new WhisperingError({
 					title: 'Error stopping media recorder',
-					description: error instanceof Error ? error.message : 'Please try again',
+					description:
+						error instanceof Error ? error.message : 'Please try again',
 					error: error,
 				});
 			}),
