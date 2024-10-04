@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
 export const errorMoreDetailsDialog = (() => {
 	let isOpen = $state(false);
 	let error = $state<unknown>(null);
@@ -35,9 +35,9 @@ export const errorMoreDetailsDialog = (() => {
     <Dialog.Header>
       <Dialog.Title>More details</Dialog.Title>
 			<Dialog.Description>The following is the raw error message.</Dialog.Description>
-    </Dialog.Header>
-    <pre class="text-sm leading-7 whitespace-pre-wrap overflow-auto max-h-96">
-			{errorMoreDetailsDialog.error}
+		</Dialog.Header>
+		<pre class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
+		{errorMoreDetailsDialog.error}
 		</pre>
-  </Dialog.Content>
+	</Dialog.Content>
 </Dialog.Root>
