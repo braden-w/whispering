@@ -24,14 +24,14 @@ export const toast = ({
 	action,
 }: ToastOptions) =>
 	Effect.gen(function* () {
-		const durationToMs = (() => {
+		const durationInMs = (() => {
 			if (variant === 'loading') return Number.POSITIVE_INFINITY;
 			if (variant === 'error' || variant === 'warning') return 5000;
 			if (action) return 4000;
 			return 3000;
 		})();
 		const toastId = sonnerToast[variant](title, {
-			duration: durationToMs,
+			duration: durationInMs,
 			id: maybeId,
 			description,
 			descriptionClass,
