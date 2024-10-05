@@ -11,7 +11,9 @@ export const enumerateRecordingDevices = Effect.tryPromise({
 			audio: true,
 		});
 		const devices = await navigator.mediaDevices.enumerateDevices();
-		allAudioDevicesStream.getTracks().forEach((track) => track.stop());
+		for (const track of allAudioDevicesStream.getTracks()) {
+			track.stop();
+		}
 		const audioInputDevices = devices.filter(
 			(device) => device.kind === 'audioinput',
 		);
@@ -149,7 +151,9 @@ export const mediaStreamManager = Effect.gen(function* () {
 		},
 		release() {
 			if (currentStream === null) return;
-			currentStream.getTracks().forEach((track) => track.stop());
+			for (const track of currentStream.getTracks()) {
+				track.stop();
+			}
 			currentStream = null;
 		},
 	};
