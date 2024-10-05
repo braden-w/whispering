@@ -25,6 +25,7 @@ tauri-plugin-os = "2.0.0-alpha.2"
 tauri-plugin-dialog = "2.0.0-alpha.2"
 tauri-plugin-clipboard-manager = "2.0.0-alpha.2"
 tauri-plugin-fs = "2.0.0-rc.0"
+tauri-plugin-shell = "2.0.1"
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"]
