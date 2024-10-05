@@ -9,9 +9,9 @@
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
-		"format": "biome format . --write",
-		"lint": "biome lint . --write",
-		"format-and-lint": "biome check . --write"
+		"format": "biome format --write .",
+		"lint": "biome lint --apply-unsafe .",
+		"format-and-lint": "biome check --apply-unsafe ."
 	},
 	"packageManager": "pnpm@8.6.5",
 	"devDependencies": {
