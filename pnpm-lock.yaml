@@ -21,11 +21,11 @@ importers:
   apps/app:
     dependencies:
       '@effect/platform':
-        specifier: ^0.61.4
-        version: 0.61.4(@effect/schema@0.70.2(effect@3.6.1))(effect@3.6.1)
+        specifier: ^0.66.2
+        version: 0.66.2(@effect/schema@0.74.1(effect@3.8.4))(effect@3.8.4)
       '@effect/schema':
-        specifier: ^0.70.2
-        version: 0.70.2(effect@3.6.1)
+        specifier: ^0.74.1
+        version: 0.74.1(effect@3.8.4)
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.3.1)
@@ -81,8 +81,8 @@ importers:
         specifier: ^7.0.3
         version: 7.0.3
       effect:
-        specifier: ^3.6.1
-        version: 3.6.1
+        specifier: ^3.8.4
+        version: 3.8.4
       hotkeys-js:
         specifier: ^3.13.7
         version: 3.13.7
@@ -137,7 +137,7 @@ importers:
         version: 5.0.0-next.262
       svelte-check:
         specifier: ^4.0.4
-        version: 4.0.4(svelte@5.0.0-next.262)(typescript@5.5.4)
+        version: 4.0.4(svelte@5.0.0-next.262)(typescript@5.6.2)
       tailwindcss:
         specifier: ^3.4.13
         version: 3.4.13
@@ -145,8 +145,8 @@ importers:
         specifier: ^2.6.3
         version: 2.6.3
       typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
+        specifier: ^5.6.2
+        version: 5.6.2
       vite:
         specifier: ^5.4.8
         version: 5.4.8(@types/node@22.1.0)(less@4.2.0)(lightningcss@1.25.1)(sass@1.77.8)
@@ -154,8 +154,8 @@ importers:
   apps/extension:
     dependencies:
       '@effect/schema':
-        specifier: ^0.70.2
-        version: 0.70.2(effect@3.6.1)
+        specifier: ^0.74.1
+        version: 0.74.1(effect@3.8.4)
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.3.1)
@@ -187,8 +187,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       effect:
-        specifier: ^3.6.1
-        version: 3.6.1
+        specifier: ^3.8.4
+        version: 3.8.4
       idb:
         specifier: ^8.0.0
         version: 8.0.0
@@ -236,24 +236,24 @@ importers:
         specifier: ^8.4.41
         version: 8.4.41
       typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
+        specifier: ^5.6.2
+        version: 5.6.2
 
   packages/shared:
     dependencies:
       '@effect/platform':
-        specifier: ^0.61.2
-        version: 0.61.4(@effect/schema@0.70.2(effect@3.6.1))(effect@3.6.1)
+        specifier: ^0.66.2
+        version: 0.66.2(@effect/schema@0.74.1(effect@3.8.4))(effect@3.8.4)
       '@effect/schema':
-        specifier: ^0.70.1
-        version: 0.70.2(effect@3.6.1)
+        specifier: ^0.74.1
+        version: 0.74.1(effect@3.8.4)
       effect:
-        specifier: ^3.6.0
-        version: 3.6.1
+        specifier: ^3.8.4
+        version: 3.8.4
     devDependencies:
       typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
+        specifier: ^5.6.2
+        version: 5.6.2
 
 packages:
 
@@ -393,16 +393,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@effect/platform@0.61.4':
-    resolution: {integrity: sha512-PCdpJnc7Rp/Su/kFQt+S3qhNmF0gv03ANAIXqR9oKm1/fLID4UA+U5yTb31qMQuK6YE6U61mKslR6MkhsovaQQ==}
+  '@effect/platform@0.66.2':
+    resolution: {integrity: sha512-Gqr+C8GhjC9Ix1JdakDVaWbJcy9qISN8wNz6OdLjiWL1aR3glAscEgICTuB3TOH7F6e3M/PK3RYhsuwVgo63QA==}
     peerDependencies:
-      '@effect/schema': ^0.70.2
-      effect: ^3.6.1
+      '@effect/schema': ^0.74.1
+      effect: ^3.8.4
 
-  '@effect/schema@0.70.2':
-    resolution: {integrity: sha512-uZcUtgnmmzqpMikFr4FBmVX0didYBp33UhpYZrIvlW5/fiENsnrGas3DOanqxXPgP6mnwx9q/kv6912Ix+NjSw==}
+  '@effect/schema@0.74.1':
+    resolution: {integrity: sha512-koTi0M1MYUjEDawLmksXBROROLx0BEG2ErwVGLVawmwuBwVbw1MTEd0QlG2+jds5avYXCJp67rHS7cuIxmnBwg==}
     peerDependencies:
-      effect: ^3.6.1
+      effect: ^3.8.4
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -2804,8 +2804,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@3.6.1:
-    resolution: {integrity: sha512-RdHsRMuEUKgkhs3z2d5XI5SDADX0THDx6GjP1oJAAAM/w+oT5/3BpKZyg/05VHy7YfOUdaQbcDzFO6YowkqsSQ==}
+  effect@3.8.4:
+    resolution: {integrity: sha512-rOZ1XAi+Fb+fAHoUJ5FnJPSPZEBxVbCl5QWtOWFTgOeFHx0QpbK3pezWvq9OIxQPdwvSkPOw926qrs4xdD9dLA==}
 
   electron-to-chromium@1.5.4:
     resolution: {integrity: sha512-orzA81VqLyIGUEA77YkVA1D+N+nNfl2isJVjjmOyrlxuooZ19ynb+dOlaDTqd/idKRS9lDCSBmtzM+kyCsMnkA==}
@@ -2899,8 +2899,8 @@ packages:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
     engines: {node: '>=4'}
 
-  fast-check@3.20.0:
-    resolution: {integrity: sha512-pZIjqLpOZgdSLecec4GKC3Zq5702MZ34upMKxojnNVSWA0K64V3pXOBT1Wdsrc3AphLtzRBbsi8bRWF4TUGmUg==}
+  fast-check@3.22.0:
+    resolution: {integrity: sha512-8HKz3qXqnHYp/VCNn2qfjHdAdcI8zcSqOyX64GOMukp7SL2bfzfeDKjSd+UyECtejccaZv3LcvZTm9YDD22iCQ==}
     engines: {node: '>=8.0.0'}
 
   fast-fifo@1.3.2:
@@ -4419,6 +4419,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.6.2:
+    resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undici-types@6.13.0:
     resolution: {integrity: sha512-xtFJHudx8S2DSoujjMd1WeWvn7KKWFRESZTMeL1RptAYERu29D6jphMjjY+vn96jvN3kVPDNxU/E13VTaXj6jg==}
 
@@ -4727,17 +4732,17 @@ snapshots:
   '@biomejs/cli-win32-x64@1.9.2':
     optional: true
 
-  '@effect/platform@0.61.4(@effect/schema@0.70.2(effect@3.6.1))(effect@3.6.1)':
+  '@effect/platform@0.66.2(@effect/schema@0.74.1(effect@3.8.4))(effect@3.8.4)':
     dependencies:
-      '@effect/schema': 0.70.2(effect@3.6.1)
-      effect: 3.6.1
+      '@effect/schema': 0.74.1(effect@3.8.4)
+      effect: 3.8.4
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/schema@0.70.2(effect@3.6.1)':
+  '@effect/schema@0.74.1(effect@3.8.4)':
     dependencies:
-      effect: 3.6.1
-      fast-check: 3.20.0
+      effect: 3.8.4
+      fast-check: 3.22.0
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -7320,7 +7325,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.6.1: {}
+  effect@3.8.4: {}
 
   electron-to-chromium@1.5.4: {}
 
@@ -7447,7 +7452,7 @@ snapshots:
       iconv-lite: 0.4.24
       tmp: 0.0.33
 
-  fast-check@3.20.0:
+  fast-check@3.22.0:
     dependencies:
       pure-rand: 6.1.0
 
@@ -8774,7 +8779,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@4.0.4(svelte@5.0.0-next.262)(typescript@5.5.4):
+  svelte-check@4.0.4(svelte@5.0.0-next.262)(typescript@5.6.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       chokidar: 4.0.1
@@ -8782,7 +8787,7 @@ snapshots:
       picocolors: 1.1.0
       sade: 1.8.1
       svelte: 5.0.0-next.262
-      typescript: 5.5.4
+      typescript: 5.6.2
     transitivePeerDependencies:
       - picomatch
 
@@ -9063,6 +9068,8 @@ snapshots:
   typescript@5.2.2: {}
 
   typescript@5.5.4: {}
+
+  typescript@5.6.2: {}
 
   undici-types@6.13.0: {}
 

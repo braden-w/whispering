@@ -1,11 +1,11 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import {
+	FetchHttpClient,
 	HttpClient,
 	HttpClientRequest,
 	HttpClientResponse,
 } from '@effect/platform';
-import { Schema } from '@effect/schema';
 import { TranscriptionService, WhisperingError } from '@repo/shared';
 import { Effect, Layer } from 'effect';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
@@ -62,26 +62,37 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 				formData.append('model', 'whisper-1');
 				if (outputLanguage !== 'auto')
 					formData.append('language', outputLanguage);
+				const client = yield* HttpClient.HttpClient;
 				const data = yield* HttpClientRequest.post(
 					'https://api.openai.com/v1/audio/transcriptions',
 				).pipe(
 					HttpClientRequest.setHeaders({ Authorization: `Bearer ${apiKey}` }),
-					HttpClientRequest.formDataBody(formData),
-					HttpClient.fetch,
-					Effect.andThen(
+					HttpClientRequest.bodyFormData(formData),
+					client.execute,
+					Effect.flatMap(
 						HttpClientResponse.schemaBodyJson(WhisperResponseSchema),
 					),
 					Effect.scoped,
-					Effect.mapError(
-						(error) =>
-							new WhisperingError({
-								title: 'Error transcribing audio',
-								description: 'Please try again',
-								action: {
-									type: 'more-details',
-									error,
-								},
-							}),
+					Effect.mapError((error) =>
+						error._tag === 'ParseError'
+							? new WhisperingError({
+									title: 'Error parsing response from OpenAI API',
+									description:
+										'Please check logs and notify the developer if the issue persists.',
+									action: {
+										type: 'more-details',
+										error: error.message,
+									},
+								})
+							: new WhisperingError({
+									title: 'Error sending audio to OpenAI API',
+									description:
+										'Please check your network connection and try again.',
+									action: {
+										type: 'more-details',
+										error: error.message,
+									},
+								}),
 					),
 				);
 				if ('error' in data) {
@@ -95,6 +106,6 @@ export const TranscriptionServiceWhisperLive = Layer.succeed(
 					});
 				}
 				return data.text;
-			}),
+			}).pipe(Effect.provide(FetchHttpClient.layer)),
 	}),
 );
