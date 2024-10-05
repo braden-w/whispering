@@ -92,8 +92,7 @@ const registerGlobalShortcut = ({
 			},
 			catch: (error) =>
 				new WhisperingError({
-					title:
-						'Error registering global shortcut.',
+					title: 'Error registering global shortcut.',
 					description:
 						'Please make sure it is a valid Electron keyboard shortcut.',
 					action: { type: 'more-details', error },

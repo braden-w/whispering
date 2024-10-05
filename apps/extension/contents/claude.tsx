@@ -42,7 +42,7 @@ function RecorderStateAsIcon() {
 			className="group relative z-10 h-8 w-8 rounded-md text-xl"
 			onClick={toggleRecordingFromContentScript}
 		>
-			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10"></div>
+			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10" />
 			{recorderStateAsIcon}
 		</button>
 	);

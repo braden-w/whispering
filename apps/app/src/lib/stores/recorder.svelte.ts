@@ -78,7 +78,7 @@ export const recorder = Effect.gen(function* () {
 							},
 						}).pipe(Effect.catchAll(renderErrorAsToast));
 						return;
-					case 'recording':
+					case 'recording': {
 						const audioBlob = yield* mediaRecorderService.stopRecording;
 						recorderState.value = 'IDLE';
 						yield* Effect.logInfo('Recording stopped');
@@ -109,6 +109,7 @@ export const recorder = Effect.gen(function* () {
 						if (settings.value.alwaysOnTop === 'When Recording') {
 							yield* setAlwaysOnTop(false);
 						}
+					}
 				}
 			}).pipe(
 				Effect.tapError(() =>

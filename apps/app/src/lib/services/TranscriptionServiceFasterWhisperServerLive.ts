@@ -74,7 +74,8 @@ export const TranscriptionServiceFasterWhisperServerLive = Layer.succeed(
 				if ('error' in data) {
 					return yield* new WhisperingError({
 						title: 'faster-whisper-server error',
-						description: 'Please check your faster-whisper-server server settings',
+						description:
+							'Please check your faster-whisper-server server settings',
 						action: {
 							type: 'more-details',
 							error: data.error.message,
