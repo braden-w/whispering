@@ -9,7 +9,9 @@ use accessibility::{is_macos_accessibility_enabled, open_apple_accessibility};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let builder = tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
@@ -20,6 +22,19 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_window_state::Builder::default().build());
+
+    // When a new instance is opened, focus on the main window if it's already running
+    // https://v2.tauri.app/plugin/single-instance/#focusing-on-new-instance
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main window")
+                .set_focus();
+        }));
+    }
+
     #[cfg(target_os = "macos")]
     let builder = builder.invoke_handler(tauri::generate_handler![
         write_text,
@@ -31,12 +46,12 @@ pub fn run() {
     let builder = builder.invoke_handler(tauri::generate_handler![write_text]);
 
     builder
-        .plugin(tauri_plugin_http::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 use enigo::{Enigo, Keyboard, Settings};
+use tauri::Manager;
 
 #[tauri::command]
 fn write_text(text: String) -> Result<(), String> {
