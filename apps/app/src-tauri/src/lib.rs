@@ -26,7 +26,7 @@ pub fn run() {
     // https://v2.tauri.app/plugin/single-instance/#focusing-on-new-instance
     #[cfg(desktop)]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = app
                 .get_webview_window("main")
                 .expect("no main window")
