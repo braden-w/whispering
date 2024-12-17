@@ -53,7 +53,7 @@ export const recordings = Effect.gen(function* () {
 		updateRecording: (recording: Recording) =>
 			Effect.gen(function* () {
 				yield* updateRecording(recording);
-				yield* toast({
+				toast({
 					variant: 'success',
 					title: 'Recording updated!',
 					description: 'Your recording has been updated successfully.',
@@ -63,7 +63,7 @@ export const recordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				yield* recordingsDb.deleteRecordingById(id);
 				recordings = recordings.filter((recording) => recording.id !== id);
-				yield* toast({
+				toast({
 					variant: 'success',
 					title: 'Recording deleted!',
 					description: 'Your recording has been deleted successfully.',
@@ -75,7 +75,7 @@ export const recordings = Effect.gen(function* () {
 				recordings = recordings.filter(
 					(recording) => !ids.includes(recording.id),
 				);
-				yield* toast({
+				toast({
 					variant: 'success',
 					title: 'Recordings deleted!',
 					description: 'Your recordings have been deleted successfully.',
@@ -91,7 +91,7 @@ export const recordings = Effect.gen(function* () {
 			return Effect.gen(function* () {
 				const transcriptionService = yield* TranscriptionService;
 				const transcribingInProgressId = nanoid();
-				yield* toast({
+				toast({
 					id: transcribingInProgressId,
 					variant: 'loading',
 					title: 'Transcribing recording...',
@@ -148,7 +148,7 @@ export const recordings = Effect.gen(function* () {
 
 					if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 
-					yield* toast({
+					toast({
 						variant: 'success',
 						id: transcribingInProgressId,
 						title: 'Transcription complete!',
@@ -185,7 +185,7 @@ export const recordings = Effect.gen(function* () {
 				// Copy transcription to clipboard if enabled
 				if (settings.value.isCopyToClipboardEnabled) {
 					yield* clipboardService.setClipboardText(transcribedText);
-					yield* toast({
+					toast({
 						variant: 'success',
 						title: 'Copied transcription to clipboard!',
 						description: transcribedText,
@@ -196,7 +196,7 @@ export const recordings = Effect.gen(function* () {
 				// Paste transcription if enabled
 				if (settings.value.isPasteContentsOnSuccessEnabled) {
 					yield* clipboardService.writeTextToCursor(transcribedText);
-					yield* toast({
+					toast({
 						variant: 'success',
 						title: 'Pasted transcription!',
 						description: transcribedText,
@@ -225,7 +225,7 @@ export const recordings = Effect.gen(function* () {
 			Effect.gen(function* () {
 				if (recording.transcribedText === '') return;
 				yield* clipboardService.setClipboardText(recording.transcribedText);
-				yield* toast({
+				toast({
 					variant: 'success',
 					title: 'Copied transcription to clipboard!',
 					description: recording.transcribedText,

@@ -24,7 +24,7 @@ function createMediaStreamManager(): MediaStreamManager {
 			return Effect.gen(this, function* () {
 				if (currentStream === null) return yield* this.refreshStream();
 				if (!currentStream.active) {
-					yield* toast({
+					toast({
 						variant: 'warning',
 						title: 'Open stream is inactive',
 						description: 'Refreshing recording session...',
@@ -39,14 +39,14 @@ function createMediaStreamManager(): MediaStreamManager {
 			this.release();
 			const toastId = nanoid();
 			return Effect.gen(function* () {
-				yield* toast({
+				toast({
 					id: toastId,
 					variant: 'loading',
 					title: 'Connecting to selected audio input device...',
 					description: 'Please allow access to your microphone if prompted.',
 				});
 				if (!settings.value.selectedAudioInputDeviceId) {
-					yield* toast({
+					toast({
 						id: toastId,
 						variant: 'loading',
 						title: 'No device selected',
@@ -54,7 +54,7 @@ function createMediaStreamManager(): MediaStreamManager {
 					});
 					const firstAvailableStream = yield* getFirstAvailableStream;
 					currentStream = firstAvailableStream;
-					yield* toast({
+					toast({
 						id: toastId,
 						variant: 'info',
 						title: 'Defaulted to first available audio input device',
@@ -67,7 +67,7 @@ function createMediaStreamManager(): MediaStreamManager {
 				);
 				if (Option.isSome(maybeStream)) {
 					currentStream = maybeStream.value;
-					yield* toast({
+					toast({
 						id: toastId,
 						variant: 'success',
 						title: 'Connected to selected audio input device',
@@ -75,7 +75,7 @@ function createMediaStreamManager(): MediaStreamManager {
 					});
 					return maybeStream.value;
 				}
-				yield* toast({
+				toast({
 					id: toastId,
 					variant: 'loading',
 					title: 'Error connecting to selected audio input device',
@@ -83,7 +83,7 @@ function createMediaStreamManager(): MediaStreamManager {
 				});
 				const firstAvailableStream = yield* getFirstAvailableStream;
 				currentStream = firstAvailableStream;
-				yield* toast({
+				toast({
 					id: toastId,
 					variant: 'info',
 					title: 'Defaulted to first available audio input device',

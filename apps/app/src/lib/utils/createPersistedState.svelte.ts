@@ -58,7 +58,7 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 
 		return Effect.gen(function* () {
 			const updatingLocalStorageToastId = nanoid();
-			yield* toast({
+			toast({
 				variant: 'loading',
 				title: `Updating "${key}" in local storage...`,
 				description: 'Please wait...',

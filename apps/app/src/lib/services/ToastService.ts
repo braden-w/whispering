@@ -22,20 +22,19 @@ export const toast = ({
 	description,
 	descriptionClass,
 	action,
-}: ToastOptions) =>
-	Effect.gen(function* () {
-		const durationInMs = (() => {
-			if (variant === 'loading') return Number.POSITIVE_INFINITY;
-			if (variant === 'error' || variant === 'warning') return 5000;
-			if (action) return 4000;
-			return 3000;
-		})();
-		const toastId = sonnerToast[variant](title, {
-			duration: durationInMs,
-			id: maybeId,
-			description,
-			descriptionClass,
-			action,
-		});
-		return String(toastId);
+}: ToastOptions) => {
+	const durationInMs = (() => {
+		if (variant === 'loading') return Number.POSITIVE_INFINITY;
+		if (variant === 'error' || variant === 'warning') return 5000;
+		if (action) return 4000;
+		return 3000;
+	})();
+	const toastId = sonnerToast[variant](title, {
+		duration: durationInMs,
+		id: maybeId,
+		description,
+		descriptionClass,
+		action,
 	});
+	return String(toastId);
+};

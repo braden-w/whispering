@@ -58,7 +58,7 @@ export function createMediaRecorder(): MediaRecorderService {
 				}).pipe(
 					Effect.catchAll(() =>
 						Effect.gen(function* () {
-							yield* toast({
+							toast({
 								id: connectingToRecordingDeviceToastId,
 								variant: 'loading',
 								title:

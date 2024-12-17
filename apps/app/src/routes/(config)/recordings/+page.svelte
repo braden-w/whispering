@@ -379,7 +379,7 @@
 										Effect.gen(function* () {
 											const clipboardService = yield* ClipboardService;
 											yield* clipboardService.setClipboardText(text);
-											yield* toast({
+											toast({
 												variant: 'success',
 												title: 'Copied transcriptions to clipboard!',
 												description: text,
