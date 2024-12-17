@@ -26,7 +26,7 @@
 			label="Local Shortcut"
 			placeholder="Local Shortcut to toggle recording"
 			value={settings.value.currentLocalShortcut}
-			oninput={({ currentTarget: { value } }) => {
+			onchange={({ currentTarget: { value } }) => {
 				settings.value = { ...settings.value, currentLocalShortcut: value };
 				registerShortcuts.registerLocalShortcut({
 					shortcut: value,
@@ -42,7 +42,7 @@
 				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"
 				value={settings.value.currentGlobalShortcut}
-				oninput={({ currentTarget: { value } }) => {
+				onchange={({ currentTarget: { value } }) => {
 					settings.value = { ...settings.value, currentGlobalShortcut: value };
 					registerShortcuts.registerGlobalShortcut({
 						shortcut: value,

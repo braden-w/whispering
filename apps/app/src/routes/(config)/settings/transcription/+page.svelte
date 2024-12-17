@@ -12,18 +12,6 @@
 	} from '@repo/shared';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-
-	const selectedLanguageOption = $derived(
-		SUPPORTED_LANGUAGES_OPTIONS.find(
-			(option) => option.value === settings.value.outputLanguage,
-		),
-	);
-
-	const selectedTranscriptionServiceOption = $derived(
-		TRANSCRIPTION_SERVICE_OPTIONS.find(
-			(option) => option.value === settings.value.selectedTranscriptionService,
-		),
-	);
 </script>
 
 <svelte:head>
@@ -44,12 +32,12 @@
 			id="selected-transcription-service"
 			label="Transcription Service"
 			items={TRANSCRIPTION_SERVICE_OPTIONS}
-			selected={selectedTranscriptionServiceOption}
+			selected={settings.value.selectedTranscriptionService}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					selectedTranscriptionService: selected.value,
+					selectedTranscriptionService: selected,
 				};
 			}}
 			placeholder="Select a transcription service"
@@ -201,10 +189,10 @@
 			id="output-language"
 			label="Output Language"
 			items={SUPPORTED_LANGUAGES_OPTIONS}
-			selected={selectedLanguageOption}
+			selected={settings.value.outputLanguage}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value = { ...settings.value, outputLanguage: selected.value };
+				settings.value = { ...settings.value, outputLanguage: selected };
 			}}
 			placeholder="Select a language"
 		/>
