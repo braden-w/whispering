@@ -3,8 +3,7 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { setAlwaysOnTopToTrueIfInSettings } from '$lib/services/AlwaysOnTopService';
 	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
 	import { Effect } from 'effect';
 	import { ModeWatcher, mode } from 'mode-watcher';
@@ -41,15 +40,15 @@
 				body: {},
 			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
 		}
-		setAlwaysOnTopToTrueIfAlwaysInSettings();
+		setAlwaysOnTopToTrueIfInSettings();
 	});
 
 	const TOASTER_SETTINGS = {
 		position: 'bottom-right',
 		richColors: true,
 		duration: 5000,
-		visibleToasts: 5,
-	} satisfies ToasterProps;
+		visibleToasts: setAlwaysOnTopToTrueIfInSettings,
+	};
 </script>
 
 <svelte:head>
