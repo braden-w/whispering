@@ -5,7 +5,14 @@
 			"dependsOn": ["^build"],
 			"outputs": [".svelte-kit/**", "dist/**", ".build/**", ".vercel/**"]
 		},
-		"lint": {},
+		"lint": {
+			"cache": false,
+			"inputs": ["**/*.{ts,tsx,md,json}"]
+		},
+		"format": {
+			"cache": false,
+			"inputs": ["**/*.{ts,tsx,md,json}"]
+		},
 		"dev": {
 			"cache": false,
 			"persistent": true
