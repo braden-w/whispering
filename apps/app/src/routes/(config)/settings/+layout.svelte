@@ -3,6 +3,8 @@ import { Button } from '$lib/components/ui/button/index.js';
 import { Separator } from '$lib/components/ui/separator/index.js';
 import SidebarNav from './SidebarNav.svelte';
 
+let { children } = $props();
+
 const sidebarNavItems = [
 	{ title: 'General', href: '/settings' },
 	{ title: 'Recording', href: '/settings/recording' },
@@ -71,7 +73,7 @@ const versionPromise = (async () => {
 			<SidebarNav items={sidebarNavItems} />
 		</aside>
 		<div class="flex-1 lg:max-w-2xl">
-			<slot />
+			{@render children()}
 		</div>
 	</div>
 </main>
