@@ -1,8 +1,6 @@
-import { WhisperingError } from '@repo/shared';
-import { Effect, Layer, Option } from 'effect';
+import { tryAsync } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
-import type { Recording } from './RecordingDbService';
-import { RecordingsDbService } from './RecordingDbService';
+import type { Recording, RecordingsDbService } from './RecordingDbService';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -31,9 +29,8 @@ interface RecordingsDbSchemaV1 extends DBSchema {
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
-export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
-	RecordingsDbService,
-	Effect.sync(() => {
+export const createRecordingsDbServiceLiveIndexedDb =
+	(): RecordingsDbService => {
 		const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 			async upgrade(db, oldVersion, newVersion, transaction) {
 				if (oldVersion === 0) {
@@ -84,7 +81,7 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 
 		return {
 			addRecording: (recording) =>
-				Effect.tryPromise({
+				tryAsync({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						const tx = (await dbPromise).transaction(
@@ -101,18 +98,18 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							tx.done,
 						]);
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Error adding recording to indexedDB',
-							description: 'Please try again',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error adding recording to indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				}),
 			updateRecording: (recording) =>
-				Effect.tryPromise({
+				tryAsync({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						await Promise.all([
@@ -123,18 +120,18 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							}),
 						]);
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Error updating recording in indexedDB',
-							description: 'Please try again',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error updating recording in indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				}),
 			deleteRecordingById: (id) =>
-				Effect.tryPromise({
+				tryAsync({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -150,18 +147,18 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							tx.done,
 						]);
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Error deleting recording from indexedDB',
-							description: 'Please try again',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error deleting recording from indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				}),
 			deleteRecordingsById: (ids) =>
-				Effect.tryPromise({
+				tryAsync({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -177,38 +174,41 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						}
 						await tx.done;
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Error deleting recordings from indexedDB',
-							description: 'Please try again',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error deleting recordings from indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				}),
-			getAllRecordings: Effect.tryPromise({
-				try: async () => {
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readonly',
-					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					const metadata = await recordingMetadataStore.getAll();
-					const blobs = await recordingBlobStore.getAll();
-					await tx.done;
-					return metadata
-						.map((recording) => {
-							const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-							return blob ? { ...recording, blob } : null;
-						})
-						.filter((r) => r !== null);
-				},
-				catch: (error) =>
-					new WhisperingError({
+			getAllRecordings: () =>
+				tryAsync({
+					try: async () => {
+						const tx = (await dbPromise).transaction(
+							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+							'readonly',
+						);
+						const recordingMetadataStore = tx.objectStore(
+							RECORDING_METADATA_STORE,
+						);
+						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+						const metadata = await recordingMetadataStore.getAll();
+						const blobs = await recordingBlobStore.getAll();
+						await tx.done;
+						return metadata
+							.map((recording) => {
+								const blob = blobs.find(
+									(blob) => blob.id === recording.id,
+								)?.blob;
+								return blob ? { ...recording, blob } : null;
+							})
+							.filter((r) => r !== null);
+					},
+					catch: (error) => ({
+						_tag: 'WhisperingError',
 						title: 'Error getting recordings from indexedDB',
 						description: 'Please try again',
 						action: {
@@ -216,9 +216,9 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 							error,
 						},
 					}),
-			}),
+				}),
 			getRecording: (id) =>
-				Effect.tryPromise({
+				tryAsync({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -236,16 +236,15 @@ export const RecordingsDbServiceLiveIndexedDb = Layer.effect(
 						}
 						return null;
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Error getting recording from indexedDB',
-							description: 'Please try again',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
-				}).pipe(Effect.map(Option.fromNullable)),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error getting recording from indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
+				}),
 		};
-	}),
-);
+	};

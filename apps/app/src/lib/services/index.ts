@@ -7,10 +7,8 @@ import { HttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { HttpServiceWebLive } from './HttpServiceWebLive';
 import { NotificationServiceDesktopLive } from './NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from './NotificationServiceWebLive';
-import { RecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
 
 export const MainLive = Layer.mergeAll(
-	RecordingsDbServiceLiveIndexedDb,
 	window.__TAURI_INTERNALS__
 		? ClipboardServiceDesktopLive
 		: ClipboardServiceWebLive,
