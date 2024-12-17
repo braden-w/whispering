@@ -1,15 +1,13 @@
 import { settings } from '$lib/stores/settings.svelte.js';
-import { WhisperingError } from '@repo/shared';
-import { Data, Effect, Option } from 'effect';
+import { Err, Ok, type Result, tryAsync } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
-import { renderErrorAsToast } from './renderErrorAsToast.js';
 
 type MediaStreamManager = {
 	readonly isStreamValid: boolean | undefined;
-	getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never>;
-	refreshStream(): Effect.Effect<MediaStream, WhisperingError, never>;
-	release(): void;
+	getOrRefreshStream(): Promise<Result<MediaStream>>;
+	refreshStream(): Promise<Result<MediaStream>>;
+	destroy(): void;
 };
 
 export const mediaStreamManager = createMediaStreamManager();
@@ -20,68 +18,37 @@ function createMediaStreamManager(): MediaStreamManager {
 		get isStreamValid() {
 			return currentStream?.active;
 		},
-		getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never> {
-			return Effect.gen(this, function* () {
-				if (currentStream === null) return yield* this.refreshStream();
-				if (!currentStream.active) {
-					toast({
-						variant: 'warning',
-						title: 'Open stream is inactive',
-						description: 'Refreshing recording session...',
-					});
-					return yield* this.refreshStream();
-				}
-				const validStream = currentStream as MediaStream;
-				return validStream;
-			});
+		async getOrRefreshStream() {
+			if (currentStream === null) return this.refreshStream();
+			if (!currentStream.active) {
+				toast({
+					variant: 'warning',
+					title: 'Open stream is inactive',
+					description: 'Refreshing recording session...',
+				});
+				return this.refreshStream();
+			}
+			return Ok(currentStream);
 		},
-		refreshStream() {
-			this.release();
+		async refreshStream() {
+			this.destroy();
 			const toastId = nanoid();
-			return Effect.gen(function* () {
+			toast({
+				id: toastId,
+				variant: 'loading',
+				title: 'Connecting to selected audio input device...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
+			if (!settings.value.selectedAudioInputDeviceId) {
 				toast({
 					id: toastId,
 					variant: 'loading',
-					title: 'Connecting to selected audio input device...',
-					description: 'Please allow access to your microphone if prompted.',
+					title: 'No device selected',
+					description: 'Defaulting to first available audio input device...',
 				});
-				if (!settings.value.selectedAudioInputDeviceId) {
-					toast({
-						id: toastId,
-						variant: 'loading',
-						title: 'No device selected',
-						description: 'Defaulting to first available audio input device...',
-					});
-					const firstAvailableStream = yield* getFirstAvailableStream;
-					currentStream = firstAvailableStream;
-					toast({
-						id: toastId,
-						variant: 'info',
-						title: 'Defaulted to first available audio input device',
-						description: 'You can select a specific device in the settings.',
-					});
-					return firstAvailableStream;
-				}
-				const maybeStream = yield* getStreamForDeviceId(
-					settings.value.selectedAudioInputDeviceId,
-				);
-				if (Option.isSome(maybeStream)) {
-					currentStream = maybeStream.value;
-					toast({
-						id: toastId,
-						variant: 'success',
-						title: 'Connected to selected audio input device',
-						description: 'Successfully connected to your microphone stream.',
-					});
-					return maybeStream.value;
-				}
-				toast({
-					id: toastId,
-					variant: 'loading',
-					title: 'Error connecting to selected audio input device',
-					description: 'Trying to find another available audio input device...',
-				});
-				const firstAvailableStream = yield* getFirstAvailableStream;
+				const firstAvailableStreamResult = await getFirstAvailableStream();
+				if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
+				const firstAvailableStream = firstAvailableStreamResult.data;
 				currentStream = firstAvailableStream;
 				toast({
 					id: toastId,
@@ -89,10 +56,40 @@ function createMediaStreamManager(): MediaStreamManager {
 					title: 'Defaulted to first available audio input device',
 					description: 'You can select a specific device in the settings.',
 				});
-				return firstAvailableStream;
-			}).pipe(Effect.tapError(renderErrorAsToast));
+				return Ok(firstAvailableStream);
+			}
+			const maybeStream = await getStreamForDeviceId(
+				settings.value.selectedAudioInputDeviceId,
+			);
+			if (maybeStream !== null) {
+				currentStream = maybeStream;
+				toast({
+					id: toastId,
+					variant: 'success',
+					title: 'Connected to selected audio input device',
+					description: 'Successfully connected to your microphone stream.',
+				});
+				return Ok(maybeStream);
+			}
+			toast({
+				id: toastId,
+				variant: 'loading',
+				title: 'Error connecting to selected audio input device',
+				description: 'Trying to find another available audio input device...',
+			});
+			const firstAvailableStreamResult = await getFirstAvailableStream();
+			if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
+			const firstAvailableStream = firstAvailableStreamResult.data;
+			currentStream = firstAvailableStream;
+			toast({
+				id: toastId,
+				variant: 'info',
+				title: 'Defaulted to first available audio input device',
+				description: 'You can select a specific device in the settings.',
+			});
+			return Ok(firstAvailableStream);
 		},
-		release() {
+		destroy() {
 			if (currentStream === null) return;
 			for (const track of currentStream.getTracks()) {
 				track.stop();
@@ -102,22 +99,25 @@ function createMediaStreamManager(): MediaStreamManager {
 	};
 }
 
-export const enumerateRecordingDevices = Effect.tryPromise({
-	try: async () => {
-		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
-		});
-		const devices = await navigator.mediaDevices.enumerateDevices();
-		for (const track of allAudioDevicesStream.getTracks()) {
-			track.stop();
-		}
-		const audioInputDevices = devices.filter(
-			(device) => device.kind === 'audioinput',
-		);
-		return audioInputDevices;
-	},
-	catch: (error) =>
-		new WhisperingError({
+export const enumerateRecordingDevices = (): Promise<
+	Result<MediaDeviceInfo[]>
+> =>
+	tryAsync({
+		try: async () => {
+			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
+				audio: true,
+			});
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			for (const track of allAudioDevicesStream.getTracks()) {
+				track.stop();
+			}
+			const audioInputDevices = devices.filter(
+				(device) => device.kind === 'audioinput',
+			);
+			return audioInputDevices;
+		},
+		catch: (error) => ({
+			_tag: 'WhisperingError',
 			title: 'Error enumerating recording devices',
 			description:
 				'Please make sure you have given permission to access your audio devices',
@@ -126,14 +126,10 @@ export const enumerateRecordingDevices = Effect.tryPromise({
 				error,
 			},
 		}),
-});
+	});
 
-class GetStreamError extends Data.TaggedError('GetStreamError')<{
-	recordingDeviceId: string;
-}> {}
-
-const getStreamForDeviceId = (recordingDeviceId: string) =>
-	Effect.tryPromise({
+const getStreamForDeviceId = async (recordingDeviceId: string) => {
+	const result = await tryAsync({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
@@ -142,22 +138,29 @@ const getStreamForDeviceId = (recordingDeviceId: string) =>
 					sampleRate: 16000, // 16 kHz is a good balance for voice
 				},
 			});
-			return Option.some(stream);
+			return stream;
 		},
-		catch: () => new GetStreamError({ recordingDeviceId }),
-	}).pipe(Effect.catchAll(() => Effect.succeed(Option.none<MediaStream>())));
+		catch: () => ({ _tag: 'GetStreamError' }),
+	});
+	if (result.ok) return result.data;
+	return null;
+};
 
-const getFirstAvailableStream = Effect.gen(function* () {
-	const recordingDevices = yield* enumerateRecordingDevices;
+const getFirstAvailableStream = async (): Promise<Result<MediaStream>> => {
+	const recordingDevicesResult = await enumerateRecordingDevices();
+	if (!recordingDevicesResult.ok) return recordingDevicesResult;
+	const recordingDevices = recordingDevicesResult.data;
+
 	for (const device of recordingDevices) {
-		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
-		if (Option.isSome(maybeStream)) {
+		const maybeStream = await getStreamForDeviceId(device.deviceId);
+		if (maybeStream) {
 			settings.value.selectedAudioInputDeviceId = device.deviceId;
-			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
-			return maybeStream.value;
+			mediaStreamManager.refreshStream();
+			return Ok(maybeStream);
 		}
 	}
-	return yield* new WhisperingError({
+	return Err({
+		_tag: 'WhisperingError',
 		title: 'No available audio input devices',
 		description: 'Please make sure you have a microphone connected',
 		action: {
@@ -166,4 +169,4 @@ const getFirstAvailableStream = Effect.gen(function* () {
 			goto: '/settings',
 		},
 	});
-});
+};
