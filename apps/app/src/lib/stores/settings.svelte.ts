@@ -122,7 +122,10 @@ export const registerShortcuts = Effect.gen(function* () {
 		registerLocalShortcut: ({
 			shortcut,
 			callback,
-		}: { shortcut: string; callback: () => void }) =>
+		}: {
+			shortcut: string;
+			callback: () => void;
+		}) =>
 			Effect.gen(function* () {
 				const job = Effect.gen(function* () {
 					yield* unregisterAllLocalShortcuts;
@@ -138,7 +141,10 @@ export const registerShortcuts = Effect.gen(function* () {
 		registerGlobalShortcut: ({
 			shortcut,
 			callback,
-		}: { shortcut: string; callback: () => void }) =>
+		}: {
+			shortcut: string;
+			callback: () => void;
+		}) =>
 			Effect.gen(function* () {
 				if (!window.__TAURI_INTERNALS__) return;
 				const job = Effect.gen(function* () {

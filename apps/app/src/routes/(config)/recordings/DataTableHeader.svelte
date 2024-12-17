@@ -1,15 +1,15 @@
 <script lang="ts">
-import {
-	ArrowDownIcon,
-	ArrowUpDownIcon,
-	ArrowUpIcon,
-} from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button/index.js';
-import type { Recording } from '$lib/services/RecordingDbService';
-import type { HeaderContext } from '@tanstack/table-core';
+	import {
+		ArrowDownIcon,
+		ArrowUpDownIcon,
+		ArrowUpIcon,
+	} from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import type { HeaderContext } from '@tanstack/table-core';
 
-let { column }: HeaderContext<Recording, unknown> = $props();
-let headerText = $derived(column.columnDef.meta?.headerText);
+	let { column }: HeaderContext<Recording, unknown> = $props();
+	let headerText = $derived(column.columnDef.meta?.headerText);
 </script>
 
 <Button

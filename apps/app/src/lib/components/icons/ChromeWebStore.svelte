@@ -7,15 +7,33 @@
 	{...$$props}
 >
 	<defs>
-		<linearGradient id="logosChromeWebStore0" x1="0%" x2="100%" y1="50%" y2="50%">
+		<linearGradient
+			id="logosChromeWebStore0"
+			x1="0%"
+			x2="100%"
+			y1="50%"
+			y2="50%"
+		>
 			<stop offset="0%" stop-color="#d93025" />
 			<stop offset="100%" stop-color="#ea4335" />
 		</linearGradient>
-		<linearGradient id="logosChromeWebStore1" x1="74.943%" x2="19.813%" y1="95.826%" y2="-4.161%">
+		<linearGradient
+			id="logosChromeWebStore1"
+			x1="74.943%"
+			x2="19.813%"
+			y1="95.826%"
+			y2="-4.161%"
+		>
 			<stop offset="0%" stop-color="#1e8e3e" />
 			<stop offset="100%" stop-color="#34a853" />
 		</linearGradient>
-		<linearGradient id="logosChromeWebStore2" x1="59.898%" x2="21.416%" y1="-.134%" y2="99.86%">
+		<linearGradient
+			id="logosChromeWebStore2"
+			x1="59.898%"
+			x2="21.416%"
+			y1="-.134%"
+			y2="99.86%"
+		>
 			<stop offset="0%" stop-color="#fbbc04" />
 			<stop offset="100%" stop-color="#fcc934" />
 		</linearGradient>
@@ -50,9 +68,25 @@
 				fill="url(#logosChromeWebStore2)"
 				d="M206.26 55.272h-95.724l47.862 82.908l-47.862 82.925c38.162-.033 75.263-19.855 95.708-55.289c20.461-35.433 19.064-77.468.016-110.544"
 			/>
-			<ellipse cx="110.536" cy="110.544" fill="#f1f3f4" rx="55.255" ry="55.272" />
-			<ellipse cx="110.536" cy="110.544" fill="#1a73e8" rx="44.898" ry="44.915" />
+			<ellipse
+				cx="110.536"
+				cy="110.544"
+				fill="#f1f3f4"
+				rx="55.255"
+				ry="55.272"
+			/>
+			<ellipse
+				cx="110.536"
+				cy="110.544"
+				fill="#1a73e8"
+				rx="44.898"
+				ry="44.915"
+			/>
 		</g>
 	</g>
-	<path fill="#bdc1c6" d="M0 111.74h255.983v1.448H0zm0-1.465h255.983v1.448H0z" opacity="0.1" />
+	<path
+		fill="#bdc1c6"
+		d="M0 111.74h255.983v1.448H0zm0-1.465h255.983v1.448H0z"
+		opacity="0.1"
+	/>
 </svg>

@@ -8,9 +8,12 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"tauri": "cross-env BUILD_TARGET=native tauri"
+		"tauri": "cross-env BUILD_TARGET=native tauri",
+		"lint": "eslint . && prettier --check .",
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@eslint/compat": "^1.2.3",
 		"@sveltejs/adapter-static": "3.0.2",
 		"@sveltejs/adapter-vercel": "^5.5.2",
 		"@sveltejs/kit": "^2.12.1",
@@ -20,8 +23,14 @@
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "1.0.0-next.72",
 		"clsx": "^2.1.1",
+		"eslint": "^9.7.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-svelte": "^2.36.0",
+		"globals": "^15.0.0",
 		"lucide-svelte": "^0.424.0",
 		"postcss": "^8.4.47",
+		"prettier": "^3.3.2",
+		"prettier-plugin-svelte": "^3.2.6",
 		"svelte": "^5.14.2",
 		"svelte-check": "^4.1.1",
 		"tailwind-merge": "^2.4.0",
@@ -29,6 +38,7 @@
 		"tailwindcss": "^3.4.16",
 		"tailwindcss-animate": "^1.0.7",
 		"typescript": "^5.7.2",
+		"typescript-eslint": "^8.0.0",
 		"vite": "^6.0.3"
 	},
 	"type": "module",
