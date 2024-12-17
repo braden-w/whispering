@@ -11,16 +11,20 @@ let {
 } & Props = $props();
 </script>
 
-<Tooltip.Root>
-	<Tooltip.Trigger asChild let:builder>
-		<Button builders={[builder]} {...restProps}>
-			{#if children}
-				{@render children()}
-			{/if}
-			<span class="sr-only">{tooltipText}</span>
-		</Button>
-	</Tooltip.Trigger>
-	<Tooltip.Content>
-		<p>{tooltipText}</p>
-	</Tooltip.Content>
-</Tooltip.Root>
+<Tooltip.Provider>
+	<Tooltip.Root>
+		<Tooltip.Trigger>
+			{#snippet child()}
+				<Button {...restProps}>
+					{#if children}
+						{@render children()}
+					{/if}
+					<span class="sr-only">{tooltipText}</span>
+				</Button>
+			{/snippet}
+		</Tooltip.Trigger>
+		<Tooltip.Content>
+			<p>{tooltipText}</p>
+		</Tooltip.Content>
+	</Tooltip.Root>
+</Tooltip.Provider>
