@@ -26,7 +26,7 @@
 			<Tooltip.Trigger>
 				{#snippet child()}
 					<Button
-						onclick={mediaStreamManager.release}
+						onclick={mediaStreamManager.destroy}
 						variant="ghost"
 						size="icon"
 						class={className}
