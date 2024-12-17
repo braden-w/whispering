@@ -23,10 +23,10 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			func: () => {
 				try {
 					window.cancelRecording();
-					return { isSuccess: true, data: undefined } as const;
+					return { ok: true, data: undefined } as const;
 				} catch (error) {
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
 							title: 'Unable to cancel recording',
 							description:

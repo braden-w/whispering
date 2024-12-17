@@ -64,7 +64,7 @@ function SettingsCard() {
 			>({
 				name: 'whispering-web/getSettings',
 			});
-			if (!response.isSuccess) throw response.error;
+			if (!response.ok) throw response.error;
 			return response.data;
 		},
 	});
@@ -78,7 +78,7 @@ function SettingsCard() {
 				name: 'whispering-web/setSettings',
 				body: { settings },
 			});
-			if (!response.isSuccess) throw response.error;
+			if (!response.ok) throw response.error;
 			return response.data;
 		},
 		onMutate: async (newSettings) => {

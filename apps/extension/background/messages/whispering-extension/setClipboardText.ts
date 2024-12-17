@@ -27,10 +27,10 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 			func: (text) => {
 				try {
 					navigator.clipboard.writeText(text);
-					return { isSuccess: true, data: text } as const;
+					return { ok: true, data: text } as const;
 				} catch (error) {
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
 							title:
 								'Unable to copy transcribed text to clipboard in active tab',
