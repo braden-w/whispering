@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
+import { Input } from '$lib/components/ui/input/index.js';
+import { Label } from '$lib/components/ui/label/index.js';
 import type { HTMLInputAttributes } from 'svelte/elements';
 
 let {

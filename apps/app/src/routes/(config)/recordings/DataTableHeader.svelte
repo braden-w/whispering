@@ -4,7 +4,7 @@ import {
 	ArrowUpDownIcon,
 	ArrowUpIcon,
 } from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button';
+import { Button } from '$lib/components/ui/button/index.js';
 import type { Recording } from '$lib/services/RecordingDbService';
 import type { HeaderContext } from '@tanstack/table-core';
 

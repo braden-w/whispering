@@ -1,9 +1,9 @@
 <script lang="ts">
 import CopyableCode from '$lib/components/CopyableCode.svelte';
-import { Button } from '$lib/components/ui/button';
-import * as Card from '$lib/components/ui/card';
-import { Separator } from '$lib/components/ui/separator';
-import * as Tabs from '$lib/components/ui/tabs';
+import { Button } from '$lib/components/ui/button/index.js';
+import * as Card from '$lib/components/ui/card/index.js';
+import { Separator } from '$lib/components/ui/separator/index.js';
+import * as Tabs from '$lib/components/ui/tabs/index.js';
 import { settings } from '$lib/stores/settings.svelte';
 import {
 	SUPPORTED_LANGUAGES_OPTIONS,
