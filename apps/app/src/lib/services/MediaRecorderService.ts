@@ -9,7 +9,16 @@ const TIMESLICE_MS = 1000;
 
 class TryResuseStreamError extends Data.TaggedError('TryResuseStreamError') {}
 
-export const MediaRecorderService = Effect.gen(function* () {
+type MediaRecorderService = {
+	readonly recordingState: RecordingState;
+	startRecording: () => Effect.Effect<undefined, WhisperingError, never>;
+	stopRecording: Effect.Effect<Blob, WhisperingError, never>;
+	cancelRecording: Effect.Effect<undefined, WhisperingError, never>;
+};
+
+export const mediaRecorder = createMediaRecorder();
+
+export function createMediaRecorder(): MediaRecorderService {
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
@@ -119,4 +128,4 @@ export const MediaRecorderService = Effect.gen(function* () {
 			}),
 		),
 	};
-});
+}

@@ -1,7 +1,7 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MainLive } from '$lib/services';
 import { setAlwaysOnTop } from '$lib/services/AlwaysOnTopService';
-import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import { mediaRecorder } from '$lib/services/MediaRecorderService';
 import { NotificationServiceDesktopLive } from '$lib/services/NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from '$lib/services/NotificationServiceWebLive';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
@@ -40,7 +40,6 @@ export const recorderState = Effect.gen(function* () {
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = Effect.gen(function* () {
-	const mediaRecorderService = yield* MediaRecorderService;
 	const { notify } = yield* NotificationService;
 
 	return {
@@ -49,12 +48,12 @@ export const recorder = Effect.gen(function* () {
 		},
 		toggleRecording: () =>
 			Effect.gen(function* () {
-				switch (mediaRecorderService.recordingState) {
+				switch (mediaRecorder.recordingState) {
 					case 'inactive':
 						if (settings.value.alwaysOnTop === 'When Recording') {
 							await setAlwaysOnTop(true);
 						}
-						yield* mediaRecorderService.startRecording();
+						yield* mediaRecorder.startRecording();
 						recorderState.value = 'RECORDING';
 						yield* Effect.logInfo('Recording started');
 						if (settings.value.isPlaySoundEnabled) {
@@ -79,7 +78,7 @@ export const recorder = Effect.gen(function* () {
 						}).pipe(Effect.catchAll(renderErrorAsToast));
 						return;
 					case 'recording': {
-						const audioBlob = yield* mediaRecorderService.stopRecording;
+						const audioBlob = yield* mediaRecorder.stopRecording;
 						recorderState.value = 'IDLE';
 						yield* Effect.logInfo('Recording stopped');
 
@@ -125,7 +124,7 @@ export const recorder = Effect.gen(function* () {
 			),
 		cancelRecording: () =>
 			Effect.gen(function* () {
-				yield* mediaRecorderService.cancelRecording;
+				yield* mediaRecorder.cancelRecording;
 				if (settings.value.isPlaySoundEnabled) {
 					if (!document.hidden) {
 						cancelSound.play();

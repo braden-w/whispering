@@ -5,73 +5,16 @@ import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 import { renderErrorAsToast } from './renderErrorAsToast.js';
 
-export const enumerateRecordingDevices = Effect.tryPromise({
-	try: async () => {
-		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
-		});
-		const devices = await navigator.mediaDevices.enumerateDevices();
-		for (const track of allAudioDevicesStream.getTracks()) {
-			track.stop();
-		}
-		const audioInputDevices = devices.filter(
-			(device) => device.kind === 'audioinput',
-		);
-		return audioInputDevices;
-	},
-	catch: (error) =>
-		new WhisperingError({
-			title: 'Error enumerating recording devices',
-			description:
-				'Please make sure you have given permission to access your audio devices',
-			action: {
-				type: 'more-details',
-				error,
-			},
-		}),
-});
+type MediaStreamManager = {
+	readonly isStreamValid: boolean | undefined;
+	getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never>;
+	refreshStream(): Effect.Effect<MediaStream, WhisperingError, never>;
+	release(): void;
+};
 
-class GetStreamError extends Data.TaggedError('GetStreamError')<{
-	recordingDeviceId: string;
-}> {}
+export const mediaStreamManager = createMediaStreamManager();
 
-const getStreamForDeviceId = (recordingDeviceId: string) =>
-	Effect.tryPromise({
-		try: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
-				},
-			});
-			return Option.some(stream);
-		},
-		catch: () => new GetStreamError({ recordingDeviceId }),
-	}).pipe(Effect.catchAll(() => Effect.succeed(Option.none<MediaStream>())));
-
-const getFirstAvailableStream = Effect.gen(function* () {
-	const recordingDevices = yield* enumerateRecordingDevices;
-	for (const device of recordingDevices) {
-		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
-		if (Option.isSome(maybeStream)) {
-			settings.value.selectedAudioInputDeviceId = device.deviceId;
-			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
-			return maybeStream.value;
-		}
-	}
-	return yield* new WhisperingError({
-		title: 'No available audio input devices',
-		description: 'Please make sure you have a microphone connected',
-		action: {
-			type: 'link',
-			label: 'Open Settings',
-			goto: '/settings',
-		},
-	});
-});
-
-export const mediaStreamManager = Effect.gen(function* () {
+function createMediaStreamManager(): MediaStreamManager {
 	let currentStream = $state<MediaStream | null>(null);
 	return {
 		get isStreamValid() {
@@ -157,4 +100,70 @@ export const mediaStreamManager = Effect.gen(function* () {
 			currentStream = null;
 		},
 	};
-}).pipe(Effect.runSync);
+}
+
+export const enumerateRecordingDevices = Effect.tryPromise({
+	try: async () => {
+		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
+			audio: true,
+		});
+		const devices = await navigator.mediaDevices.enumerateDevices();
+		for (const track of allAudioDevicesStream.getTracks()) {
+			track.stop();
+		}
+		const audioInputDevices = devices.filter(
+			(device) => device.kind === 'audioinput',
+		);
+		return audioInputDevices;
+	},
+	catch: (error) =>
+		new WhisperingError({
+			title: 'Error enumerating recording devices',
+			description:
+				'Please make sure you have given permission to access your audio devices',
+			action: {
+				type: 'more-details',
+				error,
+			},
+		}),
+});
+
+class GetStreamError extends Data.TaggedError('GetStreamError')<{
+	recordingDeviceId: string;
+}> {}
+
+const getStreamForDeviceId = (recordingDeviceId: string) =>
+	Effect.tryPromise({
+		try: async () => {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					deviceId: { exact: recordingDeviceId },
+					channelCount: 1, // Mono audio is usually sufficient for voice recording
+					sampleRate: 16000, // 16 kHz is a good balance for voice
+				},
+			});
+			return Option.some(stream);
+		},
+		catch: () => new GetStreamError({ recordingDeviceId }),
+	}).pipe(Effect.catchAll(() => Effect.succeed(Option.none<MediaStream>())));
+
+const getFirstAvailableStream = Effect.gen(function* () {
+	const recordingDevices = yield* enumerateRecordingDevices;
+	for (const device of recordingDevices) {
+		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
+		if (Option.isSome(maybeStream)) {
+			settings.value.selectedAudioInputDeviceId = device.deviceId;
+			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
+			return maybeStream.value;
+		}
+	}
+	return yield* new WhisperingError({
+		title: 'No available audio input devices',
+		description: 'Please make sure you have a microphone connected',
+		action: {
+			type: 'link',
+			label: 'Open Settings',
+			goto: '/settings',
+		},
+	});
+});
