@@ -1,25 +1,38 @@
 <script lang="ts">
-import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-import {
-	GithubIcon,
-	ListIcon,
-	Minimize2Icon,
-	MoonIcon,
-	SlidersVerticalIcon,
-	SunIcon,
-} from '$lib/components/icons';
-import { cn } from '$lib/utils';
-import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
-import { toggleMode } from 'mode-watcher';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import {
+		GithubIcon,
+		ListIcon,
+		Minimize2Icon,
+		MoonIcon,
+		SlidersVerticalIcon,
+		SunIcon,
+	} from '$lib/components/icons';
+	import { cn } from '$lib/utils';
+	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
+	import { toggleMode } from 'mode-watcher';
 
-let { class: className }: { class?: string } = $props();
+	let { class: className }: { class?: string } = $props();
 </script>
 
-<nav class={cn('flex items-center', className)} style="view-transition-name: nav">
-	<WhisperingButton tooltipText="Recordings" href="/recordings" variant="ghost" size="icon">
+<nav
+	class={cn('flex items-center', className)}
+	style="view-transition-name: nav"
+>
+	<WhisperingButton
+		tooltipText="Recordings"
+		href="/recordings"
+		variant="ghost"
+		size="icon"
+	>
 		<ListIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
-	<WhisperingButton tooltipText="Settings" href="/settings" variant="ghost" size="icon">
+	<WhisperingButton
+		tooltipText="Settings"
+		href="/settings"
+		variant="ghost"
+		size="icon"
+	>
 		<SlidersVerticalIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
@@ -32,7 +45,12 @@ let { class: className }: { class?: string } = $props();
 	>
 		<GithubIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
-	<WhisperingButton tooltipText="Toggle dark mode" onclick={toggleMode} variant="ghost" size="icon">
+	<WhisperingButton
+		tooltipText="Toggle dark mode"
+		onclick={toggleMode}
+		variant="ghost"
+		size="icon"
+	>
 		<SunIcon
 			class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 		/>

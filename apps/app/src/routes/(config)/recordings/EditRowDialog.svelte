@@ -1,19 +1,19 @@
 <script lang="ts">
-import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button/index.js';
-import * as Dialog from '$lib/components/ui/dialog/index.js';
-import { Input } from '$lib/components/ui/input/index.js';
-import { Label } from '$lib/components/ui/label/index.js';
-import { Textarea } from '$lib/components/ui/textarea/index.js';
-import type { Recording } from '$lib/services/RecordingDbService';
-import { recordings } from '$lib/stores/recordings.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import { recordings } from '$lib/stores/recordings.svelte';
 
-let { recording }: { recording: Recording } = $props();
+	let { recording }: { recording: Recording } = $props();
 
-let isDialogOpen = $state(false);
-let isDeleting = $state(false);
-let isSaving = $state(false);
+	let isDialogOpen = $state(false);
+	let isDeleting = $state(false);
+	let isSaving = $state(false);
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -45,15 +45,27 @@ let isSaving = $state(false);
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="subtitle" class="text-right">Subtitle</Label>
-				<Input id="subtitle" bind:value={recording.subtitle} class="col-span-3" />
+				<Input
+					id="subtitle"
+					bind:value={recording.subtitle}
+					class="col-span-3"
+				/>
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="timestamp" class="text-right">Timestamp</Label>
-				<Input id="timestamp" bind:value={recording.timestamp} class="col-span-3" />
+				<Input
+					id="timestamp"
+					bind:value={recording.timestamp}
+					class="col-span-3"
+				/>
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="transcribedText" class="text-right">Transcribed Text</Label>
-				<Textarea id="transcribedText" bind:value={recording.transcribedText} class="col-span-3" />
+				<Textarea
+					id="transcribedText"
+					bind:value={recording.transcribedText}
+					class="col-span-3"
+				/>
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="blob" class="text-right">Blob</Label>
@@ -80,7 +92,9 @@ let isSaving = $state(false);
 					{/if}
 					Delete
 				</Button>
-				<Button onclick={() => (isDialogOpen = false)} variant="secondary">Cancel</Button>
+				<Button onclick={() => (isDialogOpen = false)} variant="secondary"
+					>Cancel</Button
+				>
 				<Button type="submit" disabled={isSaving}>
 					{#if isSaving}
 						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />

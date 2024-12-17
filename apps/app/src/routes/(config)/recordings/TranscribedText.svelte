@@ -1,10 +1,10 @@
 <script lang="ts">
-import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 
-let {
-	recordingId,
-	transcribedText,
-}: { recordingId: string; transcribedText: string } = $props();
+	let {
+		recordingId,
+		transcribedText,
+	}: { recordingId: string; transcribedText: string } = $props();
 </script>
 
 <p

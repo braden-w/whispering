@@ -1,11 +1,11 @@
 <script lang="ts">
-import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
-import NavItems from '$lib/components/NavItems.svelte';
-import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-import { recorder } from '$lib/stores/recorder.svelte';
-import { cn } from '$lib/utils.js';
+	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
+	import NavItems from '$lib/components/NavItems.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { cn } from '$lib/utils.js';
 
-let { children } = $props();
+	let { children } = $props();
 </script>
 
 <header
@@ -16,7 +16,12 @@ let { children } = $props();
 	style="view-transition-name: header"
 >
 	<div class="mr-auto flex gap-2">
-		<WhisperingButton tooltipText="Go home" href="/" variant="ghost" class="-ml-4">
+		<WhisperingButton
+			tooltipText="Go home"
+			href="/"
+			variant="ghost"
+			class="-ml-4"
+		>
 			<span class="text-lg font-bold">whispering</span>
 		</WhisperingButton>
 	</div>

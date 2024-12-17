@@ -1,41 +1,42 @@
 <script lang="ts">
-import { Button } from '$lib/components/ui/button/index.js';
-import { Separator } from '$lib/components/ui/separator/index.js';
-import SidebarNav from './SidebarNav.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import SidebarNav from './SidebarNav.svelte';
 
-let { children } = $props();
+	let { children } = $props();
 
-const sidebarNavItems = [
-	{ title: 'General', href: '/settings' },
-	{ title: 'Recording', href: '/settings/recording' },
-	{ title: 'Transcription', href: '/settings/transcription' },
-	{ title: 'Shortcuts', href: '/settings/shortcuts' },
-] as const;
+	const sidebarNavItems = [
+		{ title: 'General', href: '/settings' },
+		{ title: 'Recording', href: '/settings/recording' },
+		{ title: 'Transcription', href: '/settings/transcription' },
+		{ title: 'Shortcuts', href: '/settings/shortcuts' },
+	] as const;
 
-const isString = (value: unknown): value is string => typeof value === 'string';
-const versionPromise = (async () => {
-	const res = await fetch(
-		'https://api.github.com/repos/braden-w/whispering/releases/latest',
-	);
-	const { html_url: latestReleaseUrl, tag_name: latestVersion } =
-		await res.json();
-	if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
-		throw new Error('Failed to fetch latest version');
-	}
-	if (!window.__TAURI_INTERNALS__)
-		return { isOutdated: false, version: latestVersion } as const;
-	const { getVersion } = await import('@tauri-apps/api/app');
-	const currentVersion = `v${await getVersion()}`;
-	if (latestVersion === currentVersion) {
-		return { isOutdated: false, version: currentVersion } as const;
-	}
-	return {
-		isOutdated: true,
-		latestVersion,
-		currentVersion,
-		latestReleaseUrl,
-	} as const;
-})();
+	const isString = (value: unknown): value is string =>
+		typeof value === 'string';
+	const versionPromise = (async () => {
+		const res = await fetch(
+			'https://api.github.com/repos/braden-w/whispering/releases/latest',
+		);
+		const { html_url: latestReleaseUrl, tag_name: latestVersion } =
+			await res.json();
+		if (!isString(latestVersion) || !isString(latestReleaseUrl)) {
+			throw new Error('Failed to fetch latest version');
+		}
+		if (!window.__TAURI_INTERNALS__)
+			return { isOutdated: false, version: latestVersion } as const;
+		const { getVersion } = await import('@tauri-apps/api/app');
+		const currentVersion = `v${await getVersion()}`;
+		if (latestVersion === currentVersion) {
+			return { isOutdated: false, version: currentVersion } as const;
+		}
+		return {
+			isOutdated: true,
+			latestVersion,
+			currentVersion,
+			latestReleaseUrl,
+		} as const;
+	})();
 </script>
 
 <main class="container flex w-full flex-1 flex-col pb-4 pt-2">
