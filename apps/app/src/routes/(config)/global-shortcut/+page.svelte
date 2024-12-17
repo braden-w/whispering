@@ -1,10 +1,10 @@
 <script lang="ts">
-import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-import {
-	ChromeWebStoreIcon,
-	LaptopIcon as DesktopIcon,
-} from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button/index.js';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import {
+		ChromeWebStoreIcon,
+		LaptopIcon as DesktopIcon,
+	} from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button/index.js';
 </script>
 
 <svelte:head>
@@ -43,6 +43,7 @@ import { Button } from '$lib/components/ui/button/index.js';
 				Get Chrome Extension
 			</WhisperingButton>
 		</div>
-		<Button onclick={() => window.history.back()} variant="link">Go back</Button>
+		<Button onclick={() => window.history.back()} variant="link">Go back</Button
+		>
 	</section>
 </main>

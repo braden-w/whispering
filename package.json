@@ -9,13 +9,14 @@
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
-		"format": "biome format --write .",
-		"lint": "biome lint --write --unsafe .",
-		"format-and-lint": "biome check --write --unsafe ."
+		"format": "concurrently \"biome format --write .\" \"turbo run format --filter=@repo/app\"",
+		"lint": "concurrently \"biome lint --write --unsafe .\" \"turbo run lint --filter=@repo/app\"",
+		"format-and-lint": "concurrently \"biome check --write --unsafe .\" \"turbo run format --filter=@repo/app && turbo run lint --filter=@repo/app\""
 	},
 	"packageManager": "pnpm@8.6.5",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"concurrently": "latest",
 		"turbo": "latest",
 		"typescript": "^5.5.4"
 	}

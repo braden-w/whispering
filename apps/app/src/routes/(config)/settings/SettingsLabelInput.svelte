@@ -1,24 +1,32 @@
 <script lang="ts">
-import { Input } from '$lib/components/ui/input/index.js';
-import { Label } from '$lib/components/ui/label/index.js';
-import type { HTMLInputAttributes } from 'svelte/elements';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
-let {
-	id,
-	label,
-	value,
-	type = 'text',
-	placeholder = '',
-	disabled = false,
-	...restProps
-}: HTMLInputAttributes & {
-	label: string;
-	value: string;
-	type?: 'text' | 'password';
-	placeholder?: string;
-	disabled?: boolean;
-} = $props();
+	let {
+		id,
+		label,
+		value,
+		type = 'text',
+		placeholder = '',
+		disabled = false,
+		...restProps
+	}: HTMLInputAttributes & {
+		label: string;
+		value: string;
+		type?: 'text' | 'password';
+		placeholder?: string;
+		disabled?: boolean;
+	} = $props();
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>
-<Input {id} bind:value {placeholder} {type} {disabled} autocomplete="off" {...restProps} />
+<Input
+	{id}
+	bind:value
+	{placeholder}
+	{type}
+	{disabled}
+	autocomplete="off"
+	{...restProps}
+/>

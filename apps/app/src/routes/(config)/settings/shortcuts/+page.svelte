@@ -1,11 +1,11 @@
 <script lang="ts">
-import { Button } from '$lib/components/ui/button/index.js';
-import { Input } from '$lib/components/ui/input/index.js';
-import { Label } from '$lib/components/ui/label/index.js';
-import { Separator } from '$lib/components/ui/separator/index.js';
-import { recorder } from '$lib/stores/recorder.svelte';
-import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
-import SettingsLabelInput from '../SettingsLabelInput.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
+	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 </script>
 
 <svelte:head>
@@ -15,7 +15,9 @@ import SettingsLabelInput from '../SettingsLabelInput.svelte';
 <div class="space-y-6">
 	<div>
 		<h3 class="text-lg font-medium">Shortcuts</h3>
-		<p class="text-muted-foreground text-sm">Configure your shortcuts for activating Whispering.</p>
+		<p class="text-muted-foreground text-sm">
+			Configure your shortcuts for activating Whispering.
+		</p>
 	</div>
 	<Separator />
 	<div class="grid gap-2">
@@ -59,7 +61,11 @@ import SettingsLabelInput from '../SettingsLabelInput.svelte';
 					autocomplete="off"
 					disabled
 				/>
-				<Button class="absolute inset-0 backdrop-blur" href="/global-shortcut" variant="link">
+				<Button
+					class="absolute inset-0 backdrop-blur"
+					href="/global-shortcut"
+					variant="link"
+				>
 					Enable Global Shortcut
 				</Button>
 			</div>

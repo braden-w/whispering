@@ -1,19 +1,19 @@
 <script lang="ts">
-import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
-import { Button } from '$lib/components/ui/button/index.js';
-import { Label } from '$lib/components/ui/label/index.js';
-import { Separator } from '$lib/components/ui/separator/index.js';
-import { Switch } from '$lib/components/ui/switch/index.js';
-import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
-import { settings } from '$lib/stores/settings.svelte';
-import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
-import SettingsLabelSelect from './SettingsLabelSelect.svelte';
+	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { setAlwaysOnTopToTrueIfAlwaysInSettings } from '$lib/services/AlwaysOnTopService';
+	import { settings } from '$lib/stores/settings.svelte';
+	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
+	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 
-const selectedAlwaysOnTopOption = $derived(
-	ALWAYS_ON_TOP_OPTIONS.find(
-		(option) => option.value === settings.value.alwaysOnTop,
-	),
-);
+	const selectedAlwaysOnTopOption = $derived(
+		ALWAYS_ON_TOP_OPTIONS.find(
+			(option) => option.value === settings.value.alwaysOnTop,
+		),
+	);
 </script>
 
 <svelte:head>
@@ -23,7 +23,9 @@ const selectedAlwaysOnTopOption = $derived(
 <div class="space-y-6">
 	<div>
 		<h3 class="text-lg font-medium">General</h3>
-		<p class="text-muted-foreground text-sm">Configure your general Whispering preferences.</p>
+		<p class="text-muted-foreground text-sm">
+			Configure your general Whispering preferences.
+		</p>
 	</div>
 	<Separator />
 	<div class="flex items-center gap-2">
@@ -46,7 +48,9 @@ const selectedAlwaysOnTopOption = $derived(
 				settings.value = { ...settings.value, isCopyToClipboardEnabled: v };
 			}}
 		/>
-		<Label for="copy-to-clipboard">Copy text to clipboard on successful transcription</Label>
+		<Label for="copy-to-clipboard"
+			>Copy text to clipboard on successful transcription</Label
+		>
 	</div>
 	<div class="flex items-center gap-2">
 		<Switch
@@ -54,7 +58,10 @@ const selectedAlwaysOnTopOption = $derived(
 			aria-labelledby="paste-from-clipboard"
 			checked={settings.value.isPasteContentsOnSuccessEnabled}
 			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isPasteContentsOnSuccessEnabled: v };
+				settings.value = {
+					...settings.value,
+					isPasteContentsOnSuccessEnabled: v,
+				};
 			}}
 		/>
 		<Label for="paste-from-clipboard">

@@ -1,25 +1,26 @@
 <script lang="ts">
-import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-import { MainLive } from '$lib/services';
-import { ClipboardService } from '$lib/services/ClipboardService';
-import { toast } from '$lib/services/ToastService';
-import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
-import { Effect } from 'effect';
-import { CheckIcon, CopyIcon } from 'lucide-svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { MainLive } from '$lib/services';
+	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { toast } from '$lib/services/ToastService';
+	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { Effect } from 'effect';
+	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
-const { codeText }: { codeText: string } = $props();
-let hasCopied = $state(false);
+	const { codeText }: { codeText: string } = $props();
+	let hasCopied = $state(false);
 
-$effect(() => {
-	if (hasCopied) {
-		setTimeout(() => {
-			hasCopied = false;
-		}, 2000);
-	}
-});
+	$effect(() => {
+		if (hasCopied) {
+			setTimeout(() => {
+				hasCopied = false;
+			}, 2000);
+		}
+	});
 </script>
 
-<pre class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
+<pre
+	class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
   <WhisperingButton
 		tooltipText="Copy to clipboard"
 		size="icon"
@@ -36,7 +37,11 @@ $effect(() => {
 					descriptionClass: 'line-clamp-2',
 				});
 				hasCopied = true;
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.provide(MainLive), Effect.runPromise);
+			}).pipe(
+				Effect.catchAll(renderErrorAsToast),
+				Effect.provide(MainLive),
+				Effect.runPromise,
+			);
 		}}>
 			<span class="sr-only">Copy</span>
     {#if hasCopied}
