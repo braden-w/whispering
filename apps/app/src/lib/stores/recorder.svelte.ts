@@ -52,7 +52,7 @@ export const recorder = Effect.gen(function* () {
 				switch (mediaRecorderService.recordingState) {
 					case 'inactive':
 						if (settings.value.alwaysOnTop === 'When Recording') {
-							yield* setAlwaysOnTop(true);
+							await setAlwaysOnTop(true);
 						}
 						yield* mediaRecorderService.startRecording();
 						recorderState.value = 'RECORDING';
@@ -107,7 +107,7 @@ export const recorder = Effect.gen(function* () {
 
 						yield* recordings.transcribeRecording(newRecording.id);
 						if (settings.value.alwaysOnTop === 'When Recording') {
-							yield* setAlwaysOnTop(false);
+							await setAlwaysOnTop(false);
 						}
 					}
 				}
@@ -116,7 +116,7 @@ export const recorder = Effect.gen(function* () {
 					Effect.gen(function* () {
 						recorderState.value = 'IDLE';
 						if (settings.value.alwaysOnTop === 'When Recording') {
-							yield* setAlwaysOnTop(false);
+							await setAlwaysOnTop(false);
 						}
 					}),
 				),
@@ -139,7 +139,7 @@ export const recorder = Effect.gen(function* () {
 				yield* Effect.logInfo('Recording cancelled');
 				recorderState.value = 'IDLE';
 				if (settings.value.alwaysOnTop === 'When Recording') {
-					yield* setAlwaysOnTop(false);
+					await setAlwaysOnTop(false);
 				}
 			}).pipe(Effect.runPromise),
 	};
