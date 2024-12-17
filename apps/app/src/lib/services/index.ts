@@ -8,8 +8,6 @@ import { HttpServiceWebLive } from './HttpServiceWebLive';
 import { NotificationServiceDesktopLive } from './NotificationServiceDesktopLive';
 import { NotificationServiceWebLive } from './NotificationServiceWebLive';
 import { RecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
-import { SetTrayIconServiceDesktopLive } from './SetTrayIconServiceDesktopLive';
-import { SetTrayIconServiceWebLive } from './SetTrayIconServiceWebLive';
 
 export const MainLive = Layer.mergeAll(
 	RecordingsDbServiceLiveIndexedDb,
@@ -22,8 +20,5 @@ export const MainLive = Layer.mergeAll(
 	window.__TAURI_INTERNALS__
 		? NotificationServiceDesktopLive
 		: NotificationServiceWebLive,
-	window.__TAURI_INTERNALS__
-		? SetTrayIconServiceDesktopLive
-		: SetTrayIconServiceWebLive,
 	window.__TAURI_INTERNALS__ ? HttpServiceDesktopLive : HttpServiceWebLive,
 );
