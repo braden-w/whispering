@@ -9,7 +9,6 @@
 		"ignoreUnknown": false,
 		"ignore": [
 			".DS_Store",
-			".svelte-kit",
 			".turbo",
 			"build",
 			"dist",
