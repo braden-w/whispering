@@ -100,9 +100,10 @@ export class WhisperingError extends Data.TaggedError(
 	'WhisperingError',
 )<WhisperingErrorProperties> {}
 
-export type Result<T> =
-	| { ok: true; data: T }
-	| { ok: false; error: WhisperingErrorProperties };
+export type Result<
+	T,
+	E extends WhisperingErrorProperties = WhisperingErrorProperties,
+> = { ok: true; data: T } | { ok: false; error: E };
 
 export const effectToResult = <T>(
 	effect: Effect.Effect<T, WhisperingError>,
