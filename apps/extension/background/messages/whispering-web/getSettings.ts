@@ -34,10 +34,10 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			func: (settingsKey) => {
 				try {
 					const valueFromStorage = localStorage.getItem(settingsKey);
-					return { isSuccess: true, data: valueFromStorage } as const;
+					return { ok: true, data: valueFromStorage } as const;
 				} catch (error) {
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
 							title: 'Unable to get Whispering settings',
 							description:

@@ -101,29 +101,21 @@ export class WhisperingError extends Data.TaggedError(
 )<WhisperingErrorProperties> {}
 
 export type Result<T> =
-	| {
-			isSuccess: true;
-			data: T;
-	  }
-	| {
-			isSuccess: false;
-			error: WhisperingErrorProperties;
-	  };
+	| { ok: true; data: T }
+	| { ok: false; error: WhisperingErrorProperties };
 
 export const effectToResult = <T>(
 	effect: Effect.Effect<T, WhisperingError>,
 ): Effect.Effect<Result<T>> =>
 	effect.pipe(
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) =>
-			Effect.succeed({ isSuccess: false, error } as const),
-		),
+		Effect.map((data) => ({ ok: true, data }) as const),
+		Effect.catchAll((error) => Effect.succeed({ ok: false, error } as const)),
 	);
 
 export const resultToEffect = <T>(
 	result: Result<T>,
 ): Effect.Effect<T, WhisperingError> =>
-	result.isSuccess
+	result.ok
 		? Effect.succeed(result.data)
 		: Effect.fail(new WhisperingError(result.error));
 

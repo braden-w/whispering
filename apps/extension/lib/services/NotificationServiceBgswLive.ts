@@ -45,10 +45,10 @@ export const NotificationServiceBgswLive = Layer.succeed(
 									func: (route) => {
 										try {
 											window.goto(route);
-											return { isSuccess: true, data: undefined } as const;
+											return { ok: true, data: undefined } as const;
 										} catch (error) {
 											return {
-												isSuccess: false,
+												ok: false,
 												error: {
 													title: `Unable to go to route ${route} in Whispering tab`,
 													description:

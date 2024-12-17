@@ -85,12 +85,12 @@ const writeTextToCursor = (
 					if (editables.length === 1) {
 						insertTextIntoEditableElement(editables[0]!, text);
 						return {
-							isSuccess: true,
+							ok: true,
 							data: text,
 						};
 					}
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
 							isWarning: true,
 							title: 'Please paste the transcribed text manually',
@@ -100,7 +100,7 @@ const writeTextToCursor = (
 					};
 				}
 				insertTextIntoEditableElement(activeElement, text);
-				return { isSuccess: true, data: text } as const;
+				return { ok: true, data: text } as const;
 			},
 			args: [text],
 		});
