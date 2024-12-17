@@ -21,29 +21,32 @@
 		🚫
 	</WhisperingButton>
 {:else if mediaStreamManager.isStreamValid}
-	<Tooltip.Root>
-		<Tooltip.Trigger asChild let:builder>
-			<Button
-				builders={[builder]}
-				onclick={mediaStreamManager.release}
-				variant="ghost"
-				size="icon"
-				class={className}
-				style="view-transition-name: end-session-icon;"
-			>
-				<span class="sr-only">End recording session</span>
-				🔴
-			</Button>
-		</Tooltip.Trigger>
-		<Tooltip.Content>
-			End recording session
-			<Button
-				variant="link"
-				size="inline"
-				onclick={() => (fasterRerecordExplainedDialog.isOpen = true)}
-			>
-				(What's that?)
-			</Button>
-		</Tooltip.Content>
-	</Tooltip.Root>
+	<Tooltip.Provider>
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				{#snippet child()}
+					<Button
+						onclick={mediaStreamManager.release}
+						variant="ghost"
+						size="icon"
+						class={className}
+						style="view-transition-name: end-session-icon;"
+					>
+						<span class="sr-only">End recording session</span>
+						🔴
+					</Button>
+				{/snippet}
+			</Tooltip.Trigger>
+			<Tooltip.Content>
+				End recording session
+				<Button
+					variant="link"
+					size="inline"
+					onclick={() => (fasterRerecordExplainedDialog.isOpen = true)}
+				>
+					(What's that?)
+				</Button>
+			</Tooltip.Content>
+		</Tooltip.Root>
+	</Tooltip.Provider>
 {/if}
