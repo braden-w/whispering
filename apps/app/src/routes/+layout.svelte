@@ -11,7 +11,7 @@ import { ModeWatcher, mode } from 'mode-watcher';
 import { onMount } from 'svelte';
 import type { ToasterProps } from 'svelte-sonner';
 import { Toaster } from 'svelte-sonner';
-import '../app.pcss';
+import '../app.css';
 
 onNavigate((navigation) => {
 	if (!document.startViewTransition) return;
