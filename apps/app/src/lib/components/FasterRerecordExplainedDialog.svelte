@@ -13,7 +13,7 @@ export const fasterRerecordExplainedDialog = (() => {
 </script>
 
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 </script>
 
 <Dialog.Root bind:open={fasterRerecordExplainedDialog.isOpen}>

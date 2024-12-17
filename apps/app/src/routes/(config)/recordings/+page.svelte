@@ -8,13 +8,13 @@ import {
 	PlayIcon as StartTranscriptionIcon,
 	TrashIcon,
 } from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button';
-import { Checkbox } from '$lib/components/ui/checkbox';
-import * as Dialog from '$lib/components/ui/dialog';
+import { Button } from '$lib/components/ui/button/index.js';
+import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+import * as Dialog from '$lib/components/ui/dialog/index.js';
 import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
-import * as Table from '$lib/components/ui/table';
+import { Input } from '$lib/components/ui/input/index.js';
+import { Label } from '$lib/components/ui/label/index.js';
+import * as Table from '$lib/components/ui/table/index.js';
 import { Textarea } from '$lib/components/ui/textarea/index.js';
 import { MainLive } from '$lib/services';
 import { ClipboardService } from '$lib/services/ClipboardService';

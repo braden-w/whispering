@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Button, type Props } from '$lib/components/ui/button';
-import * as Tooltip from '$lib/components/ui/tooltip';
+import { Button, type Props } from '$lib/components/ui/button/index.js';
+import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 let {
 	children,
@@ -11,16 +11,18 @@ let {
 } & Props = $props();
 </script>
 
-<Tooltip.Root>
-	<Tooltip.Trigger asChild let:builder>
-		<Button builders={[builder]} {...restProps}>
-			{#if children}
-				{@render children()}
-			{/if}
-			<span class="sr-only">{tooltipText}</span>
-		</Button>
-	</Tooltip.Trigger>
-	<Tooltip.Content>
-		<p>{tooltipText}</p>
-	</Tooltip.Content>
-</Tooltip.Root>
+<Tooltip.Provider>
+	<Tooltip.Root>
+		<Tooltip.Trigger>
+			{#snippet child()}
+				<Button {...restProps}>
+					{@render children?.()}
+					<span class="sr-only">{tooltipText}</span>
+				</Button>
+			{/snippet}
+		</Tooltip.Trigger>
+		<Tooltip.Content>
+			<p>{tooltipText}</p>
+		</Tooltip.Content>
+	</Tooltip.Root>
+</Tooltip.Provider>

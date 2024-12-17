@@ -1,6 +1,6 @@
 <script lang="ts">
 import { page } from '$app/stores';
-import { Button } from '$lib/components/ui/button';
+import { Button } from '$lib/components/ui/button/index.js';
 import { cn } from '$lib/utils';
 import { cubicInOut } from 'svelte/easing';
 import { crossfade } from 'svelte/transition';

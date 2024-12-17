@@ -1,11 +1,11 @@
 <script lang="ts">
 import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button';
-import * as Dialog from '$lib/components/ui/dialog';
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
-import { Textarea } from '$lib/components/ui/textarea';
+import { Button } from '$lib/components/ui/button/index.js';
+import * as Dialog from '$lib/components/ui/dialog/index.js';
+import { Input } from '$lib/components/ui/input/index.js';
+import { Label } from '$lib/components/ui/label/index.js';
+import { Textarea } from '$lib/components/ui/textarea/index.js';
 import type { Recording } from '$lib/services/RecordingDbService';
 import { recordings } from '$lib/stores/recordings.svelte';
 

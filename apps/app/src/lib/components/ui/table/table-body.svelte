@@ -1,16 +1,16 @@
 <script lang="ts">
 import { cn } from '$lib/utils.js';
+import type { WithElementRef } from 'bits-ui';
 import type { HTMLAttributes } from 'svelte/elements';
 
 let {
-	children,
+	ref = $bindable(null),
 	class: className,
+	children,
 	...restProps
-}: HTMLAttributes<HTMLTableSectionElement> = $props();
+}: WithElementRef<HTMLAttributes<HTMLTableSectionElement>> = $props();
 </script>
 
-<tbody class={cn('[&_tr:last-child]:border-0', className)} {...restProps}>
-	{#if children}
-		{@render children()}
-	{/if}
+<tbody bind:this={ref} class={cn("[&_tr:last-child]:border-0", className)} {...restProps}>
+	{@render children?.()}
 </tbody>

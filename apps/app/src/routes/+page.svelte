@@ -3,8 +3,8 @@ import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecord
 import NavItems from '$lib/components/NavItems.svelte';
 import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 import { ClipboardIcon } from '$lib/components/icons';
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
+import { Input } from '$lib/components/ui/input/index.js';
+import { Label } from '$lib/components/ui/label/index.js';
 import { recorder } from '$lib/stores/recorder.svelte';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';

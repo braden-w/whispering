@@ -11,7 +11,9 @@ import { ModeWatcher, mode } from 'mode-watcher';
 import { onMount } from 'svelte';
 import type { ToasterProps } from 'svelte-sonner';
 import { Toaster } from 'svelte-sonner';
-import '../app.pcss';
+import '../app.css';
+
+let { children } = $props();
 
 onNavigate((navigation) => {
 	if (!document.startViewTransition) return;
@@ -71,7 +73,7 @@ const TOASTER_SETTINGS = {
 </button>
 
 <div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
-	<slot />
+	{@render children()}
 </div>
 
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
