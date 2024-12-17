@@ -1,7 +1,6 @@
-<script lang="ts" generics="T">
+<script lang="ts" generics="T extends string ">
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import type { SelectProps } from 'bits-ui';
 
 	let {
 		id,
@@ -11,17 +10,35 @@
 		onSelectedChange,
 		placeholder = 'Select an option',
 		disabled = false,
-	}: SelectProps<T> & {
+	}: {
 		id: string;
 		label: string;
+		items: {
+			value: T;
+			label: string;
+			disabled?: boolean;
+		}[];
+		selected: T;
+		onSelectedChange: (selected: T) => void;
 		placeholder?: string;
+		disabled?: boolean;
 	} = $props();
+
+	const selectedLabel = $derived(
+		items.find((item) => item.value === selected)?.label,
+	);
 </script>
 
 <Label class="text-sm" for={id}>{label}</Label>
-<Select.Root {items} {selected} {onSelectedChange} {disabled}>
+<Select.Root
+	type="single"
+	{items}
+	value={selected}
+	onValueChange={(selected) => onSelectedChange(selected as T)}
+	{disabled}
+>
 	<Select.Trigger class="w-full">
-		<Select.Value {placeholder} />
+		{selectedLabel ?? placeholder}
 	</Select.Trigger>
 	<Select.Content class="max-h-96 overflow-auto">
 		{#each items as item}
@@ -30,5 +47,4 @@
 			</Select.Item>
 		{/each}
 	</Select.Content>
-	<Select.Input {id} />
 </Select.Root>

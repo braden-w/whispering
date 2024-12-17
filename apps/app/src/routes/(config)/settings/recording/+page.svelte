@@ -6,7 +6,7 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS } from '@repo/shared';
+	import { BITRATE_OPTIONS, BITRATE_VALUES } from '@repo/shared';
 	import { Effect } from 'effect';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
@@ -37,6 +37,9 @@
 				id="recording-device"
 				label="Recording Device"
 				placeholder="Loading devices..."
+				items={[]}
+				selected={''}
+				onSelectedChange={() => {}}
 				disabled
 			/>
 		{:then mediaDevices}
@@ -48,14 +51,12 @@
 				id="recording-device"
 				label="Recording Device"
 				{items}
-				selected={items.find(
-					(item) => item.value === settings.value.selectedAudioInputDeviceId,
-				)}
+				selected={settings.value.selectedAudioInputDeviceId}
 				onSelectedChange={(selected) => {
 					if (!selected) return;
 					settings.value = {
 						...settings.value,
-						selectedAudioInputDeviceId: selected.value,
+						selectedAudioInputDeviceId: selected,
 					};
 					mediaStreamManager.refreshStream().pipe(Effect.runPromise);
 				}}
@@ -69,13 +70,17 @@
 		<SettingsLabelSelect
 			id="bit-rate"
 			label="Bitrate"
-			items={BITRATE_OPTIONS}
-			selected={BITRATE_OPTIONS.find(
-				(option) => option.value === settings.value.bitsPerSecond,
-			)}
+			items={BITRATE_OPTIONS.map((option) => ({
+				value: option.value.toString(),
+				label: option.label,
+			}))}
+			selected={settings.value.bitsPerSecond.toString()}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value = { ...settings.value, bitsPerSecond: selected.value };
+				settings.value = {
+					...settings.value,
+					bitsPerSecond: Number(selected) as (typeof BITRATE_VALUES)[number],
+				};
 			}}
 			placeholder="Select a bitrate"
 		/>
