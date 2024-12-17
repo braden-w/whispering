@@ -8,12 +8,6 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
-
-	const selectedAlwaysOnTopOption = $derived(
-		ALWAYS_ON_TOP_OPTIONS.find(
-			(option) => option.value === settings.value.alwaysOnTop,
-		),
-	);
 </script>
 
 <svelte:head>
@@ -93,10 +87,10 @@
 				id="always-on-top"
 				label="Always On Top"
 				items={ALWAYS_ON_TOP_OPTIONS}
-				selected={selectedAlwaysOnTopOption}
+				selected={settings.value.alwaysOnTop}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, alwaysOnTop: selected.value };
+					settings.value = { ...settings.value, alwaysOnTop: selected };
 					setAlwaysOnTopToTrueIfAlwaysInSettings();
 				}}
 				placeholder="Select a language"
