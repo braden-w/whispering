@@ -16,9 +16,7 @@ let {
 		<Tooltip.Trigger>
 			{#snippet child()}
 				<Button {...restProps}>
-					{#if children}
-						{@render children()}
-					{/if}
+					{@render children?.()}
 					<span class="sr-only">{tooltipText}</span>
 				</Button>
 			{/snippet}
