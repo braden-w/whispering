@@ -4,7 +4,7 @@ import {
 	ChromeWebStoreIcon,
 	LaptopIcon as DesktopIcon,
 } from '$lib/components/icons';
-import { Button } from '$lib/components/ui/button';
+import { Button } from '$lib/components/ui/button/index.js';
 </script>
 
 <svelte:head>

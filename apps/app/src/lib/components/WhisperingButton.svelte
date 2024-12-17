@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Button, type Props } from '$lib/components/ui/button';
-import * as Tooltip from '$lib/components/ui/tooltip';
+import { Button, type Props } from '$lib/components/ui/button/index.js';
+import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 let {
 	children,
