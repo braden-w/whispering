@@ -26,7 +26,7 @@ export const renderErrorAsToast = (
 					return undefined;
 			}
 		};
-		yield* toast({
+		toast({
 			variant: isWarning ? 'warning' : 'error',
 			id: options?.toastId,
 			title: title,
