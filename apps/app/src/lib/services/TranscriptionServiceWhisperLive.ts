@@ -45,26 +45,25 @@ export const createTranscriptionServiceWhisperLive =
 					action: { type: 'none' },
 				});
 			}
-			const formDataFile = new File(
-				[audioBlob],
-				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
-				{
-					type: audioBlob.type,
-				},
-			);
 			const formData = new FormData();
-			formData.append('file', formDataFile);
+			formData.append(
+				'file',
+				audioBlob,
+				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
+			);
 			formData.append('model', 'whisper-1');
-			if (outputLanguage !== 'auto')
+			if (outputLanguage !== 'auto') {
 				formData.append('language', outputLanguage);
-			const postResponse = await HttpService.post({
+			}
+			const postResponseResult = await HttpService.post({
 				formData,
 				url: 'https://api.openai.com/v1/audio/transcriptions',
 				headers: { Authorization: `Bearer ${apiKey}` },
 				schema: WhisperResponseSchema,
 			});
-			if (!postResponse.ok) {
-				switch (postResponse.error._tag) {
+			if (!postResponseResult.ok) {
+				const error = postResponseResult.error;
+				switch (error._tag) {
 					case 'NetworkError':
 						return Err({
 							_tag: 'WhisperingError',
@@ -91,7 +90,7 @@ export const createTranscriptionServiceWhisperLive =
 						});
 				}
 			}
-			const data = postResponse.data;
+			const data = postResponseResult.data;
 			if ('error' in data) {
 				return Err({
 					_tag: 'WhisperingError',

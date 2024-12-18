@@ -1,11 +1,10 @@
 import type { NotificationService } from '@repo/shared';
-import { Ok, tryAsync, WhisperingError } from '@repo/shared';
+import { Ok, tryAsync } from '@repo/shared';
 import {
 	isPermissionGranted,
 	requestPermission,
 	sendNotification,
 } from '@tauri-apps/plugin-notification';
-import { nanoid } from 'nanoid/non-secure';
 
 const createNotificationServiceDesktop = (): NotificationService => {
 	return {
