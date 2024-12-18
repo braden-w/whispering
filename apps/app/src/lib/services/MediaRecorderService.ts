@@ -52,14 +52,14 @@ export function createMediaRecorder(): MediaRecorderService {
 			const reinitializedMediaRecorderResult: WhisperingResult<MediaRecorder> =
 				await (async () => {
 					const getNewOrExistingStream = async () => {
-						if (settings.value.isFasterRerecordEnabled) {
-							const existingStreamResult =
-								await mediaStreamManager.getExistingStream();
-							if (!existingStreamResult.ok) return existingStreamResult;
-							const existingStream = existingStreamResult.data;
-							if (existingStream) return Ok(existingStream);
+						if (!settings.value.isFasterRerecordEnabled) {
 							return await mediaStreamManager.refreshStream();
 						}
+						const existingStreamResult =
+							await mediaStreamManager.getExistingStream();
+						if (!existingStreamResult.ok) return existingStreamResult;
+						const existingStream = existingStreamResult.data;
+						if (existingStream) return Ok(existingStream);
 						return await mediaStreamManager.refreshStream();
 					};
 					const newOrExistingStreamResult = await getNewOrExistingStream();
