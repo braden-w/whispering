@@ -9,10 +9,7 @@ import { Err, Ok, tryAsync } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
-import {
-	SHARED_EXTENSION_STATE_KEYS,
-	storage,
-} from '~lib/services/extension-storage';
+import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 const iconPaths = {
 	IDLE: studioMicrophone,
@@ -42,10 +39,7 @@ const handler: PlasmoMessaging.MessageHandler<
 			});
 		}
 
-		storage.setItem(
-			SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
-			body.recorderState,
-		);
+		whisperingStorage.setItem('whispering-recorder-state', body.recorderState);
 		const path = iconPaths[body.recorderState];
 		const setIconResult = await tryAsync({
 			try: () => chrome.action.setIcon({ path }),

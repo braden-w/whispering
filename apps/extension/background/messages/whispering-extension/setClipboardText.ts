@@ -7,10 +7,8 @@ import type {
 import { Err } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
-import {
-	SHARED_EXTENSION_STATE_KEYS,
-	storage,
-} from '~lib/services/extension-storage';
+import { SHARED_EXTENSION_STATE_KEYS, storage } from '~lib/storage/keys';
+import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setClipboardText'>;
@@ -53,8 +51,8 @@ const handler: PlasmoMessaging.MessageHandler<
 			});
 		}
 
-		storage.setItem(
-			SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
+		whisperingStorage.setItem(
+			'whispering-latest-recording-transcribed-text',
 			body.transcribedText,
 		);
 

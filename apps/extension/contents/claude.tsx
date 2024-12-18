@@ -1,12 +1,11 @@
 import cssText from 'data-text:~/style.css';
-import { useStorage } from '@plasmohq/storage/hook';
-import { type RecorderState, recorderStateToIcons } from '@repo/shared';
+import { recorderStateToIcons } from '@repo/shared';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
-import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
+import { useWhisperingStorage } from '~lib/storage/useWhisperingStorage';
 import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
 import { waitForElement } from './utils/waitForElement';
 
@@ -32,8 +31,8 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 function RecorderStateAsIcon() {
-	const [recorderState] = useStorage<RecorderState>(
-		SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
+	const recorderState = useWhisperingStorage(
+		'whispering-recorder-state',
 		'IDLE',
 	);
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];

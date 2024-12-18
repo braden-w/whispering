@@ -11,18 +11,19 @@
  * @example
  * ```ts
  * // In popup
- * const [recorderState] = useStorage<RecorderState>(SHARED_STATE_KEYS.RECORDER_STATE);
+ * const [recorderState] = useWhisperingStorage<RecorderState>(SHARED_STATE_KEYS.RECORDER_STATE);
  *
  * // In background service worker
  * await storage.setItem(SHARED_STATE_KEYS.RECORDER_STATE, 'RECORDING');
  * ```
  */
 
-export const SHARED_EXTENSION_STATE_KEYS = {
-	RECORDER_STATE: 'whispering-recorder-state',
-	LATEST_RECORDING_TRANSCRIBED_TEXT:
-		'whispering-latest-recording-transcribed-text',
-	SETTINGS: 'whispering-settings',
-} as const;
+import type { RecorderState, Settings } from '@repo/shared';
 
-export const storage = new Storage();
+export type WhisperingStorageKeyToStorageValue = {
+	'whispering-recorder-state': RecorderState;
+	'whispering-latest-recording-transcribed-text': string;
+	'whispering-settings': Settings;
+};
+
+export type WhisperingStorageKey = keyof WhisperingStorageKeyToStorageValue;
