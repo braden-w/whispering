@@ -45,14 +45,14 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 		});
 	}).pipe(
 		Effect.catchTags({
-			GetActiveTabIdError: () =>
-				new WhisperingError({
-					title:
-						'Unable to get active tab ID to copy transcribed text to clipboard',
-					description:
-						'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
-					action: { type: 'none' },
-				}),
+			GetActiveTabIdError: () => ({
+				_tag: 'WhisperingError',
+				title:
+					'Unable to get active tab ID to copy transcribed text to clipboard',
+				description:
+					'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+				action: { type: 'none' },
+			}),
 		}),
 	);
 
@@ -69,11 +69,12 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.transcribedText) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking setClipboardText command',
 				description: 'Text must be provided in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		yield* setClipboardText(body.transcribedText);
 	}).pipe(

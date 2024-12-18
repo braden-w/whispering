@@ -67,15 +67,15 @@ function createAndSetupNewTab() {
 function getAllWhisperingTabs() {
 	return Effect.tryPromise({
 		try: () => chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error getting Whispering tabs',
-				description: 'Error querying for Whispering tabs in the browser.',
-				action: {
-					type: 'more-details',
-					error,
-				},
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error getting Whispering tabs',
+			description: 'Error querying for Whispering tabs in the browser.',
+			action: {
+				type: 'more-details',
+				error,
+			},
+		}),
 	});
 }
 
@@ -115,12 +115,12 @@ function isNotifyWhisperingTabReadyMessage(
 function makeTabUndiscardableById(tabId: number) {
 	return Effect.tryPromise({
 		try: () => chrome.tabs.update(tabId, { autoDiscardable: false }),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to make Whispering tab undiscardable',
-				description: 'Error updating Whispering tab to make it undiscardable.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to make Whispering tab undiscardable',
+			description: 'Error updating Whispering tab to make it undiscardable.',
+			action: { type: 'more-details', error },
+		}),
 	});
 }
 
@@ -133,12 +133,12 @@ function removeTabsById(tabIds: number[]) {
 		tabIds.map((tabId) =>
 			Effect.tryPromise({
 				try: () => chrome.tabs.remove(tabId),
-				catch: (error) =>
-					new WhisperingError({
-						title: `Error closing Whispering tab ${tabId}`,
-						description: `Error closing Whispering tab ${tabId} in the browser.`,
-						action: { type: 'more-details', error },
-					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: `Error closing Whispering tab ${tabId}`,
+					description: `Error closing Whispering tab ${tabId} in the browser.`,
+					action: { type: 'more-details', error },
+				}),
 			}),
 		),
 		{ concurrency: 'unbounded' },

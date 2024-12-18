@@ -26,12 +26,13 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.notifyOptions) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking notify command',
 				description:
 					'ToastOptions must be provided in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		const { notify } = yield* NotificationService;
 		return yield* notify(body.notifyOptions);

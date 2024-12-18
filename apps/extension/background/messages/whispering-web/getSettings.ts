@@ -57,18 +57,16 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 		const settings = yield* Schema.decodeUnknown(
 			Schema.parseJson(settingsSchema),
 		)(valueFromStorage).pipe(
-			Effect.mapError(
-				(error) =>
-					new WhisperingError({
-						title: 'Unable to parse Whispering settings',
-						description:
-							'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-			),
+			Effect.mapError((error) => ({
+				_tag: 'WhisperingError',
+				title: 'Unable to parse Whispering settings',
+				description:
+					'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',
+				action: {
+					type: 'more-details',
+					error,
+				},
+			})),
 		);
 		return settings;
 	}).pipe(
