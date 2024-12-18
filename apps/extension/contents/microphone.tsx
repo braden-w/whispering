@@ -1,13 +1,13 @@
+import { recorderStateToIcons } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
-import { type RecorderState, recorderStateToIcons } from '@repo/shared';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchorList,
 	PlasmoGetStyle,
 	PlasmoMountShadowHost,
 } from 'plasmo';
+import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
-import { useWhisperingStorage } from '~lib/storage/useWhisperingStorage';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(
@@ -79,10 +79,7 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 function RecorderStateAsIcon() {
-	const recorderState = useWhisperingStorage(
-		'whispering-recorder-state',
-		'IDLE',
-	);
+	const recorderState = useWhisperingRecorderState();
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button

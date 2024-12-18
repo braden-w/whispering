@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
 
+import GithubIcon from 'react:./components/icons/github.svg';
 import {
 	Ok,
 	WHISPERING_URL,
@@ -23,11 +24,13 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
-import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { useWhisperingStorage } from '~lib/storage/useWhisperingStorage';
+import {
+	useWhisperingRecorderState,
+	useWhisperingTranscribedText,
+} from '~lib/storage/useWhisperingStorage';
 import './style.css';
 
 function IndexPopup() {
@@ -87,18 +90,12 @@ const cancelRecording = async () => {
 };
 
 function IndexPage() {
-	const recorderState = useWhisperingStorage(
-		'whispering-recorder-state',
-		'IDLE',
-	);
-	const latestRecordingTranscribedText = useWhisperingStorage(
-		'whispering-latest-recording-transcribed-text',
-		'',
-	);
+	const recorderState = useWhisperingRecorderState();
+	const transcribedText = useWhisperingTranscribedText();
 
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	const copyToClipboardText = (() => {
-		if (latestRecordingTranscribedText) return latestRecordingTranscribedText;
+		if (transcribedText) return transcribedText;
 		if (recorderState === 'LOADING') return '...';
 		return '';
 	})();

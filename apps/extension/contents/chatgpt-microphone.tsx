@@ -1,12 +1,12 @@
 import cssText from 'data-text:~/style.css';
 
-import { type RecorderState, recorderStateToIcons } from '@repo/shared';
+import { recorderStateToIcons } from '@repo/shared';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
-import { useWhisperingStorage } from '~lib/storage/useWhisperingStorage';
+import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
 import { waitForElement } from './utils/waitForElement';
 
@@ -30,10 +30,7 @@ export const getStyle: PlasmoGetStyle = () => {
 };
 
 function RecorderStateAsIcon() {
-	const recorderState = useWhisperingStorage(
-		'whispering-recorder-state',
-		'IDLE',
-	);
+	const recorderState = useWhisperingRecorderState();
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	return (
 		<button
