@@ -48,7 +48,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 							_tag: 'WhisperingError',
 							title: 'Network error',
 							description: 'Please check your internet connection',
-							action: { type: 'none' },
+							action: { type: 'more-details', error: postResult.error.message },
 						});
 					case 'HttpError':
 						return Err({
@@ -56,14 +56,14 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 							title:
 								'An error occurred while sending the request to the transcription server.',
 							description: 'Please try again',
-							action: { type: 'none' },
+							action: { type: 'more-details', error: postResult.error.message },
 						});
 					case 'ParseError':
 						return Err({
 							_tag: 'WhisperingError',
 							title: 'Unable to parse transcription server response',
 							description: 'Please try again',
-							action: { type: 'none' },
+							action: { type: 'more-details', error: postResult.error.message },
 						});
 				}
 			}
