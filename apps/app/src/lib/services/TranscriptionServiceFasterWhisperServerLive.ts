@@ -83,3 +83,6 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			return Ok(data.text);
 		},
 	});
+
+export const TranscriptionServiceFasterWhisperServerLive =
+	createTranscriptionServiceFasterWhisperServerLive();

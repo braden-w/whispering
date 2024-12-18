@@ -106,3 +106,6 @@ export const createTranscriptionServiceWhisperLive =
 			return Ok(data.text.trim());
 		},
 	});
+
+export const TranscriptionServiceWhisperLive =
+	createTranscriptionServiceWhisperLive();

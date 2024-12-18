@@ -100,3 +100,6 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		return Ok(data.text.trim());
 	},
 });
+
+export const TranscriptionServiceGroqLive =
+	createTranscriptionServiceGroqLive();
