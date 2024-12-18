@@ -56,8 +56,7 @@ export const createRecordings = () => {
 				await RecordingsDbService.addRecording(recording);
 			if (!addRecordingResult.ok) return renderErrAsToast(addRecordingResult);
 			recordings.push(recording);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Recording added!',
 				description: 'Your recording has been added successfully.',
 			});
@@ -66,8 +65,7 @@ export const createRecordings = () => {
 			const updateRecordingResult = await updateRecording(recording);
 			if (!updateRecordingResult.ok)
 				return renderErrAsToast(updateRecordingResult);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Recording updated!',
 				description: 'Your recording has been updated successfully.',
 			});
@@ -78,8 +76,7 @@ export const createRecordings = () => {
 			if (!deleteRecordingResult.ok)
 				return renderErrAsToast(deleteRecordingResult);
 			recordings = recordings.filter((recording) => recording.id !== id);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Recording deleted!',
 				description: 'Your recording has been deleted successfully.',
 			});
@@ -92,8 +89,7 @@ export const createRecordings = () => {
 			recordings = recordings.filter(
 				(recording) => !ids.includes(recording.id),
 			);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Recordings deleted!',
 				description: 'Your recordings have been deleted successfully.',
 			});
@@ -106,9 +102,8 @@ export const createRecordings = () => {
 			}[settings.value.selectedTranscriptionService];
 
 			const transcribingInProgressId = nanoid();
-			toast({
+			toast.loading({
 				id: transcribingInProgressId,
-				variant: 'loading',
 				title: 'Transcribing recording...',
 				description: 'Your recording is being transcribed.',
 			});
@@ -171,8 +166,7 @@ export const createRecordings = () => {
 
 				if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 
-				toast({
-					variant: 'success',
+				toast.success({
 					id: transcribingInProgressId,
 					title: 'Transcription complete!',
 					description: 'Check it out in your recordings',
@@ -212,8 +206,7 @@ export const createRecordings = () => {
 					await clipboardService.setClipboardText(transcribedText);
 				if (!setClipboardTextResult.ok)
 					return renderErrAsToast(setClipboardTextResult);
-				toast({
-					variant: 'success',
+				toast.success({
 					title: 'Copied transcription to clipboard!',
 					description: transcribedText,
 					descriptionClass: 'line-clamp-2',
@@ -226,8 +219,7 @@ export const createRecordings = () => {
 					await clipboardService.writeTextToCursor(transcribedText);
 				if (!clipboardWriteTextToCursorResult.ok)
 					return renderErrAsToast(clipboardWriteTextToCursorResult);
-				toast({
-					variant: 'success',
+				toast.success({
 					title: 'Pasted transcription!',
 					description: transcribedText,
 					descriptionClass: 'line-clamp-2',
@@ -260,8 +252,7 @@ export const createRecordings = () => {
 			);
 			if (!setClipboardTextResult.ok)
 				return renderErrAsToast(setClipboardTextResult);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Copied transcription to clipboard!',
 				description: recording.transcribedText,
 				descriptionClass: 'line-clamp-2',

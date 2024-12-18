@@ -30,8 +30,7 @@
 				await clipboardService.setClipboardText(codeText);
 			if (!setClipboardTextResult.ok)
 				return renderErrAsToast(setClipboardTextResult);
-			toast({
-				variant: 'success',
+			toast.success({
 				title: 'Copied transcriptions to clipboard!',
 				description: codeText,
 				descriptionClass: 'line-clamp-2',
