@@ -22,16 +22,16 @@ export const NotificationServiceContentLive = Layer.succeed(
 						name: 'whispering-extension/notifications/create',
 						body: { notifyOptions },
 					}),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to notify via background service worker',
-						description:
-							'There was likely an issue sending the message to the background service worker from the popup.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Unable to notify via background service worker',
+					description:
+						'There was likely an issue sending the message to the background service worker from the popup.',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
 			}).pipe(
 				Effect.flatMap(resultToEffect),
 				Effect.tapError((error) => Console.error({ ...error })),
@@ -47,16 +47,16 @@ export const NotificationServiceContentLive = Layer.succeed(
 						name: 'whispering-extension/notifications/clear',
 						body: { notificationId },
 					}),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to clear notification via background service worker',
-						description:
-							'There was likely an issue sending the message to the background service worker from the popup.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Unable to clear notification via background service worker',
+					description:
+						'There was likely an issue sending the message to the background service worker from the popup.',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
 			}).pipe(Effect.catchAll((error) => Console.error({ ...error }))),
 	}),
 );

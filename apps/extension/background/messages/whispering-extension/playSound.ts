@@ -15,14 +15,12 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 	Effect.gen(function* () {
 		yield* Console.info('Playing sound', sound);
 		const activeTabId = yield* getActiveTabId.pipe(
-			Effect.mapError(
-				(error) =>
-					new WhisperingError({
-						title: 'Failed to get active tab ID',
-						description: 'Failed to get active tab ID to play sound',
-						action: { type: 'more-details', error },
-					}),
-			),
+			Effect.mapError((error) => ({
+				_tag: 'WhisperingError',
+				title: 'Failed to get active tab ID',
+				description: 'Failed to get active tab ID to play sound',
+				action: { type: 'more-details', error },
+			})),
 		);
 		yield* Effect.tryPromise({
 			try: () =>
@@ -30,12 +28,12 @@ const playSound = (sound: 'start' | 'stop' | 'cancel') =>
 					message: 'playSound',
 					sound,
 				}),
-			catch: (error) =>
-				new WhisperingError({
-					title: `Failed to play ${sound} sound`,
-					description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
-					action: { type: 'more-details', error },
-				}),
+			catch: (error) => ({
+				_tag: 'WhisperingError',
+				title: `Failed to play ${sound} sound`,
+				description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
+				action: { type: 'more-details', error },
+			}),
 		});
 	}).pipe(
 		// Silently catch playSound errors and log them to the console instead of render them as toast
@@ -54,12 +52,13 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.sound) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		yield* playSound(body.sound);
 	}).pipe(

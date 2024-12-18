@@ -21,24 +21,25 @@ export const injectScript = <T, Args extends any[]>({
 					func,
 					args,
 				}),
-			catch: (error) =>
-				new WhisperingError({
-					title: `Unable to execute "${commandName}" script in Whispering tab`,
-					description:
-						'This might be due to the tab not being awake or not in the correct domain.',
-					action: { type: 'more-details', error },
-				}),
+			catch: (error) => ({
+				_tag: 'WhisperingError',
+				title: `Unable to execute "${commandName}" script in Whispering tab`,
+				description:
+					'This might be due to the tab not being awake or not in the correct domain.',
+				action: { type: 'more-details', error },
+			}),
 		});
 		yield* Console.info(
 			`Injection result "${commandName}" script:`,
 			injectionResult,
 		);
 		if (!injectionResult || !injectionResult.result) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: `Unable to execute "${commandName}" script in Whispering tab`,
 				description: 'The result of the script injection is undefined',
 				action: { type: 'none' },
-			});
+			};
 		}
 		const { result } = injectionResult;
 		return yield* resultToEffect(result);

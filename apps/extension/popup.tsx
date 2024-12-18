@@ -54,13 +54,13 @@ const toggleRecording = () =>
 			>({
 				name: 'whispering-web/toggleRecording',
 			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to toggle recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to toggle recording via background service worker',
+			description:
+				'There was likely an issue sending the message to the background service worker from the popup.',
+			action: { type: 'more-details', error },
+		}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
 		Effect.catchAll(renderErrorAsNotification),
@@ -77,13 +77,13 @@ const cancelRecording = () =>
 			>({
 				name: 'whispering-web/cancelRecording',
 			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to cancel recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to cancel recording via background service worker',
+			description:
+				'There was likely an issue sending the message to the background service worker from the popup.',
+			action: { type: 'more-details', error },
+		}),
 	}).pipe(
 		Effect.flatMap(resultToEffect),
 		Effect.catchAll(renderErrorAsNotification),

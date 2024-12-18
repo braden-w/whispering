@@ -21,15 +21,15 @@ const createNotificationServiceDesktop = (): NotificationService => {
 						sendNotification({ title });
 					}
 				},
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Notification error',
-						description: 'Could not send notification',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Notification error',
+					description: 'Could not send notification',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
 			});
 			if (!notifyResult.ok) return notifyResult;
 			const uselessId = notifyResult.data;

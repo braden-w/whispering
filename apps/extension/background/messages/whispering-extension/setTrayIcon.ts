@@ -31,13 +31,13 @@ const setTrayIcon = (recorderState: RecorderState) =>
 		const path = iconPaths[recorderState];
 		yield* Effect.tryPromise({
 			try: () => chrome.action.setIcon({ path }),
-			catch: (error) =>
-				new WhisperingError({
-					title: `Error setting icon to ${recorderState} icon`,
-					description:
-						"There was an error setting the tray icon using the browser's action API. Please try again.",
-					action: { type: 'more-details', error },
-				}),
+			catch: (error) => ({
+				_tag: 'WhisperingError',
+				title: `Error setting icon to ${recorderState} icon`,
+				description:
+					"There was an error setting the tray icon using the browser's action API. Please try again.",
+				action: { type: 'more-details', error },
+			}),
 		});
 	});
 
@@ -54,12 +54,13 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.recorderState) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking setTrayIcon command',
 				description:
 					'RecorderState must be provided in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		yield* setTrayIcon(body.recorderState);
 	}).pipe(

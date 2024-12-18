@@ -37,18 +37,16 @@ const createSetWatch = <
 					const newValue: A = yield* parseValueFromStorage(
 						newValueUnparsed,
 					).pipe(
-						Effect.mapError(
-							(error) =>
-								new WhisperingError({
-									title: 'Unable to parse storage value',
-									description:
-										'There was an error running Schema.decodeUnknown on the storage value.',
-									action: {
-										type: 'more-details',
-										error,
-									},
-								}),
-						),
+						Effect.mapError((error) => ({
+							_tag: 'WhisperingError',
+							title: 'Unable to parse storage value',
+							description:
+								'There was an error running Schema.decodeUnknown on the storage value.',
+							action: {
+								type: 'more-details',
+								error,
+							},
+						})),
 					);
 					yield* Console.info('watch', key, newValue);
 					callback(newValue);

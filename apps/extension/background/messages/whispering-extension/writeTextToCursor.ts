@@ -106,14 +106,14 @@ const writeTextToCursor = (
 		});
 	}).pipe(
 		Effect.catchTags({
-			GetActiveTabIdError: () =>
-				new WhisperingError({
-					title:
-						'Unable to get active tab ID to write transcribed text to cursor',
-					description:
-						'Please try pasting or go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
-					action: { type: 'none' },
-				}),
+			GetActiveTabIdError: () => ({
+				_tag: 'WhisperingError',
+				title:
+					'Unable to get active tab ID to write transcribed text to cursor',
+				description:
+					'Please try pasting or go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+				action: { type: 'none' },
+			}),
 		}),
 	);
 };
@@ -131,11 +131,12 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.transcribedText) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking writeTextToCursor command',
 				description: 'Text must be provided in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		yield* writeTextToCursor(body.transcribedText);
 	}).pipe(

@@ -18,11 +18,12 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body || !body.settings) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
 				action: { type: 'none' },
-			});
+			};
 		}
 		const { settings } = body;
 		const whisperingTabId = yield* getOrCreateWhisperingTabId;

@@ -26,12 +26,13 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 ) =>
 	Effect.gen(function* () {
 		if (!body?.notificationId) {
-			return yield* new WhisperingError({
+			return yield* {
+				_tag: 'WhisperingError',
 				title: 'Error invoking notify command',
 				description:
 					'Notify/clear must be provided notificationId in the request body of the message',
 				action: { type: 'none' },
-			});
+			};
 		}
 		const notificationService = yield* NotificationService;
 		return yield* notificationService.clear(body.notificationId);

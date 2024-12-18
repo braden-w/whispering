@@ -87,16 +87,16 @@ export const NotificationServiceBgswLive = Layer.succeed(
 							);
 						}
 					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Failed to show notification',
-							description:
-								'There was an error showing the notification in the background service worker.',
-							action: {
-								type: 'more-details',
-								error,
-							},
-						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Failed to show notification',
+						description:
+							'There was an error showing the notification in the background service worker.',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				}).pipe(
 					Effect.tapError((error) => Console.error({ ...error })),
 					Effect.catchAll(() => Effect.succeed(maybeId ?? nanoid())),
