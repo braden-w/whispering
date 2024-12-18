@@ -1,4 +1,3 @@
-import GithubIcon from 'react:./components/icons/github.svg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,11 +13,9 @@ import { useStorage } from '@plasmohq/storage/hook';
 import {
 	type RecorderState,
 	WHISPERING_URL,
-	WhisperingError,
 	recorderStateToIcons,
-	resultToEffect,
+	tryAsync,
 } from '@repo/shared';
-import { Effect } from 'effect';
 import {
 	ClipboardIcon,
 	ListIcon,
@@ -26,10 +23,10 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
+import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 import './style.css';
 
@@ -45,15 +42,13 @@ function IndexPopup() {
 	);
 }
 
-const toggleRecording = () =>
-	Effect.tryPromise({
+const toggleRecording = async () => {
+	const sendToToggleRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
 				ToggleRecording.ResponseBody
-			>({
-				name: 'whispering-web/toggleRecording',
-			}),
+			>({ name: 'whispering-web/toggleRecording' }),
 		catch: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Unable to toggle recording via background service worker',
@@ -61,15 +56,17 @@ const toggleRecording = () =>
 				'There was likely an issue sending the message to the background service worker from the popup.',
 			action: { type: 'more-details', error },
 		}),
-	}).pipe(
-		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
+	});
+	if (!sendToToggleRecordingResult.ok)
+		return renderErrorAsNotification(sendToToggleRecordingResult);
+	const toggleRecordingResult = sendToToggleRecordingResult.data;
+	if (!toggleRecordingResult.ok)
+		return renderErrorAsNotification(toggleRecordingResult);
+	return toggleRecordingResult.data;
+};
 
-const cancelRecording = () =>
-	Effect.tryPromise({
+const cancelRecording = async () => {
+	const sendToCancelRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				CancelRecording.RequestBody,
@@ -84,12 +81,14 @@ const cancelRecording = () =>
 				'There was likely an issue sending the message to the background service worker from the popup.',
 			action: { type: 'more-details', error },
 		}),
-	}).pipe(
-		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
+	});
+	if (!sendToCancelRecordingResult.ok)
+		return renderErrorAsNotification(sendToCancelRecordingResult);
+	const cancelRecordingResult = sendToCancelRecordingResult.data;
+	if (!cancelRecordingResult.ok)
+		return renderErrorAsNotification(cancelRecordingResult);
+	return cancelRecordingResult.data;
+};
 
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>(
