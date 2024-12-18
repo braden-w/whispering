@@ -1,19 +1,17 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-export type RequestBody = {};
+export type RequestBody = undefined;
 
 export type ResponseBody = Result<void>;
 
-export const toggleRecording = Effect.gen(function* () {
-	const whisperingTabId = yield* getOrCreateWhisperingTabId;
-	yield* injectScript<undefined, []>({
+const toggleRecording = async () => {
+	const whisperingTabIdResult = await getOrCreateWhisperingTabId();
+	if (!whisperingTabIdResult.ok) return whisperingTabIdResult;
+	const whisperingTabId = whisperingTabIdResult.data;
+	return await injectScript<undefined, []>({
 		tabId: whisperingTabId,
 		commandName: 'toggleRecording',
 		func: () => {
@@ -24,6 +22,7 @@ export const toggleRecording = Effect.gen(function* () {
 				return {
 					ok: false,
 					error: {
+						_tag: 'WhisperingError',
 						title: 'Unable to toggle recording',
 						description:
 							'There was an error toggling the recording. Please try again.',
@@ -37,18 +36,14 @@ export const toggleRecording = Effect.gen(function* () {
 		},
 		args: [],
 	});
-});
+};
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	req,
-	res,
-) =>
-	toggleRecording.pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async (req, res) => {
+	const toggleRecordingResult = await toggleRecording();
+	res.send(toggleRecordingResult);
+};
 
 export default handler;
