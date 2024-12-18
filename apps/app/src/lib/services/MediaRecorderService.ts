@@ -51,10 +51,18 @@ export function createMediaRecorder(): MediaRecorderService {
 			const toastId = nanoid();
 			const reinitializedMediaRecorderResult: WhisperingResult<MediaRecorder> =
 				await (async () => {
-					const newOrExistingStreamResult = settings.value
-						.isFasterRerecordEnabled
-						? await mediaStreamManager.getOrRefreshStream()
-						: await mediaStreamManager.refreshStream();
+					const getNewOrExistingStream = async () => {
+						if (settings.value.isFasterRerecordEnabled) {
+							const existingStreamResult =
+								await mediaStreamManager.getExistingStream();
+							if (!existingStreamResult.ok) return existingStreamResult;
+							const existingStream = existingStreamResult.data;
+							if (existingStream) return Ok(existingStream);
+							return await mediaStreamManager.refreshStream();
+						}
+						return await mediaStreamManager.refreshStream();
+					};
+					const newOrExistingStreamResult = await getNewOrExistingStream();
 					if (!newOrExistingStreamResult.ok) return newOrExistingStreamResult;
 					const newOrExistingStream = newOrExistingStreamResult.data;
 					const newOrExistingMediaRecorderResult = trySyncBubble({
@@ -177,6 +185,9 @@ export function createMediaRecorder(): MediaRecorderService {
 						},
 					}),
 				});
+			if (!settings.value.isFasterRerecordEnabled) {
+				mediaStreamManager.destroy();
+			}
 			return cancelResult;
 		},
 	};
