@@ -64,6 +64,8 @@ export const settingsSchema = z.object({
 	currentGlobalShortcut: z.string(),
 });
 
+export type Settings = z.infer<typeof settingsSchema>;
+
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
@@ -85,8 +87,6 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
-
-export type Settings = S.Schema.Type<typeof settingsSchema>;
 
 export type WhisperingError = {
 	_tag: 'WhisperingError';
