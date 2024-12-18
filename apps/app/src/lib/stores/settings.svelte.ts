@@ -1,17 +1,13 @@
 import { toast } from '$lib/services/ToastService';
-import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import { Schema as S } from '@effect/schema';
 import {
-	WhisperingError,
 	getDefaultSettings,
 	settingsSchema,
 	tryAsync,
 	trySync,
-	type Result,
 } from '@repo/shared';
-import { Effect } from 'effect';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
 
@@ -68,12 +64,12 @@ function registerLocalShortcut({
 				event.preventDefault();
 				callback();
 			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error registering local shortcut',
-				description: 'Please make sure it is a valid keyboard shortcut.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error registering local shortcut',
+			description: 'Please make sure it is a valid keyboard shortcut.',
+			action: { type: 'more-details', error },
+		}),
 	});
 }
 
@@ -98,13 +94,12 @@ async function registerGlobalShortcut({
 				}
 			});
 		},
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error registering global shortcut.',
-				description:
-					'Please make sure it is a valid Electron keyboard shortcut.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error registering global shortcut.',
+			description: 'Please make sure it is a valid Electron keyboard shortcut.',
+			action: { type: 'more-details', error },
+		}),
 	});
 }
 
