@@ -6,7 +6,7 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok, type RecorderState, type Result } from '@repo/shared';
+import { Err, Ok, type RecorderState, type Result } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
@@ -44,9 +44,7 @@ const createRecorder = () => {
 		},
 
 		async toggleRecording() {
-			const toggleRecordingResult = await (async (): Promise<
-				Result<undefined>
-			> => {
+			const toggleRecording = async (): Promise<Result<undefined>> => {
 				switch (mediaRecorder.recordingState) {
 					case 'inactive': {
 						if (settings.value.alwaysOnTop === 'When Recording') {
@@ -120,7 +118,14 @@ const createRecorder = () => {
 						return Ok(undefined);
 					}
 				}
-			})();
+				return Err({
+					_tag: 'WhisperingError',
+					title: 'Recording state is invalid',
+					description: `Recording state ${mediaRecorder.recordingState} is invalid`,
+					action: { type: 'none' },
+				});
+			};
+			const toggleRecordingResult = await toggleRecording();
 			if (!toggleRecordingResult.ok) {
 				recorderState.value = 'IDLE';
 				if (settings.value.alwaysOnTop === 'When Recording') {
