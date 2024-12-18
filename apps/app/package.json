@@ -9,7 +9,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"tauri": "cross-env BUILD_TARGET=native tauri",
-		"lint": "eslint . && prettier --check .",
+		"lint": "eslint --fix . && prettier --check .",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
