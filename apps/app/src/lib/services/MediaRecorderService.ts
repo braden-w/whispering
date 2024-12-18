@@ -60,7 +60,7 @@ export function createMediaRecorder(): MediaRecorderService {
 					const newOrExistingMediaRecorderResult = trySyncBubble({
 						try: () =>
 							new MediaRecorder(newOrExistingStream, {
-								bitsPerSecond: Number(settings.value.bitsPerSecond),
+								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
 							}),
 						catch: (error) => ({
 							_tag: 'TryReuseStreamError',
@@ -91,7 +91,7 @@ export function createMediaRecorder(): MediaRecorderService {
 							trySyncWhispering({
 								try: () =>
 									new MediaRecorder(newStream, {
-										bitsPerSecond: Number(settings.value.bitsPerSecond),
+										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
 									}),
 								catch: (error) => ({
 									_tag: 'WhisperingError',

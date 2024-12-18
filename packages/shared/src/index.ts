@@ -43,7 +43,7 @@ export const settingsSchema = z.object({
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
 	selectedAudioInputDeviceId: z.string(),
-	bitsPerSecond: z
+	bitrateKbps: z
 		.enum(BITRATE_VALUES_KBPS)
 		.optional()
 		.default(DEFAULT_BITRATE_KBPS),
@@ -70,7 +70,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
-		bitsPerSecond: DEFAULT_BITRATE_KBPS,
+		bitrateKbps: DEFAULT_BITRATE_KBPS,
 
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
