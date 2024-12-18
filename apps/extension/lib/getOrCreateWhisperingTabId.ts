@@ -20,19 +20,20 @@ export const getOrCreateWhisperingTabId = async () => {
 		return await createAndSetupNewTab();
 	}
 
-	const getWhisperingTabIdResult = await getWhisperingTabId(whisperingTabs);
-	if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
-	const selectedTabId = getWhisperingTabIdResult.data;
-	const otherTabIds = whisperingTabs
+	const getBestWhisperingTabResult = await getBestWhisperingTab(whisperingTabs);
+	if (!getBestWhisperingTabResult.ok) return getBestWhisperingTabResult;
+	const bestWhisperingTabId = getBestWhisperingTabResult.data;
+
+	const otherWhisperingTabIds = whisperingTabs
 		.map((tab) => tab.id)
 		.filter((tabId) => tabId !== undefined)
-		.filter((tabId) => tabId !== selectedTabId);
+		.filter((tabId) => tabId !== bestWhisperingTabId);
 
-	const results = await removeTabsById(otherTabIds);
-	return selectedTabId;
+	const results = await removeTabsById(otherWhisperingTabIds);
+	return bestWhisperingTabId;
 };
 
-async function getWhisperingTabId(
+async function getBestWhisperingTab(
 	tabs: chrome.tabs.Tab[],
 ): Promise<Result<number>> {
 	const undiscardedWhisperingTabs = tabs.filter((tab) => !tab.discarded);
