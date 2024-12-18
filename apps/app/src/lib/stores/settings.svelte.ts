@@ -13,7 +13,7 @@ import { recorder } from './recorder.svelte';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',
-	schema: settingsSchema.pipe(S.mutable),
+	schema: settingsSchema,
 	defaultValue: getDefaultSettings('app'),
 });
 
