@@ -8,9 +8,7 @@ const MAX_FILE_SIZE_MB = 25 as const;
 
 export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 	transcribe: async (audioBlob) => {
-		const { groqApiKey: apiKey, outputLanguage } = settings.value;
-
-		if (!apiKey) {
+		if (!settings.value.groqApiKey) {
 			return Err({
 				_tag: 'WhisperingError',
 				title: 'Groq API Key not provided.',
@@ -23,7 +21,7 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 			});
 		}
 
-		if (!apiKey.startsWith('gsk_')) {
+		if (!settings.value.groqApiKey.startsWith('gsk_')) {
 			return Err({
 				_tag: 'WhisperingError',
 				title: 'Invalid Groq API Key',
@@ -52,12 +50,13 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		const formData = new FormData();
 		formData.append('file', formDataFile);
 		formData.append('model', 'whisper-large-v3');
-		if (outputLanguage !== 'auto') formData.append('language', outputLanguage);
+		if (settings.value.outputLanguage !== 'auto')
+			formData.append('language', settings.value.outputLanguage);
 		const postResult = await HttpService.post({
 			url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 			formData,
 			schema: WhisperResponseSchema,
-			headers: { Authorization: `Bearer ${apiKey}` },
+			headers: { Authorization: `Bearer ${settings.value.groqApiKey}` },
 		});
 		if (!postResult.ok) {
 			switch (postResult.error._tag) {
