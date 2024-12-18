@@ -5,7 +5,12 @@ import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
-} from './services/TranscriptionService.js';
+} from './services/index.js';
+import type {
+	Result as EpicenterResult,
+	Ok as EpicenterOk,
+	Err as EpicenterErr,
+} from '@epicenterhq/result';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -80,7 +85,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 
 export type Settings = S.Schema.Type<typeof settingsSchema>;
 
-export type WhisperingErrorProperties = {
+export type WhisperingError = {
+	_tag: 'WhisperingError';
 	title: string;
 	description: string;
 	action:
@@ -97,29 +103,47 @@ export type WhisperingErrorProperties = {
 	isWarning?: boolean;
 };
 
-export class WhisperingError extends Data.TaggedError(
-	'WhisperingError',
-)<WhisperingErrorProperties> {}
+export type BubbleError<T extends string = string> = {
+	_tag: T;
+	message: string;
+};
 
 export type Result<
 	T,
-	E extends WhisperingErrorProperties = WhisperingErrorProperties,
-> = { ok: true; data: T } | { ok: false; error: E };
+	E extends BubbleError | WhisperingError = WhisperingError,
+> = EpicenterResult<T, E>;
 
-export const effectToResult = <T>(
-	effect: Effect.Effect<T, WhisperingError>,
-): Effect.Effect<Result<T>> =>
-	effect.pipe(
-		Effect.map((data) => ({ ok: true, data }) as const),
-		Effect.catchAll((error) => Effect.succeed({ ok: false, error } as const)),
-	);
+export const Ok = <T>(data: T): EpicenterOk<T> => ({ ok: true, data });
 
-export const resultToEffect = <T>(
-	result: Result<T>,
-): Effect.Effect<T, WhisperingError> =>
-	result.ok
-		? Effect.succeed(result.data)
-		: Effect.fail(new WhisperingError(result.error));
+export const Err = <E extends BubbleError | WhisperingError>(
+	error: E,
+): EpicenterErr<E> => ({ ok: false, error });
+
+export function trySync<T, E extends BubbleError | WhisperingError>({
+	try: fn,
+	catch: errorHandler,
+}: { try: () => T; catch: (error: unknown) => E }): Result<T, E> {
+	try {
+		const data = fn();
+		return { ok: true, data };
+	} catch (error) {
+		return { ok: false, error: errorHandler(error) };
+	}
+}
+
+export async function tryAsync<T, E extends BubbleError | WhisperingError>({
+	try: fn,
+	catch: errorHandler,
+}: { try: () => Promise<T>; catch: (error: unknown) => E }): Promise<
+	Result<T, E>
+> {
+	try {
+		const data = await fn();
+		return { ok: true, data };
+	} catch (error) {
+		return { ok: false, error: errorHandler(error) };
+	}
+}
 
 export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
 
