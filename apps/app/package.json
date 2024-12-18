@@ -45,7 +45,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@effect/platform": "^0.66.2",
 		"@plasmohq/messaging": "^0.6.2",
 		"@repo/shared": "workspace:*",
 		"@tanstack/svelte-table": "^9.0.0-alpha.10",
@@ -63,7 +62,6 @@
 		"@tauri-apps/plugin-window-state": "^2.2.0",
 		"audio-recorder-polyfill": "^0.4.1",
 		"cross-env": "^7.0.3",
-		"effect": "^3.8.4",
 		"hotkeys-js": "^3.13.7",
 		"idb": "^8.0.0",
 		"nanoid": "^5.0.7",

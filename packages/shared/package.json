@@ -12,7 +12,6 @@
 	},
 	"dependencies": {
 		"@epicenterhq/result": "^0.1.0",
-		"effect": "^3.8.4",
 		"zod": "^3.24.1"
 	}
 }
