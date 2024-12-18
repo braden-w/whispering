@@ -1,5 +1,4 @@
-import { Err, tryAsync, type BubbleError, type Result } from '@repo/shared';
-import { Data, Effect, Option } from 'effect';
+import { type BubbleError, type Result, tryAsync } from '@repo/shared';
 
 export const getActiveTabId = (): Promise<
 	Result<number | undefined, BubbleError<'GetActiveTabIdError'>>
@@ -14,6 +13,6 @@ export const getActiveTabId = (): Promise<
 		},
 		catch: (error) => ({
 			_tag: 'GetActiveTabIdError',
-			message: 'Error getting active tab ID',
+			message: 'Unable to get active tab ID',
 		}),
 	});
