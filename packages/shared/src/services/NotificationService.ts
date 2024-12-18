@@ -1,6 +1,5 @@
 import { Schema as S } from '@effect/schema';
 import type { Effect } from 'effect';
-import { Context } from 'effect';
 
 export const notificationOptionsSchema = S.Struct({
 	id: S.optional(S.String),
@@ -17,10 +16,7 @@ export const notificationOptionsSchema = S.Struct({
 
 type NotificationOptions = S.Schema.Type<typeof notificationOptionsSchema>;
 
-export class NotificationService extends Context.Tag('NotificationService')<
-	NotificationService,
-	{
-		notify: (options: NotificationOptions) => Effect.Effect<string>;
-		clear: (id: string) => Effect.Effect<void>;
-	}
->() {}
+export type NotificationService = {
+	notify: (options: NotificationOptions) => Effect.Effect<string>;
+	clear: (id: string) => Effect.Effect<void>;
+};

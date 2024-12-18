@@ -1,16 +1,20 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
-import { type RecorderState, tryAsync, WhisperingError } from '@repo/shared';
+import {
+	type RecorderState,
+	type Result,
+	WhisperingError,
+	tryAsync,
+} from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
-import type { Effect } from 'effect';
 
 type SetTrayIconService = {
-	setTrayIcon: (icon: RecorderState) => Effect.Effect<void, WhisperingError>;
+	setTrayIcon: (icon: RecorderState) => Promise<Result<void>>;
 };
 
-const SetTrayIconService = window.__TAURI_INTERNALS__
+export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
