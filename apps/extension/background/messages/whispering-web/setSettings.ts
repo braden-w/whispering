@@ -1,33 +1,31 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { Result, Settings } from '@repo/shared';
-import { WhisperingError, effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
+import { Err, type Result, type Settings } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import { STORAGE_KEYS } from '~lib/services/extension-storage';
 
 export type RequestBody = { settings: Settings };
 
-export type ResponseBody = Result<void>;
+export type ResponseBody = Result<Settings>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) =>
-	Effect.gen(function* () {
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async ({ body }, res) => {
+	const setSettings = async () => {
 		if (!body || !body.settings) {
-			return yield* {
+			return Err({
 				_tag: 'WhisperingError',
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
 				action: { type: 'none' },
-			};
+			});
 		}
 		const { settings } = body;
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		const returnedSettings = yield* injectScript<
+		const whisperingTabIdResult = await getOrCreateWhisperingTabId();
+		if (!whisperingTabIdResult.ok) return whisperingTabIdResult;
+		const whisperingTabId = whisperingTabIdResult.data;
+		const returnedSettings = await injectScript<
 			Settings,
 			[typeof STORAGE_KEYS.SETTINGS, Settings]
 		>({
@@ -41,6 +39,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 					return {
 						ok: false,
 						error: {
+							_tag: 'WhisperingError',
 							title: 'Unable to set Whispering settings',
 							description:
 								'An error occurred while setting Whispering settings.',
@@ -54,12 +53,10 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			},
 			args: [STORAGE_KEYS.SETTINGS, settings],
 		});
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+		return returnedSettings;
+	};
+
+	res.send(await setSettings());
+};
 
 export default handler;
