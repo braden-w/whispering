@@ -31,4 +31,5 @@ export default ts.config(
 			},
 		},
 	},
+	{ ignores: ['src-tauri/**'] },
 );
