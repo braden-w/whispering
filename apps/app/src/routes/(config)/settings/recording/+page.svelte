@@ -6,7 +6,7 @@
 	} from '$lib/services/MediaRecorderService.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, BITRATE_VALUES } from '@repo/shared';
+	import { BITRATE_OPTIONS, BITRATE_VALUES_KBPS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
 	const getMediaDevices = async () => {
@@ -72,15 +72,15 @@
 			id="bit-rate"
 			label="Bitrate"
 			items={BITRATE_OPTIONS.map((option) => ({
-				value: option.value.toString(),
+				value: option.value,
 				label: option.label,
 			}))}
-			selected={settings.value.bitsPerSecond.toString()}
+			selected={settings.value.bitsPerSecond}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					bitsPerSecond: Number(selected) as (typeof BITRATE_VALUES)[number],
+					bitsPerSecond: selected,
 				};
 			}}
 			placeholder="Select a bitrate"
