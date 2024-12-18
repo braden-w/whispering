@@ -10,6 +10,7 @@ import {
 	trySyncWhispering,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { renderErrAsToast } from './renderErrorAsToast';
 
 const TIMESLICE_MS = 1000;
 
@@ -39,90 +40,84 @@ export function createMediaRecorder(): MediaRecorderService {
 			if (!mediaRecorder) return 'inactive';
 			return mediaRecorder.state;
 		},
-		async startRecording(): Promise<WhisperingResult<undefined>> {
+		async startRecording() {
 			if (mediaRecorder) {
-				return WhisperingErr({
-					title: 'Unexpected media recorder already exists',
-					description:
-						'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
-					action: { type: 'none' },
-				});
+				return renderErrAsToast(
+					WhisperingErr({
+						title: 'Unexpected media recorder already exists',
+						description:
+							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+						action: { type: 'none' },
+					}),
+				);
 			}
 			const toastId = nanoid();
-			const reinitializedMediaRecorderResult: WhisperingResult<MediaRecorder> =
-				await (async () => {
-					const getNewOrExistingStream = async () => {
-						if (!settings.value.isFasterRerecordEnabled) {
-							return await mediaStreamManager.refreshStream();
-						}
-						const existingStreamResult =
-							await mediaStreamManager.getExistingStream();
-						if (!existingStreamResult.ok) return existingStreamResult;
-						const existingStream = existingStreamResult.data;
-						if (existingStream) return Ok(existingStream);
-						return await mediaStreamManager.refreshStream();
-					};
-					const newOrExistingStreamResult = await getNewOrExistingStream();
-					if (!newOrExistingStreamResult.ok) return newOrExistingStreamResult;
-					const newOrExistingStream = newOrExistingStreamResult.data;
-					const newOrExistingMediaRecorderResult = trySyncBubble({
+
+			const getNewMediaRecorderNewStream = async () => {
+				const newStreamResult = await mediaStreamManager.refreshStream();
+				if (!newStreamResult.ok) return newStreamResult;
+				const newStream = newStreamResult.data;
+
+				const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
+					trySyncWhispering({
 						try: () =>
-							new MediaRecorder(newOrExistingStream, {
+							new MediaRecorder(newStream, {
 								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
 							}),
 						catch: (error) => ({
-							_tag: 'TryReuseStreamError',
-							message:
-								error instanceof Error
-									? error.message
-									: 'Error initializing media recorder with preferred device',
+							_tag: 'WhisperingError',
+							title: 'Error initializing media recorder with preferred device',
+							description: 'Please try again',
+							action: { type: 'more-details', error },
 						}),
 					});
-					if (!newOrExistingMediaRecorderResult.ok) {
-						toast.loading({
-							id: toastId,
-							title: 'Error initializing media recorder with preferred device',
-							description:
-								'Trying to find another available audio input device...',
-						});
-						const newStreamResult = await mediaStreamManager.refreshStream();
-						if (!newStreamResult.ok)
-							return WhisperingErr({
-								title:
-									'Error initializing media recorder with preferred device',
-								description: 'Please try again',
-								action: { type: 'none' },
-							});
+				if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
+				return newMediaRecorderResult;
+			};
 
-						const newStream = newStreamResult.data;
-						const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
-							trySyncWhispering({
-								try: () =>
-									new MediaRecorder(newStream, {
-										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-									}),
-								catch: (error) => ({
-									_tag: 'WhisperingError',
-									title:
-										'Error initializing media recorder with preferred device',
-									description: 'Please try again',
-									action: { type: 'more-details', error },
-								}),
-							});
-						return newMediaRecorderResult;
-					}
-					return newOrExistingMediaRecorderResult;
-				})();
-			if (!reinitializedMediaRecorderResult.ok)
-				return reinitializedMediaRecorderResult;
-			const newMediaRecorder = reinitializedMediaRecorderResult.data;
+			const getNewMediaRecorderReuseStream = async () => {
+				const existingStreamResult =
+					await mediaStreamManager.getExistingStream();
+				if (!existingStreamResult.ok) return existingStreamResult;
+				const existingStream = existingStreamResult.data;
+				if (!existingStream) {
+					toast.loading({
+						id: toastId,
+						title: 'Error initializing media recorder with preferred device',
+						description:
+							'Trying to find another available audio input device...',
+					});
+					return await getNewMediaRecorderNewStream();
+				}
+
+				const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
+					trySyncWhispering({
+						try: () =>
+							new MediaRecorder(existingStream, {
+								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+							}),
+						catch: (error) => ({
+							_tag: 'WhisperingError',
+							title: 'Error initializing media recorder with preferred device',
+							description: 'Please try again',
+							action: { type: 'more-details', error },
+						}),
+					});
+				return newMediaRecorderResult;
+			};
+
+			const newMediaRecorderResult = settings.value.isFasterRerecordEnabled
+				? await getNewMediaRecorderReuseStream()
+				: await getNewMediaRecorderNewStream();
+			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
+			const newMediaRecorder = newMediaRecorderResult.data;
+
 			newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 				if (!event.data.size) return;
 				recordedChunks.push(event.data);
 			});
 			newMediaRecorder.start(TIMESLICE_MS);
 			mediaRecorder = newMediaRecorder;
-			return Ok(undefined);
 		},
 		async stopRecording() {
 			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
