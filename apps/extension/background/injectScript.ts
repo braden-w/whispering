@@ -10,7 +10,7 @@ export const injectScript = async <T, Args extends unknown[]>({
 	commandName: string;
 	func: (...args: Args) => Result<T>;
 	args: Args;
-}) => {
+}): Promise<Result<T>> => {
 	const injectionResult = await tryAsync({
 		try: () =>
 			chrome.scripting.executeScript<Args, Result<T>>({
