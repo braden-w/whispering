@@ -131,7 +131,7 @@ const createRecorder = () => {
 			}
 			return toggleRecordingResult;
 		},
-		cancelRecording: async () => {
+		async cancelRecording() {
 			const cancelRecordingResult = await mediaRecorder.cancelRecording();
 			if (!cancelRecordingResult.ok) return cancelRecordingResult;
 			if (settings.value.isPlaySoundEnabled) {

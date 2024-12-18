@@ -5,7 +5,7 @@ import type * as CreateNotification from '~background/messages/whispering-extens
 
 export const createNotificationServiceContentLive =
 	(): NotificationService => ({
-		notify: async (notifyOptions) => {
+		async notify(notifyOptions) {
 			const sendToCreateNotificationResult = await tryAsync({
 				try: () =>
 					sendToBackground<
@@ -32,7 +32,7 @@ export const createNotificationServiceContentLive =
 			if (!createNotificationResult.ok) return createNotificationResult;
 			return createNotificationResult;
 		},
-		clear: async (notificationId) => {
+		async clear(notificationId) {
 			const sendToClearNotificationResult = await tryAsync({
 				try: () =>
 					sendToBackground<

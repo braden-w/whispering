@@ -3,7 +3,7 @@ import { type Result, tryAsync } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
-	setClipboardText: async (text): Promise<Result<void>> => {
+	async setClipboardText(text): Promise<Result<void>> {
 		const setClipboardResult = await tryAsync({
 			try: () => navigator.clipboard.writeText(text),
 			catch: (error) => ({
