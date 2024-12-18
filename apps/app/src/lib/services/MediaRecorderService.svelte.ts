@@ -11,7 +11,7 @@ import { toast } from './ToastService.js';
 
 type MediaStreamManager = {
 	readonly isStreamValid: boolean;
-	getOrRefreshStream(): Promise<WhisperingResult<MediaStream>>;
+	getExistingStream(): Promise<WhisperingResult<MediaStream | null>>;
 	refreshStream(): Promise<WhisperingResult<MediaStream>>;
 	destroy(): void;
 };
@@ -30,8 +30,8 @@ function createMediaStreamManager(): MediaStreamManager {
 		get isStreamValid() {
 			return isStreamValid;
 		},
-		async getOrRefreshStream() {
-			if (currentStream === null) return this.refreshStream();
+		async getExistingStream(): Promise<WhisperingResult<MediaStream | null>> {
+			if (currentStream === null) return Ok(null);
 			if (!currentStream.active) {
 				toast.warning({
 					title: 'Open stream is inactive',
