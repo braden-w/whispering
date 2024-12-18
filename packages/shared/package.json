@@ -8,7 +8,7 @@
 		".": "./src/index.ts"
 	},
 	"devDependencies": {
-		"typescript": "^5.6.2"
+		"typescript": "^5.7.2"
 	},
 	"dependencies": {
 		"@epicenterhq/result": "^0.1.0",
