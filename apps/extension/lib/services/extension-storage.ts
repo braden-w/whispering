@@ -1,8 +1,3 @@
-import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
-import { Err, Ok, parseJson, recorderStateSchema } from '@repo/shared';
-import { z } from 'zod';
-import { renderErrorAsNotification } from '~lib/errors';
-
 /**
  * Shared state keys used for communication between extension components:
  * - Content Scripts (injected into web pages)
@@ -19,7 +14,7 @@ import { renderErrorAsNotification } from '~lib/errors';
  * const [recorderState] = useStorage<RecorderState>(SHARED_STATE_KEYS.RECORDER_STATE);
  *
  * // In background service worker
- * await storage.set(SHARED_STATE_KEYS.RECORDER_STATE, 'RECORDING');
+ * await storage.setItem(SHARED_STATE_KEYS.RECORDER_STATE, 'RECORDING');
  * ```
  */
 
@@ -30,27 +25,4 @@ export const SHARED_EXTENSION_STATE_KEYS = {
 	SETTINGS: 'whispering-settings',
 } as const;
 
-const storage = new Storage();
-
-const createSetter = <TSchema extends z.ZodSchema, A = z.infer<TSchema>>({
-	key,
-	schema,
-}: {
-	key: string;
-	schema: TSchema;
-}) => {
-	return { set: (value: A) => storage.set(key, value) };
-};
-
-export const extensionStorageService = {
-	[SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE]: createSetter({
-		key: SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
-		schema: recorderStateSchema,
-	}),
-	[SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]: createSetter(
-		{
-			key: SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
-			schema: z.string(),
-		},
-	),
-} as const;
+export const storage = new Storage();
