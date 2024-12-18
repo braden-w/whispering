@@ -3,6 +3,56 @@ import { parseJson } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { z } from 'zod';
 
+const attemptMerge = <TSchema extends z.ZodTypeAny>({
+	key,
+	valueFromStorage,
+	defaultValue,
+	schema,
+	error,
+}: {
+	key: string;
+	valueFromStorage: unknown;
+	defaultValue: z.infer<TSchema>;
+	schema: TSchema;
+	error: z.ZodError;
+}): z.infer<TSchema> => {
+	const updatingLocalStorageToastId = nanoid();
+	toast({
+		id: updatingLocalStorageToastId,
+		variant: 'loading',
+		title: `Updating "${key}" in local storage...`,
+		description: 'Please wait...',
+	});
+
+	// Attempt to merge the default value with the value from storage if possible
+	const defaultValueMergedOldValues = {
+		...defaultValue,
+		...(valueFromStorage as Record<string, unknown>),
+	};
+
+	const parseMergedValuesResult = schema.safeParse(defaultValueMergedOldValues);
+	if (!parseMergedValuesResult.success) {
+		toast({
+			id: updatingLocalStorageToastId,
+			variant: 'error',
+			title: `Error updating "${key}" in local storage`,
+			description: 'Reverting to default value.',
+		});
+		localStorage.setItem(key, JSON.stringify(defaultValue));
+		return defaultValue;
+	}
+
+	const updatedValue = parseMergedValuesResult.data;
+	toast({
+		id: updatingLocalStorageToastId,
+		variant: 'success',
+		title: `Successfully updated "${key}" in local storage`,
+		description: 'The value has been updated.',
+	});
+	localStorage.setItem(key, JSON.stringify(updatedValue));
+	return updatedValue;
+};
+
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
  */
@@ -11,7 +61,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	schema,
 	defaultValue,
 	disableLocalStorage = false,
-	resolveParseError = () => defaultValue,
+	resolveParseErrorStrategy = () => defaultValue,
 }: {
 	/** The key used to store the value in local storage. */
 	key: string;
@@ -45,7 +95,9 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	 * Return a valid value to use it and save to storage.
 	 * @default `() => defaultValue`
 	 */
-	resolveParseError?: (params: {
+	resolveParseErrorStrategy?: (params: {
+		/** The key used to store the value in local storage. */
+		key: string;
 		/** The value from storage that failed schema validation. */
 		valueFromStorage: unknown;
 		/** The default value to use if the value from storage fails schema validation. */
@@ -73,7 +125,8 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		);
 		if (valueFromStorageResult.success) return valueFromStorageResult.data;
 
-		const resolvedValue = resolveParseError({
+		const resolvedValue = resolveParseErrorStrategy({
+			key,
 			valueFromStorage: valueFromStorageMaybeInvalid,
 			defaultValue,
 			schema,
