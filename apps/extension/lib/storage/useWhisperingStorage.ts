@@ -1,13 +1,10 @@
 import { useStorage } from '@plasmohq/storage/hook';
-import type {
-	WhisperingStorageKey,
-	WhisperingStorageKeyToStorageValue,
-} from './keys';
+import type { WhisperingStorageKey, WhisperingStorageKeyMap } from './keys';
 
 export function useWhisperingStorage<T extends WhisperingStorageKey>(
 	key: T,
-	defaultValue: WhisperingStorageKeyToStorageValue[T],
+	defaultValue: WhisperingStorageKeyMap[T],
 ) {
-	const [value] = useStorage<WhisperingStorageKeyToStorageValue[T]>(key);
+	const [value] = useStorage<WhisperingStorageKeyMap[T]>(key);
 	return value ?? defaultValue;
 }

@@ -20,10 +20,10 @@
 
 import type { RecorderState, Settings } from '@repo/shared';
 
-export type WhisperingStorageKeyToStorageValue = {
+export type WhisperingStorageKeyMap = {
 	'whispering-recorder-state': RecorderState;
 	'whispering-latest-recording-transcribed-text': string;
 	'whispering-settings': Settings;
 };
 
-export type WhisperingStorageKey = keyof WhisperingStorageKeyToStorageValue;
+export type WhisperingStorageKey = keyof WhisperingStorageKeyMap;
