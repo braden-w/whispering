@@ -1,7 +1,7 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
 import {
-	type RecorderState,
+	type WhisperingRecordingState,
 	type WhisperingResult,
 	tryAsyncWhispering,
 } from '@repo/shared';
@@ -10,7 +10,9 @@ import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 
 type SetTrayIconService = {
-	setTrayIcon: (icon: RecorderState) => Promise<WhisperingResult<void>>;
+	setTrayIcon: (
+		icon: WhisperingRecordingState,
+	) => Promise<WhisperingResult<void>>;
 };
 
 export const SetTrayIconService = window.__TAURI_INTERNALS__
@@ -19,7 +21,7 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
-		setTrayIcon: (icon: RecorderState) =>
+		setTrayIcon: (icon: WhisperingRecordingState) =>
 			sendMessageToExtension({
 				name: 'whispering-extension/setTrayIcon',
 				body: { recorderState: icon },
@@ -53,7 +55,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 		return tray;
 	})();
 	return {
-		setTrayIcon: (recorderState: RecorderState) =>
+		setTrayIcon: (recorderState: WhisperingRecordingState) =>
 			tryAsyncWhispering({
 				try: async () => {
 					const iconPath = await getIconPath(recorderState);
@@ -73,7 +75,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			}),
 	};
 }
-async function getIconPath(recorderState: RecorderState) {
+async function getIconPath(recorderState: WhisperingRecordingState) {
 	const iconPaths = {
 		IDLE: 'recorder-state-icons/studio_microphone.png',
 		RECORDING: 'recorder-state-icons/red_large_square.png',
