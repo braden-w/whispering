@@ -86,15 +86,12 @@ importers:
       idb:
         specifier: ^8.0.0
         version: 8.0.0
-      mode-watcher:
-        specifier: ^0.4.1
-        version: 0.4.1(svelte@5.14.2)
       nanoid:
         specifier: ^5.0.7
         version: 5.0.7
-      svelte-sonner:
-        specifier: ^0.3.27
-        version: 0.3.27(svelte@5.14.2)
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.3
@@ -141,6 +138,9 @@ importers:
       lucide-svelte:
         specifier: ^0.424.0
         version: 0.424.0(svelte@5.14.2)
+      mode-watcher:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@5.14.2)
       postcss:
         specifier: ^8.4.47
         version: 8.4.47
@@ -156,6 +156,9 @@ importers:
       svelte-check:
         specifier: ^4.1.1
         version: 4.1.1(picomatch@4.0.2)(svelte@5.14.2)(typescript@5.7.2)
+      svelte-sonner:
+        specifier: ^0.3.28
+        version: 0.3.28(svelte@5.14.2)
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.4.0
@@ -243,6 +246,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.7)
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.269
@@ -274,9 +280,15 @@ importers:
       '@effect/schema':
         specifier: ^0.74.1
         version: 0.74.1(effect@3.8.4)
+      '@epicenterhq/result':
+        specifier: ^0.1.0
+        version: 0.1.0
       effect:
         specifier: ^3.8.4
         version: 3.8.4
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       typescript:
         specifier: ^5.6.2
@@ -430,6 +442,9 @@ packages:
     resolution: {integrity: sha512-koTi0M1MYUjEDawLmksXBROROLx0BEG2ErwVGLVawmwuBwVbw1MTEd0QlG2+jds5avYXCJp67rHS7cuIxmnBwg==}
     peerDependencies:
       effect: ^3.8.4
+
+  '@epicenterhq/result@0.1.0':
+    resolution: {integrity: sha512-wYDmGl0+7wH93vxvteHrEeut2at8qccPOTSo/YDxVfKXjiNZm46qTUb6PTTJzU1TFGhauZRm+3QoXos2y0rVuA==}
 
   '@esbuild/aix-ppc64@0.24.0':
     resolution: {integrity: sha512-WtKdFM7ls47zkKHFVzMz8opM7LkcsIp9amDUBIAWirg70RM71WRSjdILPsY5Uv1D42ZpUfaPILDlfactHgsRkw==}
@@ -4621,8 +4636,8 @@ packages:
       svelte:
         optional: true
 
-  svelte-sonner@0.3.27:
-    resolution: {integrity: sha512-+PvbuePNTyTNCepCWqKcFeu+Lo27yYuwfSc7zJvrWjCRMJrWAmccPg3j7jO1W13QoN3TySXU5Trb956VBQiM5Q==}
+  svelte-sonner@0.3.28:
+    resolution: {integrity: sha512-K3AmlySeFifF/cKgsYNv5uXqMVNln0NBAacOYgmkQStLa/UoU0LhfAACU6Gr+YYC8bOCHdVmFNoKuDbMEsppJg==}
     peerDependencies:
       svelte: ^3.0.0 || ^4.0.0 || ^5.0.0-next.1
 
@@ -5035,6 +5050,9 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -5206,6 +5224,8 @@ snapshots:
     dependencies:
       effect: 3.8.4
       fast-check: 3.22.0
+
+  '@epicenterhq/result@0.1.0': {}
 
   '@esbuild/aix-ppc64@0.24.0':
     optional: true
@@ -9651,7 +9671,7 @@ snapshots:
     optionalDependencies:
       svelte: 5.14.2
 
-  svelte-sonner@0.3.27(svelte@5.14.2):
+  svelte-sonner@0.3.28(svelte@5.14.2):
     dependencies:
       svelte: 5.14.2
 
@@ -10100,3 +10120,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.2: {}
+
+  zod@3.24.1: {}
