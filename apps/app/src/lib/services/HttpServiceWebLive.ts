@@ -2,7 +2,7 @@ import type { HttpService } from '$lib/services/HttpService';
 import { Err, tryAsync } from '@repo/shared';
 
 export const createHttpServiceWebLive = (): HttpService => ({
-	post: async ({ formData, url, schema, headers }) => {
+	async post({ formData, url, schema, headers }) {
 		const responseResult = await tryAsync({
 			try: () =>
 				window.fetch(url, {

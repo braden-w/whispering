@@ -8,7 +8,7 @@ import {
 
 const createNotificationServiceDesktop = (): NotificationService => {
 	return {
-		notify: async ({ title, description }) => {
+		async notify({ title, description }) {
 			const notifyResult = await tryAsync({
 				try: async () => {
 					let permissionGranted = await isPermissionGranted();
