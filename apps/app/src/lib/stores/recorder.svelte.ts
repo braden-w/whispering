@@ -110,14 +110,15 @@ function createRecorder() {
 					? stopRecording()
 					: startRecording();
 			};
+
 			const toggleRecordingResult = await toggleRecording();
-			if (!toggleRecordingResult.ok) {
-				recorderState.value = 'IDLE';
-				if (settings.value.alwaysOnTop === 'When Recording') {
-					await setAlwaysOnTop(false);
-				}
-				renderErrAsToast(toggleRecordingResult);
+			if (toggleRecordingResult.ok) return;
+
+			recorderState.value = 'IDLE';
+			if (settings.value.alwaysOnTop === 'When Recording') {
+				await setAlwaysOnTop(false);
 			}
+			renderErrAsToast(toggleRecordingResult);
 		},
 		async cancelRecording() {
 			const cancelRecordingResult = await mediaRecorder.cancelRecording();
