@@ -1,4 +1,4 @@
-import type { BubbleError, Result } from '@repo/shared';
+import type { BubbleError, BubbleResult } from '@repo/shared';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
@@ -10,7 +10,7 @@ export type HttpService = {
 		schema: TSchema;
 		headers?: Record<string, string>;
 	}) => Promise<
-		Result<
+		BubbleResult<
 			z.infer<TSchema>,
 			BubbleError<'NetworkError' | 'HttpError' | 'ParseError'>
 		>

@@ -1,5 +1,5 @@
 import type { NotificationService } from '@repo/shared';
-import { Ok, tryAsync } from '@repo/shared';
+import { Ok, tryAsyncWhispering } from '@repo/shared';
 import {
 	isPermissionGranted,
 	requestPermission,
@@ -9,7 +9,7 @@ import {
 const createNotificationServiceDesktop = (): NotificationService => {
 	return {
 		async notify({ title, description }) {
-			const notifyResult = await tryAsync({
+			const notifyResult = await tryAsyncWhispering({
 				try: async () => {
 					let permissionGranted = await isPermissionGranted();
 					if (!permissionGranted) {

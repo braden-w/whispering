@@ -1,12 +1,17 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import { Err, type Result, type Settings } from '@repo/shared';
+import {
+	BubbleErr,
+	WhisperingErr,
+	type WhisperingResult,
+	type Settings,
+} from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import type { WhisperingStorageKey } from '~lib/storage/keys';
 
 export type RequestBody = { settings: Settings };
 
-export type ResponseBody = Result<Settings>;
+export type ResponseBody = WhisperingResult<Settings>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
@@ -14,8 +19,7 @@ const handler: PlasmoMessaging.MessageHandler<
 > = async ({ body }, res) => {
 	const setSettings = async () => {
 		if (!body || !body.settings) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
 				action: { type: 'none' },

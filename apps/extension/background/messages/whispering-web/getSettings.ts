@@ -1,8 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	Err,
+	BubbleErr,
 	Ok,
-	type Result,
+	type WhisperingResult,
 	type Settings,
 	getDefaultSettings,
 	settingsSchema,
@@ -13,7 +13,7 @@ import type { WhisperingStorageKey } from '~lib/storage/keys';
 
 export type RequestBody = Record<string, never>;
 
-export type ResponseBody = Result<Settings>;
+export type ResponseBody = WhisperingResult<Settings>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
@@ -56,8 +56,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		if (valueFromStorage === null) return Ok(getDefaultSettings('extension'));
 		const parseResult = settingsSchema.safeParse(valueFromStorage);
 		if (!parseResult.success)
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to parse Whispering settings',
 				description:
 					'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',

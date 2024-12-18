@@ -1,9 +1,9 @@
 import type { HttpService } from '$lib/services/HttpService';
-import { Err, tryAsync } from '@repo/shared';
+import { BubbleErr, tryAsyncBubble } from '@repo/shared';
 
 export const createHttpServiceWebLive = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
-		const responseResult = await tryAsync({
+		const responseResult = await tryAsyncBubble({
 			try: () =>
 				window.fetch(url, {
 					method: 'POST',
@@ -21,12 +21,12 @@ export const createHttpServiceWebLive = (): HttpService => ({
 
 		const response = responseResult.data;
 		if (!response.ok) {
-			return Err({
+			return BubbleErr({
 				_tag: 'HttpError',
 				message: `Request failed with status ${response.status}.`,
 			} as const);
 		}
-		const parseResult = await tryAsync({
+		const parseResult = await tryAsyncBubble({
 			try: async () => {
 				const json = await response.json();
 				return schema.parse(json);

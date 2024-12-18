@@ -1,14 +1,11 @@
-import type {
-	Err as EpicenterErr,
-	Ok as EpicenterOk,
-	Result as EpicenterResult,
-} from '@epicenterhq/result';
+import { type Result, Err, tryAsync, trySync } from '@epicenterhq/result';
 import { z } from 'zod';
 import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
+export { Err, Ok } from '@epicenterhq/result';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -109,47 +106,38 @@ export type BubbleError<T extends string = string> = {
 	message: string;
 };
 
-export type Result<
+export type BubbleResult<T, E extends BubbleError = BubbleError> = Result<T, E>;
+
+export type WhisperingResult<
 	T,
-	E extends BubbleError | WhisperingError = WhisperingError,
-> = EpicenterResult<T, E>;
+	E extends WhisperingError = WhisperingError,
+> = Result<T, E>;
 
-export const Ok = <T>(data: T): EpicenterOk<T> => ({ ok: true, data });
+export const BubbleErr = <E extends BubbleError>(error: E): Err<E> =>
+	Err(error);
 
-export const Err = <E extends BubbleError | WhisperingError>(
-	error: E,
-): EpicenterErr<E> => ({ ok: false, error });
+export const WhisperingErr = (
+	error: Omit<WhisperingError, '_tag'>,
+): Err<WhisperingError> => Err({ ...error, _tag: 'WhisperingError' });
 
-export function trySync<T, E extends BubbleError | WhisperingError>({
-	try: fn,
-	catch: errorHandler,
-}: { try: () => T; catch: (error: unknown) => E }): Result<T, E> {
-	try {
-		const data = fn();
-		return { ok: true, data };
-	} catch (error) {
-		return { ok: false, error: errorHandler(error) };
-	}
-}
+export const trySyncWhispering = <T, E extends WhisperingError>(
+	opts: Parameters<typeof trySync<T, E>>[0],
+): WhisperingResult<T, E> => trySync(opts);
 
-export async function tryAsync<T, E extends BubbleError | WhisperingError>({
-	try: fn,
-	catch: errorHandler,
-}: { try: () => Promise<T>; catch: (error: unknown) => E }): Promise<
-	Result<T, E>
-> {
-	try {
-		const data = await fn();
-		return { ok: true, data };
-	} catch (error) {
-		return { ok: false, error: errorHandler(error) };
-	}
-}
+export const trySyncBubble = <T, E extends BubbleError>(
+	opts: Parameters<typeof trySync<T, E>>[0],
+): BubbleResult<T, E> => trySync(opts);
 
-export const parseJson = (
-	value: string,
-): Result<unknown, BubbleError<'ParseJsonError'>> =>
-	trySync({
+export const tryAsyncBubble = <T, E extends BubbleError>(
+	opts: Parameters<typeof tryAsync<T, E>>[0],
+): Promise<BubbleResult<T, E>> => tryAsync(opts);
+
+export const tryAsyncWhispering = <T, E extends WhisperingError>(
+	opts: Parameters<typeof tryAsync<T, E>>[0],
+): Promise<WhisperingResult<T, E>> => tryAsync(opts);
+
+export const parseJson = (value: string) =>
+	trySyncBubble({
 		try: () => JSON.parse(value) as unknown,
 		catch: (error) => ({
 			_tag: 'ParseJsonError',

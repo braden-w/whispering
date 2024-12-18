@@ -15,7 +15,7 @@ import {
 	Ok,
 	WHISPERING_URL,
 	recorderStateToIcons,
-	tryAsync,
+	tryAsyncWhispering,
 } from '@repo/shared';
 import {
 	ClipboardIcon,
@@ -46,7 +46,7 @@ function IndexPopup() {
 }
 
 const toggleRecording = async () => {
-	const sendToToggleRecordingResult = await tryAsync({
+	const sendToToggleRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
@@ -67,7 +67,7 @@ const toggleRecording = async () => {
 };
 
 const cancelRecording = async () => {
-	const sendToCancelRecordingResult = await tryAsync({
+	const sendToCancelRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
 				CancelRecording.RequestBody,
@@ -115,8 +115,13 @@ function IndexPage() {
 				<div className="relative">
 					<Button
 						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-						onClick={async () => {
+						onClick={async (e) => {
+							console.log('🚀 ~ onClick={ ~ e:', e);
 							const toggleRecordingResult = await toggleRecording();
+							console.log(
+								'🚀 ~ onClick={ ~ toggleRecordingResult:',
+								toggleRecordingResult,
+							);
 							if (!toggleRecordingResult.ok)
 								renderErrorAsNotification(toggleRecordingResult);
 						}}

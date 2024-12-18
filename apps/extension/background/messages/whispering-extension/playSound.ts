@@ -1,16 +1,16 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	Err,
 	type ExternalMessageBody,
 	type ExternalMessageReturnType,
 	Ok,
-	type Result,
+	WhisperingErr,
+	type WhisperingResult,
 } from '@repo/shared';
 import { getActiveTabId } from '~lib/getActiveTabId';
 
 export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/playSound'>
 >;
 
@@ -20,8 +20,7 @@ const handler: PlasmoMessaging.MessageHandler<
 > = async ({ body: sound }, res) => {
 	const playSound = async () => {
 		if (!sound) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
@@ -31,8 +30,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		console.info('Playing sound', sound);
 		const getActiveTabIdResult = await getActiveTabId();
 		if (!getActiveTabIdResult.ok) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Failed to get active tab ID',
 				description: 'Failed to get active tab ID to play sound',
 				action: {
@@ -43,8 +41,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		}
 		const activeTabId = getActiveTabIdResult.data;
 		if (!activeTabId) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Failed to get active tab ID',
 				description: 'Failed to get active tab ID to play sound',
 				action: { type: 'none' },
@@ -55,8 +52,7 @@ const handler: PlasmoMessaging.MessageHandler<
 			sound,
 		});
 		if (!sendMessageResult) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: `Failed to play ${sound} sound`,
 				description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
 				action: { type: 'more-details', error: sendMessageResult },

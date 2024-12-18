@@ -1,10 +1,10 @@
 import type { HttpService } from '$lib/services/HttpService';
-import { Err, tryAsync } from '@repo/shared';
+import { BubbleErr, tryAsyncBubble } from '@repo/shared';
 import { fetch } from '@tauri-apps/plugin-http';
 
 export const createHttpServiceDesktopLive = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
-		const responseResult = await tryAsync({
+		const responseResult = await tryAsyncBubble({
 			try: () =>
 				fetch(url, {
 					method: 'POST',
@@ -22,12 +22,12 @@ export const createHttpServiceDesktopLive = (): HttpService => ({
 
 		const response = responseResult.data;
 		if (!response.ok) {
-			return Err({
+			return BubbleErr({
 				_tag: 'HttpError',
 				message: `Request failed with status ${response.status}.`,
 			} as const);
 		}
-		const parseResult = await tryAsync({
+		const parseResult = await tryAsyncBubble({
 			try: async () => {
 				const json = await response.json();
 				return schema.parse(json);

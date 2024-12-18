@@ -1,4 +1,8 @@
-import { Err, type Result, tryAsync } from '@repo/shared';
+import {
+	BubbleErr,
+	type WhisperingResult,
+	tryAsyncWhispering,
+} from '@repo/shared';
 
 export const injectScript = async <T, Args extends unknown[]>({
 	tabId,
@@ -8,12 +12,12 @@ export const injectScript = async <T, Args extends unknown[]>({
 }: {
 	tabId: number;
 	commandName: string;
-	func: (...args: Args) => Result<T>;
+	func: (...args: Args) => WhisperingResult<T>;
 	args: Args;
-}): Promise<Result<T>> => {
-	const injectionResult = await tryAsync({
+}): Promise<WhisperingResult<T>> => {
+	const injectionResult = await tryAsyncWhispering({
 		try: () =>
-			chrome.scripting.executeScript<Args, Result<T>>({
+			chrome.scripting.executeScript<Args, WhisperingResult<T>>({
 				target: { tabId },
 				world: 'MAIN',
 				func,
@@ -34,8 +38,7 @@ export const injectScript = async <T, Args extends unknown[]>({
 		executeScriptResult,
 	);
 	if (!executeScriptResult || !executeScriptResult.result) {
-		return Err({
-			_tag: 'WhisperingError',
+		return WhisperingErr({
 			title: `Unable to execute "${commandName}" script in Whispering tab`,
 			description: 'The result of the script injection is undefined',
 			action: { type: 'none' },

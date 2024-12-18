@@ -3,9 +3,9 @@ import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
 	RecorderState,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import { Err, Ok, tryAsync } from '@repo/shared';
+import { Ok, WhisperingErr, tryAsyncWhispering } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
@@ -20,7 +20,7 @@ const iconPaths = {
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setTrayIcon'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/setTrayIcon'>
 >;
 
@@ -30,8 +30,7 @@ const handler: PlasmoMessaging.MessageHandler<
 > = async ({ body }, res) => {
 	const setTrayIcon = async () => {
 		if (!body?.recorderState) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Error invoking setTrayIcon command',
 				description:
 					'RecorderState must be provided in the request body of the message',
@@ -41,7 +40,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		whisperingStorage.setItem('whispering-recorder-state', body.recorderState);
 		const path = iconPaths[body.recorderState];
-		const setIconResult = await tryAsync({
+		const setIconResult = await tryAsyncWhispering({
 			try: () => chrome.action.setIcon({ path }),
 			catch: (error) => ({
 				_tag: 'WhisperingError',

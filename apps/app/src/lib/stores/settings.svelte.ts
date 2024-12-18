@@ -4,8 +4,8 @@ import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {
 	getDefaultSettings,
 	settingsSchema,
-	tryAsync,
-	trySync,
+	tryAsyncWhispering,
+	trySyncWhispering,
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
@@ -19,7 +19,7 @@ export const settings = createPersistedState({
 type RegisterShortcutJob = Promise<void>;
 
 const unregisterAllLocalShortcuts = () =>
-	trySync({
+	trySyncWhispering({
 		try: () => hotkeys.unbind(),
 		catch: (error) => ({
 			_tag: 'WhisperingError',
@@ -30,7 +30,7 @@ const unregisterAllLocalShortcuts = () =>
 	});
 
 const unregisterAllGlobalShortcuts = () =>
-	tryAsync({
+	tryAsyncWhispering({
 		try: async () => {
 			if (!window.__TAURI_INTERNALS__) return;
 			const { unregisterAll } = await import(
@@ -56,7 +56,7 @@ function registerLocalShortcut({
 	const unregisterAllLocalShortcutsResult = unregisterAllLocalShortcuts();
 	if (!unregisterAllLocalShortcutsResult.ok)
 		return unregisterAllLocalShortcutsResult;
-	return trySync({
+	return trySyncWhispering({
 		try: () =>
 			hotkeys(shortcut, (event) => {
 				// Prevent the default refresh event under WINDOWS system
@@ -83,7 +83,7 @@ async function registerGlobalShortcut({
 		await unregisterAllGlobalShortcuts();
 	if (!unregisterAllGlobalShortcutsResult.ok)
 		return unregisterAllGlobalShortcutsResult;
-	return trySync({
+	return tryAsyncWhispering({
 		try: async () => {
 			if (!window.__TAURI_INTERNALS__) return;
 			const { register } = await import('@tauri-apps/plugin-global-shortcut');

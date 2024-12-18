@@ -1,10 +1,10 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { type Result, tryAsync } from '@repo/shared';
+import { Ok, type WhisperingResult, tryAsyncWhispering } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
-	async setClipboardText(text): Promise<Result<void>> {
-		const setClipboardResult = await tryAsync({
+	async setClipboardText(text): Promise<WhisperingResult<void>> {
+		const setClipboardResult = await tryAsyncWhispering({
 			try: () => navigator.clipboard.writeText(text),
 			catch: (error) => ({
 				_tag: 'WhisperingError',
@@ -19,18 +19,22 @@ export const createClipboardServiceWebLive = (): ClipboardService => ({
 		});
 
 		if (!setClipboardResult.ok) {
-			return sendMessageToExtension({
+			sendMessageToExtension({
 				name: 'whispering-extension/setClipboardText',
 				body: { transcribedText: text },
 			});
+			return Ok(undefined);
 		}
 
 		return setClipboardResult;
 	},
 
-	writeTextToCursor: (text) =>
-		sendMessageToExtension({
+	async writeTextToCursor(text) {
+		const result = await sendMessageToExtension({
 			name: 'whispering-extension/writeTextToCursor',
 			body: { transcribedText: text },
-		}),
+		});
+		if (!result.ok) return result;
+		return Ok(undefined);
+	},
 });

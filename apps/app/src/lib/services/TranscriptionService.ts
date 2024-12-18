@@ -1,4 +1,4 @@
-import type { Result } from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 
 /** Supported languages pulled from OpenAI Website: https://platform.openai.com/docs/guides/speech-to-text/supported-languages */
 export const SUPPORTED_LANGUAGES = [
@@ -143,5 +143,5 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 );
 
 export type TranscriptionService = {
-	readonly transcribe: (blob: Blob) => Promise<Result<string>>;
+	readonly transcribe: (blob: Blob) => Promise<WhisperingResult<string>>;
 };

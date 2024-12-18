@@ -2,14 +2,14 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
 import { Ok } from '@repo/shared';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/notifyWhisperingTabReady'>
 >;
 
