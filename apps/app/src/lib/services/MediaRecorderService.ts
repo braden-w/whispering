@@ -8,6 +8,7 @@ import {
 	tryAsyncWhispering,
 	trySyncBubble,
 	trySyncWhispering,
+	type WhisperingRecordingState,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { renderErrAsToast } from './renderErrorAsToast';
@@ -15,7 +16,7 @@ import { renderErrAsToast } from './renderErrorAsToast';
 const TIMESLICE_MS = 1000;
 
 type MediaRecorderService = {
-	readonly recordingState: RecordingState;
+	readonly recordingState: WhisperingRecordingState;
 	startRecording: () => Promise<WhisperingResult<undefined>>;
 	stopRecording: () => Promise<WhisperingResult<Blob>>;
 	cancelRecording: () => Promise<WhisperingResult<undefined>>;
@@ -24,12 +25,37 @@ type MediaRecorderService = {
 export const mediaRecorder = createMediaRecorder();
 
 export function createMediaRecorder(): MediaRecorderService {
+	let recordingState = $state<WhisperingRecordingState>('IDLE');
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
+	const setMediaRecorder = (value: MediaRecorder | null) => {
+		mediaRecorder = value;
+		updateRecordingState(value);
+	};
+
+	const updateRecordingState = (recorder: MediaRecorder | null) => {
+		if (!recorder) {
+			recordingState = 'IDLE';
+			return;
+		}
+
+		switch (recorder.state) {
+			case 'recording':
+				recordingState = 'RECORDING';
+				break;
+			case 'paused':
+				recordingState = 'IDLE';
+				break;
+			case 'inactive':
+				recordingState = 'IDLE';
+				break;
+		}
+	};
+
 	const resetRecorder = () => {
 		recordedChunks.length = 0;
-		mediaRecorder = null;
+		setMediaRecorder(null);
 		if (!settings.value.isFasterRerecordEnabled) {
 			mediaStreamManager.destroy();
 		}
@@ -37,9 +63,9 @@ export function createMediaRecorder(): MediaRecorderService {
 
 	return {
 		get recordingState() {
-			if (!mediaRecorder) return 'inactive';
-			return mediaRecorder.state;
+			return recordingState;
 		},
+
 		async startRecording() {
 			if (mediaRecorder) {
 				return renderErrAsToast(
@@ -85,10 +111,29 @@ export function createMediaRecorder(): MediaRecorderService {
 
 			const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
 				trySyncWhispering({
-					try: () =>
-						new MediaRecorder(newStream, {
+					try: () => {
+						const recorder = new MediaRecorder(newStream, {
 							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						}),
+						});
+						recorder.addEventListener('start', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('stop', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('pause', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('resume', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('dataavailable', (event: BlobEvent) => {
+							if (!event.data.size) return;
+							recordedChunks.push(event.data);
+						});
+
+						return recorder;
+					},
 					catch: (error) => ({
 						_tag: 'WhisperingError',
 						title: 'Error initializing media recorder with preferred device',
@@ -96,15 +141,13 @@ export function createMediaRecorder(): MediaRecorderService {
 						action: { type: 'more-details', error },
 					}),
 				});
+
 			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
 
 			const newMediaRecorder = newMediaRecorderResult.data;
-			newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-				if (!event.data.size) return;
-				recordedChunks.push(event.data);
-			});
 			newMediaRecorder.start(TIMESLICE_MS);
-			mediaRecorder = newMediaRecorder;
+			setMediaRecorder(newMediaRecorder);
+			return Ok(undefined);
 		},
 		async stopRecording() {
 			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
