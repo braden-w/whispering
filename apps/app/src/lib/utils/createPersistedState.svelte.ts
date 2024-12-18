@@ -3,56 +3,6 @@ import { parseJson } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { z } from 'zod';
 
-const attemptMerge = <TSchema extends z.ZodTypeAny>({
-	key,
-	valueFromStorage,
-	defaultValue,
-	schema,
-	error,
-}: {
-	key: string;
-	valueFromStorage: unknown;
-	defaultValue: z.infer<TSchema>;
-	schema: TSchema;
-	error: z.ZodError;
-}): z.infer<TSchema> => {
-	const updatingLocalStorageToastId = nanoid();
-	toast({
-		id: updatingLocalStorageToastId,
-		variant: 'loading',
-		title: `Updating "${key}" in local storage...`,
-		description: 'Please wait...',
-	});
-
-	// Attempt to merge the default value with the value from storage if possible
-	const defaultValueMergedOldValues = {
-		...defaultValue,
-		...(valueFromStorage as Record<string, unknown>),
-	};
-
-	const parseMergedValuesResult = schema.safeParse(defaultValueMergedOldValues);
-	if (!parseMergedValuesResult.success) {
-		toast({
-			id: updatingLocalStorageToastId,
-			variant: 'error',
-			title: `Error updating "${key}" in local storage`,
-			description: 'Reverting to default value.',
-		});
-		localStorage.setItem(key, JSON.stringify(defaultValue));
-		return defaultValue;
-	}
-
-	const updatedValue = parseMergedValuesResult.data;
-	toast({
-		id: updatingLocalStorageToastId,
-		variant: 'success',
-		title: `Successfully updated "${key}" in local storage`,
-		description: 'The value has been updated.',
-	});
-	localStorage.setItem(key, JSON.stringify(updatedValue));
-	return updatedValue;
-};
-
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
  */

@@ -1,23 +1,21 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { Result } from '@repo/shared';
-import { effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-export type RequestBody = {};
+export type RequestBody = undefined;
 
 export type ResponseBody = Result<void>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	req,
-	res,
-) =>
-	Effect.gen(function* () {
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		yield* injectScript<undefined, []>({
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async (req, res) => {
+	const cancelRecording = async () => {
+		const whisperingTabIdResult = await getOrCreateWhisperingTabId();
+		if (!whisperingTabIdResult.ok) return whisperingTabIdResult;
+		const whisperingTabId = whisperingTabIdResult.data;
+		return await injectScript<undefined, []>({
 			tabId: whisperingTabId,
 			commandName: 'cancelRecording',
 			func: () => {
@@ -28,6 +26,7 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 					return {
 						ok: false,
 						error: {
+							_tag: 'WhisperingError',
 							title: 'Unable to cancel recording',
 							description:
 								'There was an error canceling the recording. Please try again.',
@@ -41,12 +40,9 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 			},
 			args: [],
 		});
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+	};
+
+	res.send(await cancelRecording());
+};
 
 export default handler;
