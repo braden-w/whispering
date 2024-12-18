@@ -19,15 +19,20 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-export const BITRATE_VALUES = [
-	64_000, 96_000, 128_000, 192_000, 256_000, 320_000,
+export const BITRATE_VALUES_KBPS = [
+	'64',
+	'96',
+	'128',
+	'192',
+	'256',
+	'320',
 ] as const;
-export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
-	label: `${bitrate / 1_000} kbps`,
+export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
+	label: `${bitrate} kbps`,
 	value: bitrate,
 }));
-export const DEFAULT_BITRATE_MS =
-	64_000 as const satisfies (typeof BITRATE_VALUES)[number];
+export const DEFAULT_BITRATE_KBPS =
+	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
 const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
@@ -35,30 +40,28 @@ export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
 	value: option,
 }));
 
-export const settingsSchema = S.Struct({
-	isPlaySoundEnabled: S.Boolean,
-	isCopyToClipboardEnabled: S.Boolean,
-	isPasteContentsOnSuccessEnabled: S.Boolean,
-	isFasterRerecordEnabled: S.Boolean,
-	alwaysOnTop: S.Literal(...ALWAYS_ON_TOP_VALUES),
+export const settingsSchema = z.object({
+	isPlaySoundEnabled: z.boolean(),
+	isCopyToClipboardEnabled: z.boolean(),
+	isPasteContentsOnSuccessEnabled: z.boolean(),
+	isFasterRerecordEnabled: z.boolean(),
+	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
-	selectedAudioInputDeviceId: S.String,
-	bitsPerSecond: S.optionalWith(
-		S.compose(S.Number, S.Literal(...BITRATE_VALUES)),
-		{
-			default: () => DEFAULT_BITRATE_MS,
-		},
-	),
+	selectedAudioInputDeviceId: z.string(),
+	bitsPerSecond: z
+		.enum(BITRATE_VALUES_KBPS)
+		.optional()
+		.default(DEFAULT_BITRATE_KBPS),
 
-	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
-	openAiApiKey: S.String,
-	groqApiKey: S.String,
-	fasterWhisperServerUrl: S.String,
-	fasterWhisperServerModel: S.String,
-	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
+	selectedTranscriptionService: z.enum(TRANSCRIPTION_SERVICES),
+	openAiApiKey: z.string(),
+	groqApiKey: z.string(),
+	fasterWhisperServerUrl: z.string(),
+	fasterWhisperServerModel: z.string(),
+	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
 
-	currentLocalShortcut: S.String,
-	currentGlobalShortcut: S.String,
+	currentLocalShortcut: z.string(),
+	currentGlobalShortcut: z.string(),
 });
 
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
@@ -70,7 +73,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
-		bitsPerSecond: DEFAULT_BITRATE_MS,
+		bitsPerSecond: DEFAULT_BITRATE_KBPS,
 
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
