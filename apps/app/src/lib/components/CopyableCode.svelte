@@ -3,7 +3,6 @@
 	import { ClipboardService } from '$lib/services/ClipboardService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { Effect } from 'effect';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
 	const { codeText }: { codeText: string } = $props();
