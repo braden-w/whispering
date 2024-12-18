@@ -1,7 +1,4 @@
-import type {
-	WhisperingStorageKey,
-	WhisperingStorageKeyToStorageValue,
-} from './keys';
+import type { WhisperingStorageKey, WhisperingStorageKeyMap } from './keys';
 
 const createWhisperingStorage = () => {
 	const storage = new Storage();
@@ -9,7 +6,7 @@ const createWhisperingStorage = () => {
 	return {
 		setItem: <K extends WhisperingStorageKey>(
 			key: K,
-			value: WhisperingStorageKeyToStorageValue[K],
+			value: WhisperingStorageKeyMap[K],
 		) => {
 			storage.setItem(key, JSON.stringify(value));
 		},
