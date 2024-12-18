@@ -21,7 +21,6 @@
 		"@tanstack/react-query": "^5.51.21",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
-		"effect": "^3.8.4",
 		"idb": "^8.0.0",
 		"lucide-react": "^0.424.0",
 		"nanoid": "^5.0.7",
