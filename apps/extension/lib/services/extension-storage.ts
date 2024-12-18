@@ -1,6 +1,6 @@
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
 import { Err, Ok, parseJson, recorderStateSchema } from '@repo/shared';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { renderErrorAsNotification } from '~lib/errors';
 
 export const STORAGE_KEYS = {
