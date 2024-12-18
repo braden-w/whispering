@@ -6,11 +6,20 @@ export const notificationOptionsSchema = z.object({
 	title: z.string(),
 	description: z.string(),
 	action: z
-		.object({
-			type: z.literal('link'),
-			label: z.string(),
-			goto: z.string(),
-		})
+		.discriminatedUnion('type', [
+			z.object({
+				type: z.literal('link'),
+				label: z.string(),
+				goto: z.string(),
+			}),
+			z.object({
+				type: z.literal('more-details'),
+				error: z.unknown(),
+			}),
+			z.object({
+				type: z.literal('none'),
+			}),
+		])
 		.optional(),
 });
 
