@@ -53,29 +53,14 @@ export function createMediaRecorder(): MediaRecorderService {
 			}
 			const toastId = nanoid();
 
-			const getNewMediaRecorderNewStream = async () => {
+			const getNewStream = async () => {
 				const newStreamResult = await mediaStreamManager.refreshStream();
 				if (!newStreamResult.ok) return newStreamResult;
 				const newStream = newStreamResult.data;
-
-				const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
-					trySyncWhispering({
-						try: () =>
-							new MediaRecorder(newStream, {
-								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-							}),
-						catch: (error) => ({
-							_tag: 'WhisperingError',
-							title: 'Error initializing media recorder with preferred device',
-							description: 'Please try again',
-							action: { type: 'more-details', error },
-						}),
-					});
-				if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
-				return newMediaRecorderResult;
+				return Ok(newStream);
 			};
 
-			const getNewMediaRecorderReuseStream = async () => {
+			const getReusedStream = async () => {
 				const existingStreamResult =
 					await mediaStreamManager.getExistingStream();
 				if (!existingStreamResult.ok) return existingStreamResult;
@@ -87,31 +72,33 @@ export function createMediaRecorder(): MediaRecorderService {
 						description:
 							'Trying to find another available audio input device...',
 					});
-					return await getNewMediaRecorderNewStream();
+					return await getNewStream();
 				}
-
-				const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
-					trySyncWhispering({
-						try: () =>
-							new MediaRecorder(existingStream, {
-								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-							}),
-						catch: (error) => ({
-							_tag: 'WhisperingError',
-							title: 'Error initializing media recorder with preferred device',
-							description: 'Please try again',
-							action: { type: 'more-details', error },
-						}),
-					});
-				return newMediaRecorderResult;
+				return Ok(existingStream);
 			};
 
-			const newMediaRecorderResult = settings.value.isFasterRerecordEnabled
-				? await getNewMediaRecorderReuseStream()
-				: await getNewMediaRecorderNewStream();
-			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
-			const newMediaRecorder = newMediaRecorderResult.data;
+			const newStreamResult = settings.value.isFasterRerecordEnabled
+				? await getReusedStream()
+				: await getNewStream();
+			if (!newStreamResult.ok) return newStreamResult;
+			const newStream = newStreamResult.data;
 
+			const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
+				trySyncWhispering({
+					try: () =>
+						new MediaRecorder(newStream, {
+							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error initializing media recorder with preferred device',
+						description: 'Please try again',
+						action: { type: 'more-details', error },
+					}),
+				});
+			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
+
+			const newMediaRecorder = newMediaRecorderResult.data;
 			newMediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 				if (!event.data.size) return;
 				recordedChunks.push(event.data);
