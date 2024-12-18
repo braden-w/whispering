@@ -13,6 +13,7 @@ import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServ
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Err, Ok, type Result } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { toast as sonnerToast } from 'svelte-sonner';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
@@ -197,8 +198,10 @@ export const createRecordings = () => {
 				return Ok(transcribedText);
 			})();
 
-			if (!transcribedTextResult.ok)
+			if (!transcribedTextResult.ok) {
+				sonnerToast.dismiss(transcribingInProgressId);
 				return renderErrAsToast(transcribedTextResult);
+			}
 			const transcribedText = transcribedTextResult.data;
 
 			if (transcribedText === '') return;
