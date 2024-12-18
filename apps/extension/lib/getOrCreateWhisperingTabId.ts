@@ -11,7 +11,7 @@ import {
 import { Either } from 'effect';
 import { injectScript } from '~background/injectScript';
 
-export const getOrCreateWhisperingTabId = async () => {
+export const getOrCreateWhisperingTabId = async (): Promise<Result<number>> => {
 	const getAllWhisperingTabsResult = await getAllWhisperingTabs();
 	if (!getAllWhisperingTabsResult.ok) return getAllWhisperingTabsResult;
 	const whisperingTabs = getAllWhisperingTabsResult.data;
@@ -30,7 +30,7 @@ export const getOrCreateWhisperingTabId = async () => {
 		.filter((tabId) => tabId !== bestWhisperingTabId);
 
 	const results = await removeTabsById(otherWhisperingTabIds);
-	return bestWhisperingTabId;
+	return Ok(bestWhisperingTabId);
 };
 
 async function getBestWhisperingTab(
