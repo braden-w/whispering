@@ -45,7 +45,7 @@ const createSetWatch = <TSchema extends z.ZodSchema, A = z.infer<TSchema>>({
 	};
 
 	return {
-		set: (value: A) => Effect.promise(() => storage.set(key, value)),
+		set: (value: A) => storage.set(key, value),
 		watch: (callback: (newValue: A) => void) => {
 			const listener = (({ newValue: newValueUnparsed }) => {
 				const parseResult = parseValueFromStorage(newValueUnparsed);
