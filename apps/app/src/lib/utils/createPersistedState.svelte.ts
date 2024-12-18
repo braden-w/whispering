@@ -11,6 +11,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	schema,
 	defaultValue,
 	disableLocalStorage = false,
+	resolveParseError = () => defaultValue,
 }: {
 	/** The key used to store the value in local storage. */
 	key: string;
@@ -39,6 +40,21 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	 * ```
 	 * */
 	disableLocalStorage?: boolean;
+	/**
+	 * Handler for when the value from storage fails schema validation.
+	 * Return a valid value to use it and save to storage.
+	 * @default `() => defaultValue`
+	 */
+	resolveParseError?: (params: {
+		/** The value from storage that failed schema validation. */
+		valueFromStorage: unknown;
+		/** The default value to use if the value from storage fails schema validation. */
+		defaultValue: z.infer<TSchema>;
+		/** The schema used to validate the value from storage. */
+		schema: TSchema;
+		/** The error that occurred when parsing the value from storage. */
+		error: z.ZodError;
+	}) => z.infer<TSchema>;
 }) {
 	let value = $state(defaultValue);
 
@@ -47,6 +63,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	): z.infer<TSchema> => {
 		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
+
 		const parseJsonResult = parseJson(valueFromStorageUnparsed);
 		if (!parseJsonResult.ok) return defaultValue;
 		const valueFromStorageMaybeInvalid = parseJsonResult.data;
@@ -56,40 +73,15 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		);
 		if (valueFromStorageResult.success) return valueFromStorageResult.data;
 
-		const updatingLocalStorageToastId = nanoid();
-		toast({
-			variant: 'loading',
-			title: `Updating "${key}" in local storage...`,
-			description: 'Please wait...',
+		const resolvedValue = resolveParseError({
+			valueFromStorage: valueFromStorageMaybeInvalid,
+			defaultValue,
+			schema,
+			error: valueFromStorageResult.error,
 		});
-		// Attempt to merge the default value with the value from storage if possible
-		const defaultValueMergedOldValues = {
-			...defaultValue,
-			...(valueFromStorageMaybeInvalid as Record<string, unknown>),
-		};
 
-		const parseMergedValuesResult = schema.safeParse(
-			defaultValueMergedOldValues,
-		);
-		if (!parseMergedValuesResult.success) {
-			toast({
-				id: updatingLocalStorageToastId,
-				variant: 'error',
-				title: `Error updating "${key}" in local storage`,
-				description: 'Reverting to default value.',
-			});
-			localStorage.setItem(key, JSON.stringify(defaultValue));
-			return defaultValue;
-		}
-		const updatedValue = parseMergedValuesResult.data;
-		toast({
-			id: updatingLocalStorageToastId,
-			variant: 'success',
-			title: `Successfully updated "${key}" in local storage`,
-			description: 'The value has been updated.',
-		});
-		localStorage.setItem(key, JSON.stringify(updatedValue));
-		return updatedValue;
+		localStorage.setItem(key, JSON.stringify(resolvedValue));
+		return resolvedValue;
 	};
 
 	if (!disableLocalStorage) {
