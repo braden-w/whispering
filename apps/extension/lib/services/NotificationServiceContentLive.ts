@@ -1,19 +1,12 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import {
-	NotificationService,
-	WhisperingError,
-	resultToEffect,
-} from '@repo/shared';
-import { Console, Effect, Layer } from 'effect';
-import { nanoid } from 'nanoid/non-secure';
+import { type NotificationService, tryAsync } from '@repo/shared';
 import type * as ClearNotification from '~background/messages/whispering-extension/notifications/clear';
 import type * as CreateNotification from '~background/messages/whispering-extension/notifications/create';
 
-export const NotificationServiceContentLive = Layer.succeed(
-	NotificationService,
-	NotificationService.of({
-		notify: (notifyOptions) =>
-			Effect.tryPromise({
+export const createNotificationServiceContentLive =
+	(): NotificationService => ({
+		notify: async (notifyOptions) => {
+			const sendToCreateNotificationResult = await tryAsync({
 				try: () =>
 					sendToBackground<
 						CreateNotification.RequestBody,
@@ -32,13 +25,15 @@ export const NotificationServiceContentLive = Layer.succeed(
 						error,
 					},
 				}),
-			}).pipe(
-				Effect.flatMap(resultToEffect),
-				Effect.tapError((error) => Console.error({ ...error })),
-				Effect.catchAll(() => Effect.succeed(notifyOptions.id ?? nanoid())),
-			),
-		clear: (notificationId) =>
-			Effect.tryPromise({
+			});
+			if (!sendToCreateNotificationResult.ok)
+				return sendToCreateNotificationResult;
+			const createNotificationResult = sendToCreateNotificationResult.data;
+			if (!createNotificationResult.ok) return createNotificationResult;
+			return createNotificationResult;
+		},
+		clear: async (notificationId) => {
+			const sendToClearNotificationResult = await tryAsync({
 				try: () =>
 					sendToBackground<
 						ClearNotification.RequestBody,
@@ -57,6 +52,14 @@ export const NotificationServiceContentLive = Layer.succeed(
 						error,
 					},
 				}),
-			}).pipe(Effect.catchAll((error) => Console.error({ ...error }))),
-	}),
-);
+			});
+			if (!sendToClearNotificationResult.ok)
+				return sendToClearNotificationResult;
+			const clearNotificationResult = sendToClearNotificationResult.data;
+			if (!clearNotificationResult.ok) return clearNotificationResult;
+			return clearNotificationResult;
+		},
+	});
+
+export const NotificationServiceContentLive =
+	createNotificationServiceContentLive();
