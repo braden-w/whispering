@@ -9,7 +9,7 @@ import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 import {
 	SHARED_EXTENSION_STATE_KEYS,
-	extensionStorageService,
+	storage,
 } from '~lib/services/extension-storage';
 
 export type RequestBody =
@@ -53,9 +53,10 @@ const handler: PlasmoMessaging.MessageHandler<
 			});
 		}
 
-		extensionStorageService[
-			SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT
-		].set(body.transcribedText);
+		storage.setItem(
+			SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
+			body.transcribedText,
+		);
 
 		const injectScriptResult = await injectScript<string, [string]>({
 			tabId: activeTabId,

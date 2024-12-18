@@ -11,7 +11,7 @@ import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import {
 	SHARED_EXTENSION_STATE_KEYS,
-	extensionStorageService,
+	storage,
 } from '~lib/services/extension-storage';
 
 const iconPaths = {
@@ -42,9 +42,10 @@ const handler: PlasmoMessaging.MessageHandler<
 			});
 		}
 
-		await extensionStorageService[
-			SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE
-		].set(body.recorderState);
+		storage.setItem(
+			SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
+			body.recorderState,
+		);
 		const path = iconPaths[body.recorderState];
 		const setIconResult = await tryAsync({
 			try: () => chrome.action.setIcon({ path }),
