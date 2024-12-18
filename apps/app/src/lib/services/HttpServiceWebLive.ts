@@ -4,13 +4,13 @@ import { Err, tryAsync } from '@repo/shared';
 import { Effect } from 'effect';
 
 export const createHttpServiceWebLive = (): HttpService => ({
-	post: async ({ formData, url, schema }) => {
+	post: async ({ formData, url, schema, headers }) => {
 		const responseResult = await tryAsync({
 			try: () =>
-				fetch(url, {
+				window.fetch(url, {
 					method: 'POST',
 					body: formData,
-					headers: { 'Content-Type': 'multipart/form-data' },
+					headers,
 				}),
 			catch: (error) =>
 				({

@@ -1,5 +1,5 @@
 import type { Schema } from '@effect/schema';
-import type { BaseUncaughtErrorSerializable, Result } from '@repo/shared';
+import type { BubbleError, Result } from '@repo/shared';
 import { Data } from 'effect';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
@@ -13,10 +13,11 @@ export type HttpService = {
 		url: string;
 		formData: FormData;
 		schema: TSchema;
+		headers?: Record<string, string>;
 	}) => Promise<
 		Result<
 			Schema.Schema.Type<TSchema>,
-			BaseUncaughtErrorSerializable<'NetworkError' | 'HttpError' | 'ParseError'>
+			BubbleError<'NetworkError' | 'HttpError' | 'ParseError'>
 		>
 	>;
 };

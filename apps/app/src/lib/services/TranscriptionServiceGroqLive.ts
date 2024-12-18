@@ -66,14 +66,14 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 						_tag: 'WhisperingError',
 						title: 'Network error',
 						description: 'Please check your network connection and try again.',
-						action: { type: 'none' },
+						action: { type: 'more-details', error: postResult.error.message },
 					});
 				case 'HttpError':
 					return Err({
 						_tag: 'WhisperingError',
 						title: 'Error sending audio to Groq API',
 						description: 'Please check your network connection and try again.',
-						action: { type: 'none' },
+						action: { type: 'more-details', error: postResult.error.message },
 					});
 				case 'ParseError':
 					return Err({
@@ -81,7 +81,7 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 						title: 'Error parsing response from Groq API',
 						description:
 							'Please check logs and notify the developer if the issue persists.',
-						action: { type: 'none' },
+						action: { type: 'more-details', error: postResult.error.message },
 					});
 			}
 		}

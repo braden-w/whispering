@@ -5,13 +5,13 @@ import { fetch } from '@tauri-apps/plugin-http';
 import { Effect } from 'effect';
 
 export const createHttpServiceDesktopLive = (): HttpService => ({
-	post: async ({ formData, url, schema }) => {
+	post: async ({ formData, url, schema, headers }) => {
 		const responseResult = await tryAsync({
 			try: () =>
 				fetch(url, {
 					method: 'POST',
 					body: formData,
-					headers: { 'Content-Type': 'multipart/form-data' },
+					headers: { 'Content-Type': 'multipart/form-data', ...headers },
 				}),
 			catch: (error) =>
 				({
