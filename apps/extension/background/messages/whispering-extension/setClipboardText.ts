@@ -8,7 +8,7 @@ import { Err } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 import {
-	STORAGE_KEYS,
+	SHARED_EXTENSION_STATE_KEYS,
 	extensionStorageService,
 } from '~lib/services/extension-storage';
 
@@ -53,9 +53,9 @@ const handler: PlasmoMessaging.MessageHandler<
 			});
 		}
 
-		extensionStorageService[STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT].set(
-			body.transcribedText,
-		);
+		extensionStorageService[
+			SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT
+		].set(body.transcribedText);
 
 		const injectScriptResult = await injectScript<string, [string]>({
 			tabId: activeTabId,

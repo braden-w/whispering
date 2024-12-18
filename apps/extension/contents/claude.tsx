@@ -6,7 +6,7 @@ import type {
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
-import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
 import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
 import { waitForElement } from './utils/waitForElement';
 
@@ -33,7 +33,7 @@ export const getStyle: PlasmoGetStyle = () => {
 
 function RecorderStateAsIcon() {
 	const [recorderState] = useStorage<RecorderState>(
-		STORAGE_KEYS.RECORDER_STATE,
+		SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
 		'IDLE',
 	);
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];

@@ -3,7 +3,27 @@ import { Err, Ok, parseJson, recorderStateSchema } from '@repo/shared';
 import { z } from 'zod';
 import { renderErrorAsNotification } from '~lib/errors';
 
-export const STORAGE_KEYS = {
+/**
+ * Shared state keys used for communication between extension components:
+ * - Content Scripts (injected into web pages)
+ * - Popup (extension popup UI)
+ * - Background Service Worker
+ *
+ * These keys are used with the Storage API to maintain synchronized state
+ * across all extension contexts. Changes to these values will trigger
+ * updates in all listening components.
+ *
+ * @example
+ * ```ts
+ * // In popup
+ * const [recorderState] = useStorage<RecorderState>(SHARED_STATE_KEYS.RECORDER_STATE);
+ *
+ * // In background service worker
+ * await storage.set(SHARED_STATE_KEYS.RECORDER_STATE, 'RECORDING');
+ * ```
+ */
+
+export const SHARED_EXTENSION_STATE_KEYS = {
 	RECORDER_STATE: 'whispering-recorder-state',
 	LATEST_RECORDING_TRANSCRIBED_TEXT:
 		'whispering-latest-recording-transcribed-text',
@@ -63,12 +83,13 @@ const createSetWatch = <TSchema extends z.ZodSchema, A = z.infer<TSchema>>({
 };
 
 export const extensionStorageService = {
-	[STORAGE_KEYS.RECORDER_STATE]: createSetWatch({
-		key: STORAGE_KEYS.RECORDER_STATE,
+	[SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE]: createSetWatch({
+		key: SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
 		schema: recorderStateSchema,
 	}),
-	[STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]: createSetWatch({
-		key: STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
-		schema: z.string(),
-	}),
+	[SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]:
+		createSetWatch({
+			key: SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
+			schema: z.string(),
+		}),
 } as const;
