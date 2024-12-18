@@ -20,35 +20,37 @@ export const getOrCreateWhisperingTabId = async () => {
 		return await createAndSetupNewTab();
 	}
 
-	const selectedTabId: Result<number> = await (async () => {
-		const undiscardedWhisperingTabs = whisperingTabs.filter(
-			(tab) => !tab.discarded,
-		);
-		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter(
-			(tab) => tab.pinned,
-		);
-		for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
-			if (!pinnedUndiscardedTab.id) continue;
-			const isResponsive = await checkTabResponsiveness(
-				pinnedUndiscardedTab.id,
-			);
-			if (isResponsive) return Ok(pinnedUndiscardedTab.id);
-		}
-		for (const undiscardedTab of undiscardedWhisperingTabs) {
-			if (!undiscardedTab.id) continue;
-			const isResponsive = await checkTabResponsiveness(undiscardedTab.id);
-			if (isResponsive) return Ok(undiscardedTab.id);
-		}
-		return await createAndSetupNewTab();
-	})();
-
+	const getWhisperingTabIdResult = await getWhisperingTabId(whisperingTabs);
+	if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
+	const selectedTabId = getWhisperingTabIdResult.data;
 	const otherTabIds = whisperingTabs
 		.map((tab) => tab.id)
 		.filter((tabId) => tabId !== undefined)
 		.filter((tabId) => tabId !== selectedTabId);
+
 	const results = await removeTabsById(otherTabIds);
 	return selectedTabId;
 };
+
+async function getWhisperingTabId(
+	tabs: chrome.tabs.Tab[],
+): Promise<Result<number>> {
+	const undiscardedWhisperingTabs = tabs.filter((tab) => !tab.discarded);
+	const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter(
+		(tab) => tab.pinned,
+	);
+	for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
+		if (!pinnedUndiscardedTab.id) continue;
+		const isResponsive = await checkTabResponsiveness(pinnedUndiscardedTab.id);
+		if (isResponsive) return Ok(pinnedUndiscardedTab.id);
+	}
+	for (const undiscardedTab of undiscardedWhisperingTabs) {
+		if (!undiscardedTab.id) continue;
+		const isResponsive = await checkTabResponsiveness(undiscardedTab.id);
+		if (isResponsive) return Ok(undiscardedTab.id);
+	}
+	return await createAndSetupNewTab();
+}
 
 async function checkTabResponsiveness(tabId: number) {
 	const injectScriptResult = await injectScript<'pong', []>({
