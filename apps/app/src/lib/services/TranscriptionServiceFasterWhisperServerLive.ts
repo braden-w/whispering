@@ -9,12 +9,6 @@ const MAX_FILE_SIZE_MB = 25 as const;
 export const createTranscriptionServiceFasterWhisperServerLive =
 	(): TranscriptionService => ({
 		transcribe: async (audioBlob) => {
-			const {
-				outputLanguage,
-				fasterWhisperServerUrl,
-				fasterWhisperServerModel,
-			} = settings.value;
-
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return Err({
@@ -33,11 +27,11 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			);
 			const formData = new FormData();
 			formData.append('file', formDataFile);
-			formData.append('model', fasterWhisperServerModel);
-			if (outputLanguage !== 'auto')
-				formData.append('language', outputLanguage);
+			formData.append('model', settings.value.fasterWhisperServerModel);
+			if (settings.value.outputLanguage !== 'auto')
+				formData.append('language', settings.value.outputLanguage);
 			const postResult = await HttpService.post({
-				url: `${fasterWhisperServerUrl}/v1/audio/transcriptions`,
+				url: `${settings.value.fasterWhisperServerUrl}/v1/audio/transcriptions`,
 				formData,
 				schema: WhisperResponseSchema,
 			});

@@ -9,9 +9,7 @@ const MAX_FILE_SIZE_MB = 25 as const;
 export const createTranscriptionServiceWhisperLive =
 	(): TranscriptionService => ({
 		transcribe: async (audioBlob) => {
-			const { openAiApiKey: apiKey, outputLanguage } = settings.value;
-
-			if (!apiKey) {
+			if (!settings.value.openAiApiKey) {
 				return Err({
 					_tag: 'WhisperingError',
 					title: 'OpenAI API Key not provided.',
@@ -24,7 +22,7 @@ export const createTranscriptionServiceWhisperLive =
 				});
 			}
 
-			if (!apiKey.startsWith('sk-')) {
+			if (!settings.value.openAiApiKey.startsWith('sk-')) {
 				return Err({
 					_tag: 'WhisperingError',
 					title: 'Invalid OpenAI API Key',
@@ -52,13 +50,13 @@ export const createTranscriptionServiceWhisperLive =
 				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 			);
 			formData.append('model', 'whisper-1');
-			if (outputLanguage !== 'auto') {
-				formData.append('language', outputLanguage);
+			if (settings.value.outputLanguage !== 'auto') {
+				formData.append('language', settings.value.outputLanguage);
 			}
 			const postResponseResult = await HttpService.post({
 				formData,
 				url: 'https://api.openai.com/v1/audio/transcriptions',
-				headers: { Authorization: `Bearer ${apiKey}` },
+				headers: { Authorization: `Bearer ${settings.value.openAiApiKey}` },
 				schema: WhisperResponseSchema,
 			});
 			if (!postResponseResult.ok) {
