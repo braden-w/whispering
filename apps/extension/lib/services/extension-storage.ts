@@ -1,10 +1,7 @@
-import { Schema } from '@effect/schema';
 import { Storage, type StorageWatchCallback } from '@plasmohq/storage';
 import { Err, Ok, parseJson, recorderStateSchema } from '@repo/shared';
-import { Console, Effect } from 'effect';
-import { renderErrorAsNotification } from '~lib/errors';
-import { NotificationServiceBgswLive } from './NotificationServiceBgswLive';
 import type { z } from 'zod';
+import { renderErrorAsNotification } from '~lib/errors';
 
 export const STORAGE_KEYS = {
 	RECORDER_STATE: 'whispering-recorder-state',
