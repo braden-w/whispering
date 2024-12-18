@@ -1,7 +1,6 @@
 import { toast } from '$lib/services/ToastService';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { Schema as S } from '@effect/schema';
 import {
 	getDefaultSettings,
 	settingsSchema,
