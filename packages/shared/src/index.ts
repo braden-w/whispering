@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Schema as S } from '@effect/schema';
 import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
@@ -120,7 +121,7 @@ export const resultToEffect = <T>(
 		? Effect.succeed(result.data)
 		: Effect.fail(new WhisperingError(result.error));
 
-export const recorderStateSchema = S.Literal('IDLE', 'RECORDING', 'LOADING');
+export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
 
 export type RecorderState = S.Schema.Type<typeof recorderStateSchema>;
 
@@ -130,36 +131,48 @@ export const recorderStateToIcons = {
 	IDLE: '🎙️',
 } as const satisfies Record<RecorderState, string>;
 
-export const externalMessageSchema = S.Union(
-	S.Struct({
-		name: S.Literal('whispering-extension/notifyWhisperingTabReady'),
-		body: S.Struct({}),
+export const externalMessageSchema = z.discriminatedUnion('name', [
+	z.object({
+		name: z.literal('whispering-extension/notifyWhisperingTabReady'),
+		body: z.object({}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/playSound'),
-		body: S.Struct({ sound: S.Literal('start', 'stop', 'cancel') }),
+	z.object({
+		name: z.literal('whispering-extension/playSound'),
+		body: z.object({
+			sound: z.enum(['start', 'stop', 'cancel']),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/setClipboardText'),
-		body: S.Struct({ transcribedText: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/setClipboardText'),
+		body: z.object({
+			transcribedText: z.string(),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/setTrayIcon'),
-		body: S.Struct({ recorderState: recorderStateSchema }),
+	z.object({
+		name: z.literal('whispering-extension/setTrayIcon'),
+		body: z.object({
+			recorderState: recorderStateSchema,
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/notifications/create'),
-		body: S.Struct({ notifyOptions: notificationOptionsSchema }),
+	z.object({
+		name: z.literal('whispering-extension/notifications/create'),
+		body: z.object({
+			notifyOptions: notificationOptionsSchema,
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/notifications/clear'),
-		body: S.Struct({ notificationId: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/notifications/clear'),
+		body: z.object({
+			notificationId: z.string(),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/writeTextToCursor'),
-		body: S.Struct({ transcribedText: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/writeTextToCursor'),
+		body: z.object({
+			transcribedText: z.string(),
+		}),
 	}),
-);
+]);
 
 export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
 
