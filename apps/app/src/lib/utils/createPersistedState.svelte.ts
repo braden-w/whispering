@@ -1,12 +1,11 @@
 import { toast } from '$lib/services/ToastService';
-import { Schema as S } from '@effect/schema';
-import { Effect, Either } from 'effect';
 import { nanoid } from 'nanoid/non-secure';
+import type { z } from 'zod';
 
 /**
  * Creates a persisted state object tied to local storage, accessible through `.value`
  */
-export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
+export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	key,
 	schema,
 	defaultValue,
@@ -23,7 +22,7 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 	 * The default value to use if no value is found in local storage or the value
 	 * from local storage fails to pass the schema.
 	 * */
-	defaultValue: S.Schema.Type<TSchema>;
+	defaultValue: z.infer<TSchema>;
 	/**
 	 * If true, disables the use of local storage. In SvelteKit, you set
 	 * this to `!browser` because local storage doesn't exist in the server
@@ -44,19 +43,15 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 
 	const parseValueFromStorage = (
 		valueFromStorageUnparsed: string | null,
-	): S.Schema.Type<TSchema> => {
+	): z.infer<TSchema> => {
 		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
-		const jsonSchema = S.parseJson(schema);
-		const maybeParsedValue = S.decodeUnknownEither(jsonSchema)(
-			valueFromStorageUnparsed,
-		);
-		if (Either.isRight(maybeParsedValue)) {
-			const parsedValue = maybeParsedValue.right;
-			return parsedValue as S.Schema.Type<TSchema>;
-		}
-
-		return Effect.gen(function* () {
+		try {
+			const valueFromStorage = schema.parse(
+				JSON.parse(valueFromStorageUnparsed),
+			);
+			return valueFromStorage as z.infer<TSchema>;
+		} catch (error) {
 			const updatingLocalStorageToastId = nanoid();
 			toast({
 				variant: 'loading',
@@ -64,39 +59,37 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 				description: 'Please wait...',
 			});
 			// Attempt to merge the default value with the value from storage if possible
-			const oldValueFromStorageMaybeInvalid = yield* S.decodeUnknown(
-				S.parseJson(S.Any),
-			)(valueFromStorageUnparsed);
+			const oldValueFromStorageMaybeInvalid = JSON.parse(
+				valueFromStorageUnparsed,
+			);
 			const defaultValueMergedOldValues = {
 				...defaultValue,
 				...oldValueFromStorageMaybeInvalid,
 			};
 
-			const updatedValue: S.Schema.Type<TSchema> = yield* S.decodeUnknown(
-				schema,
-			)(defaultValueMergedOldValues).pipe(
-				Effect.tap(() =>
-					toast({
-						id: updatingLocalStorageToastId,
-						variant: 'success',
-						title: `Successfully updated "${key}" in local storage`,
-						description: 'The value has been updated.',
-					}),
-				),
-				Effect.tapError(() =>
-					toast({
-						id: updatingLocalStorageToastId,
-						variant: 'error',
-						title: `Error updating "${key}" in local storage`,
-						description: 'Reverting to default value.',
-					}),
-				),
-				Effect.catchAll(() => Effect.succeed(defaultValue)),
-			);
-
-			localStorage.setItem(key, JSON.stringify(updatedValue));
-			return updatedValue;
-		}).pipe(Effect.runSync);
+			try {
+				const updatedValue: z.infer<TSchema> = schema.parse(
+					defaultValueMergedOldValues,
+				);
+				toast({
+					id: updatingLocalStorageToastId,
+					variant: 'success',
+					title: `Successfully updated "${key}" in local storage`,
+					description: 'The value has been updated.',
+				});
+				localStorage.setItem(key, JSON.stringify(updatedValue));
+				return updatedValue;
+			} catch (error) {
+				toast({
+					id: updatingLocalStorageToastId,
+					variant: 'error',
+					title: `Error updating "${key}" in local storage`,
+					description: 'Reverting to default value.',
+				});
+				localStorage.setItem(key, JSON.stringify(defaultValue));
+				return defaultValue;
+			}
+		}
 	};
 
 	if (!disableLocalStorage) {
@@ -114,7 +107,7 @@ export function createPersistedState<TSchema extends S.Schema.AnyNoContext>({
 		get value() {
 			return value;
 		},
-		set value(newValue: S.Schema.Type<TSchema>) {
+		set value(newValue: z.infer<TSchema>) {
 			value = newValue;
 			if (!disableLocalStorage)
 				localStorage.setItem(key, JSON.stringify(newValue));
