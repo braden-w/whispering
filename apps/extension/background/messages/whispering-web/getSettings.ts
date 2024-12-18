@@ -9,7 +9,7 @@ import {
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
+import type { WhisperingStorageKey } from '~lib/storage/keys';
 
 export type RequestBody = Record<string, never>;
 
@@ -26,7 +26,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		const valueFromStorage = await injectScript<
 			string | null,
-			[typeof SHARED_EXTENSION_STATE_KEYS.SETTINGS]
+			[WhisperingStorageKey]
 		>({
 			tabId: whisperingTabId,
 			commandName: 'getSettings',
@@ -50,7 +50,7 @@ const handler: PlasmoMessaging.MessageHandler<
 					} as const;
 				}
 			},
-			args: [SHARED_EXTENSION_STATE_KEYS.SETTINGS],
+			args: ['whispering-settings'],
 		});
 
 		if (valueFromStorage === null) return Ok(getDefaultSettings('extension'));

@@ -9,10 +9,9 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
-import { useStorage } from '@plasmohq/storage/hook';
+
 import {
 	Ok,
-	type RecorderState,
 	WHISPERING_URL,
 	recorderStateToIcons,
 	tryAsync,
@@ -28,7 +27,7 @@ import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
+import { useWhisperingStorage } from '~lib/storage/useWhisperingStorage';
 import './style.css';
 
 function IndexPopup() {
@@ -88,12 +87,13 @@ const cancelRecording = async () => {
 };
 
 function IndexPage() {
-	const [recorderState] = useStorage<RecorderState>(
-		SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
+	const recorderState = useWhisperingStorage(
+		'whispering-recorder-state',
 		'IDLE',
 	);
-	const [latestRecordingTranscribedText] = useStorage<string>(
-		SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
+	const latestRecordingTranscribedText = useWhisperingStorage(
+		'whispering-latest-recording-transcribed-text',
+		'',
 	);
 
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
