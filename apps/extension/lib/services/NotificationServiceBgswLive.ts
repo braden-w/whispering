@@ -6,7 +6,7 @@ import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
 const createNotificationServiceBgswLive = (): NotificationService => ({
-	notify: async ({ id: maybeId, title, description, action }) => {
+	async notify({ id: maybeId, title, description, action }) {
 		const id = maybeId ?? nanoid();
 
 		const createNotificationResult = await tryAsync({

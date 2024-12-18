@@ -16,7 +16,7 @@ export const DownloadService = window.__TAURI_INTERNALS__
 
 function createDownloadServiceDesktopLive(): DownloadService {
 	return {
-		downloadBlob: async ({ name, blob }) => {
+		async downloadBlob({ name, blob }) {
 			const extension = getExtensionFromAudioBlob(blob);
 			return await tryAsync({
 				try: async () => {

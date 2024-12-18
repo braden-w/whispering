@@ -7,7 +7,7 @@ import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 const MAX_FILE_SIZE_MB = 25 as const;
 
 export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
-	transcribe: async (audioBlob) => {
+	async transcribe(audioBlob) {
 		if (!settings.value.groqApiKey) {
 			return Err({
 				_tag: 'WhisperingError',

@@ -51,7 +51,7 @@ export const createRecordings = () => {
 		get value() {
 			return recordings;
 		},
-		addRecording: async (recording: Recording) => {
+		async addRecording(recording: Recording) {
 			const addRecordingResult =
 				await RecordingsDbService.addRecording(recording);
 			if (!addRecordingResult.ok) return renderErrAsToast(addRecordingResult);
@@ -62,7 +62,7 @@ export const createRecordings = () => {
 				description: 'Your recording has been added successfully.',
 			});
 		},
-		updateRecording: async (recording: Recording) => {
+		async updateRecording(recording: Recording) {
 			const updateRecordingResult = await updateRecording(recording);
 			if (!updateRecordingResult.ok)
 				return renderErrAsToast(updateRecordingResult);
@@ -72,7 +72,7 @@ export const createRecordings = () => {
 				description: 'Your recording has been updated successfully.',
 			});
 		},
-		deleteRecordingById: async (id: string) => {
+		async deleteRecordingById(id: string) {
 			const deleteRecordingResult =
 				await RecordingsDbService.deleteRecordingById(id);
 			if (!deleteRecordingResult.ok)
@@ -84,7 +84,7 @@ export const createRecordings = () => {
 				description: 'Your recording has been deleted successfully.',
 			});
 		},
-		deleteRecordingsById: async (ids: string[]) => {
+		async deleteRecordingsById(ids: string[]) {
 			const deleteRecordingsResult =
 				await RecordingsDbService.deleteRecordingsById(ids);
 			if (!deleteRecordingsResult.ok)
@@ -98,7 +98,7 @@ export const createRecordings = () => {
 				description: 'Your recordings have been deleted successfully.',
 			});
 		},
-		transcribeRecording: async (id: string) => {
+		async transcribeRecording(id: string) {
 			const selectedTranscriptionService = {
 				OpenAI: TranscriptionServiceWhisperLive,
 				Groq: TranscriptionServiceGroqLive,
@@ -234,7 +234,7 @@ export const createRecordings = () => {
 				});
 			}
 		},
-		downloadRecording: async (id: string) => {
+		async downloadRecording(id: string) {
 			const getRecordingResult = await RecordingsDbService.getRecording(id);
 			if (!getRecordingResult.ok) return renderErrAsToast(getRecordingResult);
 			const maybeRecording = getRecordingResult.data;
@@ -253,7 +253,7 @@ export const createRecordings = () => {
 			});
 			if (!downloadBlobResult.ok) return renderErrAsToast(downloadBlobResult);
 		},
-		copyRecordingText: async (recording: Recording) => {
+		async copyRecordingText(recording: Recording) {
 			if (recording.transcribedText === '') return Ok(undefined);
 			const setClipboardTextResult = await clipboardService.setClipboardText(
 				recording.transcribedText,
