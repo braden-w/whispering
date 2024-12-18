@@ -16,9 +16,8 @@ const attemptMergeStrategy = <TSchema extends z.ZodTypeAny>({
 	error: z.ZodError;
 }): z.infer<TSchema> => {
 	const updatingLocalStorageToastId = nanoid();
-	toast({
+	toast.loading({
 		id: updatingLocalStorageToastId,
-		variant: 'loading',
 		title: `Updating "${key}" in local storage...`,
 		description: 'Please wait...',
 	});
@@ -31,9 +30,8 @@ const attemptMergeStrategy = <TSchema extends z.ZodTypeAny>({
 
 	const parseMergedValuesResult = schema.safeParse(defaultValueMergedOldValues);
 	if (!parseMergedValuesResult.success) {
-		toast({
+		toast.error({
 			id: updatingLocalStorageToastId,
-			variant: 'error',
 			title: `Error updating "${key}" in local storage`,
 			description: 'Reverting to default value.',
 		});
@@ -42,9 +40,8 @@ const attemptMergeStrategy = <TSchema extends z.ZodTypeAny>({
 	}
 
 	const updatedValue = parseMergedValuesResult.data;
-	toast({
+	toast.success({
 		id: updatingLocalStorageToastId,
-		variant: 'success',
 		title: `Successfully updated "${key}" in local storage`,
 		description: 'The value has been updated.',
 	});

@@ -371,8 +371,7 @@
 											renderErrAsToast(setClipboardText);
 											isDialogOpen = false;
 										}
-										toast({
-											variant: 'success',
+										toast.success({
 											title: 'Copied transcriptions to clipboard!',
 											description: text,
 											descriptionClass: 'line-clamp-2',

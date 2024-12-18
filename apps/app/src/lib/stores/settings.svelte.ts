@@ -133,8 +133,7 @@ function createRegisterShortcuts() {
 			const job = async () => {
 				unregisterAllLocalShortcuts();
 				registerLocalShortcut({ shortcut, callback });
-				toast({
-					variant: 'success',
+				toast.success({
 					title: `Local shortcut set to ${shortcut}`,
 					description: 'Press the shortcut to start recording',
 				});
@@ -152,8 +151,7 @@ function createRegisterShortcuts() {
 				if (!window.__TAURI_INTERNALS__) return;
 				unregisterAllGlobalShortcuts();
 				await registerGlobalShortcut({ shortcut, callback });
-				toast({
-					variant: 'success',
+				toast.success({
 					title: `Global shortcut set to ${shortcut}`,
 					description: 'Press the shortcut to start recording',
 				});

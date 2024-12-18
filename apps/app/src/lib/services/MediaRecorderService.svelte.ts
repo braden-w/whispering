@@ -21,8 +21,7 @@ function createMediaStreamManager(): MediaStreamManager {
 		async getOrRefreshStream() {
 			if (currentStream === null) return this.refreshStream();
 			if (!currentStream.active) {
-				toast({
-					variant: 'warning',
+				toast.warning({
 					title: 'Open stream is inactive',
 					description: 'Refreshing recording session...',
 				});
@@ -33,16 +32,14 @@ function createMediaStreamManager(): MediaStreamManager {
 		async refreshStream() {
 			this.destroy();
 			const toastId = nanoid();
-			toast({
+			toast.loading({
 				id: toastId,
-				variant: 'loading',
 				title: 'Connecting to selected audio input device...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			if (!settings.value.selectedAudioInputDeviceId) {
-				toast({
+				toast.loading({
 					id: toastId,
-					variant: 'loading',
 					title: 'No device selected',
 					description: 'Defaulting to first available audio input device...',
 				});
@@ -50,9 +47,8 @@ function createMediaStreamManager(): MediaStreamManager {
 				if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
 				const firstAvailableStream = firstAvailableStreamResult.data;
 				currentStream = firstAvailableStream;
-				toast({
+				toast.info({
 					id: toastId,
-					variant: 'info',
 					title: 'Defaulted to first available audio input device',
 					description: 'You can select a specific device in the settings.',
 				});
@@ -63,17 +59,15 @@ function createMediaStreamManager(): MediaStreamManager {
 			);
 			if (maybeStream !== null) {
 				currentStream = maybeStream;
-				toast({
+				toast.success({
 					id: toastId,
-					variant: 'success',
 					title: 'Connected to selected audio input device',
 					description: 'Successfully connected to your microphone stream.',
 				});
 				return Ok(maybeStream);
 			}
-			toast({
+			toast.loading({
 				id: toastId,
-				variant: 'loading',
 				title: 'Error connecting to selected audio input device',
 				description: 'Trying to find another available audio input device...',
 			});
@@ -81,9 +75,8 @@ function createMediaStreamManager(): MediaStreamManager {
 			if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
 			const firstAvailableStream = firstAvailableStreamResult.data;
 			currentStream = firstAvailableStream;
-			toast({
+			toast.info({
 				id: toastId,
-				variant: 'info',
 				title: 'Defaulted to first available audio input device',
 				description: 'You can select a specific device in the settings.',
 			});

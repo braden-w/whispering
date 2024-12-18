@@ -65,9 +65,8 @@ export function createMediaRecorder(): MediaRecorderService {
 						}),
 					});
 					if (!newOrExistingMediaRecorderResult.ok) {
-						toast({
+						toast.loading({
 							id: toastId,
-							variant: 'loading',
 							title: 'Error initializing media recorder with preferred device',
 							description:
 								'Trying to find another available audio input device...',
