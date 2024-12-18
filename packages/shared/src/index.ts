@@ -1,16 +1,14 @@
+import type {
+	Err as EpicenterErr,
+	Ok as EpicenterOk,
+	Result as EpicenterResult,
+} from '@epicenterhq/result';
 import { z } from 'zod';
-import { Schema as S } from '@effect/schema';
-import { Data, Effect } from 'effect';
 import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
-import type {
-	Result as EpicenterResult,
-	Ok as EpicenterOk,
-	Err as EpicenterErr,
-} from '@epicenterhq/result';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -148,9 +146,20 @@ export async function tryAsync<T, E extends BubbleError | WhisperingError>({
 	}
 }
 
+export const parseJson = (
+	value: string,
+): Result<unknown, BubbleError<'ParseJsonError'>> =>
+	trySync({
+		try: () => JSON.parse(value) as unknown,
+		catch: (error) => ({
+			_tag: 'ParseJsonError',
+			message: error instanceof Error ? error.message : 'Unexpected JSON input',
+		}),
+	});
+
 export const recorderStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
 
-export type RecorderState = S.Schema.Type<typeof recorderStateSchema>;
+export type RecorderState = z.infer<typeof recorderStateSchema>;
 
 export const recorderStateToIcons = {
 	RECORDING: '🔲',
@@ -201,7 +210,7 @@ export const externalMessageSchema = z.discriminatedUnion('name', [
 	}),
 ]);
 
-export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
+export type ExternalMessage = z.infer<typeof externalMessageSchema>;
 
 export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 	ExternalMessage,
