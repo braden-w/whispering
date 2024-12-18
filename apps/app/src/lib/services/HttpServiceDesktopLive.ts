@@ -3,7 +3,7 @@ import { Err, tryAsync } from '@repo/shared';
 import { fetch } from '@tauri-apps/plugin-http';
 
 export const createHttpServiceDesktopLive = (): HttpService => ({
-	post: async ({ formData, url, schema, headers }) => {
+	async post({ formData, url, schema, headers }) {
 		const responseResult = await tryAsync({
 			try: () =>
 				fetch(url, {

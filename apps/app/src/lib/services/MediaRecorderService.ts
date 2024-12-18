@@ -32,7 +32,7 @@ export function createMediaRecorder(): MediaRecorderService {
 			if (!mediaRecorder) return 'inactive';
 			return mediaRecorder.state;
 		},
-		startRecording: async (): Promise<Result<undefined>> => {
+		async startRecording(): Promise<Result<undefined>> {
 			if (mediaRecorder) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -146,7 +146,7 @@ export function createMediaRecorder(): MediaRecorderService {
 			resetRecorder();
 			return stopResult;
 		},
-		cancelRecording: async () => {
+		async cancelRecording() {
 			if (!mediaRecorder) return Ok(undefined);
 			const cancelResult: Result<undefined> = await tryAsync({
 				try: () =>

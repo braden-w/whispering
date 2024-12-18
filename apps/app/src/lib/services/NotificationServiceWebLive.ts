@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid/non-secure';
 
 export const createNotificationServiceWeb = (): NotificationService => {
 	return {
-		notify: async (notifyOptions) => {
+		async notify(notifyOptions) {
 			const sendMessageToExtensionResult = await sendMessageToExtension({
 				name: 'whispering-extension/notifications/create',
 				body: { notifyOptions },

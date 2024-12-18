@@ -32,7 +32,7 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 			}),
 		}),
 
-	writeTextToCursor: async (text) => {
+	async writeTextToCursor(text) {
 		const isMacos = type() === 'macos';
 
 		if (!isMacos) return writeTextToCursor(text);
