@@ -1,22 +1,20 @@
-import { Schema as S } from '@effect/schema';
+import { z } from 'zod';
 import type { Result } from '../index.js';
 
-export const notificationOptionsSchema = S.Struct({
-	id: S.optional(S.String),
-	title: S.String,
-	description: S.String,
-	action: S.optional(
-		S.Struct({
-			type: S.Literal('link'),
-			label: S.String,
-			goto: S.String,
-		}),
-	),
+export const notificationOptionsSchema = z.object({
+	id: z.string().optional(),
+	title: z.string(),
+	description: z.string(),
+	action: z
+		.object({
+			type: z.literal('link'),
+			label: z.string(),
+			goto: z.string(),
+		})
+		.optional(),
 });
 
-export type NotificationOptions = S.Schema.Type<
-	typeof notificationOptionsSchema
->;
+export type NotificationOptions = z.infer<typeof notificationOptionsSchema>;
 
 export type NotificationService = {
 	notify: (options: NotificationOptions) => Promise<Result<string>>;
