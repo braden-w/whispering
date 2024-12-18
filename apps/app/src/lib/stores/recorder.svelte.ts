@@ -57,7 +57,7 @@ function createRecorder() {
 			const toggleRecording = async (): Promise<
 				WhisperingResult<undefined>
 			> => {
-				if (mediaRecorder.recordingState === 'RECORDING') {
+				const stopRecording = async () => {
 					const stopRecordingResult = await mediaRecorder.stopRecording();
 					if (!stopRecordingResult.ok) return stopRecordingResult;
 					const audioBlob = stopRecordingResult.data;
@@ -78,32 +78,37 @@ function createRecorder() {
 					await recordings.addRecording(newRecording);
 					await recordings.transcribeRecording(newRecording.id);
 
-					if (settings.value.alwaysOnTop === 'When Recording') {
+					if (settings.value.alwaysOnTop === 'When Recording')
 						await setAlwaysOnTop(false);
-						return Ok(undefined);
-					}
-				}
+					return Ok(undefined);
+				};
 
-				if (settings.value.alwaysOnTop === 'When Recording') {
-					await setAlwaysOnTop(true);
-				}
-				const startRecordingResult = await mediaRecorder.startRecording();
-				if (!startRecordingResult.ok) return startRecordingResult;
-				recorderState.value = 'RECORDING';
-				console.info('Recording started');
-				const playSoundResult = await playSound('start');
-				if (!playSoundResult.ok) return playSoundResult;
-				await notify({
-					id: IS_RECORDING_NOTIFICATION_ID,
-					title: 'Whispering is recording...',
-					description: 'Click to go to recorder',
-					action: {
-						type: 'link',
-						label: 'Go to recorder',
-						goto: '/',
-					},
-				});
-				return Ok(undefined);
+				const startRecording = async () => {
+					if (settings.value.alwaysOnTop === 'When Recording') {
+						await setAlwaysOnTop(true);
+					}
+					const startRecordingResult = await mediaRecorder.startRecording();
+					if (!startRecordingResult.ok) return startRecordingResult;
+					recorderState.value = 'RECORDING';
+					console.info('Recording started');
+					const playSoundResult = await playSound('start');
+					if (!playSoundResult.ok) return playSoundResult;
+					await notify({
+						id: IS_RECORDING_NOTIFICATION_ID,
+						title: 'Whispering is recording...',
+						description: 'Click to go to recorder',
+						action: {
+							type: 'link',
+							label: 'Go to recorder',
+							goto: '/',
+						},
+					});
+					return Ok(undefined);
+				};
+
+				return mediaRecorder.recordingState === 'RECORDING'
+					? stopRecording()
+					: startRecording();
 			};
 			const toggleRecordingResult = await toggleRecording();
 			if (!toggleRecordingResult.ok) {
