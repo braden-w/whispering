@@ -58,7 +58,7 @@ function registerLocalShortcut({
 		return unregisterAllLocalShortcutsResult;
 	return trySync({
 		try: () =>
-			hotkeys(shortcut, (event, handler) => {
+			hotkeys(shortcut, (event) => {
 				// Prevent the default refresh event under WINDOWS system
 				event.preventDefault();
 				callback();
