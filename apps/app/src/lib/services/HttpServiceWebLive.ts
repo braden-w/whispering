@@ -1,7 +1,5 @@
 import type { HttpService } from '$lib/services/HttpService';
-import { Schema } from '@effect/schema';
 import { Err, tryAsync } from '@repo/shared';
-import { Effect } from 'effect';
 
 export const createHttpServiceWebLive = (): HttpService => ({
 	post: async ({ formData, url, schema, headers }) => {
@@ -31,7 +29,7 @@ export const createHttpServiceWebLive = (): HttpService => ({
 		const parseResult = await tryAsync({
 			try: async () => {
 				const json = await response.json();
-				return Schema.decodeUnknown(schema)(json).pipe(Effect.runSync);
+				return schema.parse(json);
 			},
 			catch: (error) =>
 				({

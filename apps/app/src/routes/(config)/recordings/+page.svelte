@@ -23,7 +23,6 @@
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { Schema as S } from '@effect/schema';
 	import {
 		FlexRender,
 		createTable,
@@ -35,6 +34,7 @@
 		getFilteredRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
+	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -147,21 +147,15 @@
 	let sorting = createPersistedState({
 		key: 'whispering-data-table-sorting',
 		defaultValue: [{ id: 'timestamp', desc: true }],
-		schema: S.Struct({ desc: S.Boolean, id: S.String }).pipe(
-			S.mutable,
-			S.Array,
-			S.mutable,
-		),
+		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = createPersistedState({
 		key: 'whispering-data-table-column-filters',
 		defaultValue: [],
-		schema: S.Struct({ id: S.String, value: S.Unknown }).pipe(
-			S.filter((data): data is ColumnFilter => data.value !== undefined),
-			S.mutable,
-			S.Array,
-			S.mutable,
-		),
+		schema: z
+			.object({ id: z.string(), value: z.unknown() })
+			.refine((data): data is ColumnFilter => data.value !== undefined)
+			.array(),
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-data-table-column-visibility',
@@ -171,12 +165,12 @@
 			subtitle: false,
 			timestamp: false,
 		},
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+		schema: z.record(z.string(), z.boolean()),
 	});
 	let rowSelection = createPersistedState({
 		key: 'whispering-data-table-row-selection',
 		defaultValue: {},
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+		schema: z.record(z.string(), z.boolean()),
 	});
 
 	function createUpdater<T>(state: { value: T }) {

@@ -1,4 +1,3 @@
-import { Schema } from '@effect/schema';
 import {
 	type ExternalMessageBody,
 	Ok,
@@ -8,7 +7,6 @@ import {
 	externalMessageSchema,
 	tryAsync,
 } from '@repo/shared';
-import { Either } from 'effect';
 import { injectScript } from '~background/injectScript';
 
 export const getOrCreateWhisperingTabId = async (): Promise<Result<number>> => {
@@ -126,11 +124,9 @@ function createWhisperingTab() {
 function isNotifyWhisperingTabReadyMessage(
 	message: unknown,
 ): message is ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'> {
-	const externalMessageResult = Schema.decodeUnknownEither(
-		externalMessageSchema,
-	)(message);
-	if (Either.isLeft(externalMessageResult)) return false;
-	const externalMessage = externalMessageResult.right;
+	const externalMessageResult = externalMessageSchema.safeParse(message);
+	if (!externalMessageResult.success) return false;
+	const externalMessage = externalMessageResult.data;
 	return (
 		externalMessage.name === 'whispering-extension/notifyWhisperingTabReady'
 	);
