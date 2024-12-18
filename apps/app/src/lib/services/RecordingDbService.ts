@@ -28,4 +28,4 @@ export type RecordingsDbService = {
 	readonly deleteRecordingsById: (ids: string[]) => Promise<Result<void>>;
 };
 
-const RecordingsDbService = createRecordingsDbServiceLiveIndexedDb();
+export const RecordingsDbService = createRecordingsDbServiceLiveIndexedDb();
