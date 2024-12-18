@@ -4,10 +4,7 @@ import type {
 	ExternalMessageReturnType,
 	Result,
 } from '@repo/shared';
-import { effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
-import { renderErrorAsNotification } from '~lib/errors';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
+import { Ok } from '@repo/shared';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'>;
@@ -19,13 +16,8 @@ export type ResponseBody = Result<
 const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 	{ body },
 	res,
-) =>
-	Effect.gen(function* () {}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+) => {
+	res.send(Ok(undefined));
+};
 
 export default handler;
