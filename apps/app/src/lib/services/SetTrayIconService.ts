@@ -1,11 +1,6 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
-import {
-	type RecorderState,
-	type Result,
-	WhisperingError,
-	tryAsync,
-} from '@repo/shared';
+import { type RecorderState, type Result, tryAsync } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
