@@ -9,7 +9,7 @@ import { settings } from '$lib/stores/settings.svelte';
 import {
 	Ok,
 	WhisperingErr,
-	type RecorderState,
+	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
@@ -19,16 +19,19 @@ import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
 const startSound = new Audio(startSoundSrc);
+console.log('🚀 ~ startSound:', startSound);
 const stopSound = new Audio(stopSoundSrc);
+console.log('🚀 ~ stopSound:', stopSound);
 const cancelSound = new Audio(cancelSoundSrc);
+console.log('🚀 ~ cancelSound:', cancelSound);
 
 export const recorderState = (() => {
-	let value = $state<RecorderState>('IDLE');
+	let value = $state<WhisperingRecordingState>('IDLE');
 	return {
 		get value() {
 			return value;
 		},
-		set value(newValue: RecorderState) {
+		set value(newValue: WhisperingRecordingState) {
 			value = newValue;
 			(async () => {
 				const result = await SetTrayIconService.setTrayIcon(newValue);
@@ -50,65 +53,57 @@ function createRecorder() {
 			return recorderState.value;
 		},
 
-		async toggleRecording() {
+		async toggleRecording(): Promise<void> {
 			const toggleRecording = async (): Promise<
 				WhisperingResult<undefined>
 			> => {
-				switch (mediaRecorder.recordingState) {
-					case 'inactive': {
-						if (settings.value.alwaysOnTop === 'When Recording') {
-							await setAlwaysOnTop(true);
-						}
-						const startRecordingResult = await mediaRecorder.startRecording();
-						if (!startRecordingResult.ok) return startRecordingResult;
-						recorderState.value = 'RECORDING';
-						console.info('Recording started');
-						const playSoundResult = await playSound('start');
-						if (!playSoundResult.ok) return playSoundResult;
-						notify({
-							id: IS_RECORDING_NOTIFICATION_ID,
-							title: 'Whispering is recording...',
-							description: 'Click to go to recorder',
-							action: {
-								type: 'link',
-								label: 'Go to recorder',
-								goto: '/',
-							},
-						});
-						return Ok(undefined);
-					}
-					case 'recording': {
-						const stopRecordingResult = await mediaRecorder.stopRecording();
-						if (!stopRecordingResult.ok) return stopRecordingResult;
-						const audioBlob = stopRecordingResult.data;
-						recorderState.value = 'IDLE';
-						console.info('Recording stopped');
-						const playSoundResult = await playSound('stop');
-						if (!playSoundResult.ok) return playSoundResult;
+				if (mediaRecorder.recordingState === 'RECORDING') {
+					const stopRecordingResult = await mediaRecorder.stopRecording();
+					if (!stopRecordingResult.ok) return stopRecordingResult;
+					const audioBlob = stopRecordingResult.data;
+					recorderState.value = 'IDLE';
+					console.info('Recording stopped');
+					const playSoundResult = await playSound('stop');
+					if (!playSoundResult.ok) return playSoundResult;
 
-						const newRecording: Recording = {
-							id: nanoid(),
-							title: '',
-							subtitle: '',
-							timestamp: new Date().toISOString(),
-							transcribedText: '',
-							blob: audioBlob,
-							transcriptionStatus: 'UNPROCESSED',
-						};
-						await recordings.addRecording(newRecording);
-						await recordings.transcribeRecording(newRecording.id);
+					const newRecording: Recording = {
+						id: nanoid(),
+						title: '',
+						subtitle: '',
+						timestamp: new Date().toISOString(),
+						transcribedText: '',
+						blob: audioBlob,
+						transcriptionStatus: 'UNPROCESSED',
+					};
+					await recordings.addRecording(newRecording);
+					await recordings.transcribeRecording(newRecording.id);
 
-						if (settings.value.alwaysOnTop === 'When Recording') {
-							await setAlwaysOnTop(false);
-						}
+					if (settings.value.alwaysOnTop === 'When Recording') {
+						await setAlwaysOnTop(false);
 						return Ok(undefined);
 					}
 				}
-				return WhisperingErr({
-					title: 'Recording state is invalid',
-					description: `Recording state ${mediaRecorder.recordingState} is invalid`,
-					action: { type: 'none' },
+
+				if (settings.value.alwaysOnTop === 'When Recording') {
+					await setAlwaysOnTop(true);
+				}
+				const startRecordingResult = await mediaRecorder.startRecording();
+				if (!startRecordingResult.ok) return startRecordingResult;
+				recorderState.value = 'RECORDING';
+				console.info('Recording started');
+				const playSoundResult = await playSound('start');
+				if (!playSoundResult.ok) return playSoundResult;
+				await notify({
+					id: IS_RECORDING_NOTIFICATION_ID,
+					title: 'Whispering is recording...',
+					description: 'Click to go to recorder',
+					action: {
+						type: 'link',
+						label: 'Go to recorder',
+						goto: '/',
+					},
 				});
+				return Ok(undefined);
 			};
 			const toggleRecordingResult = await toggleRecording();
 			if (!toggleRecordingResult.ok) {
@@ -117,9 +112,7 @@ function createRecorder() {
 					await setAlwaysOnTop(false);
 				}
 				renderErrAsToast(toggleRecordingResult);
-				return toggleRecordingResult;
 			}
-			return toggleRecordingResult;
 		},
 		async cancelRecording() {
 			const cancelRecordingResult = await mediaRecorder.cancelRecording();
