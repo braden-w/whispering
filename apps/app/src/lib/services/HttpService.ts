@@ -1,22 +1,26 @@
 import type { Schema } from '@effect/schema';
-import type { ParseError } from '@effect/schema/ParseResult';
-import type { Effect } from 'effect';
-import { Context, Data } from 'effect';
+import type { BaseUncaughtErrorSerializable, Result } from '@repo/shared';
+import { Data } from 'effect';
+import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
+import { createHttpServiceWebLive } from './HttpServiceWebLive';
 
 export class HttpServiceError extends Data.TaggedError('HttpServiceError')<{
 	message: string;
 }> {}
 
-export class HttpService extends Context.Tag('HttpService')<
-	HttpService,
-	{
-		readonly post: <TSchema extends Schema.Schema.AnyNoContext>(config: {
-			url: string;
-			formData: FormData;
-			schema: TSchema;
-		}) => Effect.Effect<
+export type HttpService = {
+	readonly post: <TSchema extends Schema.Schema.AnyNoContext>(config: {
+		url: string;
+		formData: FormData;
+		schema: TSchema;
+	}) => Promise<
+		Result<
 			Schema.Schema.Type<TSchema>,
-			HttpServiceError | ParseError
-		>;
-	}
->() {}
+			BaseUncaughtErrorSerializable<'NetworkError' | 'HttpError' | 'ParseError'>
+		>
+	>;
+};
+
+export const HttpService = window.__TAURI_INTERNALS__
+	? createHttpServiceDesktopLive()
+	: createHttpServiceWebLive();
