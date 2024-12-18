@@ -75,12 +75,12 @@
 				value: option.value,
 				label: option.label,
 			}))}
-			selected={settings.value.bitsPerSecond}
+			selected={settings.value.bitrateKbps}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					bitsPerSecond: selected,
+					bitrateKbps: selected,
 				};
 			}}
 			placeholder="Select a bitrate"
