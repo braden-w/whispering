@@ -1,4 +1,3 @@
-import { Effect } from 'effect';
 import { toast as sonnerToast } from 'svelte-sonner';
 
 type ToastOptions = {

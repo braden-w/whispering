@@ -4,8 +4,8 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { setAlwaysOnTopToTrueIfInSettings } from '$lib/services/AlwaysOnTopService';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
-	import { Effect } from 'effect';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
@@ -35,10 +35,12 @@
 			}
 		});
 		if (!window.__TAURI_INTERNALS__) {
-			sendMessageToExtension({
+			const sendMessageToExtensionResult = await sendMessageToExtension({
 				name: 'whispering-extension/notifyWhisperingTabReady',
 				body: {},
-			}).pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise);
+			});
+			if (!sendMessageToExtensionResult.ok)
+				return renderErrAsToast(sendMessageToExtensionResult);
 		}
 		setAlwaysOnTopToTrueIfInSettings();
 	});
@@ -47,8 +49,8 @@
 		position: 'bottom-right',
 		richColors: true,
 		duration: 5000,
-		visibleToasts: setAlwaysOnTopToTrueIfInSettings,
-	};
+		visibleToasts: 5,
+	} satisfies ToasterProps;
 </script>
 
 <svelte:head>
