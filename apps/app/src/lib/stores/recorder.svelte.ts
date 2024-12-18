@@ -35,6 +35,35 @@ export const recorderState = (() => {
 
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
+const playSound = async (
+	sound: 'start' | 'stop' | 'cancel',
+): Promise<Result<void>> => {
+	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
+
+	if (!document.hidden) {
+		switch (sound) {
+			case 'start':
+				await startSound.play();
+				break;
+			case 'stop':
+				await stopSound.play();
+				break;
+			case 'cancel':
+				await cancelSound.play();
+				break;
+		}
+		return Ok(undefined);
+	}
+
+	const sendMessageToExtensionResult = await sendMessageToExtension({
+		name: 'whispering-extension/playSound',
+		body: { sound },
+	});
+
+	if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+	return Ok(undefined);
+};
+
 const createRecorder = () => {
 	const { notify } = NotificationService;
 
@@ -54,19 +83,8 @@ const createRecorder = () => {
 						if (!startRecordingResult.ok) return startRecordingResult;
 						recorderState.value = 'RECORDING';
 						console.info('Recording started');
-						if (settings.value.isPlaySoundEnabled) {
-							if (!document.hidden) {
-								startSound.play();
-							} else {
-								const sendMessageToExtensionResult =
-									await sendMessageToExtension({
-										name: 'whispering-extension/playSound',
-										body: { sound: 'start' },
-									});
-								if (!sendMessageToExtensionResult.ok)
-									return sendMessageToExtensionResult;
-							}
-						}
+						const playSoundResult = await playSound('start');
+						if (!playSoundResult.ok) return playSoundResult;
 						notify({
 							id: IS_RECORDING_NOTIFICATION_ID,
 							title: 'Whispering is recording...',
@@ -85,20 +103,8 @@ const createRecorder = () => {
 						const audioBlob = stopRecordingResult.data;
 						recorderState.value = 'IDLE';
 						console.info('Recording stopped');
-
-						if (settings.value.isPlaySoundEnabled) {
-							if (!document.hidden) {
-								stopSound.play();
-							} else {
-								const sendMessageToExtensionResult =
-									await sendMessageToExtension({
-										name: 'whispering-extension/playSound',
-										body: { sound: 'stop' },
-									});
-								if (!sendMessageToExtensionResult.ok)
-									return sendMessageToExtensionResult;
-							}
-						}
+						const playSoundResult = await playSound('stop');
+						if (!playSoundResult.ok) return playSoundResult;
 
 						const newRecording: Recording = {
 							id: nanoid(),
@@ -139,18 +145,8 @@ const createRecorder = () => {
 		async cancelRecording() {
 			const cancelRecordingResult = await mediaRecorder.cancelRecording();
 			if (!cancelRecordingResult.ok) return cancelRecordingResult;
-			if (settings.value.isPlaySoundEnabled) {
-				if (!document.hidden) {
-					cancelSound.play();
-				} else {
-					const sendMessageToExtensionResult = await sendMessageToExtension({
-						name: 'whispering-extension/playSound',
-						body: { sound: 'cancel' },
-					});
-					if (!sendMessageToExtensionResult.ok)
-						return sendMessageToExtensionResult;
-				}
-			}
+			const playSoundResult = await playSound('cancel');
+			if (!playSoundResult.ok) return playSoundResult;
 			console.info('Recording cancelled');
 			recorderState.value = 'IDLE';
 			if (settings.value.alwaysOnTop === 'When Recording') {
