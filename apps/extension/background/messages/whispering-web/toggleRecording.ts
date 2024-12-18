@@ -7,7 +7,7 @@ export type RequestBody = undefined;
 
 export type ResponseBody = Result<void>;
 
-const toggleRecording = async () => {
+export const toggleRecording = async () => {
 	const whisperingTabIdResult = await getOrCreateWhisperingTabId();
 	if (!whisperingTabIdResult.ok) return whisperingTabIdResult;
 	const whisperingTabId = whisperingTabIdResult.data;
