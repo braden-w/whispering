@@ -1,12 +1,10 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { WhisperingError } from '@repo/shared';
-import { Effect } from 'effect';
+import { Ok, tryAsync } from '@repo/shared';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
 
-export const toggleRecordingFromContentScript = () =>
-	Effect.tryPromise({
+export const toggleRecordingFromContentScript = async (): Promise<void> => {
+	const sendToToggleRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
@@ -24,8 +22,12 @@ export const toggleRecordingFromContentScript = () =>
 				error,
 			},
 		}),
-	}).pipe(
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
+	});
+	if (!sendToToggleRecordingResult.ok) {
+		return renderErrorAsNotification(sendToToggleRecordingResult);
+	}
+	const toggleRecordingResult = sendToToggleRecordingResult.data;
+	if (!toggleRecordingResult.ok) {
+		return renderErrorAsNotification(toggleRecordingResult);
+	}
+};
