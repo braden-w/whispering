@@ -35,36 +35,9 @@ export const recorderState = (() => {
 
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
-const playSound = async (
-	sound: 'start' | 'stop' | 'cancel',
-): Promise<Result<void>> => {
-	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
+export const recorder = createRecorder();
 
-	if (!document.hidden) {
-		switch (sound) {
-			case 'start':
-				await startSound.play();
-				break;
-			case 'stop':
-				await stopSound.play();
-				break;
-			case 'cancel':
-				await cancelSound.play();
-				break;
-		}
-		return Ok(undefined);
-	}
-
-	const sendMessageToExtensionResult = await sendMessageToExtension({
-		name: 'whispering-extension/playSound',
-		body: { sound },
-	});
-
-	if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
-	return Ok(undefined);
-};
-
-const createRecorder = () => {
+function createRecorder() {
 	const { notify } = NotificationService;
 
 	return {
@@ -154,6 +127,33 @@ const createRecorder = () => {
 			}
 		},
 	};
-};
+}
 
-export const recorder = createRecorder();
+async function playSound(
+	sound: 'start' | 'stop' | 'cancel',
+): Promise<Result<void>> {
+	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
+
+	if (!document.hidden) {
+		switch (sound) {
+			case 'start':
+				await startSound.play();
+				break;
+			case 'stop':
+				await stopSound.play();
+				break;
+			case 'cancel':
+				await cancelSound.play();
+				break;
+		}
+		return Ok(undefined);
+	}
+
+	const sendMessageToExtensionResult = await sendMessageToExtension({
+		name: 'whispering-extension/playSound',
+		body: { sound },
+	});
+
+	if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+	return Ok(undefined);
+}
