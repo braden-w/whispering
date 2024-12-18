@@ -32,7 +32,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const notifyResult = await notify(body.notifyOptions);
 		return notifyResult;
 	};
-	return res.send(await createNotification());
+	res.send(await createNotification());
 };
 
 export default handler;
