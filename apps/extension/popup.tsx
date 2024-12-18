@@ -11,6 +11,7 @@ import {
 import { sendToBackground } from '@plasmohq/messaging';
 import { useStorage } from '@plasmohq/storage/hook';
 import {
+	Ok,
 	type RecorderState,
 	WHISPERING_URL,
 	recorderStateToIcons,
@@ -57,12 +58,10 @@ const toggleRecording = async () => {
 			action: { type: 'more-details', error },
 		}),
 	});
-	if (!sendToToggleRecordingResult.ok)
-		return renderErrorAsNotification(sendToToggleRecordingResult);
+	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
 	const toggleRecordingResult = sendToToggleRecordingResult.data;
-	if (!toggleRecordingResult.ok)
-		return renderErrorAsNotification(toggleRecordingResult);
-	return toggleRecordingResult.data;
+	if (!toggleRecordingResult.ok) return toggleRecordingResult;
+	return Ok(toggleRecordingResult.data);
 };
 
 const cancelRecording = async () => {
@@ -82,12 +81,10 @@ const cancelRecording = async () => {
 			action: { type: 'more-details', error },
 		}),
 	});
-	if (!sendToCancelRecordingResult.ok)
-		return renderErrorAsNotification(sendToCancelRecordingResult);
+	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
 	const cancelRecordingResult = sendToCancelRecordingResult.data;
-	if (!cancelRecordingResult.ok)
-		return renderErrorAsNotification(cancelRecordingResult);
-	return cancelRecordingResult.data;
+	if (!cancelRecordingResult.ok) return cancelRecordingResult;
+	return Ok(cancelRecordingResult.data);
 };
 
 function IndexPage() {
@@ -121,7 +118,11 @@ function IndexPage() {
 				<div className="relative">
 					<Button
 						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-						onClick={toggleRecording}
+						onClick={async () => {
+							const toggleRecordingResult = await toggleRecording();
+							if (!toggleRecordingResult.ok)
+								renderErrorAsNotification(toggleRecordingResult);
+						}}
 						aria-label="Toggle recording"
 						variant="ghost"
 					>
@@ -134,7 +135,11 @@ function IndexPage() {
 					{recorderState === 'RECORDING' && (
 						<Button
 							className="-right-16 absolute bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-							onClick={cancelRecording}
+							onClick={async () => {
+								const cancelRecordingResult = await cancelRecording();
+								if (!cancelRecordingResult.ok)
+									renderErrorAsNotification(cancelRecordingResult);
+							}}
 							aria-label="Cancel recording"
 							size="icon"
 							variant="ghost"
