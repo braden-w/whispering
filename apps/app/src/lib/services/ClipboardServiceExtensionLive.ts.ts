@@ -1,40 +1,37 @@
-import { WhisperingError } from '@repo/shared';
-import { Effect, Layer } from 'effect';
-import { ClipboardService } from './ClipboardService';
+import { type Result, WhisperingError, tryAsync, trySync } from '@repo/shared';
+import type { ClipboardService } from './ClipboardService';
 
-export const ClipboardServiceExtensionLive = Layer.succeed(
-	ClipboardService,
-	ClipboardService.of({
-		setClipboardText: (text) =>
-			Effect.tryPromise({
-				try: () => navigator.clipboard.writeText(text),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to write to clipboard',
-						description:
-							'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-			}),
-		writeTextToCursor: (text) =>
-			Effect.try({
-				try: () => writeTextToCursor(text),
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Unable to write text to cursor',
-						description:
-							'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-			}),
-	}),
-);
+export const createClipboardServiceExtensionLive = (): ClipboardService => ({
+	setClipboardText: (text) =>
+		tryAsync({
+			try: () => navigator.clipboard.writeText(text),
+			catch: (error) =>
+				new WhisperingError({
+					title: 'Unable to write to clipboard',
+					description:
+						'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
+		}),
+
+	writeTextToCursor: (text) =>
+		trySync({
+			try: () => writeTextToCursor(text),
+			catch: (error) =>
+				new WhisperingError({
+					title: 'Unable to write text to cursor',
+					description:
+						'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
+		}),
+});
 
 /**
  * Insert the provided text at the cursor position in the currently active input element or append it
