@@ -17,9 +17,6 @@ importers:
       turbo:
         specifier: latest
         version: 2.3.3
-      typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
 
   apps/app:
     dependencies:
@@ -208,14 +205,14 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       idb:
-        specifier: ^8.0.0
-        version: 8.0.0
+        specifier: ^8.0.1
+        version: 8.0.1
       lucide-react:
         specifier: ^0.424.0
         version: 0.424.0(react@18.3.1)
       nanoid:
-        specifier: ^5.0.7
-        version: 5.0.7
+        specifier: ^5.0.9
+        version: 5.0.9
       plasmo:
         specifier: ^0.89.4
         version: 0.89.4(@swc/core@1.10.1(@swc/helpers@0.5.15))(@swc/helpers@0.5.15)(lodash@4.17.21)(postcss@8.4.49)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3458,9 +3455,6 @@ packages:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
-  idb@8.0.0:
-    resolution: {integrity: sha512-l//qvlAKGmQO31Qn7xdzagVPPaHTxXx199MhrAFuVBTPqydcPYBWjkrbv4Y0ktB+GmWOiwHl237UUOrLmQxLvw==}
-
   idb@8.0.1:
     resolution: {integrity: sha512-EkBCzUZSdhJV8PxMSbeEV//xguVKZu9hZZulM+2gHXI0t2hGVU3eYE6/XnH77DS6FM2FY8wl17aDcu9vXpvLWQ==}
 
@@ -3958,11 +3952,6 @@ packages:
 
   nanoid@5.0.3:
     resolution: {integrity: sha512-I7X2b22cxA4LIHXPSqbBCEQSL+1wv8TuoefejsX4HFWyC6jc5JG7CEaxOltiKjc1M+YCS2YkrZZcj4+dytw9GA==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-
-  nanoid@5.0.7:
-    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -4832,11 +4821,6 @@ packages:
 
   typescript@5.2.2:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
-  typescript@5.5.4:
-    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -8462,8 +8446,6 @@ snapshots:
       safer-buffer: 2.1.2
     optional: true
 
-  idb@8.0.0: {}
-
   idb@8.0.1: {}
 
   ieee754@1.2.1: {}
@@ -8893,8 +8875,6 @@ snapshots:
   nanoid@3.3.8: {}
 
   nanoid@5.0.3: {}
-
-  nanoid@5.0.7: {}
 
   nanoid@5.0.9: {}
 
@@ -9868,8 +9848,6 @@ snapshots:
       - supports-color
 
   typescript@5.2.2: {}
-
-  typescript@5.5.4: {}
 
   typescript@5.7.2: {}
 
