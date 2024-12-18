@@ -1,4 +1,4 @@
-import { tryAsync } from '@repo/shared';
+import { tryAsyncWhispering } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
 import type { Recording, RecordingsDbService } from './RecordingDbService';
 
@@ -81,7 +81,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 
 		return {
 			addRecording: (recording) =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						const tx = (await dbPromise).transaction(
@@ -109,7 +109,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					}),
 				}),
 			updateRecording: (recording) =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						await Promise.all([
@@ -131,7 +131,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					}),
 				}),
 			deleteRecordingById: (id) =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -158,7 +158,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					}),
 				}),
 			deleteRecordingsById: (ids) =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -185,7 +185,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					}),
 				}),
 			getAllRecordings: () =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -218,7 +218,7 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					}),
 				}),
 			getRecording: (id) =>
-				tryAsync({
+				tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],

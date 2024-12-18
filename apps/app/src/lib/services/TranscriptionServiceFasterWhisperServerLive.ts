@@ -1,6 +1,6 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Err, Ok, type TranscriptionService } from '@repo/shared';
+import { Ok, type TranscriptionService, WhisperingErr } from '@repo/shared';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
@@ -11,8 +11,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 		async transcribe(audioBlob) {
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					action: {
@@ -38,23 +37,20 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			if (!postResult.ok) {
 				switch (postResult.error._tag) {
 					case 'NetworkError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title: 'Network error',
 							description: 'Please check your internet connection',
 							action: { type: 'more-details', error: postResult.error.message },
 						});
 					case 'HttpError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title:
 								'An error occurred while sending the request to the transcription server.',
 							description: 'Please try again',
 							action: { type: 'more-details', error: postResult.error.message },
 						});
 					case 'ParseError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title: 'Unable to parse transcription server response',
 							description: 'Please try again',
 							action: { type: 'more-details', error: postResult.error.message },
@@ -63,8 +59,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			}
 			const data = postResult.data;
 			if ('error' in data) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'faster-whisper-server error',
 					description:
 						'Please check your faster-whisper-server server settings',

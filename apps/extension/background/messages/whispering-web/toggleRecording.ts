@@ -1,11 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { Result } from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
 export type RequestBody = undefined;
 
-export type ResponseBody = Result<void>;
+export type ResponseBody = WhisperingResult<void>;
 
 export const toggleRecording = async () => {
 	const whisperingTabIdResult = await getOrCreateWhisperingTabId();

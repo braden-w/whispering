@@ -1,12 +1,12 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { type NotificationService, tryAsync } from '@repo/shared';
+import { type NotificationService, tryAsyncWhispering } from '@repo/shared';
 import type * as ClearNotification from '~background/messages/whispering-extension/notifications/clear';
 import type * as CreateNotification from '~background/messages/whispering-extension/notifications/create';
 
 export const createNotificationServiceContentLive =
 	(): NotificationService => ({
 		async notify(notifyOptions) {
-			const sendToCreateNotificationResult = await tryAsync({
+			const sendToCreateNotificationResult = await tryAsyncWhispering({
 				try: () =>
 					sendToBackground<
 						CreateNotification.RequestBody,
@@ -33,7 +33,7 @@ export const createNotificationServiceContentLive =
 			return createNotificationResult;
 		},
 		async clear(notificationId) {
-			const sendToClearNotificationResult = await tryAsync({
+			const sendToClearNotificationResult = await tryAsyncWhispering({
 				try: () =>
 					sendToBackground<
 						ClearNotification.RequestBody,

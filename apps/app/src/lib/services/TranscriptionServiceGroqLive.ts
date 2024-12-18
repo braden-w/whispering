@@ -1,6 +1,6 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Err, Ok, type TranscriptionService } from '@repo/shared';
+import { Ok, type TranscriptionService, WhisperingErr } from '@repo/shared';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
@@ -9,8 +9,7 @@ const MAX_FILE_SIZE_MB = 25 as const;
 export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 	async transcribe(audioBlob) {
 		if (!settings.value.groqApiKey) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Groq API Key not provided.',
 				description: 'Please enter your Groq API key in the settings',
 				action: {
@@ -22,8 +21,7 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		}
 
 		if (!settings.value.groqApiKey.startsWith('gsk_')) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Invalid Groq API Key',
 				description: 'The Groq API Key must start with "gsk_"',
 				action: {
@@ -35,8 +33,7 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		}
 		const blobSizeInMb = audioBlob.size / (1024 * 1024);
 		if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: `The file size (${blobSizeInMb}MB) is too large`,
 				description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 				action: { type: 'none' },
@@ -61,22 +58,19 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		if (!postResult.ok) {
 			switch (postResult.error._tag) {
 				case 'NetworkError':
-					return Err({
-						_tag: 'WhisperingError',
+					return WhisperingErr({
 						title: 'Network error',
 						description: 'Please check your network connection and try again.',
 						action: { type: 'more-details', error: postResult.error.message },
 					});
 				case 'HttpError':
-					return Err({
-						_tag: 'WhisperingError',
+					return WhisperingErr({
 						title: 'Error sending audio to Groq API',
 						description: 'Please check your network connection and try again.',
 						action: { type: 'more-details', error: postResult.error.message },
 					});
 				case 'ParseError':
-					return Err({
-						_tag: 'WhisperingError',
+					return WhisperingErr({
 						title: 'Error parsing response from Groq API',
 						description:
 							'Please check logs and notify the developer if the issue persists.',
@@ -86,8 +80,7 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		}
 		const data = postResult.data;
 		if ('error' in data) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Server error from Groq API',
 				description: 'This is likely a problem with Groq, not you.',
 				action: {

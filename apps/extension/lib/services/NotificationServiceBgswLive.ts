@@ -1,4 +1,10 @@
-import { type NotificationService, Ok, tryAsync } from '@repo/shared';
+import {
+	type NotificationService,
+	Ok,
+	tryAsyncWhispering,
+	WhisperingErr,
+	type WhisperingResult,
+} from '@repo/shared';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { nanoid } from 'nanoid/non-secure';
 import { injectScript } from '~background/injectScript';
@@ -9,7 +15,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 	async notify({ id: maybeId, title, description, action }) {
 		const id = maybeId ?? nanoid();
 
-		const createNotificationResult = await tryAsync({
+		const createNotificationResult = await tryAsyncWhispering({
 			try: async () => {
 				if (!action) {
 					chrome.notifications.create(id, {
@@ -31,14 +37,13 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 					});
 
 					const gotoTargetUrlInWhisperingTab = async (): Promise<
-						Result<void>
+						WhisperingResult<void>
 					> => {
 						const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
 						if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
 						const whisperingTabId = getWhisperingTabIdResult.data;
 						if (!whisperingTabId)
-							return Err({
-								_tag: 'WhisperingError',
+							return WhisperingErr({
 								title: 'Whispering tab not found',
 								description: 'The Whispering tab was not found.',
 								action: { type: 'none' },

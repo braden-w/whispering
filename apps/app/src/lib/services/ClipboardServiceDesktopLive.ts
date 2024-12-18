@@ -1,11 +1,11 @@
-import { Err, tryAsync } from '@repo/shared';
+import { BubbleErr, tryAsyncWhispering, WhisperingErr } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
 import type { ClipboardService } from './ClipboardService';
 
 const writeTextToCursor = (text: string) =>
-	tryAsync({
+	tryAsyncWhispering({
 		try: () => invoke<void>('write_text', { text }),
 		catch: (error) => ({
 			_tag: 'WhisperingError',
@@ -18,7 +18,7 @@ const writeTextToCursor = (text: string) =>
 
 export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 	setClipboardText: (text: string) =>
-		tryAsync({
+		tryAsyncWhispering({
 			try: () => writeText(text),
 			catch: (error) => ({
 				_tag: 'WhisperingError',
@@ -37,7 +37,7 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 
 		if (!isMacos) return writeTextToCursor(text);
 
-		const isAccessibilityEnabledResult = await tryAsync({
+		const isAccessibilityEnabledResult = await tryAsyncWhispering({
 			try: () =>
 				invoke<boolean>('is_macos_accessibility_enabled', {
 					askIfNotAllowed: false,
@@ -58,8 +58,7 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 		const isAccessibilityEnabled = isAccessibilityEnabledResult.data;
 
 		if (!isAccessibilityEnabled) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				isWarning: true,
 				title:
 					'Please enable or re-enable accessibility to paste transcriptions!',

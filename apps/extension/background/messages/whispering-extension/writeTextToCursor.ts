@@ -2,16 +2,16 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import { Err } from '@repo/shared';
+import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
 >;
 
@@ -19,10 +19,9 @@ const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
 	ResponseBody
 > = async ({ body }, res) => {
-	const writeTextToCursor = async (): Promise<Result<string>> => {
+	const writeTextToCursor = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.transcribedText) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Error invoking writeTextToCursor command',
 				description: 'Text must be provided in the request body of the message',
 				action: { type: 'none' },
@@ -31,8 +30,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		const activeTabIdResult = await getActiveTabId();
 		if (!activeTabIdResult.ok) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to automatically paste transcribed text',
 				description: 'Error getting active tab ID',
 				action: { type: 'more-details', error: activeTabIdResult.error },
@@ -40,8 +38,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		}
 		const activeTabId = activeTabIdResult.data;
 		if (!activeTabId) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to automatically paste transcribed text',
 				description:
 					'No active tab ID found to automatically paste the transcribed text. Please try manually pasting from your clipboard',

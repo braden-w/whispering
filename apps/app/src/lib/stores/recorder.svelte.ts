@@ -6,7 +6,12 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import { Err, Ok, type RecorderState, type Result } from '@repo/shared';
+import {
+	Ok,
+	WhisperingErr,
+	type RecorderState,
+	type WhisperingResult,
+} from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
@@ -46,7 +51,9 @@ function createRecorder() {
 		},
 
 		async toggleRecording() {
-			const toggleRecording = async (): Promise<Result<undefined>> => {
+			const toggleRecording = async (): Promise<
+				WhisperingResult<undefined>
+			> => {
 				switch (mediaRecorder.recordingState) {
 					case 'inactive': {
 						if (settings.value.alwaysOnTop === 'When Recording') {
@@ -97,8 +104,7 @@ function createRecorder() {
 						return Ok(undefined);
 					}
 				}
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'Recording state is invalid',
 					description: `Recording state ${mediaRecorder.recordingState} is invalid`,
 					action: { type: 'none' },
@@ -131,7 +137,7 @@ function createRecorder() {
 
 async function playSound(
 	sound: 'start' | 'stop' | 'cancel',
-): Promise<Result<void>> {
+): Promise<WhisperingResult<void>> {
 	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
 
 	if (!document.hidden) {

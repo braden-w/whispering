@@ -1,4 +1,4 @@
-import type { Result } from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
 import { createClipboardServiceWebLive } from './ClipboardServiceWebLive';
 
@@ -7,7 +7,7 @@ export type ClipboardService = {
 	 * Writes text to the user's clipboard.
 	 * @param text The text to write to the clipboard.
 	 */
-	readonly setClipboardText: (text: string) => Promise<Result<void>>;
+	readonly setClipboardText: (text: string) => Promise<WhisperingResult<void>>;
 	/**
 	 * Pastes text from the user's clipboard.
 	 * - Web: No need to implement this function.
@@ -16,7 +16,7 @@ export type ClipboardService = {
 	 */
 	readonly writeTextToCursor: (
 		text: string,
-	) => Promise<Result<void>> | Result<void>;
+	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
 };
 
 export const ClipboardService = window.__TAURI_INTERNALS__

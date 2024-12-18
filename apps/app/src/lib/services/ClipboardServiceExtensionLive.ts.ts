@@ -1,9 +1,9 @@
-import { tryAsync, trySync } from '@repo/shared';
+import { tryAsyncWhispering, trySyncWhispering } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceExtensionLive = (): ClipboardService => ({
 	setClipboardText: (text) =>
-		tryAsync({
+		tryAsyncWhispering({
 			try: () => navigator.clipboard.writeText(text),
 			catch: (error) => ({
 				_tag: 'WhisperingError',
@@ -18,7 +18,7 @@ export const createClipboardServiceExtensionLive = (): ClipboardService => ({
 		}),
 
 	writeTextToCursor: (text) =>
-		trySync({
+		trySyncWhispering({
 			try: () => writeTextToCursor(text),
 			catch: (error) => ({
 				_tag: 'WhisperingError',

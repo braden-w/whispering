@@ -1,6 +1,6 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Err, Ok, type TranscriptionService } from '@repo/shared';
+import { Ok, type TranscriptionService, WhisperingErr } from '@repo/shared';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
@@ -10,8 +10,7 @@ export const createTranscriptionServiceWhisperLive =
 	(): TranscriptionService => ({
 		async transcribe(audioBlob) {
 			if (!settings.value.openAiApiKey) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
 					action: {
@@ -23,8 +22,7 @@ export const createTranscriptionServiceWhisperLive =
 			}
 
 			if (!settings.value.openAiApiKey.startsWith('sk-')) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',
 					action: {
@@ -36,8 +34,7 @@ export const createTranscriptionServiceWhisperLive =
 			}
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					action: { type: 'none' },
@@ -63,24 +60,21 @@ export const createTranscriptionServiceWhisperLive =
 				const error = postResponseResult.error;
 				switch (error._tag) {
 					case 'NetworkError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title: 'Network error',
 							description:
 								'Please check your network connection and try again.',
 							action: { type: 'none' },
 						});
 					case 'HttpError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title: 'Error sending audio to OpenAI API',
 							description:
 								'Please check your network connection and try again.',
 							action: { type: 'none' },
 						});
 					case 'ParseError':
-						return Err({
-							_tag: 'WhisperingError',
+						return WhisperingErr({
 							title: 'Error parsing response from OpenAI API',
 							description:
 								'Please check logs and notify the developer if the issue persists.',
@@ -90,8 +84,7 @@ export const createTranscriptionServiceWhisperLive =
 			}
 			const data = postResponseResult.data;
 			if ('error' in data) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'Server error from Whisper API',
 					description: 'This is likely a problem with OpenAI, not you.',
 					action: {

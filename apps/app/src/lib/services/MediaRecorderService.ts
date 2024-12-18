@@ -1,16 +1,23 @@
 import { mediaStreamManager } from '$lib/services/MediaRecorderService.svelte';
 import { toast } from '$lib/services/ToastService';
 import { settings } from '$lib/stores/settings.svelte';
-import { Err, Ok, type Result, tryAsync, trySync } from '@repo/shared';
+import {
+	Ok,
+	type WhisperingResult,
+	WhisperingErr,
+	tryAsyncWhispering,
+	trySyncBubble,
+	trySyncWhispering,
+} from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
 const TIMESLICE_MS = 1000;
 
 type MediaRecorderService = {
 	readonly recordingState: RecordingState;
-	startRecording: () => Promise<Result<undefined>>;
-	stopRecording: () => Promise<Result<Blob>>;
-	cancelRecording: () => Promise<Result<undefined>>;
+	startRecording: () => Promise<WhisperingResult<undefined>>;
+	stopRecording: () => Promise<WhisperingResult<Blob>>;
+	cancelRecording: () => Promise<WhisperingResult<undefined>>;
 };
 
 export const mediaRecorder = createMediaRecorder();
@@ -32,10 +39,9 @@ export function createMediaRecorder(): MediaRecorderService {
 			if (!mediaRecorder) return 'inactive';
 			return mediaRecorder.state;
 		},
-		async startRecording(): Promise<Result<undefined>> {
+		async startRecording(): Promise<WhisperingResult<undefined>> {
 			if (mediaRecorder) {
-				return Err({
-					_tag: 'WhisperingError',
+				return WhisperingErr({
 					title: 'Unexpected media recorder already exists',
 					description:
 						'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
@@ -43,7 +49,7 @@ export function createMediaRecorder(): MediaRecorderService {
 				});
 			}
 			const toastId = nanoid();
-			const reinitializedMediaRecorderResult: Result<MediaRecorder> =
+			const reinitializedMediaRecorderResult: WhisperingResult<MediaRecorder> =
 				await (async () => {
 					const newOrExistingStreamResult = settings.value
 						.isFasterRerecordEnabled
@@ -51,7 +57,7 @@ export function createMediaRecorder(): MediaRecorderService {
 						: await mediaStreamManager.refreshStream();
 					if (!newOrExistingStreamResult.ok) return newOrExistingStreamResult;
 					const newOrExistingStream = newOrExistingStreamResult.data;
-					const newOrExistingMediaRecorderResult = trySync({
+					const newOrExistingMediaRecorderResult = trySyncBubble({
 						try: () =>
 							new MediaRecorder(newOrExistingStream, {
 								bitsPerSecond: Number(settings.value.bitsPerSecond),
@@ -73,8 +79,7 @@ export function createMediaRecorder(): MediaRecorderService {
 						});
 						const newStreamResult = await mediaStreamManager.refreshStream();
 						if (!newStreamResult.ok)
-							return Err({
-								_tag: 'WhisperingError',
+							return WhisperingErr({
 								title:
 									'Error initializing media recorder with preferred device',
 								description: 'Please try again',
@@ -82,19 +87,20 @@ export function createMediaRecorder(): MediaRecorderService {
 							});
 
 						const newStream = newStreamResult.data;
-						const newMediaRecorderResult: Result<MediaRecorder> = trySync({
-							try: () =>
-								new MediaRecorder(newStream, {
-									bitsPerSecond: Number(settings.value.bitsPerSecond),
+						const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
+							trySyncWhispering({
+								try: () =>
+									new MediaRecorder(newStream, {
+										bitsPerSecond: Number(settings.value.bitsPerSecond),
+									}),
+								catch: (error) => ({
+									_tag: 'WhisperingError',
+									title:
+										'Error initializing media recorder with preferred device',
+									description: 'Please try again',
+									action: { type: 'more-details', error },
 								}),
-							catch: (error) => ({
-								_tag: 'WhisperingError',
-								title:
-									'Error initializing media recorder with preferred device',
-								description: 'Please try again',
-								action: { type: 'more-details', error },
-							}),
-						});
+							});
 						return newMediaRecorderResult;
 					}
 					return newOrExistingMediaRecorderResult;
@@ -111,7 +117,7 @@ export function createMediaRecorder(): MediaRecorderService {
 			return Ok(undefined);
 		},
 		async stopRecording() {
-			const stopResult: Result<Blob> = await tryAsync({
+			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
 						if (!mediaRecorder) {
@@ -147,29 +153,30 @@ export function createMediaRecorder(): MediaRecorderService {
 		},
 		async cancelRecording() {
 			if (!mediaRecorder) return Ok(undefined);
-			const cancelResult: Result<undefined> = await tryAsync({
-				try: () =>
-					new Promise<undefined>((resolve, reject) => {
-						if (!mediaRecorder) {
-							reject(new Error('No active media recorder'));
-							return;
-						}
-						mediaRecorder.addEventListener('stop', () => {
-							resetRecorder();
-							resolve(undefined);
-						});
-						mediaRecorder.stop();
+			const cancelResult: WhisperingResult<undefined> =
+				await tryAsyncWhispering({
+					try: () =>
+						new Promise<undefined>((resolve, reject) => {
+							if (!mediaRecorder) {
+								reject(new Error('No active media recorder'));
+								return;
+							}
+							mediaRecorder.addEventListener('stop', () => {
+								resetRecorder();
+								resolve(undefined);
+							});
+							mediaRecorder.stop();
+						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error canceling media recorder',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
 					}),
-				catch: (error) => ({
-					_tag: 'WhisperingError',
-					title: 'Error canceling media recorder',
-					description: 'Please try again',
-					action: {
-						type: 'more-details',
-						error,
-					},
-				}),
-			});
+				});
 			return cancelResult;
 		},
 	};

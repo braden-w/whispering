@@ -1,5 +1,9 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { type Result, tryAsync, trySync } from '@repo/shared';
+import {
+	type WhisperingResult,
+	tryAsyncWhispering,
+	trySyncWhispering,
+} from '@repo/shared';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 
@@ -7,7 +11,7 @@ type DownloadService = {
 	readonly downloadBlob: (config: {
 		name: string;
 		blob: Blob;
-	}) => Promise<Result<void>> | Result<void>;
+	}) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
 };
 
 export const DownloadService = window.__TAURI_INTERNALS__
@@ -18,7 +22,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 	return {
 		async downloadBlob({ name, blob }) {
 			const extension = getExtensionFromAudioBlob(blob);
-			return await tryAsync({
+			return await tryAsyncWhispering({
 				try: async () => {
 					const path = await save({
 						filters: [{ name, extensions: [extension] }],
@@ -42,7 +46,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 function createDownloadServiceWebLive(): DownloadService {
 	return {
 		downloadBlob: ({ name, blob }) =>
-			trySync({
+			trySyncWhispering({
 				try: () => {
 					const file = new File([blob], name, { type: blob.type });
 					const url = URL.createObjectURL(file);

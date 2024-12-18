@@ -2,20 +2,20 @@ import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type {
 	ExternalMessage,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import { Ok, tryAsync } from '@repo/shared';
+import { Ok, tryAsyncWhispering } from '@repo/shared';
 
 export async function sendMessageToExtension<M extends ExternalMessage>(
 	message: M,
-): Promise<Result<undefined | ExternalMessageReturnType<M['name']>>> {
+): Promise<WhisperingResult<undefined | ExternalMessageReturnType<M['name']>>> {
 	if (window.__TAURI_INTERNALS__) return Ok(undefined);
-	const sendToBackgroundResult = await tryAsync({
+	const sendToBackgroundResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackgroundViaRelay({
 				name: message.name as never,
 				body: message.body,
-			}) as Promise<Result<ExternalMessageReturnType<M['name']>>>,
+			}) as Promise<WhisperingResult<ExternalMessageReturnType<M['name']>>>,
 		catch: (error) =>
 			({
 				_tag: 'WhisperingError',

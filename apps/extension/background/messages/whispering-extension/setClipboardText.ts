@@ -1,19 +1,18 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-	Result,
+import {
+	WhisperingErr,
+	type ExternalMessageBody,
+	type ExternalMessageReturnType,
+	type WhisperingResult,
 } from '@repo/shared';
-import { Err } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
-import { SHARED_EXTENSION_STATE_KEYS, storage } from '~lib/storage/keys';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setClipboardText'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/setClipboardText'>
 >;
 
@@ -21,10 +20,9 @@ const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
 	ResponseBody
 > = async ({ body }, res) => {
-	const setClipboardText = async (): Promise<Result<string>> => {
+	const setClipboardText = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.transcribedText) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to copy transcribed text to clipboard',
 				description: 'Text must be provided in the request body of the message',
 				action: { type: 'none' },
@@ -33,8 +31,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		const getActiveTabIdResult = await getActiveTabId();
 		if (!getActiveTabIdResult.ok) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to copy transcribed text to clipboard',
 				description:
 					'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
@@ -43,8 +40,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		}
 		const activeTabId = getActiveTabIdResult.data;
 		if (!activeTabId) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Unable to copy transcribed text to clipboard',
 				description: 'No active tab ID found',
 				action: { type: 'none' },

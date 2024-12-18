@@ -1,12 +1,18 @@
 import { settings } from '$lib/stores/settings.svelte.js';
-import { Err, Ok, type Result, tryAsync } from '@repo/shared';
+import {
+	Ok,
+	WhisperingErr,
+	type WhisperingResult,
+	tryAsyncBubble,
+	tryAsyncWhispering,
+} from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 
 type MediaStreamManager = {
 	readonly isStreamValid: boolean | undefined;
-	getOrRefreshStream(): Promise<Result<MediaStream>>;
-	refreshStream(): Promise<Result<MediaStream>>;
+	getOrRefreshStream(): Promise<WhisperingResult<MediaStream>>;
+	refreshStream(): Promise<WhisperingResult<MediaStream>>;
 	destroy(): void;
 };
 
@@ -93,9 +99,9 @@ function createMediaStreamManager(): MediaStreamManager {
 }
 
 export const enumerateRecordingDevices = (): Promise<
-	Result<MediaDeviceInfo[]>
+	WhisperingResult<MediaDeviceInfo[]>
 > =>
-	tryAsync({
+	tryAsyncWhispering({
 		try: async () => {
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
 				audio: true,
@@ -122,7 +128,7 @@ export const enumerateRecordingDevices = (): Promise<
 	});
 
 const getStreamForDeviceId = async (recordingDeviceId: string) => {
-	const result = await tryAsync({
+	const result = await tryAsyncBubble({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
@@ -133,13 +139,19 @@ const getStreamForDeviceId = async (recordingDeviceId: string) => {
 			});
 			return stream;
 		},
-		catch: () => ({ _tag: 'GetStreamError' }),
+		catch: (error) => ({
+			_tag: 'GetStreamError',
+			message:
+				error instanceof Error ? error.message : 'Please try again later.',
+		}),
 	});
 	if (result.ok) return result.data;
 	return null;
 };
 
-const getFirstAvailableStream = async (): Promise<Result<MediaStream>> => {
+const getFirstAvailableStream = async (): Promise<
+	WhisperingResult<MediaStream>
+> => {
 	const recordingDevicesResult = await enumerateRecordingDevices();
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
 	const recordingDevices = recordingDevicesResult.data;
@@ -152,8 +164,7 @@ const getFirstAvailableStream = async (): Promise<Result<MediaStream>> => {
 			return Ok(maybeStream);
 		}
 	}
-	return Err({
-		_tag: 'WhisperingError',
+	return WhisperingErr({
 		title: 'No available audio input devices',
 		description: 'Please make sure you have a microphone connected',
 		action: {

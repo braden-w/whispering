@@ -1,10 +1,10 @@
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { toast } from '$lib/services/ToastService';
-import type { Result, WhisperingError } from '@repo/shared';
+import type { WhisperingResult, WhisperingError } from '@repo/shared';
 
 export const renderErrAsToast = <T, E extends WhisperingError>(
-	result: Result<T, E>,
+	result: WhisperingResult<T, E>,
 	options?: { toastId?: string },
 ) => {
 	if (result.ok) return;

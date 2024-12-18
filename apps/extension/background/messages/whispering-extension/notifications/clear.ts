@@ -2,15 +2,15 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import { Err, Ok } from '@repo/shared';
+import { Ok, WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifications/clear'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/notifications/clear'>
 >;
 
@@ -20,8 +20,7 @@ const handler: PlasmoMessaging.MessageHandler<
 > = async ({ body }, res) => {
 	const clearNotification = async () => {
 		if (!body?.notificationId) {
-			return Err({
-				_tag: 'WhisperingError',
+			return WhisperingErr({
 				title: 'Error invoking notify command',
 				description:
 					'Notify/clear must be provided notificationId in the request body of the message',
