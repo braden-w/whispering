@@ -17,9 +17,6 @@ importers:
       turbo:
         specifier: latest
         version: 2.3.3
-      typescript:
-        specifier: ^5.5.4
-        version: 5.7.2
 
   apps/app:
     dependencies:
@@ -80,12 +77,6 @@ importers:
       nanoid:
         specifier: ^5.0.9
         version: 5.0.9
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -211,13 +202,13 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       idb:
-        specifier: ^8.0.0
+        specifier: ^8.0.1
         version: 8.0.1
       lucide-react:
         specifier: ^0.424.0
         version: 0.424.0(react@18.3.1)
       nanoid:
-        specifier: ^5.0.7
+        specifier: ^5.0.9
         version: 5.0.9
       plasmo:
         specifier: ^0.89.4
