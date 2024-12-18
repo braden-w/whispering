@@ -54,9 +54,15 @@ export function createMediaRecorder(): MediaRecorderService {
 					const newOrExistingMediaRecorderResult = trySync({
 						try: () =>
 							new MediaRecorder(newOrExistingStream, {
-								bitsPerSecond: settings.value.bitsPerSecond,
+								bitsPerSecond: Number(settings.value.bitsPerSecond),
 							}),
-						catch: (error) => ({ _tag: 'TryReuseStreamError' }),
+						catch: (error) => ({
+							_tag: 'TryReuseStreamError',
+							message:
+								error instanceof Error
+									? error.message
+									: 'Error initializing media recorder with preferred device',
+						}),
 					});
 					if (!newOrExistingMediaRecorderResult.ok) {
 						toast({
@@ -80,7 +86,7 @@ export function createMediaRecorder(): MediaRecorderService {
 						const newMediaRecorderResult: Result<MediaRecorder> = trySync({
 							try: () =>
 								new MediaRecorder(newStream, {
-									bitsPerSecond: settings.value.bitsPerSecond,
+									bitsPerSecond: Number(settings.value.bitsPerSecond),
 								}),
 							catch: (error) => ({
 								_tag: 'WhisperingError',
