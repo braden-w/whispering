@@ -220,11 +220,11 @@ export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
 	'whispering-extension/notifyWhisperingTabReady': undefined;
 	'whispering-extension/playSound': undefined;
-	'whispering-extension/setClipboardText': undefined;
+	'whispering-extension/setClipboardText': string;
 	'whispering-extension/setTrayIcon': undefined;
 	'whispering-extension/notifications/create': string;
 	'whispering-extension/notifications/clear': undefined;
-	'whispering-extension/writeTextToCursor': undefined;
+	'whispering-extension/writeTextToCursor': string;
 }[T];
 
 export * from './services/index.js';
