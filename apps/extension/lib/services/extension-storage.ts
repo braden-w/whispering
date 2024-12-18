@@ -72,6 +72,6 @@ export const extensionStorageService = {
 	}),
 	[STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT]: createSetWatch({
 		key: STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
-		schema: Schema.String,
+		schema: z.string(),
 	}),
 } as const;
