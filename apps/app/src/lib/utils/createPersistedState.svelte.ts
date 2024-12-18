@@ -1,4 +1,5 @@
 import { toast } from '$lib/services/ToastService';
+import { parseJson } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { z } from 'zod';
 
@@ -46,50 +47,49 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	): z.infer<TSchema> => {
 		const isEmpty = valueFromStorageUnparsed === null;
 		if (isEmpty) return defaultValue;
-		try {
-			const valueFromStorage = schema.parse(
-				JSON.parse(valueFromStorageUnparsed),
-			);
-			return valueFromStorage as z.infer<TSchema>;
-		} catch (error) {
-			const updatingLocalStorageToastId = nanoid();
-			toast({
-				variant: 'loading',
-				title: `Updating "${key}" in local storage...`,
-				description: 'Please wait...',
-			});
-			// Attempt to merge the default value with the value from storage if possible
-			const oldValueFromStorageMaybeInvalid = JSON.parse(
-				valueFromStorageUnparsed,
-			);
-			const defaultValueMergedOldValues = {
-				...defaultValue,
-				...oldValueFromStorageMaybeInvalid,
-			};
+		const parseJsonResult = parseJson(valueFromStorageUnparsed);
+		if (!parseJsonResult.ok) return defaultValue;
+		const valueFromStorageMaybeInvalid = parseJsonResult.data;
 
-			try {
-				const updatedValue: z.infer<TSchema> = schema.parse(
-					defaultValueMergedOldValues,
-				);
-				toast({
-					id: updatingLocalStorageToastId,
-					variant: 'success',
-					title: `Successfully updated "${key}" in local storage`,
-					description: 'The value has been updated.',
-				});
-				localStorage.setItem(key, JSON.stringify(updatedValue));
-				return updatedValue;
-			} catch (error) {
-				toast({
-					id: updatingLocalStorageToastId,
-					variant: 'error',
-					title: `Error updating "${key}" in local storage`,
-					description: 'Reverting to default value.',
-				});
-				localStorage.setItem(key, JSON.stringify(defaultValue));
-				return defaultValue;
-			}
+		const valueFromStorageResult = schema.safeParse(
+			valueFromStorageMaybeInvalid,
+		);
+		if (valueFromStorageResult.success) return valueFromStorageResult.data;
+
+		const updatingLocalStorageToastId = nanoid();
+		toast({
+			variant: 'loading',
+			title: `Updating "${key}" in local storage...`,
+			description: 'Please wait...',
+		});
+		// Attempt to merge the default value with the value from storage if possible
+		const defaultValueMergedOldValues = {
+			...defaultValue,
+			...(valueFromStorageMaybeInvalid as Record<string, unknown>),
+		};
+
+		const parseMergedValuesResult = schema.safeParse(
+			defaultValueMergedOldValues,
+		);
+		if (!parseMergedValuesResult.success) {
+			toast({
+				id: updatingLocalStorageToastId,
+				variant: 'error',
+				title: `Error updating "${key}" in local storage`,
+				description: 'Reverting to default value.',
+			});
+			localStorage.setItem(key, JSON.stringify(defaultValue));
+			return defaultValue;
 		}
+		const updatedValue = parseMergedValuesResult.data;
+		toast({
+			id: updatingLocalStorageToastId,
+			variant: 'success',
+			title: `Successfully updated "${key}" in local storage`,
+			description: 'The value has been updated.',
+		});
+		localStorage.setItem(key, JSON.stringify(updatedValue));
+		return updatedValue;
 	};
 
 	if (!disableLocalStorage) {
