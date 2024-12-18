@@ -10,7 +10,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 
 type MediaStreamManager = {
-	readonly isStreamValid: boolean | undefined;
+	readonly isStreamValid: boolean;
 	getOrRefreshStream(): Promise<WhisperingResult<MediaStream>>;
 	refreshStream(): Promise<WhisperingResult<MediaStream>>;
 	destroy(): void;
@@ -19,10 +19,16 @@ type MediaStreamManager = {
 export const mediaStreamManager = createMediaStreamManager();
 
 function createMediaStreamManager(): MediaStreamManager {
-	let currentStream = $state<MediaStream | null>(null);
+	let currentStream: MediaStream | null = null;
+	let isStreamValid = $state<boolean>(false);
+	const setStream = (stream: MediaStream | null) => {
+		currentStream = stream;
+		isStreamValid = stream?.active ?? false;
+	};
+
 	return {
 		get isStreamValid() {
-			return currentStream?.active;
+			return isStreamValid;
 		},
 		async getOrRefreshStream() {
 			if (currentStream === null) return this.refreshStream();
@@ -52,7 +58,7 @@ function createMediaStreamManager(): MediaStreamManager {
 				const firstAvailableStreamResult = await getFirstAvailableStream();
 				if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
 				const firstAvailableStream = firstAvailableStreamResult.data;
-				currentStream = firstAvailableStream;
+				setStream(firstAvailableStream);
 				toast.info({
 					id: toastId,
 					title: 'Defaulted to first available audio input device',
@@ -64,7 +70,7 @@ function createMediaStreamManager(): MediaStreamManager {
 				settings.value.selectedAudioInputDeviceId,
 			);
 			if (maybeStream !== null) {
-				currentStream = maybeStream;
+				setStream(maybeStream);
 				toast.success({
 					id: toastId,
 					title: 'Connected to selected audio input device',
@@ -80,7 +86,7 @@ function createMediaStreamManager(): MediaStreamManager {
 			const firstAvailableStreamResult = await getFirstAvailableStream();
 			if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
 			const firstAvailableStream = firstAvailableStreamResult.data;
-			currentStream = firstAvailableStream;
+			setStream(firstAvailableStream);
 			toast.info({
 				id: toastId,
 				title: 'Defaulted to first available audio input device',
