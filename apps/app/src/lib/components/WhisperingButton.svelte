@@ -14,8 +14,8 @@
 <Tooltip.Provider>
 	<Tooltip.Root>
 		<Tooltip.Trigger>
-			{#snippet child()}
-				<Button {...restProps}>
+			{#snippet child({ props })}
+				<Button {...props} {...restProps}>
 					{@render children?.()}
 					<span class="sr-only">{tooltipText}</span>
 				</Button>
