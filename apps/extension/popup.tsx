@@ -28,7 +28,7 @@ import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
 import './style.css';
 
 function IndexPopup() {
@@ -89,11 +89,11 @@ const cancelRecording = async () => {
 
 function IndexPage() {
 	const [recorderState] = useStorage<RecorderState>(
-		STORAGE_KEYS.RECORDER_STATE,
+		SHARED_EXTENSION_STATE_KEYS.RECORDER_STATE,
 		'IDLE',
 	);
 	const [latestRecordingTranscribedText] = useStorage<string>(
-		STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
+		SHARED_EXTENSION_STATE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
 	);
 
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];

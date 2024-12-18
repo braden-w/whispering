@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { Err, type Result, type Settings } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import { SHARED_EXTENSION_STATE_KEYS } from '~lib/services/extension-storage';
 
 export type RequestBody = { settings: Settings };
 
@@ -27,7 +27,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const whisperingTabId = whisperingTabIdResult.data;
 		const returnedSettings = await injectScript<
 			Settings,
-			[typeof STORAGE_KEYS.SETTINGS, Settings]
+			[typeof SHARED_EXTENSION_STATE_KEYS.SETTINGS, Settings]
 		>({
 			tabId: whisperingTabId,
 			commandName: 'setSettings',
@@ -51,7 +51,7 @@ const handler: PlasmoMessaging.MessageHandler<
 					} as const;
 				}
 			},
-			args: [STORAGE_KEYS.SETTINGS, settings],
+			args: [SHARED_EXTENSION_STATE_KEYS.SETTINGS, settings],
 		});
 		return returnedSettings;
 	};
