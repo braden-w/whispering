@@ -69,7 +69,10 @@ function createMediaStreamManager() {
 				description: 'Trying to find another available audio input device...',
 			});
 			const firstAvailableStreamResult = await getFirstAvailableStream();
-			if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
+			if (!firstAvailableStreamResult.ok) {
+				toast.dismiss(toastId);
+				return firstAvailableStreamResult;
+			}
 			const firstAvailableStream = firstAvailableStreamResult.data;
 			setStream(firstAvailableStream);
 			toast.info({
