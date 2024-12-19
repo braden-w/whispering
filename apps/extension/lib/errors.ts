@@ -7,8 +7,7 @@ export const renderErrorAsNotification = <E extends WhisperingResult<unknown>>(
 ) => {
 	if (maybeError.ok) return;
 	const error = maybeError.error;
-	const { notify } = NotificationServiceContentLive;
-	notify({
+	NotificationServiceContentLive.notify({
 		id: options?.notificationId,
 		title: error.title,
 		description: error.description,

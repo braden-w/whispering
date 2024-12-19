@@ -43,8 +43,6 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 export const recorder = createRecorder();
 
 function createRecorder() {
-	const { notify } = NotificationService;
-
 	return {
 		get recorderState() {
 			return recorderState.value;
@@ -103,7 +101,7 @@ function createRecorder() {
 					console.info('Recording started');
 					const playSoundResult = await playSound('start');
 					if (!playSoundResult.ok) return playSoundResult;
-					await notify({
+					await NotificationService.notify({
 						id: IS_RECORDING_NOTIFICATION_ID,
 						title: 'Whispering is recording...',
 						description: 'Click to go to recorder',

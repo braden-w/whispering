@@ -27,8 +27,9 @@ const handler: PlasmoMessaging.MessageHandler<
 				action: { type: 'none' },
 			});
 		}
-		const { notify } = NotificationServiceBgswLive;
-		const notifyResult = await notify(body.notifyOptions);
+		const notifyResult = await NotificationServiceBgswLive.notify(
+			body.notifyOptions,
+		);
 		return notifyResult;
 	};
 	res.send(await createNotification());
