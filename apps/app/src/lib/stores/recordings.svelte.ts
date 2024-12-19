@@ -13,15 +13,10 @@ import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServ
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { toast as sonnerToast } from 'svelte-sonner';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
 export const createRecordings = () => {
-	const { notify, clear: clearNotification } = NotificationService;
-	const clipboardService = ClipboardService;
-	const { downloadBlob } = DownloadService;
-
 	let recordings = $state<Recording[]>([]);
 
 	const syncDbToRecordingsState = async () => {
@@ -111,7 +106,7 @@ export const createRecordings = () => {
 			});
 			const isVisible = !document.hidden;
 			if (!isVisible) {
-				notify({
+				NotificationService.notify({
 					id: transcribingInProgressId,
 					title: 'Transcribing recording...',
 					description: 'Your recording is being transcribed.',
@@ -170,7 +165,7 @@ export const createRecordings = () => {
 
 			if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 			toast.dismiss(transcribingInProgressId);
-			clearNotification(transcribingInProgressId);
+			NotificationService.clear(transcribingInProgressId);
 
 			if (!transcribeRecordingResult.ok) {
 				return renderErrAsToast(transcribeRecordingResult);
@@ -184,7 +179,7 @@ export const createRecordings = () => {
 					onClick: () => goto('/recordings'),
 				},
 			});
-			notify({
+			NotificationService.notify({
 				id: nanoid(),
 				title: 'Transcription complete!',
 				description: 'Click to check it out in your recordings',
@@ -202,7 +197,7 @@ export const createRecordings = () => {
 			// Copy transcription to clipboard if enabled
 			if (settings.value.isCopyToClipboardEnabled) {
 				const setClipboardTextResult =
-					await clipboardService.setClipboardText(transcribedText);
+					await ClipboardService.setClipboardText(transcribedText);
 				if (!setClipboardTextResult.ok)
 					return renderErrAsToast(setClipboardTextResult);
 				toast.success({
@@ -215,7 +210,7 @@ export const createRecordings = () => {
 			// Paste transcription if enabled
 			if (settings.value.isPasteContentsOnSuccessEnabled) {
 				const clipboardWriteTextToCursorResult =
-					await clipboardService.writeTextToCursor(transcribedText);
+					await ClipboardService.writeTextToCursor(transcribedText);
 				if (!clipboardWriteTextToCursorResult.ok)
 					return renderErrAsToast(clipboardWriteTextToCursorResult);
 				toast.success({
@@ -237,7 +232,7 @@ export const createRecordings = () => {
 				});
 			}
 			const recording = maybeRecording;
-			const downloadBlobResult = await downloadBlob({
+			const downloadBlobResult = await DownloadService.downloadBlob({
 				blob: recording.blob,
 				name: `whispering_recording_${recording.id}`,
 			});
@@ -245,7 +240,7 @@ export const createRecordings = () => {
 		},
 		async copyRecordingText(recording: Recording) {
 			if (recording.transcribedText === '') return Ok(undefined);
-			const setClipboardTextResult = await clipboardService.setClipboardText(
+			const setClipboardTextResult = await ClipboardService.setClipboardText(
 				recording.transcribedText,
 			);
 			if (!setClipboardTextResult.ok)
