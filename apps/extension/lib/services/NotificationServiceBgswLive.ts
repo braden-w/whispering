@@ -17,7 +17,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 
 		const createNotificationResult = await tryAsyncWhispering({
 			try: async () => {
-				if (!action) {
+				if (action?.type !== 'link') {
 					chrome.notifications.create(id, {
 						priority: 2,
 						requireInteraction: true,
