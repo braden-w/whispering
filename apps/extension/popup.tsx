@@ -59,8 +59,7 @@ const toggleRecording = async () => {
 	});
 	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
 	const toggleRecordingResult = sendToToggleRecordingResult.data;
-	if (!toggleRecordingResult.ok) return toggleRecordingResult;
-	return Ok(toggleRecordingResult.data);
+	return toggleRecordingResult;
 };
 
 const cancelRecording = async () => {
@@ -82,8 +81,7 @@ const cancelRecording = async () => {
 	});
 	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
 	const cancelRecordingResult = sendToCancelRecordingResult.data;
-	if (!cancelRecordingResult.ok) return cancelRecordingResult;
-	return Ok(cancelRecordingResult.data);
+	return cancelRecordingResult;
 };
 
 function IndexPage() {
