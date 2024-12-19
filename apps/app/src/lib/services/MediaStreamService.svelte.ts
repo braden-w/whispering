@@ -9,16 +9,9 @@ import {
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 
-type MediaStreamManager = {
-	readonly stream: MediaStream | null;
-	readonly isStreamValid: boolean;
-	refreshStream(): Promise<WhisperingResult<MediaStream>>;
-	destroy(): void;
-};
-
 export const mediaStream = createMediaStreamManager();
 
-function createMediaStreamManager(): MediaStreamManager {
+function createMediaStreamManager() {
 	let currentStream: MediaStream | null = null;
 	let isStreamValid = $state<boolean>(false);
 	const setStream = (stream: MediaStream | null) => {
@@ -33,7 +26,7 @@ function createMediaStreamManager(): MediaStreamManager {
 		get isStreamValid() {
 			return isStreamValid;
 		},
-		async refreshStream() {
+		async refreshStream(): Promise<WhisperingResult<MediaStream>> {
 			this.destroy();
 			const toastId = nanoid();
 			toast.loading({
@@ -93,13 +86,13 @@ function createMediaStreamManager(): MediaStreamManager {
 			}
 			setStream(null);
 		},
-	};
+	} as const;
 }
 
-export const enumerateRecordingDevices = (): Promise<
+export function enumerateRecordingDevices(): Promise<
 	WhisperingResult<MediaDeviceInfo[]>
-> =>
-	tryAsyncWhispering({
+> {
+	return tryAsyncWhispering({
 		try: async () => {
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
 				audio: true,
@@ -124,32 +117,11 @@ export const enumerateRecordingDevices = (): Promise<
 			},
 		}),
 	});
+}
 
-const getStreamForDeviceId = async (recordingDeviceId: string) => {
-	const result = await tryAsyncBubble({
-		try: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
-				},
-			});
-			return stream;
-		},
-		catch: (error) => ({
-			_tag: 'GetStreamError',
-			message:
-				error instanceof Error ? error.message : 'Please try again later.',
-		}),
-	});
-	if (result.ok) return result.data;
-	return null;
-};
-
-const getFirstAvailableStream = async (): Promise<
+async function getFirstAvailableStream(): Promise<
 	WhisperingResult<MediaStream>
-> => {
+> {
 	const recordingDevicesResult = await enumerateRecordingDevices();
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
 	const recordingDevices = recordingDevicesResult.data;
@@ -171,4 +143,28 @@ const getFirstAvailableStream = async (): Promise<
 			goto: '/settings',
 		},
 	});
-};
+}
+
+async function getStreamForDeviceId(
+	recordingDeviceId: string,
+): Promise<MediaStream | null> {
+	const result = await tryAsyncBubble({
+		try: async () => {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					deviceId: { exact: recordingDeviceId },
+					channelCount: 1, // Mono audio is usually sufficient for voice recording
+					sampleRate: 16000, // 16 kHz is a good balance for voice
+				},
+			});
+			return stream;
+		},
+		catch: (error) => ({
+			_tag: 'GetStreamError',
+			message:
+				error instanceof Error ? error.message : 'Please try again later.',
+		}),
+	});
+	if (result.ok) return result.data;
+	return null;
+}
