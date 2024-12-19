@@ -75,7 +75,7 @@
 			Enable faster rerecord. <Button
 				variant="link"
 				size="inline"
-				onclick={() => (fasterRerecordExplainedDialog.open())}
+				onclick={() => fasterRerecordExplainedDialog.open()}
 			>
 				(What's that?)
 			</Button>
