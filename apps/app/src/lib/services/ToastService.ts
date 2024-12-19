@@ -13,7 +13,7 @@ function createToastService() {
 		(variant: ToastVariant) =>
 		({ title, ...options }: ToastOptions) => {
 			const getDurationInMs = () => {
-				if (variant === 'loading') return Number.POSITIVE_INFINITY;
+				if (variant === 'loading') return 60_000;
 				if (variant === 'error' || variant === 'warning') return 5000;
 				if (options.action) return 4000;
 				return 3000;
