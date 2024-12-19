@@ -3,7 +3,7 @@
 	import {
 		enumerateRecordingDevices,
 		mediaStreamManager,
-	} from '$lib/services/MediaRecorderService.svelte';
+	} from '$lib/services/MediaStreamService.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS, BITRATE_VALUES_KBPS } from '@repo/shared';
