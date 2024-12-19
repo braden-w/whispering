@@ -1,8 +1,8 @@
 import type { WhisperingResult } from '@repo/shared';
 import { NotificationServiceContentLive } from './services/NotificationServiceContentLive';
 
-export const renderErrorAsNotification = (
-	maybeError: WhisperingResult<unknown>,
+export const renderErrorAsNotification = <E extends WhisperingResult<unknown>>(
+	maybeError: E,
 	options?: { notificationId?: string },
 ) => {
 	if (maybeError.ok) return;
