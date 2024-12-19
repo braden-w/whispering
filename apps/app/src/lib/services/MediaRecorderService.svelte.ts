@@ -3,28 +3,19 @@ import { toast } from '$lib/services/ToastService';
 import { settings } from '$lib/stores/settings.svelte';
 import {
 	Ok,
-	type WhisperingResult,
 	WhisperingErr,
 	tryAsyncWhispering,
-	trySyncBubble,
 	trySyncWhispering,
 	type WhisperingRecordingState,
+	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { renderErrAsToast } from './renderErrorAsToast';
 
 const TIMESLICE_MS = 1000;
 
-type MediaRecorderService = {
-	readonly recordingState: WhisperingRecordingState;
-	startRecording: () => Promise<WhisperingResult<undefined>>;
-	stopRecording: () => Promise<WhisperingResult<Blob>>;
-	cancelRecording: () => Promise<WhisperingResult<undefined>>;
-};
-
 export const mediaRecorder = createMediaRecorder();
 
-export function createMediaRecorder(): MediaRecorderService {
+export function createMediaRecorder() {
 	let recordingState = $state<WhisperingRecordingState>('IDLE');
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
@@ -62,20 +53,18 @@ export function createMediaRecorder(): MediaRecorderService {
 	};
 
 	return {
-		get recordingState() {
+		get recordingState(): WhisperingRecordingState {
 			return recordingState;
 		},
 
-		async startRecording() {
+		async startRecording(): Promise<WhisperingResult<undefined>> {
 			if (mediaRecorder) {
-				return renderErrAsToast(
-					WhisperingErr({
-						title: 'Unexpected media recorder already exists',
-						description:
-							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
-						action: { type: 'none' },
-					}),
-				);
+				return WhisperingErr({
+					title: 'Unexpected media recorder already exists',
+					description:
+						'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+					action: { type: 'none' },
+				});
 			}
 			const toastId = nanoid();
 
@@ -148,7 +137,7 @@ export function createMediaRecorder(): MediaRecorderService {
 			setMediaRecorder(newMediaRecorder);
 			return Ok(undefined);
 		},
-		async stopRecording() {
+		async stopRecording(): Promise<WhisperingResult<Blob>> {
 			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
@@ -183,7 +172,7 @@ export function createMediaRecorder(): MediaRecorderService {
 			resetRecorder();
 			return stopResult;
 		},
-		async cancelRecording() {
+		async cancelRecording(): Promise<WhisperingResult<undefined>> {
 			if (!mediaRecorder) return Ok(undefined);
 			const cancelResult: WhisperingResult<undefined> =
 				await tryAsyncWhispering({
