@@ -11,6 +11,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
+	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 
 	let { children } = $props();
 
@@ -80,4 +81,5 @@
 <Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
 <ModeWatcher />
 <FasterRerecordExplainedDialog />
+<ConfirmationDialog />
 <MoreDetailsDialog />

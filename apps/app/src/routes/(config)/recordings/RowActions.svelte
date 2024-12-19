@@ -12,6 +12,7 @@
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import EditRowDialog from './EditRowDialog.svelte';
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
 </script>
@@ -58,7 +59,14 @@
 
 	<WhisperingButton
 		tooltipContent="Delete recording"
-		onclick={() => recordings.deleteRecordingById(recording.id)}
+		onclick={() => {
+			confirmationDialog.open({
+				title: 'Delete recording',
+				subtitle: 'Are you sure you want to delete this recording?',
+				onConfirm: () => recordings.deleteRecordingById(recording.id),
+				onCancel: () => {},
+			});
+		}}
 		variant="ghost"
 		size="icon"
 	>
