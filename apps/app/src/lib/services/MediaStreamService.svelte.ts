@@ -99,7 +99,7 @@ function createMediaStreamManager(): MediaStreamManager {
 			for (const track of currentStream.getTracks()) {
 				track.stop();
 			}
-			currentStream = null;
+			setStream(null);
 		},
 	};
 }
