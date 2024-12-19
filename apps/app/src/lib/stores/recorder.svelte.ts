@@ -1,6 +1,6 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { setAlwaysOnTop } from '$lib/services/AlwaysOnTopService';
-import { mediaRecorder } from '$lib/services/MediaRecorderService';
+import { mediaRecorder } from '$lib/services/MediaRecorderService.svelte';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
@@ -8,7 +8,6 @@ import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import {
 	Ok,
-	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
