@@ -15,7 +15,7 @@ const TIMESLICE_MS = 1000;
 
 export const mediaRecorder = createMediaRecorder();
 
-export function createMediaRecorder() {
+function createMediaRecorder() {
 	let recordingState = $state<WhisperingRecordingState>('IDLE');
 	let mediaRecorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
