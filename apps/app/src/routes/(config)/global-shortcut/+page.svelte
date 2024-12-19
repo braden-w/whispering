@@ -1,10 +1,8 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import {
-		ChromeWebStoreIcon,
-		LaptopIcon as DesktopIcon,
-	} from '$lib/components/icons';
+	import { ChromeWebStoreIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { LaptopIcon as DesktopIcon } from 'lucide-svelte';
 </script>
 
 <svelte:head>
