@@ -23,7 +23,7 @@ export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
 		setTrayIcon: (icon: WhisperingRecordingState) =>
 			sendMessageToExtension({
-				name: 'whispering-extension/setTrayIcon',
+				name: 'whispering-extension/setRecorderState',
 				body: { recorderState: icon },
 			}),
 	};

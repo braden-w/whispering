@@ -168,7 +168,7 @@ export const externalMessageSchema = z.discriminatedUnion('name', [
 		}),
 	}),
 	z.object({
-		name: z.literal('whispering-extension/setTrayIcon'),
+		name: z.literal('whispering-extension/setRecorderState'),
 		body: z.object({
 			recorderState: recordingStateSchema,
 		}),
@@ -204,7 +204,7 @@ export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
 	'whispering-extension/notifyWhisperingTabReady': undefined;
 	'whispering-extension/playSound': undefined;
 	'whispering-extension/setClipboardText': string;
-	'whispering-extension/setTrayIcon': undefined;
+	'whispering-extension/setRecorderState': undefined;
 	'whispering-extension/notifications/create': string;
 	'whispering-extension/notifications/clear': undefined;
 	'whispering-extension/writeTextToCursor': string;

@@ -14,5 +14,5 @@ relayMessage({ name: 'whispering-extension/notifications/create' });
 relayMessage({ name: 'whispering-extension/notifyWhisperingTabReady' });
 relayMessage({ name: 'whispering-extension/playSound' });
 relayMessage({ name: 'whispering-extension/setClipboardText' });
-relayMessage({ name: 'whispering-extension/setTrayIcon' });
+relayMessage({ name: 'whispering-extension/setRecorderState' });
 relayMessage({ name: 'whispering-extension/writeTextToCursor' });
