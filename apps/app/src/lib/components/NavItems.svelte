@@ -20,7 +20,7 @@
 	style="view-transition-name: nav"
 >
 	<WhisperingButton
-		tooltipText="Recordings"
+		tooltipContent="Recordings"
 		href="/recordings"
 		variant="ghost"
 		size="icon"
@@ -28,7 +28,7 @@
 		<ListIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
-		tooltipText="Settings"
+		tooltipContent="Settings"
 		href="/settings"
 		variant="ghost"
 		size="icon"
@@ -36,7 +36,7 @@
 		<SlidersVerticalIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
-		tooltipText="View project on GitHub"
+		tooltipContent="View project on GitHub"
 		href="https://github.com/braden-w/whispering"
 		target="_blank"
 		rel="noopener noreferrer"
@@ -46,7 +46,7 @@
 		<GithubIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
-		tooltipText="Toggle dark mode"
+		tooltipContent="Toggle dark mode"
 		onclick={toggleMode}
 		variant="ghost"
 		size="icon"
@@ -60,7 +60,7 @@
 	</WhisperingButton>
 	{#if window.__TAURI_INTERNALS__}
 		<WhisperingButton
-			tooltipText="Minimize"
+			tooltipContent="Minimize"
 			onclick={() => getCurrentWindow().setSize(new LogicalSize(72, 84))}
 			variant="ghost"
 			size="icon"

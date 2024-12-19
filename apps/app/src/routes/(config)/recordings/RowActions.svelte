@@ -18,7 +18,7 @@
 
 <div class="flex items-center">
 	<WhisperingButton
-		tooltipText="Transcribe recording"
+		tooltipContent="Transcribe recording"
 		onclick={() => recordings.transcribeRecording(recording.id)}
 		variant="ghost"
 		size="icon"
@@ -35,7 +35,7 @@
 	<EditRowDialog {recording}></EditRowDialog>
 
 	<WhisperingButton
-		tooltipText="Copy transcribed text"
+		tooltipContent="Copy transcribed text"
 		onclick={() => recordings.copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
@@ -48,7 +48,7 @@
 	</WhisperingButton>
 
 	<WhisperingButton
-		tooltipText="Download recording"
+		tooltipContent="Download recording"
 		onclick={() => recordings.downloadRecording(recording.id)}
 		variant="ghost"
 		size="icon"
@@ -57,7 +57,7 @@
 	</WhisperingButton>
 
 	<WhisperingButton
-		tooltipText="Delete recording"
+		tooltipContent="Delete recording"
 		onclick={() => recordings.deleteRecordingById(recording.id)}
 		variant="ghost"
 		size="icon"
