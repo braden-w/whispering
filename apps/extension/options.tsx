@@ -37,6 +37,8 @@ import { Switch } from '~components/ui/switch';
 import { Skeleton } from '~components/ui/skeleton';
 import './style.css';
 import { AlertTriangleIcon } from 'lucide-react';
+import { Toaster } from '~components/ui/sonner';
+import { toast } from 'sonner';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,7 @@ function IndexPopup() {
 			<main className="flex min-h-screen items-center justify-center">
 				<SettingsCard />
 			</main>
+			<Toaster />
 		</QueryClientProvider>
 	);
 }
@@ -84,6 +87,9 @@ function SettingsCard() {
 			if (!response.ok) throw response.error;
 			return response.data;
 		},
+		onSuccess: () => {
+			toast.success('Settings updated!');
+		},
 		onMutate: async (newSettings) => {
 			await queryClient.cancelQueries({ queryKey: ['settings'] });
 			const previousSettingsSnapshot = queryClient.getQueryData([
@@ -95,6 +101,9 @@ function SettingsCard() {
 		onError: (err, newSettings, context) => {
 			if (!context) return;
 			queryClient.setQueryData(['settings'], context.previousSettingsSnapshot);
+			toast.error('Error updating settings', {
+				description: err.message,
+			});
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['settings'] });
