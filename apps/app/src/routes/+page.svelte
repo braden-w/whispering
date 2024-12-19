@@ -5,24 +5,23 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 
-	const PLACEHOLDER_RECORDING = {
-		id: '',
-		title: '',
-		subtitle: '',
-		timestamp: '',
-		blob: undefined,
-		transcribedText: '',
-		transcriptionStatus: 'UNPROCESSED',
-	} as const;
-
-	const latestRecording = $derived(
-		recordings.value.at(-1) ?? PLACEHOLDER_RECORDING,
+	const latestRecording = $derived<Recording>(
+		recordings.value.at(-1) ?? {
+			id: '',
+			title: '',
+			subtitle: '',
+			timestamp: '',
+			blob: new Blob(),
+			transcribedText: '',
+			transcriptionStatus: 'UNPROCESSED',
+		},
 	);
 
 	const maybeLatestAudioSrc = $derived(
