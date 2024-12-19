@@ -36,6 +36,7 @@ import {
 import { Switch } from '~components/ui/switch';
 import { Skeleton } from '~components/ui/skeleton';
 import './style.css';
+import { AlertTriangleIcon } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ function SettingsCard() {
 	const {
 		isPending: isSettingsPending,
 		isError: isSettingsError,
+		error: settingsError,
 		data: settings,
 	} = useQuery({
 		queryKey: ['settings'],
@@ -131,11 +133,27 @@ function SettingsCard() {
 	}
 
 	if (isSettingsError) {
-		return <CardContent>Error loading settings</CardContent>;
-	}
-
-	if (!settings) {
-		return <CardContent>No settings found</CardContent>;
+		return (
+			<Card className="w-full max-w-xl">
+				<CardHeader>
+					<CardTitle className="text-xl ">Settings Error</CardTitle>
+					<CardDescription>
+						There was a problem loading your settings. Please try refreshing the
+						page.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="whitespace-pre-wrap font-mono text-destructive text-sm">
+					{settingsError instanceof Error
+						? settingsError.message
+						: JSON.stringify(settingsError)}
+				</CardContent>
+				<CardFooter>
+					<Button onClick={() => window.location.reload()} className="w-full">
+						Try Again
+					</Button>
+				</CardFooter>
+			</Card>
+		);
 	}
 
 	return (
