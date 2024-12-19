@@ -20,7 +20,7 @@
 <pre
 	class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
   <WhisperingButton
-		tooltipText="Copy to clipboard"
+		tooltipContent="Copy to clipboard"
 		size="icon"
 		variant="ghost"
 		class="absolute right-4 top-4 h-4 w-4"

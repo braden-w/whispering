@@ -5,7 +5,8 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { recorder } from '$lib/stores/recorder.svelte';
+	import { mediaStream } from '$lib/services/MediaStreamService.svelte';
+	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
@@ -50,7 +51,7 @@
 
 	<div class="relative">
 		<WhisperingButton
-			tooltipText="Toggle recording"
+			tooltipContent="Toggle recording"
 			onclick={recorder.toggleRecording}
 			variant="ghost"
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
@@ -88,7 +89,7 @@
 					: latestRecording.transcribedText}
 			/>
 			<WhisperingButton
-				tooltipText="Copy transcribed text"
+				tooltipContent="Copy transcribed text"
 				onclick={copyRecordingTextFromLatestRecording}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
@@ -119,7 +120,7 @@
 		<p class="text-foreground/75 text-center text-sm">
 			Click the microphone or press
 			{' '}<WhisperingButton
-				tooltipText="Go to local shortcut in settings"
+				tooltipContent="Go to local shortcut in settings"
 				href="/settings#local-shortcut"
 				variant="link"
 				size="inline"
@@ -136,7 +137,7 @@
 			<p class="text-foreground/75 text-sm">
 				Press
 				{' '}<WhisperingButton
-					tooltipText="Go to global shortcut in settings"
+					tooltipContent="Go to global shortcut in settings"
 					href="/settings#global-shortcut"
 					variant="link"
 					size="inline"
@@ -152,7 +153,7 @@
 		{/if}
 		<p class="text-muted-foreground text-center text-sm font-light">
 			Check out the {' '}<WhisperingButton
-				tooltipText="Check out the Chrome Extension"
+				tooltipContent="Check out the Chrome Extension"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				target="_blank"
 				rel="noopener noreferrer"
@@ -163,7 +164,7 @@
 			</WhisperingButton>{' '}
 			{#if !window.__TAURI_INTERNALS__}
 				and {' '}<WhisperingButton
-					tooltipText="Check out the desktop app"
+					tooltipContent="Check out the desktop app"
 					href="https://github.com/braden-w/whispering/releases"
 					target="_blank"
 					rel="noopener noreferrer"

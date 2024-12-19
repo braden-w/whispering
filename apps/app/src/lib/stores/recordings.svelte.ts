@@ -11,12 +11,7 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import {
-	BubbleErr,
-	Ok,
-	WhisperingErr,
-	type WhisperingResult,
-} from '@repo/shared';
+import { Ok, WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { toast as sonnerToast } from 'svelte-sonner';
 import { recorderState } from './recorder.svelte';

@@ -291,7 +291,7 @@
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
-						tooltipText="Transcribe selected recordings"
+						tooltipContent="Transcribe selected recordings"
 						variant="outline"
 						size="icon"
 						onclick={() =>
@@ -322,7 +322,7 @@
 					>
 						<Dialog.Trigger>
 							<WhisperingButton
-								tooltipText="Copy transcribed text from selected recordings"
+								tooltipContent="Copy transcribed text from selected recordings"
 								variant="outline"
 								size="icon"
 							>
@@ -363,7 +363,7 @@
 							/>
 							<Dialog.Footer>
 								<WhisperingButton
-									tooltipText="Copy transcriptions"
+									tooltipContent="Copy transcriptions"
 									onclick={async () => {
 										const setClipboardText =
 											await ClipboardService.setClipboardText(text);
@@ -387,7 +387,7 @@
 					</Dialog.Root>
 
 					<WhisperingButton
-						tooltipText="Delete selected recordings"
+						tooltipContent="Delete selected recordings"
 						variant="outline"
 						size="icon"
 						onclick={() => {

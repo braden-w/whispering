@@ -21,7 +21,7 @@
 		</p>
 		<div class="flex flex-col gap-2 md:flex-row">
 			<WhisperingButton
-				tooltipText="Check out the Chrome Extension"
+				tooltipContent="Check out the Chrome Extension"
 				href="https://github.com/braden-w/whispering/releases"
 				target="_blank"
 				rel="noopener noreferrer"
@@ -32,7 +32,7 @@
 				Download for Desktop
 			</WhisperingButton>
 			<WhisperingButton
-				tooltipText="Check out the desktop app"
+				tooltipContent="Check out the desktop app"
 				href="https://chromewebstore.google.com/detail/whispering/oilbfihknpdbpfkcncojikmooipnlglo"
 				target="_blank"
 				rel="noopener noreferrer"
