@@ -64,7 +64,6 @@
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
 				onConfirm: () => recordings.deleteRecordingById(recording.id),
-				onCancel: () => {},
 			});
 		}}
 		variant="ghost"

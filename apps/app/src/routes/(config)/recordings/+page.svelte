@@ -1,12 +1,5 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import {
-		ChevronDownIcon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
-		TrashIcon,
-	} from 'lucide-svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
@@ -34,11 +27,19 @@
 		getFilteredRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
+	import {
+		ChevronDownIcon,
+		EllipsisIcon as LoadingTranscriptionIcon,
+		RepeatIcon as RetryTranscriptionIcon,
+		PlayIcon as StartTranscriptionIcon,
+		TrashIcon,
+	} from 'lucide-svelte';
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -392,7 +393,13 @@
 						size="icon"
 						onclick={() => {
 							const ids = selectedRecordingRows.map(({ id }) => id);
-							recordings.deleteRecordingsById(ids);
+							confirmationDialog.open({
+								title: 'Delete recordings',
+								subtitle: 'Are you sure you want to delete these recordings?',
+								onConfirm: () => {
+									recordings.deleteRecordingsById(ids);
+								},
+							});
 						}}
 					>
 						<TrashIcon class="h-4 w-4" />
