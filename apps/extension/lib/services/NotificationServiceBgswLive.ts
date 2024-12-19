@@ -119,7 +119,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 		if (!createNotificationResult.ok) return createNotificationResult;
 		return Ok(id);
 	},
-	clear: (id: string) => {
+	clear(id) {
 		chrome.notifications.clear(id);
 		return Ok(undefined);
 	},
