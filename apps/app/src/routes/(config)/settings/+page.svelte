@@ -90,7 +90,7 @@
 				selected={settings.value.alwaysOnTop}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, alwaysOnTop: selected.value };
+					settings.value = { ...settings.value, alwaysOnTop: selected };
 					await setAlwaysOnTopToTrueIfInSettings();
 				}}
 				placeholder="Select a language"
