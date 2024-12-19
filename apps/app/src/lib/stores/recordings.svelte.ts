@@ -167,8 +167,8 @@ export const createRecordings = () => {
 			};
 
 			const transcribeRecordingResult = await tryTranscribeRecording();
-			if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 
+			if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 			toast.dismiss(transcribingInProgressId);
 			clearNotification(transcribingInProgressId);
 
