@@ -79,18 +79,10 @@ export function createMediaRecorder(): MediaRecorderService {
 			}
 			const toastId = nanoid();
 
-			const getNewStream = async () => {
-				const newStreamResult = await mediaStream.refreshStream();
-				if (!newStreamResult.ok) return newStreamResult;
-				const newStream = newStreamResult.data;
-				return Ok(newStream);
-			};
+			const getNewStream = () => mediaStream.refreshStream();
 
 			const getReusedStream = async () => {
-				const existingStreamResult = await mediaStream.getExistingStream();
-				if (!existingStreamResult.ok) return existingStreamResult;
-				const existingStream = existingStreamResult.data;
-				if (!existingStream) {
+				if (!mediaStream.stream) {
 					toast.loading({
 						id: toastId,
 						title: 'Error initializing media recorder with preferred device',
@@ -99,7 +91,15 @@ export function createMediaRecorder(): MediaRecorderService {
 					});
 					return await getNewStream();
 				}
-				return Ok(existingStream);
+				if (!mediaStream.stream.active) {
+					toast.warning({
+						id: toastId,
+						title: 'Open stream is inactive',
+						description: 'Refreshing recording session...',
+					});
+					return await getNewStream();
+				}
+				return Ok(mediaStream.stream);
 			};
 
 			const newStreamResult = settings.value.isFasterRerecordEnabled

@@ -10,8 +10,8 @@ import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 
 type MediaStreamManager = {
+	readonly stream: MediaStream | null;
 	readonly isStreamValid: boolean;
-	getExistingStream(): Promise<WhisperingResult<MediaStream | null>>;
 	refreshStream(): Promise<WhisperingResult<MediaStream>>;
 	destroy(): void;
 };
@@ -27,19 +27,11 @@ function createMediaStreamManager(): MediaStreamManager {
 	};
 
 	return {
+		get stream() {
+			return currentStream;
+		},
 		get isStreamValid() {
 			return isStreamValid;
-		},
-		async getExistingStream(): Promise<WhisperingResult<MediaStream | null>> {
-			if (currentStream === null) return Ok(null);
-			if (!currentStream.active) {
-				toast.warning({
-					title: 'Open stream is inactive',
-					description: 'Refreshing recording session...',
-				});
-				return this.refreshStream();
-			}
-			return Ok(currentStream);
 		},
 		async refreshStream() {
 			this.destroy();
