@@ -29,6 +29,10 @@
 			? URL.createObjectURL(latestRecording.blob)
 			: undefined,
 	);
+
+	const recorderStateAsIcon = $derived(
+		recorder.recorderState === 'RECORDING' ? '🔲' : '🎙️',
+	);
 </script>
 
 <svelte:head>
@@ -56,11 +60,7 @@
 				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
 				class="text-[100px] leading-none"
 			>
-				{#if recorder.recorderState === 'RECORDING'}
-					🔲
-				{:else}
-					🎙️
-				{/if}
+				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
 		<CancelOrEndRecordingSessionButton
