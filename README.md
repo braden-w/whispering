@@ -38,6 +38,8 @@ Whispering is an open-source transcription application that provides global spee
 
 Under the hood, it's powered by OpenAI's Whisper model, making it significantly more accurate than built-in dictation.
 
+> **Important Note**: Whispering is designed primarily as a transcription tool, not a recording tool. For longer recordings where reliability is crucial, I recommend using a dedicated recording app on your phone or device that utilizes native recording APIs. This ensures optimal audio quality and recording stability.
+
 ## Demos
 
 https://github.com/user-attachments/assets/eca93701-10a0-4d91-b38a-f715bd7e0357
