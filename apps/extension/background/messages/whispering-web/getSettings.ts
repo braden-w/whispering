@@ -19,7 +19,6 @@ const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
 	ResponseBody
 > = async (_req, res) => {
-	console.log('🚀 ~ >= ~ res:', res);
 	const getSettings = async () => {
 		const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
 		if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
