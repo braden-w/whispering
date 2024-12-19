@@ -34,6 +34,7 @@ import {
 	SelectValue,
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
+import { Skeleton } from '~components/ui/skeleton';
 import './style.css';
 
 const queryClient = new QueryClient();
@@ -99,7 +100,34 @@ function SettingsCard() {
 	});
 
 	if (isSettingsPending) {
-		return <CardContent>Loading...</CardContent>;
+		return (
+			<Card className="w-full max-w-xl">
+				<CardHeader>
+					<Skeleton className="h-8 w-[180px]" />
+					<Skeleton className="mt-2 h-4 w-[250px]" />
+				</CardHeader>
+				<CardContent className="space-y-6">
+					{/* Switch skeletons */}
+					{Array.from({ length: 3 }).map((_, i) => (
+						<div key={i} className="flex items-center gap-2">
+							<Skeleton className="h-6 w-10" />
+							<Skeleton className="h-4 w-48" />
+						</div>
+					))}
+
+					{/* Select and Input skeletons */}
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div key={i} className="grid gap-2">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-10 w-full" />
+						</div>
+					))}
+				</CardContent>
+				<CardFooter>
+					<Skeleton className="h-10 w-full" />
+				</CardFooter>
+			</Card>
+		);
 	}
 
 	if (isSettingsError) {
