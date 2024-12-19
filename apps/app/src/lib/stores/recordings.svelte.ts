@@ -16,10 +16,6 @@ import { nanoid } from 'nanoid/non-secure';
 import { recorderState } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
-type OnFns = {
-	onSuccess: () => void;
-};
-
 export const createRecordings = () => {
 	let recordings = $state<Recording[]>([]);
 
@@ -50,12 +46,15 @@ export const createRecordings = () => {
 		get value() {
 			return recordings;
 		},
-		async addRecording(recording: Recording, { onSuccess }: OnFns) {
+		async addRecording(
+			recording: Recording,
+			{ onSuccess }: { onSuccess: () => void },
+		) {
 			const addRecordingResult =
 				await RecordingsDbService.addRecording(recording);
 			if (!addRecordingResult.ok) return renderErrAsToast(addRecordingResult);
 			recordings.push(recording);
-			onSuccess?.();
+			onSuccess();
 		},
 		async updateRecording(
 			recording: Recording,
@@ -116,10 +115,11 @@ export const createRecordings = () => {
 			{ toastId }: { toastId?: string } = {},
 		) {
 			const transcribingInProgressId = toastId ?? nanoid();
+			const t = nanoid();
 
 			const onTranscribeStart = () => {
 				toast.loading({
-					id: transcribingInProgressId,
+					id: t,
 					title: 'Transcribing recording...',
 					description: 'Your recording is being transcribed.',
 				});
@@ -178,6 +178,7 @@ export const createRecordings = () => {
 			};
 
 			const onPasteToCursorSuccess = () => {
+				toast.dismiss(t);
 				toast.success({
 					id: transcribingInProgressId,
 					title: 'Transcription completed and pasted to cursor!',
@@ -261,7 +262,7 @@ export const createRecordings = () => {
 					await ClipboardService.setClipboardText(transcribedText);
 				if (!setClipboardTextResult.ok)
 					return renderErrAsToast(setClipboardTextResult);
-				onCopyToClipboardSuccess?.();
+				onCopyToClipboardSuccess();
 			}
 
 			// Paste transcription if enabled
@@ -270,7 +271,7 @@ export const createRecordings = () => {
 					await ClipboardService.writeTextToCursor(transcribedText);
 				if (!clipboardWriteTextToCursorResult.ok)
 					return renderErrAsToast(clipboardWriteTextToCursorResult);
-				onPasteToCursorSuccess?.();
+				onPasteToCursorSuccess();
 			}
 		},
 		async downloadRecording(
