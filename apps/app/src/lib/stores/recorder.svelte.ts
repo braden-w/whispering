@@ -114,18 +114,23 @@ function createRecorder() {
 					return Ok(undefined);
 				};
 
-				return mediaRecorder.recordingState === 'RECORDING'
-					? stopRecording()
-					: startRecording();
+				const startOrStopResult =
+					mediaRecorder.recordingState === 'RECORDING'
+						? await stopRecording()
+						: await startRecording();
+
+				if (!startOrStopResult.ok) return startOrStopResult;
+
+				recorderState.value = 'IDLE';
+				if (settings.value.alwaysOnTop === 'When Recording') {
+					await setAlwaysOnTop(false);
+				}
+				return Ok(undefined);
 			};
 
 			const toggleRecordingResult = await toggleRecording();
 			if (toggleRecordingResult.ok) return;
 
-			recorderState.value = 'IDLE';
-			if (settings.value.alwaysOnTop === 'When Recording') {
-				await setAlwaysOnTop(false);
-			}
 			renderErrAsToast(toggleRecordingResult);
 		},
 		async cancelRecording() {
