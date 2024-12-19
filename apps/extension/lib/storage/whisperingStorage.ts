@@ -8,7 +8,7 @@ const createWhisperingStorage = () => {
 			key: K,
 			value: WhisperingStorageKeyMap[K],
 		) => {
-			storage.setItem(key, JSON.stringify(value));
+			storage.setItem(key, value);
 		},
 	};
 };
