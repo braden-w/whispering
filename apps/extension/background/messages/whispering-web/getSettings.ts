@@ -33,7 +33,18 @@ const handler: PlasmoMessaging.MessageHandler<
 			func: (settingsKey) => {
 				try {
 					const valueFromStorage = localStorage.getItem(settingsKey);
-					return { ok: true, data: valueFromStorage } as const;
+					if (valueFromStorage === null)
+						return {
+							ok: false,
+							error: {
+								_tag: 'WhisperingError',
+								title: 'Whispering settings not found',
+								description:
+									'Local storage does not contain Whispering settings.',
+							},
+						};
+					const value = JSON.parse(valueFromStorage);
+					return { ok: true, data: value } as const;
 				} catch (error) {
 					return {
 						ok: false,
