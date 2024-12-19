@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { PencilIcon as EditIcon, Loader2Icon } from '$lib/components/icons';
+	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -8,6 +8,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recordings } from '$lib/stores/recordings.svelte';
+	import { Loader2Icon } from 'lucide-svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -18,7 +19,11 @@
 
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Trigger>
-		<WhisperingButton tooltipText="Edit recording" variant="ghost" size="icon">
+		<WhisperingButton
+			tooltipContent="Edit recording"
+			variant="ghost"
+			size="icon"
+		>
 			<EditIcon class="h-4 w-4" />
 		</WhisperingButton>
 	</Dialog.Trigger>

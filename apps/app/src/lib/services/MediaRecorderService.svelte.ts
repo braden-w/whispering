@@ -1,160 +1,207 @@
-import { settings } from '$lib/stores/settings.svelte.js';
-import { WhisperingError } from '@repo/shared';
-import { Data, Effect, Option } from 'effect';
+import { mediaStream } from '$lib/services/MediaStreamService.svelte';
+import { toast } from '$lib/services/ToastService';
+import { settings } from '$lib/stores/settings.svelte';
+import {
+	Ok,
+	WhisperingErr,
+	tryAsyncWhispering,
+	trySyncWhispering,
+	type WhisperingRecordingState,
+	type WhisperingResult,
+} from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { toast } from './ToastService.js';
-import { renderErrorAsToast } from './renderErrorAsToast.js';
 
-export const enumerateRecordingDevices = Effect.tryPromise({
-	try: async () => {
-		const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
-		});
-		const devices = await navigator.mediaDevices.enumerateDevices();
-		for (const track of allAudioDevicesStream.getTracks()) {
-			track.stop();
+const TIMESLICE_MS = 1000;
+
+export const mediaRecorder = createMediaRecorder();
+
+function createMediaRecorder() {
+	let recordingState = $state<WhisperingRecordingState>('IDLE');
+	let mediaRecorder: MediaRecorder | null = null;
+	const recordedChunks: Blob[] = [];
+
+	const setMediaRecorder = (value: MediaRecorder | null) => {
+		mediaRecorder = value;
+		updateRecordingState(value);
+	};
+
+	const updateRecordingState = (recorder: MediaRecorder | null) => {
+		if (!recorder) {
+			recordingState = 'IDLE';
+			return;
 		}
-		const audioInputDevices = devices.filter(
-			(device) => device.kind === 'audioinput',
-		);
-		return audioInputDevices;
-	},
-	catch: (error) =>
-		new WhisperingError({
-			title: 'Error enumerating recording devices',
-			description:
-				'Please make sure you have given permission to access your audio devices',
-			action: {
-				type: 'more-details',
-				error,
-			},
-		}),
-});
 
-class GetStreamError extends Data.TaggedError('GetStreamError')<{
-	recordingDeviceId: string;
-}> {}
-
-const getStreamForDeviceId = (recordingDeviceId: string) =>
-	Effect.tryPromise({
-		try: async () => {
-			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
-				},
-			});
-			return Option.some(stream);
-		},
-		catch: () => new GetStreamError({ recordingDeviceId }),
-	}).pipe(Effect.catchAll(() => Effect.succeed(Option.none<MediaStream>())));
-
-const getFirstAvailableStream = Effect.gen(function* () {
-	const recordingDevices = yield* enumerateRecordingDevices;
-	for (const device of recordingDevices) {
-		const maybeStream = yield* getStreamForDeviceId(device.deviceId);
-		if (Option.isSome(maybeStream)) {
-			settings.value.selectedAudioInputDeviceId = device.deviceId;
-			mediaStreamManager.refreshStream().pipe(Effect.runPromise);
-			return maybeStream.value;
+		switch (recorder.state) {
+			case 'recording':
+				recordingState = 'RECORDING';
+				break;
+			case 'paused':
+				recordingState = 'IDLE';
+				break;
+			case 'inactive':
+				recordingState = 'IDLE';
+				break;
 		}
-	}
-	return yield* new WhisperingError({
-		title: 'No available audio input devices',
-		description: 'Please make sure you have a microphone connected',
-		action: {
-			type: 'link',
-			label: 'Open Settings',
-			goto: '/settings',
-		},
-	});
-});
+	};
 
-export const mediaStreamManager = Effect.gen(function* () {
-	let currentStream = $state<MediaStream | null>(null);
+	const resetRecorder = () => {
+		recordedChunks.length = 0;
+		setMediaRecorder(null);
+		if (!settings.value.isFasterRerecordEnabled) {
+			mediaStream.destroy();
+		}
+	};
+
 	return {
-		get isStreamValid() {
-			return currentStream?.active;
+		get recordingState(): WhisperingRecordingState {
+			return recordingState;
 		},
-		getOrRefreshStream(): Effect.Effect<MediaStream, WhisperingError, never> {
-			return Effect.gen(this, function* () {
-				if (currentStream === null) return yield* this.refreshStream();
-				if (!currentStream.active) {
-					yield* toast({
-						variant: 'warning',
+
+		async startRecording(): Promise<WhisperingResult<undefined>> {
+			if (mediaRecorder) {
+				return WhisperingErr({
+					title: 'Unexpected media recorder already exists',
+					description:
+						'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+					action: { type: 'none' },
+				});
+			}
+			const toastId = nanoid();
+
+			const getNewStream = () => mediaStream.refreshStream();
+
+			const getReusedStream = async () => {
+				if (!mediaStream.stream) {
+					toast.loading({
+						id: toastId,
+						title: 'Error initializing media recorder with preferred device',
+						description:
+							'Trying to find another available audio input device...',
+					});
+					return await getNewStream();
+				}
+				if (!mediaStream.stream.active) {
+					toast.warning({
+						id: toastId,
 						title: 'Open stream is inactive',
 						description: 'Refreshing recording session...',
 					});
-					return yield* this.refreshStream();
+					return await getNewStream();
 				}
-				const validStream = currentStream as MediaStream;
-				return validStream;
+				return Ok(mediaStream.stream);
+			};
+
+			const newStreamResult = settings.value.isFasterRerecordEnabled
+				? await getReusedStream()
+				: await getNewStream();
+			if (!newStreamResult.ok) return newStreamResult;
+			const newStream = newStreamResult.data;
+
+			const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
+				trySyncWhispering({
+					try: () => {
+						const recorder = new MediaRecorder(newStream, {
+							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						});
+						recorder.addEventListener('start', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('stop', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('pause', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('resume', () =>
+							updateRecordingState(recorder),
+						);
+						recorder.addEventListener('dataavailable', (event: BlobEvent) => {
+							if (!event.data.size) return;
+							recordedChunks.push(event.data);
+						});
+
+						return recorder;
+					},
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error initializing media recorder with preferred device',
+						description: 'Please try again',
+						action: { type: 'more-details', error },
+					}),
+				});
+
+			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
+
+			const newMediaRecorder = newMediaRecorderResult.data;
+			newMediaRecorder.start(TIMESLICE_MS);
+			setMediaRecorder(newMediaRecorder);
+			return Ok(undefined);
+		},
+		async stopRecording(): Promise<WhisperingResult<Blob>> {
+			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
+				try: () =>
+					new Promise<Blob>((resolve, reject) => {
+						if (!mediaRecorder) {
+							reject(new Error('No active media recorder'));
+							return;
+						}
+						mediaRecorder.addEventListener('stop', () => {
+							if (!mediaRecorder) {
+								reject(
+									new Error('Media recorder was nullified during stop event'),
+								);
+								return;
+							}
+							const audioBlob = new Blob(recordedChunks, {
+								type: mediaRecorder.mimeType,
+							});
+							resolve(audioBlob);
+						});
+						mediaRecorder.stop();
+					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Error stopping media recorder',
+					description: 'Please try again',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
 			});
+			resetRecorder();
+			return stopResult;
 		},
-		refreshStream() {
-			this.release();
-			const toastId = nanoid();
-			return Effect.gen(function* () {
-				yield* toast({
-					id: toastId,
-					variant: 'loading',
-					title: 'Connecting to selected audio input device...',
-					description: 'Please allow access to your microphone if prompted.',
+		async cancelRecording(): Promise<WhisperingResult<undefined>> {
+			if (!mediaRecorder) return Ok(undefined);
+			const cancelResult: WhisperingResult<undefined> =
+				await tryAsyncWhispering({
+					try: () =>
+						new Promise<undefined>((resolve, reject) => {
+							if (!mediaRecorder) {
+								reject(new Error('No active media recorder'));
+								return;
+							}
+							mediaRecorder.addEventListener('stop', () => {
+								resetRecorder();
+								resolve(undefined);
+							});
+							mediaRecorder.stop();
+						}),
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error canceling media recorder',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 				});
-				if (!settings.value.selectedAudioInputDeviceId) {
-					yield* toast({
-						id: toastId,
-						variant: 'loading',
-						title: 'No device selected',
-						description: 'Defaulting to first available audio input device...',
-					});
-					const firstAvailableStream = yield* getFirstAvailableStream;
-					currentStream = firstAvailableStream;
-					yield* toast({
-						id: toastId,
-						variant: 'info',
-						title: 'Defaulted to first available audio input device',
-						description: 'You can select a specific device in the settings.',
-					});
-					return firstAvailableStream;
-				}
-				const maybeStream = yield* getStreamForDeviceId(
-					settings.value.selectedAudioInputDeviceId,
-				);
-				if (Option.isSome(maybeStream)) {
-					currentStream = maybeStream.value;
-					yield* toast({
-						id: toastId,
-						variant: 'success',
-						title: 'Connected to selected audio input device',
-						description: 'Successfully connected to your microphone stream.',
-					});
-					return maybeStream.value;
-				}
-				yield* toast({
-					id: toastId,
-					variant: 'loading',
-					title: 'Error connecting to selected audio input device',
-					description: 'Trying to find another available audio input device...',
-				});
-				const firstAvailableStream = yield* getFirstAvailableStream;
-				currentStream = firstAvailableStream;
-				yield* toast({
-					id: toastId,
-					variant: 'info',
-					title: 'Defaulted to first available audio input device',
-					description: 'You can select a specific device in the settings.',
-				});
-				return firstAvailableStream;
-			}).pipe(Effect.tapError(renderErrorAsToast));
-		},
-		release() {
-			if (currentStream === null) return;
-			for (const track of currentStream.getTracks()) {
-				track.stop();
+			if (!settings.value.isFasterRerecordEnabled) {
+				mediaStream.destroy();
 			}
-			currentStream = null;
+			return cancelResult;
 		},
 	};
-}).pipe(Effect.runSync);
+}

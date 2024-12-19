@@ -2,21 +2,50 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import { WhisperingError, effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
+import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getActiveTabId } from '~lib/getActiveTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-const writeTextToCursor = (
-	text: string,
-): Effect.Effect<void, WhisperingError> => {
-	return Effect.gen(function* () {
-		const activeTabId = yield* getActiveTabId;
-		yield* injectScript<string, [string]>({
+export type RequestBody =
+	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
+
+export type ResponseBody = WhisperingResult<
+	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
+>;
+
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async ({ body }, res) => {
+	const writeTextToCursor = async (): Promise<WhisperingResult<string>> => {
+		if (!body?.transcribedText) {
+			return WhisperingErr({
+				title: 'Error invoking writeTextToCursor command',
+				description: 'Text must be provided in the request body of the message',
+				action: { type: 'none' },
+			});
+		}
+
+		const activeTabIdResult = await getActiveTabId();
+		if (!activeTabIdResult.ok) {
+			return WhisperingErr({
+				title: 'Unable to automatically paste transcribed text',
+				description: 'Error getting active tab ID',
+				action: { type: 'more-details', error: activeTabIdResult.error },
+			});
+		}
+		const activeTabId = activeTabIdResult.data;
+		if (!activeTabId) {
+			return WhisperingErr({
+				title: 'Unable to automatically paste transcribed text',
+				description:
+					'No active tab ID found to automatically paste the transcribed text. Please try manually pasting from your clipboard',
+				action: { type: 'none' },
+			});
+		}
+		return injectScript<string, [string]>({
 			tabId: activeTabId,
 			commandName: 'writeTextToCursor',
 			func: (text) => {
@@ -85,65 +114,29 @@ const writeTextToCursor = (
 					if (editables.length === 1) {
 						insertTextIntoEditableElement(editables[0]!, text);
 						return {
-							isSuccess: true,
+							ok: true,
 							data: text,
 						};
 					}
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
+							_tag: 'WhisperingError',
 							isWarning: true,
 							title: 'Please paste the transcribed text manually',
 							description:
 								'There are multiple text areas or content editable divs on the page.',
+							action: { type: 'none' },
 						},
 					};
 				}
 				insertTextIntoEditableElement(activeElement, text);
-				return { isSuccess: true, data: text } as const;
+				return { ok: true, data: text } as const;
 			},
-			args: [text],
+			args: [body.transcribedText],
 		});
-	}).pipe(
-		Effect.catchTags({
-			GetActiveTabIdError: () =>
-				new WhisperingError({
-					title:
-						'Unable to get active tab ID to write transcribed text to cursor',
-					description:
-						'Please try pasting or go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
-					action: { type: 'none' },
-				}),
-		}),
-	);
+	};
+	res.send(await writeTextToCursor());
 };
-
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
-
-export type ResponseBody = Result<
-	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
->;
-
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) =>
-	Effect.gen(function* () {
-		if (!body?.transcribedText) {
-			return yield* new WhisperingError({
-				title: 'Error invoking writeTextToCursor command',
-				description: 'Text must be provided in the request body of the message',
-				action: { type: 'none' },
-			});
-		}
-		yield* writeTextToCursor(body.transcribedText);
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
 
 export default handler;

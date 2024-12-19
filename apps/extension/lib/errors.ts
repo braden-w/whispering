@@ -1,17 +1,18 @@
-import { NotificationService, type WhisperingError } from '@repo/shared';
-import { Console, Effect } from 'effect';
+import type { WhisperingResult } from '@repo/shared';
+import { NotificationServiceContentLive } from './services/NotificationServiceContentLive';
 
 export const renderErrorAsNotification = (
-	error: WhisperingError,
+	maybeError: WhisperingResult<unknown>,
 	options?: { notificationId?: string },
-) =>
-	Effect.gen(function* () {
-		const { notify } = yield* NotificationService;
-		yield* notify({
-			id: options?.notificationId,
-			title: error.title,
-			description: error.description,
-			action: error.action,
-		});
-		yield* Console.error({ ...error });
+) => {
+	if (maybeError.ok) return;
+	const error = maybeError.error;
+	const { notify } = NotificationServiceContentLive;
+	notify({
+		id: options?.notificationId,
+		title: error.title,
+		description: error.description,
+		action: error.action,
 	});
+	console.error({ ...error });
+};

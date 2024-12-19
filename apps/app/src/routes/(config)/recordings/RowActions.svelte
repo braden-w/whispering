@@ -1,18 +1,16 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import {
-		ClipboardIcon,
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
-		TrashIcon,
-	} from '$lib/components/icons';
+	} from 'lucide-svelte';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { Effect } from 'effect';
 	import EditRowDialog from './EditRowDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
@@ -20,11 +18,8 @@
 
 <div class="flex items-center">
 	<WhisperingButton
-		tooltipText="Transcribe recording"
-		onclick={() =>
-			recordings
-				.transcribeRecording(recording.id)
-				.pipe(Effect.catchAll(renderErrorAsToast), Effect.runPromise)}
+		tooltipContent="Transcribe recording"
+		onclick={() => recordings.transcribeRecording(recording.id)}
 		variant="ghost"
 		size="icon"
 	>
@@ -40,7 +35,7 @@
 	<EditRowDialog {recording}></EditRowDialog>
 
 	<WhisperingButton
-		tooltipText="Copy transcribed text"
+		tooltipContent="Copy transcribed text"
 		onclick={() => recordings.copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
@@ -53,7 +48,7 @@
 	</WhisperingButton>
 
 	<WhisperingButton
-		tooltipText="Download recording"
+		tooltipContent="Download recording"
 		onclick={() => recordings.downloadRecording(recording.id)}
 		variant="ghost"
 		size="icon"
@@ -62,7 +57,7 @@
 	</WhisperingButton>
 
 	<WhisperingButton
-		tooltipText="Delete recording"
+		tooltipContent="Delete recording"
 		onclick={() => recordings.deleteRecordingById(recording.id)}
 		variant="ghost"
 		size="icon"

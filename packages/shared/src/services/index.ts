@@ -1,2 +1,2 @@
 export * from './NotificationService.js';
-export * from './TranscriptionService.js';
+export * from '../../../../apps/app/src/lib/services/TranscriptionService.js';

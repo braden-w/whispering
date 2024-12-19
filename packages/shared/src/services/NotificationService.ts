@@ -1,26 +1,43 @@
-import { Schema as S } from '@effect/schema';
-import type { Effect } from 'effect';
-import { Context } from 'effect';
+import { z } from 'zod';
+import type { WhisperingResult } from '../index.js';
 
-export const notificationOptionsSchema = S.Struct({
-	id: S.optional(S.String),
-	title: S.String,
-	description: S.String,
-	action: S.optional(
-		S.Struct({
-			type: S.Literal('link'),
-			label: S.String,
-			goto: S.String,
-		}),
-	),
+const linkActionSchema = z.object({
+	type: z.literal('link'),
+	label: z.string(),
+	goto: z.string(),
 });
 
-type NotificationOptions = S.Schema.Type<typeof notificationOptionsSchema>;
+const moreDetailsActionSchema = z.object({
+	type: z.literal('more-details'),
+	error: z.unknown(),
+});
 
-export class NotificationService extends Context.Tag('NotificationService')<
-	NotificationService,
-	{
-		notify: (options: NotificationOptions) => Effect.Effect<string>;
-		clear: (id: string) => Effect.Effect<void>;
-	}
->() {}
+const noneActionSchema = z.object({
+	type: z.literal('none'),
+});
+
+const actionSchema = z.discriminatedUnion('type', [
+	linkActionSchema,
+	moreDetailsActionSchema,
+	noneActionSchema,
+]);
+
+const baseNotificationOptionsSchema = z.object({
+	id: z.string().optional(),
+	title: z.string(),
+	description: z.string(),
+});
+
+export const notificationOptionsSchema = baseNotificationOptionsSchema.extend({
+	action: actionSchema.optional(),
+});
+
+/** Unified type for toasts and notifications */
+export type NotificationOptions = z.infer<typeof notificationOptionsSchema>;
+
+export type NotificationService = {
+	notify: (options: NotificationOptions) => Promise<WhisperingResult<string>>;
+	clear: (
+		id: string,
+	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
+};

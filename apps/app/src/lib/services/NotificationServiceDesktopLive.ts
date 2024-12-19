@@ -1,17 +1,15 @@
-import { NotificationService, WhisperingError } from '@repo/shared';
+import type { NotificationService } from '@repo/shared';
+import { Ok, tryAsyncWhispering } from '@repo/shared';
 import {
 	isPermissionGranted,
 	requestPermission,
 	sendNotification,
 } from '@tauri-apps/plugin-notification';
-import { Console, Effect, Layer } from 'effect';
-import { nanoid } from 'nanoid/non-secure';
 
-export const NotificationServiceDesktopLive = Layer.succeed(
-	NotificationService,
-	NotificationService.of({
-		notify: ({ title, description }) =>
-			Effect.tryPromise({
+const createNotificationServiceDesktop = (): NotificationService => {
+	return {
+		async notify({ title, description }) {
+			const notifyResult = await tryAsyncWhispering({
 				try: async () => {
 					let permissionGranted = await isPermissionGranted();
 					if (!permissionGranted) {
@@ -22,20 +20,23 @@ export const NotificationServiceDesktopLive = Layer.succeed(
 						sendNotification({ title });
 					}
 				},
-				catch: (error) =>
-					new WhisperingError({
-						title: 'Notification error',
-						description: 'Could not send notification',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-			}).pipe(
-				Effect.map(() => nanoid()),
-				Effect.tapError((error) => Console.error({ ...error })),
-				Effect.catchAll(() => Effect.succeed(nanoid())),
-			),
-		clear: (notificationId: string) => Effect.sync(() => {}),
-	}),
-);
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Notification error',
+					description: 'Could not send notification',
+					action: {
+						type: 'more-details',
+						error,
+					},
+				}),
+			});
+			if (!notifyResult.ok) return notifyResult;
+			const uselessId = notifyResult.data;
+			return Ok('');
+		},
+		clear: () => Ok(undefined),
+	};
+};
+
+export const NotificationServiceDesktopLive =
+	createNotificationServiceDesktop();

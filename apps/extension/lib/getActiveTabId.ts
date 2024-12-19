@@ -1,10 +1,16 @@
-import { Data, Effect, Option } from 'effect';
+import { tryAsyncBubble } from '@repo/shared';
 
-class GetActiveTabIdError extends Data.TaggedError('GetActiveTabIdError') {}
-
-export const getActiveTabId = Effect.gen(function* () {
-	const [activeTab] = yield* Effect.promise(() =>
-		chrome.tabs.query({ active: true, currentWindow: true }),
-	);
-	return yield* Option.fromNullable(activeTab?.id);
-}).pipe(Effect.mapError(() => new GetActiveTabIdError()));
+export const getActiveTabId = () =>
+	tryAsyncBubble({
+		try: async () => {
+			const [activeTab] = await chrome.tabs.query({
+				active: true,
+				currentWindow: true,
+			});
+			return activeTab?.id;
+		},
+		catch: (error) => ({
+			_tag: 'GetActiveTabIdError',
+			message: 'Unable to get active tab ID',
+		}),
+	});

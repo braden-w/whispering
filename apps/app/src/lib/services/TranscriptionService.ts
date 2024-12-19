@@ -1,6 +1,4 @@
-import type { WhisperingError } from '@repo/shared';
-import type { Effect } from 'effect';
-import { Context } from 'effect';
+import type { WhisperingResult } from '@repo/shared';
 
 /** Supported languages pulled from OpenAI Website: https://platform.openai.com/docs/guides/speech-to-text/supported-languages */
 export const SUPPORTED_LANGUAGES = [
@@ -144,9 +142,6 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	}),
 );
 
-export class TranscriptionService extends Context.Tag('TranscriptionService')<
-	TranscriptionService,
-	{
-		readonly transcribe: (blob: Blob) => Effect.Effect<string, WhisperingError>;
-	}
->() {}
+export type TranscriptionService = {
+	readonly transcribe: (blob: Blob) => Promise<WhisperingResult<string>>;
+};

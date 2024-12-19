@@ -1,7 +1,10 @@
-import { type Result, WhisperingError, resultToEffect } from '@repo/shared';
-import { Console, Effect } from 'effect';
+import {
+	BubbleErr,
+	type WhisperingResult,
+	tryAsyncWhispering,
+} from '@repo/shared';
 
-export const injectScript = <T, Args extends any[]>({
+export const injectScript = async <T, Args extends unknown[]>({
 	tabId,
 	commandName,
 	func,
@@ -9,37 +12,38 @@ export const injectScript = <T, Args extends any[]>({
 }: {
 	tabId: number;
 	commandName: string;
-	func: (...args: Args) => Result<T>;
+	func: (...args: Args) => WhisperingResult<T>;
 	args: Args;
-}) =>
-	Effect.gen(function* () {
-		const [injectionResult] = yield* Effect.tryPromise({
-			try: () =>
-				chrome.scripting.executeScript<Args, Result<T>>({
-					target: { tabId },
-					world: 'MAIN',
-					func,
-					args,
-				}),
-			catch: (error) =>
-				new WhisperingError({
-					title: `Unable to execute "${commandName}" script in Whispering tab`,
-					description:
-						'This might be due to the tab not being awake or not in the correct domain.',
-					action: { type: 'more-details', error },
-				}),
-		});
-		yield* Console.info(
-			`Injection result "${commandName}" script:`,
-			injectionResult,
-		);
-		if (!injectionResult || !injectionResult.result) {
-			return yield* new WhisperingError({
-				title: `Unable to execute "${commandName}" script in Whispering tab`,
-				description: 'The result of the script injection is undefined',
-				action: { type: 'none' },
-			});
-		}
-		const { result } = injectionResult;
-		return yield* resultToEffect(result);
+}): Promise<WhisperingResult<T>> => {
+	const injectionResult = await tryAsyncWhispering({
+		try: () =>
+			chrome.scripting.executeScript<Args, WhisperingResult<T>>({
+				target: { tabId },
+				world: 'MAIN',
+				func,
+				args,
+			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: `Unable to execute "${commandName}" script in Whispering tab`,
+			description:
+				'This might be due to the tab not being awake or not in the correct domain.',
+			action: { type: 'more-details', error },
+		}),
 	});
+	if (!injectionResult.ok) return injectionResult;
+	const [executeScriptResult] = injectionResult.data;
+	console.info(
+		`Injection result "${commandName}" script:`,
+		executeScriptResult,
+	);
+	if (!executeScriptResult || !executeScriptResult.result) {
+		return WhisperingErr({
+			title: `Unable to execute "${commandName}" script in Whispering tab`,
+			description: 'The result of the script injection is undefined',
+			action: { type: 'none' },
+		});
+	}
+	const { result } = executeScriptResult;
+	return result;
+};

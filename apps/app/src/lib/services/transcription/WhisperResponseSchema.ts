@@ -1,12 +1,12 @@
-import { Schema } from '@effect/schema';
+import { z } from 'zod';
 
-export const WhisperResponseSchema = Schema.Union(
-	Schema.Struct({
-		text: Schema.String,
+export const WhisperResponseSchema = z.union([
+	z.object({
+		text: z.string(),
 	}),
-	Schema.Struct({
-		error: Schema.Struct({
-			message: Schema.String,
+	z.object({
+		error: z.object({
+			message: z.string(),
 		}),
 	}),
-);
+]);

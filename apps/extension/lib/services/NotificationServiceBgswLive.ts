@@ -1,109 +1,127 @@
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import {
-	NotificationService,
-	WHISPERING_URL,
-	WhisperingError,
+	type NotificationService,
+	Ok,
+	tryAsyncWhispering,
+	WhisperingErr,
+	type WhisperingResult,
 } from '@repo/shared';
-import { Console, Effect, Layer } from 'effect';
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { nanoid } from 'nanoid/non-secure';
 import { injectScript } from '~background/injectScript';
+import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
-export const NotificationServiceBgswLive = Layer.succeed(
-	NotificationService,
-	NotificationService.of({
-		notify: ({ id: maybeId, title, description, action }) =>
-			Effect.gen(function* () {
-				const id = maybeId ?? nanoid();
+const createNotificationServiceBgswLive = (): NotificationService => ({
+	async notify({ id: maybeId, title, description, action }) {
+		const id = maybeId ?? nanoid();
 
-				yield* Effect.tryPromise({
-					try: async () => {
-						if (!action) {
-							chrome.notifications.create(id, {
-								priority: 2,
-								requireInteraction: true,
-								title,
-								message: description,
-								type: 'basic',
-								iconUrl: studioMicrophone,
-							});
-						} else {
-							chrome.notifications.create(id, {
-								priority: 2,
-								title,
-								message: description,
-								type: 'basic',
-								buttons: [{ title: action.label }],
-								iconUrl: studioMicrophone,
-							});
+		const createNotificationResult = await tryAsyncWhispering({
+			try: async () => {
+				if (!action) {
+					chrome.notifications.create(id, {
+						priority: 2,
+						requireInteraction: true,
+						title,
+						message: description,
+						type: 'basic',
+						iconUrl: studioMicrophone,
+					});
+				} else {
+					chrome.notifications.create(id, {
+						priority: 2,
+						title,
+						message: description,
+						type: 'basic',
+						buttons: [{ title: action.label }],
+						iconUrl: studioMicrophone,
+					});
 
-							const gotoTargetUrlInWhisperingTab = Effect.gen(function* () {
-								const whisperingTabId = yield* getOrCreateWhisperingTabId;
-								yield* injectScript<undefined, [string]>({
-									tabId: whisperingTabId,
-									commandName: 'goto',
-									func: (route) => {
-										try {
-											window.goto(route);
-											return { isSuccess: true, data: undefined } as const;
-										} catch (error) {
-											return {
-												isSuccess: false,
-												error: {
-													title: `Unable to go to route ${route} in Whispering tab`,
-													description:
-														'There was an error going to the route in the Whispering tab.',
-													action: {
-														type: 'more-details',
-														error,
-													},
-												},
-											} as const;
-										}
-									},
-									args: [action.goto],
-								});
-								yield* Effect.promise(() =>
-									chrome.tabs.update(whisperingTabId, { active: true }),
-								);
+					const gotoTargetUrlInWhisperingTab = async (): Promise<
+						WhisperingResult<void>
+					> => {
+						const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
+						if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
+						const whisperingTabId = getWhisperingTabIdResult.data;
+						if (!whisperingTabId)
+							return WhisperingErr({
+								title: 'Whispering tab not found',
+								description: 'The Whispering tab was not found.',
+								action: { type: 'none' },
 							});
-
-							chrome.notifications.onClicked.addListener((clickedId) =>
-								Effect.gen(function* () {
-									if (clickedId === id) {
-										chrome.notifications.clear(id);
-										yield* gotoTargetUrlInWhisperingTab;
-									}
-								}).pipe(Effect.runPromise),
-							);
-							chrome.notifications.onButtonClicked.addListener(
-								(id, buttonIndex) =>
-									Effect.gen(function* () {
-										if (buttonIndex === 0) {
-											chrome.notifications.clear(id);
-											yield* gotoTargetUrlInWhisperingTab;
-										}
-									}).pipe(Effect.runPromise),
-							);
-						}
-					},
-					catch: (error) =>
-						new WhisperingError({
-							title: 'Failed to show notification',
-							description:
-								'There was an error showing the notification in the background service worker.',
-							action: {
-								type: 'more-details',
-								error,
+						const injectScriptResult = await injectScript<undefined, [string]>({
+							tabId: whisperingTabId,
+							commandName: 'goto',
+							func: (route) => {
+								try {
+									window.goto(route);
+									return { ok: true, data: undefined } as const;
+								} catch (error) {
+									return {
+										ok: false,
+										error: {
+											_tag: 'WhisperingError',
+											title: `Unable to go to route ${route} in Whispering tab`,
+											description:
+												'There was an error going to the route in the Whispering tab.',
+											action: {
+												type: 'more-details',
+												error,
+											},
+										},
+									} as const;
+								}
 							},
-						}),
-				}).pipe(
-					Effect.tapError((error) => Console.error({ ...error })),
-					Effect.catchAll(() => Effect.succeed(maybeId ?? nanoid())),
-				);
+							args: [action.goto],
+						});
+						if (!injectScriptResult.ok) return injectScriptResult;
+						await chrome.tabs.update(whisperingTabId, { active: true });
+						return Ok(undefined);
+					};
 
-				return id;
+					chrome.notifications.onClicked.addListener(async (clickedId) => {
+						if (clickedId === id) {
+							chrome.notifications.clear(id);
+							const gotoTargetUrlInWhisperingTabResult =
+								await gotoTargetUrlInWhisperingTab();
+							if (!gotoTargetUrlInWhisperingTabResult.ok)
+								return renderErrorAsNotification(
+									gotoTargetUrlInWhisperingTabResult,
+								);
+						}
+					});
+
+					chrome.notifications.onButtonClicked.addListener(
+						async (id, buttonIndex) => {
+							if (buttonIndex === 0) {
+								chrome.notifications.clear(id);
+								const gotoTargetUrlInWhisperingTabResult = await gotoTargetUrlInWhisperingTab();
+								if (!gotoTargetUrlInWhisperingTabResult.ok)
+									return renderErrorAsNotification(
+										gotoTargetUrlInWhisperingTabResult,
+									);
+							}
+						},
+					);
+				}
+			},
+			catch: (error) => ({
+				_tag: 'WhisperingError',
+				title: 'Failed to show notification',
+				description:
+					'There was an error showing the notification in the background service worker.',
+				action: {
+					type: 'more-details',
+					error,
+				},
 			}),
-		clear: (id: string) => Effect.sync(() => chrome.notifications.clear(id)),
-	}),
-);
+		});
+		if (!createNotificationResult.ok) return createNotificationResult;
+		return Ok(id);
+	},
+	clear(id) {
+		chrome.notifications.clear(id);
+		return Ok(undefined);
+	},
+});
+
+export const NotificationServiceBgswLive = createNotificationServiceBgswLive();

@@ -4,7 +4,7 @@ export function createRecordingViewTransitionName({
 	recordingId,
 	propertyName,
 }: {
-	recordingId: Recording['id'];
+	recordingId: string;
 	propertyName: keyof Recording;
 }): string {
 	return `recording-${recordingId}-${propertyName}`;

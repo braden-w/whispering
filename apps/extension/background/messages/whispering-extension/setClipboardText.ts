@@ -1,37 +1,69 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-	Result,
-} from '@repo/shared';
-import { WhisperingError, effectToResult } from '@repo/shared';
-import { Effect } from 'effect';
-import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
-import { getActiveTabId } from '~lib/getActiveTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 import {
-	STORAGE_KEYS,
-	extensionStorageService,
-} from '~lib/services/extension-storage';
+	WhisperingErr,
+	type ExternalMessageBody,
+	type ExternalMessageReturnType,
+	type WhisperingResult,
+} from '@repo/shared';
+import { injectScript } from '~background/injectScript';
+import { getActiveTabId } from '~lib/getActiveTabId';
+import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
-const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
-	Effect.gen(function* () {
-		const activeTabId = yield* getActiveTabId;
-		yield* extensionStorageService[
-			STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT
-		].set(text);
-		yield* injectScript<string, [string]>({
+export type RequestBody =
+	ExternalMessageBody<'whispering-extension/setClipboardText'>;
+
+export type ResponseBody = WhisperingResult<
+	ExternalMessageReturnType<'whispering-extension/setClipboardText'>
+>;
+
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async ({ body }, res) => {
+	const setClipboardText = async (): Promise<WhisperingResult<string>> => {
+		if (!body?.transcribedText) {
+			return WhisperingErr({
+				title: 'Unable to copy transcribed text to clipboard',
+				description: 'Text must be provided in the request body of the message',
+				action: { type: 'none' },
+			});
+		}
+
+		const getActiveTabIdResult = await getActiveTabId();
+		if (!getActiveTabIdResult.ok) {
+			return WhisperingErr({
+				title: 'Unable to copy transcribed text to clipboard',
+				description:
+					'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
+				action: { type: 'more-details', error: getActiveTabIdResult.error },
+			});
+		}
+		const activeTabId = getActiveTabIdResult.data;
+		if (!activeTabId) {
+			return WhisperingErr({
+				title: 'Unable to copy transcribed text to clipboard',
+				description: 'No active tab ID found',
+				action: { type: 'none' },
+			});
+		}
+
+		whisperingStorage.setItem(
+			'whispering-latest-recording-transcribed-text',
+			body.transcribedText,
+		);
+
+		const injectScriptResult = await injectScript<string, [string]>({
 			tabId: activeTabId,
 			commandName: 'setClipboardText',
 			func: (text) => {
 				try {
 					navigator.clipboard.writeText(text);
-					return { isSuccess: true, data: text } as const;
+					return { ok: true, data: text } as const;
 				} catch (error) {
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
+							_tag: 'WhisperingError',
 							title:
 								'Unable to copy transcribed text to clipboard in active tab',
 							description:
@@ -41,47 +73,10 @@ const setClipboardText = (text: string): Effect.Effect<void, WhisperingError> =>
 					} as const;
 				}
 			},
-			args: [text],
+			args: [body.transcribedText],
 		});
-	}).pipe(
-		Effect.catchTags({
-			GetActiveTabIdError: () =>
-				new WhisperingError({
-					title:
-						'Unable to get active tab ID to copy transcribed text to clipboard',
-					description:
-						'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
-					action: { type: 'none' },
-				}),
-		}),
-	);
-
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/setClipboardText'>;
-
-export type ResponseBody = Result<
-	ExternalMessageReturnType<'whispering-extension/setClipboardText'>
->;
-
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) =>
-	Effect.gen(function* () {
-		if (!body?.transcribedText) {
-			return yield* new WhisperingError({
-				title: 'Error invoking setClipboardText command',
-				description: 'Text must be provided in the request body of the message',
-				action: { type: 'none' },
-			});
-		}
-		yield* setClipboardText(body.transcribedText);
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
-
+		return injectScriptResult;
+	};
+	res.send(await setClipboardText());
+};
 export default handler;

@@ -1,83 +1,94 @@
-import { Schema } from '@effect/schema';
 import {
 	type ExternalMessageBody,
+	Ok,
+	type WhisperingResult,
 	WHISPERING_URL,
 	WHISPERING_URL_WILDCARD,
-	WhisperingError,
 	externalMessageSchema,
+	tryAsyncWhispering,
 } from '@repo/shared';
-import { Effect, Either } from 'effect';
 import { injectScript } from '~background/injectScript';
 
-export const getOrCreateWhisperingTabId = Effect.gen(function* () {
-	const whisperingTabs = yield* getAllWhisperingTabs();
+export const getOrCreateWhisperingTabId = async (): Promise<
+	WhisperingResult<number>
+> => {
+	const getAllWhisperingTabsResult = await getAllWhisperingTabs();
+	if (!getAllWhisperingTabsResult.ok) return getAllWhisperingTabsResult;
+	const whisperingTabs = getAllWhisperingTabsResult.data;
 
 	if (whisperingTabs.length === 0) {
-		return yield* createAndSetupNewTab();
+		return await createAndSetupNewTab();
 	}
 
-	const selectedTabId = yield* Effect.gen(function* () {
-		const undiscardedWhisperingTabs = whisperingTabs.filter(
-			(tab) => !tab.discarded,
-		);
-		const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter(
-			(tab) => tab.pinned,
-		);
-		for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
-			if (!pinnedUndiscardedTab.id) continue;
-			const isResponsive = yield* checkTabResponsiveness(
-				pinnedUndiscardedTab.id,
-			);
-			if (isResponsive) return pinnedUndiscardedTab.id;
-		}
-		for (const undiscardedTab of undiscardedWhisperingTabs) {
-			if (!undiscardedTab.id) continue;
-			const isResponsive = yield* checkTabResponsiveness(undiscardedTab.id);
-			if (isResponsive) return undiscardedTab.id;
-		}
-		return yield* createAndSetupNewTab();
-	});
+	const getBestWhisperingTabResult = await getBestWhisperingTab(whisperingTabs);
+	if (!getBestWhisperingTabResult.ok) return getBestWhisperingTabResult;
+	const bestWhisperingTabId = getBestWhisperingTabResult.data;
 
-	const otherTabIds = whisperingTabs
+	const otherWhisperingTabIds = whisperingTabs
 		.map((tab) => tab.id)
 		.filter((tabId) => tabId !== undefined)
-		.filter((tabId) => tabId !== selectedTabId);
-	yield* removeTabsById(otherTabIds);
-	return selectedTabId;
-});
+		.filter((tabId) => tabId !== bestWhisperingTabId);
 
-function checkTabResponsiveness(tabId: number) {
-	return injectScript<'pong', []>({
+	const results = await removeTabsById(otherWhisperingTabIds);
+	return Ok(bestWhisperingTabId);
+};
+
+async function getBestWhisperingTab(
+	tabs: chrome.tabs.Tab[],
+): Promise<WhisperingResult<number>> {
+	const undiscardedWhisperingTabs = tabs.filter((tab) => !tab.discarded);
+	const pinnedUndiscardedWhisperingTabs = undiscardedWhisperingTabs.filter(
+		(tab) => tab.pinned,
+	);
+	for (const pinnedUndiscardedTab of pinnedUndiscardedWhisperingTabs) {
+		if (!pinnedUndiscardedTab.id) continue;
+		const isResponsive = await checkTabResponsiveness(pinnedUndiscardedTab.id);
+		if (isResponsive) return Ok(pinnedUndiscardedTab.id);
+	}
+	for (const undiscardedTab of undiscardedWhisperingTabs) {
+		if (!undiscardedTab.id) continue;
+		const isResponsive = await checkTabResponsiveness(undiscardedTab.id);
+		if (isResponsive) return Ok(undiscardedTab.id);
+	}
+	return await createAndSetupNewTab();
+}
+
+async function checkTabResponsiveness(tabId: number) {
+	const injectScriptResult = await injectScript<'pong', []>({
 		tabId,
 		commandName: 'ping',
-		func: () => ({ isSuccess: true, data: 'pong' }),
+		func: () => ({ ok: true, data: 'pong' }),
 		args: [],
-	}).pipe(Effect.catchAll(() => Effect.succeed(false)));
-}
-
-function createAndSetupNewTab() {
-	return Effect.gen(function* () {
-		const newTabId = yield* createWhisperingTab();
-		yield* makeTabUndiscardableById(newTabId);
-		yield* pinTabById(newTabId);
-		return newTabId;
 	});
+	if (!injectScriptResult.ok) return false;
+	return true;
 }
 
-function getAllWhisperingTabs() {
-	return Effect.tryPromise({
+async function createAndSetupNewTab(): Promise<WhisperingResult<number>> {
+	const createWhisperingTabResult = await createWhisperingTab();
+	if (!createWhisperingTabResult.ok) return createWhisperingTabResult;
+	const newTabId = createWhisperingTabResult.data;
+	const makeTabUndiscardableByIdResult =
+		await makeTabUndiscardableById(newTabId);
+	if (!makeTabUndiscardableByIdResult.ok) return makeTabUndiscardableByIdResult;
+	const pinTabByIdResult = await pinTabById(newTabId);
+	if (!pinTabByIdResult.ok) return pinTabByIdResult;
+	return Ok(newTabId);
+}
+
+const getAllWhisperingTabs = () =>
+	tryAsyncWhispering({
 		try: () => chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Error getting Whispering tabs',
-				description: 'Error querying for Whispering tabs in the browser.',
-				action: {
-					type: 'more-details',
-					error,
-				},
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error getting Whispering tabs',
+			description: 'Error querying for Whispering tabs in the browser.',
+			action: {
+				type: 'more-details',
+				error,
+			},
+		}),
 	});
-}
 
 /**
  * Creates a new Whispering tab, then waits for a Whispering content script to
@@ -85,62 +96,80 @@ function getAllWhisperingTabs() {
  * recording, etc.
  */
 function createWhisperingTab() {
-	return Effect.async<number>((resume) => {
-		chrome.runtime.onMessage.addListener(
-			function contentReadyListener(message, sender, sendResponse) {
-				if (!isNotifyWhisperingTabReadyMessage(message)) return;
-				if (!sender.tab?.id) return;
-				resume(Effect.succeed(sender.tab.id));
-				chrome.runtime.onMessage.removeListener(contentReadyListener);
-			},
-		);
-		// Perform your desired action here
-		chrome.tabs.create({ url: WHISPERING_URL, active: false, pinned: true });
+	return tryAsyncWhispering({
+		try: () =>
+			new Promise<number>((resolve, reject) => {
+				chrome.runtime.onMessage.addListener(
+					function contentReadyListener(message, sender, sendResponse) {
+						if (!isNotifyWhisperingTabReadyMessage(message)) return;
+						if (!sender.tab?.id) return;
+						resolve(sender.tab.id);
+						chrome.runtime.onMessage.removeListener(contentReadyListener);
+					},
+				);
+				// Perform your desired action here
+				chrome.tabs.create({
+					url: WHISPERING_URL,
+					active: false,
+					pinned: true,
+				});
+			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error creating Whispering tab',
+			description: 'Error creating Whispering tab in the browser.',
+			action: { type: 'more-details', error },
+		}),
 	});
 }
 
 function isNotifyWhisperingTabReadyMessage(
 	message: unknown,
 ): message is ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'> {
-	const externalMessageResult = Schema.decodeUnknownEither(
-		externalMessageSchema,
-	)(message);
-	if (Either.isLeft(externalMessageResult)) return false;
-	const externalMessage = externalMessageResult.right;
+	const externalMessageResult = externalMessageSchema.safeParse(message);
+	if (!externalMessageResult.success) return false;
+	const externalMessage = externalMessageResult.data;
 	return (
 		externalMessage.name === 'whispering-extension/notifyWhisperingTabReady'
 	);
 }
 
 function makeTabUndiscardableById(tabId: number) {
-	return Effect.tryPromise({
+	return tryAsyncWhispering({
 		try: () => chrome.tabs.update(tabId, { autoDiscardable: false }),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to make Whispering tab undiscardable',
-				description: 'Error updating Whispering tab to make it undiscardable.',
-				action: { type: 'more-details', error },
-			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to make Whispering tab undiscardable',
+			description: 'Error updating Whispering tab to make it undiscardable.',
+			action: { type: 'more-details', error },
+		}),
 	});
 }
 
 function pinTabById(tabId: number) {
-	return Effect.promise(() => chrome.tabs.update(tabId, { pinned: true }));
+	return tryAsyncWhispering({
+		try: () => chrome.tabs.update(tabId, { pinned: true }),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to pin Whispering tab',
+			description: 'Error pinning Whispering tab.',
+			action: { type: 'more-details', error },
+		}),
+	});
 }
 
 function removeTabsById(tabIds: number[]) {
-	return Effect.all(
+	return Promise.all(
 		tabIds.map((tabId) =>
-			Effect.tryPromise({
+			tryAsyncWhispering({
 				try: () => chrome.tabs.remove(tabId),
-				catch: (error) =>
-					new WhisperingError({
-						title: `Error closing Whispering tab ${tabId}`,
-						description: `Error closing Whispering tab ${tabId} in the browser.`,
-						action: { type: 'more-details', error },
-					}),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: `Error closing Whispering tab ${tabId}`,
+					description: `Error closing Whispering tab ${tabId} in the browser.`,
+					action: { type: 'more-details', error },
+				}),
 			}),
 		),
-		{ concurrency: 'unbounded' },
 	);
 }

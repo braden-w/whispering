@@ -1,28 +1,37 @@
 <script lang="ts">
 	import { Button, type Props } from '$lib/components/ui/button/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import type { Snippet } from 'svelte';
 
 	let {
 		children,
-		tooltipText,
+		tooltipContent,
 		...restProps
-	}: {
-		tooltipText: string;
-	} & Props = $props();
+	}: { tooltipContent: string | Snippet } & Props = $props();
 </script>
+
+{#snippet tooltip()}
+	{#if typeof tooltipContent === 'string'}
+		{tooltipContent}
+	{:else}
+		{@render tooltipContent()}
+	{/if}
+{/snippet}
 
 <Tooltip.Provider>
 	<Tooltip.Root>
 		<Tooltip.Trigger>
-			{#snippet child()}
-				<Button {...restProps}>
+			{#snippet child({ props })}
+				<Button {...props} {...restProps}>
 					{@render children?.()}
-					<span class="sr-only">{tooltipText}</span>
+					<span class="sr-only">
+						{@render tooltip()}
+					</span>
 				</Button>
 			{/snippet}
 		</Tooltip.Trigger>
 		<Tooltip.Content>
-			<p>{tooltipText}</p>
+			{@render tooltip()}
 		</Tooltip.Content>
 	</Tooltip.Root>
 </Tooltip.Provider>

@@ -1,29 +1,24 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { NotificationService } from '@repo/shared';
-import { Console, Effect, Layer } from 'effect';
+import type { NotificationService } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
-export const NotificationServiceWebLive = Layer.succeed(
-	NotificationService,
-	NotificationService.of({
-		notify: (notifyOptions) =>
-			Effect.gen(function* () {
-				const id =
-					(yield* sendMessageToExtension({
-						name: 'whispering-extension/notifications/create',
-						body: { notifyOptions },
-					})) ?? nanoid();
-				return id;
-			}).pipe(
-				Effect.tapError((error) => Console.error({ ...error })),
-				Effect.catchAll(() => Effect.succeed(nanoid())),
-			),
+export const createNotificationServiceWeb = (): NotificationService => {
+	return {
+		async notify(notifyOptions) {
+			const sendMessageToExtensionResult = await sendMessageToExtension({
+				name: 'whispering-extension/notifications/create',
+				body: { notifyOptions },
+			});
+			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+			const id = sendMessageToExtensionResult.data ?? nanoid();
+			return id;
+		},
 		clear: (notificationId: string) =>
-			Effect.gen(function* () {
-				yield* sendMessageToExtension({
-					name: 'whispering-extension/notifications/clear',
-					body: { notificationId },
-				});
-			}).pipe(Effect.catchAll((error) => Console.error({ ...error }))),
-	}),
-);
+			sendMessageToExtension({
+				name: 'whispering-extension/notifications/clear',
+				body: { notificationId },
+			}),
+	};
+};
+
+export const NotificationServiceWebLive = createNotificationServiceWeb();

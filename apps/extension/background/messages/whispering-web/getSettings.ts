@@ -1,44 +1,44 @@
-import { Schema } from '@effect/schema';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	type Result,
+	BubbleErr,
+	Ok,
+	type WhisperingResult,
 	type Settings,
-	WhisperingError,
-	effectToResult,
 	getDefaultSettings,
 	settingsSchema,
 } from '@repo/shared';
-import { Effect } from 'effect';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
-import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import type { WhisperingStorageKey } from '~lib/storage/keys';
 
 export type RequestBody = Record<string, never>;
 
-export type ResponseBody = Result<Settings>;
+export type ResponseBody = WhisperingResult<Settings>;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	_req,
-	res,
-) =>
-	Effect.gen(function* () {
-		const whisperingTabId = yield* getOrCreateWhisperingTabId;
-		const valueFromStorage = yield* injectScript<
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async (_req, res) => {
+	const getSettings = async () => {
+		const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
+		if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
+		const whisperingTabId = getWhisperingTabIdResult.data;
+
+		const valueFromStorage = await injectScript<
 			string | null,
-			[typeof STORAGE_KEYS.SETTINGS]
+			[WhisperingStorageKey]
 		>({
 			tabId: whisperingTabId,
 			commandName: 'getSettings',
 			func: (settingsKey) => {
 				try {
 					const valueFromStorage = localStorage.getItem(settingsKey);
-					return { isSuccess: true, data: valueFromStorage } as const;
+					return { ok: true, data: valueFromStorage } as const;
 				} catch (error) {
 					return {
-						isSuccess: false,
+						ok: false,
 						error: {
+							_tag: 'WhisperingError',
 							title: 'Unable to get Whispering settings',
 							description:
 								'There was an error getting the Whispering settings from localStorage.',
@@ -50,33 +50,26 @@ const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
 					} as const;
 				}
 			},
-			args: [STORAGE_KEYS.SETTINGS],
+			args: ['whispering-settings'],
 		});
-		const isEmpty = valueFromStorage === null;
-		if (isEmpty) return getDefaultSettings('extension');
-		const settings = yield* Schema.decodeUnknown(
-			Schema.parseJson(settingsSchema),
-		)(valueFromStorage).pipe(
-			Effect.mapError(
-				(error) =>
-					new WhisperingError({
-						title: 'Unable to parse Whispering settings',
-						description:
-							'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-			),
-		);
-		return settings;
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+
+		if (valueFromStorage === null) return Ok(getDefaultSettings('extension'));
+		const parseResult = settingsSchema.safeParse(valueFromStorage);
+		if (!parseResult.success)
+			return WhisperingErr({
+				title: 'Unable to parse Whispering settings',
+				description:
+					'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',
+				action: {
+					type: 'more-details',
+					error: parseResult.error,
+				},
+			});
+		const settings = parseResult.data;
+		return Ok(settings);
+	};
+
+	res.send(await getSettings());
+};
 
 export default handler;

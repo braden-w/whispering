@@ -1,10 +1,12 @@
-import { Schema as S } from '@effect/schema';
-import { Data, Effect } from 'effect';
+import { type Result, Err, tryAsync, trySync } from '@epicenterhq/result';
+import { z } from 'zod';
 import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
-} from './services/TranscriptionService.js';
+} from './services/index.js';
+export { Err, Ok } from '@epicenterhq/result';
+import type { NotificationOptions } from './services/NotificationService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -13,15 +15,20 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
-export const BITRATE_VALUES = [
-	64_000, 96_000, 128_000, 192_000, 256_000, 320_000,
+export const BITRATE_VALUES_KBPS = [
+	'64',
+	'96',
+	'128',
+	'192',
+	'256',
+	'320',
 ] as const;
-export const BITRATE_OPTIONS = BITRATE_VALUES.map((bitrate) => ({
-	label: `${bitrate / 1_000} kbps`,
+export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
+	label: `${bitrate} kbps`,
 	value: bitrate,
 }));
-export const DEFAULT_BITRATE_MS =
-	64_000 as const satisfies (typeof BITRATE_VALUES)[number];
+export const DEFAULT_BITRATE_KBPS =
+	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
 const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
@@ -29,31 +36,31 @@ export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
 	value: option,
 }));
 
-export const settingsSchema = S.Struct({
-	isPlaySoundEnabled: S.Boolean,
-	isCopyToClipboardEnabled: S.Boolean,
-	isPasteContentsOnSuccessEnabled: S.Boolean,
-	isFasterRerecordEnabled: S.Boolean,
-	alwaysOnTop: S.Literal(...ALWAYS_ON_TOP_VALUES),
+export const settingsSchema = z.object({
+	isPlaySoundEnabled: z.boolean(),
+	isCopyToClipboardEnabled: z.boolean(),
+	isPasteContentsOnSuccessEnabled: z.boolean(),
+	isFasterRerecordEnabled: z.boolean(),
+	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
-	selectedAudioInputDeviceId: S.String,
-	bitsPerSecond: S.optionalWith(
-		S.compose(S.Number, S.Literal(...BITRATE_VALUES)),
-		{
-			default: () => DEFAULT_BITRATE_MS,
-		},
-	),
+	selectedAudioInputDeviceId: z.string(),
+	bitrateKbps: z
+		.enum(BITRATE_VALUES_KBPS)
+		.optional()
+		.default(DEFAULT_BITRATE_KBPS),
 
-	selectedTranscriptionService: S.Literal(...TRANSCRIPTION_SERVICES),
-	openAiApiKey: S.String,
-	groqApiKey: S.String,
-	fasterWhisperServerUrl: S.String,
-	fasterWhisperServerModel: S.String,
-	outputLanguage: S.Literal(...SUPPORTED_LANGUAGES),
+	selectedTranscriptionService: z.enum(TRANSCRIPTION_SERVICES),
+	openAiApiKey: z.string(),
+	groqApiKey: z.string(),
+	fasterWhisperServerUrl: z.string(),
+	fasterWhisperServerModel: z.string(),
+	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
 
-	currentLocalShortcut: S.String,
-	currentGlobalShortcut: S.String,
+	currentLocalShortcut: z.string(),
+	currentGlobalShortcut: z.string(),
 });
+
+export type Settings = z.infer<typeof settingsSchema>;
 
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
@@ -64,7 +71,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
-		bitsPerSecond: DEFAULT_BITRATE_MS,
+		bitrateKbps: DEFAULT_BITRATE_KBPS,
 
 		selectedTranscriptionService: 'OpenAI',
 		openAiApiKey: '',
@@ -77,98 +84,116 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
-export type Settings = S.Schema.Type<typeof settingsSchema>;
-
-export type WhisperingErrorProperties = {
-	title: string;
-	description: string;
-	action:
-		| {
-				type: 'link';
-				label: string;
-				goto: string;
-		  }
-		| {
-				type: 'more-details';
-				error: unknown;
-		  }
-		| { type: 'none' };
+type WhisperingErrProperties = {
+	_tag: 'WhisperingError';
 	isWarning?: boolean;
+} & NotificationOptions;
+
+export type BubbleErrProperties<T extends string = string> = {
+	_tag: T;
+	message: string;
 };
 
-export class WhisperingError extends Data.TaggedError(
-	'WhisperingError',
-)<WhisperingErrorProperties> {}
+export type BubbleResult<
+	T,
+	E extends BubbleErrProperties = BubbleErrProperties,
+> = Result<T, E>;
 
-export type Result<T> =
-	| {
-			isSuccess: true;
-			data: T;
-	  }
-	| {
-			isSuccess: false;
-			error: WhisperingErrorProperties;
-	  };
+export type WhisperingResult<
+	T,
+	E extends WhisperingErrProperties = WhisperingErrProperties,
+> = Result<T, E>;
 
-export const effectToResult = <T>(
-	effect: Effect.Effect<T, WhisperingError>,
-): Effect.Effect<Result<T>> =>
-	effect.pipe(
-		Effect.map((data) => ({ isSuccess: true, data }) as const),
-		Effect.catchAll((error) =>
-			Effect.succeed({ isSuccess: false, error } as const),
-		),
-	);
+export type BubbleErr = Err<BubbleErrProperties>;
 
-export const resultToEffect = <T>(
-	result: Result<T>,
-): Effect.Effect<T, WhisperingError> =>
-	result.isSuccess
-		? Effect.succeed(result.data)
-		: Effect.fail(new WhisperingError(result.error));
+export const BubbleErr = <E extends BubbleErrProperties>(error: E): BubbleErr =>
+	Err(error);
 
-export const recorderStateSchema = S.Literal('IDLE', 'RECORDING', 'LOADING');
+export type WhisperingErr = Err<WhisperingErrProperties>;
 
-export type RecorderState = S.Schema.Type<typeof recorderStateSchema>;
+export const WhisperingErr = (
+	error: Omit<WhisperingErrProperties, '_tag'>,
+): WhisperingErr => Err({ ...error, _tag: 'WhisperingError' });
+
+export const trySyncWhispering = <T, E extends WhisperingErrProperties>(
+	opts: Parameters<typeof trySync<T, E>>[0],
+): WhisperingResult<T, E> => trySync(opts);
+
+export const trySyncBubble = <T, E extends BubbleErrProperties>(
+	opts: Parameters<typeof trySync<T, E>>[0],
+): BubbleResult<T, E> => trySync(opts);
+
+export const tryAsyncBubble = <T, E extends BubbleErrProperties>(
+	opts: Parameters<typeof tryAsync<T, E>>[0],
+): Promise<BubbleResult<T, E>> => tryAsync(opts);
+
+export const tryAsyncWhispering = <T, E extends WhisperingErrProperties>(
+	opts: Parameters<typeof tryAsync<T, E>>[0],
+): Promise<WhisperingResult<T, E>> => tryAsync(opts);
+
+export const parseJson = (value: string) =>
+	trySyncBubble({
+		try: () => JSON.parse(value) as unknown,
+		catch: (error) => ({
+			_tag: 'ParseJsonError',
+			message: error instanceof Error ? error.message : 'Unexpected JSON input',
+		}),
+	});
+
+export const recordingStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
+
+export type WhisperingRecordingState = z.infer<typeof recordingStateSchema>;
 
 export const recorderStateToIcons = {
 	RECORDING: '🔲',
 	LOADING: '🔄',
 	IDLE: '🎙️',
-} as const satisfies Record<RecorderState, string>;
+} as const satisfies Record<WhisperingRecordingState, string>;
 
-export const externalMessageSchema = S.Union(
-	S.Struct({
-		name: S.Literal('whispering-extension/notifyWhisperingTabReady'),
-		body: S.Struct({}),
+export const externalMessageSchema = z.discriminatedUnion('name', [
+	z.object({
+		name: z.literal('whispering-extension/notifyWhisperingTabReady'),
+		body: z.object({}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/playSound'),
-		body: S.Struct({ sound: S.Literal('start', 'stop', 'cancel') }),
+	z.object({
+		name: z.literal('whispering-extension/playSound'),
+		body: z.object({
+			sound: z.enum(['start', 'stop', 'cancel']),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/setClipboardText'),
-		body: S.Struct({ transcribedText: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/setClipboardText'),
+		body: z.object({
+			transcribedText: z.string(),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/setTrayIcon'),
-		body: S.Struct({ recorderState: recorderStateSchema }),
+	z.object({
+		name: z.literal('whispering-extension/setTrayIcon'),
+		body: z.object({
+			recorderState: recordingStateSchema,
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/notifications/create'),
-		body: S.Struct({ notifyOptions: notificationOptionsSchema }),
+	z.object({
+		name: z.literal('whispering-extension/notifications/create'),
+		body: z.object({
+			notifyOptions: notificationOptionsSchema,
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/notifications/clear'),
-		body: S.Struct({ notificationId: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/notifications/clear'),
+		body: z.object({
+			notificationId: z.string(),
+		}),
 	}),
-	S.Struct({
-		name: S.Literal('whispering-extension/writeTextToCursor'),
-		body: S.Struct({ transcribedText: S.String }),
+	z.object({
+		name: z.literal('whispering-extension/writeTextToCursor'),
+		body: z.object({
+			transcribedText: z.string(),
+		}),
 	}),
-);
+]);
 
-export type ExternalMessage = S.Schema.Type<typeof externalMessageSchema>;
+export type ExternalMessage = z.infer<typeof externalMessageSchema>;
 
 export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 	ExternalMessage,
@@ -178,11 +203,11 @@ export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
 	'whispering-extension/notifyWhisperingTabReady': undefined;
 	'whispering-extension/playSound': undefined;
-	'whispering-extension/setClipboardText': undefined;
+	'whispering-extension/setClipboardText': string;
 	'whispering-extension/setTrayIcon': undefined;
 	'whispering-extension/notifications/create': string;
 	'whispering-extension/notifications/clear': undefined;
-	'whispering-extension/writeTextToCursor': undefined;
+	'whispering-extension/writeTextToCursor': string;
 }[T];
 
 export * from './services/index.js';

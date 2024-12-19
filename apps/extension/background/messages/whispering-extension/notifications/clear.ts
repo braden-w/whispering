@@ -2,45 +2,38 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import {
-	NotificationService,
-	WhisperingError,
-	effectToResult,
-} from '@repo/shared';
-import { Effect } from 'effect';
-import { renderErrorAsNotification } from '~lib/errors';
+import { Ok, WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifications/clear'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/notifications/clear'>
 >;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) =>
-	Effect.gen(function* () {
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async ({ body }, res) => {
+	const clearNotification = async () => {
 		if (!body?.notificationId) {
-			return yield* new WhisperingError({
+			return WhisperingErr({
 				title: 'Error invoking notify command',
 				description:
 					'Notify/clear must be provided notificationId in the request body of the message',
 				action: { type: 'none' },
 			});
 		}
-		const notificationService = yield* NotificationService;
-		return yield* notificationService.clear(body.notificationId);
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+		const clearResult = await NotificationServiceBgswLive.clear(
+			body.notificationId,
+		);
+		if (!clearResult.ok) return clearResult;
+		return Ok(undefined);
+	};
+	res.send(await clearNotification());
+};
 
 export default handler;

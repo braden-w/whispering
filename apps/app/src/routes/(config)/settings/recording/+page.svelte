@@ -2,21 +2,22 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import {
 		enumerateRecordingDevices,
-		mediaStreamManager,
-	} from '$lib/services/MediaRecorderService.svelte';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+		mediaStream,
+	} from '$lib/services/MediaStreamService.svelte';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, BITRATE_VALUES } from '@repo/shared';
-	import { Effect } from 'effect';
+	import { BITRATE_OPTIONS, BITRATE_VALUES_KBPS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
-	const getMediaDevicesPromise = enumerateRecordingDevices.pipe(
-		Effect.catchAll((error) => {
-			renderErrorAsToast(error);
-			return Effect.succeed([] as MediaDeviceInfo[]);
-		}),
-		Effect.runPromise,
-	);
+	const getMediaDevices = async () => {
+		const enumerateRecordingDevicesResult = await enumerateRecordingDevices();
+		if (!enumerateRecordingDevicesResult.ok) {
+			renderErrAsToast(enumerateRecordingDevicesResult);
+			return [];
+		}
+		return enumerateRecordingDevicesResult.data;
+	};
+	const getMediaDevicesPromise = getMediaDevices();
 </script>
 
 <svelte:head>
@@ -52,13 +53,13 @@
 				label="Recording Device"
 				{items}
 				selected={settings.value.selectedAudioInputDeviceId}
-				onSelectedChange={(selected) => {
+				onSelectedChange={async (selected) => {
 					if (!selected) return;
 					settings.value = {
 						...settings.value,
 						selectedAudioInputDeviceId: selected,
 					};
-					mediaStreamManager.refreshStream().pipe(Effect.runPromise);
+					await mediaStream.refreshStream();
 				}}
 				placeholder="Select a device"
 			/>
@@ -71,15 +72,15 @@
 			id="bit-rate"
 			label="Bitrate"
 			items={BITRATE_OPTIONS.map((option) => ({
-				value: option.value.toString(),
+				value: option.value,
 				label: option.label,
 			}))}
-			selected={settings.value.bitsPerSecond.toString()}
+			selected={settings.value.bitrateKbps}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					bitsPerSecond: Number(selected) as (typeof BITRATE_VALUES)[number],
+					bitrateKbps: selected,
 				};
 			}}
 			placeholder="Select a bitrate"

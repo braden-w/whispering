@@ -17,7 +17,7 @@
 >
 	<div class="mr-auto flex gap-2">
 		<WhisperingButton
-			tooltipText="Go home"
+			tooltipContent="Go home"
 			href="/"
 			variant="ghost"
 			class="-ml-4"
@@ -27,7 +27,7 @@
 	</div>
 	<CancelOrEndRecordingSessionButton />
 	<WhisperingButton
-		tooltipText="Toggle recording"
+		tooltipContent="Toggle recording"
 		onclick={recorder.toggleRecording}
 		variant="ghost"
 		size="icon"

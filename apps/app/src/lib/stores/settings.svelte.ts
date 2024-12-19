@@ -1,122 +1,126 @@
 import { toast } from '$lib/services/ToastService';
-import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { Schema as S } from '@effect/schema';
 import {
-	WhisperingError,
 	getDefaultSettings,
 	settingsSchema,
+	tryAsyncWhispering,
+	trySyncWhispering,
 } from '@repo/shared';
-import { Effect } from 'effect';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',
-	schema: settingsSchema.pipe(S.mutable),
+	schema: settingsSchema,
 	defaultValue: getDefaultSettings('app'),
 });
 
-type RegisterShortcutJob = Effect.Effect<void>;
+type RegisterShortcutJob = Promise<void>;
 
-const unregisterAllLocalShortcuts = Effect.try({
-	try: () => hotkeys.unbind(),
-	catch: (error) =>
-		new WhisperingError({
+const unregisterAllLocalShortcuts = () =>
+	trySyncWhispering({
+		try: () => hotkeys.unbind(),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
 			title: 'Error unregistering all shortcuts',
 			description: 'Please try again.',
 			action: { type: 'more-details', error },
 		}),
-});
+	});
 
-const unregisterAllGlobalShortcuts = Effect.tryPromise({
-	try: async () => {
-		if (!window.__TAURI_INTERNALS__) return;
-		const { unregisterAll } = await import(
-			'@tauri-apps/plugin-global-shortcut'
-		);
-		return await unregisterAll();
-	},
-	catch: (error) =>
-		new WhisperingError({
+const unregisterAllGlobalShortcuts = () =>
+	tryAsyncWhispering({
+		try: async () => {
+			if (!window.__TAURI_INTERNALS__) return;
+			const { unregisterAll } = await import(
+				'@tauri-apps/plugin-global-shortcut'
+			);
+			return await unregisterAll();
+		},
+		catch: (error) => ({
+			_tag: 'WhisperingError',
 			title: 'Error unregistering all shortcuts',
 			description: 'Please try again.',
 			action: { type: 'more-details', error },
 		}),
-});
+	});
 
-const registerLocalShortcut = ({
+function registerLocalShortcut({
 	shortcut,
 	callback,
 }: {
 	shortcut: string;
 	callback: () => void;
-}) =>
-	Effect.gen(function* () {
-		yield* unregisterAllLocalShortcuts;
-		yield* Effect.try({
-			try: () =>
-				hotkeys(shortcut, (event, handler) => {
-					// Prevent the default refresh event under WINDOWS system
-					event.preventDefault();
+}) {
+	const unregisterAllLocalShortcutsResult = unregisterAllLocalShortcuts();
+	if (!unregisterAllLocalShortcutsResult.ok)
+		return unregisterAllLocalShortcutsResult;
+	return trySyncWhispering({
+		try: () =>
+			hotkeys(shortcut, (event) => {
+				// Prevent the default refresh event under WINDOWS system
+				event.preventDefault();
+				callback();
+			}),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error registering local shortcut',
+			description: 'Please make sure it is a valid keyboard shortcut.',
+			action: { type: 'more-details', error },
+		}),
+	});
+}
+
+async function registerGlobalShortcut({
+	shortcut,
+	callback,
+}: {
+	shortcut: string;
+	callback: () => void;
+}) {
+	const unregisterAllGlobalShortcutsResult =
+		await unregisterAllGlobalShortcuts();
+	if (!unregisterAllGlobalShortcutsResult.ok)
+		return unregisterAllGlobalShortcutsResult;
+	return tryAsyncWhispering({
+		try: async () => {
+			if (!window.__TAURI_INTERNALS__) return;
+			const { register } = await import('@tauri-apps/plugin-global-shortcut');
+			return await register(shortcut, (event) => {
+				if (event.state === 'Pressed') {
 					callback();
-				}),
-			catch: (error) =>
-				new WhisperingError({
-					title: 'Error registering local shortcut',
-					description: 'Please make sure it is a valid keyboard shortcut.',
-					action: { type: 'more-details', error },
-				}),
-		});
+				}
+			});
+		},
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error registering global shortcut.',
+			description: 'Please make sure it is a valid Electron keyboard shortcut.',
+			action: { type: 'more-details', error },
+		}),
 	});
+}
 
-const registerGlobalShortcut = ({
-	shortcut,
-	callback,
-}: {
-	shortcut: string;
-	callback: () => void;
-}) =>
-	Effect.gen(function* () {
-		yield* unregisterAllGlobalShortcuts;
-		yield* Effect.tryPromise({
-			try: async () => {
-				if (!window.__TAURI_INTERNALS__) return;
-				const { register } = await import('@tauri-apps/plugin-global-shortcut');
-				return await register(shortcut, (event) => {
-					if (event.state === 'Pressed') {
-						callback();
-					}
-				});
-			},
-			catch: (error) =>
-				new WhisperingError({
-					title: 'Error registering global shortcut.',
-					description:
-						'Please make sure it is a valid Electron keyboard shortcut.',
-					action: { type: 'more-details', error },
-				}),
-		});
-	});
+export const registerShortcuts = createRegisterShortcuts();
 
-export const registerShortcuts = Effect.gen(function* () {
-	const jobQueue = yield* createJobQueue<RegisterShortcutJob>();
+function createRegisterShortcuts() {
+	const jobQueue = createJobQueue<RegisterShortcutJob>();
 
-	const initialSilentJob = Effect.gen(function* () {
-		yield* unregisterAllLocalShortcuts;
-		yield* unregisterAllGlobalShortcuts;
-		yield* registerLocalShortcut({
+	const initialSilentJob = async () => {
+		unregisterAllLocalShortcuts();
+		await unregisterAllGlobalShortcuts();
+		registerLocalShortcut({
 			shortcut: settings.value.currentLocalShortcut,
 			callback: recorder.toggleRecording,
 		});
-		yield* registerGlobalShortcut({
+		await registerGlobalShortcut({
 			shortcut: settings.value.currentGlobalShortcut,
 			callback: recorder.toggleRecording,
 		});
-	}).pipe(Effect.catchAll(renderErrorAsToast));
+	};
 
-	jobQueue.addJobToQueue(initialSilentJob).pipe(Effect.runPromise);
+	jobQueue.addJobToQueue(initialSilentJob());
 
 	return {
 		registerLocalShortcut: ({
@@ -125,38 +129,34 @@ export const registerShortcuts = Effect.gen(function* () {
 		}: {
 			shortcut: string;
 			callback: () => void;
-		}) =>
-			Effect.gen(function* () {
-				const job = Effect.gen(function* () {
-					yield* unregisterAllLocalShortcuts;
-					yield* registerLocalShortcut({ shortcut, callback });
-					yield* toast({
-						variant: 'success',
-						title: `Local shortcut set to ${shortcut}`,
-						description: 'Press the shortcut to start recording',
-					});
-				}).pipe(Effect.catchAll(renderErrorAsToast));
-				jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
-			}).pipe(Effect.runSync),
+		}) => {
+			const job = async () => {
+				unregisterAllLocalShortcuts();
+				registerLocalShortcut({ shortcut, callback });
+				toast.success({
+					title: `Local shortcut set to ${shortcut}`,
+					description: 'Press the shortcut to start recording',
+				});
+			};
+			jobQueue.addJobToQueue(job());
+		},
 		registerGlobalShortcut: ({
 			shortcut,
 			callback,
 		}: {
 			shortcut: string;
 			callback: () => void;
-		}) =>
-			Effect.gen(function* () {
+		}) => {
+			const job = async () => {
 				if (!window.__TAURI_INTERNALS__) return;
-				const job = Effect.gen(function* () {
-					yield* unregisterAllGlobalShortcuts;
-					yield* registerGlobalShortcut({ shortcut, callback });
-					yield* toast({
-						variant: 'success',
-						title: `Global shortcut set to ${shortcut}`,
-						description: 'Press the shortcut to start recording',
-					});
-				}).pipe(Effect.catchAll(renderErrorAsToast));
-				jobQueue.addJobToQueue(job).pipe(Effect.runPromise);
-			}).pipe(Effect.runSync),
+				unregisterAllGlobalShortcuts();
+				await registerGlobalShortcut({ shortcut, callback });
+				toast.success({
+					title: `Global shortcut set to ${shortcut}`,
+					description: 'Press the shortcut to start recording',
+				});
+			};
+			jobQueue.addJobToQueue(job());
+		},
 	};
-}).pipe(Effect.runSync);
+}

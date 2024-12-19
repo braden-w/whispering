@@ -1,4 +1,3 @@
-import GithubIcon from 'react:./components/icons/github.svg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,15 +9,14 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
-import { useStorage } from '@plasmohq/storage/hook';
+
+import GithubIcon from 'react:./components/icons/github.svg';
 import {
-	type RecorderState,
+	Ok,
 	WHISPERING_URL,
-	WhisperingError,
 	recorderStateToIcons,
-	resultToEffect,
+	tryAsyncWhispering,
 } from '@repo/shared';
-import { Effect } from 'effect';
 import {
 	ClipboardIcon,
 	ListIcon,
@@ -29,8 +27,10 @@ import {
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
-import { NotificationServiceContentLive } from '~lib/services/NotificationServiceContentLive';
-import { STORAGE_KEYS } from '~lib/services/extension-storage';
+import {
+	useWhisperingRecorderState,
+	useWhisperingTranscribedText,
+} from '~lib/storage/useWhisperingStorage';
 import './style.css';
 
 function IndexPopup() {
@@ -45,31 +45,29 @@ function IndexPopup() {
 	);
 }
 
-const toggleRecording = () =>
-	Effect.tryPromise({
+const toggleRecording = async () => {
+	const sendToToggleRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
 				ToggleRecording.ResponseBody
-			>({
-				name: 'whispering-web/toggleRecording',
-			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to toggle recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
-	}).pipe(
-		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
+			>({ name: 'whispering-web/toggleRecording' }),
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to toggle recording via background service worker',
+			description:
+				'There was likely an issue sending the message to the background service worker from the popup.',
+			action: { type: 'more-details', error },
+		}),
+	});
+	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
+	const toggleRecordingResult = sendToToggleRecordingResult.data;
+	if (!toggleRecordingResult.ok) return toggleRecordingResult;
+	return Ok(toggleRecordingResult.data);
+};
 
-const cancelRecording = () =>
-	Effect.tryPromise({
+const cancelRecording = async () => {
+	const sendToCancelRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
 				CancelRecording.RequestBody,
@@ -77,32 +75,27 @@ const cancelRecording = () =>
 			>({
 				name: 'whispering-web/cancelRecording',
 			}),
-		catch: (error) =>
-			new WhisperingError({
-				title: 'Unable to cancel recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
-	}).pipe(
-		Effect.flatMap(resultToEffect),
-		Effect.catchAll(renderErrorAsNotification),
-		Effect.provide(NotificationServiceContentLive),
-		Effect.runPromise,
-	);
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Unable to cancel recording via background service worker',
+			description:
+				'There was likely an issue sending the message to the background service worker from the popup.',
+			action: { type: 'more-details', error },
+		}),
+	});
+	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
+	const cancelRecordingResult = sendToCancelRecordingResult.data;
+	if (!cancelRecordingResult.ok) return cancelRecordingResult;
+	return Ok(cancelRecordingResult.data);
+};
 
 function IndexPage() {
-	const [recorderState] = useStorage<RecorderState>(
-		STORAGE_KEYS.RECORDER_STATE,
-		'IDLE',
-	);
-	const [latestRecordingTranscribedText] = useStorage<string>(
-		STORAGE_KEYS.LATEST_RECORDING_TRANSCRIBED_TEXT,
-	);
+	const recorderState = useWhisperingRecorderState();
+	const transcribedText = useWhisperingTranscribedText();
 
 	const recorderStateAsIcon = recorderStateToIcons[recorderState];
 	const copyToClipboardText = (() => {
-		if (latestRecordingTranscribedText) return latestRecordingTranscribedText;
+		if (transcribedText) return transcribedText;
 		if (recorderState === 'LOADING') return '...';
 		return '';
 	})();
@@ -122,7 +115,11 @@ function IndexPage() {
 				<div className="relative">
 					<Button
 						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-						onClick={toggleRecording}
+						onClick={async (e) => {
+							const toggleRecordingResult = await toggleRecording();
+							if (!toggleRecordingResult.ok)
+								renderErrorAsNotification(toggleRecordingResult);
+						}}
 						aria-label="Toggle recording"
 						variant="ghost"
 					>
@@ -135,7 +132,11 @@ function IndexPage() {
 					{recorderState === 'RECORDING' && (
 						<Button
 							className="-right-16 absolute bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
-							onClick={cancelRecording}
+							onClick={async () => {
+								const cancelRecordingResult = await cancelRecording();
+								if (!cancelRecordingResult.ok)
+									renderErrorAsNotification(cancelRecordingResult);
+							}}
 							aria-label="Cancel recording"
 							size="icon"
 							variant="ghost"

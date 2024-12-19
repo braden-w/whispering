@@ -2,45 +2,36 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	Result,
+	WhisperingResult,
 } from '@repo/shared';
-import {
-	NotificationService,
-	WhisperingError,
-	effectToResult,
-} from '@repo/shared';
-import { Effect } from 'effect';
-import { renderErrorAsNotification } from '~lib/errors';
+import { BubbleErr, Ok, WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifications/create'>;
 
-export type ResponseBody = Result<
+export type ResponseBody = WhisperingResult<
 	ExternalMessageReturnType<'whispering-extension/notifications/create'>
 >;
 
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) =>
-	Effect.gen(function* () {
+const handler: PlasmoMessaging.MessageHandler<
+	RequestBody,
+	ResponseBody
+> = async ({ body }, res) => {
+	const createNotification = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.notifyOptions) {
-			return yield* new WhisperingError({
+			return WhisperingErr({
 				title: 'Error invoking notify command',
 				description:
 					'ToastOptions must be provided in the request body of the message',
 				action: { type: 'none' },
 			});
 		}
-		const { notify } = yield* NotificationService;
-		return yield* notify(body.notifyOptions);
-	}).pipe(
-		Effect.tapError(renderErrorAsNotification),
-		Effect.provide(NotificationServiceBgswLive),
-		effectToResult,
-		Effect.map(res.send),
-		Effect.runPromise,
-	);
+		const { notify } = NotificationServiceBgswLive;
+		const notifyResult = await notify(body.notifyOptions);
+		return notifyResult;
+	};
+	res.send(await createNotification());
+};
 
 export default handler;

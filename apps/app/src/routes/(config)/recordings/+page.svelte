@@ -2,13 +2,13 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
-		ClipboardIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
-	} from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button/index.js';
+	} from 'lucide-svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -16,15 +16,13 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { MainLive } from '$lib/services';
 	import { ClipboardService } from '$lib/services/ClipboardService';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
-	import { renderErrorAsToast } from '$lib/services/renderErrorAsToast';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { Schema as S } from '@effect/schema';
 	import {
 		FlexRender,
 		createTable,
@@ -36,7 +34,7 @@
 		getFilteredRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { Effect } from 'effect';
+	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
@@ -149,21 +147,15 @@
 	let sorting = createPersistedState({
 		key: 'whispering-data-table-sorting',
 		defaultValue: [{ id: 'timestamp', desc: true }],
-		schema: S.Struct({ desc: S.Boolean, id: S.String }).pipe(
-			S.mutable,
-			S.Array,
-			S.mutable,
-		),
+		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = createPersistedState({
 		key: 'whispering-data-table-column-filters',
 		defaultValue: [],
-		schema: S.Struct({ id: S.String, value: S.Unknown }).pipe(
-			S.filter((data): data is ColumnFilter => data.value !== undefined),
-			S.mutable,
-			S.Array,
-			S.mutable,
-		),
+		schema: z
+			.object({ id: z.string(), value: z.unknown() })
+			.refine((data): data is ColumnFilter => data.value !== undefined)
+			.array(),
 	});
 	let columnVisibility = createPersistedState({
 		key: 'whispering-data-table-column-visibility',
@@ -173,12 +165,12 @@
 			subtitle: false,
 			timestamp: false,
 		},
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+		schema: z.record(z.string(), z.boolean()),
 	});
 	let rowSelection = createPersistedState({
 		key: 'whispering-data-table-row-selection',
 		defaultValue: {},
-		schema: S.Record({ key: S.String, value: S.Boolean }).pipe(S.mutable),
+		schema: z.record(z.string(), z.boolean()),
 	});
 
 	function createUpdater<T>(state: { value: T }) {
@@ -284,7 +276,7 @@
 		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
 			<form
 				class="flex w-full max-w-sm gap-2"
-				on:submit={(e) => {
+				onsubmit={(e) => {
 					e.preventDefault();
 					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
 				}}
@@ -299,18 +291,15 @@
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
-						tooltipText="Transcribe selected recordings"
+						tooltipContent="Transcribe selected recordings"
 						variant="outline"
 						size="icon"
 						onclick={() =>
-							Effect.all(
+							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordings
-										.transcribeRecording(recording.id)
-										.pipe(Effect.catchAll(renderErrorAsToast)),
+									recordings.transcribeRecording(recording.id),
 								),
-								{ concurrency: 'unbounded' },
-							).pipe(Effect.runPromise)}
+							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
 							const currentRow = recordings.value.find((r) => r.id === id);
@@ -333,7 +322,7 @@
 					>
 						<Dialog.Trigger>
 							<WhisperingButton
-								tooltipText="Copy transcribed text from selected recordings"
+								tooltipContent="Copy transcribed text from selected recordings"
 								variant="outline"
 								size="icon"
 							>
@@ -374,23 +363,21 @@
 							/>
 							<Dialog.Footer>
 								<WhisperingButton
-									tooltipText="Copy transcriptions"
-									onclick={() =>
-										Effect.gen(function* () {
-											const clipboardService = yield* ClipboardService;
-											yield* clipboardService.setClipboardText(text);
-											yield* toast({
-												variant: 'success',
-												title: 'Copied transcriptions to clipboard!',
-												description: text,
-												descriptionClass: 'line-clamp-2',
-											});
+									tooltipContent="Copy transcriptions"
+									onclick={async () => {
+										const setClipboardText =
+											await ClipboardService.setClipboardText(text);
+										if (!setClipboardText.ok) {
+											renderErrAsToast(setClipboardText);
 											isDialogOpen = false;
-										}).pipe(
-											Effect.catchAll(renderErrorAsToast),
-											Effect.provide(MainLive),
-											Effect.runPromise,
-										)}
+										}
+										toast.success({
+											title: 'Copied transcriptions to clipboard!',
+											description: text,
+											descriptionClass: 'line-clamp-2',
+										});
+										isDialogOpen = false;
+									}}
 									type="submit"
 								>
 									Copy Transcriptions
@@ -400,7 +387,7 @@
 					</Dialog.Root>
 
 					<WhisperingButton
-						tooltipText="Delete selected recordings"
+						tooltipContent="Delete selected recordings"
 						variant="outline"
 						size="icon"
 						onclick={() => {
@@ -423,16 +410,15 @@
 				</div>
 
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder>
-						<Button
-							variant="outline"
-							class="ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180"
-							builders={[builder]}
-						>
-							Columns <ChevronDownIcon
-								class="ml-2 h-4 w-4 transition-transform duration-200"
-							/>
-						</Button>
+					<DropdownMenu.Trigger
+						class={cn(
+							buttonVariants({ variant: 'outline' }),
+							'ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180',
+						)}
+					>
+						Columns <ChevronDownIcon
+							class="ml-2 h-4 w-4 transition-transform duration-200"
+						/>
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content>
 						{#each table
