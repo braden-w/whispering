@@ -115,11 +115,10 @@ export const createRecordings = () => {
 			{ toastId }: { toastId?: string } = {},
 		) {
 			const transcribingInProgressId = toastId ?? nanoid();
-			const t = nanoid();
 
 			const onTranscribeStart = () => {
 				toast.loading({
-					id: t,
+					id: transcribingInProgressId,
 					title: 'Transcribing recording...',
 					description: 'Your recording is being transcribed.',
 				});
@@ -178,7 +177,6 @@ export const createRecordings = () => {
 			};
 
 			const onPasteToCursorSuccess = () => {
-				toast.dismiss(t);
 				toast.success({
 					id: transcribingInProgressId,
 					title: 'Transcription completed and pasted to cursor!',
