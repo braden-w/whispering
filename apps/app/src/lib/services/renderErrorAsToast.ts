@@ -25,8 +25,8 @@ export const renderErrAsToast = <T, E extends WhisperingError>(
 				return undefined;
 		}
 	};
-	toast({
-		variant: isWarning ? 'warning' : 'error',
+	const variant = isWarning ? 'warning' : 'error';
+	toast[variant]({
 		id: options?.toastId,
 		title: title,
 		description: description,
