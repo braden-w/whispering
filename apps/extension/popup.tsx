@@ -42,7 +42,7 @@ function IndexPopup() {
 	);
 }
 
-const toggleRecording = async () => {
+async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
 	const sendToToggleRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
@@ -60,9 +60,9 @@ const toggleRecording = async () => {
 	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
 	const toggleRecordingResult = sendToToggleRecordingResult.data;
 	return toggleRecordingResult;
-};
+}
 
-const cancelRecording = async () => {
+async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
 	const sendToCancelRecordingResult = await tryAsyncWhispering({
 		try: () =>
 			sendToBackground<
@@ -82,7 +82,7 @@ const cancelRecording = async () => {
 	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
 	const cancelRecordingResult = sendToCancelRecordingResult.data;
 	return cancelRecordingResult;
-};
+}
 
 function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
