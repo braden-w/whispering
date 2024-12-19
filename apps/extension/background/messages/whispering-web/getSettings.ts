@@ -1,11 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	BubbleErr,
-	Ok,
-	type WhisperingResult,
-	type Settings,
 	getDefaultSettings,
+	Ok,
 	settingsSchema,
+	WhisperingErr,
+	type Settings,
+	type WhisperingResult,
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
@@ -19,6 +19,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
 	ResponseBody
 > = async (_req, res) => {
+	console.log('🚀 ~ >= ~ res:', res);
 	const getSettings = async () => {
 		const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
 		if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
