@@ -3,7 +3,8 @@
 	"version": "5.1.2",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev:web": "vite dev",
+		"dev": "pnpm tauri dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
