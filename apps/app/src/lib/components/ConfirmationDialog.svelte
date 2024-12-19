@@ -6,7 +6,6 @@
 		let title = $state('');
 		let subtitle = $state('');
 		let onConfirm = () => {};
-		let onCancel = () => {};
 		return {
 			get isOpen() {
 				return isOpen;
@@ -23,19 +22,10 @@
 			get onConfirm() {
 				return onConfirm;
 			},
-			get onCancel() {
-				return onCancel;
-			},
-			open(dialog: {
-				title: string;
-				subtitle: string;
-				onConfirm: () => void;
-				onCancel: () => void;
-			}) {
+			open(dialog: { title: string; subtitle: string; onConfirm: () => void }) {
 				title = dialog.title;
 				subtitle = dialog.subtitle;
 				onConfirm = dialog.onConfirm;
-				onCancel = dialog.onCancel;
 				isOpen = true;
 			},
 			close() {
@@ -61,10 +51,11 @@
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel
 				onclick={() => {
-					confirmationDialog.onCancel();
 					confirmationDialog.close();
-				}}>Cancel</AlertDialog.Cancel
+				}}
 			>
+				Cancel
+			</AlertDialog.Cancel>
 			<AlertDialog.Action
 				onclick={() => {
 					confirmationDialog.onConfirm();
