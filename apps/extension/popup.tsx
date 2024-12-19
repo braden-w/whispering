@@ -185,26 +185,24 @@ function IndexPage() {
 						</WhisperingButton>{' '}
 						to start recording.
 					</p>
-					{/* <p className="font-light text-muted-foreground text-sm">
+					<p className="font-light text-muted-foreground text-sm">
 						Check out the{' '}
 						<WhisperingButton
 							tooltipContent="Check out the desktop app"
-							asChild
 							variant="link"
 							size="inline"
 							title="Check out the desktop app"
 							aria-label="Check out the desktop app"
+							onClick={() => {
+								chrome.tabs.create({
+									url: 'https://github.com/braden-w/whispering/releases',
+								});
+							}}
 						>
-							<a
-								href="https://github.com/braden-w/whispering/releases"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								desktop app
-							</a>
+							desktop app
 						</WhisperingButton>{' '}
 						for more integrations!
-					</p> */}
+					</p>
 				</div>
 			</div>
 		</ThemeProvider>
