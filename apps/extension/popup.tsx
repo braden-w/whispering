@@ -16,6 +16,7 @@ import {
 	MoonIcon,
 	SlidersVerticalIcon,
 	SunIcon,
+	Loader2Icon,
 } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
@@ -89,10 +90,11 @@ function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
 
-	const recorderStateAsIcon = recorderStateToIcons[recorderState];
+	const recorderStateAsIcon = recorderState === 'RECORDING' ? '🔲' : '🎙️';
+
 	const copyToClipboardText = (() => {
-		if (transcribedText) return transcribedText;
 		if (recorderState === 'LOADING') return '...';
+		if (transcribedText) return transcribedText;
 		return '';
 	})();
 
@@ -100,7 +102,7 @@ function IndexPage() {
 		<ThemeProvider defaultTheme="system" storageKey="whispering-theme">
 			<div className="flex h-[28rem] w-96 flex-col items-center justify-center gap-4 text-center">
 				<div className="flex flex-col gap-4">
-					<h1 className="scroll-m=20 font-bold text-4xl tracking-tight lg:text-5xl">
+					<h1 className="scroll-m-20 font-bold text-4xl tracking-tight lg:text-5xl">
 						Start recording
 					</h1>
 					<p className="text-muted-foreground">
@@ -111,8 +113,8 @@ function IndexPage() {
 				<div className="relative">
 					<WhisperingButton
 						tooltipContent="Toggle recording"
-						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
-						onClick={async (e) => {
+						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
+						onClick={async () => {
 							const toggleRecordingResult = await toggleRecording();
 							if (!toggleRecordingResult.ok)
 								renderErrorAsNotification(toggleRecordingResult);
@@ -122,6 +124,7 @@ function IndexPage() {
 					>
 						<span
 							style={{ filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))' }}
+							className="text-[100px] leading-none"
 						>
 							{recorderStateAsIcon}
 						</span>
@@ -129,14 +132,13 @@ function IndexPage() {
 					{recorderState === 'RECORDING' && (
 						<WhisperingButton
 							tooltipContent="Cancel recording"
-							className="-right-16 absolute bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
+							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
 							onClick={async () => {
 								const cancelRecordingResult = await cancelRecording();
 								if (!cancelRecordingResult.ok)
 									renderErrorAsNotification(cancelRecordingResult);
 							}}
 							aria-label="Cancel recording"
-							size="icon"
 							variant="ghost"
 						>
 							🚫
@@ -147,10 +149,10 @@ function IndexPage() {
 					<Label htmlFor="transcribed-text" className="sr-only">
 						Transcribed Text
 					</Label>
-					<div className="flex items-center gap-2">
+					<div className="flex w-full max-w-80 items-center gap-2">
 						<Input
 							id="transcribed-text"
-							className="w-64"
+							className="w-full"
 							placeholder="Transcribed text will appear here..."
 							readOnly
 							value={copyToClipboardText}
@@ -162,11 +164,15 @@ function IndexPage() {
 								navigator.clipboard.writeText(copyToClipboardText);
 							}}
 						>
-							<ClipboardIcon className="h-6 w-6" />
+							{recorderState === 'LOADING' ? (
+								<Loader2Icon className="h-6 w-6 animate-spin" />
+							) : (
+								<ClipboardIcon className="h-6 w-6" />
+							)}
 						</WhisperingButton>
 					</div>
 				</div>
-				<div className="flex flex-col items-center justify-center gap-2">
+				<div className="flex flex-col items-center justify-center gap-3">
 					<NavItems />
 					<p className="text-foreground/75 text-sm leading-6">
 						Click the microphone or press your configured global{' '}
@@ -179,7 +185,7 @@ function IndexPage() {
 								chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 							}}
 						>
-							<kbd className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono font-semibold text-sm">
+							<kbd className="relative rounded bg-muted px-[0.3rem] py-[0.15rem] font-mono font-semibold text-sm">
 								shortcut
 							</kbd>
 						</WhisperingButton>{' '}
@@ -191,8 +197,6 @@ function IndexPage() {
 							tooltipContent="Check out the desktop app"
 							variant="link"
 							size="inline"
-							title="Check out the desktop app"
-							aria-label="Check out the desktop app"
 							onClick={() => {
 								chrome.tabs.create({
 									url: 'https://github.com/braden-w/whispering/releases',
