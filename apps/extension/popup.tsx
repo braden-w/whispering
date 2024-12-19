@@ -1,13 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
 
 import {
@@ -27,6 +20,7 @@ import {
 import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
+import { WhisperingButton } from '~components/WhisperingButton';
 import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
@@ -115,7 +109,8 @@ function IndexPage() {
 					</p>
 				</div>
 				<div className="relative">
-					<Button
+					<WhisperingButton
+						tooltipContent="Toggle recording"
 						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
 						onClick={async (e) => {
 							const toggleRecordingResult = await toggleRecording();
@@ -130,9 +125,10 @@ function IndexPage() {
 						>
 							{recorderStateAsIcon}
 						</span>
-					</Button>
+					</WhisperingButton>
 					{recorderState === 'RECORDING' && (
-						<Button
+						<WhisperingButton
+							tooltipContent="Cancel recording"
 							className="-right-16 absolute bottom-1.5 transform text-2xl hover:scale-110 focus:scale-110"
 							onClick={async () => {
 								const cancelRecordingResult = await cancelRecording();
@@ -144,7 +140,7 @@ function IndexPage() {
 							variant="ghost"
 						>
 							🚫
-						</Button>
+						</WhisperingButton>
 					)}
 				</div>
 				<div className="flex flex-col gap-2">
@@ -159,22 +155,23 @@ function IndexPage() {
 							readOnly
 							value={copyToClipboardText}
 						/>
-						<Button
+						<WhisperingButton
+							tooltipContent="Copy transcribed text"
 							className="px-4 py-2 dark:bg-secondary dark:text-secondary-foreground"
 							onClick={() => {
 								navigator.clipboard.writeText(copyToClipboardText);
 							}}
 						>
 							<ClipboardIcon className="h-6 w-6" />
-							<span className="sr-only">Copy transcribed text</span>
-						</Button>
+						</WhisperingButton>
 					</div>
 				</div>
 				<div className="flex flex-col items-center justify-center gap-2">
 					<NavItems />
 					<p className="text-foreground/75 text-sm leading-6">
 						Click the microphone or press your configured global{' '}
-						<Button
+						<WhisperingButton
+							tooltipContent="Keyboard Shortcuts"
 							aria-label="Keyboard Shortcuts"
 							variant="link"
 							className="px-0.5"
@@ -185,12 +182,13 @@ function IndexPage() {
 							<kbd className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono font-semibold text-sm">
 								shortcut
 							</kbd>
-						</Button>{' '}
+						</WhisperingButton>{' '}
 						to start recording.
 					</p>
-					<p className="font-light text-muted-foreground text-sm">
+					{/* <p className="font-light text-muted-foreground text-sm">
 						Check out the{' '}
-						<Button
+						<WhisperingButton
+							tooltipContent="Check out the desktop app"
 							asChild
 							variant="link"
 							size="inline"
@@ -204,9 +202,9 @@ function IndexPage() {
 							>
 								desktop app
 							</a>
-						</Button>{' '}
+						</WhisperingButton>{' '}
 						for more integrations!
-					</p>
+					</p> */}
 				</div>
 			</div>
 		</ThemeProvider>
@@ -218,110 +216,74 @@ function NavItems() {
 
 	return (
 		<nav className="flex items-center">
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							onClick={async () => {
-								const whisperingTabIdResult =
-									await getOrCreateWhisperingTabId();
-								if (!whisperingTabIdResult.ok)
-									return renderErrorAsNotification(whisperingTabIdResult);
-								const whisperingTabId = whisperingTabIdResult.data;
-								const tab = await chrome.tabs.get(whisperingTabId);
-								if (!tab.url)
-									return renderErrorAsNotification(
-										WhisperingErr({
-											title: 'Whispering tab has no URL',
-											description: 'The Whispering tab has no URL.',
-										}),
-									);
-								const url = new URL(tab.url);
+			<WhisperingButton
+				tooltipContent="Recordings"
+				onClick={async () => {
+					const whisperingTabIdResult = await getOrCreateWhisperingTabId();
+					if (!whisperingTabIdResult.ok)
+						return renderErrorAsNotification(whisperingTabIdResult);
+					const whisperingTabId = whisperingTabIdResult.data;
+					const tab = await chrome.tabs.get(whisperingTabId);
+					if (!tab.url)
+						return renderErrorAsNotification(
+							WhisperingErr({
+								title: 'Whispering tab has no URL',
+								description: 'The Whispering tab has no URL.',
+							}),
+						);
+					const url = new URL(tab.url);
 
-								if (url.pathname === WHISPERING_RECORDINGS_PATHNAME) {
-									return await chrome.tabs.update(whisperingTabId, {
-										active: true,
-									});
-								}
-								url.pathname = WHISPERING_RECORDINGS_PATHNAME;
-								await chrome.tabs.update(whisperingTabId, {
-									url: url.toString(),
-									active: true,
-								});
-							}}
-							variant="ghost"
-							size="icon"
-						>
-							<ListIcon className="h-4 w-4" aria-hidden="true" />
-							<span className="sr-only">Recordings</span>
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>Recordings</p>
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							onClick={() => chrome.runtime.openOptionsPage()}
-							variant="ghost"
-							size="icon"
-						>
-							<SlidersVerticalIcon className="h-4 w-4" aria-hidden="true" />
-							<span className="sr-only">Settings</span>
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>Settings</p>
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							onClick={() => {
-								chrome.tabs.create({
-									url: 'https://github.com/braden-w/whispering',
-								});
-							}}
-							variant="ghost"
-							size="icon"
-						>
-							<GithubIcon
-								className="h-4 w-4 fill-current text-foreground"
-								aria-hidden="true"
-							/>
-							<span className="sr-only">View project on GitHub</span>
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>View project on GitHub</p>
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							onClick={() => {
-								setTheme(theme === 'dark' ? 'light' : 'dark');
-							}}
-							variant="ghost"
-							size="icon"
-						>
-							<SunIcon className="dark:-rotate-90 h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-0" />
-							<MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-							<span className="sr-only">Toggle dark mode</span>
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>Toggle dark mode</p>
-					</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
+					if (url.pathname === WHISPERING_RECORDINGS_PATHNAME) {
+						return await chrome.tabs.update(whisperingTabId, {
+							active: true,
+						});
+					}
+					url.pathname = WHISPERING_RECORDINGS_PATHNAME;
+					await chrome.tabs.update(whisperingTabId, {
+						url: url.toString(),
+						active: true,
+					});
+				}}
+				variant="ghost"
+				size="icon"
+			>
+				<ListIcon className="h-4 w-4" aria-hidden="true" />
+			</WhisperingButton>
+
+			<WhisperingButton
+				tooltipContent="Settings"
+				onClick={() => chrome.runtime.openOptionsPage()}
+				variant="ghost"
+				size="icon"
+			>
+				<SlidersVerticalIcon className="h-4 w-4" aria-hidden="true" />
+			</WhisperingButton>
+
+			<WhisperingButton
+				tooltipContent="View project on GitHub"
+				onClick={() => {
+					chrome.tabs.create({ url: 'https://github.com/braden-w/whispering' });
+				}}
+				variant="ghost"
+				size="icon"
+			>
+				<GithubIcon
+					className="h-4 w-4 fill-current text-foreground"
+					aria-hidden="true"
+				/>
+			</WhisperingButton>
+			<WhisperingButton
+				className="relative"
+				tooltipContent="Toggle dark mode"
+				onClick={() => {
+					setTheme(theme === 'dark' ? 'light' : 'dark');
+				}}
+				variant="ghost"
+				size="icon"
+			>
+				<SunIcon className="dark:-rotate-90 h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:scale-0" />
+				<MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+			</WhisperingButton>
 		</nav>
 	);
 }
