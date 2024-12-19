@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	RecorderState,
+	WhisperingRecordingState,
 	WhisperingResult,
 } from '@repo/shared';
 import { Ok, WhisperingErr, tryAsyncWhispering } from '@repo/shared';
@@ -15,7 +15,7 @@ const iconPaths = {
 	IDLE: studioMicrophone,
 	RECORDING: redLargeSquare,
 	LOADING: arrowsCounterclockwise,
-} as const satisfies Record<RecorderState, string>;
+} as const satisfies Record<WhisperingRecordingState, string>;
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setTrayIcon'>;

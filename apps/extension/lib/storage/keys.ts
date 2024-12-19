@@ -18,10 +18,10 @@
  * ```
  */
 
-import type { RecorderState, Settings } from '@repo/shared';
+import type { WhisperingRecordingState, Settings } from '@repo/shared';
 
 export type WhisperingStorageKeyMap = {
-	'whispering-recorder-state': RecorderState;
+	'whispering-recorder-state': WhisperingRecordingState;
 	'whispering-latest-recording-transcribed-text': string;
 	'whispering-settings': Settings;
 };
