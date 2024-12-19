@@ -2,7 +2,7 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { mediaStreamManager } from '$lib/services/MediaStreamService.svelte';
+	import { mediaStream } from '$lib/services/MediaStreamService.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 
@@ -20,13 +20,13 @@
 	>
 		🚫
 	</WhisperingButton>
-{:else if mediaStreamManager.isStreamValid}
+{:else if mediaStream.isStreamValid}
 	<Tooltip.Provider>
 		<Tooltip.Root>
 			<Tooltip.Trigger>
 				{#snippet child()}
 					<Button
-						onclick={mediaStreamManager.destroy}
+						onclick={mediaStream.destroy}
 						variant="ghost"
 						size="icon"
 						class={className}

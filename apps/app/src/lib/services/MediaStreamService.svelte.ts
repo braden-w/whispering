@@ -16,7 +16,7 @@ type MediaStreamManager = {
 	destroy(): void;
 };
 
-export const mediaStreamManager = createMediaStreamManager();
+export const mediaStream = createMediaStreamManager();
 
 function createMediaStreamManager(): MediaStreamManager {
 	let currentStream: MediaStream | null = null;
@@ -166,7 +166,7 @@ const getFirstAvailableStream = async (): Promise<
 		const maybeStream = await getStreamForDeviceId(device.deviceId);
 		if (maybeStream) {
 			settings.value.selectedAudioInputDeviceId = device.deviceId;
-			mediaStreamManager.refreshStream();
+			mediaStream.refreshStream();
 			return Ok(maybeStream);
 		}
 	}

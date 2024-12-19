@@ -2,7 +2,7 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import {
 		enumerateRecordingDevices,
-		mediaStreamManager,
+		mediaStream,
 	} from '$lib/services/MediaStreamService.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -59,7 +59,7 @@
 						...settings.value,
 						selectedAudioInputDeviceId: selected,
 					};
-					await mediaStreamManager.refreshStream();
+					await mediaStream.refreshStream();
 				}}
 				placeholder="Select a device"
 			/>
