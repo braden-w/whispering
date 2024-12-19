@@ -94,7 +94,8 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 						async (id, buttonIndex) => {
 							if (buttonIndex === 0) {
 								chrome.notifications.clear(id);
-								const gotoTargetUrlInWhisperingTabResult = await gotoTargetUrlInWhisperingTab();
+								const gotoTargetUrlInWhisperingTabResult =
+									await gotoTargetUrlInWhisperingTab();
 								if (!gotoTargetUrlInWhisperingTabResult.ok)
 									return renderErrorAsNotification(
 										gotoTargetUrlInWhisperingTabResult,

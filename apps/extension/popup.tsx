@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/tooltip';
 import { sendToBackground } from '@plasmohq/messaging';
 
-import GithubIcon from 'react:./components/icons/github.svg';
 import {
 	Ok,
-	WHISPERING_URL,
+	WHISPERING_RECORDINGS_PATHNAME,
+	WhisperingErr,
 	recorderStateToIcons,
 	tryAsyncWhispering,
 } from '@repo/shared';
@@ -24,9 +24,11 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
+import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
 	useWhisperingTranscribedText,
@@ -220,8 +222,32 @@ function NavItems() {
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
-							onClick={() => {
-								chrome.tabs.create({ url: `${WHISPERING_URL}/recordings` });
+							onClick={async () => {
+								const whisperingTabIdResult =
+									await getOrCreateWhisperingTabId();
+								if (!whisperingTabIdResult.ok)
+									return renderErrorAsNotification(whisperingTabIdResult);
+								const whisperingTabId = whisperingTabIdResult.data;
+								const tab = await chrome.tabs.get(whisperingTabId);
+								if (!tab.url)
+									return renderErrorAsNotification(
+										WhisperingErr({
+											title: 'Whispering tab has no URL',
+											description: 'The Whispering tab has no URL.',
+										}),
+									);
+								const url = new URL(tab.url);
+
+								if (url.pathname === WHISPERING_RECORDINGS_PATHNAME) {
+									return await chrome.tabs.update(whisperingTabId, {
+										active: true,
+									});
+								}
+								url.pathname = WHISPERING_RECORDINGS_PATHNAME;
+								await chrome.tabs.update(whisperingTabId, {
+									url: url.toString(),
+									active: true,
+								});
 							}}
 							variant="ghost"
 							size="icon"
