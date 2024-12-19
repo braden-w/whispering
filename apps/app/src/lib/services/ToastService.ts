@@ -11,7 +11,7 @@ export const toast = createToastService();
 function createToastService() {
 	const createToastFn =
 		(variant: ToastVariant) =>
-		({ id: maybeId, title, ...options }: ToastOptions) => {
+		({ title, ...options }: ToastOptions) => {
 			const getDurationInMs = () => {
 				if (variant === 'loading') return Number.POSITIVE_INFINITY;
 				if (variant === 'error' || variant === 'warning') return 5000;
@@ -33,5 +33,6 @@ function createToastService() {
 		loading: createToastFn('loading'),
 		error: createToastFn('error'),
 		warning: createToastFn('warning'),
+		dismiss: sonnerToast.dismiss,
 	};
 }
