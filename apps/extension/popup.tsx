@@ -116,12 +116,7 @@ function IndexPage() {
 					<Button
 						className="transform px-4 py-16 text-8xl hover:scale-110 focus:scale-110"
 						onClick={async (e) => {
-							console.log('🚀 ~ onClick={ ~ e:', e);
 							const toggleRecordingResult = await toggleRecording();
-							console.log(
-								'🚀 ~ onClick={ ~ toggleRecordingResult:',
-								toggleRecordingResult,
-							);
 							if (!toggleRecordingResult.ok)
 								renderErrorAsNotification(toggleRecordingResult);
 						}}
