@@ -34,7 +34,7 @@
 			<Button
 				variant="link"
 				size="inline"
-				onclick={() => (fasterRerecordExplainedDialog.isOpen = true)}
+				onclick={() => fasterRerecordExplainedDialog.open()}
 			>
 				(What's that?)
 			</Button>
