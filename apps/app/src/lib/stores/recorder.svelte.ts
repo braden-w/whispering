@@ -18,11 +18,8 @@ import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 
 const startSound = new Audio(startSoundSrc);
-console.log('🚀 ~ startSound:', startSound);
 const stopSound = new Audio(stopSoundSrc);
-console.log('🚀 ~ stopSound:', stopSound);
 const cancelSound = new Audio(cancelSoundSrc);
-console.log('🚀 ~ cancelSound:', cancelSound);
 
 export const recorderState = (() => {
 	let value = $state<WhisperingRecordingState>('IDLE');
