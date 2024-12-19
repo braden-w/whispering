@@ -16,6 +16,7 @@ import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { toast } from '$lib/services/ToastService';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -71,8 +72,21 @@ function createRecorder() {
 						blob: audioBlob,
 						transcriptionStatus: 'UNPROCESSED',
 					};
-					await recordings.addRecording(newRecording);
-					await recordings.transcribeRecording(newRecording.id);
+
+					const addRecordingAndTranscribeResultToastId = nanoid();
+
+					void recordings.addRecording(newRecording, {
+						onSuccess: () => {
+							toast.loading({
+								id: addRecordingAndTranscribeResultToastId,
+								title: 'Recording added!',
+								description: 'Your recording has been added successfully.',
+							});
+							recordings.transcribeRecording(newRecording.id, {
+								toastId: addRecordingAndTranscribeResultToastId,
+							});
+						},
+					});
 
 					if (settings.value.alwaysOnTop === 'When Recording')
 						await setAlwaysOnTop(false);

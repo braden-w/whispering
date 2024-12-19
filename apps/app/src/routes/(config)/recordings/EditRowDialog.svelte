@@ -7,6 +7,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { toast } from '$lib/services/ToastService';
 	import { recordings } from '$lib/stores/recordings.svelte';
 
 	let { recording }: { recording: Recording } = $props();

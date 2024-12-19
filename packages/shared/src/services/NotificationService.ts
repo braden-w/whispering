@@ -32,14 +32,11 @@ export const notificationOptionsSchema = baseNotificationOptionsSchema.extend({
 	action: actionSchema.optional(),
 });
 
+/** Unified type for toasts and notifications */
 export type NotificationOptions = z.infer<typeof notificationOptionsSchema>;
 
 export type NotificationService = {
-	notify: (
-		options: z.infer<typeof notificationOptionsSchema> & {
-			action: z.infer<typeof linkActionSchema>;
-		},
-	) => Promise<WhisperingResult<string>>;
+	notify: (options: NotificationOptions) => Promise<WhisperingResult<string>>;
 	clear: (
 		id: string,
 	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;

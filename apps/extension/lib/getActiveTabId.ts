@@ -1,8 +1,4 @@
-import {
-	type BubbleError,
-	type WhisperingResult,
-	tryAsyncBubble,
-} from '@repo/shared';
+import { tryAsyncBubble } from '@repo/shared';
 
 export const getActiveTabId = () =>
 	tryAsyncBubble({

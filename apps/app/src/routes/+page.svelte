@@ -2,11 +2,10 @@
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardIcon } from '$lib/components/icons';
+	import { ClipboardIcon, Loader2Icon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { mediaStream } from '$lib/services/MediaStreamService.svelte';
-	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
@@ -22,7 +21,7 @@
 	} as const;
 
 	const latestRecording = $derived(
-		recordings.value[recordings.value.length - 1] ?? PLACEHOLDER_RECORDING,
+		recordings.value.at(-1) ?? PLACEHOLDER_RECORDING,
 	);
 
 	const maybeLatestAudioSrc = $derived(
@@ -30,9 +29,6 @@
 			? URL.createObjectURL(latestRecording.blob)
 			: undefined,
 	);
-
-	const copyRecordingTextFromLatestRecording = () =>
-		recordings.copyRecordingText(latestRecording);
 </script>
 
 <svelte:head>
@@ -90,14 +86,18 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={copyRecordingTextFromLatestRecording}
+				onclick={() => recordings.copyRecordingText(latestRecording)}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
 			>
-				<ClipboardIcon class="h-6 w-6" />
+				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+					<Loader2Icon class="h-6 w-6 animate-spin" />
+				{:else}
+					<ClipboardIcon class="h-6 w-6" />
+				{/if}
 			</WhisperingButton>
 		</div>
 		{#if maybeLatestAudioSrc}
