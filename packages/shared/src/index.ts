@@ -32,7 +32,12 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 export const DEFAULT_BITRATE_KBPS =
 	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
-const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
+const ALWAYS_ON_TOP_VALUES = [
+	'Always',
+	'Never',
+	'When Recording',
+	'When Recording and Transcribing',
+] as const;
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
 	label: option,
 	value: option,
