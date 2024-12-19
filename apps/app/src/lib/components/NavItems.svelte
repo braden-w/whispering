@@ -1,15 +1,15 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { GithubIcon } from '$lib/components/icons';
+	import { cn } from '$lib/utils';
+	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
 	import {
-		GithubIcon,
 		ListIcon,
 		Minimize2Icon,
 		MoonIcon,
 		SlidersVerticalIcon,
 		SunIcon,
-	} from '$lib/components/icons';
-	import { cn } from '$lib/utils';
-	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
+	} from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
 
 	let { class: className }: { class?: string } = $props();

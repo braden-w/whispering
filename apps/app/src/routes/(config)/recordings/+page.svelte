@@ -2,12 +2,12 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		ChevronDownIcon,
-		ClipboardIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		TrashIcon,
-	} from '$lib/components/icons';
+	} from 'lucide-svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
