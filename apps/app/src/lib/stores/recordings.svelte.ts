@@ -101,17 +101,15 @@ export const createRecordings = () => {
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
+			if (recorderState.value !== 'RECORDING') recorderState.value = 'LOADING';
+
 			const transcribingInProgressId = nanoid();
 			toast.loading({
 				id: transcribingInProgressId,
 				title: 'Transcribing recording...',
 				description: 'Your recording is being transcribed.',
 			});
-			if (recorderState.value !== 'RECORDING') {
-				recorderState.value = 'LOADING';
-			}
 			const isVisible = !document.hidden;
-
 			if (!isVisible) {
 				notify({
 					id: transcribingInProgressId,
@@ -125,77 +123,79 @@ export const createRecordings = () => {
 				});
 			}
 
-			const transcribedTextResult: WhisperingResult<string> =
-				await (async () => {
-					const getRecordingResult = await RecordingsDbService.getRecording(id);
-					if (!getRecordingResult.ok) return getRecordingResult;
-					const maybeRecording = getRecordingResult.data;
-					if (maybeRecording === null) {
-						return WhisperingErr({
-							title: `Recording with id ${id} not found`,
-							description: 'Please try again.',
-							action: { type: 'none' },
-						});
-					}
-					const recording = maybeRecording;
-					const updateRecordingTranscribingResult = await updateRecording({
-						...recording,
-						transcriptionStatus: 'TRANSCRIBING',
+			const tryTranscribeRecording = async () => {
+				const getRecordingResult = await RecordingsDbService.getRecording(id);
+				if (!getRecordingResult.ok) return getRecordingResult;
+				const maybeRecording = getRecordingResult.data;
+				if (maybeRecording === null) {
+					return WhisperingErr({
+						title: `Recording with id ${id} not found`,
+						description: 'Please try again.',
+						action: { type: 'none' },
 					});
-					if (!updateRecordingTranscribingResult.ok)
-						return updateRecordingTranscribingResult;
-					const transcribeResult =
-						await selectedTranscriptionService.transcribe(recording.blob);
-					if (!transcribeResult.ok) {
-						const updateRecordingResult = await updateRecording({
-							...recording,
-							transcriptionStatus: 'UNPROCESSED',
-						});
-						if (!updateRecordingResult.ok) return updateRecordingResult;
-						return transcribeResult;
-					}
-					const transcribedText = transcribeResult.data;
+				}
+				const recording = maybeRecording;
 
+				const updateRecordingTranscribingResult = await updateRecording({
+					...recording,
+					transcriptionStatus: 'TRANSCRIBING',
+				});
+				if (!updateRecordingTranscribingResult.ok) {
+					return updateRecordingTranscribingResult;
+				}
+
+				const transcribeResult = await selectedTranscriptionService.transcribe(
+					recording.blob,
+				);
+				if (!transcribeResult.ok) {
 					const updateRecordingResult = await updateRecording({
 						...recording,
-						transcribedText,
-						transcriptionStatus: 'DONE',
+						transcriptionStatus: 'UNPROCESSED',
 					});
 					if (!updateRecordingResult.ok) return updateRecordingResult;
+					return transcribeResult;
+				}
+				const transcribedText = transcribeResult.data;
 
-					if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
+				const updateRecordingResult = await updateRecording({
+					...recording,
+					transcribedText,
+					transcriptionStatus: 'DONE',
+				});
+				if (!updateRecordingResult.ok) return updateRecordingResult;
+				return Ok(transcribedText);
+			};
 
-					toast.success({
-						id: transcribingInProgressId,
-						title: 'Transcription complete!',
-						description: 'Check it out in your recordings',
-						action: {
-							label: 'Go to recordings',
-							onClick: () => goto('/recordings'),
-						},
-					});
+			const transcribeRecordingResult = await tryTranscribeRecording();
+			if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
 
-					clearNotification(transcribingInProgressId);
+			toast.dismiss(transcribingInProgressId);
+			clearNotification(transcribingInProgressId);
 
-					notify({
-						id: nanoid(),
-						title: 'Transcription complete!',
-						description: 'Click to check it out in your recordings',
-						action: {
-							type: 'link',
-							label: 'Go to recordings',
-							goto: '/recordings',
-						},
-					});
-
-					return Ok(transcribedText);
-				})();
-
-			if (!transcribedTextResult.ok) {
-				sonnerToast.dismiss(transcribingInProgressId);
-				return renderErrAsToast(transcribedTextResult);
+			if (!transcribeRecordingResult.ok) {
+				return renderErrAsToast(transcribeRecordingResult);
 			}
-			const transcribedText = transcribedTextResult.data;
+
+			toast.success({
+				title: 'Transcription complete!',
+				description: 'Check it out in your recordings',
+				action: {
+					label: 'Go to recordings',
+					onClick: () => goto('/recordings'),
+				},
+			});
+			notify({
+				id: nanoid(),
+				title: 'Transcription complete!',
+				description: 'Click to check it out in your recordings',
+				action: {
+					type: 'link',
+					label: 'Go to recordings',
+					goto: '/recordings',
+				},
+			});
+
+			const transcribedText = transcribeRecordingResult.data;
 
 			if (transcribedText === '') return;
 
