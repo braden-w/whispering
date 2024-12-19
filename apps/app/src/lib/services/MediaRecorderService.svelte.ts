@@ -1,4 +1,4 @@
-import { mediaStreamManager } from '$lib/services/MediaStreamService.svelte';
+import { mediaStream } from '$lib/services/MediaStreamService.svelte';
 import { toast } from '$lib/services/ToastService';
 import { settings } from '$lib/stores/settings.svelte';
 import {
@@ -57,7 +57,7 @@ export function createMediaRecorder(): MediaRecorderService {
 		recordedChunks.length = 0;
 		setMediaRecorder(null);
 		if (!settings.value.isFasterRerecordEnabled) {
-			mediaStreamManager.destroy();
+			mediaStream.destroy();
 		}
 	};
 
@@ -80,15 +80,14 @@ export function createMediaRecorder(): MediaRecorderService {
 			const toastId = nanoid();
 
 			const getNewStream = async () => {
-				const newStreamResult = await mediaStreamManager.refreshStream();
+				const newStreamResult = await mediaStream.refreshStream();
 				if (!newStreamResult.ok) return newStreamResult;
 				const newStream = newStreamResult.data;
 				return Ok(newStream);
 			};
 
 			const getReusedStream = async () => {
-				const existingStreamResult =
-					await mediaStreamManager.getExistingStream();
+				const existingStreamResult = await mediaStream.getExistingStream();
 				if (!existingStreamResult.ok) return existingStreamResult;
 				const existingStream = existingStreamResult.data;
 				if (!existingStream) {
@@ -211,7 +210,7 @@ export function createMediaRecorder(): MediaRecorderService {
 					}),
 				});
 			if (!settings.value.isFasterRerecordEnabled) {
-				mediaStreamManager.destroy();
+				mediaStream.destroy();
 			}
 			return cancelResult;
 		},
