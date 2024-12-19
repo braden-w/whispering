@@ -8,6 +8,9 @@
 			set isOpen(v) {
 				isOpen = v;
 			},
+			open() {
+				isOpen = true;
+			},
 		};
 	})();
 </script>
