@@ -10,8 +10,6 @@ use accessibility::{is_macos_accessibility_enabled, open_apple_accessibility};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
@@ -20,6 +18,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_window_state::Builder::default().build());
 
