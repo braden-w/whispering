@@ -58,6 +58,9 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	defaultValue,
 	disableLocalStorage = false,
 	resolveParseErrorStrategy = attemptMergeStrategy,
+	onUpdateSuccess,
+	onUpdateError,
+	onUpdateSettled,
 }: {
 	/** The key used to store the value in local storage. */
 	key: string;
@@ -103,8 +106,34 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		/** The error that occurred when parsing the value from storage. */
 		error: z.ZodError;
 	}) => z.infer<TSchema>;
+	/**
+	 * Handler for when the value from storage is successfully updated.
+	 * @default `() => {}`
+	 */
+	onUpdateSuccess?: () => void;
+	/**
+	 * Handler for when the value from storage fails to update.
+	 * @default `() => {}`
+	 */
+	onUpdateError?: (error: unknown) => void;
+	/**
+	 * Handler for when the value from storage update is settled.
+	 * @default `() => {}`
+	 */
+	onUpdateSettled?: () => void;
 }) {
 	let value = $state(defaultValue);
+
+	const setValueInLocalStorage = (newValue: z.infer<TSchema>) => {
+		try {
+			localStorage.setItem(key, JSON.stringify(newValue));
+			onUpdateSuccess?.();
+		} catch (error) {
+			onUpdateError?.(error);
+		} finally {
+			onUpdateSettled?.();
+		}
+	};
 
 	const parseValueFromStorage = (
 		valueFromStorageUnparsed: string | null,
@@ -129,7 +158,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 			error: valueFromStorageResult.error,
 		});
 
-		localStorage.setItem(key, JSON.stringify(resolvedValue));
+		setValueInLocalStorage(resolvedValue);
 		return resolvedValue;
 	};
 
@@ -150,8 +179,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 		},
 		set value(newValue: z.infer<TSchema>) {
 			value = newValue;
-			if (!disableLocalStorage)
-				localStorage.setItem(key, JSON.stringify(newValue));
+			if (!disableLocalStorage) setValueInLocalStorage(newValue);
 		},
 	};
 }
