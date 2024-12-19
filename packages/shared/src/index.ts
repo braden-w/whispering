@@ -6,6 +6,7 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
 export { Err, Ok } from '@epicenterhq/result';
+import type { NotificationOptions } from './services/NotificationService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -85,21 +86,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 
 export type WhisperingError = {
 	_tag: 'WhisperingError';
-	title: string;
-	description: string;
-	action:
-		| {
-				type: 'link';
-				label: string;
-				goto: string;
-		  }
-		| {
-				type: 'more-details';
-				error: unknown;
-		  }
-		| { type: 'none' };
 	isWarning?: boolean;
-};
+} & NotificationOptions;
 
 export type BubbleError<T extends string = string> = {
 	_tag: T;
