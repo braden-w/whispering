@@ -1,4 +1,4 @@
-import { mediaStream } from '$lib/services/MediaStreamService.svelte';
+import { mediaStream } from '$lib/services/mediaStream.svelte';
 import { toast } from '$lib/services/ToastService';
 import { settings } from '$lib/stores/settings.svelte';
 import {

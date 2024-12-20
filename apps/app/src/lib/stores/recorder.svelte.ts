@@ -1,5 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { mediaRecorder } from '$lib/services/MediaRecorderService.svelte';
+import { mediaRecorder } from '$lib/services/mediaRecorder.svelte';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';

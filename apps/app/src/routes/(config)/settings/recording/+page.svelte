@@ -3,10 +3,10 @@
 	import {
 		enumerateRecordingDevices,
 		mediaStream,
-	} from '$lib/services/MediaStreamService.svelte';
+	} from '$lib/services/mediaStream.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, BITRATE_VALUES_KBPS } from '@repo/shared';
+	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 
 	const getMediaDevices = async () => {
