@@ -1,10 +1,6 @@
-import {
-	BubbleErr,
-	type WhisperingResult,
-	tryAsyncWhispering,
-} from '@repo/shared';
+import { WhisperingErr, type WhisperingResult, tryAsyncWhispering } from '@repo/shared';
 
-export const injectScript = async <T, Args extends unknown[]>({
+export async function injectScript<T, Args extends unknown[]>({
 	tabId,
 	commandName,
 	func,
@@ -14,7 +10,7 @@ export const injectScript = async <T, Args extends unknown[]>({
 	commandName: string;
 	func: (...args: Args) => WhisperingResult<T>;
 	args: Args;
-}): Promise<WhisperingResult<T>> => {
+}): Promise<WhisperingResult<T>> {
 	const injectionResult = await tryAsyncWhispering({
 		try: () =>
 			chrome.scripting.executeScript<Args, WhisperingResult<T>>({
@@ -46,4 +42,4 @@ export const injectScript = async <T, Args extends unknown[]>({
 	}
 	const { result } = executeScriptResult;
 	return result;
-};
+}
