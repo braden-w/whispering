@@ -13,6 +13,7 @@
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import EditRowDialog from './EditRowDialog.svelte';
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 
 	let { recording }: { recording: Recording } = $props();
 </script>
@@ -37,7 +38,17 @@
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
-		onclick={() => recordings.copyRecordingText(recording)}
+		onclick={() =>
+			recordings.copyRecordingText(recording, {
+				onSuccess: (transcribedText) => {
+					toast.success({
+						title: 'Copied transcription to clipboard!',
+						description: transcribedText,
+						descriptionClass: 'line-clamp-2',
+					});
+				},
+				onError: renderErrAsToast,
+			})}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({
@@ -50,7 +61,16 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() => recordings.downloadRecording(recording.id)}
+		onclick={() =>
+			recordings.downloadRecording(recording.id, {
+				onSuccess: () => {
+					toast.success({
+						title: 'Recording downloaded!',
+						description: 'Your recording has been downloaded successfully.',
+					});
+				},
+				onError: renderErrAsToast,
+			})}
 		variant="ghost"
 		size="icon"
 	>
@@ -63,7 +83,16 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => recordings.deleteRecordingById(recording.id),
+				onConfirm: () =>
+					recordings.deleteRecordingById(recording.id, {
+						onSuccess: () => {
+							toast.success({
+								title: 'Deleted recording!',
+								description: 'Your recording has been deleted successfully.',
+							});
+						},
+						onError: renderErrAsToast,
+					}),
 			});
 		}}
 		variant="ghost"

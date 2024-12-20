@@ -57,14 +57,22 @@ function createMediaRecorder() {
 			return recordingState;
 		},
 
-		async startRecording(): Promise<WhisperingResult<undefined>> {
+		async startRecording({
+			onSuccess,
+			onError,
+		}: {
+			onSuccess: () => void;
+			onError: (err: WhisperingErr) => void;
+		}) {
 			if (mediaRecorder) {
-				return WhisperingErr({
-					title: 'Unexpected media recorder already exists',
-					description:
-						'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
-					action: { type: 'none' },
-				});
+				onError(
+					WhisperingErr({
+						title: 'Unexpected media recorder already exists',
+						description:
+							'It seems like it was not properly deinitialized after the previous stopRecording or cancelRecording call.',
+						action: { type: 'none' },
+					}),
+				);
 			}
 			const toastId = nanoid();
 
@@ -94,7 +102,10 @@ function createMediaRecorder() {
 			const newStreamResult = settings.value.isFasterRerecordEnabled
 				? await getReusedStream()
 				: await getNewStream();
-			if (!newStreamResult.ok) return newStreamResult;
+			if (!newStreamResult.ok) {
+				onError(newStreamResult);
+				return;
+			}
 			const newStream = newStreamResult.data;
 
 			const newMediaRecorderResult: WhisperingResult<MediaRecorder> =
@@ -130,14 +141,23 @@ function createMediaRecorder() {
 					}),
 				});
 
-			if (!newMediaRecorderResult.ok) return newMediaRecorderResult;
+			if (!newMediaRecorderResult.ok) {
+				onError(newMediaRecorderResult);
+				return;
+			}
 
 			const newMediaRecorder = newMediaRecorderResult.data;
 			newMediaRecorder.start(TIMESLICE_MS);
 			setMediaRecorder(newMediaRecorder);
-			return Ok(undefined);
+			onSuccess();
 		},
-		async stopRecording(): Promise<WhisperingResult<Blob>> {
+		async stopRecording({
+			onSuccess,
+			onError,
+		}: {
+			onSuccess: (audioBlob: Blob) => void;
+			onError: (err: WhisperingErr) => void;
+		}) {
 			const stopResult: WhisperingResult<Blob> = await tryAsyncWhispering({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
@@ -169,11 +189,25 @@ function createMediaRecorder() {
 					},
 				}),
 			});
+			if (!stopResult.ok) {
+				onError(stopResult);
+				return;
+			}
+			const blob = stopResult.data;
+			onSuccess(blob);
 			resetRecorder();
-			return stopResult;
 		},
-		async cancelRecording(): Promise<WhisperingResult<undefined>> {
-			if (!mediaRecorder) return Ok(undefined);
+		async cancelRecording({
+			onSuccess,
+			onError,
+		}: {
+			onSuccess: () => void;
+			onError: (err: WhisperingErr) => void;
+		}) {
+			if (!mediaRecorder) {
+				onSuccess?.();
+				return;
+			}
 			const cancelResult: WhisperingResult<undefined> =
 				await tryAsyncWhispering({
 					try: () =>
@@ -183,7 +217,6 @@ function createMediaRecorder() {
 								return;
 							}
 							mediaRecorder.addEventListener('stop', () => {
-								resetRecorder();
 								resolve(undefined);
 							});
 							mediaRecorder.stop();
@@ -201,7 +234,13 @@ function createMediaRecorder() {
 			if (!settings.value.isFasterRerecordEnabled) {
 				mediaStream.destroy();
 			}
-			return cancelResult;
+			if (!cancelResult.ok) {
+				onError(cancelResult);
+				resetRecorder();
+				return;
+			}
+			onSuccess();
+			resetRecorder();
 		},
 	};
 }

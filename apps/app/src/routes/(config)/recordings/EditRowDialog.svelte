@@ -7,6 +7,8 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/RecordingDbService';
+	import { toast } from '$lib/services/ToastService';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
 
@@ -36,12 +38,24 @@
 		</Dialog.Header>
 		<form
 			class="grid gap-4 py-4"
-			onsubmit={async (e) => {
+			onsubmit={(e) => {
 				e.preventDefault();
-				isSaving = true;
-				await recordings.updateRecording(recording);
-				isSaving = false;
-				isDialogOpen = false;
+				void recordings.updateRecording(recording, {
+					onStart: () => {
+						isSaving = true;
+					},
+					onSuccess: () => {
+						toast.success({
+							title: 'Updated recording!',
+							description: 'Your recording has been updated successfully.',
+						});
+					},
+					onError: renderErrAsToast,
+					onSettled: () => {
+						isSaving = false;
+						isDialogOpen = false;
+					},
+				});
 			}}
 		>
 			<div class="grid grid-cols-4 items-center gap-4">
@@ -85,7 +99,15 @@
 					class="mr-auto"
 					onclick={async () => {
 						isDeleting = true;
-						await recordings.deleteRecordingById(recording.id);
+						await recordings.deleteRecordingById(recording.id, {
+							onSuccess: () => {
+								toast.success({
+									title: 'Deleted recording!',
+									description: 'Your recording has been deleted successfully.',
+								});
+							},
+							onError: renderErrAsToast,
+						});
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

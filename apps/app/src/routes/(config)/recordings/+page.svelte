@@ -397,7 +397,16 @@
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
 								onConfirm: () => {
-									recordings.deleteRecordingsById(ids);
+									recordings.deleteRecordingsById(ids, {
+										onSuccess: () => {
+											toast.success({
+												title: 'Deleted recordings!',
+												description:
+													'Your recordings have been deleted successfully.',
+											});
+										},
+										onError: renderErrAsToast,
+									});
 								},
 							});
 						}}
