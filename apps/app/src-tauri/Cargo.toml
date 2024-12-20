@@ -30,6 +30,7 @@ tauri-plugin-updater = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-window-state = "2"
+cpal = "0.15.3"
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"]
