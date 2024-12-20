@@ -4,7 +4,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { setAlwaysOnTopToTrueIfInSettings } from '$lib/services/AlwaysOnTopService';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
@@ -91,7 +90,6 @@
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
 					settings.value = { ...settings.value, alwaysOnTop: selected };
-					await setAlwaysOnTopToTrueIfInSettings();
 				}}
 				placeholder="Select a language"
 			/>
