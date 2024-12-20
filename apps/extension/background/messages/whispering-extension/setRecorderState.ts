@@ -18,20 +18,20 @@ const iconPaths = {
 } as const satisfies Record<WhisperingRecordingState, string>;
 
 export type RequestBody =
-	ExternalMessageBody<'whispering-extension/setTrayIcon'>;
+	ExternalMessageBody<'whispering-extension/setRecorderState'>;
 
 export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/setTrayIcon'>
+	ExternalMessageReturnType<'whispering-extension/setRecorderState'>
 >;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
 	ResponseBody
 > = async ({ body }, res) => {
-	const setTrayIcon = async () => {
+	const setRecorderState = async () => {
 		if (!body?.recorderState) {
 			return WhisperingErr({
-				title: 'Error invoking setTrayIcon command',
+				title: 'Error invoking setRecorderState command',
 				description:
 					'RecorderState must be provided in the request body of the message',
 				action: { type: 'none' },
@@ -53,7 +53,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		if (!setIconResult.ok) return setIconResult;
 		return Ok(undefined);
 	};
-	res.send(await setTrayIcon());
+	res.send(await setRecorderState());
 };
 
 export default handler;

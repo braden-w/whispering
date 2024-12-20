@@ -34,7 +34,11 @@ import {
 	SelectValue,
 } from '~components/ui/select';
 import { Switch } from '~components/ui/switch';
+import { Skeleton } from '~components/ui/skeleton';
 import './style.css';
+import { AlertTriangleIcon } from 'lucide-react';
+import { Toaster } from '~components/ui/sonner';
+import { toast } from 'sonner';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +48,7 @@ function IndexPopup() {
 			<main className="flex min-h-screen items-center justify-center">
 				<SettingsCard />
 			</main>
+			<Toaster />
 		</QueryClientProvider>
 	);
 }
@@ -54,6 +59,7 @@ function SettingsCard() {
 	const {
 		isPending: isSettingsPending,
 		isError: isSettingsError,
+		error: settingsError,
 		data: settings,
 	} = useQuery({
 		queryKey: ['settings'],
@@ -81,6 +87,9 @@ function SettingsCard() {
 			if (!response.ok) throw response.error;
 			return response.data;
 		},
+		onSuccess: () => {
+			toast.success('Settings updated!');
+		},
 		onMutate: async (newSettings) => {
 			await queryClient.cancelQueries({ queryKey: ['settings'] });
 			const previousSettingsSnapshot = queryClient.getQueryData([
@@ -92,6 +101,9 @@ function SettingsCard() {
 		onError: (err, newSettings, context) => {
 			if (!context) return;
 			queryClient.setQueryData(['settings'], context.previousSettingsSnapshot);
+			toast.error('Error updating settings', {
+				description: err.message,
+			});
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['settings'] });
@@ -99,15 +111,58 @@ function SettingsCard() {
 	});
 
 	if (isSettingsPending) {
-		return <CardContent>Loading...</CardContent>;
+		return (
+			<Card className="w-full max-w-xl">
+				<CardHeader>
+					<Skeleton className="h-8 w-[180px]" />
+					<Skeleton className="mt-2 h-4 w-[250px]" />
+				</CardHeader>
+				<CardContent className="space-y-6">
+					{/* Switch skeletons */}
+					{Array.from({ length: 3 }).map((_, i) => (
+						<div key={i} className="flex items-center gap-2">
+							<Skeleton className="h-6 w-10" />
+							<Skeleton className="h-4 w-48" />
+						</div>
+					))}
+
+					{/* Select and Input skeletons */}
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div key={i} className="grid gap-2">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-10 w-full" />
+						</div>
+					))}
+				</CardContent>
+				<CardFooter>
+					<Skeleton className="h-10 w-full" />
+				</CardFooter>
+			</Card>
+		);
 	}
 
 	if (isSettingsError) {
-		return <CardContent>Error loading settings</CardContent>;
-	}
-
-	if (!settings) {
-		return <CardContent>No settings found</CardContent>;
+		return (
+			<Card className="w-full max-w-xl">
+				<CardHeader>
+					<CardTitle className="text-xl ">Settings Error</CardTitle>
+					<CardDescription>
+						There was a problem loading your settings. Please try refreshing the
+						page.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="whitespace-pre-wrap font-mono text-destructive text-sm">
+					{settingsError instanceof Error
+						? settingsError.message
+						: JSON.stringify(settingsError)}
+				</CardContent>
+				<CardFooter>
+					<Button onClick={() => window.location.reload()} className="w-full">
+						Try Again
+					</Button>
+				</CardFooter>
+			</Card>
+		);
 	}
 
 	return (

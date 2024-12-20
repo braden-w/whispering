@@ -17,7 +17,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 
 		const createNotificationResult = await tryAsyncWhispering({
 			try: async () => {
-				if (!action) {
+				if (action?.type !== 'link') {
 					chrome.notifications.create(id, {
 						priority: 2,
 						requireInteraction: true,
@@ -94,7 +94,8 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 						async (id, buttonIndex) => {
 							if (buttonIndex === 0) {
 								chrome.notifications.clear(id);
-								const gotoTargetUrlInWhisperingTabResult = await gotoTargetUrlInWhisperingTab();
+								const gotoTargetUrlInWhisperingTabResult =
+									await gotoTargetUrlInWhisperingTab();
 								if (!gotoTargetUrlInWhisperingTabResult.ok)
 									return renderErrorAsNotification(
 										gotoTargetUrlInWhisperingTabResult,

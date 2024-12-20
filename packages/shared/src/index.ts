@@ -15,6 +15,8 @@ export const WHISPERING_URL =
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
+export const WHISPERING_RECORDINGS_PATHNAME = '/recordings' as const;
+
 export const BITRATE_VALUES_KBPS = [
 	'64',
 	'96',
@@ -30,7 +32,12 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 export const DEFAULT_BITRATE_KBPS =
 	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
-const ALWAYS_ON_TOP_VALUES = ['Always', 'Never', 'When Recording'] as const;
+const ALWAYS_ON_TOP_VALUES = [
+	'Always',
+	'Never',
+	'When Recording',
+	'When Recording and Transcribing',
+] as const;
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
 	label: option,
 	value: option,
@@ -168,7 +175,7 @@ export const externalMessageSchema = z.discriminatedUnion('name', [
 		}),
 	}),
 	z.object({
-		name: z.literal('whispering-extension/setTrayIcon'),
+		name: z.literal('whispering-extension/setRecorderState'),
 		body: z.object({
 			recorderState: recordingStateSchema,
 		}),
@@ -204,7 +211,7 @@ export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
 	'whispering-extension/notifyWhisperingTabReady': undefined;
 	'whispering-extension/playSound': undefined;
 	'whispering-extension/setClipboardText': string;
-	'whispering-extension/setTrayIcon': undefined;
+	'whispering-extension/setRecorderState': undefined;
 	'whispering-extension/notifications/create': string;
 	'whispering-extension/notifications/clear': undefined;
 	'whispering-extension/writeTextToCursor': string;

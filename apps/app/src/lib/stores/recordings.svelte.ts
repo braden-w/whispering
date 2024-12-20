@@ -48,63 +48,95 @@ export const createRecordings = () => {
 		},
 		async addRecording(
 			recording: Recording,
-			{ onSuccess }: { onSuccess: () => void },
+			{
+				onSuccess,
+				onError,
+			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
 		) {
 			const addRecordingResult =
 				await RecordingsDbService.addRecording(recording);
-			if (!addRecordingResult.ok) return renderErrAsToast(addRecordingResult);
+			if (!addRecordingResult.ok) {
+				onError(addRecordingResult);
+			}
 			recordings.push(recording);
 			onSuccess();
 		},
 		async updateRecording(
 			recording: Recording,
 			{
-				onSuccess = () => {
-					toast.success({
-						title: 'Updated recording!',
-						description: 'Your recording has been updated successfully.',
-					});
-				},
-			}: { onSuccess?: () => void } = {},
+				onStart,
+				onSuccess,
+				onError,
+				onSettled,
+			}:
+				| {
+						onStart?: undefined;
+						onSuccess: () => void;
+						onError: (err: WhisperingErr) => void;
+						onSettled?: undefined;
+				  }
+				| {
+						onStart: () => void;
+						onSuccess: () => void;
+						onError: (err: WhisperingErr) => void;
+						onSettled: () => void;
+				  },
 		) {
+			onStart?.();
 			const updateRecordingResult = await updateRecording(recording);
-			if (!updateRecordingResult.ok)
-				return renderErrAsToast(updateRecordingResult);
+			if (!updateRecordingResult.ok) {
+				onError(updateRecordingResult);
+				return;
+			}
 			onSuccess();
+			onSettled?.();
 		},
 		async deleteRecordingById(
 			id: string,
 			{
-				onSuccess = () => {
-					toast.success({
-						title: 'Deleted recording!',
-						description: 'Your recording has been deleted successfully.',
-					});
-				},
-			}: { onSuccess?: () => void } = {},
+				onStart,
+				onSuccess,
+				onError,
+				onSettled,
+			}:
+				| {
+						onStart?: undefined;
+						onSuccess: () => void;
+						onError: (err: WhisperingErr) => void;
+						onSettled?: undefined;
+				  }
+				| {
+						onStart: () => void;
+						onSuccess: () => void;
+						onError: (err: WhisperingErr) => void;
+						onSettled: () => void;
+				  },
 		) {
+			onStart?.();
 			const deleteRecordingResult =
 				await RecordingsDbService.deleteRecordingById(id);
-			if (!deleteRecordingResult.ok)
-				return renderErrAsToast(deleteRecordingResult);
+			if (!deleteRecordingResult.ok) {
+				onError(deleteRecordingResult);
+				onSettled?.();
+				return;
+			}
 			recordings = recordings.filter((recording) => recording.id !== id);
 			onSuccess();
+			onSettled?.();
 		},
 		async deleteRecordingsById(
 			ids: string[],
 			{
-				onSuccess = () => {
-					toast.success({
-						title: 'Deleted recordings!',
-						description: 'Your recordings have been deleted successfully.',
-					});
-				},
-			}: { onSuccess?: () => void } = {},
+				onSuccess,
+				onError,
+			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
 		) {
 			const deleteRecordingsResult =
 				await RecordingsDbService.deleteRecordingsById(ids);
-			if (!deleteRecordingsResult.ok)
-				return renderErrAsToast(deleteRecordingsResult);
+			if (!deleteRecordingsResult.ok) {
+				onError(deleteRecordingsResult);
+				return;
+			}
 			recordings = recordings.filter(
 				(recording) => !ids.includes(recording.id),
 			);
@@ -275,16 +307,15 @@ export const createRecordings = () => {
 		async downloadRecording(
 			id: string,
 			{
-				onSuccess = () => {
-					toast.success({
-						title: 'Recording downloaded!',
-						description: 'Your recording has been downloaded successfully.',
-					});
-				},
-			}: { onSuccess?: () => void } = {},
+				onSuccess,
+				onError,
+			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
 		) {
 			const getRecordingResult = await RecordingsDbService.getRecording(id);
-			if (!getRecordingResult.ok) return renderErrAsToast(getRecordingResult);
+			if (!getRecordingResult.ok) {
+				onError(getRecordingResult);
+				return;
+			}
 			const maybeRecording = getRecordingResult.data;
 			if (maybeRecording === null) {
 				return WhisperingErr({
@@ -304,21 +335,21 @@ export const createRecordings = () => {
 		async copyRecordingText(
 			recording: Recording,
 			{
-				onSuccess = (transcribedText) => {
-					toast.success({
-						title: 'Copied transcription to clipboard!',
-						description: transcribedText,
-						descriptionClass: 'line-clamp-2',
-					});
-				},
-			}: { onSuccess?: (transcribedText: string) => void } = {},
+				onSuccess,
+				onError,
+			}: {
+				onSuccess: (transcribedText: string) => void;
+				onError: (err: WhisperingErr) => void;
+			},
 		) {
-			if (recording.transcribedText === '') return Ok(undefined);
+			if (recording.transcribedText === '') return;
 			const setClipboardTextResult = await ClipboardService.setClipboardText(
 				recording.transcribedText,
 			);
-			if (!setClipboardTextResult.ok)
-				return renderErrAsToast(setClipboardTextResult);
+			if (!setClipboardTextResult.ok) {
+				onError(setClipboardTextResult);
+				return;
+			}
 			onSuccess(recording.transcribedText);
 		},
 	};
