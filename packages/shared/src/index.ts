@@ -113,7 +113,7 @@ export type WhisperingResult<
 
 export type BubbleErr = Err<BubbleErrProperties>;
 
-export const BubbleErr = <E extends BubbleErrProperties>(error: E): BubbleErr =>
+export const BubbleErr = <E extends BubbleErrProperties>(error: E) =>
 	Err(error);
 
 export type WhisperingErr = Err<WhisperingErrProperties>;
