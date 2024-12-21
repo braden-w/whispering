@@ -116,6 +116,13 @@ export type BubbleErr = Err<BubbleErrProperties>;
 export const BubbleErr = <E extends BubbleErrProperties>(error: E) =>
 	Err(error);
 
+export type OnlyErrors<R extends Result<unknown, unknown>> = R extends Result<
+	unknown,
+	infer E
+>
+	? Err<E>
+	: never;
+
 export type WhisperingErr = Err<WhisperingErrProperties>;
 
 export const WhisperingErr = (
