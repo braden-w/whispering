@@ -1,22 +1,17 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import {
+	BubbleErr,
 	Ok,
+	type OnlyErrors,
 	WhisperingErr,
 	type WhisperingResult,
 	tryAsyncBubble,
 	tryAsyncWhispering,
-} from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
-import { toast } from './ToastService.js';
-import {
-	BubbleErr,
-	Ok,
-	tryAsyncWhispering,
 	trySyncBubble,
-	type OnlyErrors,
 } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
-import { mediaStream } from './mediaStream.svelte';
+import { nanoid } from 'nanoid/non-secure';
+import { toast } from './ToastService.js';
 
 const TIMESLICE_MS = 1000;
 
