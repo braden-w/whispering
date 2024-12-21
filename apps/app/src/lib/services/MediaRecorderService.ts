@@ -160,7 +160,9 @@ const createMediaRecorderServiceWeb = () => {
 			onError,
 		}: {
 			onSuccess: (blob: Blob) => void;
-			onError: (error: Awaited<ReturnType<typeof stopRecorder>>) => void;
+			onError: (
+				errResult: OnlyErrors<Awaited<ReturnType<typeof stopRecorder>>>,
+			) => void;
 		}) {
 			const stopResult = await stopRecorder();
 			if (!stopResult.ok) {
@@ -175,7 +177,9 @@ const createMediaRecorderServiceWeb = () => {
 			onError,
 		}: {
 			onSuccess: (blob: Blob) => void;
-			onError: (error: Awaited<ReturnType<typeof stopRecorder>>) => void;
+			onError: (
+				errResult: OnlyErrors<Awaited<ReturnType<typeof stopRecorder>>>,
+			) => void;
 		}) {
 			const stopResult = await stopRecorder();
 			if (!stopResult.ok) {
