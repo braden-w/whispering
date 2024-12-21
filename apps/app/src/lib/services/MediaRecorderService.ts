@@ -14,51 +14,25 @@ import { trySync, type Result } from '@epicenterhq/result';
 
 const TIMESLICE_MS = 1000;
 
-const TAGS = {
-	INIT_MEDIA_RECORDER_FROM_STREAM_ERR:
-		'InitMediaRecorderFromStreamErr' as const,
-};
-
-type MediaRecorderService = {
-	startFromExistingStream: (
-		{ bitsPerSecond }: { bitsPerSecond: number },
-		callbacks?: {
-			onStart?: () => void;
-			onStop?: () => void;
-			onPause?: () => void;
-			onResume?: () => void;
-		},
-	) => void;
-	startFromNewStream: (
-		{ bitsPerSecond }: { bitsPerSecond: number },
-		callbacks?: {
-			onStart?: () => void;
-			onStop?: () => void;
-			onPause?: () => void;
-			onResume?: () => void;
-		},
-	) => void;
-	stopKeepStream: () => void;
-	stopAndCloseStream: () => void;
-};
-
 export const MediaRecorderService = createMediaRecorderServiceWeb();
 
-const OpenStreamDoesNotExistErr = () =>
-	BubbleErr({
-		_tag: 'OpenStreamDoesNotExistErr',
-		title: 'Error initializing media recorder with preferred device',
-		description: 'Trying to find another available audio input device...',
-	} as const);
+const OpenStreamDoesNotExistErr = BubbleErr({
+	_tag: 'OpenStreamDoesNotExistErr',
+	message: 'Error initializing media recorder with preferred device',
+	// title: 'Error initializing media recorder with preferred device',
+	// description: 'Trying to find another available audio input device...',
+} as const);
+type OpenStreamDoesNotExistErr = typeof OpenStreamDoesNotExistErr;
 
-const OpenStreamIsInactiveErr = () =>
-	BubbleErr({
-		_tag: 'OpenStreamIsInactiveErr',
-		title: 'Open stream is inactive',
-		description: 'Refreshing recording session...',
-	});
+const OpenStreamIsInactiveErr = BubbleErr({
+	_tag: 'OpenStreamIsInactiveErr',
+	message: 'Open stream is inactive',
+	// title: 'Open stream is inactive',
+	// description: 'Refreshing recording session...',
+} as const);
+type OpenStreamIsInactiveErr = typeof OpenStreamIsInactiveErr;
 
-const createMediaRecorderServiceWeb = (() => {
+const createMediaRecorderServiceWeb = () => {
 	let recorder: MediaRecorder | null = null;
 	const recordedChunks: Blob[] = [];
 
@@ -70,7 +44,7 @@ const createMediaRecorderServiceWeb = (() => {
 			try: () => new MediaRecorder(stream, { bitsPerSecond }),
 			catch: (error) =>
 				({
-					_tag: TAGS.INIT_MEDIA_RECORDER_FROM_STREAM_ERR,
+					_tag: 'InitMediaRecorderFromStreamErr',
 					message: 'Error initializing media recorder from stream',
 				}) as const,
 		});
@@ -124,14 +98,23 @@ const createMediaRecorderServiceWeb = (() => {
 		return Ok(blob);
 	};
 
+	const cancelRecording = () => {
+		if (!recorder) return OpenStreamDoesNotExistErr;
+		recorder.stop();
+		recorder = null;
+		return Ok(undefined);
+	};
+
 	return {
-		async startFromExistingStream({ bitsPerSecond }) {
+		async startFromExistingStream({
+			bitsPerSecond,
+		}: { bitsPerSecond: number }) {
 			const getReusedStream = async () => {
 				if (!mediaStream.stream) {
-					return OpenStreamDoesNotExistErr();
+					return OpenStreamDoesNotExistErr;
 				}
 				if (!mediaStream.stream.active) {
-					return OpenStreamIsInactiveErr();
+					return OpenStreamIsInactiveErr;
 				}
 				return Ok(mediaStream.stream);
 			};
@@ -143,7 +126,7 @@ const createMediaRecorderServiceWeb = (() => {
 			});
 			return startRecordingResult;
 		},
-		async startFromNewStream({ bitsPerSecond }, callbacks) {
+		async startFromNewStream({ bitsPerSecond }: { bitsPerSecond: number }) {
 			const getNewStream = () => mediaStream.refreshStream();
 			const newStreamResult = await getNewStream();
 			if (!newStreamResult.ok) return newStreamResult;
@@ -160,8 +143,17 @@ const createMediaRecorderServiceWeb = (() => {
 			mediaStream.destroy();
 			return stopResult;
 		},
+		async cancelKeepStream() {
+			const cancelResult = cancelRecording();
+			return cancelResult;
+		},
+		async cancelAndCloseStream() {
+			const cancelResult = cancelRecording();
+			mediaStream.destroy();
+			return cancelResult;
+		},
 	};
-}) satisfies () => MediaRecorderService;
+};
 
 const createMediaRecorderServiceNative = (() => {
 	return {
