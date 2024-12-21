@@ -13,7 +13,7 @@ import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServ
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { recorderState } from './recorder.svelte';
+import { recorder } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
 export const createRecordings = () => {
@@ -227,7 +227,8 @@ export const createRecordings = () => {
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
-			if (recorderState.value !== 'RECORDING') recorderState.value = 'LOADING';
+			if (recorder.recorderState !== 'RECORDING')
+				recorder.recorderState = 'LOADING';
 
 			onTranscribeStart();
 
@@ -276,7 +277,8 @@ export const createRecordings = () => {
 
 			const transcribeRecordingResult = await tryTranscribeRecording();
 
-			if (recorderState.value !== 'RECORDING') recorderState.value = 'IDLE';
+			if (recorder.recorderState !== 'RECORDING')
+				recorder.recorderState = 'IDLE';
 			if (!transcribeRecordingResult.ok) {
 				return renderErrAsToast(transcribeRecordingResult);
 			}
