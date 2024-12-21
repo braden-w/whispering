@@ -116,10 +116,7 @@ export type BubbleErr = Err<BubbleErrProperties>;
 export const BubbleErr = <E extends BubbleErrProperties>(error: E) =>
 	Err(error);
 
-export type OnlyErrors<R extends Result<unknown, unknown>> = R extends Result<
-	unknown,
-	infer E
->
+export type OnlyErrors<R extends Result<any, any>> = R extends Err<infer E>
 	? Err<E>
 	: never;
 
