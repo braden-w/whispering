@@ -6,6 +6,7 @@ import {
 	tryAsyncWhispering,
 	trySyncBubble,
 	WhisperingErr,
+	type OnlyErrors,
 } from '@repo/shared';
 import { mediaStream } from './mediaStream.svelte';
 import { toast } from 'svelte-sonner';
@@ -105,26 +106,46 @@ const createMediaRecorderServiceWeb = () => {
 		return Ok(undefined);
 	};
 
+	const getReusedStream = async () => {
+		if (!mediaStream.stream) {
+			return OpenStreamDoesNotExistErr;
+		}
+		if (!mediaStream.stream.active) {
+			return OpenStreamIsInactiveErr;
+		}
+		return Ok(mediaStream.stream);
+	};
+
 	return {
-		async startFromExistingStream({
-			bitsPerSecond,
-		}: { bitsPerSecond: number }) {
-			const getReusedStream = async () => {
-				if (!mediaStream.stream) {
-					return OpenStreamDoesNotExistErr;
-				}
-				if (!mediaStream.stream.active) {
-					return OpenStreamIsInactiveErr;
-				}
-				return Ok(mediaStream.stream);
-			};
+		async startFromExistingStream(
+			{ bitsPerSecond }: { bitsPerSecond: number },
+			{
+				onSuccess,
+				onError,
+			}: {
+				onSuccess: () => void;
+				onError: (
+					errResult: OnlyErrors<
+						| Awaited<ReturnType<typeof getReusedStream>>
+						| Awaited<ReturnType<typeof startRecording>>
+					>,
+				) => void;
+			},
+		) {
 			const reusedStreamResult = await getReusedStream();
-			if (!reusedStreamResult.ok) return reusedStreamResult;
+			if (!reusedStreamResult.ok) {
+				onError(reusedStreamResult);
+				return;
+			}
 			const reusedStream = reusedStreamResult.data;
 			const startRecordingResult = startRecording(reusedStream, {
 				bitsPerSecond,
 			});
-			return startRecordingResult;
+			if (!startRecordingResult.ok) {
+				onError(startRecordingResult);
+				return;
+			}
+			onSuccess();
 		},
 		async startFromNewStream({ bitsPerSecond }: { bitsPerSecond: number }) {
 			const getNewStream = () => mediaStream.refreshStream();
@@ -134,14 +155,36 @@ const createMediaRecorderServiceWeb = () => {
 			const startRecordingResult = startRecording(newStream, { bitsPerSecond });
 			return startRecordingResult;
 		},
-		async stopKeepStream() {
+		async stopKeepStream({
+			onSuccess,
+			onError,
+		}: {
+			onSuccess: (blob: Blob) => void;
+			onError: (error: Awaited<ReturnType<typeof stopRecorder>>) => void;
+		}) {
 			const stopResult = await stopRecorder();
-			return stopResult;
+			if (!stopResult.ok) {
+				onError(stopResult);
+				return stopResult;
+			}
+			const blob = stopResult.data;
+			onSuccess(blob);
 		},
-		async stopAndCloseStream() {
+		async stopAndCloseStream({
+			onSuccess,
+			onError,
+		}: {
+			onSuccess: (blob: Blob) => void;
+			onError: (error: Awaited<ReturnType<typeof stopRecorder>>) => void;
+		}) {
 			const stopResult = await stopRecorder();
+			if (!stopResult.ok) {
+				onError(stopResult);
+				return stopResult;
+			}
+			const blob = stopResult.data;
 			mediaStream.destroy();
-			return stopResult;
+			onSuccess(blob);
 		},
 		async cancelKeepStream() {
 			const cancelResult = cancelRecording();

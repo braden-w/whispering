@@ -93,101 +93,96 @@ function createRecorder() {
 
 			if (recorderState === 'RECORDING') {
 				if (settings.value.isFasterRerecordEnabled) {
-					const stopResult = await MediaRecorderService.stopAndCloseStream();
-					if (!stopResult.ok) {
-						onStopError(stopResult);
-						return;
-					}
-					const blob = stopResult.data;
-					onStopSuccess(blob);
+					await MediaRecorderService.stopAndCloseStream({
+						onSuccess: onStopSuccess,
+						onError: onStopError,
+					});
 				} else {
-					const stopResult = await MediaRecorderService.stopKeepStream();
-					if (!stopResult.ok) {
-						onStopError(stopResult);
-						return;
-					}
-					const blob = stopResult.data;
-					onStopSuccess(blob);
+					await MediaRecorderService.stopKeepStream({
+						onSuccess: onStopSuccess,
+						onError: onStopError,
+					});
 				}
 			} else {
 				if (settings.value.isFasterRerecordEnabled) {
-					const startResult =
-						await MediaRecorderService.startFromExistingStream({
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						});
-					if (!startResult.ok) {
-						switch (startResult.error._tag) {
-							case 'OpenStreamDoesNotExistErr': {
-								toast.loading({
-									title: 'Existing recording session not found',
-									description: 'Creating a new recording session...',
-								});
-								const startResult =
-									await MediaRecorderService.startFromNewStream({
-										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-									});
-								if (!startResult.ok) {
-									toast.error({
-										title: 'Error creating new recording session',
-										description: 'Please try again',
-									});
-									return;
+					await MediaRecorderService.startFromExistingStream(
+						{ bitsPerSecond: Number(settings.value.bitrateKbps) * 1000 },
+						{
+							onSuccess: onStartSuccess,
+							onError: async (errResult) => {
+								switch (errResult.error._tag) {
+									case 'OpenStreamDoesNotExistErr': {
+										toast.loading({
+											title: 'Existing recording session not found',
+											description: 'Creating a new recording session...',
+										});
+										const startResult =
+											await MediaRecorderService.startFromNewStream({
+												bitsPerSecond:
+													Number(settings.value.bitrateKbps) * 1000,
+											});
+										if (!startResult.ok) {
+											toast.error({
+												title: 'Error creating new recording session',
+												description: 'Please try again',
+											});
+											return;
+										}
+										toast.loading({
+											title: 'Recording session created',
+											description: 'Recording in progress...',
+										});
+										break;
+									}
+									case 'OpenStreamIsInactiveErr':
+										toast.loading({
+											title: 'Existing recording session is inactive',
+											description: 'Refreshing recording session...',
+										});
+										break;
+									case 'InitMediaRecorderFromStreamErr':
+										toast.loading({
+											title:
+												'Error initializing media recorder with preferred device',
+											description:
+												'Trying to find another available audio input device...',
+										});
+										break;
 								}
-								toast.loading({
-									title: 'Recording session created',
-									description: 'Recording in progress...',
-								});
-								break;
-							}
-							case 'OpenStreamIsInactiveErr':
-								toast.loading({
-									title: 'Existing recording session is inactive',
-									description: 'Refreshing recording session...',
-								});
-								break;
-							case 'InitMediaRecorderFromStreamErr':
-								toast.loading({
-									title:
-										'Error initializing media recorder with preferred device',
-									description:
-										'Trying to find another available audio input device...',
-								});
-								break;
-						}
-						return;
-					}
-					onStartSuccess();
+							},
+						},
+					);
 				} else {
-					const startResult =
-						await MediaRecorderService.startFromExistingStream({
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						});
-					if (!startResult.ok) {
-						switch (startResult.error._tag) {
-							case 'OpenStreamDoesNotExistErr':
-								toast.loading({
-									title: 'Existing recording session not found',
-									description: 'Creating a new recording session...',
-								});
-								break;
-							case 'OpenStreamIsInactiveErr':
-								toast.loading({
-									title: 'Existing recording session is inactive',
-									description: 'Refreshing recording session...',
-								});
-								break;
-							case 'InitMediaRecorderFromStreamErr':
-								toast.loading({
-									title:
-										'Error initializing media recorder with preferred device',
-									description:
-										'Trying to find another available audio input device...',
-								});
-								break;
-						}
-						return;
-					}
-					onStartSuccess();
+					await MediaRecorderService.startFromExistingStream(
+						{ bitsPerSecond: Number(settings.value.bitrateKbps) * 1000 },
+						{
+							onSuccess: onStartSuccess,
+							onError: (errResult) => {
+								switch (errResult.error._tag) {
+									case 'OpenStreamDoesNotExistErr':
+										toast.loading({
+											title: 'Existing recording session not found',
+											description: 'Creating a new recording session...',
+										});
+										break;
+									case 'OpenStreamIsInactiveErr':
+										toast.loading({
+											title: 'Existing recording session is inactive',
+											description: 'Refreshing recording session...',
+										});
+										break;
+									case 'InitMediaRecorderFromStreamErr':
+										toast.loading({
+											title:
+												'Error initializing media recorder with preferred device',
+											description:
+												'Trying to find another available audio input device...',
+										});
+										break;
+								}
+							},
+						},
+					);
 				}
 			}
 		},
