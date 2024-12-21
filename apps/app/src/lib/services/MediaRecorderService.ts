@@ -60,6 +60,8 @@ const OpenStreamIsInactiveErr = () =>
 
 const createMediaRecorderServiceWeb = (() => {
 	let recorder: MediaRecorder | null = null;
+	const recordedChunks: Blob[] = [];
+
 	const startRecording = (
 		stream: MediaStream,
 		{ bitsPerSecond }: { bitsPerSecond: number },
@@ -121,7 +123,6 @@ const createMediaRecorderServiceWeb = (() => {
 		const blob = stopResult.data;
 		return Ok(blob);
 	};
-	const recordedChunks: Blob[] = [];
 
 	return {
 		async startFromExistingStream({ bitsPerSecond }) {
