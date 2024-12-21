@@ -122,8 +122,10 @@ export type OnlyErrors<R extends Result<any, any>> = R extends Err<infer E>
 
 export type WhisperingErr = Err<WhisperingErrProperties>;
 
-export const WhisperingErr = (
-	error: Omit<WhisperingErrProperties, '_tag'>,
+export const WhisperingErr = <
+	ErrProperties extends Omit<WhisperingErrProperties, '_tag'>,
+>(
+	error: ErrProperties,
 ): WhisperingErr => Err({ ...error, _tag: 'WhisperingError' });
 
 export const trySyncWhispering = <T, E extends WhisperingErrProperties>(
