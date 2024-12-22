@@ -16,6 +16,7 @@ import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { WhisperingErr } from '@repo/shared';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -39,7 +40,9 @@ function createRecorder() {
 		get recorderState() {
 			return recorderState;
 		},
-
+		get isInRecordingSession() {
+			return recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION';
+		},
 		async toggleRecording(): Promise<void> {
 			const onStopSuccess = (blob: Blob) => {
 				setRecorderState('IDLE');
@@ -181,6 +184,26 @@ function createRecorder() {
 				}
 			}
 			onCancelSuccess();
+		},
+		async closeRecordingSession() {
+			if (!this.isInRecordingSession) {
+				return renderErrAsToast(
+					WhisperingErr({
+						_tag: 'WhisperingError',
+						title: '❌ No Active Session',
+						description: 'There\'s no recording session to close at the moment',
+						action: { type: 'none' },
+					}),
+				);
+				return;
+			}
+			const closeRecordingSessionResult =
+				await MediaRecorderService.closeRecordingSession();
+			if (!closeRecordingSessionResult.ok) {
+				renderErrAsToast(closeRecordingSessionResult);
+				return;
+			}
+			setRecorderState('IDLE');
 		},
 	};
 }
