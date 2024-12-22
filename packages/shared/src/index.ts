@@ -91,36 +91,34 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
-type WhisperingErrProperties = {
-	_tag: 'WhisperingError';
-	isWarning?: boolean;
-} & NotificationOptions;
-
 export type BubbleErrProperties<T extends string = string> = {
 	_tag: T;
 	message: string;
 };
 
-export type BubbleResult<
-	T,
-	E extends BubbleErrProperties = BubbleErrProperties,
-> = Result<T, E>;
-
-export type WhisperingResult<
-	T,
-	E extends WhisperingErrProperties = WhisperingErrProperties,
-> = Result<T, E>;
+export type BubbleResult<T> = Result<T, BubbleErrProperties>;
 
 export type BubbleErr = Err<BubbleErrProperties>;
 
 export const BubbleErr = <E extends BubbleErrProperties>(error: E) =>
 	Err(error);
 
-export type OnlyErrors<R extends Result<any, any>> = R extends Err<infer E>
-	? Err<E>
-	: never;
+export const trySyncBubble = <T>(
+	opts: Parameters<typeof trySync<T, BubbleErrProperties>>[0],
+): BubbleResult<T> => trySync(opts);
+
+export const tryAsyncBubble = <T>(
+	opts: Parameters<typeof tryAsync<T, BubbleErrProperties>>[0],
+): Promise<BubbleResult<T>> => tryAsync(opts);
+
+type WhisperingErrProperties = {
+	_tag: 'WhisperingError';
+	isWarning?: boolean;
+} & NotificationOptions;
 
 export type WhisperingErr = Err<WhisperingErrProperties>;
+
+export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
 
 export const WhisperingErr = <
 	ErrProperties extends Omit<WhisperingErrProperties, '_tag'>,
@@ -128,21 +126,13 @@ export const WhisperingErr = <
 	error: ErrProperties,
 ): WhisperingErr => Err({ ...error, _tag: 'WhisperingError' });
 
-export const trySyncWhispering = <T, E extends WhisperingErrProperties>(
-	opts: Parameters<typeof trySync<T, E>>[0],
-): WhisperingResult<T, E> => trySync(opts);
+export const trySyncWhispering = <T>(
+	opts: Parameters<typeof trySync<T, WhisperingErrProperties>>[0],
+): WhisperingResult<T> => trySync(opts);
 
-export const trySyncBubble = <T, E extends BubbleErrProperties>(
-	opts: Parameters<typeof trySync<T, E>>[0],
-): BubbleResult<T, E> => trySync(opts);
-
-export const tryAsyncBubble = <T, E extends BubbleErrProperties>(
-	opts: Parameters<typeof tryAsync<T, E>>[0],
-): Promise<BubbleResult<T, E>> => tryAsync(opts);
-
-export const tryAsyncWhispering = <T, E extends WhisperingErrProperties>(
-	opts: Parameters<typeof tryAsync<T, E>>[0],
-): Promise<WhisperingResult<T, E>> => tryAsync(opts);
+export const tryAsyncWhispering = <T>(
+	opts: Parameters<typeof tryAsync<T, WhisperingErrProperties>>[0],
+): Promise<WhisperingResult<T>> => tryAsync(opts);
 
 export const parseJson = (value: string) =>
 	trySyncBubble({
