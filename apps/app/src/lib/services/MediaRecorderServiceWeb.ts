@@ -58,10 +58,20 @@ type MediaRecorderService = {
 		settings: RecordingSessionSettings,
 	) => Promise<WhisperingResult<void>>;
 	closeRecordingSession: () => Promise<WhisperingResult<void>>;
-	startRecording: (opts: { recordingId: string }) => Promise<
-		WhisperingResult<void>
-	>;
-	stopRecording: () => Promise<WhisperingResult<Blob>>;
+	startRecording: (opts: { recordingId: string }, {
+		onSuccess,
+		onError,
+	}: {
+		onSuccess: () => void;
+		onError: (error: WhisperingErr) => void;
+	}) => Promise<void>;
+	stopRecording: ({
+		onSuccess,
+		onError,
+	}: {
+		onSuccess: (blob: Blob) => void;
+		onError: (error: WhisperingErr) => void;
+	}) => Promise<void>;
 	cancelRecording: () => Promise<WhisperingResult<void>>;
 };
 
@@ -126,9 +136,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
 					description: 'There\'s no recording session to close at the moment',
-					action: {
-						type: 'none'
-					}
+					action: { type: 'none' }
 				});
 			}
 			if (currentSession.recorder) {
@@ -149,14 +157,15 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession = null;
 			return Ok(undefined);
 		},
-		async startRecording({ recordingId }) {
+		async startRecording({ recordingId }, { onSuccess, onError }) {
 			if (!currentSession) {
-				return WhisperingErr({
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
 					description: 'There\'s no recording session to start recording in at the moment',
 					action: { type: 'none' }
-				});
+				}));
+				return;
 			}
 			const {
 				stream,
@@ -171,7 +180,10 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error }
 				})
 			});
-			if (!newRecorderResult.ok) return newRecorderResult;
+			if (!newRecorderResult.ok) {
+				onError(newRecorderResult);
+				return;
+			}
 			const newRecorder = newRecorderResult.data as MediaRecorder;
 			newRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 				if (!currentSession || !event.data.size) return;
@@ -179,18 +191,19 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			newRecorder.start(TIMESLICE_MS);
 			currentSession.recorder = newRecorder;
-			return Ok(undefined);
+			onSuccess();
 		},
-		async stopRecording() {
+		async stopRecording({ onSuccess, onError }) {
 			if (!currentSession?.recorder){
-				return WhisperingErr({
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '⚠️ Nothing to Stop',
 					description: 'No active recording found to stop',
 					action: {
 						type: 'none'
 					}
-				});
+				}));
+				return;
 			}
 			const stopResult = await tryAsyncWhispering({
 				try: () =>
@@ -222,9 +235,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error }
 				})
 			});
-			if (!stopResult.ok) return stopResult;
+			if (!stopResult.ok){
+				onError(stopResult);
+				return;
+			}
 			const blob = stopResult.data;
-			return Ok(blob);
+			onSuccess(blob);
 		},
 		async cancelRecording() {
 			if (!currentSession?.recorder){

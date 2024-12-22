@@ -46,38 +46,6 @@ function createRecorder() {
 			);
 		},
 		async toggleRecording(): Promise<void> {
-			const onStopSuccess = (blob: Blob) => {
-				setRecorderState('IDLE');
-				console.info('Recording stopped');
-				void playSound('stop');
-
-				const newRecording: Recording = {
-					id: nanoid(),
-					title: '',
-					subtitle: '',
-					timestamp: new Date().toISOString(),
-					transcribedText: '',
-					blob,
-					transcriptionStatus: 'UNPROCESSED',
-				};
-
-				const addRecordingAndTranscribeResultToastId = nanoid();
-
-				void recordings.addRecording(newRecording, {
-					onSuccess: () => {
-						toast.loading({
-							id: addRecordingAndTranscribeResultToastId,
-							title: 'Recording added!',
-							description: 'Your recording has been added successfully.',
-						});
-						recordings.transcribeRecording(newRecording.id, {
-							toastId: addRecordingAndTranscribeResultToastId,
-						});
-					},
-					onError: renderErrAsToast,
-				});
-			};
-
 			const onStartSuccess = () => {
 				setRecorderState('SESSION+RECORDING');
 				console.info('Recording started');
@@ -95,13 +63,40 @@ function createRecorder() {
 			};
 
 			if (recorderState === 'SESSION+RECORDING') {
-				const stopResult = await MediaRecorderService.stopRecording();
-				if (!stopResult.ok) {
-					renderErrAsToast(stopResult);
-					return;
-				}
-				const blob = stopResult.data;
-				onStopSuccess(blob);
+				const stopResult = await MediaRecorderService.stopRecording({
+					onSuccess: (blob: Blob) => {
+						setRecorderState('IDLE');
+						console.info('Recording stopped');
+						void playSound('stop');
+
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+
+						const addRecordingAndTranscribeResultToastId = nanoid();
+
+						void recordings.addRecording(newRecording, {
+							onSuccess: () => {
+								toast.loading({
+									id: addRecordingAndTranscribeResultToastId,
+									title: 'Recording added!',
+									description: 'Your recording has been added successfully.',
+								});
+								recordings.transcribeRecording(newRecording.id, {
+									toastId: addRecordingAndTranscribeResultToastId,
+								});
+							},
+							onError: renderErrAsToast,
+						});
+					},
+					onError: renderErrAsToast,
+				});
 				if (!settings.value.isFasterRerecordEnabled) {
 					const endSessionResult =
 						await MediaRecorderService.closeRecordingSession();
@@ -120,26 +115,19 @@ function createRecorder() {
 							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
 						});
 					if (!initRecordingSessionResult.ok) return initRecordingSessionResult;
-					const startRecordingResult =
-						await MediaRecorderService.startRecording({
-							recordingId: newRecordingId,
-						});
-					if (!startRecordingResult.ok) return startRecordingResult;
-					onStartSuccess();
+					await MediaRecorderService.startRecording(
+						{ recordingId: newRecordingId },
+						{ onSuccess: onStartSuccess, onError: renderErrAsToast },
+					);
 					return Ok(undefined);
 				};
 
 				if (settings.value.isFasterRerecordEnabled) {
 					if (MediaRecorderService.isInRecordingSession) {
-						const startRecordingResult =
-							await MediaRecorderService.startRecording({
-								recordingId: newRecordingId,
-							});
-						if (!startRecordingResult.ok) {
-							renderErrAsToast(startRecordingResult);
-							return;
-						}
-						onStartSuccess();
+						await MediaRecorderService.startRecording(
+							{ recordingId: newRecordingId },
+							{ onSuccess: onStartSuccess, onError: renderErrAsToast },
+						);
 					} else {
 						const startSessionAndRecordingResult =
 							await startSessionAndRecording();
