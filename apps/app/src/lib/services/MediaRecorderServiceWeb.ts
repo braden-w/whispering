@@ -92,6 +92,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				}),
 			}),
 		async initRecordingSession(settings) {
+			if (currentSession) {
+				return BubbleErr({
+					_tag: 'RecordingSessionAlreadyInitializedErr',
+					message: 'Recording session already initialized',
+				});
+			}
 			const getStreamForDeviceIdResult = await getStreamForDeviceId(
 				settings.deviceId,
 			);
