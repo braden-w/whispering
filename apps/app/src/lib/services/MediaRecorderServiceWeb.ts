@@ -10,7 +10,7 @@ import {
 	tryAsyncWhispering,
 	trySyncBubble,
 } from '@repo/shared';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 import type { Result } from '@epicenterhq/result';
@@ -205,25 +205,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 };
 
 const createMediaRecorderServiceNative = (): MediaRecorderService => {
-	const innerInvoke = async <T>(command: string): Promise<BubbleResult<T>> => {
-		try {
-			return Ok(await invoke<T>(command));
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error
-					? error.message
-					: typeof error === 'string'
-						? error
-						: 'Unknown error';
-			return BubbleErr({
-				_tag: 'InnerInvokeErr',
-				message: `Error invoking command ${command}: ${errorMessage}`,
-			});
-		}
-	};
 	return {
 		enumerateRecordingDevices: async () => {
-			const invokeResult = await innerInvoke<string[]>(
+			const invokeResult = await invoke<string[]>(
 				'enumerate_recording_devices',
 			);
 			if (!invokeResult.ok) {
@@ -242,13 +226,23 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				})),
 			);
 		},
-		initRecordingSession: async () => innerInvoke('init_recording_session'),
-		closeRecordingSession: async () => innerInvoke('close_recording_session'),
-		startRecording: async () => innerInvoke('start_recording'),
-		stopRecording: async () => innerInvoke('stop_recording'),
-		cancelRecording: async () => innerInvoke('cancel_recording'),
+		initRecordingSession: async () => invoke('init_recording_session'),
+		closeRecordingSession: async () => invoke('close_recording_session'),
+		startRecording: async () => invoke('start_recording'),
+		stopRecording: async () => invoke('stop_recording'),
+		cancelRecording: async () => invoke('cancel_recording'),
 	};
 };
+
+async function invoke<T>(command: string): Promise<BubbleResult<T>> {
+	return tryAsyncBubble({
+		try: async () => await tauriInvoke<T>(command),
+		catch: (error) => ({
+			_tag: 'InnerInvokeErr',
+			message: `Error invoking command ${command}: ${error.message}`,
+		}),
+	});
+}
 
 const toastId = nanoid();
 toast.loading({
