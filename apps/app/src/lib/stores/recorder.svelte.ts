@@ -45,6 +45,38 @@ function createRecorder() {
 				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
 			);
 		},
+		async openRecordingSession() {
+			await MediaRecorderService.initRecordingSession(
+				{
+					deviceId: settings.value.selectedAudioInputDeviceId,
+					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+				},
+				{
+					onSuccess: () => {
+						setRecorderState('SESSION+RECORDING');
+					},
+					onError: renderErrAsToast,
+				},
+			);
+		},
+		async closeRecordingSession() {
+			if (!this.isInRecordingSession) {
+				return renderErrAsToast(
+					WhisperingErr({
+						_tag: 'WhisperingError',
+						title: '❌ No Active Session',
+						description: "There's no recording session to close at the moment",
+						action: { type: 'none' },
+					}),
+				);
+			}
+			await MediaRecorderService.closeRecordingSession({
+				onSuccess: () => {
+					setRecorderState('IDLE');
+				},
+				onError: renderErrAsToast,
+			});
+		},
 		async toggleRecording(): Promise<void> {
 			const onStartSuccess = () => {
 				setRecorderState('SESSION+RECORDING');
@@ -109,12 +141,7 @@ function createRecorder() {
 				const newRecordingId = nanoid();
 
 				const startSessionAndRecording = async () => {
-					const initRecordingSessionResult =
-						await MediaRecorderService.initRecordingSession({
-							deviceId: settings.value.selectedAudioInputDeviceId,
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						});
-					if (!initRecordingSessionResult.ok) return initRecordingSessionResult;
+					await this.openRecordingSession();
 					await MediaRecorderService.startRecording(
 						{ recordingId: newRecordingId },
 						{ onSuccess: onStartSuccess, onError: renderErrAsToast },
@@ -174,25 +201,6 @@ function createRecorder() {
 			}
 			void playSound('cancel');
 			console.info('Recording cancelled');
-			setRecorderState('IDLE');
-		},
-		async closeRecordingSession() {
-			if (!this.isInRecordingSession) {
-				return renderErrAsToast(
-					WhisperingErr({
-						_tag: 'WhisperingError',
-						title: '❌ No Active Session',
-						description: "There's no recording session to close at the moment",
-						action: { type: 'none' },
-					}),
-				);
-			}
-			const closeRecordingSessionResult =
-				await MediaRecorderService.closeRecordingSession();
-			if (!closeRecordingSessionResult.ok) {
-				renderErrAsToast(closeRecordingSessionResult);
-				return;
-			}
 			setRecorderState('IDLE');
 		},
 	};
