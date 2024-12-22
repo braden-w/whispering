@@ -44,6 +44,7 @@ type RecordingSession = UserRecordingSessionConfig & {
 };
 
 type MediaRecorderService = {
+	readonly isInRecordingSession: boolean;
 	enumerateRecordingDevices: () => Promise<
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;
@@ -62,6 +63,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	return {
+		get isInRecordingSession() {
+			return currentSession !== null;
+		},
 		enumerateRecordingDevices: async () =>
 			tryAsyncWhispering({
 				try: async () => {
