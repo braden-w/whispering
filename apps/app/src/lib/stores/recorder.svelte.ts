@@ -17,7 +17,6 @@ import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
-import { createMediaRecorderServiceWeb } from '$lib/services/MediaRecorderServiceWeb';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -107,9 +106,24 @@ function createRecorder() {
 					}
 				}
 			} else {
-				if (settings.value.isFasterRerecordEnabled) {
-					const newRecordingId = nanoid();
+				const newRecordingId = nanoid();
 
+				const startSessionAndRecording = async () => {
+					const initRecordingSessionResult =
+						await MediaRecorderService.initRecordingSession({
+							deviceId: settings.value.selectedAudioInputDeviceId,
+							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						});
+					if (!initRecordingSessionResult.ok) return initRecordingSessionResult;
+					const startRecordingResult =
+						await MediaRecorderService.startRecording({
+							recordingId: newRecordingId,
+						});
+					if (!startRecordingResult.ok) return startRecordingResult;
+					return Ok(undefined);
+				};
+
+				if (settings.value.isFasterRerecordEnabled) {
 					if (MediaRecorderService.isInRecordingSession) {
 						const startRecordingResult =
 							await MediaRecorderService.startRecording({
@@ -120,40 +134,18 @@ function createRecorder() {
 							return;
 						}
 					} else {
-						const initRecordingSessionResult =
-							await MediaRecorderService.initRecordingSession({
-								deviceId: settings.value.selectedAudioInputDeviceId,
-								bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-							});
-						if (!initRecordingSessionResult.ok) {
-							renderErrAsToast(initRecordingSessionResult);
-							return;
-						}
-						const startRecordingResult =
-							await MediaRecorderService.startRecording({
-								recordingId: newRecordingId,
-							});
-						if (!startRecordingResult.ok) {
-							renderErrAsToast(startRecordingResult);
+						const startSessionAndRecordingResult =
+							await startSessionAndRecording();
+						if (!startSessionAndRecordingResult.ok) {
+							renderErrAsToast(startSessionAndRecordingResult);
 							return;
 						}
 					}
 				} else {
-					const initRecordingSessionResult =
-						await MediaRecorderService.initRecordingSession({
-							deviceId: settings.value.selectedAudioInputDeviceId,
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						});
-					if (!initRecordingSessionResult.ok) {
-						renderErrAsToast(initRecordingSessionResult);
-						return;
-					}
-					const startRecordingResult =
-						await MediaRecorderService.startRecording({
-							recordingId: newRecordingId,
-						});
-					if (!startRecordingResult.ok) {
-						renderErrAsToast(startRecordingResult);
+					const startSessionAndRecordingResult =
+						await startSessionAndRecording();
+					if (!startSessionAndRecordingResult.ok) {
+						renderErrAsToast(startSessionAndRecordingResult);
 						return;
 					}
 				}
