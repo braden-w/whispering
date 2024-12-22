@@ -18,6 +18,7 @@ import { settings } from './settings.svelte';
 
 export const createRecordings = () => {
 	let recordings = $state<Recording[]>([]);
+	let transcribingRecordingIds = $state<string[]>([]);
 
 	const syncDbToRecordingsState = async () => {
 		const getAllRecordingsResult = await RecordingsDbService.getAllRecordings();
@@ -43,6 +44,9 @@ export const createRecordings = () => {
 	};
 
 	return {
+		get isTranscribing() {
+			return transcribingRecordingIds.length > 0;
+		},
 		get value() {
 			return recordings;
 		},
@@ -147,8 +151,8 @@ export const createRecordings = () => {
 			{ toastId }: { toastId?: string } = {},
 		) {
 			const transcribingInProgressId = toastId ?? nanoid();
-
 			const onTranscribeStart = () => {
+			transcribingRecordingIds.push(transcribingInProgressId);
 				toast.loading({
 					id: transcribingInProgressId,
 					title: 'Transcribing recording...',
@@ -170,6 +174,9 @@ export const createRecordings = () => {
 			};
 
 			const onTranscribeSuccess = () => {
+				transcribingRecordingIds = transcribingRecordingIds.filter(
+					(id) => id !== transcribingInProgressId,
+				);
 				NotificationService.clear(transcribingInProgressId);
 				toast.success({
 					id: transcribingInProgressId,
@@ -227,8 +234,6 @@ export const createRecordings = () => {
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
-			if (recorder.recorderState !== 'RECORDING')
-				recorder.recorderState = 'LOADING';
 
 			onTranscribeStart();
 
@@ -277,8 +282,6 @@ export const createRecordings = () => {
 
 			const transcribeRecordingResult = await tryTranscribeRecording();
 
-			if (recorder.recorderState !== 'RECORDING')
-				recorder.recorderState = 'IDLE';
 			if (!transcribeRecordingResult.ok) {
 				return renderErrAsToast(transcribeRecordingResult);
 			}
