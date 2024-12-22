@@ -43,7 +43,7 @@ function createRecorder() {
 
 		async toggleRecording(): Promise<void> {
 			const onStopSuccess = (blob: Blob) => {
-				recorderState = 'IDLE';
+				setRecorderState('IDLE');
 				console.info('Recording stopped');
 				void playSound('stop');
 
@@ -75,7 +75,7 @@ function createRecorder() {
 			};
 
 			const onStartSuccess = () => {
-				recorderState = 'RECORDING';
+				setRecorderState('RECORDING');
 				console.info('Recording started');
 				void playSound('start');
 				void NotificationService.notify({
@@ -158,7 +158,7 @@ function createRecorder() {
 			const onCancelSuccess = () => {
 				void playSound('cancel');
 				console.info('Recording cancelled');
-				recorderState = 'IDLE';
+				setRecorderState('IDLE');
 			};
 
 			const cancelResult = await MediaRecorderService.cancelRecording();
