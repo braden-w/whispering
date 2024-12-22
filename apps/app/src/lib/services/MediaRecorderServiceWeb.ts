@@ -74,7 +74,6 @@ type WhisperingCallbacks<T> = {
 }
 
 type MediaRecorderService = {
-	readonly isInRecordingSession: boolean;
 	enumerateRecordingDevices: () => Promise<
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;
@@ -95,9 +94,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	return {
-		get isInRecordingSession() {
-			return currentSession !== null;
-		},
 		enumerateRecordingDevices: async () =>
 			tryAsyncWhispering({
 				try: async () => {
@@ -125,12 +121,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		async initRecordingSession(settings, { onSuccess, onError }) {
 			if (currentSession) {
 				onError(WhisperingErr({
-					_tag: 'WhisperingError',
 					title: '⚠️ Session Already Active',
 					description: 'A recording session is already running and ready to go',
-					action: {
-						type: 'none'
-					}
+					action: { type: 'none' }
 				}));
 				return;
 			}
@@ -142,11 +135,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				return;
 			}
 			const stream = getStreamForDeviceIdResult.data;
-			currentSession = {
-				settings,
-				stream,
-				recorder: null,
-			};
+			currentSession = { settings, stream, recorder: null, };
 			onSuccess();
 		},
 		async closeRecordingSession({ onSuccess, onError }) {
