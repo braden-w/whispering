@@ -33,11 +33,12 @@ const OpenStreamIsInactiveErr = BubbleErr({
 } as const);
 type OpenStreamIsInactiveErr = typeof OpenStreamIsInactiveErr;
 
-type UserRecordingSessionConfig = {
+type RecordingSessionSettings = {
 	deviceId: string;
 	bitsPerSecond: number;
 };
-type RecordingSession = UserRecordingSessionConfig & {
+type RecordingSession = {
+	settings: RecordingSessionSettings;
 	stream: MediaStream;
 	recorder: MediaRecorder | null;
 	recordedChunks: Blob[];
@@ -49,7 +50,7 @@ type MediaRecorderService = {
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;
 	initRecordingSession: (
-		userRecordingSessionConfig: UserRecordingSessionConfig,
+		settings: RecordingSessionSettings,
 	) => Promise<BubbleResult<void>>;
 	closeRecordingSession: () => Promise<BubbleResult<void>>;
 	startRecording: (opts: { recordingId: string }) => Promise<
@@ -90,14 +91,14 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			}),
-		async initRecordingSession(config) {
+		async initRecordingSession(settings) {
 			const getStreamForDeviceIdResult = await getStreamForDeviceId(
-				config.deviceId,
+				settings.deviceId,
 			);
 			if (!getStreamForDeviceIdResult.ok) return getStreamForDeviceIdResult;
 			const stream = getStreamForDeviceIdResult.data;
 			currentSession = {
-				...config,
+				settings,
 				stream,
 				recorder: null,
 				recordedChunks: [],
@@ -133,7 +134,10 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					message: 'Recording session not initialized',
 				});
 			}
-			const { stream, bitsPerSecond } = currentSession;
+			const {
+				stream,
+				settings: { bitsPerSecond },
+			} = currentSession;
 			const newRecorderResult = trySyncBubble({
 				try: () => new MediaRecorder(stream, { bitsPerSecond }),
 				catch: (error) =>
