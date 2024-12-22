@@ -1,5 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { mediaRecorder } from '$lib/services/mediaRecorder.svelte';
+import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
@@ -16,7 +16,6 @@ import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
