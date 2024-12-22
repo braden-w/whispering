@@ -63,14 +63,14 @@ function createRecorder() {
 			};
 
 			if (recorderState === 'SESSION+RECORDING') {
-				const stopResult = await MediaRecorderService.stopRecording({
+				await MediaRecorderService.stopRecording({
 					onSuccess: (blob: Blob) => {
 						setRecorderState('IDLE');
 						console.info('Recording stopped');
 						void playSound('stop');
 
 						const newRecording: Recording = {
-							id: nanoid(),
+							id: recordingId,
 							title: '',
 							subtitle: '',
 							timestamp: new Date().toISOString(),
