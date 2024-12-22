@@ -68,6 +68,11 @@ type RecordingSession = {
 	recorder: Recorder | null
 }  
 
+type WhisperingCallbacks<T> = {
+	onSuccess: (data: T) => void;
+	onError: (error: WhisperingErr) => void;
+}
+
 type MediaRecorderService = {
 	readonly isInRecordingSession: boolean;
 	enumerateRecordingDevices: () => Promise<
@@ -75,29 +80,15 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-		callbacks: {
-			onSuccess: () => void;
-			onError: (error: WhisperingErr) => void;
-		}
+		callbacks: WhisperingCallbacks<void>
 	) => Promise<void>;
-	closeRecordingSession: (callbacks: {
-		onSuccess: () => void;
-		onError: (error: WhisperingErr) => void;
-	}) => Promise<void>;
+	closeRecordingSession: (callbacks: WhisperingCallbacks<void>) => Promise<void>;
 	startRecording: (
 		{ recordingId }: { recordingId: string },
-		callbacks: {
-		onSuccess: () => void;
-		onError: (error: WhisperingErr) => void;
-	}) => Promise<void>;
-	stopRecording: (callbacks: {
-		onSuccess: (blob: Blob) => void;
-		onError: (error: WhisperingErr) => void;
-	}) => Promise<void>;
-	cancelRecording: (callbacks: {
-		onSuccess: () => void;
-		onError: (error: WhisperingErr) => void;
-	}) => Promise<void>;
+		callbacks: WhisperingCallbacks<void>
+	) => Promise<void>;
+	stopRecording: (callbacks: WhisperingCallbacks<Blob>) => Promise<void>;
+	cancelRecording: (callbacks: WhisperingCallbacks<void>) => Promise<void>;
 };
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
