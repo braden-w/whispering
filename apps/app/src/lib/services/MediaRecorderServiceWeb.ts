@@ -38,16 +38,35 @@ const OpenStreamIsInactiveErr = WhisperingErr({
 } as const);
 type OpenStreamIsInactiveErr = typeof OpenStreamIsInactiveErr;
 
+
 type RecordingSessionSettings = {
 	deviceId: string;
 	bitsPerSecond: number;
 };
+
+type Recorder = {
+		mediaRecorder: MediaRecorder;
+		recordedChunks: Blob[];
+		recordingId: string;
+	}
+
+	type InactiveRecorder = {
+		mediaRecorder: null;
+		recordedChunks: readonly [];
+		recordingId: null;
+	}
+
+	const Recorder = (mediaRecorder: MediaRecorder, recordingId: string) => ({
+		mediaRecorder,
+		recordedChunks: [],
+		recordingId,
+	}) satisfies Recorder;
+
 type RecordingSession = {
 	settings: RecordingSessionSettings;
 	stream: MediaStream;
-	recorder: MediaRecorder | null;
-	recordedChunks: Blob[];
-};
+	recorder: Recorder | null
+}  
 
 type MediaRecorderService = {
 	readonly isInRecordingSession: boolean;
@@ -56,23 +75,29 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-	) => Promise<WhisperingResult<void>>;
-	closeRecordingSession: () => Promise<WhisperingResult<void>>;
-	startRecording: (opts: { recordingId: string }, {
-		onSuccess,
-		onError,
-	}: {
+		callbacks: {
+			onSuccess: () => void;
+			onError: (error: WhisperingErr) => void;
+		}
+	) => Promise<void>;
+	closeRecordingSession: (callbacks: {
 		onSuccess: () => void;
 		onError: (error: WhisperingErr) => void;
 	}) => Promise<void>;
-	stopRecording: ({
-		onSuccess,
-		onError,
-	}: {
+	startRecording: (
+		{ recordingId }: { recordingId: string },
+		callbacks: {
+		onSuccess: () => void;
+		onError: (error: WhisperingErr) => void;
+	}) => Promise<void>;
+	stopRecording: (callbacks: {
 		onSuccess: (blob: Blob) => void;
 		onError: (error: WhisperingErr) => void;
 	}) => Promise<void>;
-	cancelRecording: () => Promise<WhisperingResult<void>>;
+	cancelRecording: (callbacks: {
+		onSuccess: () => void;
+		onError: (error: WhisperingErr) => void;
+	}) => Promise<void>;
 };
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
@@ -106,56 +131,61 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			}),
-		async initRecordingSession(settings) {
+		async initRecordingSession(settings, { onSuccess, onError }) {
 			if (currentSession) {
-				return WhisperingErr({
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '⚠️ Session Already Active',
 					description: 'A recording session is already running and ready to go',
 					action: {
 						type: 'none'
 					}
-				});
+				}));
+				return;
 			}
 			const getStreamForDeviceIdResult = await getStreamForDeviceId(
 				settings.deviceId,
 			);
-			if (!getStreamForDeviceIdResult.ok) return getStreamForDeviceIdResult;
+			if (!getStreamForDeviceIdResult.ok) {
+				onError(getStreamForDeviceIdResult);
+				return;
+			}
 			const stream = getStreamForDeviceIdResult.data;
 			currentSession = {
 				settings,
 				stream,
 				recorder: null,
-				recordedChunks: [],
 			};
-			return Ok(undefined);
+			onSuccess();
 		},
-		async closeRecordingSession() {
+		async closeRecordingSession({ onSuccess, onError }) {
 			if (!currentSession) {
-				return WhisperingErr({
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
 					description: 'There\'s no recording session to close at the moment',
 					action: { type: 'none' }
-				});
+				}));
+				return;
 			}
-			if (currentSession.recorder) {
-				return WhisperingErr({
+			const { recorder } = currentSession;
+			if (recorder) {
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '⏺️ Recording in Progress',
 					description: 'Please stop or cancel your current recording first before closing the session',
 					action: {
 						type: 'none'
 					}
-				});
+				}));
+				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
 			}
 			currentSession.recorder = null;
-			currentSession.recordedChunks = [];
 			currentSession = null;
-			return Ok(undefined);
+			onSuccess();
 		},
 		async startRecording({ recordingId }, { onSuccess, onError }) {
 			if (!currentSession) {
@@ -184,17 +214,18 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				onError(newRecorderResult);
 				return;
 			}
-			const newRecorder = newRecorderResult.data as MediaRecorder;
+			const newRecorder = newRecorderResult.data
+			currentSession.recorder = { mediaRecorder: newRecorder, recordedChunks: [], recordingId,
+			}
 			newRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 				if (!currentSession || !event.data.size) return;
-				currentSession.recordedChunks.push(event.data);
+				currentSession.recorder?.recordedChunks.push(event.data);
 			});
 			newRecorder.start(TIMESLICE_MS);
-			currentSession.recorder = newRecorder;
 			onSuccess();
 		},
 		async stopRecording({ onSuccess, onError }) {
-			if (!currentSession?.recorder){
+			if (!currentSession?.recorder?.mediaRecorder){
 				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '⚠️ Nothing to Stop',
@@ -208,12 +239,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const stopResult = await tryAsyncWhispering({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
-						if (!currentSession?.recorder) {
+						if (!currentSession?.recorder?.mediaRecorder) {
 							reject(new Error('No active media recorder'));
 							return;
 						}
-						currentSession.recorder.addEventListener('stop', () => {
-							if (!currentSession?.recorder) {
+						currentSession.recorder.mediaRecorder.addEventListener('stop', () => {
+							if (!currentSession?.recorder?.mediaRecorder) {
 								reject(
 									new Error(
 										'Media recorder was nullified before stop event listener',
@@ -221,12 +252,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 								);
 								return;
 							}
-							const audioBlob = new Blob(currentSession.recordedChunks, {
-								type: currentSession.recorder.mimeType,
+							const audioBlob = new Blob(currentSession.recorder.recordedChunks, {
+								type: currentSession.recorder.mediaRecorder.mimeType,
 							});
 							resolve(audioBlob);
 						});
-						currentSession.recorder.stop();
+						currentSession.recorder.mediaRecorder.stop();
 					}),
 				catch: (error) => ({
 					_tag: 'WhisperingError',
@@ -242,21 +273,24 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const blob = stopResult.data;
 			onSuccess(blob);
 		},
-		async cancelRecording() {
-			if (!currentSession?.recorder){
-				return WhisperingErr({
+		async cancelRecording({ onSuccess, onError }) {
+			if (!currentSession?.recorder?.mediaRecorder){
+				onError(WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '⚠️ Nothing to Cancel',
 					description: 'No active recording found to cancel',
 					action: {
 						type: 'none'
 					}
-				});
+				}));
+				return;
 			}
-			currentSession.recorder.stop();
+			for (const track of currentSession.stream.getTracks()) {
+				track.stop();
+			}
+			currentSession.recorder.mediaRecorder.stop();
 			currentSession.recorder = null;
-			currentSession.recordedChunks = [];
-			return Ok(undefined);
+			onSuccess();
 		},
 	};
 };
