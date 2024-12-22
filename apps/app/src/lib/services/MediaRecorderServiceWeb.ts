@@ -115,11 +115,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			if (!newRecorderResult.ok) return newRecorderResult;
 			const newRecorder = newRecorderResult.data;
 			newRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-				if (!event.data.size) return;
-				recordedChunks.push(event.data);
+				if (!currentSession || !event.data.size) return;
+				currentSession.recordedChunks.push(event.data);
 			});
 			newRecorder.start(TIMESLICE_MS);
-			recorder = newRecorder;
+			currentSession.recorder = newRecorder;
 			return Ok(undefined);
 		},
 		async stopRecording() {
@@ -189,16 +189,8 @@ const createMediaRecorderServiceNative = () => {
 // if enabled, destroy the stream and recorder
 
 function createMediaStreamManager() {
-	const setStream = (stream: MediaStream | null) => {
-		currentStream = stream;
-	};
-
 	return {
-		get stream() {
-			return currentStream;
-		},
 		async refreshStream(): Promise<WhisperingResult<MediaStream>> {
-			this.destroy();
 			const toastId = nanoid();
 			toast.loading({
 				id: toastId,
