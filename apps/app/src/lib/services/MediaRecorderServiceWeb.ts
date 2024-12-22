@@ -186,96 +186,39 @@ const createMediaRecorderServiceNative = () => {
 	};
 };
 
-// startRecording:
-// if browser: if stream is already there, create new recorder with same stream
-// if native: if stream + recorder is already there, return it
-
-// stopRecording:
-// stop it and return the blob
-// if enabled, destroy the stream and recorder
-
-function createMediaStreamManager() {
-	return {
-		async refreshStream(): Promise<WhisperingResult<MediaStream>> {
-			const toastId = nanoid();
-			toast.loading({
-				id: toastId,
-				title: 'Connecting to selected audio input device...',
-				description: 'Please allow access to your microphone if prompted.',
-			});
-			if (!settings.value.selectedAudioInputDeviceId) {
-				toast.loading({
-					id: toastId,
-					title: 'No device selected',
-					description: 'Defaulting to first available audio input device...',
-				});
-				const firstAvailableStreamResult = await getFirstAvailableStream({
-					onSuccess: (stream, deviceId) => {
-						settings.value.selectedAudioInputDeviceId = deviceId;
-						setStream(stream);
-					},
-					onError: () => {
-						toast.dismiss(toastId);
-					},
-				});
-				if (!firstAvailableStreamResult.ok) return firstAvailableStreamResult;
-				const firstAvailableStream = firstAvailableStreamResult.data;
-				setStream(firstAvailableStream);
-				toast.info({
-					id: toastId,
-					title: 'Defaulted to first available audio input device',
-					description: 'You can select a specific device in the settings.',
-				});
-				return Ok(firstAvailableStream);
-			}
-			const maybeStream = await getStreamForDeviceId(
-				settings.value.selectedAudioInputDeviceId,
-			);
-			if (maybeStream !== null) {
-				setStream(maybeStream);
-				toast.success({
-					id: toastId,
-					title: 'Connected to selected audio input device',
-					description: 'Successfully connected to your microphone stream.',
-				});
-				return Ok(maybeStream);
-			}
-			toast.loading({
-				id: toastId,
-				title: 'Error connecting to selected audio input device',
-				description: 'Trying to find another available audio input device...',
-			});
-			const firstAvailableStreamResult = await getFirstAvailableStream({
-				onSuccess: (stream, deviceId) => {
-					settings.value.selectedAudioInputDeviceId = deviceId;
-					setStream(stream);
-				},
-				onError: () => {
-					toast.dismiss(toastId);
-				},
-			});
-			if (!firstAvailableStreamResult.ok) {
-				toast.dismiss(toastId);
-				return firstAvailableStreamResult;
-			}
-			const firstAvailableStream = firstAvailableStreamResult.data;
-			setStream(firstAvailableStream);
-			toast.info({
-				id: toastId,
-				title: 'Defaulted to first available audio input device',
-				description: 'You can select a specific device in the settings.',
-			});
-			return Ok(firstAvailableStream);
-		},
-		destroy() {
-			if (currentStream === null) return;
-			for (const track of currentStream.getTracks()) {
-				track.stop();
-			}
-			setStream(null);
-		},
-	} as const;
+const toastId = nanoid();
+toast.loading({
+	id: toastId,
+	title: 'Connecting to selected audio input device...',
+	description: 'Please allow access to your microphone if prompted.',
+});
+if (!settings.value.selectedAudioInputDeviceId) {
+	toast.loading({
+		id: toastId,
+		title: 'No device selected',
+		description: 'Defaulting to first available audio input device...',
+	});
 }
+toast.info({
+	id: toastId,
+	title: 'Defaulted to first available audio input device',
+	description: 'You can select a specific device in the settings.',
+});
+toast.success({
+	id: toastId,
+	title: 'Connected to selected audio input device',
+	description: 'Successfully connected to your microphone stream.',
+});
+toast.loading({
+	id: toastId,
+	title: 'Error connecting to selected audio input device',
+	description: 'Trying to find another available audio input device...',
+});
+toast.info({
+	id: toastId,
+	title: 'Defaulted to first available audio input device',
+	description: 'You can select a specific device in the settings.',
+});
 
 async function enumerateRecordingDevices() {
 	return tryAsyncWhispering({
