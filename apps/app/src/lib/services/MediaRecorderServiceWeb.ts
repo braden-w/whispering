@@ -1,7 +1,7 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import {
 	BubbleErr,
-	type BubbleResult,
+	type WhisperingResult,
 	Ok,
 	type OnlyErrors,
 	WhisperingErr,
@@ -17,19 +17,24 @@ import type { Result } from '@epicenterhq/result';
 
 const TIMESLICE_MS = 1000;
 
-const OpenStreamDoesNotExistErr = BubbleErr({
-	_tag: 'OpenStreamDoesNotExistErr',
-	message: 'Error initializing media recorder with preferred device',
-	// title: 'Error initializing media recorder with preferred device',
-	// description: 'Trying to find another available audio input device...',
+const OpenStreamDoesNotExistErr = WhisperingErr({
+	_tag: 'WhisperingError',
+	title: '🎤 Microphone Setup Needed',
+	description: 'Looking for alternative audio devices to get you started...',
+	action: {
+		type: 'link',
+		label: 'Open Settings',
+		goto: '/settings'
+	}
 } as const);
-type OpenStreamDoesNotExistErr = typeof OpenStreamDoesNotExistErr;
 
-const OpenStreamIsInactiveErr = BubbleErr({
-	_tag: 'OpenStreamIsInactiveErr',
-	message: 'Open stream is inactive',
-	// title: 'Open stream is inactive',
-	// description: 'Refreshing recording session...',
+const OpenStreamIsInactiveErr = WhisperingErr({
+	_tag: 'WhisperingError',
+	title: '🔄 Recording Session Expired',
+	description: 'Refreshing your recording session to get you back on track...',
+	action: {
+		type: 'none'
+	}
 } as const);
 type OpenStreamIsInactiveErr = typeof OpenStreamIsInactiveErr;
 
@@ -51,13 +56,13 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-	) => Promise<BubbleResult<void>>;
-	closeRecordingSession: () => Promise<BubbleResult<void>>;
+	) => Promise<WhisperingResult<void>>;
+	closeRecordingSession: () => Promise<WhisperingResult<void>>;
 	startRecording: (opts: { recordingId: string }) => Promise<
-		BubbleResult<void>
+		WhisperingResult<void>
 	>;
-	stopRecording: () => Promise<BubbleResult<Blob>>;
-	cancelRecording: () => Promise<BubbleResult<void>>;
+	stopRecording: () => Promise<WhisperingResult<Blob>>;
+	cancelRecording: () => Promise<WhisperingResult<void>>;
 };
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
@@ -93,9 +98,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			}),
 		async initRecordingSession(settings) {
 			if (currentSession) {
-				return BubbleErr({
-					_tag: 'RecordingSessionAlreadyInitializedErr',
-					message: 'Recording session already initialized',
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '⚠️ Session Already Active',
+					description: 'A recording session is already running and ready to go',
+					action: {
+						type: 'none'
+					}
 				});
 			}
 			const getStreamForDeviceIdResult = await getStreamForDeviceId(
@@ -113,17 +122,24 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		},
 		async closeRecordingSession() {
 			if (!currentSession) {
-				return BubbleErr({
-					_tag: 'RecordingSessionNotInitializedErr',
-					message: 'Attempted to close recording session without initializing',
-				} as const);
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ No Active Session',
+					description: 'There\'s no recording session to close at the moment',
+					action: {
+						type: 'none'
+					}
+				});
 			}
 			if (currentSession.recorder) {
-				return BubbleErr({
-					_tag: 'RecordingSessionNotInitializedErr',
-					message:
-						'Attempted to close recording session without stopping or canceling',
-				} as const);
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '⏺️ Recording in Progress',
+					description: 'Please stop or cancel your current recording first before closing the session',
+					action: {
+						type: 'none'
+					}
+				});
 			}
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
@@ -135,25 +151,28 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		},
 		async startRecording({ recordingId }) {
 			if (!currentSession) {
-				return BubbleErr({
-					_tag: 'RecordingSessionNotInitializedErr',
-					message: 'Recording session not initialized',
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ No Active Session',
+					description: 'There\'s no recording session to start recording in at the moment',
+					action: { type: 'none' }
 				});
 			}
 			const {
 				stream,
 				settings: { bitsPerSecond },
 			} = currentSession;
-			const newRecorderResult = trySyncBubble({
-				try: () => new MediaRecorder(stream, { bitsPerSecond }),
-				catch: (error) =>
-					({
-						_tag: 'InitMediaRecorderFromStreamErr',
-						message: 'Error initializing media recorder from stream',
-					}) as const,
+			const newRecorderResult = await tryAsyncWhispering({
+				try: async () => new MediaRecorder(stream, { bitsPerSecond }),
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: '🎙️ Recording Setup Failed',
+					description: 'Unable to initialize your microphone. Please try again',
+					action: { type: 'more-details', error }
+				})
 			});
 			if (!newRecorderResult.ok) return newRecorderResult;
-			const newRecorder = newRecorderResult.data;
+			const newRecorder = newRecorderResult.data as MediaRecorder;
 			newRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
 				if (!currentSession || !event.data.size) return;
 				currentSession.recordedChunks.push(event.data);
@@ -163,7 +182,17 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			return Ok(undefined);
 		},
 		async stopRecording() {
-			const stopResult = await tryAsyncBubble({
+			if (!currentSession?.recorder){
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '⚠️ Nothing to Stop',
+					description: 'No active recording found to stop',
+					action: {
+						type: 'none'
+					}
+				});
+			}
+			const stopResult = await tryAsyncWhispering({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
 						if (!currentSession?.recorder) {
@@ -186,26 +215,28 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						});
 						currentSession.recorder.stop();
 					}),
-				catch: (error) =>
-					({
-						_tag: 'StopMediaRecorderErr',
-
-						message:
-							error instanceof Error
-								? `Error stopping media recorder: ${error.message}`
-								: 'Error stopping media recorder',
-					}) as const,
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: '⏹️ Recording Stop Failed',
+					description: 'Unable to save your recording. Please try again',
+					action: { type: 'more-details', error }
+				})
 			});
 			if (!stopResult.ok) return stopResult;
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
 		async cancelRecording() {
-			if (!currentSession?.recorder)
-				return BubbleErr({
-					_tag: 'CancelRecordingErr',
-					message: 'No active media recorder',
-				} as const);
+			if (!currentSession?.recorder){
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '⚠️ Nothing to Cancel',
+					description: 'No active recording found to cancel',
+					action: {
+						type: 'none'
+					}
+				});
+			}
 			currentSession.recorder.stop();
 			currentSession.recorder = null;
 			currentSession.recordedChunks = [];
@@ -244,13 +275,15 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 	};
 };
 
-async function invoke<T>(command: string): Promise<BubbleResult<T>> {
-	return tryAsyncBubble({
+async function invoke<T>(command: string): Promise<WhisperingResult<T>> {
+	return tryAsyncWhispering({
 		try: async () => await tauriInvoke<T>(command),
 		catch: (error) => ({
-			_tag: 'InnerInvokeErr',
-			message: `Error invoking command ${command}: ${error.message}`,
-		}),
+			_tag: 'WhisperingError',
+			title: 'Command Execution Failed',
+			description: `Error invoking command ${command}`,
+			action: { type: 'more-details', error }
+		})
 	});
 }
 
@@ -309,8 +342,8 @@ toast.loading({
 });
 
 const NoAvailableAudioInputDevicesErr = WhisperingErr({
-	title: 'No available audio input devices',
-	description: 'Please make sure you have a microphone connected',
+	title: '🎙️ No Microphone Found',
+	description: 'Connect a microphone to start recording your awesome content',
 	action: {
 		type: 'link',
 		label: 'Open Settings',
@@ -368,7 +401,7 @@ async function getFirstAvailableStream({
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
-	return tryAsyncBubble({
+	return tryAsyncWhispering({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
@@ -380,8 +413,11 @@ async function getStreamForDeviceId(recordingDeviceId: string) {
 			return stream;
 		},
 		catch: (error) => ({
-			_tag: 'GetStreamForDeviceIdErr',
-			message: `Error getting stream for device id ${recordingDeviceId}: ${error.message}`,
-		}),
+			_tag: 'WhisperingError',
+			title: '🎤 Microphone Access Error',
+			description: 'Unable to connect to your selected microphone',
+			action: { type: 'more-details', error
+			}
+		})
 	});
 }
