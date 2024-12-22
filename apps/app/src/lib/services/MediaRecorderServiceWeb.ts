@@ -43,7 +43,7 @@ type RecordingSession = UserRecordingSessionConfig & {
 };
 
 type MediaRecorderService = {
-	enumerateRecordingDevices: () => Promise<BubbleResult<MediaDeviceInfo[]>>;
+	enumerateRecordingDevices: () => Promise<WhisperingResult<MediaDeviceInfo[]>>;
 	initRecordingSession: (
 		userRecordingSessionConfig: UserRecordingSessionConfig,
 	) => Promise<BubbleResult<void>>;
@@ -59,7 +59,30 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	return {
-		enumerateRecordingDevices,
+		enumerateRecordingDevices: async () =>
+			tryAsyncWhispering({
+				try: async () => {
+					const allAudioDevicesStream =
+						await navigator.mediaDevices.getUserMedia({
+							audio: true,
+						});
+					const devices = await navigator.mediaDevices.enumerateDevices();
+					for (const track of allAudioDevicesStream.getTracks()) {
+						track.stop();
+					}
+					const audioInputDevices = devices.filter(
+						(device) => device.kind === 'audioinput',
+					);
+					return audioInputDevices;
+				},
+				catch: (error) => ({
+					_tag: 'WhisperingError',
+					title: 'Error enumerating recording devices',
+					description:
+						'Please make sure you have given permission to access your audio devices',
+					action: { type: 'more-details', error },
+				}),
+			}),
 		async initRecordingSession(config) {
 			const getStreamForDeviceIdResult = await getStreamForDeviceId(
 				config.deviceId,
@@ -149,6 +172,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				catch: (error) =>
 					({
 						_tag: 'StopMediaRecorderErr',
+
 						message:
 							error instanceof Error
 								? `Error stopping media recorder: ${error.message}`
@@ -220,34 +244,6 @@ toast.info({
 	description: 'You can select a specific device in the settings.',
 });
 
-async function enumerateRecordingDevices() {
-	return tryAsyncWhispering({
-		try: async () => {
-			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-				audio: true,
-			});
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			for (const track of allAudioDevicesStream.getTracks()) {
-				track.stop();
-			}
-			const audioInputDevices = devices.filter(
-				(device) => device.kind === 'audioinput',
-			);
-			return audioInputDevices;
-		},
-		catch: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Error enumerating recording devices',
-			description:
-				'Please make sure you have given permission to access your audio devices',
-			action: {
-				type: 'more-details',
-				error,
-			},
-		}),
-	});
-}
-
 const NoAvailableAudioInputDevicesErr = WhisperingErr({
 	title: 'No available audio input devices',
 	description: 'Please make sure you have a microphone connected',
@@ -265,7 +261,35 @@ async function getFirstAvailableStream({
 	onSuccess: (stream: MediaStream, deviceId: string) => void;
 	onError: (error: typeof NoAvailableAudioInputDevicesErr) => void;
 }) {
-	const recordingDevicesResult = await enumerateRecordingDevices();
+	const recordingDevicesResult = await (async () => {
+		return tryAsyncWhispering({
+			try: async () => {
+				const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia(
+					{
+						audio: true,
+					},
+				);
+				const devices = await navigator.mediaDevices.enumerateDevices();
+				for (const track of allAudioDevicesStream.getTracks()) {
+					track.stop();
+				}
+				const audioInputDevices = devices.filter(
+					(device) => device.kind === 'audioinput',
+				);
+				return audioInputDevices;
+			},
+			catch: (error) => ({
+				_tag: 'WhisperingError',
+				title: 'Error enumerating recording devices',
+				description:
+					'Please make sure you have given permission to access your audio devices',
+				action: {
+					type: 'more-details',
+					error,
+				},
+			}),
+		});
+	})();
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
 	const recordingDevices = recordingDevicesResult.data;
 
