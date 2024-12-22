@@ -17,6 +17,7 @@ import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import { createMediaRecorderServiceWeb } from '$lib/services/MediaRecorderServiceWeb';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -28,17 +29,17 @@ export const recorder = createRecorder();
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
+	const setRecorderState = (newValue: WhisperingRecordingState) => {
+		recorderState = newValue;
+		(async () => {
+			const result = await SetTrayIconService.setTrayIcon(newValue);
+			if (!result.ok) renderErrAsToast(result);
+		})();
+	};
 
 	return {
 		get recorderState() {
 			return recorderState;
-		},
-		set recorderState(newValue: WhisperingRecordingState) {
-			recorderState = newValue;
-			(async () => {
-				const result = await SetTrayIconService.setTrayIcon(newValue);
-				if (!result.ok) renderErrAsToast(result);
-			})();
 		},
 
 		async toggleRecording(): Promise<void> {
@@ -105,7 +106,7 @@ function createRecorder() {
 				}
 			} else {
 				if (settings.value.isFasterRerecordEnabled) {
-					await MediaRecorderService.startFromExistingStream(
+					await MediaRecorderService.startFromExistingRecordingSession(
 						{ bitsPerSecond: Number(settings.value.bitrateKbps) * 1000 },
 						{
 							onSuccess: onStartSuccess,
@@ -117,7 +118,7 @@ function createRecorder() {
 											description: 'Creating a new recording session...',
 										});
 										const startResult =
-											await MediaRecorderService.startFromNewStream({
+											await MediaRecorderService.startFromNewRecordingSession({
 												bitsPerSecond:
 													Number(settings.value.bitrateKbps) * 1000,
 											});
@@ -153,7 +154,7 @@ function createRecorder() {
 						},
 					);
 				} else {
-					await MediaRecorderService.startFromExistingStream(
+					await MediaRecorderService.startFromExistingRecordingSession(
 						{ bitsPerSecond: Number(settings.value.bitrateKbps) * 1000 },
 						{
 							onSuccess: onStartSuccess,
