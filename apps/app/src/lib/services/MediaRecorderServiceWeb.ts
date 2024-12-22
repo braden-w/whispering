@@ -283,6 +283,26 @@ toast.info({
 	title: 'Defaulted to first available audio input device',
 	description: 'You can select a specific device in the settings.',
 });
+toast.loading({
+	title: 'Existing recording session not found',
+	description: 'Creating a new recording session...',
+});
+toast.error({
+	title: 'Error creating new recording session',
+	description: 'Please try again',
+});
+toast.loading({
+	title: 'Recording session created',
+	description: 'Recording in progress...',
+});
+toast.loading({
+	title: 'Existing recording session is inactive',
+	description: 'Refreshing recording session...',
+});
+toast.loading({
+	title: 'Error initializing media recorder with preferred device',
+	description: 'Trying to find another available audio input device...',
+});
 
 const NoAvailableAudioInputDevicesErr = WhisperingErr({
 	title: 'No available audio input devices',
