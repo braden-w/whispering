@@ -13,6 +13,7 @@ import {
 import { invoke } from '@tauri-apps/api/core';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
+import type { Result } from '@epicenterhq/result';
 
 const TIMESLICE_MS = 1000;
 
@@ -43,7 +44,9 @@ type RecordingSession = UserRecordingSessionConfig & {
 };
 
 type MediaRecorderService = {
-	enumerateRecordingDevices: () => Promise<WhisperingResult<MediaDeviceInfo[]>>;
+	enumerateRecordingDevices: () => Promise<
+		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
+	>;
 	initRecordingSession: (
 		userRecordingSessionConfig: UserRecordingSessionConfig,
 	) => Promise<BubbleResult<void>>;
@@ -197,16 +200,49 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	};
 };
 
-const createMediaRecorderServiceNative = () => {
+const createMediaRecorderServiceNative = (): MediaRecorderService => {
+	const innerInvoke = async <T>(command: string): Promise<BubbleResult<T>> => {
+		try {
+			return Ok(await invoke<T>(command));
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: typeof error === 'string'
+						? error
+						: 'Unknown error';
+			return BubbleErr({
+				_tag: 'InnerInvokeErr',
+				message: `Error invoking command ${command}: ${errorMessage}`,
+			});
+		}
+	};
 	return {
-		startFromExistingRecordingSession() {},
-		startFromNewRecordingSession() {
-			invoke('start');
+		enumerateRecordingDevices: async () => {
+			const invokeResult = await innerInvoke<string[]>(
+				'enumerate_recording_devices',
+			);
+			if (!invokeResult.ok) {
+				return WhisperingErr({
+					title: 'Error enumerating recording devices',
+					description:
+						'Please make sure you have given permission to access your audio devices',
+					action: { type: 'more-details', error: invokeResult.error },
+				});
+			}
+			const deviceNames = invokeResult.data;
+			return Ok(
+				deviceNames.map((deviceName) => ({
+					deviceId: deviceName,
+					label: deviceName,
+				})),
+			);
 		},
-		stopKeepStream() {},
-		stopAndCloseStream() {
-			invoke('stop');
-		},
+		initRecordingSession: async () => innerInvoke('init_recording_session'),
+		closeRecordingSession: async () => innerInvoke('close_recording_session'),
+		startRecording: async () => innerInvoke('start_recording'),
+		stopRecording: async () => innerInvoke('stop_recording'),
+		cancelRecording: async () => innerInvoke('cancel_recording'),
 	};
 };
 
