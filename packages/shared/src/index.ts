@@ -150,7 +150,7 @@ type ServiceErrorSystem<ErrProps extends Record<string, unknown>> = {
 
 export function createServiceErrorSystem<
 	ErrorProps extends Record<string, unknown>,
->(): ServiceErrorSystem<ErrorProps> {
+>(_errorType?: ErrorProps): ServiceErrorSystem<ErrorProps> {
 	return {
 		Ok: (data) => ({ ok: true, data }),
 		Err: (props) => ({ ok: false, error: props }),
