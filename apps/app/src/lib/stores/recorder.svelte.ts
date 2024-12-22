@@ -166,7 +166,7 @@ function createRecorder() {
 				recorderState = 'IDLE';
 			};
 
-			const cancelResult = await MediaRecorderService.cancelAndCloseStream();
+			const cancelResult = await MediaRecorderService.cancelRecording();
 			if (!cancelResult.ok) {
 				switch (cancelResult.error._tag) {
 					case 'OpenStreamDoesNotExistErr':
@@ -177,6 +177,14 @@ function createRecorder() {
 						break;
 				}
 				return;
+			}
+			if (!settings.value.isFasterRerecordEnabled) {
+				const closeRecordingSessionResult =
+					await MediaRecorderService.closeRecordingSession();
+				if (!closeRecordingSessionResult.ok) {
+					renderErrAsToast(closeRecordingSessionResult);
+					return;
+				}
 			}
 			onCancelSuccess();
 		},
