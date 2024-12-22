@@ -167,6 +167,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				} as const);
 			currentSession.recorder.stop();
 			currentSession.recorder = null;
+			currentSession.recordedChunks = [];
 			return Ok(undefined);
 		},
 	};
