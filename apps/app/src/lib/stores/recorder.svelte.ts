@@ -42,7 +42,6 @@ function createRecorder() {
 		},
 
 		async toggleRecording(): Promise<void> {
-			const onStopError = renderErrAsToast;
 			const onStopSuccess = (blob: Blob) => {
 				recorderState = 'IDLE';
 				console.info('Recording stopped');
@@ -97,6 +96,8 @@ function createRecorder() {
 					renderErrAsToast(stopResult);
 					return;
 				}
+				const blob = stopResult.data;
+				onStopSuccess(blob);
 				if (!settings.value.isFasterRerecordEnabled) {
 					const endSessionResult =
 						await MediaRecorderService.closeRecordingSession();
@@ -120,6 +121,7 @@ function createRecorder() {
 							recordingId: newRecordingId,
 						});
 					if (!startRecordingResult.ok) return startRecordingResult;
+					onStartSuccess();
 					return Ok(undefined);
 				};
 
@@ -133,6 +135,7 @@ function createRecorder() {
 							renderErrAsToast(startRecordingResult);
 							return;
 						}
+						onStartSuccess();
 					} else {
 						const startSessionAndRecordingResult =
 							await startSessionAndRecording();
