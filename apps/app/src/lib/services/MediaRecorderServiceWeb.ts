@@ -126,28 +126,33 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const stopResult = await tryAsyncBubble({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
-						if (!recorder) {
+						if (!currentSession?.recorder) {
 							reject(new Error('No active media recorder'));
 							return;
 						}
-						recorder.addEventListener('stop', () => {
-							if (!recorder) {
+						currentSession.recorder.addEventListener('stop', () => {
+							if (!currentSession?.recorder) {
 								reject(
-									new Error('Media recorder was nullified during stop event'),
+									new Error(
+										'Media recorder was nullified before stop event listener',
+									),
 								);
 								return;
 							}
-							const audioBlob = new Blob(recordedChunks, {
-								type: recorder.mimeType,
+							const audioBlob = new Blob(currentSession.recordedChunks, {
+								type: currentSession.recorder.mimeType,
 							});
 							resolve(audioBlob);
 						});
-						recorder.stop();
+						currentSession.recorder.stop();
 					}),
 				catch: (error) =>
 					({
 						_tag: 'StopMediaRecorderErr',
-						message: 'Error stopping media recorder',
+						message:
+							error instanceof Error
+								? `Error stopping media recorder: ${error.message}`
+								: 'Error stopping media recorder',
 					}) as const,
 			});
 			if (!stopResult.ok) return stopResult;
