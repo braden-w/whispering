@@ -88,7 +88,8 @@ function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
 
-	const recorderStateAsIcon = recorderState === 'RECORDING' ? '🔲' : '🎙️';
+	const recorderStateAsIcon =
+		recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
 
 	const copyToClipboardText = (() => {
 		if (recorderState === 'LOADING') return '...';
@@ -127,7 +128,7 @@ function IndexPage() {
 							{recorderStateAsIcon}
 						</span>
 					</WhisperingButton>
-					{recorderState === 'RECORDING' && (
+					{recorderState === 'SESSION+RECORDING' && (
 						<WhisperingButton
 							tooltipContent="Cancel recording"
 							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"

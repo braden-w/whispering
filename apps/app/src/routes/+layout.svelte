@@ -5,7 +5,7 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { ModeWatcher, mode } from 'mode-watcher';
@@ -13,6 +13,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
+	import { recordings } from '$lib/stores/recordings.svelte';
 
 	let { children } = $props();
 
@@ -28,8 +29,8 @@
 				break;
 			case 'When Recording and Transcribing':
 				if (
-					recorderState.value === 'RECORDING' ||
-					recorderState.value === 'LOADING'
+					recorder.recorderState === 'SESSION+RECORDING' ||
+					recordings.isTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {
@@ -37,7 +38,7 @@
 				}
 				break;
 			case 'When Recording':
-				if (recorderState.value === 'RECORDING') {
+				if (recorder.recorderState === 'SESSION+RECORDING') {
 					void setAlwaysOnTop(true);
 				} else {
 					void setAlwaysOnTop(false);
@@ -64,11 +65,6 @@
 		window.toggleRecording = recorder.toggleRecording;
 		window.cancelRecording = recorder.cancelRecording;
 		window.goto = goto;
-		window.addEventListener('beforeunload', () => {
-			if (recorderState.value === 'RECORDING') {
-				recorderState.value = 'IDLE';
-			}
-		});
 		if (!window.__TAURI_INTERNALS__) {
 			const sendMessageToExtensionResult = await sendMessageToExtension({
 				name: 'whispering-extension/notifyWhisperingTabReady',
@@ -99,7 +95,7 @@
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
 		class="text-[48px] leading-none"
 	>
-		{#if recorder.recorderState === 'RECORDING'}
+		{#if recorder.recorderState === 'SESSION+RECORDING'}
 			🔲
 		{:else}
 			🎙️

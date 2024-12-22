@@ -153,14 +153,18 @@ export const parseJson = (value: string) =>
 		}),
 	});
 
-export const recordingStateSchema = z.enum(['IDLE', 'RECORDING', 'LOADING']);
+export const recordingStateSchema = z.enum([
+	'IDLE',
+	'SESSION',
+	'SESSION+RECORDING',
+]);
 
 export type WhisperingRecordingState = z.infer<typeof recordingStateSchema>;
 
 export const recorderStateToIcons = {
-	RECORDING: '🔲',
-	LOADING: '🔄',
 	IDLE: '🎙️',
+	SESSION: '🎙️',
+	'SESSION+RECORDING': '🔲',
 } as const satisfies Record<WhisperingRecordingState, string>;
 
 export const externalMessageSchema = z.discriminatedUnion('name', [

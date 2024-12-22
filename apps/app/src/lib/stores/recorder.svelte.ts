@@ -74,7 +74,7 @@ function createRecorder() {
 			};
 
 			const onStartSuccess = () => {
-				setRecorderState('RECORDING');
+				setRecorderState('SESSION+RECORDING');
 				console.info('Recording started');
 				void playSound('start');
 				void NotificationService.notify({
@@ -89,7 +89,7 @@ function createRecorder() {
 				});
 			};
 
-			if (recorderState === 'RECORDING') {
+			if (recorderState === 'SESSION+RECORDING') {
 				const stopResult = await MediaRecorderService.stopRecording();
 				if (!stopResult.ok) {
 					renderErrAsToast(stopResult);

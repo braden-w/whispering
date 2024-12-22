@@ -33,7 +33,7 @@
 	);
 
 	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'RECORDING' ? '🔲' : '🎙️',
+		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
 	);
 </script>
 

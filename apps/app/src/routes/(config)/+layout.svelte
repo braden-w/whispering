@@ -33,7 +33,7 @@
 		size="icon"
 		style="view-transition-name: microphone-icon"
 	>
-		{#if recorder.recorderState === 'RECORDING'}
+		{#if recorder.recorderState === 'SESSION+RECORDING'}
 			🔲
 		{:else}
 			🎙️
