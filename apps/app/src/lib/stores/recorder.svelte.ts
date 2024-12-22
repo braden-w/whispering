@@ -41,7 +41,9 @@ function createRecorder() {
 			return recorderState;
 		},
 		get isInRecordingSession() {
-			return recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION';
+			return (
+				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
+			);
 		},
 		async toggleRecording(): Promise<void> {
 			const onStopSuccess = (blob: Blob) => {
@@ -157,24 +159,23 @@ function createRecorder() {
 			}
 		},
 		async cancelRecording() {
-			const onCancelSuccess = () => {
-				void playSound('cancel');
-				console.info('Recording cancelled');
-				setRecorderState('IDLE');
-			};
+			if (!this.isInRecordingSession) {
+				return renderErrAsToast(
+					WhisperingErr({
+						_tag: 'WhisperingError',
+						title: '❌ No Active Session',
+						description: "There's no recording session to cancel at the moment",
+						action: { type: 'none' },
+					}),
+				);
+			}
 
 			const cancelResult = await MediaRecorderService.cancelRecording();
 			if (!cancelResult.ok) {
-				switch (cancelResult.error._tag) {
-					case 'OpenStreamDoesNotExistErr':
-						toast.success({
-							title: 'No existing recording session found to cancel',
-							description: 'You can start a new recording session',
-						});
-						break;
-				}
+				renderErrAsToast(cancelResult);
 				return;
 			}
+
 			if (!settings.value.isFasterRerecordEnabled) {
 				const closeRecordingSessionResult =
 					await MediaRecorderService.closeRecordingSession();
@@ -183,7 +184,9 @@ function createRecorder() {
 					return;
 				}
 			}
-			onCancelSuccess();
+			void playSound('cancel');
+			console.info('Recording cancelled');
+			setRecorderState('IDLE');
 		},
 		async closeRecordingSession() {
 			if (!this.isInRecordingSession) {
@@ -191,11 +194,10 @@ function createRecorder() {
 					WhisperingErr({
 						_tag: 'WhisperingError',
 						title: '❌ No Active Session',
-						description: 'There\'s no recording session to close at the moment',
+						description: "There's no recording session to close at the moment",
 						action: { type: 'none' },
 					}),
 				);
-				return;
 			}
 			const closeRecordingSessionResult =
 				await MediaRecorderService.closeRecordingSession();
