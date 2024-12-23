@@ -28,6 +28,52 @@ const cancelSound = new Audio(cancelSoundSrc);
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
+const createMutation = <I, O, ServiceError, TContext>({
+	mutationFn,
+	onMutate,
+	onSuccess,
+	onError,
+	onSettled,
+}: {
+	mutationFn: (
+		input: I,
+		context?: TContext,
+	) => Promise<Result<O, ServiceError>>;
+	onMutate: (
+		input: I,
+	) => Promise<Result<TContext, ServiceError>> | Result<TContext, ServiceError>;
+	onSuccess: (data: O, input: I, context: TContext | undefined) => void;
+	onError: (
+		error: ServiceError,
+		input: I,
+		context: TContext | undefined,
+	) => void;
+	onSettled: (
+		result: Result<O, ServiceError>,
+		input: I,
+		context: TContext | undefined,
+	) => void;
+}) => {
+	const mutate = async (input: I): Promise<void> => {
+		let context: TContext | undefined;
+		const onMutateResult = await onMutate(input);
+		if (!onMutateResult.ok) {
+			onError(onMutateResult.error, input, context);
+			onSettled(onMutateResult, input, context);
+			return;
+		}
+		context = onMutateResult.data;
+		const result = await mutationFn(input, context);
+		if (!result.ok) {
+			onError(result.error, input, context);
+			onSettled(result, input, context);
+			return;
+		}
+		onSuccess(result.data, input, context);
+		onSettled(result, input, context);
+	};
+	return { mutate };
+};
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
