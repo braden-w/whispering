@@ -114,29 +114,13 @@ export const createRecordings = (): RecordingsService => {
 			{ onMutate, onSuccess, onError, onSettled },
 		) {
 			onMutate(id);
-			const oldRecordingIndex = recordings.findIndex((r) => r.id === id);
-			if (oldRecordingIndex === -1) {
-				onError({
-					_tag: 'WhisperingError',
-					title: `Recording with id ${id} not found`,
-					description: 'Please try again.',
-					action: { type: 'none' },
-				});
-				return;
-			}
-			const oldRecording = recordings[oldRecordingIndex];
-
-			// Optimistic delete
-			recordings = recordings.filter((recording) => recording.id !== id);
 
 			await RecordingsDbService.deleteRecordingById(id, {
 				onMutate: () => {},
-				onSuccess,
-				onError: (error) => {
-					// Rollback the delete
-					recordings.splice(oldRecordingIndex, 0, oldRecording);
-					onError(error);
+				onSuccess: () => {
+					recordings = recordings.filter((r) => r.id !== id);
 				},
+				onError,
 				onSettled: () => {},
 			});
 			onSuccess();
@@ -144,21 +128,21 @@ export const createRecordings = (): RecordingsService => {
 		},
 		async deleteRecordingsById(
 			ids: string[],
-			{
-				onSuccess,
-				onError,
-			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
+			{ onMutate, onSuccess, onError, onSettled },
 		) {
-			const deleteRecordingsResult =
-				await RecordingsDbService.deleteRecordingsById(ids);
-			if (!deleteRecordingsResult.ok) {
-				onError(deleteRecordingsResult);
-				return;
-			}
-			recordings = recordings.filter(
-				(recording) => !ids.includes(recording.id),
-			);
+			onMutate(ids);
+			await RecordingsDbService.deleteRecordingsById(ids, {
+				onMutate: () => {},
+				onSuccess: () => {
+					recordings = recordings.filter(
+						(recording) => !ids.includes(recording.id),
+					);
+				},
+				onError,
+				onSettled: () => {},
+			});
 			onSuccess();
+			onSettled();
 		},
 		async transcribeRecording(
 			id: string,
