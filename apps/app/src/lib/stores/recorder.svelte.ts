@@ -47,16 +47,16 @@ function createRecorder() {
 			{
 				onSuccess: () => {
 					setRecorderState('SESSION+RECORDING');
+					toast.success({
+						id: recordingSessionToastId,
+						title: 'Recording session opened',
+						description: 'Your recording session has been opened',
+					});
 				},
 				onError: renderErrAsToast,
 				sendUpdateStatus: updateRecordingSessionToast,
 			},
 		);
-		toast.success({
-			id: recordingSessionToastId,
-			title: 'Recording session opened',
-			description: 'Your recording session has been opened',
-		});
 	}
 
 	async function closeRecordingSession() {
@@ -75,14 +75,14 @@ function createRecorder() {
 		await MediaRecorderService.closeRecordingSession(undefined, {
 			onSuccess: () => {
 				setRecorderState('IDLE');
+				toast.success({
+					id: closeRecordingSessionToastId,
+					title: 'Recording session closed',
+					description: 'Your recording session has been closed',
+				});
 			},
 			onError: renderErrAsToast,
 			sendUpdateStatus: updateCloseRecordingSessionToast,
-		});
-		toast.success({
-			id: closeRecordingSessionToastId,
-			title: 'Recording session closed',
-			description: 'Your recording session has been closed',
 		});
 	}
 
@@ -195,16 +195,16 @@ function createRecorder() {
 			await MediaRecorderService.closeRecordingSession(undefined, {
 				onSuccess: () => {
 					setRecorderState('IDLE');
+					toast.success({
+						id: cancelRecordingToastId,
+						title: 'Recording cancelled',
+						description: 'Your recording has been cancelled',
+					});
 				},
 				onError: renderErrAsToast,
 				sendUpdateStatus: updateCancelRecordingToast,
 			});
 		}
-		toast.success({
-			id: cancelRecordingToastId,
-			title: 'Recording cancelled',
-			description: 'Your recording has been cancelled',
-		});
 	}
 
 	return {
