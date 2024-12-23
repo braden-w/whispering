@@ -1,14 +1,13 @@
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { toast } from '$lib/services/ToastService';
-import type { WhisperingResult } from '@repo/shared';
+import type { WhisperingErrProperties } from '@repo/shared';
 
-export const renderErrAsToast = <TResult extends WhisperingResult<unknown>>(
-	result: TResult,
+export const renderErrAsToast = (
+	errProperties: WhisperingErrProperties,
 	options?: { toastId?: string },
 ) => {
-	if (result.ok) return;
-	const { isWarning, title, description, action } = result.error;
+	const { isWarning, title, description, action } = errProperties;
 	const getAction = () => {
 		switch (action?.type) {
 			case 'link':
@@ -32,5 +31,5 @@ export const renderErrAsToast = <TResult extends WhisperingResult<unknown>>(
 		description: description,
 		action: getAction(),
 	});
-	console.error(result.error);
+	console.error(errProperties);
 };
