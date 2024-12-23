@@ -1,10 +1,6 @@
-import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
+import type { MutationFn, QueryFn } from '@epicenterhq/result';
+import type { WhisperingErrProperties } from '@repo/shared';
 import { createRecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
-import {
-	createServiceErrorFns,
-	type MutationFn,
-	type QueryFn,
-} from '@epicenterhq/result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 

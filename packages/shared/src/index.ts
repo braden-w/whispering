@@ -1,17 +1,17 @@
 import {
-	Ok,
-	createServiceErrorFns,
-	trySync,
 	type Result,
+	createServiceErrorFns,
+	trySync
 } from '@epicenterhq/result';
 import { z } from 'zod';
-import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
-export { Err, Ok } from '@epicenterhq/result';
 import type { NotificationOptions } from './services/NotificationService.js';
+import { notificationOptionsSchema } from './services/NotificationService.js';
+export { Err, Ok } from '@epicenterhq/result';
+export { WhisperingErr, tryAsyncWhispering, trySyncWhispering };
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -108,7 +108,6 @@ const {
 	trySync: trySyncWhispering,
 	tryAsync: tryAsyncWhispering,
 } = createServiceErrorFns<WhisperingErrProperties>();
-export { WhisperingErr, trySyncWhispering, tryAsyncWhispering };
 
 export const parseJson = (value: string) =>
 	trySync({

@@ -1,11 +1,11 @@
+import { settings } from '$lib/stores/settings.svelte.js';
 import {
-	createServiceErrorFns,
-	Ok,
 	type MutationFn,
+	Ok,
 	type QueryFn,
 	type Result,
+	createServiceErrorFns,
 } from '@epicenterhq/result';
-import { settings } from '$lib/stores/settings.svelte.js';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import { nanoid } from 'nanoid/non-secure';
