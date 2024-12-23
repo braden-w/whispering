@@ -386,7 +386,7 @@ async function getFirstAvailableStream({
 	onError: (error: typeof NoAvailableAudioInputDevicesErr) => void;
 }) {
 	const recordingDevicesResult = await (async () => {
-		return tryAsyncWhispering({
+		return tryAsync({
 			try: async () => {
 				const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia(
 					{
@@ -428,7 +428,7 @@ async function getFirstAvailableStream({
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
-	return tryAsyncWhispering({
+	return tryAsync({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
