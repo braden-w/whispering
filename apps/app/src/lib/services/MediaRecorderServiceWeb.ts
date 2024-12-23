@@ -7,8 +7,7 @@ import {
 } from '@epicenterhq/result';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
-import { nanoid } from 'nanoid/non-secure';
-import { toast } from './ToastService.js';
+import type { toast } from './ToastService';
 
 const TIMESLICE_MS = 1000;
 
@@ -20,19 +19,46 @@ type MediaRecorderService = {
 		Pick<MediaDeviceInfo, 'deviceId' | 'label'>[],
 		MediaRecorderErrProperties
 	>;
-	initRecordingSession: MutationFn<
-		RecordingSessionSettings,
-		void,
-		MediaRecorderErrProperties
-	>;
-	closeRecordingSession: MutationFn<void, void, MediaRecorderErrProperties>;
-	startRecording: MutationFn<
-		{ recordingId: string },
-		void,
-		MediaRecorderErrProperties
-	>;
-	stopRecording: MutationFn<void, Blob, MediaRecorderErrProperties>;
-	cancelRecording: MutationFn<void, void, MediaRecorderErrProperties>;
+	initRecordingSession: (
+		settings: RecordingSessionSettings,
+		callbacks: {
+			onSuccess: () => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => Promise<void>;
+	closeRecordingSession: (
+		_: undefined,
+		callbacks: {
+			onSuccess: () => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => Promise<void>;
+	startRecording: (
+		recordingId: string,
+		callbacks: {
+			onSuccess: () => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => Promise<void>;
+	stopRecording: (
+		_: undefined,
+		callbacks: {
+			onSuccess: (blob: Blob) => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => Promise<void>;
+	cancelRecording: (
+		_: undefined,
+		callbacks: {
+			onSuccess: () => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => Promise<void>;
 };
 
 type RecordingSession = {
@@ -55,16 +81,20 @@ const { Err, tryAsync } = createServiceErrorFns<MediaRecorderErrProperties>();
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
-	const acquireStreamAndSetUpRecordingSession: MutationFn<
-		RecordingSessionSettings,
-		MediaStream,
-		MediaRecorderErrProperties
-	> = async (settings, { onMutate, onSuccess, onError, onSettled }) => {
-		onMutate(settings);
-		const getStreamToastId = nanoid();
+	const acquireStreamAndSetUpRecordingSession = async (
+		settings: RecordingSessionSettings,
+		{
+			onSuccess,
+			onError,
+			sendUpdateStatus,
+		}: {
+			onSuccess: (stream: MediaStream) => void;
+			onError: (error: MediaRecorderErrProperties) => void;
+			sendUpdateStatus: typeof toast.loading;
+		},
+	) => {
 		if (!settings.deviceId) {
-			toast.loading({
-				id: getStreamToastId,
+			sendUpdateStatus({
 				title: 'No device selected',
 				description: 'Defaulting to first available audio input device...',
 			});
@@ -77,21 +107,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						'No device selected and no available audio input devices found',
 					action: { type: 'more-details', error: getFirstStreamResult.error },
 				});
-				onSettled();
 				return;
 			}
-			toast.info({
-				id: getStreamToastId,
-				title: 'Defaulted to first available audio input device',
-				description: 'You can select a specific device in the settings.',
-			});
 			const firstStream = getFirstStreamResult.data;
 			onSuccess(firstStream);
-			onSettled();
 			return;
 		}
-		toast.loading({
-			id: getStreamToastId,
+		sendUpdateStatus({
 			title: 'Connecting to selected audio input device...',
 			description: 'Please allow access to your microphone if prompted.',
 		});
@@ -101,11 +123,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		if (getPreferredStreamResult.ok) {
 			const preferredStream = getPreferredStreamResult.data;
 			onSuccess(preferredStream);
-			onSettled();
 			return;
 		}
-		toast.loading({
-			id: getStreamToastId,
+		sendUpdateStatus({
 			title: 'Error connecting to selected audio input device',
 			description: 'Trying to find another available audio input device...',
 		});
@@ -118,18 +138,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					'Unable to connect to your selected microphone or find any available audio input devices',
 				action: { type: 'more-details', error: getFirstStreamResult.error },
 			});
-			onSettled();
 			return;
 		}
 
-		toast.info({
-			id: getStreamToastId,
-			title: 'Defaulted to first available audio input device',
-			description: 'You can select a specific device in the settings.',
-		});
 		const firstStream = getFirstStreamResult.data;
 		onSuccess(firstStream);
-		onSettled();
 		return;
 	};
 
@@ -160,9 +173,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			}),
 		async initRecordingSession(
 			settings,
-			{ onMutate, onSuccess, onError, onSettled },
+			{ onSuccess, onError, sendUpdateStatus },
 		) {
-			onMutate(settings);
+			sendUpdateStatus({
+				title: 'Initializing recording session...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			if (currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -170,15 +186,16 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					description: 'A recording session is already running and ready to go',
 					action: { type: 'none' },
 				});
-				onSettled();
 				return;
 			}
-			const initRecordingSessionToastId = nanoid();
 
 			await acquireStreamAndSetUpRecordingSession(settings, {
-				onMutate: () => {},
 				onSuccess: (stream) => {
 					currentSession = { settings, stream, recorder: null };
+					sendUpdateStatus({
+						title: '🎤 Microphone Connected',
+						description: 'You can now start recording',
+					});
 					onSuccess();
 				},
 				onError: (error) => {
@@ -189,15 +206,10 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						action: { type: 'more-details', error },
 					});
 				},
-				onSettled: () => {},
+				sendUpdateStatus,
 			});
-			onSettled();
 		},
-		async closeRecordingSession(
-			_,
-			{ onMutate, onSuccess, onError, onSettled },
-		) {
-			onMutate();
+		async closeRecordingSession(_, { onSuccess, onError, sendUpdateStatus }) {
 			if (!currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -217,7 +229,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						type: 'none',
 					},
 				});
-				onSettled();
 				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
@@ -226,13 +237,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession.recorder = null;
 			currentSession = null;
 			onSuccess();
-			onSettled();
 		},
 		async startRecording(
-			{ recordingId },
-			{ onMutate, onSuccess, onError, onSettled },
+			recordingId,
+			{ onSuccess, onError, sendUpdateStatus },
 		) {
-			onMutate({ recordingId });
 			if (!currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -241,20 +250,16 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						"There's no recording session to start recording in at the moment",
 					action: { type: 'none' },
 				});
-				onSettled();
 				return;
 			}
 			const { stream, settings } = currentSession;
 			if (!stream.active) {
-				const refreshRecordingSessionToastId = nanoid();
-				toast.loading({
-					id: refreshRecordingSessionToastId,
+				sendUpdateStatus({
 					title: '🔄 Recording Session Expired',
 					description:
 						'Refreshing your recording session to get you back on track...',
 				});
 				await acquireStreamAndSetUpRecordingSession(settings, {
-					onMutate: () => {},
 					onSuccess: (stream) => {
 						currentSession = { settings, stream, recorder: null };
 					},
@@ -266,7 +271,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 							action: { type: 'more-details', error },
 						});
 					},
-					onSettled: () => {},
+					sendUpdateStatus,
 				});
 			}
 			const newRecorderResult = await tryAsync({
@@ -281,7 +286,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			if (!newRecorderResult.ok) {
 				onError(newRecorderResult.error);
-				onSettled();
 				return;
 			}
 			const newRecorder = newRecorderResult.data;
@@ -296,10 +300,8 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			newRecorder.start(TIMESLICE_MS);
 			onSuccess();
-			onSettled();
 		},
-		async stopRecording(_, { onMutate, onSuccess, onError, onSettled }) {
-			onMutate();
+		async stopRecording(_, { onSuccess, onError, sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				onError({
 					_tag: 'WhisperingError',
@@ -309,7 +311,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						type: 'none',
 					},
 				});
-				onSettled();
 				return;
 			}
 			const stopResult = await tryAsync({
@@ -350,15 +351,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			if (!stopResult.ok) {
 				onError(stopResult.error);
-				onSettled();
 				return;
 			}
 			const blob = stopResult.data;
 			onSuccess(blob);
-			onSettled();
 		},
-		async cancelRecording(_, { onMutate, onSuccess, onError, onSettled }) {
-			onMutate();
+		async cancelRecording(_, { onSuccess, onError, sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				onError({
 					_tag: 'WhisperingError',
@@ -366,7 +364,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					description: 'No active recording found to cancel',
 					action: { type: 'none' },
 				});
-				onSettled();
 				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
@@ -375,7 +372,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession.recorder.mediaRecorder.stop();
 			currentSession.recorder = null;
 			onSuccess();
-			onSettled();
 		},
 	};
 };
@@ -405,62 +401,72 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 		},
 		initRecordingSession: async (
 			settings,
-			{ onMutate, onSuccess, onError, onSettled },
+			{ onSuccess, onError, sendUpdateStatus },
 		) => {
-			onMutate(settings);
+			sendUpdateStatus({
+				title: 'Initializing recording session...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			const result = await invoke('init_recording_session');
 			if (result.ok) {
 				onSuccess();
 			} else {
 				onError(result.error);
 			}
-			onSettled();
 		},
 		closeRecordingSession: async (
 			_,
-			{ onMutate, onSuccess, onError, onSettled },
+			{ onSuccess, onError, sendUpdateStatus },
 		) => {
-			onMutate();
+			sendUpdateStatus({
+				title: 'Closing recording session...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			const result = await invoke('close_recording_session');
 			if (result.ok) {
 				onSuccess();
 			} else {
 				onError(result.error);
 			}
-			onSettled();
 		},
 		startRecording: async (
-			{ recordingId },
-			{ onMutate, onSuccess, onError, onSettled },
+			recordingId,
+			{ onSuccess, onError, sendUpdateStatus },
 		) => {
-			onMutate({ recordingId });
+			sendUpdateStatus({
+				title: 'Starting recording...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			const result = await invoke('start_recording');
 			if (result.ok) {
 				onSuccess();
 			} else {
 				onError(result.error);
 			}
-			onSettled();
 		},
-		stopRecording: async (_, { onMutate, onSuccess, onError, onSettled }) => {
-			onMutate();
-			const result = await invoke('stop_recording');
+		stopRecording: async (_, { onSuccess, onError, sendUpdateStatus }) => {
+			sendUpdateStatus({
+				title: 'Stopping recording...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
+			const result = await invoke<Blob>('stop_recording');
 			if (result.ok) {
 				onSuccess(result.data);
 			} else {
 				onError(result.error);
 			}
-			onSettled();
 		},
-		cancelRecording: async (_, { onMutate, onSuccess, onError, onSettled }) => {
-			onMutate();
+		cancelRecording: async (_, { onSuccess, onError, sendUpdateStatus }) => {
+			sendUpdateStatus({
+				title: 'Cancelling recording...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			const result = await invoke('cancel_recording');
 			if (result.ok) {
 				onSuccess();
 			} else {
 				onError(result.error);
 			}
-			onSettled();
 		},
 	};
 };
