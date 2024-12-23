@@ -55,6 +55,89 @@ const { Err, tryAsync } = createServiceErrorFns<MediaRecorderErrProperties>();
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
+	const acquireStreamAndSetUpRecordingSession: MutationFn<
+		RecordingSessionSettings,
+		MediaStream,
+		MediaRecorderErrProperties
+	> = async (settings, { onMutate, onSuccess, onError, onSettled }) => {
+		onMutate(settings);
+		const getStreamToastId = nanoid();
+		if (!settings.deviceId) {
+			toast.loading({
+				id: getStreamToastId,
+				title: 'No device selected',
+				description: 'Defaulting to first available audio input device...',
+			});
+			const getFirstStreamResult = await getFirstAvailableStream();
+			if (!getFirstStreamResult.ok) {
+				onError({
+					_tag: 'WhisperingError',
+					title: 'Error acquiring stream',
+					description:
+						'No device selected and no available audio input devices found',
+					action: { type: 'more-details', error: getFirstStreamResult.error },
+				});
+				onSettled();
+				return;
+			}
+			toast.info({
+				id: getStreamToastId,
+				title: 'Defaulted to first available audio input device',
+				description: 'You can select a specific device in the settings.',
+			});
+			const firstStream = getFirstStreamResult.data;
+			onSuccess(firstStream);
+			onSettled();
+			return;
+		}
+		toast.loading({
+			id: getStreamToastId,
+			title: 'Connecting to selected audio input device...',
+			description: 'Please allow access to your microphone if prompted.',
+		});
+		const getPreferredStreamResult = await getStreamForDeviceId(
+			settings.deviceId,
+		);
+		if (getPreferredStreamResult.ok) {
+			toast.success({
+				id: getStreamToastId,
+				title: 'Connected to selected audio input device',
+				description: 'Successfully connected to your microphone stream.',
+			});
+			const preferredStream = getPreferredStreamResult.data;
+			onSuccess(preferredStream);
+			onSettled();
+			return;
+		}
+		toast.loading({
+			id: getStreamToastId,
+			title: 'Error connecting to selected audio input device',
+			description: 'Trying to find another available audio input device...',
+		});
+		const getFirstStreamResult = await getFirstAvailableStream();
+		if (!getFirstStreamResult.ok) {
+			onError({
+				_tag: 'WhisperingError',
+				title: 'Error acquiring stream',
+				description:
+					'Unable to connect to your selected microphone or find any available audio input devices',
+				action: { type: 'more-details', error: getFirstStreamResult.error },
+			});
+			onSettled();
+			return;
+		}
+
+		toast.info({
+			id: getStreamToastId,
+			title: 'Defaulted to first available audio input device',
+			description: 'You can select a specific device in the settings.',
+		});
+		const firstStream = getFirstStreamResult.data;
+		onSuccess(firstStream);
+		onSettled();
+		return;
+	};
+
 	return {
 		enumerateRecordingDevices: async () =>
 			tryAsync({
@@ -97,69 +180,27 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			}
 			const initRecordingSessionToastId = nanoid();
 
-			const getStream = async () => {
-				if (!settings.deviceId) {
-					toast.loading({
-						id: initRecordingSessionToastId,
-						title: 'No device selected',
-						description: 'Defaulting to first available audio input device...',
-					});
-					const getFirstStreamResult = await getFirstAvailableStream();
-					if (!getFirstStreamResult.ok) return getFirstStreamResult;
-					toast.info({
-						id: initRecordingSessionToastId,
-						title: 'Defaulted to first available audio input device',
-						description: 'You can select a specific device in the settings.',
-					});
-					return getFirstStreamResult;
-				}
-				toast.loading({
-					id: initRecordingSessionToastId,
-					title: 'Connecting to selected audio input device...',
-					description: 'Please allow access to your microphone if prompted.',
-				});
-				const getPreferredStreamResult = await getStreamForDeviceId(
-					settings.deviceId,
-				);
-				if (getPreferredStreamResult.ok) {
+			await acquireStreamAndSetUpRecordingSession(settings, {
+				onMutate: () => {},
+				onSuccess: (stream) => {
+					currentSession = { settings, stream, recorder: null };
 					toast.success({
 						id: initRecordingSessionToastId,
-						title: 'Connected to selected audio input device',
-						description: 'Successfully connected to your microphone stream.',
+						title: 'Recording Session Created',
+						description: 'Recording session created successfully',
 					});
-					return getPreferredStreamResult;
-				}
-				toast.loading({
-					id: initRecordingSessionToastId,
-					title: 'Error connecting to selected audio input device',
-					description: 'Trying to find another available audio input device...',
-				});
-				const getFirstStreamResult = await getFirstAvailableStream();
-				if (!getFirstStreamResult.ok) return getFirstStreamResult;
-
-				toast.info({
-					id: initRecordingSessionToastId,
-					title: 'Defaulted to first available audio input device',
-					description: 'You can select a specific device in the settings.',
-				});
-				return getFirstStreamResult;
-			};
-
-			const getStreamForDeviceIdResult = await getStream();
-
-			if (!getStreamForDeviceIdResult.ok) {
-				onError(getStreamForDeviceIdResult.error);
-				onSettled();
-				return;
-			}
-			const stream = getStreamForDeviceIdResult.data;
-			toast.success({
-				id: initRecordingSessionToastId,
-				title: 'Connected to selected audio input device',
-				description: 'Successfully connected to your microphone stream.',
+					onSuccess();
+				},
+				onError: (error) => {
+					onError({
+						_tag: 'WhisperingError',
+						title: '🎤 Microphone Access Error',
+						description: 'Unable to connect to your selected microphone',
+						action: { type: 'more-details', error },
+					});
+				},
+				onSettled: () => {},
 			});
-			currentSession = { settings, stream, recorder: null };
-			onSuccess();
 			onSettled();
 		},
 		async closeRecordingSession(
@@ -213,12 +254,34 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				onSettled();
 				return;
 			}
-			const {
-				stream,
-				settings: { bitsPerSecond },
-			} = currentSession;
+			const { stream, settings } = currentSession;
+			if (!stream.active) {
+				const refreshRecordingSessionToastId = nanoid();
+				toast.loading({
+					id: refreshRecordingSessionToastId,
+					title: '🔄 Recording Session Expired',
+					description:
+						'Refreshing your recording session to get you back on track...',
+				});
+				await acquireStreamAndSetUpRecordingSession(settings, {
+					onMutate: () => {},
+					onSuccess: (stream) => {
+						currentSession = { settings, stream, recorder: null };
+					},
+					onError: (error) => {
+						onError({
+							_tag: 'WhisperingError',
+							title: '🎤 Microphone Access Error',
+							description: 'Unable to connect to your selected microphone',
+							action: { type: 'more-details', error },
+						});
+					},
+					onSettled: () => {},
+				});
+			}
 			const newRecorderResult = await tryAsync({
-				try: async () => new MediaRecorder(stream, { bitsPerSecond }),
+				try: async () =>
+					new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond }),
 				catch: (error) => ({
 					_tag: 'WhisperingError',
 					title: '🎙️ Recording Setup Failed',
@@ -446,17 +509,6 @@ toast.loading({
 	title: 'Error initializing media recorder with preferred device',
 	description: 'Trying to find another available audio input device...',
 });
-
-const OpenStreamDoesNotExistErr = WhisperingErr({
-	_tag: 'WhisperingError',
-	title: '🎤 Microphone Setup Needed',
-	description: 'Looking for alternative audio devices to get you started...',
-	action: {
-		type: 'link',
-		label: 'Open Settings',
-		goto: '/settings',
-	},
-} as const);
 
 const OpenStreamIsInactiveErr = WhisperingErr({
 	_tag: 'WhisperingError',
