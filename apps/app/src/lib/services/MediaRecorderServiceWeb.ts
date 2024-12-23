@@ -1,11 +1,9 @@
-import { settings } from '$lib/stores/settings.svelte.js';
 import {
 	type MutationFn,
 	Ok,
 	type QueryFn,
 	type Result,
 	createServiceErrorFns,
-	WhisperingErr,
 } from '@epicenterhq/result';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
