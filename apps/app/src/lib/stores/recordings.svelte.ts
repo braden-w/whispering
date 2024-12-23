@@ -278,7 +278,6 @@ export const createRecordings = (): RecordingsService => {
 			await markNotTranscribingAndDismissToastAndNotification();
 			if (isDocumentVisible()) {
 				toast.success({
-					id: currentTranscribingRecordingToastId,
 					title: 'Transcription complete!',
 					description: 'Check it out in your recordings',
 					action: {
@@ -288,7 +287,6 @@ export const createRecordings = (): RecordingsService => {
 				});
 			} else {
 				NotificationService.notify({
-					id: currentTranscribingRecordingToastId,
 					title: 'Transcription complete!',
 					description: 'Check it out in your recordings',
 					action: {
