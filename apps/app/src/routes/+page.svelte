@@ -88,17 +88,7 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={() =>
-					recordings.copyRecordingText(latestRecording, {
-						onSuccess: (transcribedText) => {
-							toast.success({
-								title: 'Copied transcription to clipboard!',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-							});
-						},
-						onError: renderErrAsToast,
-					})}
+				onclick={() => recordings.copyRecordingText(latestRecording)}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,

@@ -38,24 +38,12 @@
 		</Dialog.Header>
 		<form
 			class="grid gap-4 py-4"
-			onsubmit={(e) => {
+			onsubmit={async (e) => {
 				e.preventDefault();
-				void recordings.updateRecording(recording, {
-					onStart: () => {
-						isSaving = true;
-					},
-					onSuccess: () => {
-						toast.success({
-							title: 'Updated recording!',
-							description: 'Your recording has been updated successfully.',
-						});
-					},
-					onError: renderErrAsToast,
-					onSettled: () => {
-						isSaving = false;
-						isDialogOpen = false;
-					},
-				});
+				isSaving = true;
+				await recordings.updateRecording(recording);
+				isSaving = false;
+				isDialogOpen = false;
 			}}
 		>
 			<div class="grid grid-cols-4 items-center gap-4">
@@ -99,15 +87,7 @@
 					class="mr-auto"
 					onclick={async () => {
 						isDeleting = true;
-						await recordings.deleteRecordingById(recording.id, {
-							onSuccess: () => {
-								toast.success({
-									title: 'Deleted recording!',
-									description: 'Your recording has been deleted successfully.',
-								});
-							},
-							onError: renderErrAsToast,
-						});
+						await recordings.deleteRecordingById(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

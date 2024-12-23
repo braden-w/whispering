@@ -122,7 +122,7 @@ function createRecorder() {
 
 				await MediaRecorderService.stopRecording(undefined, {
 					onMutate: () => {},
-					onSuccess: (blob: Blob) => {
+					onSuccess: async (blob: Blob) => {
 						setRecorderState('IDLE');
 						console.info('Recording stopped');
 						void playSound('stop');
@@ -137,31 +137,7 @@ function createRecorder() {
 							transcriptionStatus: 'UNPROCESSED',
 						};
 
-						void recordings.addRecording(newRecording, {
-							onMutate: () => {},
-							onSuccess: () => {
-								toast.loading({
-									id: addRecordingAndTranscribeResultToastId,
-									title: 'Recording added!',
-									description: 'Your recording has been added successfully.',
-								});
-								recordings.transcribeRecording(newRecording.id, {
-									onMutate: () => {},
-									onSuccess: () => {
-										toast.success({
-											id: addRecordingAndTranscribeResultToastId,
-											title: 'Recording transcribed!',
-											description:
-												'Your recording has been transcribed successfully.',
-										});
-									},
-									onError: renderErrAsToast,
-									onSettled: () => {},
-								});
-							},
-							onError: renderErrAsToast,
-							onSettled: () => {},
-						});
+						await recordings.addAndTranscribeRecording(newRecording);
 					},
 					onError: renderErrAsToast,
 					onSettled: () => {},

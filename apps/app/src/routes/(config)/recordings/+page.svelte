@@ -366,18 +366,20 @@
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
 									onclick={async () => {
-										const setClipboardText =
-											await ClipboardService.setClipboardText(text);
-										if (!setClipboardText.ok) {
-											renderErrAsToast(setClipboardText);
-											isDialogOpen = false;
-										}
-										toast.success({
-											title: 'Copied transcriptions to clipboard!',
-											description: text,
-											descriptionClass: 'line-clamp-2',
+										await ClipboardService.setClipboardText(text, {
+											onMutate: () => {},
+											onSuccess: () => {
+												toast.success({
+													title: 'Copied transcriptions to clipboard!',
+													description: text,
+													descriptionClass: 'line-clamp-2',
+												});
+											},
+											onError: renderErrAsToast,
+											onSettled: () => {
+												isDialogOpen = false;
+											},
 										});
-										isDialogOpen = false;
 									}}
 									type="submit"
 								>

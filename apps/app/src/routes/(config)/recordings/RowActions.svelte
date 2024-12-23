@@ -22,12 +22,7 @@
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
 		onclick={() => {
-			recordings.transcribeRecording(recording.id, {
-				onMutate: () => {},
-				onSuccess: () => {},
-				onError: renderErrAsToast,
-				onSettled: () => {},
-			});
+			recordings.transcribeRecording(recording.id);
 		}}
 		variant="ghost"
 		size="icon"
@@ -45,19 +40,7 @@
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
-		onclick={() =>
-			recordings.copyRecordingText(recording, {
-				onMutate: () => {},
-				onSuccess: (transcribedText) => {
-					toast.success({
-						title: 'Copied transcription to clipboard!',
-						description: transcribedText,
-						descriptionClass: 'line-clamp-2',
-					});
-				},
-				onError: renderErrAsToast,
-				onSettled: () => {},
-			})}
+		onclick={() => recordings.copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({
@@ -70,18 +53,7 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() =>
-			recordings.downloadRecording(recording.id, {
-				onMutate: () => {},
-				onSuccess: () => {
-					toast.success({
-						title: 'Recording downloaded!',
-						description: 'Your recording has been downloaded successfully.',
-					});
-				},
-				onError: renderErrAsToast,
-				onSettled: () => {},
-			})}
+		onclick={() => recordings.downloadRecording(recording.id)}
 		variant="ghost"
 		size="icon"
 	>
@@ -94,18 +66,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () =>
-					recordings.deleteRecordingById(recording.id, {
-						onMutate: () => {},
-						onSuccess: () => {
-							toast.success({
-								title: 'Deleted recording!',
-								description: 'Your recording has been deleted successfully.',
-							});
-						},
-						onError: renderErrAsToast,
-						onSettled: () => {},
-					}),
+				onConfirm: () => recordings.deleteRecordingById(recording.id),
 			});
 		}}
 		variant="ghost"
