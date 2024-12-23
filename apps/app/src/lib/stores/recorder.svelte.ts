@@ -114,20 +114,11 @@ function createRecorder() {
 		})();
 	};
 
-	const { mutate: closeRecordingSession } = createMutation<
-		undefined,
-		undefined,
-		WhisperingErrProperties,
-		ReturnType<typeof createActionStatuses>,
-	>({
-		mutationFn: async (_, { updateStatus }) => {
-			const closeRecordingSessionResult =
-				await MediaRecorderService.closeRecordingSession(undefined, {
-					setStatusMessage: updateStatus,
-				});
-			if (!closeRecordingSessionResult.ok) return closeRecordingSessionResult;
-			return Ok(undefined);
-		},
+	const { mutate: closeRecordingSession } = createMutation({
+		mutationFn: (_, { updateStatus }) =>
+			MediaRecorderService.closeRecordingSession(undefined, {
+				setStatusMessage: updateStatus,
+			}),
 		onMutate: () => {
 			if (!isInRecordingSession) {
 				return WhisperingErr({
