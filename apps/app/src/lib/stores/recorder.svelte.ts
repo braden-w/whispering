@@ -31,6 +31,9 @@ export const recorder = createRecorder();
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
+	const isInRecordingSession = $derived(
+		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
+	);
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
 		(async () => {
@@ -50,7 +53,7 @@ function createRecorder() {
 				description: message,
 			});
 		updateCloseRecordingSessionToast({ message: '' });
-		if (!recorder.isInRecordingSession) {
+		if (!isInRecordingSession) {
 			return renderErrAsToast({
 				_tag: 'WhisperingError',
 				title: '❌ No Active Session',
@@ -135,7 +138,7 @@ function createRecorder() {
 				});
 			updateStartRecordingToast({ message: '' });
 
-			if (!recorder.isInRecordingSession) {
+			if (!isInRecordingSession) {
 				const initRecordingSessionResult =
 					await MediaRecorderService.initRecordingSession(
 						{
@@ -149,6 +152,12 @@ function createRecorder() {
 					return renderErrAsToast(initRecordingSessionResult.error);
 				}
 				setRecorderState('SESSION');
+				toast.loading({
+					id: startRecordingToastId,
+					title: 'Recording session opened!',
+					description:
+						'Your recording session has been opened, starting recording...',
+				});
 			}
 			const startRecordingResult = await MediaRecorderService.startRecording(
 				nanoid(),
@@ -158,6 +167,10 @@ function createRecorder() {
 				return renderErrAsToast(startRecordingResult.error);
 			}
 			setRecorderState('SESSION+RECORDING');
+			toast.success({
+				id: startRecordingToastId,
+				title: 'Recording started!',
+			});
 			console.info('Recording started');
 			void playSound('start');
 			void NotificationService.notify({
@@ -182,7 +195,7 @@ function createRecorder() {
 				description: message,
 			});
 		updateCancelRecordingToast({ message: '' });
-		if (!recorder.isInRecordingSession) {
+		if (!isInRecordingSession) {
 			return renderErrAsToast({
 				_tag: 'WhisperingError',
 				title: '❌ No Active Session',
@@ -193,32 +206,38 @@ function createRecorder() {
 
 		const cancelRecordingResult = await MediaRecorderService.cancelRecording(
 			undefined,
-			{
-				setStatusMessage: updateCancelRecordingToast,
-			},
+			{ setStatusMessage: updateCancelRecordingToast },
 		);
 		if (!cancelRecordingResult.ok) {
 			return renderErrAsToast(cancelRecordingResult.error);
 		}
 		void playSound('cancel');
 		console.info('Recording cancelled');
-		setRecorderState('IDLE');
+		setRecorderState('SESSION');
+		toast.success({
+			id: cancelRecordingToastId,
+			title: 'Recording cancelled',
+			description:
+				'Your recording has been cancelled, session has been kept open',
+		});
 
-		if (!settings.value.isFasterRerecordEnabled) {
-			const closeRecordingSessionResult =
-				await MediaRecorderService.closeRecordingSession(undefined, {
-					setStatusMessage: updateCancelRecordingToast,
-				});
-			if (!closeRecordingSessionResult.ok) {
-				return renderErrAsToast(closeRecordingSessionResult.error);
-			}
-			setRecorderState('IDLE');
-			toast.success({
-				id: cancelRecordingToastId,
-				title: 'Recording cancelled',
-				description: 'Your recording has been cancelled',
+		if (settings.value.isFasterRerecordEnabled) return;
+		updateCancelRecordingToast({
+			message: 'Canceled recording, closing recording session...',
+		});
+		const closeRecordingSessionResult =
+			await MediaRecorderService.closeRecordingSession(undefined, {
+				setStatusMessage: updateCancelRecordingToast,
 			});
+		if (!closeRecordingSessionResult.ok) {
+			return renderErrAsToast(closeRecordingSessionResult.error);
 		}
+		setRecorderState('IDLE');
+		toast.success({
+			id: cancelRecordingToastId,
+			title: 'Recording cancelled',
+			description: 'Your recording has been cancelled, session has been closed',
+		});
 	}
 
 	return {
@@ -226,9 +245,7 @@ function createRecorder() {
 			return recorderState;
 		},
 		get isInRecordingSession() {
-			return (
-				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
-			);
+			return isInRecordingSession;
 		},
 		closeRecordingSession,
 		toggleRecording,
