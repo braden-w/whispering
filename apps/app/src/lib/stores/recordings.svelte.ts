@@ -155,13 +155,35 @@ export const createRecordings = (): RecordingsService => {
 					},
 				});
 			}
+			const markNotTranscribingAndDismissToastAndNotification = async () => {
+				const updatedRecordingWithUnprocessedStatus = {
+					...recording,
+					transcriptionStatus: 'UNPROCESSED',
+				} satisfies Recording;
+				await RecordingsDbService.updateRecording(
+					updatedRecordingWithUnprocessedStatus,
+					{
+						onMutate: () => {},
+						onSuccess: () => {
+							recordings = recordings.map((r) =>
+								r.id === recording.id
+									? updatedRecordingWithUnprocessedStatus
+									: r,
+							);
+						},
+						onError: (_error) => {},
+						onSettled: () => {},
+					},
+				);
+				transcribingRecordingIds.delete(id);
+				toast.dismiss(currentTranscribingRecordingToastId);
+				NotificationService.clear(currentTranscribingRecordingToastId);
+			};
 
 			transcribingRecordingIds.add(id);
 			const getRecordingResult = await RecordingsDbService.getRecording(id);
 			if (!getRecordingResult.ok) {
-				transcribingRecordingIds.delete(id);
-				toast.dismiss(currentTranscribingRecordingToastId);
-				NotificationService.clear(currentTranscribingRecordingToastId);
+				await markNotTranscribingAndDismissToastAndNotification();
 				onError({
 					_tag: 'WhisperingError',
 					title: `Error getting recording ${id} to transcribe`,
@@ -173,9 +195,7 @@ export const createRecordings = (): RecordingsService => {
 			}
 			const maybeRecording = getRecordingResult.data;
 			if (maybeRecording === null) {
-				transcribingRecordingIds.delete(id);
-				toast.dismiss(currentTranscribingRecordingToastId);
-				NotificationService.clear(currentTranscribingRecordingToastId);
+				await markNotTranscribingAndDismissToastAndNotification();
 				onError({
 					_tag: 'WhisperingError',
 					title: `Recording with id ${id} not found to transcribe`,
@@ -218,28 +238,7 @@ export const createRecordings = (): RecordingsService => {
 			);
 
 			if (!transcribeResult.ok) {
-				const updatedRecordingWithUnprocessedStatus = {
-					...recording,
-					transcriptionStatus: 'UNPROCESSED',
-				} satisfies Recording;
-				await RecordingsDbService.updateRecording(
-					updatedRecordingWithUnprocessedStatus,
-					{
-						onMutate: () => {},
-						onSuccess: () => {
-							recordings = recordings.map((r) =>
-								r.id === recording.id
-									? updatedRecordingWithUnprocessedStatus
-									: r,
-							);
-						},
-						onError: (_error) => {},
-						onSettled: () => {},
-					},
-				);
-				transcribingRecordingIds.delete(id);
-				toast.dismiss(currentTranscribingRecordingToastId);
-				NotificationService.clear(currentTranscribingRecordingToastId);
+				await markNotTranscribingAndDismissToastAndNotification();
 				onError({
 					_tag: 'WhisperingError',
 					title: `Error transcribing recording ${id}`,
@@ -276,9 +275,7 @@ export const createRecordings = (): RecordingsService => {
 				},
 			);
 
-			transcribingRecordingIds.delete(id);
-			toast.dismiss(currentTranscribingRecordingToastId);
-			NotificationService.clear(currentTranscribingRecordingToastId);
+			await markNotTranscribingAndDismissToastAndNotification();
 			if (isDocumentVisible()) {
 				toast.success({
 					id: currentTranscribingRecordingToastId,
