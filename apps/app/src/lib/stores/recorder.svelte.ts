@@ -46,7 +46,7 @@ function createRecorder() {
 			},
 			{
 				onSuccess: () => {
-					setRecorderState('SESSION+RECORDING');
+					setRecorderState('SESSION');
 					toast.success({
 						id: recordingSessionToastId,
 						title: 'Recording session opened',
