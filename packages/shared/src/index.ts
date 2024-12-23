@@ -1,4 +1,4 @@
-import { type Result, Err, Ok, tryAsync, trySync } from '@epicenterhq/result';
+import { Result, Ok, createServiceErrorFns } from '@epicenterhq/result';
 import { z } from 'zod';
 import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
@@ -111,80 +111,17 @@ export const tryAsyncBubble = <T>(
 	opts: Parameters<typeof tryAsync<T, BubbleErrProperties>>[0],
 ): Promise<BubbleResult<T>> => tryAsync(opts);
 
-type WhisperingErrProperties = {
+export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
 	isWarning?: boolean;
 } & NotificationOptions;
 
-export type WhisperingErr = Err<WhisperingErrProperties>;
-
-export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
-
-export const WhisperingErr = <
-	ErrProperties extends Omit<WhisperingErrProperties, '_tag'>,
->(
-	error: ErrProperties,
-): WhisperingErr => Err({ ...error, _tag: 'WhisperingError' });
-
-export const trySyncWhispering = <T>(
-	opts: Parameters<typeof trySync<T, WhisperingErrProperties>>[0],
-): WhisperingResult<T> => trySync(opts);
-
-export const tryAsyncWhispering = <T>(
-	opts: Parameters<typeof tryAsync<T, WhisperingErrProperties>>[0],
-): Promise<WhisperingResult<T>> => tryAsync(opts);
-
-type ServiceErrorSystem<ErrProps extends Record<string, unknown>> = {
-	Ok: <T>(data: T) => Ok<T>;
-	Err: <Props extends ErrProps>(props: Props) => Err<ErrProps>;
-	Result: <T>(data: T) => Result<T, ErrProps>;
-	trySync: <T>(opts: {
-		try: () => T;
-		catch: (error: unknown) => ErrProps;
-	}) => Result<T, ErrProps>;
-	tryAsync: <T>(opts: {
-		try: () => Promise<T>;
-		catch: (error: unknown) => ErrProps;
-	}) => Promise<Result<T, ErrProps>>;
-};
-
-export function createServiceErrorSystem<
-	ErrorProps extends Record<string, unknown>,
->(_errorType?: ErrorProps): ServiceErrorSystem<ErrorProps> {
-	return {
-		Ok: (data) => ({ ok: true, data }),
-		Err: (props) => ({ ok: false, error: props }),
-		Result: (data) => ({ ok: true, data }),
-		trySync: ({ try: tryFn, catch: catchFn }) => {
-			try {
-				return { ok: true, data: tryFn() };
-			} catch (error) {
-				return { ok: false, error: catchFn(error) };
-			}
-		},
-		tryAsync: async ({ try: tryFn, catch: catchFn }) => {
-			try {
-				return { ok: true, data: await tryFn() };
-			} catch (error) {
-				return { ok: false, error: catchFn(error) };
-			}
-		},
-	};
-}
-
-export type QueryFn<I, O, ServiceError> = (
-	input: I,
-) => Promise<Result<O, ServiceError>>;
-
-export type MutationFn<I, O, ServiceError> = (
-	input: I,
-	callbacks: {
-		onMutate: (data: O) => void;
-		onSuccess: () => void;
-		onError: (error: ServiceError) => void;
-		onSettled: () => void;
-	},
-) => Promise<void>;
+const {
+	Err: WhisperingErr,
+	trySync: trySyncWhispering,
+	tryAsync: tryAsyncWhispering,
+} = createServiceErrorFns<WhisperingErrProperties>();
+export { WhisperingErr, trySyncWhispering, tryAsyncWhispering };
 
 export const parseJson = (value: string) =>
 	trySyncBubble({
