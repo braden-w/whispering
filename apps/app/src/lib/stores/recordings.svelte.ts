@@ -301,10 +301,11 @@ export const createRecordings = (): RecordingsService => {
 
 			if (transcribedText === '') return;
 
-			const currentCopyingToClipboardToastId =
-				`copying-to-clipboard-${id}` as const;
 			// Copy transcription to clipboard if enabled
+
 			if (settings.value.isCopyToClipboardEnabled) {
+				const currentCopyingToClipboardToastId =
+					`copying-to-clipboard-${id}` as const;
 				await ClipboardService.setClipboardText(transcribedText, {
 					onMutate: () => {},
 					onSuccess: () => {
@@ -335,10 +336,10 @@ export const createRecordings = (): RecordingsService => {
 				});
 			}
 
-			const currentPastingToCursorToastId = `pasting-to-cursor-${id}` as const;
-
 			// Paste transcription if enabled
 			if (settings.value.isPasteContentsOnSuccessEnabled) {
+				const currentPastingToCursorToastId =
+					`pasting-to-cursor-${id}` as const;
 				await ClipboardService.writeTextToCursor(transcribedText, {
 					onMutate: () => {},
 					onSuccess: () => {
