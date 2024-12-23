@@ -1,5 +1,4 @@
 import {
-	type MutationFn,
 	Ok,
 	type QueryFn,
 	type Result,
@@ -13,6 +12,11 @@ const TIMESLICE_MS = 1000;
 
 type MediaRecorderErrProperties = WhisperingErrProperties;
 
+type SetStatusMessageFn = (message: {
+	title: string;
+	description: string;
+}) => void;
+
 type MediaRecorderService = {
 	enumerateRecordingDevices: QueryFn<
 		void,
@@ -21,23 +25,23 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-		callbacks: { sendUpdateStatus: typeof toast.loading },
+		callbacks: { setStatusMessage: SetStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	closeRecordingSession: (
 		_: undefined,
-		callbacks: { sendUpdateStatus: typeof toast.loading },
+		callbacks: { setStatusMessage: SetStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	startRecording: (
 		recordingId: string,
-		callbacks: { sendUpdateStatus: typeof toast.loading },
+		callbacks: { setStatusMessage: SetStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	stopRecording: (
 		_: undefined,
-		callbacks: { sendUpdateStatus: typeof toast.loading },
+		callbacks: { setStatusMessage: SetStatusMessageFn },
 	) => Promise<Result<Blob, MediaRecorderErrProperties>>;
 	cancelRecording: (
 		_: undefined,
-		callbacks: { sendUpdateStatus: typeof toast.loading },
+		callbacks: { setStatusMessage: SetStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 };
 
@@ -137,7 +141,10 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			}),
-		async initRecordingSession(settings, { sendUpdateStatus }) {
+		async initRecordingSession(
+			settings,
+			{ setStatusMessage: sendUpdateStatus },
+		) {
 			sendUpdateStatus({
 				title: 'Initializing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
@@ -170,7 +177,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			return Ok(undefined);
 		},
-		async closeRecordingSession(_, { sendUpdateStatus }) {
+		async closeRecordingSession(_, { setStatusMessage: sendUpdateStatus }) {
 			if (!currentSession) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -197,7 +204,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession = null;
 			return Ok(undefined);
 		},
-		async startRecording(recordingId, { sendUpdateStatus }) {
+		async startRecording(recordingId, { setStatusMessage: sendUpdateStatus }) {
 			if (!currentSession) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -257,7 +264,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			newRecorder.start(TIMESLICE_MS);
 			return Ok(undefined);
 		},
-		async stopRecording(_, { sendUpdateStatus }) {
+		async stopRecording(_, { setStatusMessage: sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -310,7 +317,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
-		async cancelRecording(_, { sendUpdateStatus }) {
+		async cancelRecording(_, { setStatusMessage: sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -352,7 +359,10 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				})),
 			);
 		},
-		initRecordingSession: async (settings, { sendUpdateStatus }) => {
+		initRecordingSession: async (
+			settings,
+			{ setStatusMessage: sendUpdateStatus },
+		) => {
 			sendUpdateStatus({
 				title: 'Initializing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
@@ -361,7 +371,10 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			if (!result.ok) return Err(result.error);
 			return Ok(undefined);
 		},
-		closeRecordingSession: async (_, { sendUpdateStatus }) => {
+		closeRecordingSession: async (
+			_,
+			{ setStatusMessage: sendUpdateStatus },
+		) => {
 			sendUpdateStatus({
 				title: 'Closing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
@@ -370,7 +383,10 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			if (!result.ok) return Err(result.error);
 			return Ok(undefined);
 		},
-		startRecording: async (recordingId, { sendUpdateStatus }) => {
+		startRecording: async (
+			recordingId,
+			{ setStatusMessage: sendUpdateStatus },
+		) => {
 			sendUpdateStatus({
 				title: 'Starting recording...',
 				description: 'Please allow access to your microphone if prompted.',
@@ -379,7 +395,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			if (!result.ok) return Err(result.error);
 			return Ok(undefined);
 		},
-		stopRecording: async (_, { sendUpdateStatus }) => {
+		stopRecording: async (_, { setStatusMessage: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Stopping recording...',
 				description: 'Please allow access to your microphone if prompted.',
@@ -388,7 +404,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			if (!result.ok) return Err(result.error);
 			return Ok(result.data);
 		},
-		cancelRecording: async (_, { sendUpdateStatus }) => {
+		cancelRecording: async (_, { setStatusMessage: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Cancelling recording...',
 				description: 'Please allow access to your microphone if prompted.',
