@@ -39,35 +39,6 @@ function createRecorder() {
 		})();
 	};
 
-	async function openRecordingSession() {
-		const recordingSessionToastId = nanoid();
-		const updateRecordingSessionToast: UpdateStatusMessageFn = ({ message }) =>
-			toast.loading({
-				id: recordingSessionToastId,
-				title: 'Initializing recording session...',
-				description: message,
-			});
-		updateRecordingSessionToast({ message: '' });
-		const initRecordingSessionResult =
-			await MediaRecorderService.initRecordingSession(
-				{
-					deviceId: settings.value.selectedAudioInputDeviceId,
-					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-				},
-				{ setStatusMessage: updateRecordingSessionToast },
-			);
-
-		if (!initRecordingSessionResult.ok) {
-			return renderErrAsToast(initRecordingSessionResult.error);
-		}
-		setRecorderState('SESSION');
-		toast.success({
-			id: recordingSessionToastId,
-			title: 'Recording session opened!',
-			description: 'Your recording session has been opened',
-		});
-	}
-
 	async function closeRecordingSession() {
 		const closeRecordingSessionToastId = nanoid();
 		const updateCloseRecordingSessionToast: UpdateStatusMessageFn = ({
@@ -164,42 +135,41 @@ function createRecorder() {
 				});
 			updateStartRecordingToast({ message: '' });
 
-			const startRecording = async () => {
-				const startRecordingResult = await MediaRecorderService.startRecording(
-					nanoid(),
-					{
-						setStatusMessage: updateStartRecordingToast,
-					},
-				);
-				if (!startRecordingResult.ok) {
-					return renderErrAsToast(startRecordingResult.error);
-				}
-				setRecorderState('SESSION+RECORDING');
-				console.info('Recording started');
-				void playSound('start');
-				void NotificationService.notify({
-					id: IS_RECORDING_NOTIFICATION_ID,
-					title: 'Whispering is recording...',
-					description: 'Click to go to recorder',
-					action: {
-						type: 'link',
-						label: 'Go to recorder',
-						goto: '/',
-					},
-				});
-			};
+			if (!recorder.isInRecordingSession) {
+				const initRecordingSessionResult =
+					await MediaRecorderService.initRecordingSession(
+						{
+							deviceId: settings.value.selectedAudioInputDeviceId,
+							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						},
+						{ setStatusMessage: updateStartRecordingToast },
+					);
 
-			if (!settings.value.isFasterRerecordEnabled) {
-				await openRecordingSession();
-				await startRecording();
-			} else {
-				if (!recorder.isInRecordingSession) {
-					await openRecordingSession();
-					await startRecording();
-				} else {
-					await startRecording();
+				if (!initRecordingSessionResult.ok) {
+					return renderErrAsToast(initRecordingSessionResult.error);
 				}
+				setRecorderState('SESSION');
 			}
+			const startRecordingResult = await MediaRecorderService.startRecording(
+				nanoid(),
+				{ setStatusMessage: updateStartRecordingToast },
+			);
+			if (!startRecordingResult.ok) {
+				return renderErrAsToast(startRecordingResult.error);
+			}
+			setRecorderState('SESSION+RECORDING');
+			console.info('Recording started');
+			void playSound('start');
+			void NotificationService.notify({
+				id: IS_RECORDING_NOTIFICATION_ID,
+				title: 'Whispering is recording...',
+				description: 'Click to go to recorder',
+				action: {
+					type: 'link',
+					label: 'Go to recorder',
+					goto: '/',
+				},
+			});
 		}
 	}
 
@@ -260,7 +230,6 @@ function createRecorder() {
 				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
 			);
 		},
-		openRecordingSession,
 		closeRecordingSession,
 		toggleRecording,
 		cancelRecording,
