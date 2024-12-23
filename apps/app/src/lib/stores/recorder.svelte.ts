@@ -7,7 +7,7 @@ import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import type { Result } from '@epicenterhq/result';
+import { createMutation } from '@epicenterhq/result';
 import {
 	Ok,
 	WhisperingErr,
@@ -16,8 +16,8 @@ import {
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import {
-	RecordingsDbService,
 	type Recording,
+	RecordingsDbService,
 } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
@@ -64,54 +64,6 @@ const createActionStatuses = ({
 	updateStatus({ description: '' });
 	return { updateStatus, succeedStatus, errorStatus };
 };
-
-function createMutation<I, O, ServiceError, TContext>({
-	mutationFn,
-	onMutate = () => Ok({} as TContext),
-	onSuccess = () => undefined,
-	onError = () => undefined,
-	onSettled = () => undefined,
-}: {
-	mutationFn: (args: { input: I; context: TContext }) =>
-		| Promise<Result<O, ServiceError>>
-		| Result<O, ServiceError>;
-	onMutate?: (
-		input: I,
-	) => Promise<Result<TContext, ServiceError>> | Result<TContext, ServiceError>;
-	onSuccess?: (args: { output: O; input: I; context: TContext }) => void;
-	onError?: (args: {
-		error: ServiceError;
-		input: I;
-		contextResult: Result<TContext, ServiceError>;
-	}) => void;
-	onSettled?: (args: {
-		result: Result<O, ServiceError>;
-		input: I;
-		contextResult: Result<TContext, ServiceError>;
-	}) => void;
-}) {
-	const mutate = async (input: I): Promise<void> => {
-		const contextResult = await onMutate(input);
-		if (!contextResult.ok) {
-			const error = contextResult.error;
-			onError({ error, input, contextResult });
-			onSettled({ result: contextResult, input, contextResult });
-			return;
-		}
-		const context = contextResult.data;
-		const result = await mutationFn({ input, context });
-		if (!result.ok) {
-			const error = result.error;
-			onError({ error, input, contextResult });
-			onSettled({ result, input, contextResult });
-			return;
-		}
-		const output = result.data;
-		onSuccess({ output, input, context });
-		onSettled({ result, input, contextResult });
-	};
-	return { mutate };
-}
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
