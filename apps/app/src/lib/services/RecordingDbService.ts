@@ -1,5 +1,10 @@
-import type { WhisperingResult } from '@repo/shared';
+import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
 import { createRecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
+import {
+	createServiceErrorFns,
+	type MutationFn,
+	type QueryFn,
+} from '@epicenterhq/result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -20,20 +25,32 @@ export type Recording = {
 };
 
 export type RecordingsDbService = {
-	readonly getAllRecordings: () => Promise<WhisperingResult<Recording[]>>;
-	readonly getRecording: (
-		id: string,
-	) => Promise<WhisperingResult<Recording | null>>;
-	readonly addRecording: (
-		recording: Recording,
-	) => Promise<WhisperingResult<void>>;
-	readonly updateRecording: (
-		recording: Recording,
-	) => Promise<WhisperingResult<void>>;
-	readonly deleteRecordingById: (id: string) => Promise<WhisperingResult<void>>;
-	readonly deleteRecordingsById: (
-		ids: string[],
-	) => Promise<WhisperingResult<void>>;
+	readonly getAllRecordings: QueryFn<
+		void,
+		Recording[],
+		WhisperingErrProperties
+	>;
+	readonly getRecording: QueryFn<
+		string,
+		Recording | null,
+		WhisperingErrProperties
+	>;
+	readonly addRecording: MutationFn<Recording, void, WhisperingErrProperties>;
+	readonly updateRecording: MutationFn<
+		Recording,
+		void,
+		WhisperingErrProperties
+	>;
+	readonly deleteRecordingById: MutationFn<
+		string,
+		void,
+		WhisperingErrProperties
+	>;
+	readonly deleteRecordingsById: MutationFn<
+		string[],
+		void,
+		WhisperingErrProperties
+	>;
 };
 
 export const RecordingsDbService = createRecordingsDbServiceLiveIndexedDb();
