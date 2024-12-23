@@ -12,10 +12,23 @@ import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionService
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { nanoid } from 'nanoid/non-secure';
-import { recorder } from './recorder.svelte';
 import { settings } from './settings.svelte';
+import type { MutationFn } from '@epicenterhq/result';
+import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
 
-export const createRecordings = () => {
+type RecordingsService = {
+	readonly isTranscribing: boolean;
+	readonly value: Recording[];
+	addRecording: MutationFn<Recording, void, WhisperingErrProperties>;
+	updateRecording: MutationFn<Recording, void, WhisperingErrProperties>;
+	deleteRecordingById: MutationFn<string, void, WhisperingErrProperties>;
+	deleteRecordingsById: MutationFn<string[], void, WhisperingErrProperties>;
+	transcribeRecording: MutationFn<string, void, WhisperingErrProperties>;
+	downloadRecording: MutationFn<string, void, WhisperingErrProperties>;
+	copyRecordingText: MutationFn<Recording, void, WhisperingErrProperties>;
+};
+
+export const createRecordings = (): RecordingsService => {
 	let recordings = $state<Recording[]>([]);
 	const transcribingRecordingIds = $state(new Set<string>());
 
@@ -66,26 +79,9 @@ export const createRecordings = () => {
 		},
 		async updateRecording(
 			recording: Recording,
-			{
-				onStart,
-				onSuccess,
-				onError,
-				onSettled,
-			}:
-				| {
-						onStart?: undefined;
-						onSuccess: () => void;
-						onError: (err: WhisperingErr) => void;
-						onSettled?: undefined;
-				  }
-				| {
-						onStart: () => void;
-						onSuccess: () => void;
-						onError: (err: WhisperingErr) => void;
-						onSettled: () => void;
-				  },
+			{ onMutate, onSuccess, onError, onSettled },
 		) {
-			onStart?.();
+			onMutate(recording);
 			const updateRecordingResult = await updateRecording(recording);
 			if (!updateRecordingResult.ok) {
 				onError(updateRecordingResult);
