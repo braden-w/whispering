@@ -148,57 +148,61 @@ function createRecorder() {
 	});
 
 	const { mutate: toggleRecording } = createMutation({
-		mutationFn: async ({ input: _, context: { updateStatus, isStarting } }) => {
-			if (!isStarting) {
-				const stopResult = await MediaRecorderService.stopRecording(undefined, {
+		mutationFn: async ({
+			input: _,
+			context: { updateStatus, shouldStartRecording },
+		}) => {
+			if (shouldStartRecording) {
+				if (!isInRecordingSession) {
+					const initResult = await MediaRecorderService.initRecordingSession(
+						{
+							deviceId: settings.value.selectedAudioInputDeviceId,
+							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						},
+						{ setStatusMessage: updateStatus },
+					);
+					if (!initResult.ok) return initResult;
+				}
+				return MediaRecorderService.startRecording(nanoid(), {
 					setStatusMessage: updateStatus,
 				});
-				if (!stopResult.ok) return stopResult;
-				const blob = stopResult.data;
-				const newRecording: Recording = {
-					id: nanoid(),
-					title: '',
-					subtitle: '',
-					timestamp: new Date().toISOString(),
-					transcribedText: '',
-					blob,
-					transcriptionStatus: 'UNPROCESSED',
-				};
-				const addRecordingResult =
-					await RecordingsDbService.addRecording(newRecording);
-				if (!addRecordingResult.ok) return addRecordingResult;
-				await recordings.transcribeRecording(newRecording.id);
-				if (!settings.value.isFasterRerecordEnabled) {
-					return MediaRecorderService.closeRecordingSession(undefined, {
-						setStatusMessage: updateStatus,
-					});
-				}
-				return Ok(undefined);
 			}
-
-			if (!isInRecordingSession) {
-				const initResult = await MediaRecorderService.initRecordingSession(
-					{
-						deviceId: settings.value.selectedAudioInputDeviceId,
-						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-					},
-					{ setStatusMessage: updateStatus },
-				);
-				if (!initResult.ok) return initResult;
-			}
-			return MediaRecorderService.startRecording(nanoid(), {
+			const stopResult = await MediaRecorderService.stopRecording(undefined, {
 				setStatusMessage: updateStatus,
 			});
+			if (!stopResult.ok) return stopResult;
+			const blob = stopResult.data;
+			const newRecording: Recording = {
+				id: nanoid(),
+				title: '',
+				subtitle: '',
+				timestamp: new Date().toISOString(),
+				transcribedText: '',
+				blob,
+				transcriptionStatus: 'UNPROCESSED',
+			};
+			const addRecordingResult =
+				await RecordingsDbService.addRecording(newRecording);
+			if (!addRecordingResult.ok) return addRecordingResult;
+			await recordings.transcribeRecording(newRecording.id);
+			if (!settings.value.isFasterRerecordEnabled) {
+				return MediaRecorderService.closeRecordingSession(undefined, {
+					setStatusMessage: updateStatus,
+				});
+			}
+			return Ok(undefined);
 		},
 		onMutate: () => {
-			const isStarting = recorderState !== 'SESSION+RECORDING';
+			const shouldStartRecording = recorderState !== 'SESSION+RECORDING';
 			const actionStatuses = createActionStatuses({
-				title: isStarting ? 'Starting recording...' : 'Stopping recording...',
+				title: shouldStartRecording
+					? 'Starting recording...'
+					: 'Stopping recording...',
 			});
-			return Ok({ ...actionStatuses, isStarting });
+			return Ok({ ...actionStatuses, shouldStartRecording });
 		},
-		onSuccess: ({ context: { succeedStatus, isStarting } }) => {
-			if (isStarting) {
+		onSuccess: ({ context: { succeedStatus, shouldStartRecording } }) => {
+			if (shouldStartRecording) {
 				setRecorderState('SESSION+RECORDING');
 				succeedStatus({
 					title: 'Recording started!',
