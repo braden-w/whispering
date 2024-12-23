@@ -1,4 +1,9 @@
-import { Result, Ok, createServiceErrorFns } from '@epicenterhq/result';
+import {
+	Result,
+	Ok,
+	createServiceErrorFns,
+	trySync,
+} from '@epicenterhq/result';
 import { z } from 'zod';
 import { notificationOptionsSchema } from './services/NotificationService.js';
 import {
@@ -91,26 +96,6 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
-export type BubbleErrProperties<T extends string = string> = {
-	_tag: T;
-	message: string;
-};
-
-export type BubbleResult<T> = Result<T, BubbleErrProperties>;
-
-export type BubbleErr = Err<BubbleErrProperties>;
-
-export const BubbleErr = <E extends BubbleErrProperties>(error: E) =>
-	Err(error);
-
-export const trySyncBubble = <T>(
-	opts: Parameters<typeof trySync<T, BubbleErrProperties>>[0],
-): BubbleResult<T> => trySync(opts);
-
-export const tryAsyncBubble = <T>(
-	opts: Parameters<typeof tryAsync<T, BubbleErrProperties>>[0],
-): Promise<BubbleResult<T>> => tryAsync(opts);
-
 export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
 	isWarning?: boolean;
@@ -124,12 +109,9 @@ const {
 export { WhisperingErr, trySyncWhispering, tryAsyncWhispering };
 
 export const parseJson = (value: string) =>
-	trySyncBubble({
+	trySync({
 		try: () => JSON.parse(value) as unknown,
-		catch: (error) => ({
-			_tag: 'ParseJsonError',
-			message: error instanceof Error ? error.message : 'Unexpected JSON input',
-		}),
+		catch: (error) => ({ _tag: 'ParseJsonError', error }),
 	});
 
 export const recordingStateSchema = z.enum([
