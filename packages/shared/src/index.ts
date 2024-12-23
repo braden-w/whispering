@@ -1,8 +1,8 @@
 import {
-	Result,
 	Ok,
 	createServiceErrorFns,
 	trySync,
+	type Result,
 } from '@epicenterhq/result';
 import { z } from 'zod';
 import { notificationOptionsSchema } from './services/NotificationService.js';
@@ -100,6 +100,8 @@ export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
 	isWarning?: boolean;
 } & NotificationOptions;
+
+export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
 
 const {
 	Err: WhisperingErr,

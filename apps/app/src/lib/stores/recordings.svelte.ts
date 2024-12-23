@@ -11,14 +11,13 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { Ok, WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { recorder } from './recorder.svelte';
 import { settings } from './settings.svelte';
 
 export const createRecordings = () => {
 	let recordings = $state<Recording[]>([]);
-	let transcribingRecordingIds = $state<string[]>([]);
+	const transcribingRecordingIds = $state(new Set<string>());
 
 	const syncDbToRecordingsState = async () => {
 		const getAllRecordingsResult = await RecordingsDbService.getAllRecordings();
@@ -45,7 +44,7 @@ export const createRecordings = () => {
 
 	return {
 		get isTranscribing() {
-			return transcribingRecordingIds.length > 0;
+			return transcribingRecordingIds.size > 0;
 		},
 		get value() {
 			return recordings;
@@ -152,7 +151,7 @@ export const createRecordings = () => {
 		) {
 			const transcribingInProgressId = toastId ?? nanoid();
 			const onTranscribeStart = () => {
-			transcribingRecordingIds.push(transcribingInProgressId);
+				transcribingRecordingIds.add(transcribingInProgressId);
 				toast.loading({
 					id: transcribingInProgressId,
 					title: 'Transcribing recording...',
@@ -174,9 +173,7 @@ export const createRecordings = () => {
 			};
 
 			const onTranscribeSuccess = () => {
-				transcribingRecordingIds = transcribingRecordingIds.filter(
-					(id) => id !== transcribingInProgressId,
-				);
+				transcribingRecordingIds.delete(transcribingInProgressId);
 				NotificationService.clear(transcribingInProgressId);
 				toast.success({
 					id: transcribingInProgressId,
@@ -233,7 +230,6 @@ export const createRecordings = () => {
 				Groq: TranscriptionServiceGroqLive,
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
-
 
 			onTranscribeStart();
 
