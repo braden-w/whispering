@@ -12,6 +12,7 @@ const TIMESLICE_MS = 1000;
 
 type MediaRecorderErrProperties = WhisperingErrProperties;
 
+/** Sets status message to be displayed in the UI that is calling this service */
 type SetStatusMessageFn = (message: {
 	title: string;
 	description: string;
