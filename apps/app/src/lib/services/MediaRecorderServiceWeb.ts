@@ -12,21 +12,6 @@ import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
 const TIMESLICE_MS = 1000;
 
-type RecordingSession = {
-	settings: RecordingSessionSettings;
-	stream: MediaStream;
-	recorder: {
-		mediaRecorder: MediaRecorder;
-		recordedChunks: Blob[];
-		recordingId: string;
-	} | null;
-};
-
-type RecordingSessionSettings = {
-	deviceId: string;
-	bitsPerSecond: number;
-};
-
 type MediaRecorderErrProperties = WhisperingErrProperties;
 
 type MediaRecorderService = {
@@ -48,6 +33,21 @@ type MediaRecorderService = {
 	>;
 	stopRecording: MutationFn<void, Blob, MediaRecorderErrProperties>;
 	cancelRecording: MutationFn<void, void, MediaRecorderErrProperties>;
+};
+
+type RecordingSession = {
+	settings: RecordingSessionSettings;
+	stream: MediaStream;
+	recorder: {
+		mediaRecorder: MediaRecorder;
+		recordedChunks: Blob[];
+		recordingId: string;
+	} | null;
+};
+
+type RecordingSessionSettings = {
+	deviceId: string;
+	bitsPerSecond: number;
 };
 
 const {
