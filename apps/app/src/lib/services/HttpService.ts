@@ -1,4 +1,4 @@
-import type { BubbleErrProperties, BubbleResult } from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
@@ -9,12 +9,7 @@ export type HttpService = {
 		formData: FormData;
 		schema: TSchema;
 		headers?: Record<string, string>;
-	}) => Promise<
-		BubbleResult<
-			z.infer<TSchema>,
-			BubbleErrProperties<'NetworkError' | 'HttpError' | 'ParseError'>
-		>
-	>;
+	}) => Promise<WhisperingResult<z.infer<TSchema>>>;
 };
 
 export const HttpService = window.__TAURI_INTERNALS__
