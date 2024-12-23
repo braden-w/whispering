@@ -32,13 +32,21 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 export const recorder = createRecorder();
 
 const createActionStatuses = ({
-	title,
+	title: initialTitle,
+	description: initialDescription,
 }: {
 	title: string;
+	description: string;
 }) => {
 	const toastId = nanoid();
-	const updateStatus: UpdateStatusMessageFn = ({ message }) =>
-		toast.loading({ id: toastId, title, description: message });
+	toast.loading({
+		id: toastId,
+		title: initialTitle,
+		description: initialDescription,
+	});
+
+	const updateStatus: UpdateStatusMessageFn = ({ title, description }) =>
+		toast.loading({ id: toastId, title: title ?? initialTitle, description });
 	const succeedStatus = ({
 		title,
 		description,
@@ -53,7 +61,7 @@ const createActionStatuses = ({
 		title: string;
 		description: string;
 	}) => toast.error({ id: toastId, title, description });
-	updateStatus({ message: '' });
+	updateStatus({ description: '' });
 	return { updateStatus, succeedStatus, errorStatus };
 };
 
@@ -134,6 +142,7 @@ function createRecorder() {
 			}
 			const actionStatuses = createActionStatuses({
 				title: 'Closing recording session...',
+				description: '',
 			});
 			return Ok(actionStatuses);
 		},
@@ -154,6 +163,7 @@ function createRecorder() {
 		}) => {
 			if (shouldStartRecording) {
 				if (!isInRecordingSession) {
+					updateStatus({ description: 'Initializing recording session...' });
 					const initResult = await MediaRecorderService.initRecordingSession(
 						{
 							deviceId: settings.value.selectedAudioInputDeviceId,
@@ -163,14 +173,17 @@ function createRecorder() {
 					);
 					if (!initResult.ok) return initResult;
 				}
+				updateStatus({ description: 'Starting recording...' });
 				return MediaRecorderService.startRecording(nanoid(), {
 					setStatusMessage: updateStatus,
 				});
 			}
+			updateStatus({ description: 'Stopping recording...' });
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
 				setStatusMessage: updateStatus,
 			});
 			if (!stopResult.ok) return stopResult;
+			updateStatus({ description: 'Adding recording to database...' });
 			const blob = stopResult.data;
 			const newRecording: Recording = {
 				id: nanoid(),
@@ -184,8 +197,9 @@ function createRecorder() {
 			const addRecordingResult =
 				await RecordingsDbService.addRecording(newRecording);
 			if (!addRecordingResult.ok) return addRecordingResult;
-			await recordings.transcribeRecording(newRecording.id);
+			void recordings.transcribeRecording(newRecording.id);
 			if (!settings.value.isFasterRerecordEnabled) {
+				updateStatus({ description: 'Closing recording session...' });
 				return MediaRecorderService.closeRecordingSession(undefined, {
 					setStatusMessage: updateStatus,
 				});
@@ -198,6 +212,7 @@ function createRecorder() {
 				title: shouldStartRecording
 					? 'Starting recording...'
 					: 'Stopping recording...',
+				description: '',
 			});
 			return Ok({ ...actionStatuses, shouldStartRecording });
 		},
@@ -253,6 +268,7 @@ function createRecorder() {
 			}
 			const actionStatuses = createActionStatuses({
 				title: 'Cancelling recording...',
+				description: '',
 			});
 			return Ok(actionStatuses);
 		},
@@ -268,7 +284,7 @@ function createRecorder() {
 
 			if (settings.value.isFasterRerecordEnabled) return;
 			updateStatus({
-				message: 'Canceled recording, closing recording session...',
+				description: 'Recording cancelled, closing recording session...',
 			});
 			const closeResult = await MediaRecorderService.closeRecordingSession(
 				undefined,
