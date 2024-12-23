@@ -1,4 +1,4 @@
-import { tryAsyncWhispering } from '@repo/shared';
+import { Ok, WhisperingErr, tryAsyncWhispering } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
@@ -17,45 +17,28 @@ const writeTextToCursor = (text: string) =>
 	});
 
 export const createClipboardServiceDesktopLive = (): ClipboardService => ({
-	async setClipboardText(
-		text: string,
-		{ onMutate, onSuccess, onError, onSettled },
-	) {
-		onMutate(text);
-		const result = await tryAsyncWhispering({
+	async setClipboardText(text) {
+		return await tryAsyncWhispering({
 			try: () => writeText(text),
 			catch: (error) => ({
 				_tag: 'WhisperingError',
 				title: 'Unable to write to clipboard',
 				description:
 					'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
-				action: {
-					type: 'more-details',
-					error,
-				},
+				action: { type: 'more-details', error },
 			}),
 		});
-		if (result.ok) {
-			onSuccess();
-		} else {
-			onError(result.error);
-		}
-		onSettled();
 	},
 
-	async writeTextToCursor(text, { onMutate, onSuccess, onError, onSettled }) {
-		onMutate(text);
+	async writeTextToCursor(text) {
 		const isMacos = type() === 'macos';
 
 		if (!isMacos) {
 			const result = await writeTextToCursor(text);
-			if (result.ok) {
-				onSuccess();
-			} else {
-				onError(result.error);
+			if (!result.ok) {
+				return result;
 			}
-			onSettled();
-			return;
+			return Ok(undefined);
 		}
 
 		const isAccessibilityEnabledResult = await tryAsyncWhispering({
@@ -73,14 +56,12 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 		});
 
 		if (!isAccessibilityEnabledResult.ok) {
-			onError(isAccessibilityEnabledResult.error);
-			onSettled();
-			return;
+			return isAccessibilityEnabledResult;
 		}
 		const isAccessibilityEnabled = isAccessibilityEnabledResult.data;
 
 		if (!isAccessibilityEnabled) {
-			onError({
+			return WhisperingErr({
 				_tag: 'WhisperingError',
 				isWarning: true,
 				title:
@@ -93,16 +74,12 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 					goto: '/macos-enable-accessibility',
 				},
 			});
-			onSettled();
-			return;
 		}
 
 		const result = await writeTextToCursor(text);
-		if (result.ok) {
-			onSuccess();
-		} else {
-			onError(result.error);
+		if (!result.ok) {
+			return result;
 		}
-		onSettled();
+		return Ok(undefined);
 	},
 });
