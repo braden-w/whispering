@@ -80,6 +80,68 @@ export const createRecordingsDbServiceLiveIndexedDb =
 		});
 
 		return {
+			getAllRecordings: () =>
+				tryAsyncWhispering({
+					try: async () => {
+						const tx = (await dbPromise).transaction(
+							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+							'readonly',
+						);
+						const recordingMetadataStore = tx.objectStore(
+							RECORDING_METADATA_STORE,
+						);
+						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+						const metadata = await recordingMetadataStore.getAll();
+						const blobs = await recordingBlobStore.getAll();
+						await tx.done;
+						return metadata
+							.map((recording) => {
+								const blob = blobs.find(
+									(blob) => blob.id === recording.id,
+								)?.blob;
+								return blob ? { ...recording, blob } : null;
+							})
+							.filter((r) => r !== null);
+					},
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error getting recordings from indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
+				}),
+			getRecording: (id) =>
+				tryAsyncWhispering({
+					try: async () => {
+						const tx = (await dbPromise).transaction(
+							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+							'readonly',
+						);
+						const recordingMetadataStore = tx.objectStore(
+							RECORDING_METADATA_STORE,
+						);
+						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+						const metadata = await recordingMetadataStore.get(id);
+						const blobData = await recordingBlobStore.get(id);
+						await tx.done;
+						if (metadata && blobData) {
+							return { ...metadata, blob: blobData.blob };
+						}
+						return null;
+					},
+					catch: (error) => ({
+						_tag: 'WhisperingError',
+						title: 'Error getting recording from indexedDB',
+						description: 'Please try again',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
+				}),
 			addRecording: (recording) =>
 				tryAsyncWhispering({
 					try: async () => {
@@ -177,68 +239,6 @@ export const createRecordingsDbServiceLiveIndexedDb =
 					catch: (error) => ({
 						_tag: 'WhisperingError',
 						title: 'Error deleting recordings from indexedDB',
-						description: 'Please try again',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-				}),
-			getAllRecordings: () =>
-				tryAsyncWhispering({
-					try: async () => {
-						const tx = (await dbPromise).transaction(
-							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-							'readonly',
-						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
-						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-						const metadata = await recordingMetadataStore.getAll();
-						const blobs = await recordingBlobStore.getAll();
-						await tx.done;
-						return metadata
-							.map((recording) => {
-								const blob = blobs.find(
-									(blob) => blob.id === recording.id,
-								)?.blob;
-								return blob ? { ...recording, blob } : null;
-							})
-							.filter((r) => r !== null);
-					},
-					catch: (error) => ({
-						_tag: 'WhisperingError',
-						title: 'Error getting recordings from indexedDB',
-						description: 'Please try again',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					}),
-				}),
-			getRecording: (id) =>
-				tryAsyncWhispering({
-					try: async () => {
-						const tx = (await dbPromise).transaction(
-							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-							'readonly',
-						);
-						const recordingMetadataStore = tx.objectStore(
-							RECORDING_METADATA_STORE,
-						);
-						const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-						const metadata = await recordingMetadataStore.get(id);
-						const blobData = await recordingBlobStore.get(id);
-						await tx.done;
-						if (metadata && blobData) {
-							return { ...metadata, blob: blobData.blob };
-						}
-						return null;
-					},
-					catch: (error) => ({
-						_tag: 'WhisperingError',
-						title: 'Error getting recording from indexedDB',
 						description: 'Please try again',
 						action: {
 							type: 'more-details',
