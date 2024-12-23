@@ -489,47 +489,6 @@ async function invoke<T>(
 	});
 }
 
-toast.loading({
-	title: 'Existing recording session not found',
-	description: 'Creating a new recording session...',
-});
-toast.error({
-	title: 'Error creating new recording session',
-	description: 'Please try again',
-});
-toast.loading({
-	title: 'Recording session created',
-	description: 'Recording in progress...',
-});
-toast.loading({
-	title: 'Existing recording session is inactive',
-	description: 'Refreshing recording session...',
-});
-toast.loading({
-	title: 'Error initializing media recorder with preferred device',
-	description: 'Trying to find another available audio input device...',
-});
-
-const OpenStreamIsInactiveErr = WhisperingErr({
-	_tag: 'WhisperingError',
-	title: '🔄 Recording Session Expired',
-	description: 'Refreshing your recording session to get you back on track...',
-	action: {
-		type: 'none',
-	},
-} as const);
-
-const NoAvailableAudioInputDevicesErr = WhisperingErr({
-	_tag: 'WhisperingError',
-	title: '🎙️ No Microphone Found',
-	description: 'Connect a microphone to start recording your awesome content',
-	action: {
-		type: 'link',
-		label: 'Open Settings',
-		goto: '/settings',
-	},
-} as const);
-
 async function getFirstAvailableStream() {
 	const recordingDevicesResult = await tryAsync({
 		try: async () => {
@@ -547,13 +506,11 @@ async function getFirstAvailableStream() {
 		},
 		catch: (error) => ({
 			_tag: 'WhisperingError',
-			title: 'Error enumerating recording devices',
+			title:
+				'Error enumerating recording devices and acquiring first available stream',
 			description:
 				'Please make sure you have given permission to access your audio devices',
-			action: {
-				type: 'more-details',
-				error,
-			},
+			action: { type: 'more-details', error },
 		}),
 	});
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
@@ -565,7 +522,15 @@ async function getFirstAvailableStream() {
 			return streamResult;
 		}
 	}
-	return Err(NoAvailableAudioInputDevicesErr);
+	return Err({
+		_tag: 'WhisperingError',
+		title: '🎤 Microphone Access Error',
+		description: 'Unable to connect to your selected microphone',
+		action: {
+			type: 'more-details',
+			error: new Error('No available audio input devices'),
+		},
+	});
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
