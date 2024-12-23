@@ -35,6 +35,43 @@ function createRecorder() {
 		})();
 	};
 
+	async function openRecordingSession() {
+		const openRecordingSessionToastId = nanoid();
+		if (!settings.value.selectedAudioInputDeviceId) {
+			toast.loading({
+				id: openRecordingSessionToastId,
+				title: 'No device selected',
+				description: 'Defaulting to first available audio input device...',
+			});
+		}
+
+		await MediaRecorderService.initRecordingSession(
+			{
+				deviceId: settings.value.selectedAudioInputDeviceId,
+				bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+			},
+			{
+				onMutate: () => {
+					toast.loading({
+						id: openRecordingSessionToastId,
+						title: 'Connecting to selected audio input device...',
+						description: 'Please allow access to your microphone if prompted.',
+					});
+				},
+				onSuccess: () => {
+					setRecorderState('SESSION+RECORDING');
+					toast.success({
+						id: openRecordingSessionToastId,
+						title: 'Connected to selected audio input device',
+						description: 'Successfully connected to your microphone stream.',
+					});
+				},
+				onError: renderErrAsToast,
+				onSettled: () => {},
+			},
+		);
+	}
+
 	return {
 		get recorderState() {
 			return recorderState;
@@ -44,43 +81,7 @@ function createRecorder() {
 				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
 			);
 		},
-		async openRecordingSession() {
-			const openRecordingSessionToastId = nanoid();
-			if (!settings.value.selectedAudioInputDeviceId) {
-				toast.loading({
-					id: openRecordingSessionToastId,
-					title: 'No device selected',
-					description: 'Defaulting to first available audio input device...',
-				});
-			}
-
-			await MediaRecorderService.initRecordingSession(
-				{
-					deviceId: settings.value.selectedAudioInputDeviceId,
-					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-				},
-				{
-					onMutate: () => {
-						toast.loading({
-							id: openRecordingSessionToastId,
-							title: 'Connecting to selected audio input device...',
-							description:
-								'Please allow access to your microphone if prompted.',
-						});
-					},
-					onSuccess: () => {
-						setRecorderState('SESSION+RECORDING');
-						toast.success({
-							id: openRecordingSessionToastId,
-							title: 'Connected to selected audio input device',
-							description: 'Successfully connected to your microphone stream.',
-						});
-					},
-					onError: renderErrAsToast,
-					onSettled: () => {},
-				},
-			);
-		},
+		openRecordingSession,
 		async closeRecordingSession() {
 			if (!this.isInRecordingSession) {
 				return renderErrAsToast({
@@ -179,7 +180,7 @@ function createRecorder() {
 				const newRecordingId = nanoid();
 
 				const startNewSessionAndRecording = async () => {
-					await this.openRecordingSession();
+					await openRecordingSession();
 					await MediaRecorderService.startRecording(
 						{ recordingId: newRecordingId },
 						{
