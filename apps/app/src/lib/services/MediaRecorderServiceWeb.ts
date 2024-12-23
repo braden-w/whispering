@@ -21,44 +21,24 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-		callbacks: {
-			onSuccess: () => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
-	) => Promise<void>;
+		callbacks: { sendUpdateStatus: typeof toast.loading },
+	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	closeRecordingSession: (
 		_: undefined,
-		callbacks: {
-			onSuccess: () => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
-	) => Promise<void>;
+		callbacks: { sendUpdateStatus: typeof toast.loading },
+	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	startRecording: (
 		recordingId: string,
-		callbacks: {
-			onSuccess: () => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
-	) => Promise<void>;
+		callbacks: { sendUpdateStatus: typeof toast.loading },
+	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	stopRecording: (
 		_: undefined,
-		callbacks: {
-			onSuccess: (blob: Blob) => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
-	) => Promise<void>;
+		callbacks: { sendUpdateStatus: typeof toast.loading },
+	) => Promise<Result<Blob, MediaRecorderErrProperties>>;
 	cancelRecording: (
 		_: undefined,
-		callbacks: {
-			onSuccess: () => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
-	) => Promise<void>;
+		callbacks: { sendUpdateStatus: typeof toast.loading },
+	) => Promise<Result<void, MediaRecorderErrProperties>>;
 };
 
 type RecordingSession = {
@@ -81,17 +61,9 @@ const { Err, tryAsync } = createServiceErrorFns<MediaRecorderErrProperties>();
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
-	const acquireStreamAndSetUpRecordingSession = async (
+	const acquireStream = async (
 		settings: RecordingSessionSettings,
-		{
-			onSuccess,
-			onError,
-			sendUpdateStatus,
-		}: {
-			onSuccess: (stream: MediaStream) => void;
-			onError: (error: MediaRecorderErrProperties) => void;
-			sendUpdateStatus: typeof toast.loading;
-		},
+		{ sendUpdateStatus }: { sendUpdateStatus: typeof toast.loading },
 	) => {
 		if (!settings.deviceId) {
 			sendUpdateStatus({
@@ -100,18 +72,16 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			const getFirstStreamResult = await getFirstAvailableStream();
 			if (!getFirstStreamResult.ok) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: 'Error acquiring stream',
 					description:
 						'No device selected and no available audio input devices found',
 					action: { type: 'more-details', error: getFirstStreamResult.error },
 				});
-				return;
 			}
 			const firstStream = getFirstStreamResult.data;
-			onSuccess(firstStream);
-			return;
+			return Ok(firstStream);
 		}
 		sendUpdateStatus({
 			title: 'Connecting to selected audio input device...',
@@ -120,30 +90,26 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		const getPreferredStreamResult = await getStreamForDeviceId(
 			settings.deviceId,
 		);
-		if (getPreferredStreamResult.ok) {
-			const preferredStream = getPreferredStreamResult.data;
-			onSuccess(preferredStream);
-			return;
-		}
-		sendUpdateStatus({
-			title: 'Error connecting to selected audio input device',
-			description: 'Trying to find another available audio input device...',
-		});
-		const getFirstStreamResult = await getFirstAvailableStream();
-		if (!getFirstStreamResult.ok) {
-			onError({
-				_tag: 'WhisperingError',
-				title: 'Error acquiring stream',
-				description:
-					'Unable to connect to your selected microphone or find any available audio input devices',
-				action: { type: 'more-details', error: getFirstStreamResult.error },
+		if (!getPreferredStreamResult.ok) {
+			sendUpdateStatus({
+				title: 'Error connecting to selected audio input device',
+				description: 'Trying to find another available audio input device...',
 			});
-			return;
+			const getFirstStreamResult = await getFirstAvailableStream();
+			if (!getFirstStreamResult.ok) {
+				return Err({
+					_tag: 'WhisperingError',
+					title: 'Error acquiring stream',
+					description:
+						'Unable to connect to your selected microphone or find any available audio input devices',
+					action: { type: 'more-details', error: getFirstStreamResult.error },
+				});
+			}
+			const firstStream = getFirstStreamResult.data;
+			return Ok(firstStream);
 		}
-
-		const firstStream = getFirstStreamResult.data;
-		onSuccess(firstStream);
-		return;
+		const preferredStream = getPreferredStreamResult.data;
+		return Ok(preferredStream);
 	};
 
 	return {
@@ -171,56 +137,50 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			}),
-		async initRecordingSession(
-			settings,
-			{ onSuccess, onError, sendUpdateStatus },
-		) {
+		async initRecordingSession(settings, { sendUpdateStatus }) {
 			sendUpdateStatus({
 				title: 'Initializing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			if (currentSession) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '⚠️ Session Already Active',
 					description: 'A recording session is already running and ready to go',
 					action: { type: 'none' },
 				});
-				return;
 			}
 
-			await acquireStreamAndSetUpRecordingSession(settings, {
-				onSuccess: (stream) => {
-					currentSession = { settings, stream, recorder: null };
-					sendUpdateStatus({
-						title: '🎤 Microphone Connected',
-						description: 'You can now start recording',
-					});
-					onSuccess();
-				},
-				onError: (error) => {
-					onError({
-						_tag: 'WhisperingError',
-						title: '🎤 Microphone Access Error',
-						description: 'Unable to connect to your selected microphone',
-						action: { type: 'more-details', error },
-					});
-				},
+			const acquireStreamResult = await acquireStream(settings, {
 				sendUpdateStatus,
 			});
+			if (!acquireStreamResult.ok) {
+				return Err({
+					_tag: 'WhisperingError',
+					title: '🎤 Microphone Access Error',
+					description: 'Unable to connect to your selected microphone',
+					action: { type: 'more-details', error: acquireStreamResult.error },
+				});
+			}
+			const stream = acquireStreamResult.data;
+			currentSession = { settings, stream, recorder: null };
+			sendUpdateStatus({
+				title: '🎤 Microphone Connected',
+				description: 'You can now start recording',
+			});
+			return Ok(undefined);
 		},
-		async closeRecordingSession(_, { onSuccess, onError, sendUpdateStatus }) {
+		async closeRecordingSession(_, { sendUpdateStatus }) {
 			if (!currentSession) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
 					description: "There's no recording session to close at the moment",
 					action: { type: 'none' },
 				});
-				return;
 			}
 			if (currentSession.recorder) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '⏺️ Recording in Progress',
 					description:
@@ -229,28 +189,23 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						type: 'none',
 					},
 				});
-				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
 			}
 			currentSession.recorder = null;
 			currentSession = null;
-			onSuccess();
+			return Ok(undefined);
 		},
-		async startRecording(
-			recordingId,
-			{ onSuccess, onError, sendUpdateStatus },
-		) {
+		async startRecording(recordingId, { sendUpdateStatus }) {
 			if (!currentSession) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
 					description:
 						"There's no recording session to start recording in at the moment",
 					action: { type: 'none' },
 				});
-				return;
 			}
 			const { stream, settings } = currentSession;
 			if (!stream.active) {
@@ -259,20 +214,24 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					description:
 						'Refreshing your recording session to get you back on track...',
 				});
-				await acquireStreamAndSetUpRecordingSession(settings, {
-					onSuccess: (stream) => {
-						currentSession = { settings, stream, recorder: null };
-					},
-					onError: (error) => {
-						onError({
-							_tag: 'WhisperingError',
-							title: '🎤 Microphone Access Error',
-							description: 'Unable to connect to your selected microphone',
-							action: { type: 'more-details', error },
-						});
-					},
+				const acquireStreamResult = await acquireStream(settings, {
 					sendUpdateStatus,
 				});
+				if (!acquireStreamResult.ok) {
+					return Err({
+						_tag: 'WhisperingError',
+						title: '🎤 Microphone Access Error',
+						description: 'Unable to connect to your selected microphone',
+						action: { type: 'more-details', error: acquireStreamResult.error },
+					});
+				}
+				const stream = acquireStreamResult.data;
+				currentSession = { settings, stream, recorder: null };
+				sendUpdateStatus({
+					title: '🎤 Microphone Connected',
+					description: 'You can now start recording',
+				});
+				return Ok(undefined);
 			}
 			const newRecorderResult = await tryAsync({
 				try: async () =>
@@ -284,10 +243,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			});
-			if (!newRecorderResult.ok) {
-				onError(newRecorderResult.error);
-				return;
-			}
+			if (!newRecorderResult.ok) return Err(newRecorderResult.error);
 			const newRecorder = newRecorderResult.data;
 			currentSession.recorder = {
 				mediaRecorder: newRecorder,
@@ -299,20 +255,21 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				currentSession.recorder?.recordedChunks.push(event.data);
 			});
 			newRecorder.start(TIMESLICE_MS);
-			onSuccess();
+			return Ok(undefined);
 		},
-		async stopRecording(_, { onSuccess, onError, sendUpdateStatus }) {
+		async stopRecording(_, { sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '⚠️ Nothing to Stop',
 					description: 'No active recording found to stop',
-					action: {
-						type: 'none',
-					},
+					action: { type: 'none' },
 				});
-				return;
 			}
+			sendUpdateStatus({
+				title: 'Stopping recording...',
+				description: 'Please allow access to your microphone if prompted.',
+			});
 			const stopResult = await tryAsync({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
@@ -349,29 +306,25 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			});
-			if (!stopResult.ok) {
-				onError(stopResult.error);
-				return;
-			}
+			if (!stopResult.ok) return Err(stopResult.error);
 			const blob = stopResult.data;
-			onSuccess(blob);
+			return Ok(blob);
 		},
-		async cancelRecording(_, { onSuccess, onError, sendUpdateStatus }) {
+		async cancelRecording(_, { sendUpdateStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
-				onError({
+				return Err({
 					_tag: 'WhisperingError',
 					title: '⚠️ Nothing to Cancel',
 					description: 'No active recording found to cancel',
 					action: { type: 'none' },
 				});
-				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
 			}
 			currentSession.recorder.mediaRecorder.stop();
 			currentSession.recorder = null;
-			onSuccess();
+			return Ok(undefined);
 		},
 	};
 };
@@ -399,74 +352,50 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				})),
 			);
 		},
-		initRecordingSession: async (
-			settings,
-			{ onSuccess, onError, sendUpdateStatus },
-		) => {
+		initRecordingSession: async (settings, { sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Initializing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('init_recording_session');
-			if (result.ok) {
-				onSuccess();
-			} else {
-				onError(result.error);
-			}
+			if (!result.ok) return Err(result.error);
+			return Ok(undefined);
 		},
-		closeRecordingSession: async (
-			_,
-			{ onSuccess, onError, sendUpdateStatus },
-		) => {
+		closeRecordingSession: async (_, { sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Closing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('close_recording_session');
-			if (result.ok) {
-				onSuccess();
-			} else {
-				onError(result.error);
-			}
+			if (!result.ok) return Err(result.error);
+			return Ok(undefined);
 		},
-		startRecording: async (
-			recordingId,
-			{ onSuccess, onError, sendUpdateStatus },
-		) => {
+		startRecording: async (recordingId, { sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Starting recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('start_recording');
-			if (result.ok) {
-				onSuccess();
-			} else {
-				onError(result.error);
-			}
+			if (!result.ok) return Err(result.error);
+			return Ok(undefined);
 		},
-		stopRecording: async (_, { onSuccess, onError, sendUpdateStatus }) => {
+		stopRecording: async (_, { sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Stopping recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke<Blob>('stop_recording');
-			if (result.ok) {
-				onSuccess(result.data);
-			} else {
-				onError(result.error);
-			}
+			if (!result.ok) return Err(result.error);
+			return Ok(result.data);
 		},
-		cancelRecording: async (_, { onSuccess, onError, sendUpdateStatus }) => {
+		cancelRecording: async (_, { sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: 'Cancelling recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('cancel_recording');
-			if (result.ok) {
-				onSuccess();
-			} else {
-				onError(result.error);
-			}
+			if (!result.ok) return Err(result.error);
+			return Ok(undefined);
 		},
 	};
 };
