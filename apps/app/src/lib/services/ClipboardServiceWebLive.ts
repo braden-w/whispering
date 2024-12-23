@@ -3,7 +3,9 @@ import { Ok, type WhisperingResult, tryAsyncWhispering } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
-	async setClipboardText(text): Promise<WhisperingResult<void>> {
+	async setClipboardText(text, { onMutate, onSuccess, onError, onSettled }) {
+		onMutate(text);
+
 		const setClipboardResult = await tryAsyncWhispering({
 			try: () => navigator.clipboard.writeText(text),
 			catch: (error) => ({
@@ -11,30 +13,33 @@ export const createClipboardServiceWebLive = (): ClipboardService => ({
 				title: 'Unable to write to clipboard',
 				description:
 					'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
-				action: {
-					type: 'more-details',
-					error,
-				},
+				action: { type: 'more-details', error },
 			}),
 		});
 
-		if (!setClipboardResult.ok) {
+		if (setClipboardResult.ok) {
+			onSuccess();
+		} else {
 			sendMessageToExtension({
 				name: 'whispering-extension/setClipboardText',
 				body: { transcribedText: text },
 			});
-			return Ok(undefined);
+			onError(setClipboardResult.error);
 		}
-
-		return setClipboardResult;
+		onSettled();
 	},
 
-	async writeTextToCursor(text) {
+	async writeTextToCursor(text, { onMutate, onSuccess, onError, onSettled }) {
+		onMutate(text);
 		const result = await sendMessageToExtension({
 			name: 'whispering-extension/writeTextToCursor',
 			body: { transcribedText: text },
 		});
-		if (!result.ok) return result;
-		return Ok(undefined);
+		if (result.ok) {
+			onSuccess();
+		} else {
+			onError(result.error);
+		}
+		onSettled();
 	},
 });
