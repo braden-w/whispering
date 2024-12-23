@@ -91,15 +91,68 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				});
 				return;
 			}
+			const initRecordingSessionToastId = nanoid();
 
-			const getStreamForDeviceIdResult = await getStreamForDeviceId(
-				settings.deviceId,
-			);
+			const getStream = async () => {
+				if (!settings.deviceId) {
+					toast.loading({
+						id: initRecordingSessionToastId,
+						title: 'No device selected',
+						description: 'Defaulting to first available audio input device...',
+					});
+					const getFirstStreamResult = await getFirstAvailableStream();
+					if (!getFirstStreamResult.ok) return getFirstStreamResult;
+					toast.info({
+						id: initRecordingSessionToastId,
+						title: 'Defaulted to first available audio input device',
+						description: 'You can select a specific device in the settings.',
+					});
+					return getFirstStreamResult;
+				}
+				toast.loading({
+					id: initRecordingSessionToastId,
+					title: 'Connecting to selected audio input device...',
+					description: 'Please allow access to your microphone if prompted.',
+				});
+				const getPreferredStreamResult = await getStreamForDeviceId(
+					settings.deviceId,
+				);
+				if (getPreferredStreamResult.ok) {
+					toast.success({
+						id: initRecordingSessionToastId,
+						title: 'Connected to selected audio input device',
+						description: 'Successfully connected to your microphone stream.',
+					});
+					return getPreferredStreamResult;
+				}
+				toast.loading({
+					id: initRecordingSessionToastId,
+					title: 'Error connecting to selected audio input device',
+					description: 'Trying to find another available audio input device...',
+				});
+				const getFirstStreamResult = await getFirstAvailableStream();
+				if (!getFirstStreamResult.ok) return getFirstStreamResult;
+
+				toast.info({
+					id: initRecordingSessionToastId,
+					title: 'Defaulted to first available audio input device',
+					description: 'You can select a specific device in the settings.',
+				});
+				return getFirstStreamResult;
+			};
+
+			const getStreamForDeviceIdResult = await getStream();
+
 			if (!getStreamForDeviceIdResult.ok) {
 				onError(getStreamForDeviceIdResult.error);
 				return;
 			}
 			const stream = getStreamForDeviceIdResult.data;
+			toast.success({
+				id: initRecordingSessionToastId,
+				title: 'Connected to selected audio input device',
+				description: 'Successfully connected to your microphone stream.',
+			});
 			currentSession = { settings, stream, recorder: null };
 			onSuccess();
 		},
@@ -294,39 +347,6 @@ async function invoke<T>(
 	});
 }
 
-const toastId = nanoid();
-toast.loading({
-	id: toastId,
-	title: 'Connecting to selected audio input device...',
-	description: 'Please allow access to your microphone if prompted.',
-});
-if (!settings.value.selectedAudioInputDeviceId) {
-	toast.loading({
-		id: toastId,
-		title: 'No device selected',
-		description: 'Defaulting to first available audio input device...',
-	});
-}
-toast.info({
-	id: toastId,
-	title: 'Defaulted to first available audio input device',
-	description: 'You can select a specific device in the settings.',
-});
-toast.success({
-	id: toastId,
-	title: 'Connected to selected audio input device',
-	description: 'Successfully connected to your microphone stream.',
-});
-toast.loading({
-	id: toastId,
-	title: 'Error connecting to selected audio input device',
-	description: 'Trying to find another available audio input device...',
-});
-toast.info({
-	id: toastId,
-	title: 'Defaulted to first available audio input device',
-	description: 'You can select a specific device in the settings.',
-});
 toast.loading({
 	title: 'Existing recording session not found',
 	description: 'Creating a new recording session...',
@@ -379,53 +399,42 @@ const NoAvailableAudioInputDevicesErr = WhisperingErr({
 	},
 } as const);
 
-async function getFirstAvailableStream({
-	onSuccess,
-	onError,
-}: {
-	onSuccess: (stream: MediaStream, deviceId: string) => void;
-	onError: (error: typeof NoAvailableAudioInputDevicesErr) => void;
-}) {
-	const recordingDevicesResult = await (async () => {
-		return tryAsync({
-			try: async () => {
-				const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia(
-					{
-						audio: true,
-					},
-				);
-				const devices = await navigator.mediaDevices.enumerateDevices();
-				for (const track of allAudioDevicesStream.getTracks()) {
-					track.stop();
-				}
-				const audioInputDevices = devices.filter(
-					(device) => device.kind === 'audioinput',
-				);
-				return audioInputDevices;
+async function getFirstAvailableStream() {
+	const recordingDevicesResult = await tryAsync({
+		try: async () => {
+			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
+				audio: true,
+			});
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			for (const track of allAudioDevicesStream.getTracks()) {
+				track.stop();
+			}
+			const audioInputDevices = devices.filter(
+				(device) => device.kind === 'audioinput',
+			);
+			return audioInputDevices;
+		},
+		catch: (error) => ({
+			_tag: 'WhisperingError',
+			title: 'Error enumerating recording devices',
+			description:
+				'Please make sure you have given permission to access your audio devices',
+			action: {
+				type: 'more-details',
+				error,
 			},
-			catch: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Error enumerating recording devices',
-				description:
-					'Please make sure you have given permission to access your audio devices',
-				action: {
-					type: 'more-details',
-					error,
-				},
-			}),
-		});
-	})();
+		}),
+	});
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
 	const recordingDevices = recordingDevicesResult.data;
 
 	for (const device of recordingDevices) {
 		const streamResult = await getStreamForDeviceId(device.deviceId);
 		if (streamResult.ok) {
-			onSuccess(streamResult.data, device.deviceId);
 			return streamResult;
 		}
 	}
-	onError(NoAvailableAudioInputDevicesErr);
+	return Err(NoAvailableAudioInputDevicesErr);
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
