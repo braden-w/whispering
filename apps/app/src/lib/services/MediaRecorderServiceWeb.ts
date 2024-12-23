@@ -99,11 +99,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			settings.deviceId,
 		);
 		if (getPreferredStreamResult.ok) {
-			toast.success({
-				id: getStreamToastId,
-				title: 'Connected to selected audio input device',
-				description: 'Successfully connected to your microphone stream.',
-			});
 			const preferredStream = getPreferredStreamResult.data;
 			onSuccess(preferredStream);
 			onSettled();
@@ -184,11 +179,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				onMutate: () => {},
 				onSuccess: (stream) => {
 					currentSession = { settings, stream, recorder: null };
-					toast.success({
-						id: initRecordingSessionToastId,
-						title: 'Recording Session Created',
-						description: 'Recording session created successfully',
-					});
 					onSuccess();
 				},
 				onError: (error) => {
