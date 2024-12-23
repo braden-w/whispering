@@ -10,6 +10,7 @@ import type { WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import { nanoid } from 'nanoid/non-secure';
 import { toast } from './ToastService.js';
+
 const TIMESLICE_MS = 1000;
 
 type MediaRecorderErrProperties = WhisperingErrProperties;
@@ -50,11 +51,7 @@ type RecordingSessionSettings = {
 	bitsPerSecond: number;
 };
 
-const {
-	Err: MediaRecorderErr,
-	trySync,
-	tryAsync,
-} = createServiceErrorFns<MediaRecorderErrProperties>();
+const { Err, tryAsync } = createServiceErrorFns<MediaRecorderErrProperties>();
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
@@ -259,7 +256,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				'enumerate_recording_devices',
 			);
 			if (!invokeResult.ok) {
-				return MediaRecorderErr({
+				return Err({
 					_tag: 'WhisperingError',
 					title: 'Error enumerating recording devices',
 					description:
