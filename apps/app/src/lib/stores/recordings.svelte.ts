@@ -253,7 +253,7 @@ export const createRecordings = (): RecordingsService => {
 			const updatedRecordingWithDoneStatus = {
 				...recording,
 				transcriptionStatus: 'DONE',
-				transcribedText: transcribedText,
+				transcribedText,
 			} satisfies Recording;
 			await RecordingsDbService.updateRecording(
 				updatedRecordingWithDoneStatus,
