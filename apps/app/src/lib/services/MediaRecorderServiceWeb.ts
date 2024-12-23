@@ -13,9 +13,8 @@ const TIMESLICE_MS = 1000;
 type MediaRecorderErrProperties = WhisperingErrProperties;
 
 /** Sets status message to be displayed in the UI that is calling this service */
-type SetStatusMessageFn = (message: {
-	title: string;
-	description: string;
+export type UpdateStatusMessageFn = (message: {
+	message: string;
 }) => void;
 
 type MediaRecorderService = {
@@ -26,23 +25,23 @@ type MediaRecorderService = {
 	>;
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
-		callbacks: { setStatusMessage: SetStatusMessageFn },
+		callbacks: { setStatusMessage: UpdateStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	closeRecordingSession: (
 		_: undefined,
-		callbacks: { setStatusMessage: SetStatusMessageFn },
+		callbacks: { setStatusMessage: UpdateStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	startRecording: (
 		recordingId: string,
-		callbacks: { setStatusMessage: SetStatusMessageFn },
+		callbacks: { setStatusMessage: UpdateStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 	stopRecording: (
 		_: undefined,
-		callbacks: { setStatusMessage: SetStatusMessageFn },
+		callbacks: { setStatusMessage: UpdateStatusMessageFn },
 	) => Promise<Result<Blob, MediaRecorderErrProperties>>;
 	cancelRecording: (
 		_: undefined,
-		callbacks: { setStatusMessage: SetStatusMessageFn },
+		callbacks: { setStatusMessage: UpdateStatusMessageFn },
 	) => Promise<Result<void, MediaRecorderErrProperties>>;
 };
 
@@ -68,12 +67,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 
 	const acquireStream = async (
 		settings: RecordingSessionSettings,
-		{ setStatusMessage }: { setStatusMessage: SetStatusMessageFn },
+		{ setStatusMessage }: { setStatusMessage: UpdateStatusMessageFn },
 	) => {
 		if (!settings.deviceId) {
 			setStatusMessage({
-				title: 'No device selected',
-				description: 'Defaulting to first available audio input device...',
+				message:
+					'No device selected, defaulting to first available audio input device...',
 			});
 			const getFirstStreamResult = await getFirstAvailableStream();
 			if (!getFirstStreamResult.ok) {
@@ -89,16 +88,16 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			return Ok(firstStream);
 		}
 		setStatusMessage({
-			title: 'Connecting to selected audio input device...',
-			description: 'Please allow access to your microphone if prompted.',
+			message:
+				'Please allow access to your microphone if prompted, connecting to selected audio input device...',
 		});
 		const getPreferredStreamResult = await getStreamForDeviceId(
 			settings.deviceId,
 		);
 		if (!getPreferredStreamResult.ok) {
 			setStatusMessage({
-				title: 'Error connecting to selected audio input device',
-				description: 'Trying to find another available audio input device...',
+				message:
+					'Error connecting to selected audio input device, trying to find another available audio input device...',
 			});
 			const getFirstStreamResult = await getFirstAvailableStream();
 			if (!getFirstStreamResult.ok) {
@@ -118,8 +117,8 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	};
 
 	return {
-		enumerateRecordingDevices: async () =>
-			tryAsync({
+		async enumerateRecordingDevices() {
+			return tryAsync({
 				try: async () => {
 					const allAudioDevicesStream =
 						await navigator.mediaDevices.getUserMedia({
@@ -141,12 +140,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						'Please make sure you have given permission to access your audio devices',
 					action: { type: 'more-details', error },
 				}),
-			}),
-		async initRecordingSession(settings, { setStatusMessage }) {
-			setStatusMessage({
-				title: 'Initializing recording session...',
-				description: 'Please allow access to your microphone if prompted.',
 			});
+		},
+		async initRecordingSession(settings, { setStatusMessage }) {
 			if (currentSession) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -155,7 +151,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'none' },
 				});
 			}
-
 			const acquireStreamResult = await acquireStream(settings, {
 				setStatusMessage,
 			});
@@ -169,10 +164,6 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			}
 			const stream = acquireStreamResult.data;
 			currentSession = { settings, stream, recorder: null };
-			setStatusMessage({
-				title: '🎤 Microphone Connected',
-				description: 'You can now start recording',
-			});
 			return Ok(undefined);
 		},
 		async closeRecordingSession(_, { setStatusMessage }) {
@@ -195,10 +186,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					},
 				});
 			}
+			setStatusMessage({ message: 'Stopping media stream...' });
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
 			}
+			setStatusMessage({ message: 'Closing media recorder...' });
 			currentSession.recorder = null;
+			setStatusMessage({ message: 'Closing recording session...' });
 			currentSession = null;
 			return Ok(undefined);
 		},
@@ -215,9 +209,8 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const { stream, settings } = currentSession;
 			if (!stream.active) {
 				setStatusMessage({
-					title: '🔄 Recording Session Expired',
-					description:
-						'Refreshing your recording session to get you back on track...',
+					message:
+						'🔄 Recording Session Expired, refreshing to get you back on track...',
 				});
 				const acquireStreamResult = await acquireStream(settings, {
 					setStatusMessage,
@@ -232,12 +225,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				}
 				const stream = acquireStreamResult.data;
 				currentSession = { settings, stream, recorder: null };
-				sendUpdateStatus({
-					title: '🎤 Microphone Connected',
-					description: 'You can now start recording',
-				});
 				return Ok(undefined);
 			}
+			setStatusMessage({ message: 'Starting recording...' });
 			const newRecorderResult = await tryAsync({
 				try: async () =>
 					new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond }),
@@ -250,6 +240,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			if (!newRecorderResult.ok) return Err(newRecorderResult.error);
 			const newRecorder = newRecorderResult.data;
+			setStatusMessage({ message: 'Recording started...' });
 			currentSession.recorder = {
 				mediaRecorder: newRecorder,
 				recordedChunks: [],
@@ -262,7 +253,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			newRecorder.start(TIMESLICE_MS);
 			return Ok(undefined);
 		},
-		async stopRecording(_, { setStatusMessage: sendUpdateStatus }) {
+		async stopRecording(_, { setStatusMessage }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -271,10 +262,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'none' },
 				});
 			}
-			sendUpdateStatus({
-				title: 'Stopping recording...',
-				description: 'Please allow access to your microphone if prompted.',
-			});
+			setStatusMessage({ message: 'Stopping recording...' });
 			const stopResult = await tryAsync({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
@@ -303,6 +291,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 							},
 						);
 						currentSession.recorder.mediaRecorder.stop();
+						setStatusMessage({ message: 'Recording stopped...' });
 					}),
 				catch: (error) => ({
 					_tag: 'WhisperingError',
@@ -315,7 +304,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
-		async cancelRecording(_, { setStatusMessage: sendUpdateStatus }) {
+		async cancelRecording(_, { setStatusMessage }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return Err({
 					_tag: 'WhisperingError',
@@ -324,10 +313,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'none' },
 				});
 			}
+			setStatusMessage({ message: 'Stopping media stream...' });
 			for (const track of currentSession.stream.getTracks()) {
 				track.stop();
 			}
+			setStatusMessage({ message: 'Stopping media recorder...' });
 			currentSession.recorder.mediaRecorder.stop();
+			setStatusMessage({ message: 'Cancelling recording...' });
 			currentSession.recorder = null;
 			return Ok(undefined);
 		},
@@ -362,7 +354,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			{ setStatusMessage: sendUpdateStatus },
 		) => {
 			sendUpdateStatus({
-				title: 'Initializing recording session...',
+				message: 'Initializing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('init_recording_session');
@@ -374,7 +366,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			{ setStatusMessage: sendUpdateStatus },
 		) => {
 			sendUpdateStatus({
-				title: 'Closing recording session...',
+				message: 'Closing recording session...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('close_recording_session');
@@ -386,7 +378,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 			{ setStatusMessage: sendUpdateStatus },
 		) => {
 			sendUpdateStatus({
-				title: 'Starting recording...',
+				message: 'Starting recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('start_recording');
@@ -395,7 +387,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 		},
 		stopRecording: async (_, { setStatusMessage: sendUpdateStatus }) => {
 			sendUpdateStatus({
-				title: 'Stopping recording...',
+				message: 'Stopping recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke<Blob>('stop_recording');
@@ -404,7 +396,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 		},
 		cancelRecording: async (_, { setStatusMessage: sendUpdateStatus }) => {
 			sendUpdateStatus({
-				title: 'Cancelling recording...',
+				message: 'Cancelling recording...',
 				description: 'Please allow access to your microphone if prompted.',
 			});
 			const result = await invoke('cancel_recording');

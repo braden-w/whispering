@@ -13,6 +13,7 @@ import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServ
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { nanoid } from 'nanoid';
 import { settings } from './settings.svelte';
+import type { SetStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 
 export const recordings = createRecordings();
 
@@ -39,17 +40,13 @@ function createRecordings() {
 		},
 		async addAndTranscribeRecording(
 			recording: Recording,
-			{ sendUpdateStatus }: { sendUpdateStatus: typeof toast.loading },
+			{ sendUpdateStatus }: { sendUpdateStatus: SetStatusMessageFn },
 		) {
-			const addRecordingAndTranscribeResultToastId = nanoid();
 			await RecordingsDbService.addRecording(recording, {
 				onMutate: () => {},
 				onSuccess: () => {
 					recordingsArray.push(recording);
-					sendUpdateStatus({
-						title: 'Recording added!',
-						description: 'Your recording has been added successfully.',
-					});
+					sendUpdateStatus({ message: 'Recording added!' });
 					recordings.transcribeRecording(recording.id);
 				},
 				onError: (error) => {

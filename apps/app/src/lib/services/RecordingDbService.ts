@@ -1,4 +1,4 @@
-import type { MutationFn, QueryFn } from '@epicenterhq/result';
+import type { QueryFn } from '@epicenterhq/result';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { createRecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
 
@@ -31,18 +31,18 @@ export type RecordingsDbService = {
 		Recording | null,
 		WhisperingErrProperties
 	>;
-	readonly addRecording: MutationFn<Recording, void, WhisperingErrProperties>;
-	readonly updateRecording: MutationFn<
+	readonly addRecording: QueryFn<Recording, void, WhisperingErrProperties>;
+	readonly updateRecording: QueryFn<
 		Recording,
 		void,
 		WhisperingErrProperties
 	>;
-	readonly deleteRecordingById: MutationFn<
+	readonly deleteRecordingById: QueryFn<
 		string,
 		void,
 		WhisperingErrProperties
 	>;
-	readonly deleteRecordingsById: MutationFn<
+	readonly deleteRecordingsById: QueryFn<
 		string[],
 		void,
 		WhisperingErrProperties
