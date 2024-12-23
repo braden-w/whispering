@@ -12,6 +12,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return WhisperingErr({
+					_tag: 'WhisperingError',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					action: {
@@ -38,12 +39,14 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 				switch (postResult.error._tag) {
 					case 'NetworkError':
 						return WhisperingErr({
+							_tag: 'WhisperingError',
 							title: 'Network error',
 							description: 'Please check your internet connection',
 							action: { type: 'more-details', error: postResult.error.message },
 						});
 					case 'HttpError':
 						return WhisperingErr({
+							_tag: 'WhisperingError',
 							title:
 								'An error occurred while sending the request to the transcription server.',
 							description: 'Please try again',
@@ -51,6 +54,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 						});
 					case 'ParseError':
 						return WhisperingErr({
+							_tag: 'WhisperingError',
 							title: 'Unable to parse transcription server response',
 							description: 'Please try again',
 							action: { type: 'more-details', error: postResult.error.message },
@@ -60,6 +64,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			const data = postResult.data;
 			if ('error' in data) {
 				return WhisperingErr({
+					_tag: 'WhisperingError',
 					title: 'faster-whisper-server error',
 					description:
 						'Please check your faster-whisper-server server settings',

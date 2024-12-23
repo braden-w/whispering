@@ -21,6 +21,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	const playSound = async () => {
 		if (!sound) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
@@ -31,6 +32,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const getActiveTabIdResult = await getActiveTabId();
 		if (!getActiveTabIdResult.ok) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Failed to get active tab ID',
 				description: 'Failed to get active tab ID to play sound',
 				action: {
@@ -42,6 +44,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const activeTabId = getActiveTabIdResult.data;
 		if (!activeTabId) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Failed to get active tab ID',
 				description: 'Failed to get active tab ID to play sound',
 				action: { type: 'none' },
@@ -53,6 +56,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		});
 		if (!sendMessageResult) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: `Failed to play ${sound} sound`,
 				description: `Failed to play ${sound} sound in active tab ${activeTabId}`,
 				action: { type: 'more-details', error: sendMessageResult },

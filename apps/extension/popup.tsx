@@ -228,6 +228,7 @@ function NavItems() {
 					if (!tab.url)
 						return renderErrorAsNotification(
 							WhisperingErr({
+								_tag: 'WhisperingError',
 								title: 'Whispering tab has no URL',
 								description: 'The Whispering tab has no URL.',
 							}),

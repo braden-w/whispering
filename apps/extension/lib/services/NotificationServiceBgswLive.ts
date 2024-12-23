@@ -44,6 +44,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 						const whisperingTabId = getWhisperingTabIdResult.data;
 						if (!whisperingTabId)
 							return WhisperingErr({
+								_tag: 'WhisperingError',
 								title: 'Whispering tab not found',
 								description: 'The Whispering tab was not found.',
 								action: { type: 'none' },

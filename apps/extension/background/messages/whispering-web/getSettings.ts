@@ -58,6 +58,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		if (valueFromStorage === null) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Whispering settings not found',
 				description: 'Local storage does not contain Whispering settings.',
 			});
@@ -66,6 +67,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const parseJsonResult = parseJson(valueFromStorage);
 		if (!parseJsonResult.ok)
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Unable to parse Whispering settings',
 				description:
 					'There was an error parsing the Whispering settings from localStorage with JSON.parse.',
@@ -75,6 +77,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const parseResult = settingsSchema.safeParse(maybeSettings);
 		if (!parseResult.success) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Unable to parse Whispering settings',
 				description:
 					'There was an error running Schema.parseJson on the Whispering settings fetched from localStorage.',

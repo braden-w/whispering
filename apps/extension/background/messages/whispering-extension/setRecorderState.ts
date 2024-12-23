@@ -13,8 +13,8 @@ import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 const iconPaths = {
 	IDLE: studioMicrophone,
-	RECORDING: redLargeSquare,
-	LOADING: arrowsCounterclockwise,
+	SESSION: studioMicrophone,
+	'SESSION+RECORDING': redLargeSquare,
 } as const satisfies Record<WhisperingRecordingState, string>;
 
 export type RequestBody =
@@ -31,6 +31,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	const setRecorderState = async () => {
 		if (!body?.recorderState) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Error invoking setRecorderState command',
 				description:
 					'RecorderState must be provided in the request body of the message',

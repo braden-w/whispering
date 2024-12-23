@@ -35,6 +35,7 @@ export async function injectScript<T, Args extends unknown[]>({
 	);
 	if (!executeScriptResult || !executeScriptResult.result) {
 		return WhisperingErr({
+			_tag: 'WhisperingError',
 			title: `Unable to execute "${commandName}" script in Whispering tab`,
 			description: 'The result of the script injection is undefined',
 			action: { type: 'none' },

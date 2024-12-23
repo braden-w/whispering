@@ -1,9 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	BubbleErr,
+	type Settings,
 	WhisperingErr,
 	type WhisperingResult,
-	type Settings,
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
@@ -20,6 +19,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	const setSettings = async () => {
 		if (!body || !body.settings) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
 				action: { type: 'none' },

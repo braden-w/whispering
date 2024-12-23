@@ -4,7 +4,7 @@ import type {
 	ExternalMessageReturnType,
 	WhisperingResult,
 } from '@repo/shared';
-import { BubbleErr, Ok, WhisperingErr } from '@repo/shared';
+import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody =
@@ -21,6 +21,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	const createNotification = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.notifyOptions) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Error invoking notify command',
 				description:
 					'ToastOptions must be provided in the request body of the message',

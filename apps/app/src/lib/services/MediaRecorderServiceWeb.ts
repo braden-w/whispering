@@ -369,6 +369,7 @@ const OpenStreamIsInactiveErr = WhisperingErr({
 } as const);
 
 const NoAvailableAudioInputDevicesErr = WhisperingErr({
+	_tag: 'WhisperingError',
 	title: '🎙️ No Microphone Found',
 	description: 'Connect a microphone to start recording your awesome content',
 	action: {

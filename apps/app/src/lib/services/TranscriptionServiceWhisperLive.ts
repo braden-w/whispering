@@ -11,6 +11,7 @@ export const createTranscriptionServiceWhisperLive =
 		async transcribe(audioBlob) {
 			if (!settings.value.openAiApiKey) {
 				return WhisperingErr({
+					_tag: 'WhisperingError',
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
 					action: {
@@ -23,6 +24,7 @@ export const createTranscriptionServiceWhisperLive =
 
 			if (!settings.value.openAiApiKey.startsWith('sk-')) {
 				return WhisperingErr({
+					_tag: 'WhisperingError',
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',
 					action: {
@@ -35,6 +37,7 @@ export const createTranscriptionServiceWhisperLive =
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return WhisperingErr({
+					_tag: 'WhisperingError',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 					action: { type: 'none' },

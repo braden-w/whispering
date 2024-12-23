@@ -23,6 +23,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	const setClipboardText = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.transcribedText) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Unable to copy transcribed text to clipboard',
 				description: 'Text must be provided in the request body of the message',
 				action: { type: 'none' },
@@ -32,6 +33,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const getActiveTabIdResult = await getActiveTabId();
 		if (!getActiveTabIdResult.ok) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Unable to copy transcribed text to clipboard',
 				description:
 					'Please go to your recordings tab in the Whispering website to copy the transcribed text to clipboard',
@@ -41,6 +43,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const activeTabId = getActiveTabIdResult.data;
 		if (!activeTabId) {
 			return WhisperingErr({
+				_tag: 'WhisperingError',
 				title: 'Unable to copy transcribed text to clipboard',
 				description: 'No active tab ID found',
 				action: { type: 'none' },
