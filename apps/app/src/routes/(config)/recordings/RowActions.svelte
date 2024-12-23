@@ -1,19 +1,19 @@
 <script lang="ts">
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import type { Recording } from '$lib/services/RecordingDbService';
+	import { toast } from '$lib/services/ToastService';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { recordings } from '$lib/stores/recordings.svelte';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 
 	let { recording }: { recording: Recording } = $props();
 </script>
@@ -21,7 +21,14 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() => recordings.transcribeRecording(recording.id)}
+		onclick={() => {
+			recordings.transcribeRecording(recording.id, {
+				onMutate: () => {},
+				onSuccess: () => {},
+				onError: renderErrAsToast,
+				onSettled: () => {},
+			});
+		}}
 		variant="ghost"
 		size="icon"
 	>
@@ -40,6 +47,7 @@
 		tooltipContent="Copy transcribed text"
 		onclick={() =>
 			recordings.copyRecordingText(recording, {
+				onMutate: () => {},
 				onSuccess: (transcribedText) => {
 					toast.success({
 						title: 'Copied transcription to clipboard!',
@@ -48,6 +56,7 @@
 					});
 				},
 				onError: renderErrAsToast,
+				onSettled: () => {},
 			})}
 		variant="ghost"
 		size="icon"
@@ -63,6 +72,7 @@
 		tooltipContent="Download recording"
 		onclick={() =>
 			recordings.downloadRecording(recording.id, {
+				onMutate: () => {},
 				onSuccess: () => {
 					toast.success({
 						title: 'Recording downloaded!',
@@ -70,6 +80,7 @@
 					});
 				},
 				onError: renderErrAsToast,
+				onSettled: () => {},
 			})}
 		variant="ghost"
 		size="icon"
@@ -85,6 +96,7 @@
 				subtitle: 'Are you sure you want to delete this recording?',
 				onConfirm: () =>
 					recordings.deleteRecordingById(recording.id, {
+						onMutate: () => {},
 						onSuccess: () => {
 							toast.success({
 								title: 'Deleted recording!',
@@ -92,6 +104,7 @@
 							});
 						},
 						onError: renderErrAsToast,
+						onSettled: () => {},
 					}),
 			});
 		}}
