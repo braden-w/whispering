@@ -1,15 +1,16 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
+import type { Result } from '@epicenterhq/result';
 import {
 	Ok,
 	WhisperingErr,
-	type WhisperingErrProperties,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
@@ -21,8 +22,6 @@ import {
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
-import type { Result } from '@epicenterhq/result';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -58,7 +57,7 @@ const createActionStatuses = ({
 	return { updateStatus, succeedStatus, errorStatus };
 };
 
-const createMutation = <I, O, ServiceError, TContext>({
+function createMutation<I, O, ServiceError, TContext>({
 	mutationFn,
 	onMutate = () => Ok({} as TContext),
 	onSuccess = () => undefined,
@@ -82,7 +81,7 @@ const createMutation = <I, O, ServiceError, TContext>({
 		input: I;
 		contextResult: Result<TContext, ServiceError>;
 	}) => void;
-}) => {
+}) {
 	const mutate = async (input: I): Promise<void> => {
 		const contextResult = await onMutate(input);
 		if (!contextResult.ok) {
@@ -104,7 +103,7 @@ const createMutation = <I, O, ServiceError, TContext>({
 		onSettled({ result, input, contextResult });
 	};
 	return { mutate };
-};
+}
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
@@ -148,169 +147,142 @@ function createRecorder() {
 		onError: ({ error }) => renderErrAsToast(error),
 	});
 
-	async function toggleRecording(): Promise<void> {
-		if (recorderState === 'SESSION+RECORDING') {
-			const stopRecordingToastId = nanoid();
-			const updateStopRecordingStatus: UpdateStatusMessageFn = ({ message }) =>
-				toast.loading({
-					id: stopRecordingToastId,
-					title: 'Stopping recording...',
-					description: message,
+	const { mutate: toggleRecording } = createMutation({
+		mutationFn: async ({ input: _, context: { updateStatus, isStarting } }) => {
+			if (!isStarting) {
+				const stopResult = await MediaRecorderService.stopRecording(undefined, {
+					setStatusMessage: updateStatus,
 				});
-			updateStopRecordingStatus({ message: '' });
-			const stopResult = await MediaRecorderService.stopRecording(undefined, {
-				setStatusMessage: updateStopRecordingStatus,
-			});
-			if (!stopResult.ok) {
-				return renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: 'Unable to stop recording',
-					description: 'Please check the error details for more information',
-					action: { type: 'more-details', error: stopResult.error },
-				});
-			}
-			setRecorderState('SESSION');
-			console.info('Recording stopped');
-			void playSound('stop');
-			const blob = stopResult.data;
-			const newRecording: Recording = {
-				id: nanoid(),
-				title: '',
-				subtitle: '',
-				timestamp: new Date().toISOString(),
-				transcribedText: '',
-				blob,
-				transcriptionStatus: 'UNPROCESSED',
-			};
-
-			const addRecordingResult =
-				await RecordingsDbService.addRecording(newRecording);
-			if (!addRecordingResult.ok) {
-				return renderErrAsToast(addRecordingResult.error);
-			}
-			updateStopRecordingStatus({ message: 'Recording added!' });
-			await recordings.transcribeRecording(newRecording.id);
-			if (!settings.value.isFasterRerecordEnabled) {
-				const closeRecordingSessionResult =
-					await MediaRecorderService.closeRecordingSession(undefined, {
-						setStatusMessage: updateStopRecordingStatus,
+				if (!stopResult.ok) return stopResult;
+				const blob = stopResult.data;
+				const newRecording: Recording = {
+					id: nanoid(),
+					title: '',
+					subtitle: '',
+					timestamp: new Date().toISOString(),
+					transcribedText: '',
+					blob,
+					transcriptionStatus: 'UNPROCESSED',
+				};
+				const addRecordingResult =
+					await RecordingsDbService.addRecording(newRecording);
+				if (!addRecordingResult.ok) return addRecordingResult;
+				await recordings.transcribeRecording(newRecording.id);
+				if (!settings.value.isFasterRerecordEnabled) {
+					return MediaRecorderService.closeRecordingSession(undefined, {
+						setStatusMessage: updateStatus,
 					});
-				if (!closeRecordingSessionResult.ok) {
-					return renderErrAsToast(closeRecordingSessionResult.error);
 				}
-				setRecorderState('IDLE');
+				return Ok(undefined);
 			}
-		} else {
-			const startRecordingToastId = nanoid();
-			const updateStartRecordingToast: UpdateStatusMessageFn = ({ message }) =>
-				toast.loading({
-					id: startRecordingToastId,
-					title: 'Starting recording...',
-					description: message,
-				});
-			updateStartRecordingToast({ message: '' });
 
 			if (!isInRecordingSession) {
-				const initRecordingSessionResult =
-					await MediaRecorderService.initRecordingSession(
-						{
-							deviceId: settings.value.selectedAudioInputDeviceId,
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						},
-						{ setStatusMessage: updateStartRecordingToast },
-					);
+				const initResult = await MediaRecorderService.initRecordingSession(
+					{
+						deviceId: settings.value.selectedAudioInputDeviceId,
+						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+					},
+					{ setStatusMessage: updateStatus },
+				);
+				if (!initResult.ok) return initResult;
+			}
+			return MediaRecorderService.startRecording(nanoid(), {
+				setStatusMessage: updateStatus,
+			});
+		},
+		onMutate: () => {
+			const isStarting = recorderState !== 'SESSION+RECORDING';
+			const actionStatuses = createActionStatuses({
+				title: isStarting ? 'Starting recording...' : 'Stopping recording...',
+			});
+			return Ok({ ...actionStatuses, isStarting });
+		},
+		onSuccess: ({ context: { succeedStatus, isStarting } }) => {
+			if (isStarting) {
+				setRecorderState('SESSION+RECORDING');
+				succeedStatus({
+					title: 'Recording started!',
+					description: '',
+				});
+				console.info('Recording started');
+				void playSound('start');
+				void NotificationService.notify({
+					id: IS_RECORDING_NOTIFICATION_ID,
+					title: 'Whispering is recording...',
+					description: 'Click to go to recorder',
+					action: {
+						type: 'link',
+						label: 'Go to recorder',
+						goto: '/',
+					},
+				});
+			} else {
+				setRecorderState(
+					settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
+				);
+				succeedStatus({
+					title: 'Recording stopped',
+					description: settings.value.isFasterRerecordEnabled
+						? 'Recording has been stopped and saved'
+						: 'Recording has been stopped, saved and session closed',
+				});
+				console.info('Recording stopped');
+				void playSound('stop');
+			}
+		},
+		onError: ({ error }) => renderErrAsToast(error),
+	});
 
-				if (!initRecordingSessionResult.ok) {
-					return renderErrAsToast(initRecordingSessionResult.error);
-				}
-				setRecorderState('SESSION');
-				toast.loading({
-					id: startRecordingToastId,
-					title: 'Recording session opened!',
-					description:
-						'Your recording session has been opened, starting recording...',
+	const { mutate: cancelRecording } = createMutation({
+		mutationFn: ({ context: { updateStatus } }) =>
+			MediaRecorderService.cancelRecording(undefined, {
+				setStatusMessage: updateStatus,
+			}),
+		onMutate: () => {
+			if (!isInRecordingSession) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ No Active Session',
+					description: "There's no recording session to cancel at the moment",
+					action: { type: 'none' },
 				});
 			}
-			const startRecordingResult = await MediaRecorderService.startRecording(
-				nanoid(),
-				{ setStatusMessage: updateStartRecordingToast },
-			);
-			if (!startRecordingResult.ok) {
-				return renderErrAsToast(startRecordingResult.error);
-			}
-			setRecorderState('SESSION+RECORDING');
-			toast.success({
-				id: startRecordingToastId,
-				title: 'Recording started!',
-			});
-			console.info('Recording started');
-			void playSound('start');
-			void NotificationService.notify({
-				id: IS_RECORDING_NOTIFICATION_ID,
-				title: 'Whispering is recording...',
-				description: 'Click to go to recorder',
-				action: {
-					type: 'link',
-					label: 'Go to recorder',
-					goto: '/',
-				},
-			});
-		}
-	}
-
-	async function cancelRecording() {
-		const cancelRecordingToastId = nanoid();
-		const updateCancelRecordingToast: UpdateStatusMessageFn = ({ message }) =>
-			toast.loading({
-				id: cancelRecordingToastId,
+			const actionStatuses = createActionStatuses({
 				title: 'Cancelling recording...',
-				description: message,
 			});
-		updateCancelRecordingToast({ message: '' });
-		if (!isInRecordingSession) {
-			return renderErrAsToast({
-				_tag: 'WhisperingError',
-				title: '❌ No Active Session',
-				description: "There's no recording session to cancel at the moment",
-				action: { type: 'none' },
+			return Ok(actionStatuses);
+		},
+		onSuccess: async ({ context: { updateStatus, succeedStatus } }) => {
+			void playSound('cancel');
+			console.info('Recording cancelled');
+			setRecorderState('SESSION');
+			succeedStatus({
+				title: 'Recording cancelled',
+				description:
+					'Your recording has been cancelled, session has been kept open',
 			});
-		}
 
-		const cancelRecordingResult = await MediaRecorderService.cancelRecording(
-			undefined,
-			{ setStatusMessage: updateCancelRecordingToast },
-		);
-		if (!cancelRecordingResult.ok) {
-			return renderErrAsToast(cancelRecordingResult.error);
-		}
-		void playSound('cancel');
-		console.info('Recording cancelled');
-		setRecorderState('SESSION');
-		toast.success({
-			id: cancelRecordingToastId,
-			title: 'Recording cancelled',
-			description:
-				'Your recording has been cancelled, session has been kept open',
-		});
-
-		if (settings.value.isFasterRerecordEnabled) return;
-		updateCancelRecordingToast({
-			message: 'Canceled recording, closing recording session...',
-		});
-		const closeRecordingSessionResult =
-			await MediaRecorderService.closeRecordingSession(undefined, {
-				setStatusMessage: updateCancelRecordingToast,
+			if (settings.value.isFasterRerecordEnabled) return;
+			updateStatus({
+				message: 'Canceled recording, closing recording session...',
 			});
-		if (!closeRecordingSessionResult.ok) {
-			return renderErrAsToast(closeRecordingSessionResult.error);
-		}
-		setRecorderState('IDLE');
-		toast.success({
-			id: cancelRecordingToastId,
-			title: 'Recording cancelled',
-			description: 'Your recording has been cancelled, session has been closed',
-		});
-	}
+			const closeResult = await MediaRecorderService.closeRecordingSession(
+				undefined,
+				{ setStatusMessage: updateStatus },
+			);
+			if (!closeResult.ok) {
+				renderErrAsToast(closeResult.error);
+				return;
+			}
+			setRecorderState('IDLE');
+			succeedStatus({
+				title: 'Recording cancelled',
+				description:
+					'Your recording has been cancelled, session has been closed',
+			});
+		},
+		onError: ({ error }) => renderErrAsToast(error),
+	});
 
 	return {
 		get recorderState() {
@@ -320,8 +292,8 @@ function createRecorder() {
 			return isInRecordingSession;
 		},
 		closeRecordingSession,
-		toggleRecording,
-		cancelRecording,
+		toggleRecording: () => toggleRecording(undefined),
+		cancelRecording: () => cancelRecording(undefined),
 	};
 }
 
