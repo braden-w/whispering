@@ -37,14 +37,16 @@ function createRecordings() {
 		get value() {
 			return recordingsArray;
 		},
-		async addAndTranscribeRecording(recording: Recording) {
+		async addAndTranscribeRecording(
+			recording: Recording,
+			{ sendUpdateStatus }: { sendUpdateStatus: typeof toast.loading },
+		) {
 			const addRecordingAndTranscribeResultToastId = nanoid();
 			await RecordingsDbService.addRecording(recording, {
 				onMutate: () => {},
 				onSuccess: () => {
 					recordingsArray.push(recording);
-					toast.loading({
-						id: addRecordingAndTranscribeResultToastId,
+					sendUpdateStatus({
 						title: 'Recording added!',
 						description: 'Your recording has been added successfully.',
 					});
