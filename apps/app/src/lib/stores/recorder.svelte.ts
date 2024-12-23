@@ -83,7 +83,7 @@ function createRecorder() {
 		},
 		openRecordingSession,
 		async closeRecordingSession() {
-			if (!this.isInRecordingSession) {
+			if (!recorder.isInRecordingSession) {
 				return renderErrAsToast({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
@@ -196,7 +196,7 @@ function createRecorder() {
 				if (!settings.value.isFasterRerecordEnabled) {
 					await startNewSessionAndRecording();
 				} else {
-					if (!this.isInRecordingSession) {
+					if (!recorder.isInRecordingSession) {
 						await startNewSessionAndRecording();
 					} else {
 						await MediaRecorderService.startRecording(
@@ -213,7 +213,7 @@ function createRecorder() {
 			}
 		},
 		async cancelRecording() {
-			if (!this.isInRecordingSession) {
+			if (!recorder.isInRecordingSession) {
 				return renderErrAsToast({
 					_tag: 'WhisperingError',
 					title: '❌ No Active Session',
