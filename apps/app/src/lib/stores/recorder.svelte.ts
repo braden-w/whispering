@@ -65,20 +65,23 @@ const createMutation = <I, O, ServiceError, TContext>({
 	onError = () => undefined,
 	onSettled = () => undefined,
 }: {
-	mutationFn: (input: I, context: TContext) => Promise<Result<O, ServiceError>>;
+	mutationFn: (
+		input: I,
+		context: TContext,
+	) => Promise<Result<O, ServiceError>> | Result<O, ServiceError>;
 	onMutate?: (
 		input: I,
 	) => Promise<Result<TContext, ServiceError>> | Result<TContext, ServiceError>;
-	onSuccess?: (data: O, input: I, context: TContext) => void;
+	onSuccess?: (output: O, input: I, context: TContext) => void;
 	onError?: (
 		error: ServiceError,
 		input: I,
-		context: Result<TContext, ServiceError>,
+		contextResult: Result<TContext, ServiceError>,
 	) => void;
 	onSettled?: (
 		result: Result<O, ServiceError>,
 		input: I,
-		context: Result<TContext, ServiceError>,
+		contextResult: Result<TContext, ServiceError>,
 	) => void;
 }) => {
 	const mutate = async (input: I): Promise<void> => {
