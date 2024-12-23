@@ -5,6 +5,7 @@ import {
 	type QueryFn,
 	type Result,
 	createServiceErrorFns,
+	WhisperingErr,
 } from '@epicenterhq/result';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
@@ -81,7 +82,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					action: { type: 'more-details', error },
 				}),
 			}),
-		async initRecordingSession(settings, { onSuccess, onError }) {
+		async initRecordingSession(
+			settings,
+			{ onMutate, onSuccess, onError, onSettled },
+		) {
+			onMutate(settings);
 			if (currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -89,6 +94,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					description: 'A recording session is already running and ready to go',
 					action: { type: 'none' },
 				});
+				onSettled();
 				return;
 			}
 			const initRecordingSessionToastId = nanoid();
@@ -145,6 +151,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 
 			if (!getStreamForDeviceIdResult.ok) {
 				onError(getStreamForDeviceIdResult.error);
+				onSettled();
 				return;
 			}
 			const stream = getStreamForDeviceIdResult.data;
@@ -155,8 +162,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			currentSession = { settings, stream, recorder: null };
 			onSuccess();
+			onSettled();
 		},
-		async closeRecordingSession(_, { onSuccess, onError }) {
+		async closeRecordingSession(
+			_,
+			{ onMutate, onSuccess, onError, onSettled },
+		) {
+			onMutate();
 			if (!currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -166,8 +178,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				});
 				return;
 			}
-			const { recorder } = currentSession;
-			if (recorder) {
+			if (currentSession.recorder) {
 				onError({
 					_tag: 'WhisperingError',
 					title: '⏺️ Recording in Progress',
@@ -177,6 +188,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						type: 'none',
 					},
 				});
+				onSettled();
 				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
@@ -185,8 +197,13 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession.recorder = null;
 			currentSession = null;
 			onSuccess();
+			onSettled();
 		},
-		async startRecording({ recordingId }, { onSuccess, onError }) {
+		async startRecording(
+			{ recordingId },
+			{ onMutate, onSuccess, onError, onSettled },
+		) {
+			onMutate({ recordingId });
 			if (!currentSession) {
 				onError({
 					_tag: 'WhisperingError',
@@ -195,6 +212,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						"There's no recording session to start recording in at the moment",
 					action: { type: 'none' },
 				});
+				onSettled();
 				return;
 			}
 			const {
@@ -212,6 +230,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			if (!newRecorderResult.ok) {
 				onError(newRecorderResult.error);
+				onSettled();
 				return;
 			}
 			const newRecorder = newRecorderResult.data;
@@ -226,8 +245,10 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			newRecorder.start(TIMESLICE_MS);
 			onSuccess();
+			onSettled();
 		},
-		async stopRecording(_, { onSuccess, onError }) {
+		async stopRecording(_, { onMutate, onSuccess, onError, onSettled }) {
+			onMutate();
 			if (!currentSession?.recorder?.mediaRecorder) {
 				onError({
 					_tag: 'WhisperingError',
@@ -237,6 +258,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						type: 'none',
 					},
 				});
+				onSettled();
 				return;
 			}
 			const stopResult = await tryAsync({
@@ -277,12 +299,15 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			if (!stopResult.ok) {
 				onError(stopResult.error);
+				onSettled();
 				return;
 			}
 			const blob = stopResult.data;
 			onSuccess(blob);
+			onSettled();
 		},
-		async cancelRecording(_, { onSuccess, onError }) {
+		async cancelRecording(_, { onMutate, onSuccess, onError, onSettled }) {
+			onMutate();
 			if (!currentSession?.recorder?.mediaRecorder) {
 				onError({
 					_tag: 'WhisperingError',
@@ -290,6 +315,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					description: 'No active recording found to cancel',
 					action: { type: 'none' },
 				});
+				onSettled();
 				return;
 			}
 			for (const track of currentSession.stream.getTracks()) {
@@ -298,6 +324,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			currentSession.recorder.mediaRecorder.stop();
 			currentSession.recorder = null;
 			onSuccess();
+			onSettled();
 		},
 	};
 };
@@ -325,11 +352,65 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				})),
 			);
 		},
-		initRecordingSession: async () => invoke('init_recording_session'),
-		closeRecordingSession: async () => invoke('close_recording_session'),
-		startRecording: async () => invoke('start_recording'),
-		stopRecording: async () => invoke('stop_recording'),
-		cancelRecording: async () => invoke('cancel_recording'),
+		initRecordingSession: async (
+			settings,
+			{ onMutate, onSuccess, onError, onSettled },
+		) => {
+			onMutate(settings);
+			const result = await invoke('init_recording_session');
+			if (result.ok) {
+				onSuccess();
+			} else {
+				onError(result.error);
+			}
+			onSettled();
+		},
+		closeRecordingSession: async (
+			_,
+			{ onMutate, onSuccess, onError, onSettled },
+		) => {
+			onMutate();
+			const result = await invoke('close_recording_session');
+			if (result.ok) {
+				onSuccess();
+			} else {
+				onError(result.error);
+			}
+			onSettled();
+		},
+		startRecording: async (
+			{ recordingId },
+			{ onMutate, onSuccess, onError, onSettled },
+		) => {
+			onMutate({ recordingId });
+			const result = await invoke('start_recording');
+			if (result.ok) {
+				onSuccess();
+			} else {
+				onError(result.error);
+			}
+			onSettled();
+		},
+		stopRecording: async (_, { onMutate, onSuccess, onError, onSettled }) => {
+			onMutate();
+			const result = await invoke('stop_recording');
+			if (result.ok) {
+				onSuccess(result.data);
+			} else {
+				onError(result.error);
+			}
+			onSettled();
+		},
+		cancelRecording: async (_, { onMutate, onSuccess, onError, onSettled }) => {
+			onMutate();
+			const result = await invoke('cancel_recording');
+			if (result.ok) {
+				onSuccess();
+			} else {
+				onError(result.error);
+			}
+			onSettled();
+		},
 	};
 };
 
