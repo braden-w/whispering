@@ -8,6 +8,8 @@ import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import {
 	Ok,
+	WhisperingErr,
+	type WhisperingErrProperties,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
@@ -20,6 +22,7 @@ import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
+import type { Result } from '@epicenterhq/result';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -28,49 +31,72 @@ const cancelSound = new Audio(cancelSoundSrc);
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
+
+const createActionStatuses = ({
+	title,
+}: {
+	title: string;
+}) => {
+	const toastId = nanoid();
+	const updateStatus: UpdateStatusMessageFn = ({ message }) =>
+		toast.loading({ id: toastId, title, description: message });
+	const succeedStatus = ({
+		title,
+		description,
+	}: {
+		title: string;
+		description: string;
+	}) => toast.success({ id: toastId, title, description });
+	const errorStatus = ({
+		title,
+		description,
+	}: {
+		title: string;
+		description: string;
+	}) => toast.error({ id: toastId, title, description });
+	updateStatus({ message: '' });
+	return { updateStatus, succeedStatus, errorStatus };
+};
+
 const createMutation = <I, O, ServiceError, TContext>({
 	mutationFn,
-	onMutate,
-	onSuccess,
-	onError,
-	onSettled,
+	onMutate = () => Ok({} as TContext),
+	onSuccess = () => undefined,
+	onError = () => undefined,
+	onSettled = () => undefined,
 }: {
-	mutationFn: (
-		input: I,
-		context?: TContext,
-	) => Promise<Result<O, ServiceError>>;
-	onMutate: (
+	mutationFn: (input: I, context: TContext) => Promise<Result<O, ServiceError>>;
+	onMutate?: (
 		input: I,
 	) => Promise<Result<TContext, ServiceError>> | Result<TContext, ServiceError>;
-	onSuccess: (data: O, input: I, context: TContext | undefined) => void;
-	onError: (
+	onSuccess?: (data: O, input: I, context: TContext) => void;
+	onError?: (
 		error: ServiceError,
 		input: I,
-		context: TContext | undefined,
+		context: Result<TContext, ServiceError>,
 	) => void;
-	onSettled: (
+	onSettled?: (
 		result: Result<O, ServiceError>,
 		input: I,
-		context: TContext | undefined,
+		context: Result<TContext, ServiceError>,
 	) => void;
 }) => {
 	const mutate = async (input: I): Promise<void> => {
-		let context: TContext | undefined;
-		const onMutateResult = await onMutate(input);
-		if (!onMutateResult.ok) {
-			onError(onMutateResult.error, input, context);
-			onSettled(onMutateResult, input, context);
+		const contextResult = await onMutate(input);
+		if (!contextResult.ok) {
+			onError(contextResult.error, input, contextResult);
+			onSettled(contextResult, input, contextResult);
 			return;
 		}
-		context = onMutateResult.data;
+		const context = contextResult.data;
 		const result = await mutationFn(input, context);
 		if (!result.ok) {
-			onError(result.error, input, context);
-			onSettled(result, input, context);
+			onError(result.error, input, contextResult);
+			onSettled(result, input, contextResult);
 			return;
 		}
 		onSuccess(result.data, input, context);
-		onSettled(result, input, context);
+		onSettled(result, input, contextResult);
 	};
 	return { mutate };
 };
@@ -88,39 +114,43 @@ function createRecorder() {
 		})();
 	};
 
-	async function closeRecordingSession() {
-		const closeRecordingSessionToastId = nanoid();
-		const updateCloseRecordingSessionToast: UpdateStatusMessageFn = ({
-			message,
-		}) =>
-			toast.loading({
-				id: closeRecordingSessionToastId,
+	const { mutate: closeRecordingSession } = createMutation<
+		undefined,
+		undefined,
+		WhisperingErrProperties,
+		ReturnType<typeof createActionStatuses>,
+	>({
+		mutationFn: async (_, { updateStatus }) => {
+			const closeRecordingSessionResult =
+				await MediaRecorderService.closeRecordingSession(undefined, {
+					setStatusMessage: updateStatus,
+				});
+			if (!closeRecordingSessionResult.ok) return closeRecordingSessionResult;
+			return Ok(undefined);
+		},
+		onMutate: () => {
+			if (!isInRecordingSession) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ No Active Session',
+					description: "There's no recording session to close at the moment",
+					action: { type: 'none' },
+				});
+			}
+			const actionStatuses = createActionStatuses({
 				title: 'Closing recording session...',
-				description: message,
 			});
-		updateCloseRecordingSessionToast({ message: '' });
-		if (!isInRecordingSession) {
-			return renderErrAsToast({
-				_tag: 'WhisperingError',
-				title: '❌ No Active Session',
-				description: "There's no recording session to close at the moment",
-				action: { type: 'none' },
+			return Ok(actionStatuses);
+		},
+		onSuccess: (_data, _input, { succeedStatus }) => {
+			setRecorderState('IDLE');
+			succeedStatus({
+				title: 'Recording session closed',
+				description: 'Your recording session has been closed',
 			});
-		}
-		const closeRecordingSessionResult =
-			await MediaRecorderService.closeRecordingSession(undefined, {
-				setStatusMessage: updateCloseRecordingSessionToast,
-			});
-		if (!closeRecordingSessionResult.ok) {
-			return renderErrAsToast(closeRecordingSessionResult.error);
-		}
-		setRecorderState('IDLE');
-		toast.success({
-			id: closeRecordingSessionToastId,
-			title: 'Recording session closed',
-			description: 'Your recording session has been closed',
-		});
-	}
+		},
+		onError: renderErrAsToast,
+	});
 
 	async function toggleRecording(): Promise<void> {
 		if (recorderState === 'SESSION+RECORDING') {
