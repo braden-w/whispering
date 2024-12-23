@@ -114,8 +114,8 @@ export const createRecordings = (): RecordingsService => {
 			{ onMutate, onSuccess, onError, onSettled },
 		) {
 			onMutate(id);
-			const oldRecording = recordings.find((r) => r.id === id);
-			if (!oldRecording) {
+			const oldRecordingIndex = recordings.findIndex((r) => r.id === id);
+			if (oldRecordingIndex === -1) {
 				onError({
 					_tag: 'WhisperingError',
 					title: `Recording with id ${id} not found`,
@@ -124,6 +124,7 @@ export const createRecordings = (): RecordingsService => {
 				});
 				return;
 			}
+			const oldRecording = recordings[oldRecordingIndex];
 
 			// Optimistic delete
 			recordings = recordings.filter((recording) => recording.id !== id);
@@ -133,7 +134,7 @@ export const createRecordings = (): RecordingsService => {
 				onSuccess,
 				onError: (error) => {
 					// Rollback the delete
-					recordings = recordings.filter((r) => r.id !== id);
+					recordings.splice(oldRecordingIndex, 0, oldRecording);
 					onError(error);
 				},
 				onSettled: () => {},
