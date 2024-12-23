@@ -142,8 +142,12 @@ export const createRecordingsDbServiceLiveIndexedDb =
 						},
 					}),
 				}),
-			addRecording: (recording) =>
-				tryAsyncWhispering({
+			async addRecording(
+				recording,
+				{ onMutate, onSuccess, onError, onSettled },
+			) {
+				onMutate(recording);
+				const addRecordingResult = await tryAsyncWhispering({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						const tx = (await dbPromise).transaction(
@@ -169,9 +173,20 @@ export const createRecordingsDbServiceLiveIndexedDb =
 							error,
 						},
 					}),
-				}),
-			updateRecording: (recording) =>
-				tryAsyncWhispering({
+				});
+				if (addRecordingResult.ok) {
+					onSuccess();
+				} else {
+					onError(addRecordingResult.error);
+				}
+				onSettled();
+			},
+			async updateRecording(
+				recording,
+				{ onMutate, onSuccess, onError, onSettled },
+			) {
+				onMutate(recording);
+				const updateRecordingResult = await tryAsyncWhispering({
 					try: async () => {
 						const { blob, ...metadata } = recording;
 						await Promise.all([
@@ -191,9 +206,20 @@ export const createRecordingsDbServiceLiveIndexedDb =
 							error,
 						},
 					}),
-				}),
-			deleteRecordingById: (id) =>
-				tryAsyncWhispering({
+				});
+				if (updateRecordingResult.ok) {
+					onSuccess();
+				} else {
+					onError(updateRecordingResult.error);
+				}
+				onSettled();
+			},
+			async deleteRecordingById(
+				id,
+				{ onMutate, onSuccess, onError, onSettled },
+			) {
+				onMutate(id);
+				const deleteRecordingResult = await tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -218,9 +244,20 @@ export const createRecordingsDbServiceLiveIndexedDb =
 							error,
 						},
 					}),
-				}),
-			deleteRecordingsById: (ids) =>
-				tryAsyncWhispering({
+				});
+				if (deleteRecordingResult.ok) {
+					onSuccess();
+				} else {
+					onError(deleteRecordingResult.error);
+				}
+				onSettled();
+			},
+			async deleteRecordingsById(
+				ids,
+				{ onMutate, onSuccess, onError, onSettled },
+			) {
+				onMutate(ids);
+				const deleteRecordingsResult = await tryAsyncWhispering({
 					try: async () => {
 						const tx = (await dbPromise).transaction(
 							[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -245,6 +282,13 @@ export const createRecordingsDbServiceLiveIndexedDb =
 							error,
 						},
 					}),
-				}),
+				});
+				if (deleteRecordingsResult.ok) {
+					onSuccess();
+				} else {
+					onError(deleteRecordingsResult.error);
+				}
+				onSettled();
+			},
 		};
 	};
