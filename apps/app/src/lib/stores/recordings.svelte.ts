@@ -11,10 +11,9 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { nanoid } from 'nanoid/non-secure';
-import { settings } from './settings.svelte';
 import type { MutationFn } from '@epicenterhq/result';
-import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
+import type { WhisperingErrProperties } from '@repo/shared';
+import { settings } from './settings.svelte';
 
 type RecordingsService = {
 	readonly isTranscribing: boolean;
@@ -70,29 +69,21 @@ export const createRecordings = (): RecordingsService => {
 			{ onMutate, onSuccess, onError, onSettled },
 		) {
 			onMutate(recording);
-			const oldRecording = recordings.find((r) => r.id === recording.id);
-			if (!oldRecording) {
-				onError({
-					_tag: 'WhisperingError',
-					title: `Recording with id ${recording.id} not found to update`,
-					description: 'Please try again.',
-					action: { type: 'none' },
-				});
-				onSettled();
-				return;
-			}
-			recordings = recordings.map((r) =>
-				r.id === recording.id ? recording : r,
-			);
 			await RecordingsDbService.updateRecording(recording, {
 				onMutate: () => {},
-				onSuccess,
-				onError: (error) => {
-					// Rollback the update
+				onSuccess: () => {
 					recordings = recordings.map((r) =>
-						r.id === recording.id ? oldRecording : r,
+						r.id === recording.id ? recording : r,
 					);
-					onError(error);
+					onSuccess();
+				},
+				onError: (error) => {
+					onError({
+						_tag: 'WhisperingError',
+						title: `Error updating recording ${recording.id}`,
+						description: 'Please try again.',
+						action: { type: 'more-details', error },
+					});
 				},
 				onSettled: () => {},
 			});
@@ -211,7 +202,7 @@ export const createRecordings = (): RecordingsService => {
 								: r,
 						);
 					},
-					onError: (error) => {
+					onError: (_error) => {
 						toast.loading({
 							id: currentTranscribingRecordingToastId,
 							title: `Error updating recording ${id} to transcribing`,
@@ -242,7 +233,7 @@ export const createRecordings = (): RecordingsService => {
 									: r,
 							);
 						},
-						onError: (error) => {},
+						onError: (_error) => {},
 						onSettled: () => {},
 					},
 				);
@@ -317,37 +308,34 @@ export const createRecordings = (): RecordingsService => {
 				`copying-to-clipboard-${id}` as const;
 			// Copy transcription to clipboard if enabled
 			if (settings.value.isCopyToClipboardEnabled) {
-				const setClipboardTextResult = await ClipboardService.setClipboardText(
-					transcribedText,
-					{
-						onMutate: () => {},
-						onSuccess: () => {
-							toast.success({
-								id: currentCopyingToClipboardToastId,
-								title: 'Transcription completed and copied to clipboard!',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-								action: {
-									label: 'Go to recordings',
-									onClick: () => goto('/recordings'),
-								},
-							});
-						},
-						onError: (errProperties) => {
-							toast.error({
-								id: currentCopyingToClipboardToastId,
-								title: 'Error copying transcription to clipboard',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-								action: {
-									label: 'Go to recordings',
-									onClick: () => goto('/recordings'),
-								},
-							});
-						},
-						onSettled: () => {},
+				await ClipboardService.setClipboardText(transcribedText, {
+					onMutate: () => {},
+					onSuccess: () => {
+						toast.success({
+							id: currentCopyingToClipboardToastId,
+							title: 'Transcription completed and copied to clipboard!',
+							description: transcribedText,
+							descriptionClass: 'line-clamp-2',
+							action: {
+								label: 'Go to recordings',
+								onClick: () => goto('/recordings'),
+							},
+						});
 					},
-				);
+					onError: (error) => {
+						toast.error({
+							id: currentCopyingToClipboardToastId,
+							title: 'Error copying transcription to clipboard',
+							description: transcribedText,
+							descriptionClass: 'line-clamp-2',
+							action: {
+								label: 'Go to recordings',
+								onClick: () => goto('/recordings'),
+							},
+						});
+					},
+					onSettled: () => {},
+				});
 			}
 
 			const currentPastingToCursorToastId = `pasting-to-cursor-${id}` as const;
