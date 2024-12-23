@@ -99,11 +99,11 @@ export const createRecordings = (): RecordingsService => {
 				onMutate: () => {},
 				onSuccess: () => {
 					recordings = recordings.filter((r) => r.id !== id);
+					onSuccess();
 				},
 				onError,
 				onSettled: () => {},
 			});
-			onSuccess();
 			onSettled();
 		},
 		async deleteRecordingsById(
@@ -117,11 +117,11 @@ export const createRecordings = (): RecordingsService => {
 					recordings = recordings.filter(
 						(recording) => !ids.includes(recording.id),
 					);
+					onSuccess();
 				},
 				onError,
 				onSettled: () => {},
 			});
-			onSuccess();
 			onSettled();
 		},
 		async transcribeRecording(
