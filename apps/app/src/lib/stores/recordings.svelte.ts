@@ -51,18 +51,19 @@ export const createRecordings = (): RecordingsService => {
 		},
 		async addRecording(
 			recording: Recording,
-			{
-				onSuccess,
-				onError,
-			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
+			{ onMutate, onSuccess, onError, onSettled },
 		) {
-			const addRecordingResult =
-				await RecordingsDbService.addRecording(recording);
-			if (!addRecordingResult.ok) {
-				onError(addRecordingResult);
-			}
-			recordings.push(recording);
-			onSuccess();
+			onMutate(recording);
+			await RecordingsDbService.addRecording(recording, {
+				onMutate: () => {},
+				onSuccess: () => {
+					recordings.push(recording);
+					onSuccess();
+				},
+				onError,
+				onSettled: () => {},
+			});
+			onSettled();
 		},
 		async updateRecording(
 			recording: Recording,
