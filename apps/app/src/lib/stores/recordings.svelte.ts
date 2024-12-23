@@ -25,7 +25,7 @@ type RecordingsService = {
 	deleteRecordingsById: MutationFn<string[], void, WhisperingErrProperties>;
 	transcribeRecording: MutationFn<string, void, WhisperingErrProperties>;
 	downloadRecording: MutationFn<string, void, WhisperingErrProperties>;
-	copyRecordingText: MutationFn<Recording, void, WhisperingErrProperties>;
+	copyRecordingText: MutationFn<Recording, string, WhisperingErrProperties>;
 };
 
 export const createRecordings = (): RecordingsService => {
@@ -73,10 +73,11 @@ export const createRecordings = (): RecordingsService => {
 			if (!oldRecording) {
 				onError({
 					_tag: 'WhisperingError',
-					title: `Recording with id ${recording.id} not found`,
+					title: `Recording with id ${recording.id} not found to update`,
 					description: 'Please try again.',
 					action: { type: 'none' },
 				});
+				onSettled();
 				return;
 			}
 			recordings = recordings.map((r) =>
@@ -185,7 +186,7 @@ export const createRecordings = (): RecordingsService => {
 				NotificationService.clear(currentTranscribingRecordingToastId);
 				onError({
 					_tag: 'WhisperingError',
-					title: `Recording ${id} not found`,
+					title: `Recording with id ${id} not found to transcribe`,
 					description: 'Please try again.',
 					action: { type: 'none' },
 				});
@@ -381,54 +382,79 @@ export const createRecordings = (): RecordingsService => {
 					onSettled: () => {},
 				});
 			}
+			onSuccess();
+			onSettled();
 		},
 		async downloadRecording(
 			id: string,
-			{
-				onSuccess,
-				onError,
-			}: { onSuccess: () => void; onError: (err: WhisperingErr) => void },
+			{ onMutate, onSuccess, onError, onSettled },
 		) {
+			onMutate(id);
 			const getRecordingResult = await RecordingsDbService.getRecording(id);
 			if (!getRecordingResult.ok) {
-				onError(getRecordingResult);
+				onError({
+					_tag: 'WhisperingError',
+					title: `Error getting recording ${id} to download`,
+					description: 'Please try again.',
+					action: { type: 'more-details', error: getRecordingResult.error },
+				});
+				onSettled();
 				return;
 			}
 			const maybeRecording = getRecordingResult.data;
 			if (maybeRecording === null) {
-				return WhisperingErr({
-					title: `Recording with id ${id} not found`,
+				onError({
+					_tag: 'WhisperingError',
+					title: `Recording with id ${id} not found to download`,
 					description: 'Please try again.',
 					action: { type: 'none' },
 				});
+				onSettled();
+				return;
 			}
 			const recording = maybeRecording;
 			const downloadBlobResult = await DownloadService.downloadBlob({
 				blob: recording.blob,
 				name: `whispering_recording_${recording.id}`,
 			});
-			if (!downloadBlobResult.ok) return renderErrAsToast(downloadBlobResult);
+			if (!downloadBlobResult.ok) {
+				onError({
+					_tag: 'WhisperingError',
+					title: `Error downloading recording ${id}`,
+					description: 'Please try again.',
+					action: { type: 'more-details', error: downloadBlobResult.error },
+				});
+				onSettled();
+				return;
+			}
 			onSuccess();
+			onSettled();
 		},
 		async copyRecordingText(
 			recording: Recording,
-			{
-				onSuccess,
-				onError,
-			}: {
-				onSuccess: (transcribedText: string) => void;
-				onError: (err: WhisperingErr) => void;
-			},
+			{ onMutate, onSuccess, onError, onSettled },
 		) {
+			onMutate(recording);
 			if (recording.transcribedText === '') return;
-			const setClipboardTextResult = await ClipboardService.setClipboardText(
-				recording.transcribedText,
-			);
-			if (!setClipboardTextResult.ok) {
-				onError(setClipboardTextResult);
-				return;
-			}
-			onSuccess(recording.transcribedText);
+			await ClipboardService.setClipboardText(recording.transcribedText, {
+				onMutate: () => {},
+				onSuccess: () => {
+					onSuccess(recording.transcribedText);
+				},
+				onError: (errProperties) => {
+					onError({
+						_tag: 'WhisperingError',
+						title: 'Error copying transcription to clipboard',
+						description: recording.transcribedText,
+						action: {
+							type: 'more-details',
+							error: errProperties,
+						},
+					});
+				},
+				onSettled: () => {},
+			});
+			onSettled();
 		},
 	};
 };
