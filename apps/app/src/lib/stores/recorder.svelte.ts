@@ -90,26 +90,11 @@ function createRecorder() {
 		const toggleRecordingToastId = nanoid();
 		const updateToggleRecordingToast: typeof toast.loading = (toastOptions) =>
 			toast.loading({ ...toastOptions, id: toggleRecordingToastId });
-		const onStartSuccess = () => {
-			setRecorderState('SESSION+RECORDING');
-			console.info('Recording started');
-			void playSound('start');
-			void NotificationService.notify({
-				id: IS_RECORDING_NOTIFICATION_ID,
-				title: 'Whispering is recording...',
-				description: 'Click to go to recorder',
-				action: {
-					type: 'link',
-					label: 'Go to recorder',
-					goto: '/',
-				},
-			});
-		};
 
 		if (recorderState === 'SESSION+RECORDING') {
 			await MediaRecorderService.stopRecording(undefined, {
 				onSuccess: async (blob: Blob) => {
-					setRecorderState('IDLE');
+					setRecorderState('SESSION');
 					console.info('Recording stopped');
 					void playSound('stop');
 
@@ -140,30 +125,38 @@ function createRecorder() {
 				});
 			}
 		} else {
-			const newRecordingId = nanoid();
-
-			const startNewSessionAndRecording = async () => {
+			if (!settings.value.isFasterRerecordEnabled) {
 				await openRecordingSession();
-				await MediaRecorderService.startRecording(newRecordingId, {
-					onSuccess: onStartSuccess,
+				await startRecording();
+			} else {
+				if (!recorder.isInRecordingSession) {
+					await startRecording();
+					await startRecording();
+				} else {
+					await startRecording();
+				}
+			}
+
+			async function startRecording() {
+				await MediaRecorderService.startRecording(nanoid(), {
+					onSuccess: () => {
+						setRecorderState('SESSION+RECORDING');
+						console.info('Recording started');
+						void playSound('start');
+						void NotificationService.notify({
+							id: IS_RECORDING_NOTIFICATION_ID,
+							title: 'Whispering is recording...',
+							description: 'Click to go to recorder',
+							action: {
+								type: 'link',
+								label: 'Go to recorder',
+								goto: '/',
+							},
+						});
+					},
 					onError: renderErrAsToast,
 					sendUpdateStatus: updateToggleRecordingToast,
 				});
-				return Ok(undefined);
-			};
-
-			if (!settings.value.isFasterRerecordEnabled) {
-				await startNewSessionAndRecording();
-			} else {
-				if (!recorder.isInRecordingSession) {
-					await startNewSessionAndRecording();
-				} else {
-					await MediaRecorderService.startRecording(newRecordingId, {
-						onSuccess: onStartSuccess,
-						onError: renderErrAsToast,
-						sendUpdateStatus: updateToggleRecordingToast,
-					});
-				}
 			}
 		}
 	}
