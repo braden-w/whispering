@@ -65,41 +65,43 @@ const createMutation = <I, O, ServiceError, TContext>({
 	onError = () => undefined,
 	onSettled = () => undefined,
 }: {
-	mutationFn: (
-		input: I,
-		context: TContext,
-	) => Promise<Result<O, ServiceError>> | Result<O, ServiceError>;
+	mutationFn: (args: { input: I; context: TContext }) =>
+		| Promise<Result<O, ServiceError>>
+		| Result<O, ServiceError>;
 	onMutate?: (
 		input: I,
 	) => Promise<Result<TContext, ServiceError>> | Result<TContext, ServiceError>;
-	onSuccess?: (output: O, input: I, context: TContext) => void;
-	onError?: (
-		error: ServiceError,
-		input: I,
-		contextResult: Result<TContext, ServiceError>,
-	) => void;
-	onSettled?: (
-		result: Result<O, ServiceError>,
-		input: I,
-		contextResult: Result<TContext, ServiceError>,
-	) => void;
+	onSuccess?: (args: { output: O; input: I; context: TContext }) => void;
+	onError?: (args: {
+		error: ServiceError;
+		input: I;
+		contextResult: Result<TContext, ServiceError>;
+	}) => void;
+	onSettled?: (args: {
+		result: Result<O, ServiceError>;
+		input: I;
+		contextResult: Result<TContext, ServiceError>;
+	}) => void;
 }) => {
 	const mutate = async (input: I): Promise<void> => {
 		const contextResult = await onMutate(input);
 		if (!contextResult.ok) {
-			onError(contextResult.error, input, contextResult);
-			onSettled(contextResult, input, contextResult);
+			const error = contextResult.error;
+			onError({ error, input, contextResult });
+			onSettled({ result: contextResult, input, contextResult });
 			return;
 		}
 		const context = contextResult.data;
-		const result = await mutationFn(input, context);
+		const result = await mutationFn({ input, context });
 		if (!result.ok) {
-			onError(result.error, input, contextResult);
-			onSettled(result, input, contextResult);
+			const error = result.error;
+			onError({ error, input, contextResult });
+			onSettled({ result, input, contextResult });
 			return;
 		}
-		onSuccess(result.data, input, context);
-		onSettled(result, input, contextResult);
+		const output = result.data;
+		onSuccess({ output, input, context });
+		onSettled({ result, input, contextResult });
 	};
 	return { mutate };
 };
@@ -118,7 +120,7 @@ function createRecorder() {
 	};
 
 	const { mutate: closeRecordingSession } = createMutation({
-		mutationFn: (_, { updateStatus }) =>
+		mutationFn: ({ context: { updateStatus } }) =>
 			MediaRecorderService.closeRecordingSession(undefined, {
 				setStatusMessage: updateStatus,
 			}),
@@ -136,14 +138,14 @@ function createRecorder() {
 			});
 			return Ok(actionStatuses);
 		},
-		onSuccess: (_data, _input, { succeedStatus }) => {
+		onSuccess: ({ context: { succeedStatus } }) => {
 			setRecorderState('IDLE');
 			succeedStatus({
 				title: 'Recording session closed',
 				description: 'Your recording session has been closed',
 			});
 		},
-		onError: renderErrAsToast,
+		onError: ({ error }) => renderErrAsToast(error),
 	});
 
 	async function toggleRecording(): Promise<void> {
