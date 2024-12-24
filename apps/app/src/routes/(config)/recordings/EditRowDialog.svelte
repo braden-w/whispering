@@ -7,8 +7,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
 
