@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import type {
-	TranscriptionServiceErrProperties,
-	WhisperingResult,
-} from '../index.js';
-import { createServiceErrorFns } from '@epicenterhq/result';
+import type { WhisperingResult } from '../index.js';
 
 export const toastOptionsSchema = z.object({
 	id: z.string().optional(),
@@ -43,9 +39,3 @@ export type NotificationService = {
 		id: string,
 	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
 };
-
-export const {
-	Err: TranscriptionServiceErr,
-	trySync,
-	tryAsync,
-} = createServiceErrorFns<TranscriptionServiceErrProperties>();
