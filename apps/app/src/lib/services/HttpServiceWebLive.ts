@@ -12,7 +12,7 @@ export const createHttpServiceWebLive = (): HttpService => ({
 				}),
 			catch: (error) => ({
 				_tag: 'HttpServiceErr',
-				enum: 'NetworkError',
+				code: 'NetworkError',
 				error,
 			}),
 		});
@@ -22,7 +22,8 @@ export const createHttpServiceWebLive = (): HttpService => ({
 		if (!response.ok) {
 			return HttpServiceErr({
 				_tag: 'HttpServiceErr',
-				enum: 'HttpError',
+				code: 'HttpError',
+				status: response.status,
 				error: response,
 			});
 		}
@@ -33,7 +34,7 @@ export const createHttpServiceWebLive = (): HttpService => ({
 			},
 			catch: (error) => ({
 				_tag: 'HttpServiceErr',
-				enum: 'ParseError',
+				code: 'ParseError',
 				error,
 			}),
 		});
