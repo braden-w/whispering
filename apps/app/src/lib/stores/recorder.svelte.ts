@@ -30,7 +30,11 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
 
-const createToastFns = () => {
+/**
+ * Creates a set of toast functions that are scoped to a single mutation.
+ * This is useful for creating multiple toasts in a single mutation.
+ */
+const createLocalToastFns = () => {
 	const toastId = nanoid();
 	return {
 		success: (options: ToastOptions) =>
@@ -55,10 +59,22 @@ function createRecorder() {
 	};
 
 	const { mutate: closeRecordingSession } = createMutation({
-		mutationFn: (_, { context: { localToast } }) =>
-			MediaRecorderService.closeRecordingSession(undefined, {
-				sendStatus: localToast.loading,
-			}),
+		mutationFn: async (_, { context: { localToast } }) => {
+			const result = await MediaRecorderService.closeRecordingSession(
+				undefined,
+				{ sendStatus: localToast.loading },
+			);
+			if (!result.ok) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ Session Close Failed',
+					description:
+						'Oops! We hit a snag while closing your recording session',
+					action: { type: 'more-details', error: result.error },
+				});
+			}
+			return Ok(undefined);
+		},
 		onMutate: () => {
 			if (!isInRecordingSession) {
 				return WhisperingErr({
@@ -67,7 +83,7 @@ function createRecorder() {
 					description: "There's no recording session to close at the moment",
 				});
 			}
-			const localToast = createToastFns();
+			const localToast = createLocalToastFns();
 			localToast.loading({
 				title: '⏳ Closing recording session...',
 				description: 'Wrapping things up, just a moment...',
@@ -83,20 +99,11 @@ function createRecorder() {
 		},
 		onError: (error, { contextResult }) => {
 			if (!contextResult.ok) {
-				toast.error({
-					title: '❌ Session Close Failed',
-					description:
-						'Oops! We hit a snag while closing your recording session',
-					action: { type: 'more-details', error },
-				});
+				toast.error(contextResult.error);
 				return;
 			}
 			const { localToast } = contextResult.data;
-			localToast.error({
-				title: '❌ Session Close Failed',
-				description: 'Oops! We hit a snag while closing your recording session',
-				action: { type: 'more-details', error },
-			});
+			localToast.error(error);
 		},
 	});
 
@@ -110,14 +117,33 @@ function createRecorder() {
 					},
 					{ sendStatus: localToast.loading },
 				);
-				if (!initResult.ok) return initResult;
+				if (!initResult.ok) {
+					return WhisperingErr({
+						_tag: 'WhisperingError',
+						title: '❌ Session Initialization Failed',
+						description:
+							'Oops! We hit a snag while initializing your recording session',
+						action: { type: 'more-details', error: initResult.error },
+					});
+				}
+				return Ok(undefined);
 			}
-			return MediaRecorderService.startRecording(nanoid(), {
+			const result = await MediaRecorderService.startRecording(nanoid(), {
 				sendStatus: localToast.loading,
 			});
+			if (!result.ok) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ Recording Failed to Start',
+					description:
+						'We encountered an issue while setting up your recording',
+					action: { type: 'more-details', error: result.error },
+				});
+			}
+			return Ok(undefined);
 		},
 		onMutate: () => {
-			const localToast = createToastFns();
+			const localToast = createLocalToastFns();
 			localToast.loading({
 				title: '🎙️ Preparing to record...',
 				description: 'Setting up your recording environment...',
@@ -146,20 +172,11 @@ function createRecorder() {
 		},
 		onError: (error, { contextResult }) => {
 			if (!contextResult.ok) {
-				toast.error({
-					title: '❌ Recording Failed to Start',
-					description:
-						'We encountered an issue while setting up your recording',
-					action: { type: 'more-details', error },
-				});
+				toast.error(contextResult.error);
 				return;
 			}
 			const { localToast } = contextResult.data;
-			localToast.error({
-				title: '❌ Recording Failed to Start',
-				description: 'We encountered an issue while setting up your recording',
-				action: { type: 'more-details', error },
-			});
+			localToast.error(error);
 		},
 	});
 
@@ -168,7 +185,14 @@ function createRecorder() {
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
 				sendStatus: localToast.loading,
 			});
-			if (!stopResult.ok) return stopResult;
+			if (!stopResult.ok) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ Recording Failed to Stop',
+					description: 'We encountered an issue while stopping your recording',
+					action: { type: 'more-details', error: stopResult.error },
+				});
+			}
 			localToast.loading({
 				title: '💾 Saving your recording...',
 				description: 'Adding your recording to the library...',
@@ -185,21 +209,37 @@ function createRecorder() {
 			};
 			const addRecordingResult =
 				await RecordingsDbService.addRecording(newRecording);
-			if (!addRecordingResult.ok) return addRecordingResult;
+			if (!addRecordingResult.ok) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ Failed to Save Recording',
+					description: 'We encountered an issue while saving your recording',
+					action: { type: 'more-details', error: addRecordingResult.error },
+				});
+			}
 			void recordings.transcribeRecording(newRecording);
 			if (!settings.value.isFasterRerecordEnabled) {
 				localToast.loading({
 					title: '⏳ Closing session...',
 					description: 'Wrapping up your recording session...',
 				});
-				return MediaRecorderService.closeRecordingSession(undefined, {
-					sendStatus: localToast.loading,
-				});
+				const closeResult = await MediaRecorderService.closeRecordingSession(
+					undefined,
+					{ sendStatus: localToast.loading },
+				);
+				if (!closeResult.ok) {
+					return WhisperingErr({
+						_tag: 'WhisperingError',
+						title: '❌ Failed to Close Session',
+						description: 'We encountered an issue while closing your session',
+						action: { type: 'more-details', error: closeResult.error },
+					});
+				}
 			}
 			return Ok(undefined);
 		},
 		onMutate: () => {
-			const localToast = createToastFns();
+			const localToast = createLocalToastFns();
 			localToast.loading({
 				title: '⏸️ Stopping recording...',
 				description: 'Finalizing your audio capture...',
@@ -219,14 +259,32 @@ function createRecorder() {
 			console.info('Recording stopped');
 			void playSound('stop');
 		},
-		onError: (error) => renderErrAsToast(error),
+		onError: (error, { contextResult }) => {
+			if (!contextResult.ok) {
+				toast.error(contextResult.error);
+				return;
+			}
+			const { localToast } = contextResult.data;
+			localToast.error(error);
+		},
 	});
 
 	const { mutate: cancelRecording } = createMutation({
-		mutationFn: (_, { context: { localToast } }) =>
-			MediaRecorderService.cancelRecording(undefined, {
-				sendStatus: localToast.loading,
-			}),
+		mutationFn: async (_, { context: { localToast } }) => {
+			const cancelResult = await MediaRecorderService.cancelRecording(
+				undefined,
+				{ sendStatus: localToast.loading },
+			);
+			if (!cancelResult.ok) {
+				return WhisperingErr({
+					_tag: 'WhisperingError',
+					title: '❌ Failed to Cancel Recording',
+					description: 'We encountered an issue while canceling your recording',
+					action: { type: 'more-details', error: cancelResult.error },
+				});
+			}
+			return Ok(undefined);
+		},
 		onMutate: () => {
 			if (!isInRecordingSession) {
 				return WhisperingErr({
@@ -235,7 +293,7 @@ function createRecorder() {
 					description: "There's no recording session to cancel at the moment",
 				});
 			}
-			const localToast = createToastFns();
+			const localToast = createLocalToastFns();
 			localToast.loading({
 				title: '🔄 Cancelling recording...',
 				description: 'Discarding the current recording...',
@@ -262,7 +320,12 @@ function createRecorder() {
 				{ sendStatus: localToast.loading },
 			);
 			if (!closeResult.ok) {
-				renderErrAsToast(closeResult.error);
+				renderErrAsToast({
+					_tag: 'WhisperingError',
+					title: '❌ Failed to Close Session',
+					description: 'We encountered an issue while closing your session',
+					action: { type: 'more-details', error: closeResult.error },
+				});
 				return;
 			}
 			setRecorderState('IDLE');
@@ -271,7 +334,14 @@ function createRecorder() {
 				description: 'Recording cancelled and session closed successfully',
 			});
 		},
-		onError: (error) => renderErrAsToast(error),
+		onError: (error, { contextResult }) => {
+			if (!contextResult.ok) {
+				toast.error(contextResult.error);
+				return;
+			}
+			const { localToast } = contextResult.data;
+			localToast.error(error);
+		},
 	});
 
 	return {
