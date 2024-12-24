@@ -106,7 +106,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 					);
 				}
 			},
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'WhisperingError',
 				title: 'Failed to show notification',
 				description:

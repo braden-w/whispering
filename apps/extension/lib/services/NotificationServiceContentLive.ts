@@ -15,7 +15,7 @@ export const createNotificationServiceContentLive =
 						name: 'whispering-extension/notifications/create',
 						body: { notifyOptions },
 					}),
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'WhisperingError',
 					title: 'Unable to notify via background service worker',
 					description:
@@ -42,7 +42,7 @@ export const createNotificationServiceContentLive =
 						name: 'whispering-extension/notifications/clear',
 						body: { notificationId },
 					}),
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'WhisperingError',
 					title: 'Unable to clear notification via background service worker',
 					description:

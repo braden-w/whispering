@@ -1,8 +1,17 @@
 import { z } from 'zod';
 import type { WhisperingResult } from '../index.js';
 
-export const toastOptionsSchema = z.object({
+const toastVariantSchema = z.enum([
+	'error',
+	'warning',
+	'success',
+	'info',
+	'loading',
+]);
+
+export const toastAndNotificationOptionsSchema = z.object({
 	id: z.string().optional(),
+	variant: toastVariantSchema,
 	title: z.string(),
 	description: z.string(),
 	descriptionClass: z.string().optional(),
@@ -21,20 +30,12 @@ export const toastOptionsSchema = z.object({
 		.optional(),
 });
 
-export type ToastOptions = z.infer<typeof toastOptionsSchema>;
-
-export const notificationOptionsSchema = toastOptionsSchema.extend({
-	variant: z.enum(['success', 'info', 'loading', 'error', 'warning']),
-});
-
-export type NotificationServiceOptions = z.infer<
-	typeof notificationOptionsSchema
+export type ToastAndNotifyOptions = z.infer<
+	typeof toastAndNotificationOptionsSchema
 >;
 
 export type NotificationService = {
-	notify: (
-		options: NotificationServiceOptions,
-	) => Promise<WhisperingResult<string>>;
+	notify: (options: ToastAndNotifyOptions) => Promise<WhisperingResult<string>>;
 	clear: (
 		id: string,
 	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;

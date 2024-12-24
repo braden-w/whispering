@@ -7,10 +7,9 @@
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { createMutation, Ok } from '@epicenterhq/result';
-	import { WhisperingErr } from '@repo/shared';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
@@ -27,12 +26,7 @@
 				blob: recording.blob,
 				name: `whispering_recording_${recording.id}`,
 			});
-			if (!downloadResult.ok)
-				return WhisperingErr({
-					...downloadResult.error,
-					_tag: 'WhisperingError',
-					action: { type: 'more-details', error: downloadResult.error },
-				});
+			if (!downloadResult.ok) return downloadResult;
 			return Ok(recording);
 		},
 		onSuccess: () => {
@@ -49,7 +43,7 @@
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
 		onclick={() => {
-			recordings.transcribeRecording(recording);
+			RecordingsService.transcribeRecording(recording);
 		}}
 		variant="ghost"
 		size="icon"
@@ -93,7 +87,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => recordings.deleteRecordingById(recording.id),
+				onConfirm: () => RecordingsService.deleteRecordingById(recording.id),
 			});
 		}}
 		variant="ghost"

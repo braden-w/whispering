@@ -44,7 +44,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		const path = iconPaths[body.recorderState];
 		const setIconResult = await tryAsyncWhispering({
 			try: () => chrome.action.setIcon({ path }),
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'WhisperingError',
 				title: `Error setting icon to ${body.recorderState} icon`,
 				description:

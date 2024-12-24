@@ -1,44 +1,37 @@
 import type {
 	Recording,
-	RecordingsDbService,
-	RecordingsDbServiceErrorProperties,
-} from '$lib/services/RecordingDbService';
-import { createRecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
+	Recordings,
+	RecordingsErrorProperties,
+} from './db/DbService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { Ok, type ServiceFn } from '@epicenterhq/result';
+import { Ok, type ServiceFn } from '@repo/shared/epicenter-result';
+import { createRecordingsLiveIndexedDb } from './db/DbServiceIndexedDbLive.svelte';
 
 export type RecordingsService = {
 	get recordings(): Recording[];
-	updateRecording: ServiceFn<
-		Recording,
-		void,
-		RecordingsDbServiceErrorProperties
-	>;
-	deleteRecordingById: ServiceFn<
-		string,
-		string,
-		RecordingsDbServiceErrorProperties
-	>;
+	updateRecording: ServiceFn<Recording, void, RecordingsErrorProperties>;
+	deleteRecordingById: ServiceFn<string, string, RecordingsErrorProperties>;
 	deleteRecordingsById: ServiceFn<
 		string[],
 		string[],
-		RecordingsDbServiceErrorProperties
+		RecordingsErrorProperties
 	>;
 };
 
 export const RecordingsService = createRecordingsService({
-	RecordingsDbService: createRecordingsDbServiceLiveIndexedDb(),
+	Recordings: createRecordingsLiveIndexedDb(),
 });
 
 function createRecordingsService({
-	RecordingsDbService,
-}: { RecordingsDbService: RecordingsDbService }): RecordingsService {
+	Recordings,
+}: { Recordings: Recordings }): RecordingsService {
 	let recordingsArray = $state<Recording[]>([]);
 
 	const syncDbToRecordingsState = async () => {
-		const getAllRecordingsResult = await RecordingsDbService.getAllRecordings();
+		const getAllRecordingsResult = await Recordings.getAllRecordings();
 		if (!getAllRecordingsResult.ok) {
 			return renderErrAsToast({
+				variant: 'error',
 				title: 'Failed to initialize recordings',
 				description:
 					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
@@ -55,8 +48,7 @@ function createRecordingsService({
 			return recordingsArray;
 		},
 		async updateRecording(recording) {
-			const updateRecordingResult =
-				await RecordingsDbService.updateRecording(recording);
+			const updateRecordingResult = await Recordings.updateRecording(recording);
 			if (!updateRecordingResult.ok) {
 				return updateRecordingResult;
 			}
@@ -67,7 +59,7 @@ function createRecordingsService({
 		},
 		async deleteRecordingById(id: string) {
 			const deleteRecordingByIdResult =
-				await RecordingsDbService.deleteRecordingById(id);
+				await Recordings.deleteRecordingById(id);
 			if (!deleteRecordingByIdResult.ok) {
 				return deleteRecordingByIdResult;
 			}
@@ -76,7 +68,7 @@ function createRecordingsService({
 		},
 		async deleteRecordingsById(ids: string[]) {
 			const deleteRecordingsByIdResult =
-				await RecordingsDbService.deleteRecordingsById(ids);
+				await Recordings.deleteRecordingsById(ids);
 			if (!deleteRecordingsByIdResult.ok) {
 				return deleteRecordingsByIdResult;
 			}

@@ -1,16 +1,16 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { Ok } from '@epicenterhq/result';
-import type { ClipboardService } from './ClipboardService';
+import { Ok } from '@repo/shared/epicenter-result';
+import type { ClipboardService } from './clipboard/ClipboardService';
 import {
 	ClipboardServiceError,
 	tryAsyncClipboardService,
-} from './ClipboardService';
+} from './clipboard/ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
 	async setClipboardText(text) {
 		const setClipboardResult = await tryAsyncClipboardService({
 			try: () => navigator.clipboard.writeText(text),
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'ClipboardError',
 				message:
 					'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',

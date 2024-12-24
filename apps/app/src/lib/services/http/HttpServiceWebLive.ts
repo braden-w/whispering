@@ -1,20 +1,19 @@
+import type { HttpService } from '$lib/services/http/HttpService';
 import {
-	type HttpService,
 	HttpServiceErr,
 	tryHttpServiceAsync,
-} from '$lib/services/HttpService';
-import { fetch } from '@tauri-apps/plugin-http';
+} from '$lib/services/http/HttpService';
 
-export const createHttpServiceDesktopLive = (): HttpService => ({
+export const createHttpServiceWebLive = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
 		const responseResult = await tryHttpServiceAsync({
 			try: () =>
-				fetch(url, {
+				window.fetch(url, {
 					method: 'POST',
 					body: formData,
-					headers: { 'Content-Type': 'multipart/form-data', ...headers },
+					headers,
 				}),
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'HttpServiceErr',
 				code: 'NetworkError',
 				error,
@@ -36,7 +35,7 @@ export const createHttpServiceDesktopLive = (): HttpService => ({
 				const json = await response.json();
 				return schema.parse(json);
 			},
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'HttpServiceErr',
 				code: 'ParseError',
 				error,

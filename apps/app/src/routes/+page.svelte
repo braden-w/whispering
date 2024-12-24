@@ -8,13 +8,13 @@
 	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 
 	const latestRecording = $derived<Recording>(
-		recordings.value.at(-1) ?? {
+		RecordingsService.recordings.at(-1) ?? {
 			id: '',
 			title: '',
 			subtitle: '',

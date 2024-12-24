@@ -2,12 +2,12 @@ import {
 	HttpServiceErrorIntoTranscriptionServiceError,
 	type TranscriptionService,
 	TranscriptionServiceErr,
-} from '$lib/services/TranscriptionService';
+} from '$lib/services/transcribe-recordings/transcription/TranscriptionService';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok } from '@epicenterhq/result';
-import { HttpService } from './HttpService';
-import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
+import { Ok } from '@repo/shared/epicenter-result';
+import { HttpService } from '$lib/services/http/HttpService';
+import { WhisperResponseSchema } from '$lib/services/transcribe-recordings/WhisperResponseSchema';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 

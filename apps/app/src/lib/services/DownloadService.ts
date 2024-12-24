@@ -1,13 +1,14 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { createServiceErrorFns, type ServiceFn } from '@epicenterhq/result';
+import {
+	type ServiceFn,
+	createServiceErrorFns,
+} from '@repo/shared/epicenter-result';
+import type { WhisperingErrProperties } from '@repo/shared';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 
-type DownloadServiceErrorProperties = {
+type DownloadServiceErrorProperties = WhisperingErrProperties & {
 	_tag: 'DownloadServiceError';
-	title: string;
-	description: string;
-	error: unknown;
 };
 
 type DownloadService = {
@@ -38,12 +39,12 @@ function createDownloadServiceDesktopLive(): DownloadService {
 					const contents = new Uint8Array(await blob.arrayBuffer());
 					return writeFile(path, contents);
 				},
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'DownloadServiceError',
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
-					error,
+					action: { type: 'more-details', error },
 				}),
 			});
 		},
@@ -65,12 +66,12 @@ function createDownloadServiceWebLive(): DownloadService {
 					document.body.removeChild(a);
 					URL.revokeObjectURL(url);
 				},
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'DownloadServiceError',
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording in your browser. Please try again.',
-					error,
+					action: { type: 'more-details', error },
 				}),
 			}),
 	};

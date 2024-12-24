@@ -1,4 +1,4 @@
-import { Ok } from '@epicenterhq/result';
+import { Ok } from '@repo/shared/epicenter-result';
 import type { NotificationService } from '@repo/shared';
 import { tryAsyncWhispering } from '@repo/shared';
 import {
@@ -21,7 +21,7 @@ const createNotificationServiceDesktop = (): NotificationService => {
 						sendNotification({ title });
 					}
 				},
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'WhisperingError',
 					title: 'Notification error',
 					description: 'Could not send notification',

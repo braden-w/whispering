@@ -1,9 +1,8 @@
 import { toast } from '$lib/services/ToastService';
-import type { WhisperingErrProperties } from '@repo/shared';
+import type { ToastAndNotifyOptions } from '@repo/shared';
 
-export const renderErrAsToast = (errProperties: WhisperingErrProperties) => {
-	const { isWarning, ...toastOptions } = errProperties;
-	const variant = isWarning ? 'warning' : 'error';
+export const renderErrAsToast = (errProperties: ToastAndNotifyOptions) => {
+	const { variant, ...toastOptions } = errProperties;
 	toast[variant](toastOptions);
 	console.error(errProperties);
 };

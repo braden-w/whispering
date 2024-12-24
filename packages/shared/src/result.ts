@@ -1,10 +1,10 @@
 import { type Result, createServiceErrorFns } from '@epicenterhq/result';
-import type { ToastOptions } from './services/ToastAndNotificationService.js';
+import type { ToastAndNotifyOptions } from './services/ToastAndNotificationService.js';
 
 export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
 	isWarning?: boolean;
-} & ToastOptions;
+} & ToastAndNotifyOptions;
 
 export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
 

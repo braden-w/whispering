@@ -12,7 +12,7 @@ export const toggleRecordingFromContentScript = async (): Promise<void> => {
 			>({
 				name: 'whispering-web/toggleRecording',
 			}),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Unable to toggle recording via background service worker',
 			description:

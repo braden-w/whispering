@@ -5,7 +5,7 @@ export const createClipboardServiceExtensionLive = (): ClipboardService => ({
 	setClipboardText: (text) =>
 		tryAsyncWhispering({
 			try: () => navigator.clipboard.writeText(text),
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'WhisperingError',
 				title: 'Unable to write to clipboard',
 				description:
@@ -20,7 +20,7 @@ export const createClipboardServiceExtensionLive = (): ClipboardService => ({
 	writeTextToCursor: (text) =>
 		trySyncWhispering({
 			try: () => writeTextToCursor(text),
-			catch: (error) => ({
+			mapErr: (error) => ({
 				_tag: 'WhisperingError',
 				title: 'Unable to write text to cursor',
 				description:

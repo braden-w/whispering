@@ -9,7 +9,7 @@ export const getActiveTabId = () =>
 			});
 			return activeTab?.id;
 		},
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'GetActiveTabIdError',
 			message: 'Unable to get active tab ID',
 		}),

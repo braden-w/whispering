@@ -1,16 +1,14 @@
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import type { ToastOptions } from '@repo/shared';
+import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
-
-type ToastVariant = 'success' | 'info' | 'loading' | 'error' | 'warning';
 
 export const toast = createToastService();
 
 function createToastService() {
 	const createToastFn =
-		(variant: ToastVariant) =>
-		({ title, action, ...options }: ToastOptions) => {
+		(variant: ToastAndNotifyOptions['variant']) =>
+		({ title, action, ...options }: Omit<ToastAndNotifyOptions, 'variant'>) => {
 			const getDurationInMs = () => {
 				if (variant === 'loading') return 60_000;
 				if (variant === 'error' || variant === 'warning') return 5000;
@@ -38,7 +36,7 @@ function createToastService() {
 	};
 }
 
-function convertActionToToastAction(action: ToastOptions['action']) {
+function convertActionToToastAction(action: ToastAndNotifyOptions['action']) {
 	switch (action?.type) {
 		case 'link':
 			return {

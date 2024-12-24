@@ -1,6 +1,9 @@
-import { createServiceErrorFns, type ServiceFn } from '@epicenterhq/result';
+import {
+	createServiceErrorFns,
+	type ServiceFn,
+} from '@repo/shared/epicenter-result';
 import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
-import { createClipboardServiceWebLive } from './ClipboardServiceWebLive';
+import { createClipboardServiceWebLive } from '../ClipboardServiceWebLive';
 import type { WhisperingErrProperties } from '@repo/shared';
 
 type ClipboardErrorProperties = {

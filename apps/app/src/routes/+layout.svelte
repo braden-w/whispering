@@ -13,7 +13,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
 
 	let { children } = $props();
 
@@ -21,6 +21,10 @@
 		if (!window.__TAURI_INTERNALS__) return;
 		return getCurrentWindow().setAlwaysOnTop(value);
 	};
+
+	const isCurrentlyTranscribing = $derived(
+		RecordingsService.currentTranscribingRecordingIds.size > 0,
+	);
 
 	$effect(() => {
 		switch (settings.value.alwaysOnTop) {
@@ -30,7 +34,7 @@
 			case 'When Recording and Transcribing':
 				if (
 					recorder.recorderState === 'SESSION+RECORDING' ||
-					recordings.isTranscribing
+					isCurrentlyTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {

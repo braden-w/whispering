@@ -62,7 +62,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 					const tray = await trayPromise;
 					return tray.setIcon(iconPath);
 				},
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'WhisperingError',
 					isWarning: true,
 					title: `Could not set tray icon to ${recorderState} icon...`,

@@ -1,6 +1,10 @@
-import type { ServiceFn } from '@epicenterhq/result';
-import { createServiceErrorFns } from '@epicenterhq/result';
-import type { SupportedLanguage, ToastOptions } from '@repo/shared';
+import type { ServiceFn } from '@repo/shared/epicenter-result';
+import { createServiceErrorFns } from '@repo/shared/epicenter-result';
+import type {
+	SupportedLanguage,
+	ToastAndNotifyOptions,
+	WhisperingErrProperties,
+} from '@repo/shared';
 import { SUPPORTED_LANGUAGES, TRANSCRIPTION_SERVICES } from '@repo/shared';
 import type { HttpServiceErrProperties } from './HttpService';
 
@@ -77,19 +81,22 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	}),
 );
 
-export type TranscriptionServiceErrProperties = ToastOptions & {
-	_tag: 'TranscriptionServiceErr';
-};
+export type TranscriptionServiceErrProperties = WhisperingErrProperties;
 
 export type TranscriptionService = {
 	transcribe: ServiceFn<Blob, string, TranscriptionServiceErrProperties>;
 };
 
-export const {
-	Err: TranscriptionServiceErr,
-	trySync,
-	tryAsync,
-} = createServiceErrorFns<TranscriptionServiceErrProperties>();
+export const TranscriptionServiceErr = (
+	args: Pick<
+		TranscriptionServiceErrProperties,
+		'title' | 'description' | 'action'
+	>,
+): TranscriptionServiceErrProperties => ({
+	...args,
+	variant: 'error',
+	_tag: 'WhisperingError',
+});
 
 export async function HttpServiceErrorIntoTranscriptionServiceError(
 	httpServiceErrProperties: HttpServiceErrProperties,
@@ -97,7 +104,6 @@ export async function HttpServiceErrorIntoTranscriptionServiceError(
 	switch (httpServiceErrProperties.code) {
 		case 'NetworkError':
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: '🌐 Network Hiccup!',
 				description:
 					httpServiceErrProperties.error instanceof Error
@@ -108,7 +114,6 @@ export async function HttpServiceErrorIntoTranscriptionServiceError(
 
 		case 'HttpError':
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: '🚫 Request Hit a Snag',
 				description: `Houston, we have a problem! The server responded with status ${httpServiceErrProperties.status}. Let's try that again, shall we?`,
 				action: { type: 'more-details', error: httpServiceErrProperties.error },
@@ -116,7 +121,6 @@ export async function HttpServiceErrorIntoTranscriptionServiceError(
 
 		case 'ParseError':
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: '🤔 Data Puzzle',
 				description:
 					httpServiceErrProperties.error instanceof Error

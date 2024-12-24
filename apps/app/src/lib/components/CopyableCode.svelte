@@ -1,9 +1,9 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardService } from '$lib/services/ClipboardService';
+	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { createMutation } from '@epicenterhq/result';
+	import { createMutation } from '@repo/shared/epicenter-result';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
 	const { codeText }: { codeText: string } = $props();

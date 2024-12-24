@@ -1,6 +1,4 @@
-import type { ServiceFn } from '@epicenterhq/result';
-import type { WhisperingErrProperties } from '@repo/shared';
-import { createRecordingsDbServiceLiveIndexedDb } from './RecordingDbServiceIndexedDbLive.svelte';
+import type { ServiceFn } from '@repo/shared/epicenter-result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -20,27 +18,38 @@ export type Recording = {
 	transcriptionStatus: TranscriptionStatus;
 };
 
-export type RecordingsDbService = {
+export type RecordingsErrorProperties = {
+	_tag: 'RecordingsError';
+	title: string;
+	description: string;
+	action: { type: 'more-details'; error: unknown };
+};
+
+export type Recordings = {
 	readonly getAllRecordings: ServiceFn<
 		void,
 		Recording[],
-		WhisperingErrProperties
+		RecordingsErrorProperties
 	>;
 	readonly getRecording: ServiceFn<
 		string,
 		Recording | null,
-		WhisperingErrProperties
+		RecordingsErrorProperties
 	>;
-	readonly addRecording: ServiceFn<Recording, void, WhisperingErrProperties>;
-	readonly updateRecording: ServiceFn<Recording, void, WhisperingErrProperties>;
+	readonly addRecording: ServiceFn<Recording, void, RecordingsErrorProperties>;
+	readonly updateRecording: ServiceFn<
+		Recording,
+		void,
+		RecordingsErrorProperties
+	>;
 	readonly deleteRecordingById: ServiceFn<
 		string,
 		void,
-		WhisperingErrProperties
+		RecordingsErrorProperties
 	>;
 	readonly deleteRecordingsById: ServiceFn<
 		string[],
 		void,
-		WhisperingErrProperties
+		RecordingsErrorProperties
 	>;
 };

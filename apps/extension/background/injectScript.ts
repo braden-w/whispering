@@ -1,4 +1,8 @@
-import { WhisperingErr, type WhisperingResult, tryAsyncWhispering } from '@repo/shared';
+import {
+	WhisperingErr,
+	type WhisperingResult,
+	tryAsyncWhispering,
+} from '@repo/shared';
 
 export async function injectScript<T, Args extends unknown[]>({
 	tabId,
@@ -19,7 +23,7 @@ export async function injectScript<T, Args extends unknown[]>({
 				func,
 				args,
 			}),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: `Unable to execute "${commandName}" script in Whispering tab`,
 			description:

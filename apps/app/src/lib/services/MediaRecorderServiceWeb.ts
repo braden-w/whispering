@@ -3,8 +3,11 @@ import {
 	type ServiceFn,
 	type Result,
 	createServiceErrorFns,
-} from '@epicenterhq/result';
-import type { ToastOptions, WhisperingErrProperties } from '@repo/shared';
+} from '@repo/shared/epicenter-result';
+import type {
+	ToastAndNotifyOptions,
+	WhisperingErrProperties,
+} from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type { toast } from './ToastService';
 
@@ -142,7 +145,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					);
 					return audioInputDevices;
 				},
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'MediaRecorderError',
 					title: '🎤 Device Access Error',
 					description:
@@ -241,7 +244,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					new MediaRecorder(currentSession.stream, {
 						bitsPerSecond: currentSession.settings.bitsPerSecond,
 					}),
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'MediaRecorderError',
 					title: '🎙️ Setup Failed',
 					description:
@@ -315,7 +318,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 							description: 'Successfully saved your audio recording!',
 						});
 					}),
-				catch: (error) => ({
+				mapErr: (error) => ({
 					_tag: 'MediaRecorderError',
 					title: '⏹️ Recording Stop Failed',
 					description: 'Unable to save your recording. Please try again',
@@ -442,7 +445,7 @@ async function invoke<T>(
 ): Promise<Result<T, MediaRecorderErrProperties>> {
 	return tryAsyncMediaRecorderService({
 		try: async () => await tauriInvoke<T>(command),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'MediaRecorderError',
 			title: '🎤 Device Access Error',
 			description:
@@ -467,7 +470,7 @@ async function getFirstAvailableStream() {
 			);
 			return audioInputDevices;
 		},
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'MediaRecorderError',
 			title:
 				'Error enumerating recording devices and acquiring first available stream',
@@ -505,7 +508,7 @@ async function getStreamForDeviceId(recordingDeviceId: string) {
 			});
 			return stream;
 		},
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'MediaRecorderError',
 			title: '🎤 Microphone Access Error',
 			description: 'Unable to connect to your selected microphone',

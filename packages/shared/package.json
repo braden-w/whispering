@@ -5,7 +5,8 @@
 	"description": "Shared constants for use Whispering web app, desktop app, and Chrome extension",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./epicenter-result": "./src/epicenter-result.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.2",
