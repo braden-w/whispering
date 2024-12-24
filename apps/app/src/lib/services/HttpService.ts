@@ -1,16 +1,28 @@
-import type { WhisperingResult } from '@repo/shared';
+import { createServiceErrorFns, type Result } from '@epicenterhq/result';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
 
+type HttpServiceErrProperties = {
+	_tag: 'HttpServiceErr';
+	enum: 'NetworkError' | 'HttpError' | 'ParseError';
+	error: unknown;
+};
+
 export type HttpService = {
-	readonly post: <TSchema extends z.ZodTypeAny>(config: {
+	post: <TSchema extends z.ZodTypeAny>(config: {
 		url: string;
 		formData: FormData;
 		schema: TSchema;
 		headers?: Record<string, string>;
-	}) => Promise<WhisperingResult<z.infer<TSchema>>>;
+	}) => Promise<Result<z.infer<TSchema>, HttpServiceErrProperties>>;
 };
+
+export const {
+	Err: HttpServiceErr,
+	trySync: tryHttpServiceSync,
+	tryAsync: tryHttpServiceAsync,
+} = createServiceErrorFns<HttpServiceErrProperties>();
 
 export const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktopLive()
