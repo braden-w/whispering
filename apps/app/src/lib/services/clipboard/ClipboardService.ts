@@ -1,10 +1,7 @@
-import {
-	createServiceErrorFns,
-	type ServiceFn,
-} from '@repo/shared/epicenter-result';
-import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
+import { Err, type Result } from '@epicenterhq/result';
+import type { MaybePromise, WhisperingErrProperties } from '@repo/shared';
 import { createClipboardServiceWebLive } from '../ClipboardServiceWebLive';
-import type { WhisperingErrProperties } from '@repo/shared';
+import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
 
 type ClipboardErrorProperties = {
 	_tag: 'ClipboardError';
@@ -12,20 +9,24 @@ type ClipboardErrorProperties = {
 	error: unknown;
 };
 
-const { Err: ClipboardServiceError, tryAsync: tryAsyncClipboardService } =
-	createServiceErrorFns<ClipboardErrorProperties>();
-export { ClipboardServiceError, tryAsyncClipboardService };
+type ClipboardServiceResult<T> = Result<
+	T,
+	ClipboardErrorProperties | WhisperingErrProperties
+>;
+
+export const ClipboardErr = (args: {
+	message: string;
+	error: unknown;
+}): ClipboardServiceResult<never> => {
+	return Err({ _tag: 'ClipboardError', ...args });
+};
 
 export type ClipboardService = {
 	/**
 	 * Writes text to the user's clipboard.
 	 * @param text The text to write to the clipboard.
 	 */
-	setClipboardText: ServiceFn<
-		string,
-		void,
-		ClipboardErrorProperties | WhisperingErrProperties
-	>;
+	setClipboardText: (text: string) => Promise<ClipboardServiceResult<void>>;
 
 	/**
 	 * Pastes text from the user's clipboard.
@@ -33,11 +34,9 @@ export type ClipboardService = {
 	 * - Desktop: This function should trigger a paste action, as if the user had pressed `Ctrl` + `V`.
 	 * - Mobile: This function should trigger a paste action, as if the user had pressed `Paste` in the context menu.
 	 */
-	writeTextToCursor: ServiceFn<
-		string,
-		void,
-		ClipboardErrorProperties | WhisperingErrProperties
-	>;
+	writeTextToCursor: (
+		text: string,
+	) => MaybePromise<ClipboardServiceResult<void>>;
 };
 
 export const ClipboardService = window.__TAURI_INTERNALS__

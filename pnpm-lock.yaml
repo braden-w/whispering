@@ -21,7 +21,7 @@ importers:
   apps/app:
     dependencies:
       '@epicenterhq/result':
-        specifier: ^0.3.2
+        specifier: ^0.3.1
         version: 0.3.2
       '@plasmohq/messaging':
         specifier: ^0.6.2

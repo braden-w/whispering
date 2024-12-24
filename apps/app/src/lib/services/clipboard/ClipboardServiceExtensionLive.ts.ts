@@ -1,35 +1,30 @@
-import { tryAsyncWhispering, trySyncWhispering } from '@repo/shared';
+import { tryAsync, trySync } from '@epicenterhq/result';
+import { WhisperingErr } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceExtensionLive = (): ClipboardService => ({
 	setClipboardText: (text) =>
-		tryAsyncWhispering({
+		tryAsync({
 			try: () => navigator.clipboard.writeText(text),
-			mapErr: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Unable to write to clipboard',
-				description:
-					'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
-				action: {
-					type: 'more-details',
-					error,
-				},
-			}),
+			mapErr: (error) =>
+				WhisperingErr({
+					title: 'Unable to write to clipboard',
+					description:
+						'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
+					action: { type: 'more-details', error },
+				}),
 		}),
 
 	writeTextToCursor: (text) =>
-		trySyncWhispering({
+		trySync({
 			try: () => writeTextToCursor(text),
-			mapErr: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Unable to write text to cursor',
-				description:
-					'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
-				action: {
-					type: 'more-details',
-					error,
-				},
-			}),
+			mapErr: (error) =>
+				WhisperingErr({
+					title: 'Unable to write text to cursor',
+					description:
+						'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
+					action: { type: 'more-details', error },
+				}),
 		}),
 });
 

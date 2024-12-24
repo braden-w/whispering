@@ -1,30 +1,30 @@
-import {
-	createServiceErrorFns,
-	type Result,
-	tryAsync,
-} from '@repo/shared/epicenter-result';
+import type { Result } from '@epicenterhq/result';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
+import { Err } from '@repo/shared/epicenter-result';
 
 type HttpServiceErrCodes =
 	| { code: 'NetworkError'; error: unknown }
 	| { code: 'HttpError'; error: unknown; status: number }
 	| { code: 'ParseError'; error: unknown };
 
-export type HttpServiceErrProperties = {
+type HttpServiceErrProperties = {
 	_tag: 'HttpServiceErr';
 	error: unknown;
 } & HttpServiceErrCodes;
 
-export function HttpServiceErr(
-	args: Omit<HttpServiceErrProperties, '_tag'> & HttpServiceErrCodes,
-): HttpServiceErrProperties {
-	return {
+type HttpServiceResult<T> = Result<T, HttpServiceErrProperties>;
+
+export const HttpServiceErr = (
+	args: {
+		error: unknown;
+	} & HttpServiceErrCodes,
+): HttpServiceResult<never> =>
+	Err({
 		_tag: 'HttpServiceErr',
 		...args,
-	};
-}
+	});
 
 export type HttpService = {
 	post: <TSchema extends z.ZodTypeAny>(config: {
@@ -32,7 +32,7 @@ export type HttpService = {
 		formData: FormData;
 		schema: TSchema;
 		headers?: Record<string, string>;
-	}) => Promise<Result<z.infer<TSchema>, HttpServiceErrProperties>>;
+	}) => Promise<HttpServiceResult<z.infer<TSchema>>>;
 };
 
 export const HttpService = window.__TAURI_INTERNALS__

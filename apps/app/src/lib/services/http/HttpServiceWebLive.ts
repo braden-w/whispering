@@ -1,45 +1,34 @@
 import type { HttpService } from '$lib/services/http/HttpService';
-import {
-	HttpServiceErr,
-	tryHttpServiceAsync,
-} from '$lib/services/http/HttpService';
+import { HttpServiceErr } from '$lib/services/http/HttpService';
+import { tryAsync } from '@epicenterhq/result';
 
 export const createHttpServiceWebLive = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
-		const responseResult = await tryHttpServiceAsync({
+		const responseResult = await tryAsync({
 			try: () =>
 				window.fetch(url, {
 					method: 'POST',
 					body: formData,
 					headers,
 				}),
-			mapErr: (error) => ({
-				_tag: 'HttpServiceErr',
-				code: 'NetworkError',
-				error,
-			}),
+			mapErr: (error) => HttpServiceErr({ code: 'NetworkError', error }),
 		});
 		if (!responseResult.ok) return responseResult;
 
 		const response = responseResult.data;
 		if (!response.ok) {
 			return HttpServiceErr({
-				_tag: 'HttpServiceErr',
 				code: 'HttpError',
 				status: response.status,
 				error: response,
 			});
 		}
-		const parseResult = await tryHttpServiceAsync({
+		const parseResult = await tryAsync({
 			try: async () => {
 				const json = await response.json();
 				return schema.parse(json);
 			},
-			mapErr: (error) => ({
-				_tag: 'HttpServiceErr',
-				code: 'ParseError',
-				error,
-			}),
+			mapErr: (error) => HttpServiceErr({ code: 'ParseError', error }),
 		});
 		return parseResult;
 	},

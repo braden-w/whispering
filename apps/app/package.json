@@ -46,7 +46,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@repo/shared/epicenter-result": "^0.3.2",
+		"@epicenterhq/result": "^0.4.2",
 		"@plasmohq/messaging": "^0.6.2",
 		"@repo/shared": "workspace:*",
 		"@tanstack/svelte-table": "^9.0.0-alpha.10",
