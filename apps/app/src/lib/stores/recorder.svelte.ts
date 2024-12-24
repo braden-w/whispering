@@ -4,9 +4,9 @@ import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { createMutation, recordings } from '$lib/stores/recordings.svelte';
+import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok } from '@epicenterhq/result';
+import { Ok, createMutation } from '@epicenterhq/result';
 import {
 	type ToastOptions,
 	WhisperingErr,
