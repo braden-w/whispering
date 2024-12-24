@@ -66,10 +66,7 @@ function createRecordings() {
 	});
 
 	const { mutate: transcribeRecording } = createMutation({
-		mutationFn: async (
-			recording,
-			{ context: { updateStatus, succeedStatus } },
-		) => {
+		mutationFn: async (recording, { context: { succeedStatus } }) => {
 			const selectedTranscriptionService = {
 				OpenAI: TranscriptionServiceWhisperLive,
 				Groq: TranscriptionServiceGroqLive,
@@ -79,7 +76,12 @@ function createRecordings() {
 			const transcribeResult = await selectedTranscriptionService.transcribe(
 				recording.blob,
 			);
-			if (!transcribeResult.ok) return transcribeResult;
+			if (!transcribeResult.ok) {
+				return WhisperingErr({
+					...transcribeResult.error,
+					_tag: 'WhisperingError',
+				});
+			}
 
 			const transcribedText = transcribeResult.data;
 			const newRecordingWithDoneStatus = {
