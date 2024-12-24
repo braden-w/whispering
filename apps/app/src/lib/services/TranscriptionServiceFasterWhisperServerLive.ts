@@ -17,7 +17,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return TranscriptionServiceErr({
-					_tag: 'WhisperingError',
+					_tag: 'TranscriptionServiceErr',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 				});
