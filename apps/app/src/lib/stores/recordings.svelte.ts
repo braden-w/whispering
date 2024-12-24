@@ -305,35 +305,6 @@ function createRecordings() {
 		},
 	});
 
-	const { mutate: downloadRecording } = createMutation({
-		mutationFn: async (id: string) => {
-			const getRecordingResult = await RecordingsDbService.getRecording(id);
-			if (!getRecordingResult.ok) return getRecordingResult;
-			const maybeRecording = getRecordingResult.data;
-			if (maybeRecording === null)
-				return WhisperingErr({
-					_tag: 'WhisperingError',
-					title: 'Recording not found',
-					description:
-						'The recording you are trying to download does not exist.',
-				});
-			const recording = maybeRecording;
-			const downloadResult = await DownloadService.downloadBlob({
-				blob: recording.blob,
-				name: `whispering_recording_${recording.id}`,
-			});
-			if (!downloadResult.ok) return downloadResult;
-			return Ok(id);
-		},
-		onSuccess: (_) => {
-			toast.success({
-				title: 'Recording downloading!',
-				description: 'Your recording is being downloaded.',
-			});
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
-
 	const { mutate: copyRecordingText } = createMutation({
 		mutationFn: async (recording: Recording) => {
 			if (recording.transcribedText === '') return Ok(recording);
@@ -364,7 +335,6 @@ function createRecordings() {
 		deleteRecordingById,
 		deleteRecordingsById,
 		transcribeRecording,
-		downloadRecording,
 		copyRecordingText,
 	};
 }

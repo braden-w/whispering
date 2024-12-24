@@ -1,18 +1,28 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import {
-	type WhisperingResult,
-	tryAsyncWhispering,
-	trySyncWhispering,
-} from '@repo/shared';
+import { createServiceErrorFns, type ServiceFn } from '@epicenterhq/result';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 
-type DownloadService = {
-	readonly downloadBlob: (config: {
-		name: string;
-		blob: Blob;
-	}) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
+type DownloadServiceErrorProperties = {
+	_tag: 'DownloadServiceError';
+	title: string;
+	description: string;
+	error: unknown;
 };
+
+type DownloadService = {
+	downloadBlob: ServiceFn<
+		{
+			name: string;
+			blob: Blob;
+		},
+		void,
+		DownloadServiceErrorProperties
+	>;
+};
+
+const { tryAsync: tryAsyncDownloadService } =
+	createServiceErrorFns<DownloadServiceErrorProperties>();
 
 export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktopLive()
@@ -22,7 +32,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 	return {
 		async downloadBlob({ name, blob }) {
 			const extension = getExtensionFromAudioBlob(blob);
-			return await tryAsyncWhispering({
+			return await tryAsyncDownloadService({
 				try: async () => {
 					const path = await save({
 						filters: [{ name, extensions: [extension] }],
@@ -32,11 +42,11 @@ function createDownloadServiceDesktopLive(): DownloadService {
 					return writeFile(path, contents);
 				},
 				catch: (error) => ({
-					_tag: 'WhisperingError',
+					_tag: 'DownloadServiceError',
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
-					action: { type: 'more-details', error },
+					error,
 				}),
 			});
 		},
@@ -46,8 +56,8 @@ function createDownloadServiceDesktopLive(): DownloadService {
 function createDownloadServiceWebLive(): DownloadService {
 	return {
 		downloadBlob: ({ name, blob }) =>
-			trySyncWhispering({
-				try: () => {
+			tryAsyncDownloadService({
+				try: async () => {
 					const file = new File([blob], name, { type: blob.type });
 					const url = URL.createObjectURL(file);
 					const a = document.createElement('a');
@@ -59,14 +69,11 @@ function createDownloadServiceWebLive(): DownloadService {
 					URL.revokeObjectURL(url);
 				},
 				catch: (error) => ({
-					_tag: 'WhisperingError',
+					_tag: 'DownloadServiceError',
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording in your browser. Please try again.',
-					action: {
-						type: 'more-details',
-						error,
-					},
+					error,
 				}),
 			}),
 	};

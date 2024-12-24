@@ -2,11 +2,14 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { DownloadService } from '$lib/services/DownloadService';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { createMutation, Ok } from '@epicenterhq/result';
+	import { WhisperingErr } from '@repo/shared';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
@@ -16,6 +19,29 @@
 	import EditRowDialog from './EditRowDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
+
+	const { mutate: downloadRecording } = createMutation({
+		mutationFn: async (recording: Recording) => {
+			const downloadResult = await DownloadService.downloadBlob({
+				blob: recording.blob,
+				name: `whispering_recording_${recording.id}`,
+			});
+			if (!downloadResult.ok)
+				return WhisperingErr({
+					...downloadResult.error,
+					_tag: 'WhisperingError',
+					action: { type: 'more-details', error: downloadResult.error },
+				});
+			return Ok(recording);
+		},
+		onSuccess: (_) => {
+			toast.success({
+				title: 'Recording downloading!',
+				description: 'Your recording is being downloaded.',
+			});
+		},
+		onError: (error) => renderErrAsToast(error),
+	});
 </script>
 
 <div class="flex items-center">
@@ -53,7 +79,7 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() => recordings.downloadRecording(recording.id)}
+		onclick={() => downloadRecording(recording)}
 		variant="ghost"
 		size="icon"
 	>
