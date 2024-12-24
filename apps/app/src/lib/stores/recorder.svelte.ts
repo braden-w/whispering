@@ -20,12 +20,7 @@ import {
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-
-/** Sets status message to be displayed in the UI that is calling this service */
-type UpdateStatusMessageFn = (message: {
-	title?: string;
-	description: string;
-}) => void;
+import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -49,8 +44,8 @@ const createActionStatuses = ({
 		description: initialDescription,
 	});
 
-	const updateStatus: UpdateStatusMessageFn = ({ title, description }) =>
-		toast.loading({ id: toastId, title: title ?? initialTitle, description });
+	const updateStatus: UpdateStatusMessageFn = (message) =>
+		toast.loading({ id: toastId, title: initialTitle, description: message });
 	const succeedStatus = ({
 		title,
 		description,
@@ -65,7 +60,7 @@ const createActionStatuses = ({
 		title: string;
 		description: string;
 	}) => toast.error({ id: toastId, title, description });
-	updateStatus({ description: '' });
+	updateStatus('');
 	return { updateStatus, succeedStatus, errorStatus };
 };
 
@@ -85,7 +80,7 @@ function createRecorder() {
 	const { mutate: closeRecordingSession } = createMutation({
 		mutationFn: (_, { context: { updateStatus } }) =>
 			MediaRecorderService.closeRecordingSession(undefined, {
-				setStatusMessage: updateStatus,
+				sendStatus: updateStatus,
 			}),
 		onMutate: () => {
 			if (!isInRecordingSession) {
@@ -111,34 +106,62 @@ function createRecorder() {
 		onError: (error) => renderErrAsToast(error),
 	});
 
-	const { mutate: toggleRecording } = createMutation({
-		mutationFn: async (
-			_,
-			{ context: { updateStatus, shouldStartRecording } },
-		) => {
-			if (shouldStartRecording) {
-				if (!isInRecordingSession) {
-					updateStatus({ description: 'Initializing recording session...' });
-					const initResult = await MediaRecorderService.initRecordingSession(
-						{
-							deviceId: settings.value.selectedAudioInputDeviceId,
-							bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-						},
-						{ setStatusMessage: updateStatus },
-					);
-					if (!initResult.ok) return initResult;
-				}
-				updateStatus({ description: 'Starting recording...' });
-				return MediaRecorderService.startRecording(nanoid(), {
-					setStatusMessage: updateStatus,
-				});
+	const { mutate: startRecording } = createMutation({
+		mutationFn: async (_, { context: { updateStatus } }) => {
+			if (!isInRecordingSession) {
+				updateStatus('Initializing recording session...');
+				const initResult = await MediaRecorderService.initRecordingSession(
+					{
+						deviceId: settings.value.selectedAudioInputDeviceId,
+						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+					},
+					{ sendStatus: updateStatus },
+				);
+				if (!initResult.ok) return initResult;
 			}
-			updateStatus({ description: 'Stopping recording...' });
+			updateStatus('Starting recording...');
+			return MediaRecorderService.startRecording(nanoid(), {
+				sendStatus: updateStatus,
+			});
+		},
+		onMutate: () => {
+			const actionStatuses = createActionStatuses({
+				title: 'Starting recording...',
+				description: '',
+			});
+			return Ok(actionStatuses);
+		},
+		onSuccess: (_, { context: { succeedStatus } }) => {
+			setRecorderState('SESSION+RECORDING');
+			succeedStatus({
+				title: 'Recording started!',
+				description: '',
+			});
+			console.info('Recording started');
+			void playSound('start');
+			void NotificationService.notify({
+				variant: 'info',
+				id: IS_RECORDING_NOTIFICATION_ID,
+				title: 'Whispering is recording...',
+				description: 'Click to go to recorder',
+				action: {
+					type: 'link',
+					label: 'Go to recorder',
+					goto: '/',
+				},
+			});
+		},
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	const { mutate: stopRecording } = createMutation({
+		mutationFn: async (_, { context: { updateStatus } }) => {
+			updateStatus('Stopping recording...');
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
-				setStatusMessage: updateStatus,
+				sendStatus: updateStatus,
 			});
 			if (!stopResult.ok) return stopResult;
-			updateStatus({ description: 'Adding recording to database...' });
+			updateStatus('Adding recording to database...');
 			const blob = stopResult.data;
 			const newRecording: Recording = {
 				id: nanoid(),
@@ -154,56 +177,32 @@ function createRecorder() {
 			if (!addRecordingResult.ok) return addRecordingResult;
 			void recordings.transcribeRecording(newRecording);
 			if (!settings.value.isFasterRerecordEnabled) {
-				updateStatus({ description: 'Closing recording session...' });
+				updateStatus('Closing recording session...');
 				return MediaRecorderService.closeRecordingSession(undefined, {
-					setStatusMessage: updateStatus,
+					sendStatus: updateStatus,
 				});
 			}
 			return Ok(undefined);
 		},
 		onMutate: () => {
-			const shouldStartRecording = recorderState !== 'SESSION+RECORDING';
 			const actionStatuses = createActionStatuses({
-				title: shouldStartRecording
-					? 'Starting recording...'
-					: 'Stopping recording...',
+				title: 'Stopping recording...',
 				description: '',
 			});
-			return Ok({ ...actionStatuses, shouldStartRecording });
+			return Ok(actionStatuses);
 		},
-		onSuccess: (_, { context: { succeedStatus, shouldStartRecording } }) => {
-			if (shouldStartRecording) {
-				setRecorderState('SESSION+RECORDING');
-				succeedStatus({
-					title: 'Recording started!',
-					description: '',
-				});
-				console.info('Recording started');
-				void playSound('start');
-				void NotificationService.notify({
-					variant: 'info',
-					id: IS_RECORDING_NOTIFICATION_ID,
-					title: 'Whispering is recording...',
-					description: 'Click to go to recorder',
-					action: {
-						type: 'link',
-						label: 'Go to recorder',
-						goto: '/',
-					},
-				});
-			} else {
-				setRecorderState(
-					settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
-				);
-				succeedStatus({
-					title: 'Recording stopped',
-					description: settings.value.isFasterRerecordEnabled
-						? 'Recording has been stopped and saved'
-						: 'Recording has been stopped, saved and session closed',
-				});
-				console.info('Recording stopped');
-				void playSound('stop');
-			}
+		onSuccess: (_, { context: { succeedStatus } }) => {
+			setRecorderState(
+				settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
+			);
+			succeedStatus({
+				title: 'Recording stopped',
+				description: settings.value.isFasterRerecordEnabled
+					? 'Recording has been stopped and saved'
+					: 'Recording has been stopped, saved and session closed',
+			});
+			console.info('Recording stopped');
+			void playSound('stop');
 		},
 		onError: (error) => renderErrAsToast(error),
 	});
@@ -211,7 +210,7 @@ function createRecorder() {
 	const { mutate: cancelRecording } = createMutation({
 		mutationFn: (_, { context: { updateStatus } }) =>
 			MediaRecorderService.cancelRecording(undefined, {
-				setStatusMessage: updateStatus,
+				sendStatus: updateStatus,
 			}),
 		onMutate: () => {
 			if (!isInRecordingSession) {
@@ -238,12 +237,10 @@ function createRecorder() {
 			});
 			if (settings.value.isFasterRerecordEnabled) return;
 
-			updateStatus({
-				description: 'Recording cancelled, closing recording session...',
-			});
+			updateStatus('Recording cancelled, closing recording session...');
 			const closeResult = await MediaRecorderService.closeRecordingSession(
 				undefined,
-				{ setStatusMessage: updateStatus },
+				{ sendStatus: updateStatus },
 			);
 			if (!closeResult.ok) {
 				renderErrAsToast(closeResult.error);
@@ -267,7 +264,13 @@ function createRecorder() {
 			return isInRecordingSession;
 		},
 		closeRecordingSession,
-		toggleRecording: () => toggleRecording(undefined),
+		toggleRecording() {
+			if (isInRecordingSession) {
+				stopRecording(undefined);
+			} else {
+				startRecording(undefined);
+			}
+		},
 		cancelRecording: () => cancelRecording(undefined),
 	};
 }

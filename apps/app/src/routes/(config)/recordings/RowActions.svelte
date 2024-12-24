@@ -22,7 +22,7 @@
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
 		onclick={() => {
-			recordings.transcribeRecording(recording.id);
+			recordings.transcribeRecording(recording);
 		}}
 		variant="ghost"
 		size="icon"

@@ -8,9 +8,10 @@
 	import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 
 	const getMediaDevices = async () => {
-		const enumerateRecordingDevicesResult = await MediaRecorderService.enumerateRecordingDevices();
+		const enumerateRecordingDevicesResult =
+			await MediaRecorderService.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
-			renderErrAsToast(enumerateRecordingDevicesResult);
+			renderErrAsToast(enumerateRecordingDevicesResult.error);
 			return [];
 		}
 		return enumerateRecordingDevicesResult.data;
@@ -58,7 +59,6 @@
 						...settings.value,
 						selectedAudioInputDeviceId: selected,
 					};
-					await recorder.openRecordingSession();
 				}}
 				placeholder="Select a device"
 			/>
