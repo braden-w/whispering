@@ -127,7 +127,6 @@ function createRecorder() {
 						action: { type: 'more-details', error: initResult.error },
 					});
 				}
-				return Ok(undefined);
 			}
 			const result = await MediaRecorderService.startRecording(nanoid(), {
 				sendStatus: localToast.loading,
