@@ -14,18 +14,20 @@ import { Ok, createMutation } from '@epicenterhq/result';
 import { type ToastOptions, WhisperingErr } from '@repo/shared';
 import { settings } from './settings.svelte';
 
+const recordingsDbService = createRecordingsDbServiceLiveIndexedDb();
+
 export const recordings = createRecordings({
-	RecordingsDbService: createRecordingsDbServiceLiveIndexedDb(),
+	recordingsDbService,
 });
 
 function createRecordings({
-	RecordingsDbService,
-}: { RecordingsDbService: RecordingsDbService }) {
+	recordingsDbService,
+}: { recordingsDbService: RecordingsDbService }) {
 	let recordingsArray = $state<Recording[]>([]);
 	const transcribingRecordingIds = $state(new Set<string>());
 
 	const syncDbToRecordingsState = async () => {
-		const getAllRecordingsResult = await RecordingsDbService.getAllRecordings();
+		const getAllRecordingsResult = await recordingsDbService.getAllRecordings();
 		if (!getAllRecordingsResult.ok) {
 			return renderErrAsToast(getAllRecordingsResult.error);
 		}
@@ -35,7 +37,7 @@ function createRecordings({
 	syncDbToRecordingsState();
 
 	const updateRecording = createMutation({
-		mutationFn: RecordingsDbService.updateRecording,
+		mutationFn: recordingsDbService.updateRecording,
 		onSuccess: (_, { input: recording }) => {
 			recordingsArray = recordingsArray.map((r) =>
 				r.id === recording.id ? recording : r,
@@ -45,7 +47,7 @@ function createRecordings({
 	});
 
 	const deleteRecordingById = createMutation({
-		mutationFn: RecordingsDbService.deleteRecordingById,
+		mutationFn: recordingsDbService.deleteRecordingById,
 		onSuccess: (_, { input: id }) => {
 			recordingsArray = recordingsArray.filter((r) => r.id !== id);
 			toast.success({
@@ -57,7 +59,7 @@ function createRecordings({
 	});
 
 	const deleteRecordingsById = createMutation({
-		mutationFn: RecordingsDbService.deleteRecordingsById,
+		mutationFn: recordingsDbService.deleteRecordingsById,
 		onSuccess: (_, { input: ids }) => {
 			recordingsArray = recordingsArray.filter(
 				(recording) => !ids.includes(recording.id),
@@ -95,7 +97,7 @@ function createRecordings({
 				transcribedText,
 			} satisfies Recording;
 			const updateRecordingWithDoneStatusResult =
-				await RecordingsDbService.updateRecording(newRecordingWithDoneStatus);
+				await recordingsDbService.updateRecording(newRecordingWithDoneStatus);
 			if (!updateRecordingWithDoneStatusResult.ok) {
 				return updateRecordingWithDoneStatusResult;
 			}
@@ -215,7 +217,7 @@ function createRecordings({
 				transcriptionStatus: 'TRANSCRIBING',
 			} satisfies Recording;
 			const setTranscribingStatusResult =
-				await RecordingsDbService.updateRecording(newRecorder);
+				await recordingsDbService.updateRecording(newRecorder);
 			if (!setTranscribingStatusResult.ok) {
 				updateStatus({
 					title: `Error updating recording ${recording.id} to transcribing`,
@@ -239,7 +241,7 @@ function createRecordings({
 				...recording,
 				transcriptionStatus: 'UNPROCESSED',
 			} satisfies Recording;
-			const updateRecordingResult = await RecordingsDbService.updateRecording(
+			const updateRecordingResult = await recordingsDbService.updateRecording(
 				updatedRecordingWithUnprocessedStatus,
 			);
 			if (!updateRecordingResult.ok) {
