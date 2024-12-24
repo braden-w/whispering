@@ -2,6 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import { DownloadService } from '$lib/services/DownloadService';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
@@ -66,7 +67,7 @@
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
-		onclick={() => recordings.copyRecordingText(recording)}
+		onclick={() => copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({

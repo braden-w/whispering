@@ -80,7 +80,7 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 
 		const result = await writeTextToCursor(text);
 		if (!result.ok) return result;
-		
+
 		return Ok(undefined);
 	},
 });

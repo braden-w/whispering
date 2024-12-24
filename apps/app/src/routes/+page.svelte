@@ -5,6 +5,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
@@ -88,7 +89,7 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={() => recordings.copyRecordingText(latestRecording)}
+				onclick={() => copyRecordingText(latestRecording)}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,

@@ -12,10 +12,7 @@ type DownloadServiceErrorProperties = {
 
 type DownloadService = {
 	downloadBlob: ServiceFn<
-		{
-			name: string;
-			blob: Blob;
-		},
+		{ name: string; blob: Blob },
 		void,
 		DownloadServiceErrorProperties
 	>;

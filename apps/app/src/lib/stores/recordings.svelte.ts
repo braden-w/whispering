@@ -1,6 +1,4 @@
-import { Ok } from '@epicenterhq/result';
 import { ClipboardService } from '$lib/services/ClipboardService';
-import { DownloadService } from '$lib/services/DownloadService';
 import { NotificationService } from '$lib/services/NotificationService';
 import {
 	type Recording,
@@ -11,9 +9,10 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import type { Result } from '@epicenterhq/result';
+import { Ok } from '@epicenterhq/result';
 import { type ToastOptions, WhisperingErr } from '@repo/shared';
 import { settings } from './settings.svelte';
-import type { Result } from '@epicenterhq/result';
 
 export function createMutation<I, O, ServiceError, TContext = undefined>({
 	mutationFn,
@@ -305,25 +304,6 @@ function createRecordings() {
 		},
 	});
 
-	const { mutate: copyRecordingText } = createMutation({
-		mutationFn: async (recording: Recording) => {
-			if (recording.transcribedText === '') return Ok(recording);
-			const copyResult = await ClipboardService.setClipboardText(
-				recording.transcribedText,
-			);
-			if (!copyResult.ok) return copyResult;
-			return Ok(recording);
-		},
-		onSuccess: (_, { input: recording }) => {
-			toast.success({
-				title: 'Copied transcription to clipboard!',
-				description: recording.transcribedText,
-				descriptionClass: 'line-clamp-2',
-			});
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
-
 	return {
 		get isTranscribing() {
 			return transcribingRecordingIds.size > 0;
@@ -335,6 +315,5 @@ function createRecordings() {
 		deleteRecordingById,
 		deleteRecordingsById,
 		transcribeRecording,
-		copyRecordingText,
 	};
 }
