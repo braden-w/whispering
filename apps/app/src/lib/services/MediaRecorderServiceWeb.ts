@@ -212,22 +212,25 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					error: undefined,
 				});
 			}
-			const { stream, settings } = currentSession;
-			if (!stream.active) {
+			if (!currentSession.stream.active) {
 				sendStatus({
 					title: '🔄 Session Expired',
 					description:
 						'Your recording session timed out. Reconnecting to your microphone...',
 				});
-				const acquireStreamResult = await acquireStream(settings, {
-					sendStatus,
-				});
+				const acquireStreamResult = await acquireStream(
+					currentSession.settings,
+					{ sendStatus },
+				);
 				if (!acquireStreamResult.ok) {
 					return acquireStreamResult;
 				}
 				const stream = acquireStreamResult.data;
-				currentSession = { settings, stream, recorder: null };
-				return Ok(undefined);
+				currentSession = {
+					settings: currentSession.settings,
+					stream,
+					recorder: null,
+				};
 			}
 			sendStatus({
 				title: '🎯 Getting Ready',
@@ -235,7 +238,9 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			const newRecorderResult = await tryAsyncMediaRecorderService({
 				try: async () =>
-					new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond }),
+					new MediaRecorder(currentSession.stream, {
+						bitsPerSecond: currentSession.settings.bitsPerSecond,
+					}),
 				catch: (error) => ({
 					_tag: 'MediaRecorderError',
 					title: '🎙️ Setup Failed',
@@ -244,8 +249,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					error,
 				}),
 			});
-			if (!newRecorderResult.ok)
-				return MediaRecorderServiceErr(newRecorderResult.error);
+			if (!newRecorderResult.ok) return newRecorderResult;
 			const newRecorder = newRecorderResult.data;
 			sendStatus({
 				title: '🎤 Recording Active',
