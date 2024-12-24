@@ -1,18 +1,20 @@
-import { Ok } from '@epicenterhq/result';
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { tryAsyncWhispering } from '@repo/shared';
+import { Ok } from '@epicenterhq/result';
 import type { ClipboardService } from './ClipboardService';
+import {
+	ClipboardServiceError,
+	tryAsyncClipboardService,
+} from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
 	async setClipboardText(text) {
-		const setClipboardResult = await tryAsyncWhispering({
+		const setClipboardResult = await tryAsyncClipboardService({
 			try: () => navigator.clipboard.writeText(text),
 			catch: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Unable to write to clipboard',
-				description:
+				_tag: 'ClipboardError',
+				message:
 					'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
-				action: { type: 'more-details', error },
+				error,
 			}),
 		});
 
@@ -27,23 +29,17 @@ export const createClipboardServiceWebLive = (): ClipboardService => ({
 	},
 
 	async writeTextToCursor(text) {
-		const writeTextToCursorResult = await tryAsyncWhispering({
-			try: () => navigator.clipboard.writeText(text),
-			catch: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Unable to write to clipboard',
-				description:
-					'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
-				action: { type: 'more-details', error },
-			}),
+		const sendMessageToExtensionResult = await sendMessageToExtension({
+			name: 'whispering-extension/writeTextToCursor',
+			body: { transcribedText: text },
 		});
-
-		if (!writeTextToCursorResult.ok) {
-			sendMessageToExtension({
-				name: 'whispering-extension/writeTextToCursor',
-				body: { transcribedText: text },
+		if (!sendMessageToExtensionResult.ok) {
+			return ClipboardServiceError({
+				_tag: 'ClipboardError',
+				message:
+					'There was an error writing text to the cursor using the Whispering extension. Please try again.',
+				error: sendMessageToExtensionResult.error,
 			});
-			return writeTextToCursorResult;
 		}
 		return Ok(undefined);
 	},

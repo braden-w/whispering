@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
@@ -16,6 +17,7 @@
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { createMutation } from '@epicenterhq/result';
 	import {
 		FlexRender,
 		createTable,
@@ -39,7 +41,6 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -260,6 +261,32 @@
 		const text = transcriptions.join(delimiter);
 		return text;
 	});
+
+	const { mutate: setClipboardText } = createMutation({
+		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
+		onSuccess: (_, { input: text }) => {
+			toast.success({
+				title: 'Copied transcription to clipboard!',
+				description: text,
+				descriptionClass: 'line-clamp-2',
+			});
+		},
+		onError: (error) => {
+			if (error._tag === 'ClipboardError') {
+				renderErrAsToast({
+					_tag: 'WhisperingError',
+					title: 'Error copying transcription to clipboard',
+					description: 'Please try again.',
+					action: { type: 'more-details', error: error },
+				});
+				return;
+			}
+			renderErrAsToast(error);
+		},
+		onSettled: () => {
+			isDialogOpen = false;
+		},
+	});
 </script>
 
 <svelte:head>
@@ -365,22 +392,7 @@
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
-									onclick={async () => {
-										await ClipboardService.setClipboardText(text, {
-											onMutate: () => {},
-											onSuccess: () => {
-												toast.success({
-													title: 'Copied transcriptions to clipboard!',
-													description: text,
-													descriptionClass: 'line-clamp-2',
-												});
-											},
-											onError: renderErrAsToast,
-											onSettled: () => {
-												isDialogOpen = false;
-											},
-										});
-									}}
+									onclick={() => setClipboardText(text)}
 									type="submit"
 								>
 									Copy Transcriptions

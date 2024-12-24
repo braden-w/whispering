@@ -3,6 +3,7 @@
 	import { ClipboardService } from '$lib/services/ClipboardService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { createMutation } from '@epicenterhq/result';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
 	const { codeText }: { codeText: string } = $props();
@@ -15,6 +16,30 @@
 			}, 2000);
 		}
 	});
+
+	const { mutate: setClipboardText } = createMutation({
+		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
+		onError: (error) => {
+			if (error._tag === 'ClipboardError') {
+				renderErrAsToast({
+					_tag: 'WhisperingError',
+					title: 'Error copying transcription to clipboard',
+					description: 'Please try again.',
+					action: { type: 'more-details', error: error },
+				});
+				return;
+			}
+			renderErrAsToast(error);
+		},
+		onSuccess: (_, { input: text }) => {
+			toast.success({
+				title: 'Copied transcription to clipboard!',
+				description: text,
+				descriptionClass: 'line-clamp-2',
+			});
+			hasCopied = true;
+		},
+	});
 </script>
 
 <pre
@@ -24,19 +49,7 @@
 		size="icon"
 		variant="ghost"
 		class="absolute right-4 top-4 h-4 w-4"
-		onclick={async () => {
-			const clipboardService = ClipboardService;
-			const setClipboardTextResult =
-				await clipboardService.setClipboardText(codeText);
-			if (!setClipboardTextResult.ok)
-				return renderErrAsToast(setClipboardTextResult);
-			toast.success({
-				title: 'Copied transcriptions to clipboard!',
-				description: codeText,
-				descriptionClass: 'line-clamp-2',
-			});
-			hasCopied = true;
-		}}>
+		onclick={() => setClipboardText(codeText)}>
 			<span class="sr-only">Copy</span>
     {#if hasCopied}
 			<CheckIcon />

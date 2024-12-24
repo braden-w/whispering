@@ -3,30 +3,31 @@ import { WhisperingErr, tryAsyncWhispering } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
-import type { ClipboardService } from './ClipboardService';
+import {
+	type ClipboardService,
+	tryAsyncClipboardService,
+} from './ClipboardService';
 
 const writeTextToCursor = (text: string) =>
-	tryAsyncWhispering({
+	tryAsyncClipboardService({
 		try: () => invoke<void>('write_text', { text }),
 		catch: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Unable to paste from clipboard',
-			description:
+			_tag: 'ClipboardError',
+			message:
 				'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
-			action: { type: 'more-details', error },
+			error,
 		}),
 	});
 
 export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 	async setClipboardText(text) {
-		return await tryAsyncWhispering({
+		return await tryAsyncClipboardService({
 			try: () => writeText(text),
 			catch: (error) => ({
-				_tag: 'WhisperingError',
-				title: 'Unable to write to clipboard',
-				description:
+				_tag: 'ClipboardError',
+				message:
 					'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
-				action: { type: 'more-details', error },
+				error,
 			}),
 		});
 	},
@@ -78,9 +79,8 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 		}
 
 		const result = await writeTextToCursor(text);
-		if (!result.ok) {
-			return result;
-		}
+		if (!result.ok) return result;
+		
 		return Ok(undefined);
 	},
 });
