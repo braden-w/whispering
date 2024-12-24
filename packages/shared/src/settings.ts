@@ -29,7 +29,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
-const settingsSchema = z.object({
+export const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
 	isCopyToClipboardEnabled: z.boolean(),
 	isPasteContentsOnSuccessEnabled: z.boolean(),
