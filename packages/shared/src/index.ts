@@ -4,17 +4,19 @@ import {
 	trySync,
 } from '@epicenterhq/result';
 import { z } from 'zod';
+import type { ToastOptions } from './services/ToastAndNotificationService.js';
+import { notificationOptionsSchema } from './services/ToastAndNotificationService.js';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
-import type {
-	NotificationOptions,
-	ToastOptions,
-} from './services/ToastAndNotificationService.js';
-import { notificationOptionsSchema } from './services/ToastAndNotificationService.js';
 export { Err, Ok } from '@epicenterhq/result';
 export { WhisperingErr, tryAsyncWhispering, trySyncWhispering };
+
+export type {
+	NotificationServiceOptions as NotificationOptions,
+	ToastOptions,
+} from './services/ToastAndNotificationService.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'

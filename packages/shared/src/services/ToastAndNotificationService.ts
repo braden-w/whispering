@@ -27,10 +27,14 @@ export const notificationOptionsSchema = toastOptionsSchema.extend({
 	variant: z.enum(['success', 'info', 'loading', 'error', 'warning']),
 });
 
-export type NotificationOptions = z.infer<typeof notificationOptionsSchema>;
+export type NotificationServiceOptions = z.infer<
+	typeof notificationOptionsSchema
+>;
 
 export type NotificationService = {
-	notify: (options: NotificationOptions) => Promise<WhisperingResult<string>>;
+	notify: (
+		options: NotificationServiceOptions,
+	) => Promise<WhisperingResult<string>>;
 	clear: (
 		id: string,
 	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
