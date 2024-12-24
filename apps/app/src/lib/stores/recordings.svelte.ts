@@ -1,9 +1,10 @@
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { NotificationService } from '$lib/services/NotificationService';
-import {
-	type Recording,
+import type {
+	Recording,
 	RecordingsDbService,
 } from '$lib/services/RecordingDbService';
+import { createRecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { toast } from '$lib/services/ToastService';
 import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/TranscriptionServiceFasterWhisperServerLive';
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
@@ -13,9 +14,13 @@ import { Ok, createMutation } from '@epicenterhq/result';
 import { type ToastOptions, WhisperingErr } from '@repo/shared';
 import { settings } from './settings.svelte';
 
-export const recordings = createRecordings();
+export const recordings = createRecordings({
+	RecordingsDbService: createRecordingsDbServiceLiveIndexedDb(),
+});
 
-function createRecordings() {
+function createRecordings({
+	RecordingsDbService,
+}: { RecordingsDbService: RecordingsDbService }) {
 	let recordingsArray = $state<Recording[]>([]);
 	const transcribingRecordingIds = $state(new Set<string>());
 

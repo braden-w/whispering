@@ -1,6 +1,8 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
+import type { RecordingsDbService } from '$lib/services/RecordingDbService';
+import { createRecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
@@ -14,10 +16,7 @@ import {
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import {
-	type Recording,
-	RecordingsDbService,
-} from '../services/RecordingDbService';
+import type { Recording } from '../services/RecordingDbService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
