@@ -1,6 +1,5 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
-import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
@@ -9,6 +8,7 @@ import { createMutation, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import {
+	type ToastOptions,
 	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
@@ -30,38 +30,15 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
 
-const createActionStatuses = ({
-	title: initialTitle,
-	description: initialDescription,
-}: {
-	title: string;
-	description: string;
-}) => {
+const createToastFns = () => {
 	const toastId = nanoid();
-	toast.loading({
-		id: toastId,
-		title: initialTitle,
-		description: initialDescription,
-	});
-
-	const updateStatus: UpdateStatusMessageFn = (message) =>
-		toast.loading({ id: toastId, title: initialTitle, description: message });
-	const succeedStatus = ({
-		title,
-		description,
-	}: {
-		title: string;
-		description: string;
-	}) => toast.success({ id: toastId, title, description });
-	const errorStatus = ({
-		title,
-		description,
-	}: {
-		title: string;
-		description: string;
-	}) => toast.error({ id: toastId, title, description });
-	updateStatus('');
-	return { updateStatus, succeedStatus, errorStatus };
+	return {
+		success: (options: ToastOptions) =>
+			toast.success({ id: toastId, ...options }),
+		error: (options: ToastOptions) => toast.error({ id: toastId, ...options }),
+		loading: (options: ToastOptions) =>
+			toast.loading({ id: toastId, ...options }),
+	};
 };
 
 function createRecorder() {
@@ -78,9 +55,9 @@ function createRecorder() {
 	};
 
 	const { mutate: closeRecordingSession } = createMutation({
-		mutationFn: (_, { context: { updateStatus } }) =>
+		mutationFn: (_, { context: { localToast } }) =>
 			MediaRecorderService.closeRecordingSession(undefined, {
-				sendStatus: updateStatus,
+				sendStatus: localToast.loading,
 			}),
 		onMutate: () => {
 			if (!isInRecordingSession) {
@@ -90,50 +67,65 @@ function createRecorder() {
 					description: "There's no recording session to close at the moment",
 				});
 			}
-			const actionStatuses = createActionStatuses({
+			const localToast = createToastFns();
+			localToast.loading({
 				title: 'Closing recording session...',
 				description: '',
 			});
-			return Ok(actionStatuses);
+			return Ok({ localToast });
 		},
-		onSuccess: (_, { context: { succeedStatus } }) => {
+		onSuccess: (_, { context: { localToast } }) => {
 			setRecorderState('IDLE');
-			succeedStatus({
+			localToast.success({
 				title: 'Recording session closed',
 				description: 'Your recording session has been closed',
 			});
 		},
-		onError: (error) => renderErrAsToast(error),
+		onError: (error, { contextResult }) => {
+			if (!contextResult.ok) {
+				toast.error({
+					title: 'Error closing recording session',
+					description: 'There was an error closing your recording session',
+					action: { type: 'more-details', error },
+				});
+				return;
+			}
+			const { localToast } = contextResult.data;
+			localToast.error({
+				title: 'Error closing recording session',
+				description: 'There was an error closing your recording session',
+				action: { type: 'more-details', error },
+			});
+		},
 	});
 
 	const { mutate: startRecording } = createMutation({
-		mutationFn: async (_, { context: { updateStatus } }) => {
+		mutationFn: async (_, { context: { localToast } }) => {
 			if (!isInRecordingSession) {
-				updateStatus('Initializing recording session...');
 				const initResult = await MediaRecorderService.initRecordingSession(
 					{
 						deviceId: settings.value.selectedAudioInputDeviceId,
 						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
 					},
-					{ sendStatus: updateStatus },
+					{ sendStatus: localToast.loading },
 				);
 				if (!initResult.ok) return initResult;
 			}
-			updateStatus('Starting recording...');
 			return MediaRecorderService.startRecording(nanoid(), {
-				sendStatus: updateStatus,
+				sendStatus: localToast.loading,
 			});
 		},
 		onMutate: () => {
-			const actionStatuses = createActionStatuses({
+			const localToast = createToastFns();
+			localToast.loading({
 				title: 'Starting recording...',
 				description: '',
 			});
-			return Ok(actionStatuses);
+			return Ok({ localToast });
 		},
-		onSuccess: (_, { context: { succeedStatus } }) => {
+		onSuccess: (_, { context: { localToast } }) => {
 			setRecorderState('SESSION+RECORDING');
-			succeedStatus({
+			localToast.success({
 				title: 'Recording started!',
 				description: '',
 			});
@@ -151,17 +143,34 @@ function createRecorder() {
 				},
 			});
 		},
-		onError: (error) => renderErrAsToast(error),
+		onError: (error, { contextResult }) => {
+			if (!contextResult.ok) {
+				toast.error({
+					title: 'Error starting recording',
+					description: 'There was an error starting your recording',
+					action: { type: 'more-details', error },
+				});
+				return;
+			}
+			const { localToast } = contextResult.data;
+			localToast.error({
+				title: 'Error starting recording',
+				description: 'There was an error starting your recording',
+				action: { type: 'more-details', error },
+			});
+		},
 	});
 
 	const { mutate: stopRecording } = createMutation({
-		mutationFn: async (_, { context: { updateStatus } }) => {
-			updateStatus('Stopping recording...');
+		mutationFn: async (_, { context: { localToast } }) => {
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
-				sendStatus: updateStatus,
+				sendStatus: localToast.loading,
 			});
 			if (!stopResult.ok) return stopResult;
-			updateStatus('Adding recording to database...');
+			localToast.loading({
+				title: 'Adding recording to database...',
+				description: '',
+			});
 			const blob = stopResult.data;
 			const newRecording: Recording = {
 				id: nanoid(),
@@ -177,25 +186,29 @@ function createRecorder() {
 			if (!addRecordingResult.ok) return addRecordingResult;
 			void recordings.transcribeRecording(newRecording);
 			if (!settings.value.isFasterRerecordEnabled) {
-				updateStatus('Closing recording session...');
+				localToast.loading({
+					title: 'Closing recording session...',
+					description: '',
+				});
 				return MediaRecorderService.closeRecordingSession(undefined, {
-					sendStatus: updateStatus,
+					sendStatus: localToast.loading,
 				});
 			}
 			return Ok(undefined);
 		},
 		onMutate: () => {
-			const actionStatuses = createActionStatuses({
+			const localToast = createToastFns();
+			localToast.loading({
 				title: 'Stopping recording...',
 				description: '',
 			});
-			return Ok(actionStatuses);
+			return Ok({ localToast });
 		},
-		onSuccess: (_, { context: { succeedStatus } }) => {
+		onSuccess: (_, { context: { localToast } }) => {
 			setRecorderState(
 				settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
 			);
-			succeedStatus({
+			localToast.success({
 				title: 'Recording stopped',
 				description: settings.value.isFasterRerecordEnabled
 					? 'Recording has been stopped and saved'
@@ -208,9 +221,9 @@ function createRecorder() {
 	});
 
 	const { mutate: cancelRecording } = createMutation({
-		mutationFn: (_, { context: { updateStatus } }) =>
+		mutationFn: (_, { context: { localToast } }) =>
 			MediaRecorderService.cancelRecording(undefined, {
-				sendStatus: updateStatus,
+				sendStatus: localToast.loading,
 			}),
 		onMutate: () => {
 			if (!isInRecordingSession) {
@@ -220,34 +233,38 @@ function createRecorder() {
 					description: "There's no recording session to cancel at the moment",
 				});
 			}
-			const actionStatuses = createActionStatuses({
+			const localToast = createToastFns();
+			localToast.loading({
 				title: 'Cancelling recording...',
 				description: '',
 			});
-			return Ok(actionStatuses);
+			return Ok({ localToast });
 		},
-		onSuccess: async (_, { context: { updateStatus, succeedStatus } }) => {
+		onSuccess: async (_, { context: { localToast } }) => {
 			void playSound('cancel');
 			console.info('Recording cancelled');
 			setRecorderState('SESSION');
-			succeedStatus({
+			localToast.success({
 				title: 'Recording cancelled',
 				description:
 					'Your recording has been cancelled, session has been kept open',
 			});
 			if (settings.value.isFasterRerecordEnabled) return;
 
-			updateStatus('Recording cancelled, closing recording session...');
+			localToast.loading({
+				title: 'Closing recording session...',
+				description: '',
+			});
 			const closeResult = await MediaRecorderService.closeRecordingSession(
 				undefined,
-				{ sendStatus: updateStatus },
+				{ sendStatus: localToast.loading },
 			);
 			if (!closeResult.ok) {
 				renderErrAsToast(closeResult.error);
 				return;
 			}
 			setRecorderState('IDLE');
-			succeedStatus({
+			localToast.success({
 				title: 'Recording cancelled',
 				description:
 					'Your recording has been cancelled, session has been closed',

@@ -12,7 +12,10 @@ const TIMESLICE_MS = 1000;
 
 type MediaRecorderErrProperties = WhisperingErrProperties;
 
-export type UpdateStatusMessageFn = (message: string) => void;
+export type UpdateStatusMessageFn = (args: {
+	title: string;
+	description: string;
+}) => void;
 
 type MediaRecorderService = {
 	enumerateRecordingDevices: ServiceFn<
