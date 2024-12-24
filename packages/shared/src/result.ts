@@ -7,6 +7,8 @@ export type WhisperingErrProperties = {
 
 export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export const WhisperingWarning = (
 	args: Pick<WhisperingErrProperties, 'title' | 'description' | 'action'>,
 ): WhisperingResult<never> => {
@@ -19,10 +21,9 @@ export const WhisperingWarning = (
 
 export const WhisperingErr = (
 	args: Pick<WhisperingErrProperties, 'title' | 'description' | 'action'>,
-): WhisperingResult<never> => {
-	return Err({
+): WhisperingResult<never> =>
+	Err({
 		_tag: 'WhisperingError',
 		variant: 'error',
 		...args,
 	} satisfies WhisperingErrProperties);
-};

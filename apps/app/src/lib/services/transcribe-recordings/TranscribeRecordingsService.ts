@@ -1,38 +1,37 @@
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import type { Recording, RecordingsErrorProperties } from '$lib/services/db/';
+import { settings } from '$lib/stores/settings.svelte';
+import { Ok, type Result } from '@epicenterhq/result';
+import { RecordingsService } from '../recordings-db/RecordingsService.svelte';
+import type { DbServiceErr, Recording } from '../recordings-db/db/DbService';
 import type {
 	TranscriptionService,
-	TranscriptionServiceErrProperties,
-} from '$lib/services/TranscriptionService';
-import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/TranscriptionServiceFasterWhisperServerLive';
-import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
-import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
-import { Ok, type ServiceFn } from '@repo/shared/epicenter-result';
-import { RecordingsService } from '../services/recordings/RecordingsDbService.svelte';
-import { settings } from '../../stores/settings.svelteings.svelte';
+	TranscriptionServiceErr,
+} from './transcription/TranscriptionService';
+import { TranscriptionServiceFasterWhisperServerLive } from './transcription/TranscriptionServiceFasterWhisperServerLive';
+import { TranscriptionServiceGroqLive } from './transcription/TranscriptionServiceGroqLive';
+import { TranscriptionServiceWhisperLive } from './transcription/TranscriptionServiceWhisperLive';
 
 export const TranscribeAndUpdateService = createTranscribeAndUpdateService({
 	TranscriptionService: TranscriptionServiceWhisperLive,
 	RecordingsService: RecordingsService,
 });
 
-type TranscribeAndUpdateService = {
+type TranscribeRecordingsServiceResult =
+	| Result<TranscribeRecordingsService, never>
+	| DbServiceErr
+	| TranscriptionServiceErr;
+
+type TranscribeRecordingsService = {
 	readonly currentTranscribingRecordingIds: Set<string>;
-	transcribeAndUpdateRecording: ServiceFn<
-		Recording,
-		string,
-		TranscriptionServiceErrProperties | RecordingsErrorProperties
-	>;
-	transcribeAndUpdateRecordingAndCopyToClipboard: ServiceFn<
-		Recording,
-		string,
-		TranscriptionServiceErrProperties | RecordingsErrorProperties
-	>;
-	transcribeAndUpdateRecordingAndCopyToClipboardAndPasteToCursor: ServiceFn<
-		Recording,
-		string,
-		TranscriptionServiceErrProperties | RecordingsErrorProperties
-	>;
+	readonly transcribeAndUpdateRecording: (
+		recording: Recording,
+	) => Promise<TranscribeRecordingsServiceResult>;
+	readonly transcribeAndUpdateRecordingAndCopyToClipboard: (
+		recording: Recording,
+	) => Promise<TranscribeRecordingsServiceResult>;
+	readonly transcribeAndUpdateRecordingAndCopyToClipboardAndPasteToCursor: (
+		recording: Recording,
+	) => Promise<TranscribeRecordingsServiceResult>;
 };
 
 function createTranscribeAndUpdateService({

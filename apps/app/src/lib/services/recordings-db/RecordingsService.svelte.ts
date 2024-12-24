@@ -1,34 +1,32 @@
-import type {
-	Recording,
-	Recordings,
-	RecordingsErrorProperties,
-} from './db/DbService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { Ok, type ServiceFn } from '@repo/shared/epicenter-result';
-import { createRecordingsLiveIndexedDb } from './db/DbServiceIndexedDbLive.svelte';
+import { Ok } from '@epicenterhq/result';
+import type { DbService, DbServiceResult, Recording } from './db/DbService';
+import { createIndexedDbService } from './db/DbServiceIndexedDbLive.svelte';
+
+type RecordingServiceResult<T> = DbServiceResult<T>;
 
 export type RecordingsService = {
 	get recordings(): Recording[];
-	updateRecording: ServiceFn<Recording, void, RecordingsErrorProperties>;
-	deleteRecordingById: ServiceFn<string, string, RecordingsErrorProperties>;
-	deleteRecordingsById: ServiceFn<
-		string[],
-		string[],
-		RecordingsErrorProperties
-	>;
+	updateRecording: (
+		recording: Recording,
+	) => Promise<RecordingServiceResult<void>>;
+	deleteRecordingById: (id: string) => Promise<RecordingServiceResult<string>>;
+	deleteRecordingsById: (
+		ids: string[],
+	) => Promise<RecordingServiceResult<string[]>>;
 };
 
 export const RecordingsService = createRecordingsService({
-	Recordings: createRecordingsLiveIndexedDb(),
+	DbService: createIndexedDbService(),
 });
 
 function createRecordingsService({
-	Recordings,
-}: { Recordings: Recordings }): RecordingsService {
+	DbService,
+}: { DbService: DbService }): RecordingsService {
 	let recordingsArray = $state<Recording[]>([]);
 
 	const syncDbToRecordingsState = async () => {
-		const getAllRecordingsResult = await Recordings.getAllRecordings();
+		const getAllRecordingsResult = await DbService.getAllRecordings();
 		if (!getAllRecordingsResult.ok) {
 			return renderErrAsToast({
 				variant: 'error',
@@ -48,18 +46,15 @@ function createRecordingsService({
 			return recordingsArray;
 		},
 		async updateRecording(recording) {
-			const updateRecordingResult = await Recordings.updateRecording(recording);
-			if (!updateRecordingResult.ok) {
-				return updateRecordingResult;
-			}
+			const updateRecordingResult = await DbService.updateRecording(recording);
+			if (!updateRecordingResult.ok) return updateRecordingResult;
 			recordingsArray = recordingsArray.map((r) =>
 				r.id === recording.id ? recording : r,
 			);
 			return Ok(undefined);
 		},
 		async deleteRecordingById(id: string) {
-			const deleteRecordingByIdResult =
-				await Recordings.deleteRecordingById(id);
+			const deleteRecordingByIdResult = await DbService.deleteRecordingById(id);
 			if (!deleteRecordingByIdResult.ok) {
 				return deleteRecordingByIdResult;
 			}
@@ -68,7 +63,7 @@ function createRecordingsService({
 		},
 		async deleteRecordingsById(ids: string[]) {
 			const deleteRecordingsByIdResult =
-				await Recordings.deleteRecordingsById(ids);
+				await DbService.deleteRecordingsById(ids);
 			if (!deleteRecordingsByIdResult.ok) {
 				return deleteRecordingsByIdResult;
 			}

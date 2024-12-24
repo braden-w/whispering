@@ -27,21 +27,30 @@ type DbErrorProperties = {
 };
 
 export type DbServiceResult<T> = Result<T, DbErrorProperties>;
+export type DbServiceErr = DbServiceResult<never>;
 
 export const DbError = (
 	properties: Omit<DbErrorProperties, '_tag'>,
-): DbServiceResult<never> => {
+): DbServiceErr => {
 	return Err({
 		_tag: 'DbError',
 		...properties,
 	});
 };
 
-export type Recordings = {
-	readonly getAllRecordings: () => DbServiceResult<Recording[]>;
-	readonly getRecording: (id: string) => DbServiceResult<Recording | null>;
-	readonly addRecording: (recording: Recording) => DbServiceResult<void>;
-	readonly updateRecording: (recording: Recording) => DbServiceResult<void>;
-	readonly deleteRecordingById: (id: string) => DbServiceResult<void>;
-	readonly deleteRecordingsById: (ids: string[]) => DbServiceResult<void>;
+export type DbService = {
+	readonly getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
+	readonly getRecording: (
+		id: string,
+	) => Promise<DbServiceResult<Recording | null>>;
+	readonly addRecording: (
+		recording: Recording,
+	) => Promise<DbServiceResult<void>>;
+	readonly updateRecording: (
+		recording: Recording,
+	) => Promise<DbServiceResult<void>>;
+	readonly deleteRecordingById: (id: string) => Promise<DbServiceResult<void>>;
+	readonly deleteRecordingsById: (
+		ids: string[],
+	) => Promise<DbServiceResult<void>>;
 };

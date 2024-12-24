@@ -1,7 +1,7 @@
 import { Err, type Result } from '@epicenterhq/result';
 import type { MaybePromise, WhisperingErrProperties } from '@repo/shared';
-import { createClipboardServiceWebLive } from '../ClipboardServiceWebLive';
 import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
+import { createClipboardServiceWebLive } from './ClipboardServiceWebLive';
 
 type ClipboardErrorProperties = {
 	_tag: 'ClipboardError';
@@ -9,15 +9,16 @@ type ClipboardErrorProperties = {
 	error: unknown;
 };
 
-type ClipboardServiceResult<T> = Result<
+export type ClipboardServiceResult<T> = Result<
 	T,
 	ClipboardErrorProperties | WhisperingErrProperties
 >;
+export type ClipboardServiceErr = ClipboardServiceResult<never>;
 
-export const ClipboardErr = (args: {
+export const ClipboardServiceErr = (args: {
 	message: string;
 	error: unknown;
-}): ClipboardServiceResult<never> => {
+}): ClipboardServiceErr => {
 	return Err({ _tag: 'ClipboardError', ...args });
 };
 

@@ -1,5 +1,5 @@
 import {
-	ClipboardErr,
+	ClipboardServiceErr,
 	type ClipboardService,
 } from '$lib/services/clipboard/ClipboardService';
 import { Ok, tryAsync } from '@epicenterhq/result';
@@ -12,7 +12,7 @@ const writeTextToCursor = (text: string) =>
 	tryAsync({
 		try: () => invoke<void>('write_text', { text }),
 		mapErr: (error) =>
-			ClipboardErr({
+			ClipboardServiceErr({
 				message:
 					'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
 				error,
@@ -24,7 +24,7 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 		tryAsync({
 			try: () => writeText(text),
 			mapErr: (error) =>
-				ClipboardErr({
+				ClipboardServiceErr({
 					message:
 						'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
 					error,

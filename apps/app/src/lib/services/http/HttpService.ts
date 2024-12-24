@@ -14,13 +14,14 @@ type HttpServiceErrProperties = {
 	error: unknown;
 } & HttpServiceErrCodes;
 
-type HttpServiceResult<T> = Result<T, HttpServiceErrProperties>;
+export type HttpServiceResult<T> = Result<T, HttpServiceErrProperties>;
+export type HttpServiceErr = HttpServiceResult<never>;
 
 export const HttpServiceErr = (
 	args: {
 		error: unknown;
 	} & HttpServiceErrCodes,
-): HttpServiceResult<never> =>
+): HttpServiceErr =>
 	Err({
 		_tag: 'HttpServiceErr',
 		...args,

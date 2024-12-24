@@ -1,5 +1,5 @@
 import { type DBSchema, openDB } from 'idb';
-import { DbError, type Recording, type Recordings } from './DbService';
+import { DbError, type Recording, type DbService } from './DbService';
 import { tryAsync } from '@epicenterhq/result';
 
 const DB_NAME = 'RecordingDB' as const;
@@ -29,7 +29,7 @@ interface RecordingsDbSchemaV1 extends DBSchema {
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
-export const createRecordingsLiveIndexedDb = (): Recordings => {
+export const createIndexedDbService = (): DbService => {
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 		async upgrade(db, oldVersion, newVersion, transaction) {
 			if (oldVersion === 0) {

@@ -1,21 +1,20 @@
+import { HttpService } from '$lib/services/http/HttpService';
 import {
-	HttpServiceErrorIntoTranscriptionServiceError,
+	HttpServiceErrIntoTranscriptionServiceErr,
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from '$lib/services/transcribe-recordings/transcription/TranscriptionService';
+import { WhisperResponseSchema } from '$lib/services/transcribe-recordings/WhisperResponseSchema';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok } from '@repo/shared/epicenter-result';
-import { HttpService } from '$lib/services/http/HttpService';
-import { WhisperResponseSchema } from '$lib/services/transcribe-recordings/WhisperResponseSchema';
+import { Ok } from '@epicenterhq/result';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
 export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
-	async transcribe(audioBlob) {
+	transcribe: async (audioBlob) => {
 		if (!settings.value.groqApiKey) {
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: 'Groq API Key not provided.',
 				description: 'Please enter your Groq API key in the settings',
 				action: {
@@ -28,7 +27,6 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 
 		if (!settings.value.groqApiKey.startsWith('gsk_')) {
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: 'Invalid Groq API Key',
 				description: 'The Groq API Key must start with "gsk_"',
 				action: {
@@ -41,7 +39,6 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		const blobSizeInMb = audioBlob.size / (1024 * 1024);
 		if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: `The file size (${blobSizeInMb}MB) is too large`,
 				description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 			});
@@ -63,13 +60,11 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 			headers: { Authorization: `Bearer ${settings.value.groqApiKey}` },
 		});
 		if (!postResult.ok) {
-			const error = postResult.error;
-			return HttpServiceErrorIntoTranscriptionServiceError(error);
+			return HttpServiceErrIntoTranscriptionServiceErr(postResult);
 		}
 		const data = postResult.data;
 		if ('error' in data) {
 			return TranscriptionServiceErr({
-				_tag: 'TranscriptionServiceErr',
 				title: 'Server error from Groq API',
 				description: 'This is likely a problem with Groq, not you.',
 				action: { type: 'more-details', error: data.error.message },
