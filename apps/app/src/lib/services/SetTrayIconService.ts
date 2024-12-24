@@ -1,13 +1,13 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
-import {
-	type WhisperingRecordingState,
-	type WhisperingResult,
-	tryAsync,
-} from '@repo/shared';
+import { tryAsync, type Result } from '@epicenterhq/result';
+import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
+
+export type SetTrayIconServiceResult<T> = Result<
+	T, { _tag: 'TrayIconError'; icon: WhisperingRecordingState } >;
 
 type SetTrayIconService = {
 	setTrayIcon: (
@@ -67,19 +67,19 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 					isWarning: true,
 					title: `Could not set tray icon to ${recorderState} icon...`,
 					description: 'Please check your system tray settings',
-					action: {
-						type: 'more-details',
-						error,
-					},
+					action: { type: 'more-details', error },
 				}),
 			}),
 	};
 }
+
 async function getIconPath(recorderState: WhisperingRecordingState) {
 	const iconPaths = {
 		IDLE: 'recorder-state-icons/studio_microphone.png',
-		RECORDING: 'recorder-state-icons/red_large_square.png',
-		LOADING: 'recorder-state-icons/arrows_counterclockwise.png',
-	} as const;
+		SESSION: 'recorder-state-icons/studio_microphone.png',
+		'SESSION+RECORDING': 'recorder-state-icons/red_large_square.png',
+	} as const satisfies Record<WhisperingRecordingState, string>;
 	return await resolveResource(iconPaths[recorderState]);
 }
+
+		LOADING: 'recorder-state-icons/arrows_counterclockwise.png',

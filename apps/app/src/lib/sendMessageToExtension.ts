@@ -1,33 +1,37 @@
-import { Ok } from '@repo/shared/epicenter-result';
+import {
+	Err,
+	Ok,
+	tryAsync,
+	type InferErr,
+	type Result,
+} from '@epicenterhq/result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
-import type {
-	ExternalMessage,
-	ExternalMessageReturnType,
-	WhisperingResult,
-} from '@repo/shared';
-import { tryAsyncWhispering } from '@repo/shared';
+import type { ExternalMessage, ExternalMessageReturnType } from '@repo/shared';
+
+type SendMessageToExtensionResult<M extends ExternalMessage> = Result<
+	undefined | ExternalMessageReturnType<M['name']>,
+	{ _tag: 'SendMessageToExtensionError'; message: M; error: unknown }
+>;
+
+type SendMessageToExtensionErr<M extends ExternalMessage> = InferErr<
+	SendMessageToExtensionResult<M>
+>;
 
 export async function sendMessageToExtension<M extends ExternalMessage>(
 	message: M,
-): Promise<WhisperingResult<undefined | ExternalMessageReturnType<M['name']>>> {
+): Promise<SendMessageToExtensionResult<M>> {
 	if (window.__TAURI_INTERNALS__) return Ok(undefined);
-	const sendToBackgroundResult = await tryAsyncWhispering({
+	const sendToBackgroundResult = await tryAsync({
 		try: () =>
 			sendToBackgroundViaRelay({
 				name: message.name as never,
 				body: message.body,
-			}) as Promise<WhisperingResult<ExternalMessageReturnType<M['name']>>>,
+			}) as Promise<ExternalMessageReturnType<M['name']>>,
 		mapErr: (error) =>
-			({
-				_tag: 'WhisperingError',
-				title: 'Unable to send message to extension',
-				description: `There was an issue sending the message ${message.name} to the extension via background relay.`,
-				action: { type: 'more-details', error },
-			}) as const,
+			Err({ _tag: 'SendMessageToExtensionError', message, error } as const),
 	});
 
 	if (!sendToBackgroundResult.ok) return sendToBackgroundResult;
 	const response = sendToBackgroundResult.data;
-	if (!response) return response;
-	return response;
+	return Ok(response);
 }
