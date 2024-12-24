@@ -39,8 +39,6 @@
 			>
 		</Dialog.Header>
 		<pre
-			class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
-		{errorMoreDetailsDialog.error}
-		</pre>
+			class="bg-muted relative whitespace-pre-wrap break-words rounded p-4 pr-12 font-mono text-sm">{errorMoreDetailsDialog.error}</pre>
 	</Dialog.Content>
 </Dialog.Root>
