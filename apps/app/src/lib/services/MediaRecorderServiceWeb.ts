@@ -4,13 +4,18 @@ import {
 	type Result,
 	createServiceErrorFns,
 } from '@epicenterhq/result';
-import type { WhisperingErrProperties } from '@repo/shared';
+import type { ToastOptions, WhisperingErrProperties } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type { toast } from './ToastService';
 
 const TIMESLICE_MS = 1000;
 
-type MediaRecorderErrProperties = WhisperingErrProperties;
+type MediaRecorderErrProperties = {
+	_tag: 'MediaRecorderError';
+	title: string;
+	description: string;
+	error: unknown | undefined;
+};
 
 export type UpdateStatusMessageFn = (args: {
 	title: string;
@@ -60,7 +65,8 @@ type RecordingSessionSettings = {
 	bitsPerSecond: number;
 };
 
-const { Err, tryAsync } = createServiceErrorFns<MediaRecorderErrProperties>();
+const { Err: MediaRecorderServiceErr, tryAsync: tryAsyncMediaRecorderService } =
+	createServiceErrorFns<MediaRecorderErrProperties>();
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	let currentSession: RecordingSession | null = null;
@@ -77,12 +83,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			const getFirstStreamResult = await getFirstAvailableStream();
 			if (!getFirstStreamResult.ok) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '🚫 Stream Error',
 					description:
 						"Hmm... We couldn't find any microphones to use. Check your connections and try again!",
-					action: { type: 'more-details', error: getFirstStreamResult.error },
+					error: getFirstStreamResult.error,
 				});
 			}
 			const firstStream = getFirstStreamResult.data;
@@ -104,12 +110,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 			});
 			const getFirstStreamResult = await getFirstAvailableStream();
 			if (!getFirstStreamResult.ok) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '🎤 No Microphone Found',
 					description:
 						"We couldn't connect to any microphones. Make sure they're plugged in and try again!",
-					action: { type: 'more-details', error: getFirstStreamResult.error },
+					error: getFirstStreamResult.error,
 				});
 			}
 			const firstStream = getFirstStreamResult.data;
@@ -121,7 +127,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 
 	return {
 		async enumerateRecordingDevices() {
-			return tryAsync({
+			return tryAsyncMediaRecorderService({
 				try: async () => {
 					const allAudioDevicesStream =
 						await navigator.mediaDevices.getUserMedia({
@@ -137,21 +143,22 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 					return audioInputDevices;
 				},
 				catch: (error) => ({
-					_tag: 'WhisperingError',
+					_tag: 'MediaRecorderError',
 					title: '🎤 Device Access Error',
 					description:
 						'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-					action: { type: 'more-details', error },
+					error,
 				}),
 			});
 		},
 		async initRecordingSession(settings, { sendStatus }) {
 			if (currentSession) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '🚫 No Active Session',
 					description:
 						'Looks like we need to start a new recording session first!',
+					error: undefined,
 				});
 			}
 			const acquireStreamResult = await acquireStream(settings, {
@@ -166,10 +173,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		},
 		async closeRecordingSession(_, { sendStatus }) {
 			if (!currentSession) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '❌ No Active Session',
 					description: "There's no recording session to close at the moment",
+					error: undefined,
 				});
 			}
 			sendStatus({
@@ -196,11 +204,12 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		},
 		async startRecording(recordingId, { sendStatus }) {
 			if (!currentSession) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '🚫 No Active Session',
 					description:
 						'Looks like we need to start a new recording session first!',
+					error: undefined,
 				});
 			}
 			const { stream, settings } = currentSession;
@@ -224,18 +233,19 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				title: '🎯 Getting Ready',
 				description: 'Initializing your microphone and preparing to record...',
 			});
-			const newRecorderResult = await tryAsync({
+			const newRecorderResult = await tryAsyncMediaRecorderService({
 				try: async () =>
 					new MediaRecorder(stream, { bitsPerSecond: settings.bitsPerSecond }),
 				catch: (error) => ({
-					_tag: 'WhisperingError',
+					_tag: 'MediaRecorderError',
 					title: '🎙️ Setup Failed',
 					description:
 						"Oops! Something went wrong with your microphone. Let's try that again!",
-					action: { type: 'more-details', error },
+					error,
 				}),
 			});
-			if (!newRecorderResult.ok) return Err(newRecorderResult.error);
+			if (!newRecorderResult.ok)
+				return MediaRecorderServiceErr(newRecorderResult.error);
 			const newRecorder = newRecorderResult.data;
 			sendStatus({
 				title: '🎤 Recording Active',
@@ -256,10 +266,11 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 		},
 		async stopRecording(_, { sendStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '⚠️ Nothing to Stop',
 					description: 'No active recording found to stop',
+					error: undefined,
 				});
 			}
 			sendStatus({
@@ -267,7 +278,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 				description:
 					'Saving your recording and preparing the final audio file...',
 			});
-			const stopResult = await tryAsync({
+			const stopResult = await tryAsyncMediaRecorderService({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
 						if (!currentSession?.recorder?.mediaRecorder) {
@@ -301,22 +312,23 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 						});
 					}),
 				catch: (error) => ({
-					_tag: 'WhisperingError',
+					_tag: 'MediaRecorderError',
 					title: '⏹️ Recording Stop Failed',
 					description: 'Unable to save your recording. Please try again',
-					action: { type: 'more-details', error },
+					error,
 				}),
 			});
-			if (!stopResult.ok) return Err(stopResult.error);
+			if (!stopResult.ok) return MediaRecorderServiceErr(stopResult.error);
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
 		async cancelRecording(_, { sendStatus }) {
 			if (!currentSession?.recorder?.mediaRecorder) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '⚠️ Nothing to Cancel',
 					description: 'No active recording found to cancel',
+					error: undefined,
 				});
 			}
 			sendStatus({
@@ -350,12 +362,12 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				'enumerate_recording_devices',
 			);
 			if (!invokeResult.ok) {
-				return Err({
-					_tag: 'WhisperingError',
+				return MediaRecorderServiceErr({
+					_tag: 'MediaRecorderError',
 					title: '🎤 Device Access Error',
 					description:
 						'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-					action: { type: 'more-details', error: invokeResult.error },
+					error: invokeResult.error,
 				});
 			}
 			const deviceNames = invokeResult.data;
@@ -376,7 +388,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 					'Initializing your recording session and checking microphone access...',
 			});
 			const result = await invoke('init_recording_session');
-			if (!result.ok) return Err(result.error);
+			if (!result.ok) return MediaRecorderServiceErr(result.error);
 			return Ok(undefined);
 		},
 		closeRecordingSession: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -386,7 +398,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 					'Safely closing your recording session and freeing up resources...',
 			});
 			const result = await invoke('close_recording_session');
-			if (!result.ok) return Err(result.error);
+			if (!result.ok) return MediaRecorderServiceErr(result.error);
 			return Ok(undefined);
 		},
 		startRecording: async (recordingId, { sendStatus: sendUpdateStatus }) => {
@@ -395,7 +407,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 				description: 'Preparing your microphone and initializing recording...',
 			});
 			const result = await invoke('start_recording');
-			if (!result.ok) return Err(result.error);
+			if (!result.ok) return MediaRecorderServiceErr(result.error);
 			return Ok(undefined);
 		},
 		stopRecording: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -405,7 +417,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 					'Saving your recording and preparing the final audio file...',
 			});
 			const result = await invoke<Blob>('stop_recording');
-			if (!result.ok) return Err(result.error);
+			if (!result.ok) return MediaRecorderServiceErr(result.error);
 			return Ok(result.data);
 		},
 		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -415,7 +427,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 					'Safely stopping your recording and cleaning up resources...',
 			});
 			const result = await invoke('cancel_recording');
-			if (!result.ok) return Err(result.error);
+			if (!result.ok) return MediaRecorderServiceErr(result.error);
 			return Ok(undefined);
 		},
 	};
@@ -424,20 +436,20 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 async function invoke<T>(
 	command: string,
 ): Promise<Result<T, MediaRecorderErrProperties>> {
-	return tryAsync({
+	return tryAsyncMediaRecorderService({
 		try: async () => await tauriInvoke<T>(command),
 		catch: (error) => ({
-			_tag: 'WhisperingError',
+			_tag: 'MediaRecorderError',
 			title: '🎤 Device Access Error',
 			description:
 				'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-			action: { type: 'more-details', error },
+			error,
 		}),
 	});
 }
 
 async function getFirstAvailableStream() {
-	const recordingDevicesResult = await tryAsync({
+	const recordingDevicesResult = await tryAsyncMediaRecorderService({
 		try: async () => {
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
 				audio: true,
@@ -452,12 +464,12 @@ async function getFirstAvailableStream() {
 			return audioInputDevices;
 		},
 		catch: (error) => ({
-			_tag: 'WhisperingError',
+			_tag: 'MediaRecorderError',
 			title:
 				'Error enumerating recording devices and acquiring first available stream',
 			description:
 				'Please make sure you have given permission to access your audio devices',
-			action: { type: 'more-details', error },
+			error,
 		}),
 	});
 	if (!recordingDevicesResult.ok) return recordingDevicesResult;
@@ -469,19 +481,16 @@ async function getFirstAvailableStream() {
 			return streamResult;
 		}
 	}
-	return Err({
-		_tag: 'WhisperingError',
+	return MediaRecorderServiceErr({
+		_tag: 'MediaRecorderError',
 		title: '🎤 Microphone Access Error',
 		description: 'Unable to connect to your selected microphone',
-		action: {
-			type: 'more-details',
-			error: new Error('No available audio input devices'),
-		},
+		error: undefined,
 	});
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
-	return tryAsync({
+	return tryAsyncMediaRecorderService({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
@@ -493,10 +502,10 @@ async function getStreamForDeviceId(recordingDeviceId: string) {
 			return stream;
 		},
 		catch: (error) => ({
-			_tag: 'WhisperingError',
+			_tag: 'MediaRecorderError',
 			title: '🎤 Microphone Access Error',
 			description: 'Unable to connect to your selected microphone',
-			action: { type: 'more-details', error },
+			error,
 		}),
 	});
 }
