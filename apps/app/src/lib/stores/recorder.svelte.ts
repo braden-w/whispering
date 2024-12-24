@@ -69,31 +69,32 @@ function createRecorder() {
 			}
 			const localToast = createToastFns();
 			localToast.loading({
-				title: 'Closing recording session...',
-				description: '',
+				title: '⏳ Closing recording session...',
+				description: 'Wrapping things up, just a moment...',
 			});
 			return Ok({ localToast });
 		},
 		onSuccess: (_, { context: { localToast } }) => {
 			setRecorderState('IDLE');
 			localToast.success({
-				title: 'Recording session closed',
-				description: 'Your recording session has been closed',
+				title: '✨ Session Closed Successfully',
+				description: 'Your recording session has been neatly wrapped up',
 			});
 		},
 		onError: (error, { contextResult }) => {
 			if (!contextResult.ok) {
 				toast.error({
-					title: 'Error closing recording session',
-					description: 'There was an error closing your recording session',
+					title: '❌ Session Close Failed',
+					description:
+						'Oops! We hit a snag while closing your recording session',
 					action: { type: 'more-details', error },
 				});
 				return;
 			}
 			const { localToast } = contextResult.data;
 			localToast.error({
-				title: 'Error closing recording session',
-				description: 'There was an error closing your recording session',
+				title: '❌ Session Close Failed',
+				description: 'Oops! We hit a snag while closing your recording session',
 				action: { type: 'more-details', error },
 			});
 		},
@@ -118,23 +119,23 @@ function createRecorder() {
 		onMutate: () => {
 			const localToast = createToastFns();
 			localToast.loading({
-				title: 'Starting recording...',
-				description: '',
+				title: '🎙️ Preparing to record...',
+				description: 'Setting up your recording environment...',
 			});
 			return Ok({ localToast });
 		},
 		onSuccess: (_, { context: { localToast } }) => {
 			setRecorderState('SESSION+RECORDING');
 			localToast.success({
-				title: 'Recording started!',
-				description: '',
+				title: '🎯 Recording Started!',
+				description: 'Your voice is being captured crystal clear',
 			});
 			console.info('Recording started');
 			void playSound('start');
 			void NotificationService.notify({
 				variant: 'info',
 				id: IS_RECORDING_NOTIFICATION_ID,
-				title: 'Whispering is recording...',
+				title: '🎙️ Whispering is recording...',
 				description: 'Click to go to recorder',
 				action: {
 					type: 'link',
@@ -146,16 +147,17 @@ function createRecorder() {
 		onError: (error, { contextResult }) => {
 			if (!contextResult.ok) {
 				toast.error({
-					title: 'Error starting recording',
-					description: 'There was an error starting your recording',
+					title: '❌ Recording Failed to Start',
+					description:
+						'We encountered an issue while setting up your recording',
 					action: { type: 'more-details', error },
 				});
 				return;
 			}
 			const { localToast } = contextResult.data;
 			localToast.error({
-				title: 'Error starting recording',
-				description: 'There was an error starting your recording',
+				title: '❌ Recording Failed to Start',
+				description: 'We encountered an issue while setting up your recording',
 				action: { type: 'more-details', error },
 			});
 		},
@@ -168,8 +170,8 @@ function createRecorder() {
 			});
 			if (!stopResult.ok) return stopResult;
 			localToast.loading({
-				title: 'Adding recording to database...',
-				description: '',
+				title: '💾 Saving your recording...',
+				description: 'Adding your recording to the library...',
 			});
 			const blob = stopResult.data;
 			const newRecording: Recording = {
@@ -187,8 +189,8 @@ function createRecorder() {
 			void recordings.transcribeRecording(newRecording);
 			if (!settings.value.isFasterRerecordEnabled) {
 				localToast.loading({
-					title: 'Closing recording session...',
-					description: '',
+					title: '⏳ Closing session...',
+					description: 'Wrapping up your recording session...',
 				});
 				return MediaRecorderService.closeRecordingSession(undefined, {
 					sendStatus: localToast.loading,
@@ -199,8 +201,8 @@ function createRecorder() {
 		onMutate: () => {
 			const localToast = createToastFns();
 			localToast.loading({
-				title: 'Stopping recording...',
-				description: '',
+				title: '⏸️ Stopping recording...',
+				description: 'Finalizing your audio capture...',
 			});
 			return Ok({ localToast });
 		},
@@ -209,10 +211,10 @@ function createRecorder() {
 				settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
 			);
 			localToast.success({
-				title: 'Recording stopped',
+				title: '✨ Recording Complete!',
 				description: settings.value.isFasterRerecordEnabled
-					? 'Recording has been stopped and saved'
-					: 'Recording has been stopped, saved and session closed',
+					? 'Recording saved! Ready for another take'
+					: 'Recording saved and session closed successfully',
 			});
 			console.info('Recording stopped');
 			void playSound('stop');
@@ -235,8 +237,8 @@ function createRecorder() {
 			}
 			const localToast = createToastFns();
 			localToast.loading({
-				title: 'Cancelling recording...',
-				description: '',
+				title: '🔄 Cancelling recording...',
+				description: 'Discarding the current recording...',
 			});
 			return Ok({ localToast });
 		},
@@ -245,15 +247,15 @@ function createRecorder() {
 			console.info('Recording cancelled');
 			setRecorderState('SESSION');
 			localToast.success({
-				title: 'Recording cancelled',
+				title: '🚫 Recording Cancelled',
 				description:
-					'Your recording has been cancelled, session has been kept open',
+					'Recording discarded, but session remains open for a new take',
 			});
 			if (settings.value.isFasterRerecordEnabled) return;
 
 			localToast.loading({
-				title: 'Closing recording session...',
-				description: '',
+				title: '⏳ Closing session...',
+				description: 'Wrapping up your recording session...',
 			});
 			const closeResult = await MediaRecorderService.closeRecordingSession(
 				undefined,
@@ -265,9 +267,8 @@ function createRecorder() {
 			}
 			setRecorderState('IDLE');
 			localToast.success({
-				title: 'Recording cancelled',
-				description:
-					'Your recording has been cancelled, session has been closed',
+				title: '✅ All Done!',
+				description: 'Recording cancelled and session closed successfully',
 			});
 		},
 		onError: (error) => renderErrAsToast(error),
