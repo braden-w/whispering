@@ -44,5 +44,3 @@ export type RecordingsDbService = {
 		WhisperingErrProperties
 	>;
 };
-
-export const RecordingsDbService = createRecordingsDbServiceLiveIndexedDb();

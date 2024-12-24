@@ -14,7 +14,7 @@
 	import type { Recording } from '$lib/services/RecordingDbService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { recordingsService } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createMutation } from '@epicenterhq/result';
@@ -193,7 +193,7 @@
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordings.value;
+			return recordingsService.recordings;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -287,6 +287,17 @@
 			isDialogOpen = false;
 		},
 	});
+
+	const deleteRecordingsById = createMutation({
+		mutationFn: recordingsService.deleteRecordingsById,
+		onSuccess: (_, { input: ids }) => {
+			toast.success({
+				title: 'Deleted recordings!',
+				description: 'Your recordings have been deleted successfully.',
+			});
+		},
+		onError: (error) => renderErrAsToast(error),
+	});
 </script>
 
 <svelte:head>
@@ -325,17 +336,17 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordings.transcribeRecording(recording.original),
+									recordingsService.transcribeRecording(recording.original),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsService.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsService.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />
@@ -410,7 +421,7 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () => recordings.deleteRecordingsById(ids),
+								onConfirm: () => deleteRecordingsById(ids),
 							});
 						}}
 					>

@@ -16,11 +16,11 @@ import { settings } from './settings.svelte';
 
 const recordingsDbService = createRecordingsDbServiceLiveIndexedDb();
 
-export const recordings = createRecordings({
+export const recordingsService = createRecordingsService({
 	recordingsDbService,
 });
 
-function createRecordings({
+function createRecordingsService({
 	recordingsDbService,
 }: { recordingsDbService: RecordingsDbService }) {
 	let recordingsArray = $state<Recording[]>([]);
@@ -42,32 +42,6 @@ function createRecordings({
 			recordingsArray = recordingsArray.map((r) =>
 				r.id === recording.id ? recording : r,
 			);
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
-
-	const deleteRecordingById = createMutation({
-		mutationFn: recordingsDbService.deleteRecordingById,
-		onSuccess: (_, { input: id }) => {
-			recordingsArray = recordingsArray.filter((r) => r.id !== id);
-			toast.success({
-				title: 'Deleted recording!',
-				description: 'Your recording has been deleted successfully.',
-			});
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
-
-	const deleteRecordingsById = createMutation({
-		mutationFn: recordingsDbService.deleteRecordingsById,
-		onSuccess: (_, { input: ids }) => {
-			recordingsArray = recordingsArray.filter(
-				(recording) => !ids.includes(recording.id),
-			);
-			toast.success({
-				title: 'Deleted recordings!',
-				description: 'Your recordings have been deleted successfully.',
-			});
 		},
 		onError: (error) => renderErrAsToast(error),
 	});
@@ -269,12 +243,30 @@ function createRecordings({
 		get isTranscribing() {
 			return transcribingRecordingIds.size > 0;
 		},
-		get value() {
+		get recordings() {
 			return recordingsArray;
 		},
 		updateRecording,
-		deleteRecordingById,
-		deleteRecordingsById,
+		async deleteRecordingById(id: string) {
+			const deleteRecordingByIdResult =
+				await recordingsDbService.deleteRecordingById(id);
+			if (!deleteRecordingByIdResult.ok) {
+				return deleteRecordingByIdResult;
+			}
+			recordingsArray = recordingsArray.filter((r) => r.id !== id);
+			return Ok(id);
+		},
+		async deleteRecordingsById(ids: string[]) {
+			const deleteRecordingsByIdResult =
+				await recordingsDbService.deleteRecordingsById(ids);
+			if (!deleteRecordingsByIdResult.ok) {
+				return deleteRecordingsByIdResult;
+			}
+			recordingsArray = recordingsArray.filter(
+				(recording) => !ids.includes(recording.id),
+			);
+			return Ok(ids);
+		},
 		transcribeRecording,
 	};
 }

@@ -7,7 +7,10 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { toast } from '$lib/services/ToastService';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { recordingsService } from '$lib/stores/recordings.svelte';
+	import { createMutation, Ok } from '@epicenterhq/result';
 	import { Loader2Icon } from 'lucide-svelte';
 
 	let { recording }: { recording: Recording } = $props();
@@ -15,6 +18,24 @@
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
+
+	const deleteRecordingByIdThenCloseRecording = createMutation({
+		mutationFn: recordingsService.deleteRecordingById,
+		onMutate: () => {
+			isDeleting = true;
+			return Ok(undefined);
+		},
+		onSuccess: (_, { input: id }) => {
+			toast.success({
+				title: 'Deleted recording!',
+				description: 'Your recording has been deleted successfully.',
+			});
+		},
+		onSettled: () => {
+			isDeleting = false;
+		},
+		onError: (error) => renderErrAsToast(error),
+	});
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -39,7 +60,7 @@
 			onsubmit={async (e) => {
 				e.preventDefault();
 				isSaving = true;
-				await recordings.updateRecording(recording);
+				await recordingsService.updateRecording(recording);
 				isSaving = false;
 				isDialogOpen = false;
 			}}
@@ -83,12 +104,7 @@
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={async () => {
-						isDeleting = true;
-						await recordings.deleteRecordingById(recording.id);
-						isDeleting = false;
-						isDialogOpen = false;
-					}}
+					onclick={() => deleteRecordingByIdThenCloseRecording(recording.id); }
 					variant="destructive"
 					disabled={isDeleting}
 				>
