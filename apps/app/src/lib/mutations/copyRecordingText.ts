@@ -4,7 +4,7 @@ import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, createMutation } from '@epicenterhq/result';
 
-const { mutate: copyRecordingText } = createMutation({
+const copyRecordingText = createMutation({
 	mutationFn: async (recording: Recording) => {
 		if (recording.transcribedText === '') return Ok(recording);
 		const copyResult = await ClipboardService.setClipboardText(

@@ -21,7 +21,7 @@
 
 	let { recording }: { recording: Recording } = $props();
 
-	const { mutate: downloadRecording } = createMutation({
+	const downloadRecording = createMutation({
 		mutationFn: async (recording: Recording) => {
 			const downloadResult = await DownloadService.downloadBlob({
 				blob: recording.blob,

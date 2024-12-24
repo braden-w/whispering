@@ -58,7 +58,7 @@ function createRecorder() {
 		})();
 	};
 
-	const { mutate: closeRecordingSession } = createMutation({
+	const closeRecordingSession = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			const result = await MediaRecorderService.closeRecordingSession(
 				undefined,
@@ -108,7 +108,7 @@ function createRecorder() {
 		},
 	});
 
-	const { mutate: startRecording } = createMutation({
+	const startRecording = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			if (!isInRecordingSession) {
 				const initResult = await MediaRecorderService.initRecordingSession(
@@ -180,7 +180,7 @@ function createRecorder() {
 		},
 	});
 
-	const { mutate: stopRecording } = createMutation({
+	const stopRecording = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
 				sendStatus: localToast.loading,
@@ -272,7 +272,7 @@ function createRecorder() {
 		},
 	});
 
-	const { mutate: cancelRecording } = createMutation({
+	const cancelRecording = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			const cancelResult = await MediaRecorderService.cancelRecording(
 				undefined,

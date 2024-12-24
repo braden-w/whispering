@@ -262,7 +262,7 @@
 		return text;
 	});
 
-	const { mutate: setClipboardText } = createMutation({
+	const setClipboardText = createMutation({
 		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
 		onSuccess: (_, { input: text }) => {
 			toast.success({

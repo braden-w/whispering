@@ -29,7 +29,7 @@ function createRecordings() {
 
 	syncDbToRecordingsState();
 
-	const { mutate: updateRecording } = createMutation({
+	const updateRecording = createMutation({
 		mutationFn: RecordingsDbService.updateRecording,
 		onSuccess: (_, { input: recording }) => {
 			recordingsArray = recordingsArray.map((r) =>
@@ -39,7 +39,7 @@ function createRecordings() {
 		onError: (error) => renderErrAsToast(error),
 	});
 
-	const { mutate: deleteRecordingById } = createMutation({
+	const deleteRecordingById = createMutation({
 		mutationFn: RecordingsDbService.deleteRecordingById,
 		onSuccess: (_, { input: id }) => {
 			recordingsArray = recordingsArray.filter((r) => r.id !== id);
@@ -51,7 +51,7 @@ function createRecordings() {
 		onError: (error) => renderErrAsToast(error),
 	});
 
-	const { mutate: deleteRecordingsById } = createMutation({
+	const deleteRecordingsById = createMutation({
 		mutationFn: RecordingsDbService.deleteRecordingsById,
 		onSuccess: (_, { input: ids }) => {
 			recordingsArray = recordingsArray.filter(
@@ -65,7 +65,7 @@ function createRecordings() {
 		onError: (error) => renderErrAsToast(error),
 	});
 
-	const { mutate: transcribeRecording } = createMutation({
+	const transcribeRecording = createMutation({
 		mutationFn: async (recording, { context: { succeedStatus } }) => {
 			const selectedTranscriptionService = {
 				OpenAI: TranscriptionServiceWhisperLive,

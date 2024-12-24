@@ -17,7 +17,7 @@
 		}
 	});
 
-	const { mutate: setClipboardText } = createMutation({
+	const setClipboardText = createMutation({
 		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
 		onError: (error) => {
 			if (error._tag === 'ClipboardError') {
