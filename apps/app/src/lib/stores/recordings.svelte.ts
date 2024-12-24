@@ -1,4 +1,3 @@
-import { goto } from '$app/navigation';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { DownloadService } from '$lib/services/DownloadService';
 import { NotificationService } from '$lib/services/NotificationService';
@@ -11,6 +10,8 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import { createMutation } from '@epicenterhq/result';
+import { Ok, type ToastOptions, WhisperingErr } from '@repo/shared';
 import { settings } from './settings.svelte';
 
 export const recordings = createRecordings();
@@ -29,45 +30,31 @@ function createRecordings() {
 
 	syncDbToRecordingsState();
 
-	return {
-		get isTranscribing() {
-			return transcribingRecordingIds.size > 0;
-		},
-		get value() {
-			return recordingsArray;
-		},
-		async updateRecording(recording: Recording) {
-			const updateRecordingResult =
-				await RecordingsDbService.updateRecording(recording);
-			if (!updateRecordingResult.ok) {
-				return renderErrAsToast(updateRecordingResult.error);
-			}
+	const { mutate: updateRecording } = createMutation({
+		mutationFn: RecordingsDbService.updateRecording,
+		onSuccess: (_, { input: recording }) => {
 			recordingsArray = recordingsArray.map((r) =>
 				r.id === recording.id ? recording : r,
 			);
-			toast.success({
-				title: 'Updated recording!',
-				description: 'Your recording has been updated successfully.',
-			});
 		},
-		async deleteRecordingById(id: string) {
-			const deleteRecordingResult =
-				await RecordingsDbService.deleteRecordingById(id);
-			if (!deleteRecordingResult.ok) {
-				return renderErrAsToast(deleteRecordingResult.error);
-			}
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	const { mutate: deleteRecordingById } = createMutation({
+		mutationFn: RecordingsDbService.deleteRecordingById,
+		onSuccess: (_, { input: id }) => {
 			recordingsArray = recordingsArray.filter((r) => r.id !== id);
 			toast.success({
 				title: 'Deleted recording!',
 				description: 'Your recording has been deleted successfully.',
 			});
 		},
-		async deleteRecordingsById(ids: string[]) {
-			const deleteRecordingsByIdResult =
-				await RecordingsDbService.deleteRecordingsById(ids);
-			if (!deleteRecordingsByIdResult.ok) {
-				return renderErrAsToast(deleteRecordingsByIdResult.error);
-			}
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	const { mutate: deleteRecordingsById } = createMutation({
+		mutationFn: RecordingsDbService.deleteRecordingsById,
+		onSuccess: (_, { input: ids }) => {
 			recordingsArray = recordingsArray.filter(
 				(recording) => !ids.includes(recording.id),
 			);
@@ -76,181 +63,58 @@ function createRecordings() {
 				description: 'Your recordings have been deleted successfully.',
 			});
 		},
-		async transcribeRecording(id: string) {
-			const isDocumentVisible = () => !document.hidden;
-			const currentTranscribingRecordingToastId = `transcribing-${id}` as const;
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	const { mutate: transcribeRecording } = createMutation({
+		mutationFn: async (
+			recording,
+			{ context: { updateStatus, succeedStatus } },
+		) => {
 			const selectedTranscriptionService = {
 				OpenAI: TranscriptionServiceWhisperLive,
 				Groq: TranscriptionServiceGroqLive,
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
-			if (isDocumentVisible()) {
-				toast.loading({
-					id: currentTranscribingRecordingToastId,
-					title: 'Transcribing...',
-					description: 'Your recording is being transcribed.',
-				});
-			} else {
-				NotificationService.notify({
-					id: currentTranscribingRecordingToastId,
-					title: 'Transcribing recording...',
-					description: 'Your recording is being transcribed.',
-					action: {
-						type: 'link',
-						label: 'Go to recordings',
-						goto: '/recordings',
-					},
-				});
-			}
-			const markNotTranscribingAndDismissToastAndNotification =
-				async (): Promise<void> => {
-					const updatedRecordingWithUnprocessedStatus = {
-						...recording,
-						transcriptionStatus: 'UNPROCESSED',
-					} satisfies Recording;
-					const updateRecordingResult =
-						await RecordingsDbService.updateRecording(
-							updatedRecordingWithUnprocessedStatus,
-						);
-					if (!updateRecordingResult.ok) {
-						renderErrAsToast({
-							_tag: 'WhisperingError',
-							title: `Error rolling back recording ${id} to unprocessed`,
-							description: 'Please try re-recording.',
-							action: {
-								type: 'more-details',
-								error: updateRecordingResult.error,
-							},
-						});
-						return;
-					}
-					recordingsArray = recordingsArray.map((r) =>
-						r.id === recording.id ? updatedRecordingWithUnprocessedStatus : r,
-					);
-					transcribingRecordingIds.delete(id);
-					toast.dismiss(currentTranscribingRecordingToastId);
-					NotificationService.clear(currentTranscribingRecordingToastId);
-				};
-
-			transcribingRecordingIds.add(id);
-			const getRecordingResult = await RecordingsDbService.getRecording(id);
-			if (!getRecordingResult.ok) {
-				await markNotTranscribingAndDismissToastAndNotification();
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Error getting recording ${id} to transcribe`,
-					description: 'Please try again.',
-					action: { type: 'more-details', error: getRecordingResult.error },
-				});
-				return;
-			}
-			const maybeRecording = getRecordingResult.data;
-			if (maybeRecording === null) {
-				await markNotTranscribingAndDismissToastAndNotification();
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Recording with id ${id} not found to transcribe`,
-					description: 'Please try again.',
-					action: { type: 'none' },
-				});
-				return;
-			}
-			const recording = maybeRecording;
-
-			const updatedRecordingWithTranscribingStatus = {
-				...recording,
-				transcriptionStatus: 'TRANSCRIBING',
-			} satisfies Recording;
-			const updateRecordingWithTranscribingStatusResult =
-				await RecordingsDbService.updateRecording(
-					updatedRecordingWithTranscribingStatus,
-				);
-			if (!updateRecordingWithTranscribingStatusResult.ok) {
-				return renderErrAsToast(
-					updateRecordingWithTranscribingStatusResult.error,
-				);
-			}
-			recordingsArray = recordingsArray.map((r) =>
-				r.id === recording.id ? updatedRecordingWithTranscribingStatus : r,
-			);
-			toast.loading({
-				id: currentTranscribingRecordingToastId,
-				title: `Error updating recording ${id} to transcribing`,
-				description: 'Still trying to transcribe...',
-			});
-
 			const transcribeResult = await selectedTranscriptionService.transcribe(
 				recording.blob,
 			);
-
-			if (!transcribeResult.ok) {
-				await markNotTranscribingAndDismissToastAndNotification();
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Error transcribing recording ${id}`,
-					description: 'Please try again.',
-					action: { type: 'more-details', error: transcribeResult.error },
-				});
-				return;
-			}
+			if (!transcribeResult.ok) return transcribeResult;
 
 			const transcribedText = transcribeResult.data;
-			const updatedRecordingWithDoneStatus = {
+			const newRecordingWithDoneStatus = {
 				...recording,
 				transcriptionStatus: 'DONE',
 				transcribedText,
 			} satisfies Recording;
 			const updateRecordingWithDoneStatusResult =
-				await RecordingsDbService.updateRecording(
-					updatedRecordingWithDoneStatus,
-				);
+				await RecordingsDbService.updateRecording(newRecordingWithDoneStatus);
 			if (!updateRecordingWithDoneStatusResult.ok) {
-				await markNotTranscribingAndDismissToastAndNotification();
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Error updating recording ${id} to done with transcribed text`,
-					description: transcribedText,
-					action: { type: 'more-details', error: updateRecordingWithDoneStatusResult.error, },
-				});
-				return;
+				return updateRecordingWithDoneStatusResult;
 			}
 			recordingsArray = recordingsArray.map((r) =>
-				r.id === recording.id ? updatedRecordingWithDoneStatus : r,
+				r.id === recording.id ? newRecordingWithDoneStatus : r,
 			);
 
-			await markNotTranscribingAndDismissToastAndNotification();
-			if (isDocumentVisible()) {
-				toast.success({
-					title: 'Transcription complete!',
-					description: 'Check it out in your recordings',
-					action: {
-						label: 'Go to recordings',
-						onClick: () => goto('/recordings'),
-					},
-				});
-			} else {
-				NotificationService.notify({
-					title: 'Transcription complete!',
-					description: 'Check it out in your recordings',
-					action: {
-						type: 'link',
-						label: 'Go to recordings',
-						goto: '/recordings',
-					},
-				});
-			}
+			succeedStatus({
+				title: 'Transcription complete!',
+				description: 'Check it out in your recordings',
+				action: {
+					type: 'link',
+					label: 'Go to recordings',
+					goto: '/recordings',
+				},
+			});
 
-			if (transcribedText === '') return;
+			if (transcribedText === '') return Ok(undefined);
 
 			// Copy transcription to clipboard if enabled
 			if (settings.value.isCopyToClipboardEnabled) {
-				const currentCopyingToClipboardToastId =
-					`copying-to-clipboard-${id}` as const;
 				const setClipboardTextResult =
 					await ClipboardService.setClipboardText(transcribedText);
 				if (!setClipboardTextResult.ok) {
-					renderErrAsToast({
+					return WhisperingErr({
 						_tag: 'WhisperingError',
 						title: 'Error copying transcription to clipboard',
 						description: transcribedText,
@@ -259,28 +123,25 @@ function createRecordings() {
 							error: setClipboardTextResult.error,
 						},
 					});
-					return;
 				}
-				toast.success({
-					id: currentCopyingToClipboardToastId,
+				succeedStatus({
 					title: 'Transcription completed and copied to clipboard!',
 					description: transcribedText,
 					descriptionClass: 'line-clamp-2',
 					action: {
+						type: 'link',
 						label: 'Go to recordings',
-						onClick: () => goto('/recordings'),
+						goto: '/recordings',
 					},
 				});
 			}
 
 			// Paste transcription if enabled
 			if (settings.value.isPasteContentsOnSuccessEnabled) {
-				const currentPastingToCursorToastId =
-					`pasting-to-cursor-${id}` as const;
 				const writeTextToCursorResult =
 					await ClipboardService.writeTextToCursor(transcribedText);
 				if (!writeTextToCursorResult.ok) {
-					renderErrAsToast({
+					return WhisperingErr({
 						_tag: 'WhisperingError',
 						title: 'Error pasting transcription to cursor',
 						description: transcribedText,
@@ -289,79 +150,174 @@ function createRecordings() {
 							error: writeTextToCursorResult.error,
 						},
 					});
-					return;
 				}
-				toast.success({
-					id: currentPastingToCursorToastId,
-					title: 'Transcription completed and pasted to cursor!',
+				succeedStatus({
+					title:
+						'Transcription completed, copied to clipboard, and pasted to cursor!',
 					description: transcribedText,
 					descriptionClass: 'line-clamp-2',
 					action: {
+						type: 'link',
 						label: 'Go to recordings',
-						onClick: () => goto('/recordings'),
+						goto: '/recordings',
 					},
 				});
 			}
+
+			return Ok(undefined);
 		},
-		async downloadRecording(id: string) {
+		onMutate: async (recording: Recording) => {
+			const isDocumentVisible = () => !document.hidden;
+			const currentTranscribingRecordingToastId =
+				`transcribing-${recording.id}` as const;
+			const createStatusUpdater =
+				(variant: 'loading' | 'success') => (options: ToastOptions) => {
+					if (isDocumentVisible()) {
+						toast[variant]({
+							...options,
+							id: currentTranscribingRecordingToastId,
+						});
+					} else {
+						NotificationService.notify({
+							...options,
+							id: currentTranscribingRecordingToastId,
+							variant,
+						});
+					}
+				};
+
+			const updateStatus = createStatusUpdater('loading');
+			const succeedStatus = createStatusUpdater('success');
+			const dismissToast = () => {
+				toast.dismiss(currentTranscribingRecordingToastId);
+				NotificationService.clear(currentTranscribingRecordingToastId);
+			};
+
+			transcribingRecordingIds.add(recording.id);
+			updateStatus({
+				id: currentTranscribingRecordingToastId,
+				title: 'Transcribing...',
+				description: 'Your recording is being transcribed.',
+				action: {
+					type: 'link',
+					label: 'Go to recordings',
+					goto: '/recordings',
+				},
+			});
+			const newRecorder = {
+				...recording,
+				transcriptionStatus: 'TRANSCRIBING',
+			} satisfies Recording;
+			const setTranscribingStatusResult =
+				await RecordingsDbService.updateRecording(newRecorder);
+			if (!setTranscribingStatusResult.ok) {
+				updateStatus({
+					title: `Error updating recording ${recording.id} to transcribing`,
+					description: 'Still trying to transcribe...',
+				});
+			}
+			recordingsArray = recordingsArray.map((r) =>
+				r.id === recording.id ? newRecorder : r,
+			);
+
+			return Ok({ updateStatus, succeedStatus, dismissToast });
+		},
+		onError: async (error, { contextResult, input: recording }) => {
+			if (!contextResult.ok) {
+				const error = contextResult.error;
+				renderErrAsToast(error);
+				return;
+			}
+			const { dismissToast } = contextResult.data;
+			const updatedRecordingWithUnprocessedStatus = {
+				...recording,
+				transcriptionStatus: 'UNPROCESSED',
+			} satisfies Recording;
+			const updateRecordingResult = await RecordingsDbService.updateRecording(
+				updatedRecordingWithUnprocessedStatus,
+			);
+			if (!updateRecordingResult.ok) {
+				renderErrAsToast({
+					_tag: 'WhisperingError',
+					title: `Error rolling back recording ${recording.id} to unprocessed`,
+					description: 'Please try re-recording.',
+					action: {
+						type: 'more-details',
+						error: updateRecordingResult.error,
+					},
+				});
+				return updateRecordingResult;
+			}
+			recordingsArray = recordingsArray.map((r) =>
+				r.id === recording.id ? updatedRecordingWithUnprocessedStatus : r,
+			);
+			transcribingRecordingIds.delete(recording.id);
+			dismissToast();
+			return Ok(recording);
+		},
+	});
+
+	const { mutate: downloadRecording } = createMutation({
+		mutationFn: async (id: string) => {
 			const getRecordingResult = await RecordingsDbService.getRecording(id);
-			if (!getRecordingResult.ok) {
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Error getting recording ${id} to download`,
-					description: 'Please try again.',
-					action: { type: 'more-details', error: getRecordingResult.error },
-				});
-				return;
-			}
+			if (!getRecordingResult.ok) return getRecordingResult;
 			const maybeRecording = getRecordingResult.data;
-			if (maybeRecording === null) {
-				renderErrAsToast({
+			if (maybeRecording === null)
+				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: `Recording with id ${id} not found to download`,
-					description: 'Please try again.',
-					action: { type: 'none' },
+					title: 'Recording not found',
+					description:
+						'The recording you are trying to download does not exist.',
 				});
-				return;
-			}
 			const recording = maybeRecording;
-			const downloadBlobResult = await DownloadService.downloadBlob({
+			const downloadResult = await DownloadService.downloadBlob({
 				blob: recording.blob,
 				name: `whispering_recording_${recording.id}`,
 			});
-			if (!downloadBlobResult.ok) {
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: `Error downloading recording ${id}`,
-					description: 'Please try again.',
-					action: { type: 'more-details', error: downloadBlobResult.error },
-				});
-				return;
-			}
+			if (!downloadResult.ok) return downloadResult;
+			return Ok(id);
+		},
+		onSuccess: (_) => {
 			toast.success({
-				title: 'Recording downloaded!',
-				description: 'Your recording has been downloaded successfully.',
+				title: 'Recording downloading!',
+				description: 'Your recording is being downloaded.',
 			});
 		},
-		async copyRecordingText(recording: Recording) {
-			if (recording.transcribedText === '') return;
-			const setClipboardTextResult = await ClipboardService.setClipboardText(
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	const { mutate: copyRecordingText } = createMutation({
+		mutationFn: async (recording: Recording) => {
+			if (recording.transcribedText === '') return Ok(recording);
+			const copyResult = await ClipboardService.setClipboardText(
 				recording.transcribedText,
 			);
-			if (!setClipboardTextResult.ok) {
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: 'Error copying transcription to clipboard',
-					description: recording.transcribedText,
-					action: { type: 'more-details', error: setClipboardTextResult.error },
-				});
-				return;
-			}
+			if (!copyResult.ok) return copyResult;
+			return Ok(recording);
+		},
+		onSuccess: (_, { input: recording }) => {
 			toast.success({
 				title: 'Copied transcription to clipboard!',
 				description: recording.transcribedText,
 				descriptionClass: 'line-clamp-2',
 			});
 		},
+		onError: (error) => renderErrAsToast(error),
+	});
+
+	return {
+		get isTranscribing() {
+			return transcribingRecordingIds.size > 0;
+		},
+		get value() {
+			return recordingsArray;
+		},
+		updateRecording: (recording: Recording) => updateRecording(recording),
+		deleteRecordingById: (id: string) => deleteRecordingById(id),
+		deleteRecordingsById: (ids: string[]) => deleteRecordingsById(ids),
+		transcribeRecording: (recording: Recording) =>
+			transcribeRecording(recording),
+		downloadRecording: (id: string) => downloadRecording(id),
+		copyRecordingText: (recording: Recording) => copyRecordingText(recording),
 	};
 }

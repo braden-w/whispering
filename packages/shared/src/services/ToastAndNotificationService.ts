@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { WhisperingResult } from '../index.js';
 
-export const notificationOptionsSchema = z.object({
+export const toastOptionsSchema = z.object({
 	id: z.string().optional(),
 	title: z.string(),
 	description: z.string(),
@@ -21,7 +21,12 @@ export const notificationOptionsSchema = z.object({
 		.optional(),
 });
 
-/** Unified type for toasts and notifications */
+export type ToastOptions = z.infer<typeof toastOptionsSchema>;
+
+export const notificationOptionsSchema = toastOptionsSchema.extend({
+	variant: z.enum(['success', 'info', 'loading', 'error', 'warning']),
+});
+
 export type NotificationOptions = z.infer<typeof notificationOptionsSchema>;
 
 export type NotificationService = {

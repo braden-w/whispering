@@ -15,9 +15,6 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 					_tag: 'WhisperingError',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
-					action: {
-						type: 'none',
-					},
 				});
 			}
 			const formDataFile = new File(

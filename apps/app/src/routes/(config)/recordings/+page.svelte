@@ -298,7 +298,7 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordings.transcribeRecording(recording.id),
+									recordings.transcribeRecording(recording.original),
 								),
 							)}
 					>

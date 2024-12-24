@@ -1,15 +1,18 @@
 import {
 	type Result,
 	createServiceErrorFns,
-	trySync
+	trySync,
 } from '@epicenterhq/result';
 import { z } from 'zod';
 import {
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
-import type { NotificationOptions } from './services/NotificationService.js';
-import { notificationOptionsSchema } from './services/NotificationService.js';
+import type {
+	NotificationOptions,
+	ToastOptions,
+} from './services/ToastAndNotificationService.js';
+import { notificationOptionsSchema } from './services/ToastAndNotificationService.js';
 export { Err, Ok } from '@epicenterhq/result';
 export { WhisperingErr, tryAsyncWhispering, trySyncWhispering };
 
@@ -99,7 +102,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
 	isWarning?: boolean;
-} & NotificationOptions;
+} & ToastOptions;
 
 export type WhisperingResult<T> = Result<T, WhisperingErrProperties>;
 
