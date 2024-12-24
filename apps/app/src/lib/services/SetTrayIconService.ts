@@ -3,7 +3,7 @@ import { recorder } from '$lib/stores/recorder.svelte';
 import {
 	type WhisperingRecordingState,
 	type WhisperingResult,
-	tryAsyncWhispering,
+	tryAsync,
 } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
@@ -56,7 +56,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 	})();
 	return {
 		setTrayIcon: (recorderState: WhisperingRecordingState) =>
-			tryAsyncWhispering({
+			tryAsync({
 				try: async () => {
 					const iconPath = await getIconPath(recorderState);
 					const tray = await trayPromise;

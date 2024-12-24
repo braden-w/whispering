@@ -3,7 +3,7 @@ import {
 	type ServiceFn,
 	type Result,
 	createServiceErrorFns,
-} from '@repo/shared/epicenter-result';
+} from '@epicenterhq/result';
 import type {
 	ToastAndNotifyOptions,
 	WhisperingErrProperties,

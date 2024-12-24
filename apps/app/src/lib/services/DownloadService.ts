@@ -1,8 +1,5 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import {
-	type ServiceFn,
-	createServiceErrorFns,
-} from '@repo/shared/epicenter-result';
+import { type ServiceFn, createServiceErrorFns } from '@epicenterhq/result';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';

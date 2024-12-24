@@ -1,6 +1,6 @@
-import { Ok } from '@repo/shared/epicenter-result';
+import { Ok } from '@epicenterhq/result';
 import type { NotificationService } from '@repo/shared';
-import { tryAsyncWhispering } from '@repo/shared';
+import { tryAsync } from '@repo/shared';
 import {
 	isPermissionGranted,
 	requestPermission,
@@ -10,7 +10,7 @@ import {
 const createNotificationServiceDesktop = (): NotificationService => {
 	return {
 		async notify({ title, description }) {
-			const notifyResult = await tryAsyncWhispering({
+			const notifyResult = await tryAsync({
 				try: async () => {
 					let permissionGranted = await isPermissionGranted();
 					if (!permissionGranted) {
