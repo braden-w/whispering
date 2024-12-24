@@ -1,4 +1,4 @@
-import type { Recording } from '$lib/services/RecordingDbService';
+import type { Recording } from '$lib/services/db/';
 
 export function createRecordingViewTransitionName({
 	recordingId,

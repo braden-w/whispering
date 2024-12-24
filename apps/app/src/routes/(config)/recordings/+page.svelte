@@ -10,14 +10,14 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { ClipboardService } from '$lib/services/ClipboardService';
-	import type { Recording } from '$lib/services/RecordingDbService';
+	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
+	import type { Recording } from '$lib/services/db/';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordingsService } from '$lib/stores/recordings.svelte';
+	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { createMutation } from '@epicenterhq/result';
+	import { createMutation } from '@repo/shared/epicenter-result';
 	import {
 		FlexRender,
 		createTable,
@@ -193,7 +193,7 @@
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordingsService.recordings;
+			return RecordingsService.recordings;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -289,7 +289,7 @@
 	});
 
 	const deleteRecordingsById = createMutation({
-		mutationFn: recordingsService.deleteRecordingsById,
+		mutationFn: RecordingsService.deleteRecordingsById,
 		onSuccess: (_, { input: ids }) => {
 			toast.success({
 				title: 'Deleted recordings!',
@@ -336,17 +336,17 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordingsService.transcribeRecording(recording.original),
+									RecordingsService.transcribeRecording(recording.original),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordingsService.recordings.find((r) => r.id === id);
+							const currentRow = RecordingsService.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordingsService.recordings.find((r) => r.id === id);
+							const currentRow = RecordingsService.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />

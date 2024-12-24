@@ -1,4 +1,4 @@
-import type { ToastOptions } from '@repo/shared';
+import type { ToastAndNotifyOptions } from '@repo/shared';
 import { type ClassValue, clsx } from 'clsx';
 import { nanoid } from 'nanoid';
 import { cubicOut } from 'svelte/easing';
@@ -84,10 +84,11 @@ export function getExtensionFromAudioBlob(blob: Blob) {
 export const createLocalToastFns = () => {
 	const toastId = nanoid();
 	return {
-		success: (options: ToastOptions) =>
+		success: (options: ToastAndNotifyOptions) =>
 			toast.success({ id: toastId, ...options }),
-		error: (options: ToastOptions) => toast.error({ id: toastId, ...options }),
-		loading: (options: ToastOptions) =>
+		error: (options: ToastAndNotifyOptions) =>
+			toast.error({ id: toastId, ...options }),
+		loading: (options: ToastAndNotifyOptions) =>
 			toast.loading({ id: toastId, ...options }),
 	};
 };

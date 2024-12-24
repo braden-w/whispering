@@ -1,8 +1,7 @@
-import { ClipboardService } from '$lib/services/ClipboardService';
-import type { Recording } from '$lib/services/RecordingDbService';
+import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { Ok, createMutation } from '@epicenterhq/result';
+import { Ok, createMutation } from '@repo/shared/epicenter-result';
 
 const copyRecordingText = createMutation({
 	mutationFn: async (recording: Recording) => {

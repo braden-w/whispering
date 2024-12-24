@@ -49,7 +49,7 @@ async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
 				ToggleRecording.RequestBody,
 				ToggleRecording.ResponseBody
 			>({ name: 'whispering-web/toggleRecording' }),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Unable to toggle recording via background service worker',
 			description:
@@ -71,7 +71,7 @@ async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
 			>({
 				name: 'whispering-web/cancelRecording',
 			}),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Unable to cancel recording via background service worker',
 			description:

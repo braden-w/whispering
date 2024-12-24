@@ -6,11 +6,11 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/RecordingDbService';
+	import type { Recording } from '$lib/services/db/';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordingsService } from '$lib/stores/recordings.svelte';
-	import { createMutation, Ok } from '@epicenterhq/result';
+	import { recordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
+	import { createMutation, Ok } from '@repo/shared/epicenter-result';
 	import { Loader2Icon } from 'lucide-svelte';
 
 	let { recording }: { recording: Recording } = $props();

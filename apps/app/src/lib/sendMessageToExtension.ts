@@ -1,4 +1,4 @@
-import { Ok } from '@epicenterhq/result';
+import { Ok } from '@repo/shared/epicenter-result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type {
 	ExternalMessage,
@@ -17,7 +17,7 @@ export async function sendMessageToExtension<M extends ExternalMessage>(
 				name: message.name as never,
 				body: message.body,
 			}) as Promise<WhisperingResult<ExternalMessageReturnType<M['name']>>>,
-		catch: (error) =>
+		mapErr: (error) =>
 			({
 				_tag: 'WhisperingError',
 				title: 'Unable to send message to extension',

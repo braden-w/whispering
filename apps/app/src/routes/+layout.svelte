@@ -13,7 +13,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
-	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
+	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 
 	let { children } = $props();
 

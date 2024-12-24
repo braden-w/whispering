@@ -6,9 +6,9 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
-	import type { Recording } from '$lib/services/RecordingDbService';
+	import type { Recording } from '$lib/services/db/';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
+	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';

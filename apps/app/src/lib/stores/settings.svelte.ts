@@ -30,7 +30,7 @@ type RegisterShortcutJob = Promise<void>;
 const unregisterAllLocalShortcuts = () =>
 	trySyncWhispering({
 		try: () => hotkeys.unbind(),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Error unregistering all shortcuts',
 			description: 'Please try again.',
@@ -47,7 +47,7 @@ const unregisterAllGlobalShortcuts = () =>
 			);
 			return await unregisterAll();
 		},
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Error unregistering all shortcuts',
 			description: 'Please try again.',
@@ -72,7 +72,7 @@ function registerLocalShortcut({
 				event.preventDefault();
 				callback();
 			}),
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Error registering local shortcut',
 			description: 'Please make sure it is a valid keyboard shortcut.',
@@ -102,7 +102,7 @@ async function registerGlobalShortcut({
 				}
 			});
 		},
-		catch: (error) => ({
+		mapErr: (error) => ({
 			_tag: 'WhisperingError',
 			title: 'Error registering global shortcut.',
 			description: 'Please make sure it is a valid Electron keyboard shortcut.',

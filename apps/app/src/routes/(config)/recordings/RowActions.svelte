@@ -4,12 +4,12 @@
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import { DownloadService } from '$lib/services/DownloadService';
-	import type { Recording } from '$lib/services/RecordingDbService';
+	import type { Recording } from '$lib/services/recordings-db/db/DbService';
 	import { toast } from '$lib/services/ToastService';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { RecordingsService } from '$lib/stores/RecordingsService.svelte';
+	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { createMutation, Ok } from '@epicenterhq/result';
+	import { createMutation, Ok } from '@repo/shared/epicenter-result';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,

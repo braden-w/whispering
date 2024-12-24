@@ -9,7 +9,7 @@
 	import {
 		SUPPORTED_LANGUAGES_OPTIONS,
 		TRANSCRIPTION_SERVICE_OPTIONS,
-	} from '$lib/services/TranscriptionService';
+	} from '$lib/services/transcribe-recordings/TranscriptionService';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 </script>

@@ -1,25 +1,26 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
-import type { RecordingsDbService } from '$lib/services/RecordingDbService';
-import { createRecordingsDbServiceLiveIndexedDb } from '$lib/services/RecordingDbServiceIndexedDbLive.svelte';
+import type { Recordings } from '$lib/services/db/';
+import { createRecordingsLiveIndexedDb } from '$lib/services/IndexedDbLive.svelte';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { recordings } from '$lib/stores/recordings.svelte';
+import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok, createMutation } from '@epicenterhq/result';
+import { Ok, createMutation } from '@repo/shared/epicenter-result';
 import {
-	type ToastOptions,
+	type ToastAndNotifyOptions,
 	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import type { Recording } from '../services/RecordingDbService';
+import type { Recording } from '../services/db/';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { createLocalToastFns } from '$lib/utils';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -28,21 +29,6 @@ const cancelSound = new Audio(cancelSoundSrc);
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
-
-/**
- * Creates a set of toast functions that are scoped to a single mutation.
- * This is useful for creating multiple toasts in a single mutation.
- */
-const createLocalToastFns = () => {
-	const toastId = nanoid();
-	return {
-		success: (options: ToastOptions) =>
-			toast.success({ id: toastId, ...options }),
-		error: (options: ToastOptions) => toast.error({ id: toastId, ...options }),
-		loading: (options: ToastOptions) =>
-			toast.loading({ id: toastId, ...options }),
-	};
-};
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
@@ -207,8 +193,7 @@ function createRecorder() {
 				blob,
 				transcriptionStatus: 'UNPROCESSED',
 			};
-			const addRecordingResult =
-				await RecordingsDbService.addRecording(newRecording);
+			const addRecordingResult = await Recordings.addRecording(newRecording);
 			if (!addRecordingResult.ok) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
@@ -218,7 +203,7 @@ function createRecorder() {
 					action: { type: 'more-details', error: addRecordingResult.error },
 				});
 			}
-			void recordings.transcribeRecording(newRecording);
+			void RecordingsService.transcribeRecording(newRecording);
 			if (!settings.value.isFasterRerecordEnabled) {
 				localToast.loading({
 					title: '⏳ Closing session...',
