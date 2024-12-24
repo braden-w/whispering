@@ -1,10 +1,10 @@
+import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
 	WhisperingResult,
 } from '@repo/shared';
-import { Ok } from '@repo/shared';
 
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'>;
