@@ -67,9 +67,9 @@ function createRecorder() {
 			if (!result.ok) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: '❌ Session Close Failed',
+					title: '❌ Failed to Close Recording Session',
 					description:
-						'Oops! We hit a snag while closing your recording session',
+						'Unable to properly close the recording session. This may affect future recordings. Please try restarting the application if issues persist.',
 					action: { type: 'more-details', error: result.error },
 				});
 			}
@@ -79,8 +79,9 @@ function createRecorder() {
 			if (!isInRecordingSession) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: '❌ No Active Session',
-					description: "There's no recording session to close at the moment",
+					title: '❌ No Active Recording Session',
+					description:
+						"Cannot close a recording session because there isn't one currently active. Try starting a new recording first.",
 				});
 			}
 			const localToast = createLocalToastFns();
@@ -120,9 +121,9 @@ function createRecorder() {
 				if (!initResult.ok) {
 					return WhisperingErr({
 						_tag: 'WhisperingError',
-						title: '❌ Session Initialization Failed',
+						title: '❌ Failed to Initialize Recording Session',
 						description:
-							'Oops! We hit a snag while initializing your recording session',
+							'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
 						action: { type: 'more-details', error: initResult.error },
 					});
 				}
@@ -134,9 +135,9 @@ function createRecorder() {
 			if (!result.ok) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: '❌ Recording Failed to Start',
+					title: '❌ Failed to Start Recording',
 					description:
-						'We encountered an issue while setting up your recording',
+						'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
 					action: { type: 'more-details', error: result.error },
 				});
 			}
@@ -188,8 +189,9 @@ function createRecorder() {
 			if (!stopResult.ok) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: '❌ Recording Failed to Stop',
-					description: 'We encountered an issue while stopping your recording',
+					title: '❌ Failed to Stop Recording',
+					description:
+						'Unable to properly stop the current recording. Your audio may not have been saved correctly.',
 					action: { type: 'more-details', error: stopResult.error },
 				});
 			}
@@ -213,7 +215,8 @@ function createRecorder() {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '❌ Failed to Save Recording',
-					description: 'We encountered an issue while saving your recording',
+					description:
+						'Your recording was completed but could not be saved to the library. This might be due to storage limitations or permissions.',
 					action: { type: 'more-details', error: addRecordingResult.error },
 				});
 			}
@@ -230,8 +233,9 @@ function createRecorder() {
 				if (!closeResult.ok) {
 					return WhisperingErr({
 						_tag: 'WhisperingError',
-						title: '❌ Failed to Close Session',
-						description: 'We encountered an issue while closing your session',
+						title: '❌ Failed to Close Session After Recording',
+						description:
+							'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
 						action: { type: 'more-details', error: closeResult.error },
 					});
 				}
@@ -279,7 +283,8 @@ function createRecorder() {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
 					title: '❌ Failed to Cancel Recording',
-					description: 'We encountered an issue while canceling your recording',
+					description:
+						'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
 					action: { type: 'more-details', error: cancelResult.error },
 				});
 			}
@@ -289,8 +294,9 @@ function createRecorder() {
 			if (!isInRecordingSession) {
 				return WhisperingErr({
 					_tag: 'WhisperingError',
-					title: '❌ No Active Session',
-					description: "There's no recording session to cancel at the moment",
+					title: '❌ No Active Recording to Cancel',
+					description:
+						"Cannot cancel recording because there isn't one currently in progress.",
 				});
 			}
 			const localToast = createLocalToastFns();
