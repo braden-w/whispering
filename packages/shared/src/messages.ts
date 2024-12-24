@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { notificationOptionsSchema, recordingStateSchema } from './index.js';
+import { recordingStateSchema } from './constants.js';
+import { notificationOptionsSchema } from './services/index.js';
 
 export const externalMessageSchema = z.discriminatedUnion('name', [
 	z.object({

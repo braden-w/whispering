@@ -1,11 +1,11 @@
 import {
 	HttpServiceErrorIntoTranscriptionServiceError,
-	TranscriptionServiceErr,
 	type TranscriptionService,
+	TranscriptionServiceErr,
 } from '$lib/services/TranscriptionService';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok } from '@repo/shared';
+import { Ok } from '@epicenterhq/result';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 

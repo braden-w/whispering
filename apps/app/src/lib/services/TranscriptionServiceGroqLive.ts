@@ -1,13 +1,13 @@
-import { settings } from '$lib/stores/settings.svelte.js';
-import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok } from '@repo/shared';
-import { HttpService } from './HttpService';
-import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 import {
 	HttpServiceErrorIntoTranscriptionServiceError,
-	TranscriptionServiceErr,
 	type TranscriptionService,
+	TranscriptionServiceErr,
 } from '$lib/services/TranscriptionService';
+import { settings } from '$lib/stores/settings.svelte.js';
+import { getExtensionFromAudioBlob } from '$lib/utils';
+import { Ok } from '@epicenterhq/result';
+import { HttpService } from './HttpService';
+import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 

@@ -1,13 +1,14 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { createMutation, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
+import { Ok } from '@epicenterhq/result';
 import {
-	Ok,
 	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
@@ -20,7 +21,6 @@ import {
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import type { UpdateStatusMessageFn } from '$lib/services/MediaRecorderServiceWeb';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
