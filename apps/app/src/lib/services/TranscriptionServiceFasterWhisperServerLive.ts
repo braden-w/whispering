@@ -1,8 +1,13 @@
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok, type TranscriptionService, WhisperingErr } from '@repo/shared';
+import { Ok } from '@repo/shared';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
+import {
+	HttpServiceErrorIntoTranscriptionServiceError,
+	TranscriptionServiceErr,
+	type TranscriptionService,
+} from './TranscriptionService';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
@@ -11,7 +16,7 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 		async transcribe(audioBlob) {
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-				return WhisperingErr({
+				return TranscriptionServiceErr({
 					_tag: 'WhisperingError',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
@@ -33,35 +38,13 @@ export const createTranscriptionServiceFasterWhisperServerLive =
 				schema: WhisperResponseSchema,
 			});
 			if (!postResult.ok) {
-				switch (postResult.error._tag) {
-					case 'NetworkError':
-						return WhisperingErr({
-							_tag: 'WhisperingError',
-							title: 'Network error',
-							description: 'Please check your internet connection',
-							action: { type: 'more-details', error: postResult.error.message },
-						});
-					case 'HttpError':
-						return WhisperingErr({
-							_tag: 'WhisperingError',
-							title:
-								'An error occurred while sending the request to the transcription server.',
-							description: 'Please try again',
-							action: { type: 'more-details', error: postResult.error.message },
-						});
-					case 'ParseError':
-						return WhisperingErr({
-							_tag: 'WhisperingError',
-							title: 'Unable to parse transcription server response',
-							description: 'Please try again',
-							action: { type: 'more-details', error: postResult.error.message },
-						});
-				}
+				const error = postResult.error;
+				return HttpServiceErrorIntoTranscriptionServiceError(error);
 			}
 			const data = postResult.data;
 			if ('error' in data) {
-				return WhisperingErr({
-					_tag: 'WhisperingError',
+				return TranscriptionServiceErr({
+					_tag: 'TranscriptionServiceErr',
 					title: 'faster-whisper-server error',
 					description:
 						'Please check your faster-whisper-server server settings',

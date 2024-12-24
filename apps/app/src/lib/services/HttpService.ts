@@ -3,11 +3,14 @@ import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
 
-type HttpServiceErrProperties = {
+export type HttpServiceErrProperties = {
 	_tag: 'HttpServiceErr';
-	enum: 'NetworkError' | 'HttpError' | 'ParseError';
 	error: unknown;
-};
+} & (
+	| { code: 'NetworkError' }
+	| { code: 'HttpError'; status: number }
+	| { code: 'ParseError' }
+);
 
 export type HttpService = {
 	post: <TSchema extends z.ZodTypeAny>(config: {

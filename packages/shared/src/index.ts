@@ -11,12 +11,11 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './services/index.js';
 export { Err, Ok } from '@epicenterhq/result';
-export { WhisperingErr, tryAsyncWhispering, trySyncWhispering };
-
 export type {
-	NotificationServiceOptions as NotificationOptions,
+	NotificationServiceOptions,
 	ToastOptions,
 } from './services/ToastAndNotificationService.js';
+export { WhisperingErr, tryAsyncWhispering, trySyncWhispering };
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'

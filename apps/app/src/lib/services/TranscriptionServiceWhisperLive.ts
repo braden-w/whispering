@@ -1,6 +1,11 @@
+import {
+	HttpServiceErrorIntoTranscriptionServiceError,
+	TranscriptionServiceErr,
+	type TranscriptionService,
+} from '$lib/services/TranscriptionService';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok, type TranscriptionService, WhisperingErr } from '@repo/shared';
+import { Ok } from '@repo/shared';
 import { HttpService } from './HttpService';
 import { WhisperResponseSchema } from './transcription/WhisperResponseSchema';
 
@@ -10,8 +15,8 @@ export const createTranscriptionServiceWhisperLive =
 	(): TranscriptionService => ({
 		async transcribe(audioBlob) {
 			if (!settings.value.openAiApiKey) {
-				return WhisperingErr({
-					_tag: 'WhisperingError',
+				return TranscriptionServiceErr({
+					_tag: 'TranscriptionServiceErr',
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
 					action: {
@@ -23,8 +28,8 @@ export const createTranscriptionServiceWhisperLive =
 			}
 
 			if (!settings.value.openAiApiKey.startsWith('sk-')) {
-				return WhisperingErr({
-					_tag: 'WhisperingError',
+				return TranscriptionServiceErr({
+					_tag: 'TranscriptionServiceErr',
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',
 					action: {
@@ -36,11 +41,10 @@ export const createTranscriptionServiceWhisperLive =
 			}
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
-				return WhisperingErr({
-					_tag: 'WhisperingError',
+				return TranscriptionServiceErr({
+					_tag: 'TranscriptionServiceErr',
 					title: `The file size (${blobSizeInMb}MB) is too large`,
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
-					action: { type: 'none' },
 				});
 			}
 			const formData = new FormData();
@@ -61,39 +65,15 @@ export const createTranscriptionServiceWhisperLive =
 			});
 			if (!postResponseResult.ok) {
 				const error = postResponseResult.error;
-				switch (error._tag) {
-					case 'NetworkError':
-						return WhisperingErr({
-							title: 'Network error',
-							description:
-								'Please check your network connection and try again.',
-							action: { type: 'none' },
-						});
-					case 'HttpError':
-						return WhisperingErr({
-							title: 'Error sending audio to OpenAI API',
-							description:
-								'Please check your network connection and try again.',
-							action: { type: 'none' },
-						});
-					case 'ParseError':
-						return WhisperingErr({
-							title: 'Error parsing response from OpenAI API',
-							description:
-								'Please check logs and notify the developer if the issue persists.',
-							action: { type: 'none' },
-						});
-				}
+				return HttpServiceErrorIntoTranscriptionServiceError(error);
 			}
 			const data = postResponseResult.data;
 			if ('error' in data) {
-				return WhisperingErr({
+				return TranscriptionServiceErr({
+					_tag: 'TranscriptionServiceErr',
 					title: 'Server error from Whisper API',
 					description: 'This is likely a problem with OpenAI, not you.',
-					action: {
-						type: 'more-details',
-						error: data.error.message,
-					},
+					action: { type: 'more-details', error: data.error.message },
 				});
 			}
 			return Ok(data.text.trim());

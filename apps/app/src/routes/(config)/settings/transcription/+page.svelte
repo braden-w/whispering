@@ -5,11 +5,11 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { WHISPERING_URL } from '@repo/shared';
 	import {
 		SUPPORTED_LANGUAGES_OPTIONS,
 		TRANSCRIPTION_SERVICE_OPTIONS,
-		WHISPERING_URL,
-	} from '@repo/shared';
+	} from '$lib/services/TranscriptionService';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 </script>
