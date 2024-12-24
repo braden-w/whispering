@@ -1,10 +1,11 @@
+import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
 	WhisperingResult,
 } from '@repo/shared';
-import { Ok, WhisperingErr } from '@repo/shared';
+import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
 export type RequestBody =

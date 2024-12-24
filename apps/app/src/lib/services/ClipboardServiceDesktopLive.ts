@@ -1,4 +1,5 @@
-import { Ok, WhisperingErr, tryAsyncWhispering } from '@repo/shared';
+import { Ok } from '@epicenterhq/result';
+import { WhisperingErr, tryAsyncWhispering } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';

@@ -1,3 +1,4 @@
+import { Ok } from '@epicenterhq/result';
 import { ClipboardService } from '$lib/services/ClipboardService';
 import { DownloadService } from '$lib/services/DownloadService';
 import { NotificationService } from '$lib/services/NotificationService';
@@ -10,7 +11,7 @@ import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/Trans
 import { TranscriptionServiceGroqLive } from '$lib/services/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from '$lib/services/TranscriptionServiceWhisperLive';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { Ok, type ToastOptions, WhisperingErr } from '@repo/shared';
+import { type ToastOptions, WhisperingErr } from '@repo/shared';
 import { settings } from './settings.svelte';
 import type { Result } from '@epicenterhq/result';
 

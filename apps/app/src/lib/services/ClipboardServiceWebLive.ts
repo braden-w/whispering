@@ -1,5 +1,6 @@
+import { Ok } from '@epicenterhq/result';
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-import { Ok, tryAsyncWhispering } from '@repo/shared';
+import { tryAsyncWhispering } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({

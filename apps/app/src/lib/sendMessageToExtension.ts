@@ -1,10 +1,11 @@
+import { Ok } from '@epicenterhq/result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type {
 	ExternalMessage,
 	ExternalMessageReturnType,
 	WhisperingResult,
 } from '@repo/shared';
-import { Ok, tryAsyncWhispering } from '@repo/shared';
+import { tryAsyncWhispering } from '@repo/shared';
 
 export async function sendMessageToExtension<M extends ExternalMessage>(
 	message: M,

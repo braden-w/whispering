@@ -1,3 +1,4 @@
+import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
@@ -5,7 +6,7 @@ import type {
 	WhisperingRecordingState,
 	WhisperingResult,
 } from '@repo/shared';
-import { Ok, WhisperingErr, tryAsyncWhispering } from '@repo/shared';
+import { WhisperingErr, tryAsyncWhispering } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';

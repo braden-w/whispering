@@ -1,5 +1,6 @@
+import { Ok } from '@epicenterhq/result';
 import { sendToBackground } from '@plasmohq/messaging';
-import { Ok, tryAsyncWhispering } from '@repo/shared';
+import { tryAsyncWhispering } from '@repo/shared';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
 
