@@ -35,7 +35,7 @@
 				});
 			return Ok(recording);
 		},
-		onSuccess: (_) => {
+		onSuccess: () => {
 			toast.success({
 				title: 'Recording downloading!',
 				description: 'Your recording is being downloaded.',
