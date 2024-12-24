@@ -1,10 +1,6 @@
-import { createServiceErrorFns } from '@repo/shared/epicenter-result';
 import { type DBSchema, openDB } from 'idb';
-import type {
-	Recording,
-	Recordings,
-	RecordingsErrorProperties,
-} from './DbService';
+import { DbError, type Recording, type Recordings } from './DbService';
+import { tryAsync } from '@epicenterhq/result';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -19,6 +15,7 @@ interface RecordingsDbSchemaV2 extends DBSchema {
 		value: Omit<Recording, 'blob'>;
 	};
 	[RECORDING_BLOB_STORE]: {
+		key: Recording['id'];
 		value: { id: Recording['id']; blob: Blob };
 	};
 }
@@ -31,9 +28,6 @@ interface RecordingsDbSchemaV1 extends DBSchema {
 }
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
-
-const { tryAsync: tryAsyncRecordings } =
-	createServiceErrorFns<RecordingsErrorProperties>();
 
 export const createRecordingsLiveIndexedDb = (): Recordings => {
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
@@ -86,7 +80,7 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 
 	return {
 		getAllRecordings: () =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -106,15 +100,15 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 						})
 						.filter((r) => r !== null);
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error getting recordings from indexedDB',
-					description: 'Please try again',
-					action: { type: 'more-details', error },
-				}),
+				mapErr: (error) =>
+					DbError({
+						title: 'Error getting recordings from indexedDB',
+						description: 'Please try again',
+						error,
+					}),
 			}),
 		getRecording: (id) =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -132,18 +126,15 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 					}
 					return null;
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error getting recording from indexedDB',
-					description: 'Please try again',
-					action: {
-						type: 'more-details',
+				mapErr: (error) =>
+					DbError({
+						title: 'Error getting recording from indexedDB',
+						description: 'Please try again',
 						error,
-					},
-				}),
+					}),
 			}),
 		addRecording: (recording) =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const { blob, ...metadata } = recording;
 					const tx = (await dbPromise).transaction(
@@ -160,18 +151,15 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 						tx.done,
 					]);
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error adding recording to indexedDB',
-					description: 'Please try again',
-					action: {
-						type: 'more-details',
+				mapErr: (error) =>
+					DbError({
+						title: 'Error adding recording to indexedDB',
+						description: 'Please try again',
 						error,
-					},
-				}),
+					}),
 			}),
 		updateRecording: (recording) =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const { blob, ...metadata } = recording;
 					await Promise.all([
@@ -182,15 +170,15 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 						}),
 					]);
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error updating recording in indexedDB',
-					description: 'Please try again',
-					action: { type: 'more-details', error },
-				}),
+				mapErr: (error) =>
+					DbError({
+						title: 'Error updating recording in indexedDB',
+						description: 'Please try again',
+						error,
+					}),
 			}),
 		deleteRecordingById: (id) =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -206,18 +194,15 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 						tx.done,
 					]);
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error deleting recording from indexedDB',
-					description: 'Please try again',
-					action: {
-						type: 'more-details',
+				mapErr: (error) =>
+					DbError({
+						title: 'Error deleting recording from indexedDB',
+						description: 'Please try again',
 						error,
-					},
-				}),
+					}),
 			}),
 		deleteRecordingsById: (ids) =>
-			tryAsyncRecordings({
+			tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -233,15 +218,12 @@ export const createRecordingsLiveIndexedDb = (): Recordings => {
 					}
 					await tx.done;
 				},
-				mapErr: (error) => ({
-					_tag: 'RecordingsError',
-					title: 'Error deleting recordings from indexedDB',
-					description: 'Please try again',
-					action: {
-						type: 'more-details',
+				mapErr: (error) =>
+					DbError({
+						title: 'Error deleting recordings from indexedDB',
+						description: 'Please try again',
 						error,
-					},
-				}),
+					}),
 			}),
 	};
 };

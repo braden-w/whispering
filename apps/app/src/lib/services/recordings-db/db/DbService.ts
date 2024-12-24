@@ -1,4 +1,5 @@
-import type { ServiceFn } from '@repo/shared/epicenter-result';
+import type { Result } from '@epicenterhq/result';
+import { Err } from '@repo/shared/epicenter-result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -18,38 +19,29 @@ export type Recording = {
 	transcriptionStatus: TranscriptionStatus;
 };
 
-export type RecordingsErrorProperties = {
-	_tag: 'RecordingsError';
+type DbErrorProperties = {
+	_tag: 'DbError';
 	title: string;
 	description: string;
-	action: { type: 'more-details'; error: unknown };
+	error: unknown;
+};
+
+export type DbServiceResult<T> = Result<T, DbErrorProperties>;
+
+export const DbError = (
+	properties: Omit<DbErrorProperties, '_tag'>,
+): DbServiceResult<never> => {
+	return Err({
+		_tag: 'DbError',
+		...properties,
+	});
 };
 
 export type Recordings = {
-	readonly getAllRecordings: ServiceFn<
-		void,
-		Recording[],
-		RecordingsErrorProperties
-	>;
-	readonly getRecording: ServiceFn<
-		string,
-		Recording | null,
-		RecordingsErrorProperties
-	>;
-	readonly addRecording: ServiceFn<Recording, void, RecordingsErrorProperties>;
-	readonly updateRecording: ServiceFn<
-		Recording,
-		void,
-		RecordingsErrorProperties
-	>;
-	readonly deleteRecordingById: ServiceFn<
-		string,
-		void,
-		RecordingsErrorProperties
-	>;
-	readonly deleteRecordingsById: ServiceFn<
-		string[],
-		void,
-		RecordingsErrorProperties
-	>;
+	readonly getAllRecordings: () => DbServiceResult<Recording[]>;
+	readonly getRecording: (id: string) => DbServiceResult<Recording | null>;
+	readonly addRecording: (recording: Recording) => DbServiceResult<void>;
+	readonly updateRecording: (recording: Recording) => DbServiceResult<void>;
+	readonly deleteRecordingById: (id: string) => DbServiceResult<void>;
+	readonly deleteRecordingsById: (ids: string[]) => DbServiceResult<void>;
 };
