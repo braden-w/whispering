@@ -7,8 +7,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
