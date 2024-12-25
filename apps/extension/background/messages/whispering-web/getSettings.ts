@@ -11,9 +11,11 @@ import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import type { WhisperingStorageKey } from '~lib/storage/keys';
 
+export type GetSettingsResponse = WhisperingResult<Settings>;
+
 const handler: PlasmoMessaging.MessageHandler<
 	never,
-	WhisperingResult<Settings>
+	GetSettingsResponse
 > = async (_req, res) => {
 	const getSettings = async () => {
 		const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();

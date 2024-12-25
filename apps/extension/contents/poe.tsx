@@ -7,8 +7,8 @@ import type {
 	PlasmoGetStyle,
 } from 'plasmo';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
-import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
 import { waitForElement } from './utils/waitForElement';
+import { app } from '~background/messages/whispering-web/app';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
 	const element = await waitForElement('div.GrowingTextArea_growWrap__im5W3');
@@ -35,7 +35,7 @@ function RecorderStateAsIcon() {
 	return (
 		<button
 			className="group relative z-10 h-10 w-10 rounded-md text-2xl"
-			onClick={toggleRecordingFromContentScript}
+			onClick={app.toggleRecording}
 		>
 			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10" />
 			{recorderStateAsIcon}
