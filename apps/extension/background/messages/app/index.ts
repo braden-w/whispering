@@ -8,20 +8,20 @@ import type { ToggleRecordingResponse } from './toggleRecording';
 export const app = {
 	getSettings: async () => {
 		const response = (await sendToBackground({
-			name: 'whispering-web/getSettings',
+			name: 'app/getSettings',
 		})) as GetSettingsResponse;
 		return response;
 	},
 	setSettings: async (settings: Settings) => {
 		const response = (await sendToBackground({
-			name: 'whispering-web/setSettings',
+			name: 'app/setSettings',
 			body: settings,
 		})) as SetSettingsResponse;
 		return response;
 	},
 	toggleRecording: async () => {
 		const response = (await sendToBackground({
-			name: 'whispering-web/toggleRecording',
+			name: 'app/toggleRecording',
 		})) as ToggleRecordingResponse;
 		if (!response.ok) {
 			return WhisperingErr({
@@ -35,7 +35,7 @@ export const app = {
 	},
 	cancelRecording: async () => {
 		const response = (await sendToBackground({
-			name: 'whispering-web/cancelRecording',
+			name: 'app/cancelRecording',
 		})) as CancelRecordingResponse;
 		if (!response.ok) {
 			return WhisperingErr({

@@ -1,4 +1,4 @@
-import { toggleRecording } from '~background/messages/whispering-web/toggleRecording';
+import { toggleRecording } from '~background/messages/app/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
 
 chrome.runtime.onInstalled.addListener(async (details) => {
