@@ -35,12 +35,33 @@ export const recorder = createRecorder();
 const createLocalToastFns = () => {
 	const toastId = nanoid();
 	return {
-		success: (options: Pick<ToastAndNotifyOptions, 'title' | 'description'>) =>
-			toast.success({ id: toastId, ...options }),
-		error: (options: Pick<ToastAndNotifyOptions, 'title' | 'description'>) =>
-			toast.error({ id: toastId, ...options }),
-		loading: (options: Pick<ToastAndNotifyOptions, 'title' | 'description'>) =>
-			toast.loading({ id: toastId, ...options }),
+		success: (
+			options: Pick<
+				ToastAndNotifyOptions,
+				'title' | 'description' | 'descriptionClass'
+			>,
+		) => {
+			console.log('🚀 ~ createLocalToastFns ~ success:', options);
+			return toast.success({ id: toastId, ...options });
+		},
+		error: (
+			options: Pick<
+				ToastAndNotifyOptions,
+				'title' | 'description' | 'descriptionClass'
+			>,
+		) => {
+			console.log('🚀 ~ createLocalToastFns ~ error:', options);
+			return toast.error({ id: toastId, ...options });
+		},
+		loading: (
+			options: Pick<
+				ToastAndNotifyOptions,
+				'title' | 'description' | 'descriptionClass'
+			>,
+		) => {
+			console.log('🚀 ~ createLocalToastFns ~ loading:', options);
+			return toast.loading({ id: toastId, ...options });
+		},
 	};
 };
 
@@ -242,18 +263,24 @@ function createRecorder() {
 									transcribeRecordingAndUpdateDbResult.data;
 
 								if (!settings.value.isCopyToClipboardEnabled) {
-									toast.success({
+									localToast.success({
 										title: 'Recording transcribed!',
 										description: updatedRecording.transcribedText,
 										descriptionClass: 'line-clamp-2',
 									});
 								}
+
 								if (settings.value.isCopyToClipboardEnabled) {
+									localToast.loading({
+										title: '⏳ Copying to clipboard...',
+										description:
+											'Copying the transcription to your clipboard...',
+									});
 									const copyResult = await ClipboardService.setClipboardText(
 										updatedRecording.transcribedText,
 									);
 									if (!copyResult.ok) {
-										toast.success({
+										localToast.success({
 											title: 'Recording transcribed!',
 											description: updatedRecording.transcribedText,
 											descriptionClass: 'line-clamp-2',
@@ -274,11 +301,15 @@ function createRecorder() {
 								}
 
 								if (settings.value.isPasteContentsOnSuccessEnabled) {
+									localToast.loading({
+										title: '⏳ Pasting ...',
+										description: 'Pasting the transcription to your cursor...',
+									});
 									const pasteResult = await ClipboardService.writeTextToCursor(
 										updatedRecording.transcribedText,
 									);
 									if (!pasteResult.ok) {
-										toast.success({
+										localToast.success({
 											title: 'Recording transcribed and copied to clipboard!',
 											description: updatedRecording.transcribedText,
 											descriptionClass: 'line-clamp-2',
@@ -297,7 +328,7 @@ function createRecorder() {
 										});
 									}
 								}
-								toast.success({
+								localToast.success({
 									title:
 										'Recording transcribed, copied to clipboard, and pasted!',
 									description: updatedRecording.transcribedText,
