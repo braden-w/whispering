@@ -3,13 +3,18 @@ import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
+import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
+import { RecordingsService } from '$lib/services/recordings-db/RecordingsService.svelte';
+import type { Recording } from '$lib/services/recordings-db/db/DbService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
+import { TranscriptionServiceGroqLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceGroqLive';
+import { TranscriptionServiceWhisperLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok, createMutation } from '@epicenterhq/result';
+import { Err, Ok, createMutation } from '@epicenterhq/result';
 import {
-	WhisperingErr,
 	type ToastAndNotifyOptions,
-	type WhisperingErrProperties,
+	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
@@ -17,13 +22,6 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import type { Recording } from '$lib/services/recordings-db/db/DbService';
-import { RecordingsService } from '$lib/services/recordings-db/RecordingsService.svelte';
-import { TranscribeRecordingsService } from '$lib/services/transcribe-recordings/TranscribeRecordingsService';
-import { TranscriptionServiceGroqLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceGroqLive';
-import { TranscriptionServiceWhisperLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
-import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -174,11 +172,8 @@ function createRecorder() {
 				sendStatus: localToast.loading,
 			});
 			if (!stopResult.ok) return stopResult;
-			localToast.loading({
-				title: '💾 Saving your recording...',
-				description: 'Adding your recording to the library...',
-			});
 			const blob = stopResult.data;
+
 			const newRecording: Recording = {
 				id: nanoid(),
 				title: '',
@@ -189,14 +184,17 @@ function createRecorder() {
 				transcriptionStatus: 'UNPROCESSED',
 			};
 
-			const addRecordingResult =
+			const saveRecordingToDatabaseResult =
 				await RecordingsService.addRecording(newRecording);
-			if (!addRecordingResult.ok) {
+			if (!saveRecordingToDatabaseResult.ok) {
 				return WhisperingErr({
 					title: '❌ Failed to Save Recording',
 					description:
 						'Your recording was completed but could not be saved to the library. This might be due to storage limitations or permissions.',
-					action: { type: 'more-details', error: addRecordingResult.error },
+					action: {
+						type: 'more-details',
+						error: saveRecordingToDatabaseResult.error,
+					},
 				});
 			}
 
@@ -206,31 +204,38 @@ function createRecorder() {
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
-			transcribingRecordingIds.add(newRecording.id);
-			const transcribeResult = await selectedTranscriptionService.transcribe(
-				newRecording.blob,
-			);
-			transcribingRecordingIds.delete(newRecording.id);
+			const [transcribeResult, closeSessionResult] = await Promise.all([
+				(async () => {
+					transcribingRecordingIds.add(newRecording.id);
+					const result = await selectedTranscriptionService.transcribe(blob);
+					transcribingRecordingIds.delete(newRecording.id);
+					return result;
+				})(),
+
+				(async () => {
+					if (!settings.value.isFasterRerecordEnabled) {
+						localToast.loading({
+							title: '⏳ Closing session...',
+							description: 'Wrapping up your recording session...',
+						});
+						return await MediaRecorderService.closeRecordingSession(undefined, {
+							sendStatus: localToast.loading,
+						});
+					}
+					return Ok(undefined);
+				})(),
+			]);
+
 			if (!transcribeResult.ok) return transcribeResult;
 			const transcribedText = transcribeResult.data;
 
-			if (!settings.value.isFasterRerecordEnabled) {
-				localToast.loading({
-					title: '⏳ Closing session...',
-					description: 'Wrapping up your recording session...',
+			if (!closeSessionResult.ok) {
+				return WhisperingErr({
+					title: '❌ Failed to Close Session After Recording',
+					description:
+						'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
+					action: { type: 'more-details', error: closeSessionResult.error },
 				});
-				const closeResult = await MediaRecorderService.closeRecordingSession(
-					undefined,
-					{ sendStatus: localToast.loading },
-				);
-				if (!closeResult.ok) {
-					toast.error({
-						title: '❌ Failed to Close Session After Recording',
-						description:
-							'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
-						action: { type: 'more-details', error: closeResult.error },
-					});
-				}
 			}
 
 			const newRecordingWithDoneStatus = {
@@ -242,23 +247,51 @@ function createRecorder() {
 			const updateRecordingWithDoneStatusResult =
 				await RecordingsService.updateRecording(newRecordingWithDoneStatus);
 			if (!updateRecordingWithDoneStatusResult.ok)
-				return updateRecordingWithDoneStatusResult;
+				return WhisperingErr({
+					title: '❌ Failed to Update Recording',
+					description:
+						'Your recording was saved but we encountered an issue while updating the recording with the transcription result. You may need to restart the application.',
+					action: {
+						type: 'more-details',
+						error: updateRecordingWithDoneStatusResult.error,
+					},
+				});
 
 			if (transcribedText === '') return Ok(transcribedText);
 
 			if (settings.value.isCopyToClipboardEnabled) {
-				const setClipboardTextResult =
+				const copyResult =
 					await ClipboardService.setClipboardText(transcribedText);
-				if (!setClipboardTextResult.ok) return setClipboardTextResult;
+				if (!copyResult.ok) {
+					if (copyResult.error._tag === 'WhisperingError') {
+						return Err(copyResult.error);
+					}
+					return WhisperingErr({
+						title: '❌ Failed to Copy to Clipboard',
+						description:
+							'We encountered an issue while copying the transcription to your clipboard. Please try again.',
+						action: { type: 'more-details', error: copyResult.error },
+					});
+				}
 			}
 
 			if (settings.value.isPasteContentsOnSuccessEnabled) {
-				const pasteToCursorResult =
+				const pasteResult =
 					await ClipboardService.writeTextToCursor(transcribedText);
-				if (!pasteToCursorResult.ok) return pasteToCursorResult;
+				if (!pasteResult.ok) {
+					if (pasteResult.error._tag === 'WhisperingError') {
+						return Err(pasteResult.error);
+					}
+					return WhisperingErr({
+						title: '❌ Failed to Paste to Cursor',
+						description:
+							'We encountered an issue while pasting the transcription to your cursor. Please try again.',
+						action: { type: 'more-details', error: pasteResult.error },
+					});
+				}
 			}
 
-			return Ok(undefined);
+			return Ok(transcribedText);
 		},
 		onMutate: () => {
 			const localToast = createLocalToastFns();
@@ -305,33 +338,8 @@ function createRecorder() {
 					action: { type: 'more-details', error: cancelResult.error },
 				});
 			}
-			return Ok(undefined);
-		},
-		onMutate: () => {
-			if (!isInRecordingSession) {
-				return WhisperingErr({
-					title: '❌ No Active Recording to Cancel',
-					description:
-						"Cannot cancel recording because there isn't one currently in progress.",
-				});
-			}
-			const localToast = createLocalToastFns();
-			localToast.loading({
-				title: '🔄 Cancelling recording...',
-				description: 'Discarding the current recording...',
-			});
-			return Ok({ localToast });
-		},
-		onSuccess: async (_, { context: { localToast } }) => {
-			void playSound('cancel');
-			console.info('Recording cancelled');
 			setRecorderState('SESSION');
-			localToast.success({
-				title: '🚫 Recording Cancelled',
-				description:
-					'Recording discarded, but session remains open for a new take',
-			});
-			if (settings.value.isFasterRerecordEnabled) return;
+			if (settings.value.isFasterRerecordEnabled) return Ok(undefined);
 
 			localToast.loading({
 				title: '⏳ Closing session...',
@@ -342,24 +350,41 @@ function createRecorder() {
 				{ sendStatus: localToast.loading },
 			);
 			if (!closeResult.ok) {
-				renderErrAsToast({
+				return WhisperingErr({
 					title: '❌ Failed to Close Session',
 					description: 'We encountered an issue while closing your session',
 					action: { type: 'more-details', error: closeResult.error },
 				});
-				return;
 			}
 			setRecorderState('IDLE');
-			localToast.success({
-				title: '✅ All Done!',
-				description: 'Recording cancelled and session closed successfully',
+			return Ok(undefined);
+		},
+		onMutate: () => {
+			const localToast = createLocalToastFns();
+			localToast.loading({
+				title: '🔄 Cancelling recording...',
+				description: 'Discarding the current recording...',
 			});
+			return Ok({ localToast });
+		},
+		onSuccess: async (_, { context: { localToast } }) => {
+			void playSound('cancel');
+			console.info('Recording cancelled');
+			if (settings.value.isFasterRerecordEnabled) {
+				localToast.success({
+					title: '🚫 Recording Cancelled',
+					description:
+						'Recording discarded, but session remains open for a new take',
+				});
+			} else {
+				localToast.success({
+					title: '✅ All Done!',
+					description: 'Recording cancelled and session closed successfully',
+				});
+			}
 		},
 		onError: (error, { contextResult }) => {
-			if (!contextResult.ok) {
-				toast.error(contextResult.error);
-				return;
-			}
+			if (!contextResult.ok) return;
 			const { localToast } = contextResult.data;
 			localToast.error(error);
 		},
@@ -409,6 +434,14 @@ async function playSound(
 		body: { sound },
 	});
 
-	if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+	if (!sendMessageToExtensionResult.ok)
+		return WhisperingErr({
+			title: '❌ Failed to Play Sound',
+			description: `We encountered an issue while playing the ${sound} sound`,
+			action: {
+				type: 'more-details',
+				error: sendMessageToExtensionResult.error,
+			},
+		});
 	return Ok(undefined);
 }
