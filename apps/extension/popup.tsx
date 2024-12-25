@@ -11,7 +11,7 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
-import { app } from '~background/messages/whispering-web/app';
+import { app } from '~background/messages/app';
 import { WhisperingButton } from '~components/WhisperingButton';
 import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
@@ -20,6 +20,7 @@ import {
 	useWhisperingTranscribedText,
 } from '~lib/storage/useWhisperingStorage';
 import './style.css';
+import { extension } from '~background/messages/whispering-extension';
 
 function IndexPopup() {
 	return (
@@ -35,14 +36,20 @@ function IndexPopup() {
 
 async function toggleRecording() {
 	const toggleRecordingResult = await app.toggleRecording();
-	if (!toggleRecordingResult.ok)
-		renderErrorAsNotification(toggleRecordingResult);
+	if (!toggleRecordingResult.ok) {
+		extension.createNotification({
+			notifyOptions: toggleRecordingResult.error,
+		});
+	}
 }
 
 async function cancelRecording() {
 	const cancelRecordingResult = await app.cancelRecording();
-	if (!cancelRecordingResult.ok)
-		renderErrorAsNotification(cancelRecordingResult);
+	if (!cancelRecordingResult.ok) {
+		extension.createNotification({
+			notifyOptions: cancelRecordingResult.error,
+		});
+	}
 }
 
 function IndexPage() {

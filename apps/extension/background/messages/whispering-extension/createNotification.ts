@@ -5,8 +5,8 @@ import { WhisperingErr } from '@repo/shared';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { nanoid } from 'nanoid';
 import { injectScript } from '~background/injectScript';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
+import { extension } from '.';
 
 export type CreateNotificationMessage = {
 	notifyOptions: ToastAndNotifyOptions;
@@ -44,10 +44,11 @@ const handler: PlasmoMessaging.MessageHandler<
 								chrome.notifications.clear(id);
 								const gotoTargetUrlInWhisperingTabResult =
 									await gotoTargetUrlInWhisperingTab(action.goto);
-								if (!gotoTargetUrlInWhisperingTabResult.ok)
-									return renderErrorAsNotification(
-										gotoTargetUrlInWhisperingTabResult,
-									);
+								if (!gotoTargetUrlInWhisperingTabResult.ok) {
+									extension.createNotification({
+										notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
+									});
+								}
 							}
 						});
 
@@ -57,10 +58,11 @@ const handler: PlasmoMessaging.MessageHandler<
 									chrome.notifications.clear(id);
 									const gotoTargetUrlInWhisperingTabResult =
 										await gotoTargetUrlInWhisperingTab(action.goto);
-									if (!gotoTargetUrlInWhisperingTabResult.ok)
-										return renderErrorAsNotification(
-											gotoTargetUrlInWhisperingTabResult,
-										);
+									if (!gotoTargetUrlInWhisperingTabResult.ok) {
+										return extension.createNotification({
+											notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
+										});
+									}
 								}
 							},
 						);
