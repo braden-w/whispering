@@ -10,11 +10,14 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 	import { recordings, type Recording } from '$lib/services/db';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/services/ToastService';
+	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { copyToClipboardWithToast } from '$lib/with-toasts/clipboard';
-	import { deleteRecordingsByIdWithToast } from '$lib/with-toasts/recordings';
+	import { createMutation } from '@epicenterhq/result';
 	import {
 		FlexRender,
 		createTable,
@@ -35,10 +38,10 @@
 	} from 'lucide-svelte';
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
+	import { deleteRecordingsByIdWithToast } from './recordingMutations';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -259,6 +262,29 @@
 		const text = transcriptions.join(delimiter);
 		return text;
 	});
+
+	const copyToClipboardWithToast = createMutation({
+		mutationFn: ClipboardService.setClipboardText,
+		onSuccess: (_, { input: text }) => {
+			toast.success({
+				title: 'Copied transcription to clipboard!',
+				description: text,
+				descriptionClass: 'line-clamp-2',
+			});
+		},
+		onError: (error) => {
+			if (error._tag === 'ClipboardError') {
+				renderErrAsToast({
+					variant: 'error',
+					title: 'Error copying transcription to clipboard',
+					description: 'Please try again.',
+					action: { type: 'more-details', error: error },
+				});
+				return;
+			}
+			renderErrAsToast(error);
+		},
+	});
 </script>
 
 <svelte:head>
@@ -364,8 +390,8 @@
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
-									onclick={() => {
-										copyToClipboardWithToast(text);
+									onclick={async () => {
+										await copyToClipboardWithToast(text);
 										isDialogOpen = false;
 									}}
 									type="submit"

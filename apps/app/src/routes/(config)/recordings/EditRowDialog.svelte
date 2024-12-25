@@ -7,11 +7,11 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { Recording } from '$lib/services/db';
+	import { Loader2Icon } from 'lucide-svelte';
 	import {
 		deleteRecordingByIdWithToast,
 		updateRecordingWithToast,
-	} from '$lib/with-toasts/recordings';
-	import { Loader2Icon } from 'lucide-svelte';
+	} from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 
