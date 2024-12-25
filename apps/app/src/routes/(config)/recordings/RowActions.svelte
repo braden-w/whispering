@@ -7,8 +7,8 @@
 	import type { Recording } from '$lib/services/db';
 	import { recordings } from '$lib/services/db';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { copyRecordingText } from '$lib/with-toasts/copyRecordingText';
 	import { createMutation, Ok } from '@epicenterhq/result';
 	import {
 		DownloadIcon,
@@ -17,7 +17,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
+	import { copyRecordingText } from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 

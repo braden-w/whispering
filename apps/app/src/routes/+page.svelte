@@ -5,12 +5,12 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { copyRecordingText } from '$lib/with-toasts/copyRecordingText';
 	import { recordings, type Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
+	import { copyRecordingText } from './(config)/recordings/recordingMutations';
 
 	const latestRecording = $derived<Recording>(
 		recordings.recordings.at(-1) ?? {
