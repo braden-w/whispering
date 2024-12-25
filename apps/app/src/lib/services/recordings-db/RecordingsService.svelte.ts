@@ -7,6 +7,7 @@ type RecordingServiceResult<T> = DbServiceResult<T>;
 
 export type RecordingsService = {
 	get recordings(): Recording[];
+	addRecording: (recording: Recording) => Promise<RecordingServiceResult<void>>;
 	updateRecording: (
 		recording: Recording,
 	) => Promise<RecordingServiceResult<void>>;
@@ -45,28 +46,38 @@ function createRecordingsService({
 		get recordings() {
 			return recordingsArray;
 		},
+
+		async addRecording(recording: Recording) {
+			const addRecordingResult = await DbService.addRecording(recording);
+			if (!addRecordingResult.ok) return addRecordingResult;
+
+			recordingsArray = [...recordingsArray, recording];
+			return Ok(undefined);
+		},
+
 		async updateRecording(recording) {
 			const updateRecordingResult = await DbService.updateRecording(recording);
 			if (!updateRecordingResult.ok) return updateRecordingResult;
+
 			recordingsArray = recordingsArray.map((r) =>
 				r.id === recording.id ? recording : r,
 			);
 			return Ok(undefined);
 		},
+
 		async deleteRecordingById(id: string) {
 			const deleteRecordingByIdResult = await DbService.deleteRecordingById(id);
-			if (!deleteRecordingByIdResult.ok) {
-				return deleteRecordingByIdResult;
-			}
+			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
+
 			recordingsArray = recordingsArray.filter((r) => r.id !== id);
 			return Ok(id);
 		},
+
 		async deleteRecordingsById(ids: string[]) {
 			const deleteRecordingsByIdResult =
 				await DbService.deleteRecordingsById(ids);
-			if (!deleteRecordingsByIdResult.ok) {
-				return deleteRecordingsByIdResult;
-			}
+			if (!deleteRecordingsByIdResult.ok) return deleteRecordingsByIdResult;
+
 			recordingsArray = recordingsArray.filter(
 				(recording) => !ids.includes(recording.id),
 			);

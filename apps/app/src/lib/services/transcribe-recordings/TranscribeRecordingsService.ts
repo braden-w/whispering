@@ -8,10 +8,9 @@ import { TranscriptionServiceFasterWhisperServerLive } from './transcription/Tra
 import { TranscriptionServiceGroqLive } from './transcription/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from './transcription/TranscriptionServiceWhisperLive';
 
-export const TranscribeRecordingsUpdateService =
-	createTranscribeRecordingsUpdateService({
-		RecordingsService: RecordingsService,
-	});
+export const TranscribeRecordingsService = createTranscribeRecordingsService({
+	RecordingsService: RecordingsService,
+});
 
 type TranscribeRecordingsServiceResult =
 	| Result<TranscribeRecordingsService, never>
@@ -31,7 +30,7 @@ type TranscribeRecordingsService = {
 	) => Promise<TranscribeRecordingsServiceResult>;
 };
 
-function createTranscribeRecordingsUpdateService({
+function createTranscribeRecordingsService({
 	RecordingsService,
 }: { RecordingsService: RecordingsService }) {
 	const transcribingRecordingIds = new Set<string>();

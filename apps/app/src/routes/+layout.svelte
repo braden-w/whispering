@@ -5,7 +5,7 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { TranscribeRecordingsUpdateService } from '$lib/services/transcribe-recordings/TranscribeRecordingsService';
+	import { TranscribeRecordingsService } from '$lib/services/transcribe-recordings/TranscribeRecordingsService';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -23,7 +23,7 @@
 	};
 
 	const isCurrentlyTranscribing = $derived(
-		TranscribeRecordingsUpdateService.currentTranscribingRecordingIds.size > 0,
+		TranscribeRecordingsService.currentTranscribingRecordingIds.size > 0,
 	);
 
 	$effect(() => {
