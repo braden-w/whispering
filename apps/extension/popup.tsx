@@ -1,22 +1,16 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
+import { tryAsync } from '@epicenterhq/result';
 import { sendToBackground } from '@plasmohq/messaging';
-
-import {
-	Ok,
-	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
-	recorderStateToIcons,
-	tryAsyncWhispering,
-} from '@repo/shared';
+import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
 import {
 	ClipboardIcon,
 	ListIcon,
+	Loader2Icon,
 	MoonIcon,
 	SlidersVerticalIcon,
 	SunIcon,
-	Loader2Icon,
 } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
 import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
@@ -43,7 +37,7 @@ function IndexPopup() {
 }
 
 async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
-	const sendToToggleRecordingResult = await tryAsyncWhispering({
+	const sendToToggleRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
@@ -63,7 +57,7 @@ async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
 }
 
 async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
-	const sendToCancelRecordingResult = await tryAsyncWhispering({
+	const sendToCancelRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				CancelRecording.RequestBody,

@@ -1,7 +1,7 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import {
-	SUPPORTED_LANGUAGES_OPTIONS,
 	type Settings,
+	SUPPORTED_LANGUAGES_OPTIONS,
 	TRANSCRIPTION_SERVICE_OPTIONS,
 	WHISPERING_URL,
 } from '@repo/shared';

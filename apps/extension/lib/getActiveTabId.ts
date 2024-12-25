@@ -1,7 +1,7 @@
-import { tryAsyncBubble } from '@repo/shared';
+import { Err, tryAsync } from '@epicenterhq/result';
 
 export const getActiveTabId = () =>
-	tryAsyncBubble({
+	tryAsync({
 		try: async () => {
 			const [activeTab] = await chrome.tabs.query({
 				active: true,
@@ -9,8 +9,9 @@ export const getActiveTabId = () =>
 			});
 			return activeTab?.id;
 		},
-		mapErr: (error) => ({
-			_tag: 'GetActiveTabIdError',
-			message: 'Unable to get active tab ID',
-		}),
+		mapErr: (error) =>
+			Err({
+				_tag: 'GetActiveTabIdError',
+				message: 'Unable to get active tab ID',
+			} as const),
 	});

@@ -10,7 +10,7 @@ function createToastService() {
 		(variant: ToastAndNotifyOptions['variant']) =>
 		({ title, action, ...options }: Omit<ToastAndNotifyOptions, 'variant'>) => {
 			const getDurationInMs = () => {
-				if (variant === 'loading') return 60_000;
+				if (variant === 'loading') return 5000;
 				if (variant === 'error' || variant === 'warning') return 5000;
 				if (action) return 4000;
 				return 3000;
