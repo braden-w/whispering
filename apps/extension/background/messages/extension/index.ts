@@ -84,14 +84,14 @@ export const sendMessageToExtension = async <
 export const extension = {
 	createNotification: async (body: CreateNotificationMessage) => {
 		const result = await sendMessageToExtension<CreateNotificationResult>({
-			name: 'whispering-extension/createNotification',
+			name: 'extension/createNotification',
 			body,
 		});
 		return result;
 	},
 	clearNotification: async (body: ClearNotificationMessage) => {
 		const result = await sendMessageToExtension<ClearNotificationResult>({
-			name: 'whispering-extension/clearNotification',
+			name: 'extension/clearNotification',
 			body,
 		});
 		return result;
@@ -99,7 +99,7 @@ export const extension = {
 	notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
 		const result = await sendMessageToExtension<NotifyWhisperingTabReadyResult>(
 			{
-				name: 'whispering-extension/notifyWhisperingTabReady',
+				name: 'extension/notifyWhisperingTabReady',
 				body,
 			},
 		);
@@ -107,28 +107,28 @@ export const extension = {
 	},
 	playSound: async (body: PlaySoundMessage) => {
 		const result = await sendMessageToExtension<PlaySoundResult>({
-			name: 'whispering-extension/playSound',
+			name: 'extension/playSound',
 			body,
 		});
 		return result;
 	},
 	setClipboardText: async (body: SetClipboardTextMessage) => {
 		const result = await sendMessageToExtension<SetClipboardTextResult>({
-			name: 'whispering-extension/setClipboardText',
+			name: 'extension/setClipboardText',
 			body,
 		});
 		return result;
 	},
 	setRecorderState: async (body: SetRecorderStateMessage) => {
 		const result = await sendMessageToExtension<SetRecorderStateResult>({
-			name: 'whispering-extension/setRecorderState',
+			name: 'extension/setRecorderState',
 			body,
 		});
 		return result;
 	},
 	writeTextToCursor: async (body: WriteTextToCursorMessage) => {
 		const result = await sendMessageToExtension<WriteTextToCursorResult>({
-			name: 'whispering-extension/writeTextToCursor',
+			name: 'extension/writeTextToCursor',
 			body,
 		});
 		return result;
