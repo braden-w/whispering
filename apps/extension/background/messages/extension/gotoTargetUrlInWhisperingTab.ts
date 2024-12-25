@@ -3,7 +3,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~background/messages/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
 
 export async function gotoTargetUrlInWhisperingTab(
 	path: string,

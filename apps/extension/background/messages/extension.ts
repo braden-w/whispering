@@ -4,28 +4,28 @@ import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
 	ClearNotificationMessage,
 	ClearNotificationResult,
-} from './clearNotification';
+} from './extension/clearNotification';
 import type {
 	CreateNotificationMessage,
 	CreateNotificationResult,
-} from './createNotification';
+} from './extension/createNotification';
 import type {
 	NotifyWhisperingTabReadyMessage,
 	NotifyWhisperingTabReadyResult,
-} from './notifyWhisperingTabReady';
-import type { PlaySoundMessage, PlaySoundResult } from './playSound';
+} from './extension/notifyWhisperingTabReady';
+import type { PlaySoundMessage, PlaySoundResult } from './extension/playSound';
 import type {
 	SetClipboardTextMessage,
 	SetClipboardTextResult,
-} from './setClipboardText';
+} from './extension/setClipboardText';
 import type {
 	SetRecorderStateMessage,
 	SetRecorderStateResult,
-} from './setRecorderState';
+} from './extension/setRecorderState';
 import type {
 	WriteTextToCursorMessage,
 	WriteTextToCursorResult,
-} from './writeTextToCursor';
+} from './extension/writeTextToCursor';
 
 type SendMessageToExtensionErrProperties = {
 	_tag: 'SendMessageToExtensionError';
