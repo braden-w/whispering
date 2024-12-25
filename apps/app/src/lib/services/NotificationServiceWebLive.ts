@@ -1,5 +1,5 @@
 import { extension } from '@repo/extension';
-import type { NotificationService } from '@repo/shared';
+import type { NotificationService } from './NotificationService';
 
 export const createNotificationServiceWeb = (): NotificationService => {
 	return {

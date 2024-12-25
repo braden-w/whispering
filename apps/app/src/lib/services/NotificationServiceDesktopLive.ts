@@ -1,11 +1,11 @@
-import { Ok } from '@epicenterhq/result';
-import type { NotificationService } from '@repo/shared';
-import { tryAsync } from '@epicenterhq/result';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import { WhisperingErr } from '@repo/shared';
 import {
 	isPermissionGranted,
 	requestPermission,
 	sendNotification,
 } from '@tauri-apps/plugin-notification';
+import type { NotificationService } from './NotificationService';
 
 const createNotificationServiceDesktop = (): NotificationService => {
 	return {
@@ -21,15 +21,15 @@ const createNotificationServiceDesktop = (): NotificationService => {
 						sendNotification({ title });
 					}
 				},
-				mapErr: (error) => ({
-					_tag: 'WhisperingError',
-					title: 'Notification error',
-					description: 'Could not send notification',
-					action: {
-						type: 'more-details',
-						error,
-					},
-				}),
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Notification error',
+						description: 'Could not send notification',
+						action: {
+							type: 'more-details',
+							error,
+						},
+					}),
 			});
 			if (!notifyResult.ok) return notifyResult;
 			const uselessId = notifyResult.data;
