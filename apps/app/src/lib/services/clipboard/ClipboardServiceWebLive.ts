@@ -1,7 +1,6 @@
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { Ok, tryAsync } from '@epicenterhq/result';
-import { ClipboardServiceErr, type ClipboardService } from './ClipboardService';
 import { extension } from '@repo/extension';
+import { ClipboardServiceErr, type ClipboardService } from './ClipboardService';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
 	setClipboardText: async (text) => {
