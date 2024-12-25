@@ -2,14 +2,14 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
-	import { copyRecordingText } from '$lib/mutations/copyRecordingText';
 	import { DownloadService } from '$lib/services/DownloadService';
-	import type { Recording } from '$lib/services/recordings-db/db/DbService';
 	import { toast } from '$lib/services/ToastService';
+	import type { Recording } from '$lib/services/db';
+	import { recordings } from '$lib/services/db';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { createMutation, Ok } from '@repo/shared/epicenter-result';
+	import { copyRecordingText } from '$lib/with-toasts/copyRecordingText';
+	import { createMutation, Ok } from '@epicenterhq/result';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
@@ -17,6 +17,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
+	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -42,9 +43,7 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() => {
-			RecordingsService.transcribeRecording(recording);
-		}}
+		onclick={() => transcribeRecordingAndUpdateDb(recording)}
 		variant="ghost"
 		size="icon"
 	>
@@ -87,7 +86,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => RecordingsService.deleteRecordingById(recording.id),
+				onConfirm: () => recordings.deleteRecordingById(recording.id),
 			});
 		}}
 		variant="ghost"

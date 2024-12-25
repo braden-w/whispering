@@ -1,9 +1,9 @@
 import {
 	Err,
-	Ok,
-	tryAsync,
 	type InferErr,
+	Ok,
 	type Result,
+	tryAsync,
 } from '@epicenterhq/result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type { ExternalMessage, ExternalMessageReturnType } from '@repo/shared';

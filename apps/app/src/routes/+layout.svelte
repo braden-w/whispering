@@ -4,8 +4,8 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+	import { transcribingRecordingIds } from '$lib/transcribe.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { TranscribeRecordingsService } from '$lib/services/transcribe-recordings/TranscribeRecordingsService';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -22,9 +22,7 @@
 		return getCurrentWindow().setAlwaysOnTop(value);
 	};
 
-	const isCurrentlyTranscribing = $derived(
-		TranscribeRecordingsService.currentTranscribingRecordingIds.size > 0,
-	);
+	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
 
 	$effect(() => {
 		switch (settings.value.alwaysOnTop) {

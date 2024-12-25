@@ -6,9 +6,9 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/recordings-db/db/DbService';
+	import type { Recording } from '$lib/services/db';
 	import {
-		deleteRecordingByIdThenCloseRecording,
+		deleteRecordingByIdWithToast,
 		updateRecordingWithToast,
 	} from '$lib/with-toasts/recordings';
 	import { Loader2Icon } from 'lucide-svelte';
@@ -88,7 +88,7 @@
 					class="mr-auto"
 					onclick={() => {
 						isDeleting = true;
-						deleteRecordingByIdThenCloseRecording(recording.id);
+						deleteRecordingByIdWithToast(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

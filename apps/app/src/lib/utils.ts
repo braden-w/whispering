@@ -76,19 +76,3 @@ export function getExtensionFromAudioBlob(blob: Blob) {
 	if (mimeIncludes('flac')) return 'flac';
 	return 'mp3';
 }
-
-/**
- * Creates a set of toast functions that are scoped to a single mutation.
- * This is useful for creating multiple toasts in a single mutation.
- */
-export const createLocalToastFns = () => {
-	const toastId = nanoid();
-	return {
-		success: (options: ToastAndNotifyOptions) =>
-			toast.success({ id: toastId, ...options }),
-		error: (options: ToastAndNotifyOptions) =>
-			toast.error({ id: toastId, ...options }),
-		loading: (options: ToastAndNotifyOptions) =>
-			toast.loading({ id: toastId, ...options }),
-	};
-};

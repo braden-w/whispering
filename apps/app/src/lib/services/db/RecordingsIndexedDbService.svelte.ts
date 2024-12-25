@@ -1,12 +1,7 @@
-import { type DBSchema, openDB } from 'idb';
-import {
-	DbError,
-	type Recording,
-	type DbService,
-	type DbServiceResult,
-} from '.';
-import { Ok, tryAsync } from '@epicenterhq/result';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import { type DBSchema, openDB } from 'idb';
+import { DbError, type DbService, type Recording } from '.';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;

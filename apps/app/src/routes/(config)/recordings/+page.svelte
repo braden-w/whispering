@@ -10,8 +10,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import type { Recording } from '$lib/services/recordings-db/db/DbService';
-	import { RecordingsService } from '$lib/services/recordings-db/RecordingsService.svelte';
+	import { recordings, type Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { copyToClipboardWithToast } from '$lib/with-toasts/clipboard';
@@ -39,6 +38,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -191,7 +191,7 @@
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return RecordingsService.recordings;
+			return recordings.recordings;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -297,17 +297,17 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									RecordingsService.transcribeRecording(recording.original),
+									transcribeRecordingAndUpdateDb(recording.original),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = RecordingsService.recordings.find((r) => r.id === id);
+							const currentRow = recordings.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = RecordingsService.recordings.find((r) => r.id === id);
+							const currentRow = recordings.recordings.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />

@@ -7,7 +7,7 @@ import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 import { recordings, type Recording } from '$lib/services/db';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { settings } from '$lib/stores/settings.svelte';
-import { Err, Ok, createMutation, runMutation } from '@epicenterhq/result';
+import { Err, Ok, createMutation } from '@epicenterhq/result';
 import {
 	WhisperingErr,
 	type ToastAndNotifyOptions,
@@ -18,7 +18,7 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { transcribeRecordingAndUpdateDb } from '$lib/services/db/transcribe';
+import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -87,210 +87,6 @@ function createRecorder() {
 		},
 		onError: (error, { contextResult }) => {
 			if (!contextResult.ok) return;
-			const { localToast } = contextResult.data;
-			localToast.error(error);
-		},
-	});
-
-	const startRecordingWithToast = createMutation({
-		mutationFn: async (_, { context: { localToast } }) => {
-			if (!isInRecordingSession) {
-				const initResult = await MediaRecorderService.initRecordingSession(
-					{
-						deviceId: settings.value.selectedAudioInputDeviceId,
-						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-					},
-					{ sendStatus: localToast.loading },
-				);
-				if (!initResult.ok) {
-					return WhisperingErr({
-						title: '❌ Failed to Initialize Recording Session',
-						description:
-							'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
-						action: { type: 'more-details', error: initResult.error },
-					});
-				}
-			}
-			const result = await MediaRecorderService.startRecording(nanoid(), {
-				sendStatus: localToast.loading,
-			});
-			if (!result.ok) {
-				return WhisperingErr({
-					title: '❌ Failed to Start Recording',
-					description:
-						'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
-					action: { type: 'more-details', error: result.error },
-				});
-			}
-			return Ok(undefined);
-		},
-		onMutate: () => {
-			const localToast = createLocalToastFns();
-			localToast.loading({
-				title: '🎙️ Preparing to record...',
-				description: 'Setting up your recording environment...',
-			});
-			return Ok({ localToast });
-		},
-		onSuccess: (_, { context: { localToast } }) => {
-			setRecorderState('SESSION+RECORDING');
-			localToast.success({
-				title: '🎯 Recording Started!',
-				description: 'Your voice is being captured crystal clear',
-			});
-			console.info('Recording started');
-			void playSound('start');
-			void NotificationService.notify({
-				variant: 'info',
-				id: IS_RECORDING_NOTIFICATION_ID,
-				title: '🎙️ Whispering is recording...',
-				description: 'Click to go to recorder',
-				action: {
-					type: 'link',
-					label: 'Go to recorder',
-					goto: '/',
-				},
-			});
-		},
-		onError: (error, { contextResult }) => {
-			if (!contextResult.ok) {
-				toast.error(contextResult.error);
-				return;
-			}
-			const { localToast } = contextResult.data;
-			localToast.error(error);
-		},
-	});
-
-	const stopRecordingWithToast = createMutation({
-		mutationFn: async (_, { context: { localToast } }) => {
-			const stopResult = await MediaRecorderService.stopRecording(undefined, {
-				sendStatus: localToast.loading,
-			});
-			if (!stopResult.ok) return stopResult;
-			setRecorderState('SESSION');
-
-			const blob = stopResult.data;
-			const newRecording: Recording = {
-				id: nanoid(),
-				title: '',
-				subtitle: '',
-				timestamp: new Date().toISOString(),
-				transcribedText: '',
-				blob,
-				transcriptionStatus: 'UNPROCESSED',
-			};
-
-			const saveRecordingToDatabaseResult =
-				await recordings.addRecording(newRecording);
-			if (!saveRecordingToDatabaseResult.ok) {
-				return WhisperingErr({
-					title: '❌ Failed to Save Recording',
-					description:
-						'Your recording was completed but could not be saved to the library. This might be due to storage limitations or permissions.',
-					action: {
-						type: 'more-details',
-						error: saveRecordingToDatabaseResult.error,
-					},
-				});
-			}
-
-			const closeSessionWithToastIfNeeded = async () => {
-				if (settings.value.isFasterRerecordEnabled) return;
-				localToast.loading({
-					title: '⏳ Closing session...',
-					description: 'Wrapping up your recording session...',
-				});
-				const closeSessionResult =
-					await MediaRecorderService.closeRecordingSession(undefined, {
-						sendStatus: localToast.loading,
-					});
-				setRecorderState('IDLE');
-
-				if (!closeSessionResult.ok) {
-					renderErrAsToast({
-						title: '❌ Failed to Close Session After Recording',
-						description:
-							'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
-						action: { type: 'more-details', error: closeSessionResult.error },
-					});
-				}
-			};
-
-			await Promise.race([
-				runMutation({
-					mutationFn: async () => {
-						const transcribeRecordingAndUpdateDbResult =
-							await transcribeRecordingAndUpdateDb(newRecording);
-						if (!transcribeRecordingAndUpdateDbResult.ok)
-							return transcribeRecordingAndUpdateDbResult;
-
-						const updatedRecording = transcribeRecordingAndUpdateDbResult.data;
-
-						if (settings.value.isCopyToClipboardEnabled) {
-							const copyResult = await ClipboardService.setClipboardText(
-								updatedRecording.transcribedText,
-							);
-							if (!copyResult.ok) {
-								if (copyResult.error._tag === 'WhisperingError') {
-									return Err(copyResult.error);
-								}
-								return WhisperingErr({
-									title: '❌ Failed to Copy to Clipboard',
-									description:
-										'We encountered an issue while copying the transcription to your clipboard. Please try again.',
-									action: { type: 'more-details', error: copyResult.error },
-								});
-							}
-						}
-
-						if (settings.value.isPasteContentsOnSuccessEnabled) {
-							const pasteResult = await ClipboardService.writeTextToCursor(
-								updatedRecording.transcribedText,
-							);
-							if (!pasteResult.ok) {
-								if (pasteResult.error._tag === 'WhisperingError') {
-									return Err(pasteResult.error);
-								}
-								return WhisperingErr({
-									title: '❌ Failed to Paste to Cursor',
-									description:
-										'We encountered an issue while pasting the transcription to your cursor. Please try again.',
-									action: { type: 'more-details', error: pasteResult.error },
-								});
-							}
-						}
-						return Ok(undefined);
-					},
-					onError: (error) => renderErrAsToast(error),
-				}),
-				closeSessionWithToastIfNeeded(),
-			]);
-			return Ok(undefined);
-		},
-		onMutate: () => {
-			const localToast = createLocalToastFns();
-			localToast.loading({
-				title: '⏸️ Stopping recording...',
-				description: 'Finalizing your audio capture...',
-			});
-			return Ok({ localToast });
-		},
-		onSuccess: (_, { context: { localToast } }) => {
-			localToast.success({
-				title: '✨ Recording Complete!',
-				description: settings.value.isFasterRerecordEnabled
-					? 'Recording saved! Ready for another take'
-					: 'Recording saved and session closed successfully',
-			});
-			console.info('Recording stopped');
-			void playSound('stop');
-		},
-		onError: (error, { contextResult }) => {
-			if (!contextResult.ok) {
-				toast.error(contextResult.error);
-				return;
-			}
 			const { localToast } = contextResult.data;
 			localToast.error(error);
 		},
@@ -372,8 +168,230 @@ function createRecorder() {
 		closeRecordingSession,
 		toggleRecording() {
 			if (isInRecordingSession) {
+				const stopRecordingWithToast = createMutation({
+					mutationFn: async (_, { context: { localToast } }) => {
+						const stopResult = await MediaRecorderService.stopRecording(
+							undefined,
+							{
+								sendStatus: localToast.loading,
+							},
+						);
+						if (!stopResult.ok) return stopResult;
+						setRecorderState('SESSION');
+
+						const blob = stopResult.data;
+						const newRecording: Recording = {
+							id: nanoid(),
+							title: '',
+							subtitle: '',
+							timestamp: new Date().toISOString(),
+							transcribedText: '',
+							blob,
+							transcriptionStatus: 'UNPROCESSED',
+						};
+
+						const saveRecordingToDatabaseResult =
+							await recordings.addRecording(newRecording);
+						if (!saveRecordingToDatabaseResult.ok) {
+							return WhisperingErr({
+								title: '❌ Failed to Save Recording',
+								description:
+									'Your recording was completed but could not be saved to the library. This might be due to storage limitations or permissions.',
+								action: {
+									type: 'more-details',
+									error: saveRecordingToDatabaseResult.error,
+								},
+							});
+						}
+
+						const closeSessionWithToastIfNeeded = createMutation({
+							mutationFn: async () => {
+								if (settings.value.isFasterRerecordEnabled)
+									return Ok(undefined);
+								localToast.loading({
+									title: '⏳ Closing session...',
+									description: 'Wrapping up your recording session...',
+								});
+								const closeSessionResult =
+									await MediaRecorderService.closeRecordingSession(undefined, {
+										sendStatus: localToast.loading,
+									});
+								if (!closeSessionResult.ok) {
+									return WhisperingErr({
+										title: '❌ Failed to Close Session After Recording',
+										description:
+											'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
+										action: {
+											type: 'more-details',
+											error: closeSessionResult.error,
+										},
+									});
+								}
+								setRecorderState('IDLE');
+								return Ok(undefined);
+							},
+							onError: (error) => renderErrAsToast(error),
+						});
+
+						const createTranscriptionJob = createMutation({
+							mutationFn: async () => {
+								const transcribeRecordingAndUpdateDbResult =
+									await transcribeRecordingAndUpdateDb(newRecording);
+								if (!transcribeRecordingAndUpdateDbResult.ok)
+									return transcribeRecordingAndUpdateDbResult;
+
+								const updatedRecording =
+									transcribeRecordingAndUpdateDbResult.data;
+
+								if (settings.value.isCopyToClipboardEnabled) {
+									const copyResult = await ClipboardService.setClipboardText(
+										updatedRecording.transcribedText,
+									);
+									if (!copyResult.ok) {
+										if (copyResult.error._tag === 'WhisperingError') {
+											return Err(copyResult.error);
+										}
+										return WhisperingErr({
+											title: '❌ Failed to Copy to Clipboard',
+											description:
+												'We encountered an issue while copying the transcription to your clipboard. Please try again.',
+											action: {
+												type: 'more-details',
+												error: copyResult.error,
+											},
+										});
+									}
+								}
+
+								if (settings.value.isPasteContentsOnSuccessEnabled) {
+									const pasteResult = await ClipboardService.writeTextToCursor(
+										updatedRecording.transcribedText,
+									);
+									if (!pasteResult.ok) {
+										if (pasteResult.error._tag === 'WhisperingError') {
+											return Err(pasteResult.error);
+										}
+										return WhisperingErr({
+											title: '❌ Failed to Paste to Cursor',
+											description:
+												'We encountered an issue while pasting the transcription to your cursor. Please try again.',
+											action: {
+												type: 'more-details',
+												error: pasteResult.error,
+											},
+										});
+									}
+								}
+								return Ok(undefined);
+							},
+							onError: (error) => renderErrAsToast(error),
+						});
+
+						await Promise.allSettled([
+							createTranscriptionJob(undefined),
+							closeSessionWithToastIfNeeded(undefined),
+						]);
+						return Ok(undefined);
+					},
+					onMutate: () => {
+						const localToast = createLocalToastFns();
+						localToast.loading({
+							title: '⏸️ Stopping recording...',
+							description: 'Finalizing your audio capture...',
+						});
+						return Ok({ localToast });
+					},
+					onSuccess: (_, { context: { localToast } }) => {
+						localToast.success({
+							title: '✨ Recording Complete!',
+							description: settings.value.isFasterRerecordEnabled
+								? 'Recording saved! Ready for another take'
+								: 'Recording saved and session closed successfully',
+						});
+						console.info('Recording stopped');
+						void playSound('stop');
+					},
+					onError: (error, { contextResult }) => {
+						if (!contextResult.ok) {
+							toast.error(contextResult.error);
+							return;
+						}
+						const { localToast } = contextResult.data;
+						localToast.error(error);
+					},
+				});
 				stopRecordingWithToast(undefined);
 			} else {
+				const startRecordingWithToast = createMutation({
+					mutationFn: async (_, { context: { localToast } }) => {
+						if (!isInRecordingSession) {
+							const initResult =
+								await MediaRecorderService.initRecordingSession(
+									{
+										deviceId: settings.value.selectedAudioInputDeviceId,
+										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+									},
+									{ sendStatus: localToast.loading },
+								);
+							if (!initResult.ok) {
+								return WhisperingErr({
+									title: '❌ Failed to Initialize Recording Session',
+									description:
+										'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
+									action: { type: 'more-details', error: initResult.error },
+								});
+							}
+						}
+						const result = await MediaRecorderService.startRecording(nanoid(), {
+							sendStatus: localToast.loading,
+						});
+						if (!result.ok) {
+							return WhisperingErr({
+								title: '❌ Failed to Start Recording',
+								description:
+									'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
+								action: { type: 'more-details', error: result.error },
+							});
+						}
+						return Ok(undefined);
+					},
+					onMutate: () => {
+						const localToast = createLocalToastFns();
+						localToast.loading({
+							title: '🎙️ Preparing to record...',
+							description: 'Setting up your recording environment...',
+						});
+						return Ok({ localToast });
+					},
+					onSuccess: (_, { context: { localToast } }) => {
+						setRecorderState('SESSION+RECORDING');
+						localToast.success({
+							title: '🎯 Recording Started!',
+							description: 'Your voice is being captured crystal clear',
+						});
+						console.info('Recording started');
+						void playSound('start');
+						void NotificationService.notify({
+							variant: 'info',
+							id: IS_RECORDING_NOTIFICATION_ID,
+							title: '🎙️ Whispering is recording...',
+							description: 'Click to go to recorder',
+							action: {
+								type: 'link',
+								label: 'Go to recorder',
+								goto: '/',
+							},
+						});
+					},
+					onError: (error, { contextResult }) => {
+						if (!contextResult.ok) {
+							toast.error(contextResult.error);
+							return;
+						}
+						const { localToast } = contextResult.data;
+						localToast.error(error);
+					},
+				});
 				startRecordingWithToast(undefined);
 			}
 		},
