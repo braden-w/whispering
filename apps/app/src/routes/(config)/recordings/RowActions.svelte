@@ -7,7 +7,7 @@
 	import type { Recording } from '$lib/services/db';
 	import { recordings } from '$lib/services/db';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
+	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { createMutation, Ok } from '@epicenterhq/result';
 	import {
@@ -43,7 +43,8 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() => transcribeRecordingAndUpdateDb(recording)}
+		onclick={() =>
+			transcriptionManager.transcribeRecordingAndUpdateDb(recording)}
 		variant="ghost"
 		size="icon"
 	>

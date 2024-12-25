@@ -43,13 +43,13 @@ async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
 				ToggleRecording.RequestBody,
 				ToggleRecording.ResponseBody
 			>({ name: 'whispering-web/toggleRecording' }),
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Unable to toggle recording via background service worker',
-			description:
-				'There was likely an issue sending the message to the background service worker from the popup.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Unable to toggle recording via background service worker',
+				description:
+					'There was likely an issue sending the message to the background service worker from the popup.',
+				action: { type: 'more-details', error },
+			}),
 	});
 	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
 	const toggleRecordingResult = sendToToggleRecordingResult.data;
@@ -65,13 +65,13 @@ async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
 			>({
 				name: 'whispering-web/cancelRecording',
 			}),
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Unable to cancel recording via background service worker',
-			description:
-				'There was likely an issue sending the message to the background service worker from the popup.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Unable to cancel recording via background service worker',
+				description:
+					'There was likely an issue sending the message to the background service worker from the popup.',
+				action: { type: 'more-details', error },
+			}),
 	});
 	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
 	const cancelRecordingResult = sendToCancelRecordingResult.data;
@@ -222,7 +222,6 @@ function NavItems() {
 					if (!tab.url)
 						return renderErrorAsNotification(
 							WhisperingErr({
-								_tag: 'WhisperingError',
 								title: 'Whispering tab has no URL',
 								description: 'The Whispering tab has no URL.',
 							}),

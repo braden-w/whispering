@@ -1,13 +1,11 @@
-import { Ok } from '@epicenterhq/result';
+import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type {
 	ExternalMessageBody,
 	ExternalMessageReturnType,
-	WhisperingRecordingState,
-	WhisperingResult,
+	WhisperingRecordingState
 } from '@repo/shared';
-import { WhisperingErr, tryAsync } from '@repo/shared';
-import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
+import { WhisperingErr } from '@repo/shared';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
@@ -31,7 +29,6 @@ const handler: PlasmoMessaging.MessageHandler<
 	const setRecorderState = async () => {
 		if (!body?.recorderState) {
 			return WhisperingErr({
-				_tag: 'WhisperingError',
 				title: 'Error invoking setRecorderState command',
 				description:
 					'RecorderState must be provided in the request body of the message',
@@ -42,13 +39,13 @@ const handler: PlasmoMessaging.MessageHandler<
 		const path = iconPaths[body.recorderState];
 		const setIconResult = await tryAsync({
 			try: () => chrome.action.setIcon({ path }),
-			mapErr: (error) => ({
-				_tag: 'WhisperingError',
-				title: `Error setting icon to ${body.recorderState} icon`,
-				description:
-					"There was an error setting the tray icon using the browser's action API. Please try again.",
-				action: { type: 'more-details', error },
-			}),
+			mapErr: (error) =>
+				WhisperingErr({
+					title: `Error setting icon to ${body.recorderState} icon`,
+					description:
+						"There was an error setting the tray icon using the browser's action API. Please try again.",
+					action: { type: 'more-details', error },
+				}),
 		});
 		if (!setIconResult.ok) return setIconResult;
 		return Ok(undefined);

@@ -1,4 +1,4 @@
-import { HttpService } from '$lib/services/http/HttpService';
+import type { HttpService } from '$lib/services/http/HttpService';
 import {
 	HttpServiceErrIntoTranscriptionServiceErr,
 	type TranscriptionService,
@@ -11,7 +11,9 @@ import { Ok } from '@epicenterhq/result';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
+export const createTranscriptionServiceGroqLive = ({
+	HttpService,
+}: { HttpService: HttpService }): TranscriptionService => ({
 	transcribe: async (audioBlob) => {
 		if (!settings.value.groqApiKey) {
 			return TranscriptionServiceErr({
@@ -73,6 +75,3 @@ export const createTranscriptionServiceGroqLive = (): TranscriptionService => ({
 		return Ok(data.text.trim());
 	},
 });
-
-export const TranscriptionServiceGroqLive =
-	createTranscriptionServiceGroqLive();

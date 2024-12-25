@@ -1,12 +1,6 @@
 import type { HttpServiceErr } from '$lib/services/http/HttpService';
-import { Err, Ok } from '@epicenterhq/result';
-import type {
-	SupportedLanguage,
-	WhisperingErr,
-	WhisperingErrProperties,
-	WhisperingResult,
-} from '@repo/shared';
-import { SUPPORTED_LANGUAGES, TRANSCRIPTION_SERVICES } from '@repo/shared';
+import { Err, type Ok } from '@epicenterhq/result';
+import type { WhisperingErr, WhisperingErrProperties } from '@repo/shared';
 
 export type TranscriptionServiceErr = WhisperingErr;
 export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
@@ -27,7 +21,6 @@ export const TranscriptionServiceErr = (
 export function HttpServiceErrIntoTranscriptionServiceErr(
 	err: HttpServiceErr,
 ): TranscriptionServiceErr {
-	if (err.ok) return Ok(err.data);
 	const { code, error } = err.error;
 	switch (code) {
 		case 'NetworkError':

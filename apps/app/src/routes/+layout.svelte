@@ -4,10 +4,10 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
-	import { transcribingRecordingIds } from '$lib/transcribe.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
@@ -22,8 +22,6 @@
 		return getCurrentWindow().setAlwaysOnTop(value);
 	};
 
-	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
-
 	$effect(() => {
 		switch (settings.value.alwaysOnTop) {
 			case 'Always':
@@ -32,7 +30,7 @@
 			case 'When Recording and Transcribing':
 				if (
 					recorder.recorderState === 'SESSION+RECORDING' ||
-					isCurrentlyTranscribing
+					transcriptionManager.isCurrentlyTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {

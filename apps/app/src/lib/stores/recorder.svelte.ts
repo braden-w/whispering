@@ -18,7 +18,7 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
+import { transcriptionManager } from '$lib/transcribe.svelte';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -255,7 +255,9 @@ function createRecorder() {
 						const createTranscriptionJob = createMutation({
 							mutationFn: async () => {
 								const transcribeRecordingAndUpdateDbResult =
-									await transcribeRecordingAndUpdateDb(newRecording);
+									await transcriptionManager.transcribeRecordingAndUpdateDb(
+										newRecording,
+									);
 								if (!transcribeRecordingAndUpdateDbResult.ok)
 									return transcribeRecordingAndUpdateDbResult;
 

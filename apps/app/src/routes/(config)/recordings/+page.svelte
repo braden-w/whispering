@@ -14,7 +14,7 @@
 	import { recordings, type Recording } from '$lib/services/db';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { toast } from '$lib/services/ToastService';
-	import { transcribeRecordingAndUpdateDb } from '$lib/transcribe.svelte';
+	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createMutation } from '@epicenterhq/result';
@@ -323,7 +323,9 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									transcribeRecordingAndUpdateDb(recording.original),
+									transcriptionManager.transcribeRecordingAndUpdateDb(
+										recording.original,
+									),
 								),
 							)}
 					>

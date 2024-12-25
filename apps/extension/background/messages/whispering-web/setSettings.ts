@@ -19,7 +19,6 @@ const handler: PlasmoMessaging.MessageHandler<
 	const setSettings = async () => {
 		if (!body || !body.settings) {
 			return WhisperingErr({
-				_tag: 'WhisperingError',
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
 			});

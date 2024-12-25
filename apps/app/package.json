@@ -33,7 +33,7 @@
 		"postcss": "^8.4.49",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.2",
-		"svelte": "^5.14.3",
+		"svelte": "^5.16.0",
 		"svelte-check": "^4.1.1",
 		"svelte-sonner": "^0.3.28",
 		"tailwind-merge": "^2.5.5",
@@ -46,7 +46,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@epicenterhq/result": "^0.4.2",
+		"@epicenterhq/result": "^0.5.2",
 		"@plasmohq/messaging": "^0.6.2",
 		"@repo/shared": "workspace:*",
 		"@tanstack/svelte-table": "^9.0.0-alpha.10",
