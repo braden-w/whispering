@@ -13,12 +13,14 @@ import {
 	type ToastAndNotifyOptions,
 	type WhisperingRecordingState,
 	type WhisperingResult,
+	type WhisperingSoundNames,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import { transcriptionManager } from '$lib/transcribe.svelte';
+import { extension } from '@repo/extension';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -454,7 +456,7 @@ function createRecorder() {
 }
 
 async function playSound(
-	sound: 'start' | 'stop' | 'cancel',
+	sound: WhisperingSoundNames,
 ): Promise<WhisperingResult<void>> {
 	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
 
@@ -473,10 +475,7 @@ async function playSound(
 		return Ok(undefined);
 	}
 
-	const sendMessageToExtensionResult = await sendMessageToExtension({
-		name: 'whispering-extension/playSound',
-		body: { sound },
-	});
+	const sendMessageToExtensionResult = await extension.playSound({ sound });
 
 	if (!sendMessageToExtensionResult.ok)
 		return WhisperingErr({

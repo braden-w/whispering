@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { WhisperingResult } from '../index.js';
+import type { BgswResult } from '../result.js';
 
 const toastVariantSchema = z.enum([
 	'error',
@@ -35,8 +35,6 @@ export type ToastAndNotifyOptions = z.infer<
 >;
 
 export type NotificationService = {
-	notify: (options: ToastAndNotifyOptions) => Promise<WhisperingResult<string>>;
-	clear: (
-		id: string,
-	) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
+	notify: (options: ToastAndNotifyOptions) => Promise<BgswResult<string>>;
+	clear: (id: string) => Promise<BgswResult<void>> | BgswResult<void>;
 };

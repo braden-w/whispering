@@ -1,6 +1,7 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { ClipboardServiceErr, type ClipboardService } from './ClipboardService';
+import { extension } from '@repo/extension';
 
 export const createClipboardServiceWebLive = (): ClipboardService => ({
 	setClipboardText: async (text) => {
@@ -9,31 +10,51 @@ export const createClipboardServiceWebLive = (): ClipboardService => ({
 			mapErr: (error) =>
 				ClipboardServiceErr({
 					message:
-						'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
+						'There was an error copying to the clipboard using the browser Clipboard API. Please try again.',
 					error,
 				}),
 		});
 
 		if (!setClipboardResult.ok) {
-			sendMessageToExtension({
-				name: 'whispering-extension/setClipboardText',
-				body: { transcribedText: text },
+			const sendMessageToExtensionResult = await extension.setClipboardText({
+				transcribedText: text,
 			});
-			return setClipboardResult;
+			if (!sendMessageToExtensionResult.ok)
+				return ClipboardServiceErr({
+					message:
+						'There was an error sending a message to the Whispering extension to copy text to the clipboard. Please try again.',
+					error: sendMessageToExtensionResult.error,
+				});
+			const setClipboardResult = sendMessageToExtensionResult.data;
+			if (!setClipboardResult.ok) {
+				return ClipboardServiceErr({
+					message:
+						'There was an error copying text to the clipboard using the Whispering extension. Please try again.',
+					error: setClipboardResult.error,
+				});
+			}
+			return Ok(undefined);
 		}
 		return Ok(undefined);
 	},
 
 	writeTextToCursor: async (text) => {
-		const sendMessageToExtensionResult = await sendMessageToExtension({
-			name: 'whispering-extension/writeTextToCursor',
-			body: { transcribedText: text },
+		const sendMessageToExtensionResult = await extension.writeTextToCursor({
+			transcribedText: text,
 		});
 		if (!sendMessageToExtensionResult.ok) {
 			return ClipboardServiceErr({
 				message:
-					'There was an error writing text to the cursor using the Whispering extension. Please try again.',
+					'There was an error sending a message to the Whispering extension to write text to the cursor. Please try again.',
 				error: sendMessageToExtensionResult.error,
+			});
+		}
+		const writeTextToCursorResult = sendMessageToExtensionResult.data;
+		if (!writeTextToCursorResult.ok) {
+			return ClipboardServiceErr({
+				message:
+					'There was an error writing text to the cursor using the Whispering extension. Please try again.',
+				error: writeTextToCursorResult.error,
 			});
 		}
 		return Ok(undefined);

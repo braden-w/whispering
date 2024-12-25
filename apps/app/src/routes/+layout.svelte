@@ -3,7 +3,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
-	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+	import { extension } from '@repo/extension';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -66,10 +66,8 @@
 		window.cancelRecording = recorder.cancelRecording;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
-			const sendMessageToExtensionResult = await sendMessageToExtension({
-				name: 'whispering-extension/notifyWhisperingTabReady',
-				body: {},
-			});
+			const sendMessageToExtensionResult =
+				await extension.notifyWhisperingTabReady();
 			if (!sendMessageToExtensionResult.ok) {
 				renderErrAsToast({
 					variant: 'error',
@@ -78,6 +76,18 @@
 					action: {
 						type: 'more-details',
 						error: sendMessageToExtensionResult.error,
+					},
+				});
+			}
+			const notifyWhisperingTabReadyResult = sendMessageToExtensionResult.data;
+			if (!notifyWhisperingTabReadyResult.ok) {
+				renderErrAsToast({
+					variant: 'error',
+					title: 'Error notifying extension that tab is ready',
+					description: 'Error sending message to extension',
+					action: {
+						type: 'more-details',
+						error: notifyWhisperingTabReadyResult.error,
 					},
 				});
 			}

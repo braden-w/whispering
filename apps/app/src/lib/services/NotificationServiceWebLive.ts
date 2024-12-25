@@ -1,23 +1,24 @@
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+import { extension } from '@repo/extension';
 import type { NotificationService } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
 
 export const createNotificationServiceWeb = (): NotificationService => {
 	return {
-		async notify(notifyOptions) {
-			const sendMessageToExtensionResult = await sendMessageToExtension({
-				name: 'whispering-extension/notifications/create',
-				body: { notifyOptions },
+		notify: async (notifyOptions) => {
+			const sendMessageToExtensionResult = await extension.createNotification({
+				notifyOptions,
 			});
 			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
-			const id = sendMessageToExtensionResult.data ?? nanoid();
-			return id;
+			const createNotificationResult = sendMessageToExtensionResult.data;
+			return createNotificationResult;
 		},
-		clear: (notificationId: string) =>
-			sendMessageToExtension({
-				name: 'whispering-extension/notifications/clear',
-				body: { notificationId },
-			}),
+		clear: async (notificationId: string) => {
+			const sendMessageToExtensionResult = await extension.clearNotification({
+				notificationId,
+			});
+			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+			const clearNotificationResult = sendMessageToExtensionResult.data;
+			return clearNotificationResult;
+		},
 	};
 };
 

@@ -1,6 +1,7 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
 import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { extension } from '@repo/extension';
 import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
@@ -30,14 +31,14 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
 		setTrayIcon: async (icon: WhisperingRecordingState) => {
-			const sendMessageToExtensionResult = await sendMessageToExtension({
-				name: 'whispering-extension/setRecorderState',
-				body: { recorderState: icon },
+			const sendMessageToExtensionResult = await extension.setRecorderState({
+				recorderState: icon,
 			});
 			if (!sendMessageToExtensionResult.ok) return SetTrayIconServiceErr(icon);
 
-			const response = sendMessageToExtensionResult.data;
-			if (!response.ok) return SetTrayIconServiceErr(icon);
+			const setExtensionRecorderStateResult = sendMessageToExtensionResult.data;
+			if (!setExtensionRecorderStateResult.ok)
+				return SetTrayIconServiceErr(icon);
 
 			return Ok(undefined);
 		},
