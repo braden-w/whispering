@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { recordingStateSchema } from './constants.js';
+import type { WhisperingResult } from './result.js';
 import { toastAndNotificationOptionsSchema } from './services/index.js';
-import type { WhisperingErrProperties } from './result.js';
-import type { Result } from '@epicenterhq/result';
 
 export const externalMessageSchema = z.discriminatedUnion('name', [
 	z.object({
@@ -54,10 +53,7 @@ export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 	{ name: T }
 >['body'];
 
-export type MessageServiceResult<T> = Result<
-	T,
-	Pick<WhisperingErrProperties, 'title' | 'description' | 'action'>
->;
+export type MessageServiceResult<T> = WhisperingResult<T>;
 
 export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
 	'whispering-extension/notifyWhisperingTabReady': MessageServiceResult<undefined>;
