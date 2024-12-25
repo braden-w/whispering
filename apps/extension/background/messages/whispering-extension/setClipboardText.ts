@@ -12,9 +12,8 @@ import { whisperingStorage } from '~lib/storage/whisperingStorage';
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setClipboardText'>;
 
-export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/setClipboardText'>
->;
+export type ResponseBody =
+	ExternalMessageReturnType<'whispering-extension/setClipboardText'>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,

@@ -10,9 +10,8 @@ import { getActiveTabId } from '~lib/getActiveTabId';
 
 export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
 
-export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/playSound'>
->;
+export type ResponseBody =
+	ExternalMessageReturnType<'whispering-extension/playSound'>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,

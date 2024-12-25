@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { recordingStateSchema } from './constants.js';
-import { notificationOptionsSchema } from './services/index.js';
+import { toastAndNotificationOptionsSchema } from './services/index.js';
+import type { WhisperingErrProperties } from './result.js';
+import type { Result } from '@epicenterhq/result';
 
 export const externalMessageSchema = z.discriminatedUnion('name', [
 	z.object({
@@ -28,7 +30,7 @@ export const externalMessageSchema = z.discriminatedUnion('name', [
 	z.object({
 		name: z.literal('whispering-extension/notifications/create'),
 		body: z.object({
-			notifyOptions: notificationOptionsSchema,
+			notifyOptions: toastAndNotificationOptionsSchema,
 		}),
 	}),
 	z.object({
@@ -52,12 +54,17 @@ export type ExternalMessageBody<T extends ExternalMessage['name']> = Extract<
 	{ name: T }
 >['body'];
 
+export type MessageServiceResult<T> = Result<
+	T,
+	Pick<WhisperingErrProperties, 'title' | 'description' | 'action'>
+>;
+
 export type ExternalMessageReturnType<T extends ExternalMessage['name']> = {
-	'whispering-extension/notifyWhisperingTabReady': undefined;
-	'whispering-extension/playSound': undefined;
-	'whispering-extension/setClipboardText': string;
-	'whispering-extension/setRecorderState': undefined;
-	'whispering-extension/notifications/create': string;
-	'whispering-extension/notifications/clear': undefined;
-	'whispering-extension/writeTextToCursor': string;
+	'whispering-extension/notifyWhisperingTabReady': MessageServiceResult<undefined>;
+	'whispering-extension/playSound': MessageServiceResult<undefined>;
+	'whispering-extension/setClipboardText': MessageServiceResult<string>;
+	'whispering-extension/setRecorderState': MessageServiceResult<undefined>;
+	'whispering-extension/notifications/create': MessageServiceResult<string>;
+	'whispering-extension/notifications/clear': MessageServiceResult<undefined>;
+	'whispering-extension/writeTextToCursor': MessageServiceResult<string>;
 }[T];

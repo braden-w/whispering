@@ -3,18 +3,15 @@ import { settings } from '$lib/stores/settings.svelte';
 import { Ok, type Result } from '@epicenterhq/result';
 import { RecordingsService } from '../recordings-db/RecordingsService.svelte';
 import type { DbServiceErr, Recording } from '../recordings-db/db/DbService';
-import type {
-	TranscriptionService,
-	TranscriptionServiceErr,
-} from './transcription/TranscriptionService';
+import type { TranscriptionServiceErr } from './transcription/TranscriptionService';
 import { TranscriptionServiceFasterWhisperServerLive } from './transcription/TranscriptionServiceFasterWhisperServerLive';
 import { TranscriptionServiceGroqLive } from './transcription/TranscriptionServiceGroqLive';
 import { TranscriptionServiceWhisperLive } from './transcription/TranscriptionServiceWhisperLive';
 
-export const TranscribeAndUpdateService = createTranscribeAndUpdateService({
-	TranscriptionService: TranscriptionServiceWhisperLive,
-	RecordingsService: RecordingsService,
-});
+export const TranscribeRecordingsUpdateService =
+	createTranscribeRecordingsUpdateService({
+		RecordingsService: RecordingsService,
+	});
 
 type TranscribeRecordingsServiceResult =
 	| Result<TranscribeRecordingsService, never>
@@ -34,13 +31,9 @@ type TranscribeRecordingsService = {
 	) => Promise<TranscribeRecordingsServiceResult>;
 };
 
-function createTranscribeAndUpdateService({
-	TranscriptionService,
+function createTranscribeRecordingsUpdateService({
 	RecordingsService,
-}: {
-	TranscriptionService: TranscriptionService;
-	RecordingsService: RecordingsService;
-}) {
+}: { RecordingsService: RecordingsService }) {
 	const transcribingRecordingIds = new Set<string>();
 
 	async function transcribeAndUpdateRecording(recording: Recording) {

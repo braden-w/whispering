@@ -6,7 +6,7 @@ import type {
 	WhisperingRecordingState,
 	WhisperingResult,
 } from '@repo/shared';
-import { WhisperingErr, tryAsyncWhispering } from '@repo/shared';
+import { WhisperingErr, tryAsync } from '@repo/shared';
 import arrowsCounterclockwise from 'data-base64:~assets/arrows_counterclockwise.png';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
@@ -21,9 +21,8 @@ const iconPaths = {
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/setRecorderState'>;
 
-export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/setRecorderState'>
->;
+export type ResponseBody =
+	ExternalMessageReturnType<'whispering-extension/setRecorderState'>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,
@@ -42,7 +41,7 @@ const handler: PlasmoMessaging.MessageHandler<
 
 		whisperingStorage.setItem('whispering-recorder-state', body.recorderState);
 		const path = iconPaths[body.recorderState];
-		const setIconResult = await tryAsyncWhispering({
+		const setIconResult = await tryAsync({
 			try: () => chrome.action.setIcon({ path }),
 			mapErr: (error) => ({
 				_tag: 'WhisperingError',

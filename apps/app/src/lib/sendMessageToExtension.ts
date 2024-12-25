@@ -8,13 +8,9 @@ import {
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import type { ExternalMessage, ExternalMessageReturnType } from '@repo/shared';
 
-type SendMessageToExtensionResult<M extends ExternalMessage> = Result<
+export type SendMessageToExtensionResult<M extends ExternalMessage> = Result<
 	undefined | ExternalMessageReturnType<M['name']>,
 	{ _tag: 'SendMessageToExtensionError'; message: M; error: unknown }
->;
-
-type SendMessageToExtensionErr<M extends ExternalMessage> = InferErr<
-	SendMessageToExtensionResult<M>
 >;
 
 export async function sendMessageToExtension<M extends ExternalMessage>(

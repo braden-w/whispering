@@ -1,26 +1,21 @@
 import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
-import type { Recordings } from '$lib/services/db/';
-import { createRecordingsLiveIndexedDb } from '$lib/services/IndexedDbLive.svelte';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok, createMutation } from '@repo/shared/epicenter-result';
+import { createLocalToastFns } from '$lib/utils';
+import { Ok, createMutation } from '@epicenterhq/result';
 import {
-	type ToastAndNotifyOptions,
 	WhisperingErr,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import type { Recording } from '../services/db/';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { createLocalToastFns } from '$lib/utils';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -39,7 +34,14 @@ function createRecorder() {
 		recorderState = newValue;
 		(async () => {
 			const result = await SetTrayIconService.setTrayIcon(newValue);
-			if (!result.ok) renderErrAsToast(result.error);
+			if (!result.ok) {
+				renderErrAsToast({
+					variant: 'warning',
+					title: `Could not set tray icon to ${recorderState} icon...`,
+					description: 'Please check your system tray settings',
+					action: { type: 'more-details', error: result.error },
+				});
+			}
 		})();
 	};
 

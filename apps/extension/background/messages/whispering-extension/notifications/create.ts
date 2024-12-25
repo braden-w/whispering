@@ -10,9 +10,8 @@ import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBg
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/notifications/create'>;
 
-export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/notifications/create'>
->;
+export type ResponseBody =
+	ExternalMessageReturnType<'whispering-extension/notifications/create'>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,

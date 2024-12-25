@@ -11,9 +11,8 @@ import { getActiveTabId } from '~lib/getActiveTabId';
 export type RequestBody =
 	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
 
-export type ResponseBody = WhisperingResult<
-	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>
->;
+export type ResponseBody =
+	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>;
 
 const handler: PlasmoMessaging.MessageHandler<
 	RequestBody,

@@ -5,6 +5,7 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { TranscribeRecordingsUpdateService } from '$lib/services/transcribe-recordings/TranscribeRecordingsService';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -13,7 +14,6 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
-	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
 
 	let { children } = $props();
 
@@ -23,7 +23,7 @@
 	};
 
 	const isCurrentlyTranscribing = $derived(
-		RecordingsService.currentTranscribingRecordingIds.size > 0,
+		TranscribeRecordingsUpdateService.currentTranscribingRecordingIds.size > 0,
 	);
 
 	$effect(() => {
@@ -74,8 +74,17 @@
 				name: 'whispering-extension/notifyWhisperingTabReady',
 				body: {},
 			});
-			if (!sendMessageToExtensionResult.ok)
-				return renderErrAsToast(sendMessageToExtensionResult);
+			if (!sendMessageToExtensionResult.ok) {
+				renderErrAsToast({
+					variant: 'error',
+					title: 'Error notifying extension that tab is ready',
+					description: 'Error sending message to extension',
+					action: {
+						type: 'more-details',
+						error: sendMessageToExtensionResult.error,
+					},
+				});
+			}
 		}
 	});
 
