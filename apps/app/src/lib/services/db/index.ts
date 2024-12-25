@@ -1,4 +1,4 @@
-import type { Result } from '@epicenterhq/result';
+import type { Ok, Result } from '@epicenterhq/result';
 import { Err } from '@epicenterhq/result';
 import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.svelte';
 
@@ -29,8 +29,8 @@ type DbErrorProperties = {
 	error: unknown;
 };
 
-export type DbServiceResult<T> = Result<T, DbErrorProperties>;
-export type DbServiceErr = DbServiceResult<never>;
+export type DbServiceErr = Err<DbErrorProperties>;
+export type DbServiceResult<T> = Ok<T> | DbServiceErr;
 
 export const DbError = (
 	properties: Omit<DbErrorProperties, '_tag'>,

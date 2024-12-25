@@ -11,12 +11,9 @@ type DownloadServiceErrorProperties = Pick<
 	_tag: 'DownloadServiceError';
 };
 
-export type DownloadServiceResult<T> = Result<
-	T,
-	DownloadServiceErrorProperties
->;
+export type DownloadServiceErr = Err<DownloadServiceErrorProperties>;
 
-export type DownloadServiceErr = DownloadServiceResult<never>;
+export type DownloadServiceResult<T> = Ok<T> | DownloadServiceErr;
 
 export const DownloadServiceErr = (
 	args: Pick<

@@ -6,12 +6,12 @@ import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 
-export type SetTrayIconServiceResult<T> = Result<
-	T,
-	{ _tag: 'TrayIconError'; icon: WhisperingRecordingState }
->;
+export type SetTrayIconServiceErr = Err<{
+	_tag: 'TrayIconError';
+	icon: WhisperingRecordingState;
+}>;
 
-export type SetTrayIconServiceErr = SetTrayIconServiceResult<never>;
+export type SetTrayIconServiceResult<T> = Ok<T> | SetTrayIconServiceErr;
 
 export const SetTrayIconServiceErr = (
 	icon: WhisperingRecordingState,

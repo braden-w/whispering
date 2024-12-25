@@ -2,6 +2,7 @@ import type { HttpServiceErr } from '$lib/services/http/HttpService';
 import { Err, Ok } from '@epicenterhq/result';
 import type {
 	SupportedLanguage,
+	WhisperingErr,
 	WhisperingErrProperties,
 	WhisperingResult,
 } from '@repo/shared';
@@ -80,8 +81,8 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	}),
 );
 
-export type TranscriptionServiceResult<T> = WhisperingResult<T>;
-export type TranscriptionServiceErr = TranscriptionServiceResult<never>;
+export type TranscriptionServiceErr = WhisperingErr;
+export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
 
 export type TranscriptionService = {
 	transcribe: (audioBlob: Blob) => Promise<TranscriptionServiceResult<string>>;

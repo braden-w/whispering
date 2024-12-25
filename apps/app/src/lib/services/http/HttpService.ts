@@ -1,4 +1,4 @@
-import type { Result } from '@epicenterhq/result';
+import type { Ok, Result } from '@epicenterhq/result';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
@@ -14,8 +14,8 @@ type HttpServiceErrProperties = {
 	error: unknown;
 } & HttpServiceErrCodes;
 
-export type HttpServiceResult<T> = Result<T, HttpServiceErrProperties>;
-export type HttpServiceErr = HttpServiceResult<never>;
+export type HttpServiceErr = Err<HttpServiceErrProperties>;
+export type HttpServiceResult<T> = Ok<T> | HttpServiceErr;
 
 export const HttpServiceErr = (
 	args: {
