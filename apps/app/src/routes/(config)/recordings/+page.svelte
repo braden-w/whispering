@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
@@ -10,14 +9,13 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-	import type { Recording } from '$lib/services/db/';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { RecordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import type { Recording } from '$lib/services/recordings-db/db/DbService';
+	import { RecordingsService } from '$lib/services/recordings-db/RecordingsService.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { createMutation } from '@repo/shared/epicenter-result';
+	import { copyToClipboardWithToast } from '$lib/with-toasts/clipboard';
+	import { deleteRecordingsByIdWithToast } from '$lib/with-toasts/recordings';
 	import {
 		FlexRender,
 		createTable,
@@ -261,43 +259,6 @@
 		const text = transcriptions.join(delimiter);
 		return text;
 	});
-
-	const setClipboardText = createMutation({
-		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
-		onSuccess: (_, { input: text }) => {
-			toast.success({
-				title: 'Copied transcription to clipboard!',
-				description: text,
-				descriptionClass: 'line-clamp-2',
-			});
-		},
-		onError: (error) => {
-			if (error._tag === 'ClipboardError') {
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: 'Error copying transcription to clipboard',
-					description: 'Please try again.',
-					action: { type: 'more-details', error: error },
-				});
-				return;
-			}
-			renderErrAsToast(error);
-		},
-		onSettled: () => {
-			isDialogOpen = false;
-		},
-	});
-
-	const deleteRecordingsById = createMutation({
-		mutationFn: RecordingsService.deleteRecordingsById,
-		onSuccess: (_, { input: ids }) => {
-			toast.success({
-				title: 'Deleted recordings!',
-				description: 'Your recordings have been deleted successfully.',
-			});
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
 </script>
 
 <svelte:head>
@@ -403,7 +364,10 @@
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
-									onclick={() => setClipboardText(text)}
+									onclick={() => {
+										copyToClipboardWithToast(text);
+										isDialogOpen = false;
+									}}
 									type="submit"
 								>
 									Copy Transcriptions
@@ -421,7 +385,7 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () => deleteRecordingsById(ids),
+								onConfirm: () => deleteRecordingsByIdWithToast(ids),
 							});
 						}}
 					>

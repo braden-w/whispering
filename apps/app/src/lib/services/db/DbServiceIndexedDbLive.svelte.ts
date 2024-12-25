@@ -1,6 +1,7 @@
 import { type DBSchema, openDB } from 'idb';
-import { DbError, type Recording, type DbService } from './DbService';
-import { tryAsync } from '@epicenterhq/result';
+import { DbError, type Recording, type DbService } from '.';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -29,7 +30,52 @@ interface RecordingsDbSchemaV1 extends DBSchema {
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
-export const createIndexedDbService = (): DbService => {
+export const createRecordingsIndexedDbService = (): DbService => {
+	let recordings = $state<Recording[]>([]);
+
+	const syncDbToRecordingsState = async () => {
+		const allRecordingsFromDbResult = await tryAsync({
+			try: async () => {
+				const tx = (await dbPromise).transaction(
+					[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+					'readonly',
+				);
+				const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
+				const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+				const metadata = await recordingMetadataStore.getAll();
+				const blobs = await recordingBlobStore.getAll();
+				await tx.done;
+				return metadata
+					.map((recording) => {
+						const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
+						return blob ? { ...recording, blob } : null;
+					})
+					.filter((r) => r !== null);
+			},
+			mapErr: (error) =>
+				DbError({
+					title: 'Error getting recordings from indexedDB',
+					description: 'Please try again',
+					error,
+				}),
+		});
+		if (!allRecordingsFromDbResult.ok) {
+			return renderErrAsToast({
+				variant: 'error',
+				title: 'Failed to initialize recordings',
+				description:
+					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
+				action: {
+					type: 'more-details',
+					error: allRecordingsFromDbResult.error,
+				},
+			});
+		}
+		recordings = allRecordingsFromDbResult.data;
+	};
+
+	syncDbToRecordingsState();
+
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 		async upgrade(db, oldVersion, newVersion, transaction) {
 			if (oldVersion === 0) {
@@ -79,34 +125,6 @@ export const createIndexedDbService = (): DbService => {
 	});
 
 	return {
-		getAllRecordings: () =>
-			tryAsync({
-				try: async () => {
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readonly',
-					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					const metadata = await recordingMetadataStore.getAll();
-					const blobs = await recordingBlobStore.getAll();
-					await tx.done;
-					return metadata
-						.map((recording) => {
-							const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-							return blob ? { ...recording, blob } : null;
-						})
-						.filter((r) => r !== null);
-				},
-				mapErr: (error) =>
-					DbError({
-						title: 'Error getting recordings from indexedDB',
-						description: 'Please try again',
-						error,
-					}),
-			}),
 		getRecording: (id) =>
 			tryAsync({
 				try: async () => {
@@ -133,8 +151,8 @@ export const createIndexedDbService = (): DbService => {
 						error,
 					}),
 			}),
-		addRecording: (recording) =>
-			tryAsync({
+		addRecording: async (recording) => {
+			const addRecordingResult = await tryAsync({
 				try: async () => {
 					const { blob, ...metadata } = recording;
 					const tx = (await dbPromise).transaction(
@@ -157,9 +175,13 @@ export const createIndexedDbService = (): DbService => {
 						description: 'Please try again',
 						error,
 					}),
-			}),
-		updateRecording: (recording) =>
-			tryAsync({
+			});
+			if (!addRecordingResult.ok) return addRecordingResult;
+			recordings.push(recording);
+			return Ok(undefined);
+		},
+		updateRecording: async (recording) => {
+			const updateRecordingResult = await tryAsync({
 				try: async () => {
 					const { blob, ...metadata } = recording;
 					await Promise.all([
@@ -176,9 +198,15 @@ export const createIndexedDbService = (): DbService => {
 						description: 'Please try again',
 						error,
 					}),
-			}),
-		deleteRecordingById: (id) =>
-			tryAsync({
+			});
+			if (!updateRecordingResult.ok) return updateRecordingResult;
+			recordings = recordings.map((r) =>
+				r.id === recording.id ? recording : r,
+			);
+			return Ok(undefined);
+		},
+		deleteRecordingById: async (id) => {
+			const deleteRecordingByIdResult = await tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -200,9 +228,13 @@ export const createIndexedDbService = (): DbService => {
 						description: 'Please try again',
 						error,
 					}),
-			}),
-		deleteRecordingsById: (ids) =>
-			tryAsync({
+			});
+			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
+			recordings = recordings.filter((r) => r.id !== id);
+			return Ok(undefined);
+		},
+		deleteRecordingsById: async (ids) => {
+			const deleteRecordingsByIdResult = await tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
 						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
@@ -224,6 +256,10 @@ export const createIndexedDbService = (): DbService => {
 						description: 'Please try again',
 						error,
 					}),
-			}),
+			});
+			if (!deleteRecordingsByIdResult.ok) return deleteRecordingsByIdResult;
+			recordings = recordings.filter((r) => !ids.includes(r.id));
+			return Ok(undefined);
+		},
 	};
 };

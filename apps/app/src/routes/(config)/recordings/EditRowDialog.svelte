@@ -6,11 +6,11 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/db/';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordingsService } from '$lib/services/recordings/RecordingsDbService.svelte';
-	import { createMutation, Ok } from '@repo/shared/epicenter-result';
+	import type { Recording } from '$lib/services/recordings-db/db/DbService';
+	import {
+		deleteRecordingByIdThenCloseRecording,
+		updateRecordingWithToast,
+	} from '$lib/with-toasts/recordings';
 	import { Loader2Icon } from 'lucide-svelte';
 
 	let { recording }: { recording: Recording } = $props();
@@ -18,24 +18,6 @@
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
-
-	const deleteRecordingByIdThenCloseRecording = createMutation({
-		mutationFn: recordingsService.deleteRecordingById,
-		onMutate: () => {
-			isDeleting = true;
-			return Ok(undefined);
-		},
-		onSuccess: (_, { input: id }) => {
-			toast.success({
-				title: 'Deleted recording!',
-				description: 'Your recording has been deleted successfully.',
-			});
-		},
-		onSettled: () => {
-			isDeleting = false;
-		},
-		onError: (error) => renderErrAsToast(error),
-	});
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -60,7 +42,7 @@
 			onsubmit={async (e) => {
 				e.preventDefault();
 				isSaving = true;
-				await recordingsService.updateRecording(recording);
+				await updateRecordingWithToast(recording);
 				isSaving = false;
 				isDialogOpen = false;
 			}}
@@ -104,7 +86,12 @@
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={() => deleteRecordingByIdThenCloseRecording(recording.id); }
+					onclick={() => {
+						isDeleting = true;
+						deleteRecordingByIdThenCloseRecording(recording.id);
+						isDeleting = false;
+						isDialogOpen = false;
+					}}
 					variant="destructive"
 					disabled={isDeleting}
 				>

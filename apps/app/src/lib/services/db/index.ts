@@ -1,8 +1,8 @@
 import type { Result } from '@epicenterhq/result';
 import { Err } from '@epicenterhq/result';
-import { createIndexedDbService } from './DbServiceIndexedDbLive.svelte';
+import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.svelte';
 
-export const RecordingsService = createIndexedDbService();
+export const recordings = createRecordingsIndexedDbService();
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 

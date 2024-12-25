@@ -4,17 +4,13 @@ import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import { RecordingsService } from '$lib/services/recordings-db/RecordingsService.svelte';
-import type { Recording } from '$lib/services/recordings-db/db/DbService';
+import { recordings, type Recording } from '$lib/services/db';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { TranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { TranscriptionServiceGroqLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceGroqLive';
-import { TranscriptionServiceWhisperLive } from '$lib/services/transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
 import { settings } from '$lib/stores/settings.svelte';
-import { Err, Ok, createMutation } from '@epicenterhq/result';
+import { Err, Ok, createMutation, runMutation } from '@epicenterhq/result';
 import {
-	type ToastAndNotifyOptions,
 	WhisperingErr,
+	type ToastAndNotifyOptions,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 } from '@repo/shared';
@@ -22,6 +18,7 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
+import { transcribeRecordingAndUpdateDb } from '$lib/services/db/transcribe';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -49,7 +46,6 @@ const createLocalToastFns = () => {
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
-	const transcribingRecordingIds = $state<Set<string>>(new Set());
 	const isInRecordingSession = $derived(
 		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
 	);
@@ -96,7 +92,7 @@ function createRecorder() {
 		},
 	});
 
-	const startRecording = createMutation({
+	const startRecordingWithToast = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			if (!isInRecordingSession) {
 				const initResult = await MediaRecorderService.initRecordingSession(
@@ -166,14 +162,15 @@ function createRecorder() {
 		},
 	});
 
-	const stopRecording = createMutation({
+	const stopRecordingWithToast = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
 			const stopResult = await MediaRecorderService.stopRecording(undefined, {
 				sendStatus: localToast.loading,
 			});
 			if (!stopResult.ok) return stopResult;
-			const blob = stopResult.data;
+			setRecorderState('SESSION');
 
+			const blob = stopResult.data;
 			const newRecording: Recording = {
 				id: nanoid(),
 				title: '',
@@ -185,7 +182,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await RecordingsService.addRecording(newRecording);
+				await recordings.addRecording(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				return WhisperingErr({
 					title: '❌ Failed to Save Recording',
@@ -198,100 +195,78 @@ function createRecorder() {
 				});
 			}
 
-			const selectedTranscriptionService = {
-				OpenAI: TranscriptionServiceWhisperLive,
-				Groq: TranscriptionServiceGroqLive,
-				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
-			}[settings.value.selectedTranscriptionService];
-
-			const [transcribeResult, closeSessionResult] = await Promise.all([
-				(async () => {
-					transcribingRecordingIds.add(newRecording.id);
-					const result = await selectedTranscriptionService.transcribe(blob);
-					transcribingRecordingIds.delete(newRecording.id);
-					return result;
-				})(),
-
-				(async () => {
-					if (!settings.value.isFasterRerecordEnabled) {
-						localToast.loading({
-							title: '⏳ Closing session...',
-							description: 'Wrapping up your recording session...',
-						});
-						return await MediaRecorderService.closeRecordingSession(undefined, {
-							sendStatus: localToast.loading,
-						});
-					}
-					return Ok(undefined);
-				})(),
-			]);
-
-			if (!transcribeResult.ok) return transcribeResult;
-			const transcribedText = transcribeResult.data;
-
-			if (!closeSessionResult.ok) {
-				return WhisperingErr({
-					title: '❌ Failed to Close Session After Recording',
-					description:
-						'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
-					action: { type: 'more-details', error: closeSessionResult.error },
+			const closeSessionWithToastIfNeeded = async () => {
+				if (settings.value.isFasterRerecordEnabled) return;
+				localToast.loading({
+					title: '⏳ Closing session...',
+					description: 'Wrapping up your recording session...',
 				});
-			}
+				const closeSessionResult =
+					await MediaRecorderService.closeRecordingSession(undefined, {
+						sendStatus: localToast.loading,
+					});
+				setRecorderState('IDLE');
 
-			const newRecordingWithDoneStatus = {
-				...newRecording,
-				transcriptionStatus: 'DONE',
-				transcribedText,
-			} satisfies Recording;
+				if (!closeSessionResult.ok) {
+					renderErrAsToast({
+						title: '❌ Failed to Close Session After Recording',
+						description:
+							'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
+						action: { type: 'more-details', error: closeSessionResult.error },
+					});
+				}
+			};
 
-			const updateRecordingWithDoneStatusResult =
-				await RecordingsService.updateRecording(newRecordingWithDoneStatus);
-			if (!updateRecordingWithDoneStatusResult.ok)
-				return WhisperingErr({
-					title: '❌ Failed to Update Recording',
-					description:
-						'Your recording was saved but we encountered an issue while updating the recording with the transcription result. You may need to restart the application.',
-					action: {
-						type: 'more-details',
-						error: updateRecordingWithDoneStatusResult.error,
+			await Promise.race([
+				runMutation({
+					mutationFn: async () => {
+						const transcribeRecordingAndUpdateDbResult =
+							await transcribeRecordingAndUpdateDb(newRecording);
+						if (!transcribeRecordingAndUpdateDbResult.ok)
+							return transcribeRecordingAndUpdateDbResult;
+
+						const updatedRecording = transcribeRecordingAndUpdateDbResult.data;
+
+						if (settings.value.isCopyToClipboardEnabled) {
+							const copyResult = await ClipboardService.setClipboardText(
+								updatedRecording.transcribedText,
+							);
+							if (!copyResult.ok) {
+								if (copyResult.error._tag === 'WhisperingError') {
+									return Err(copyResult.error);
+								}
+								return WhisperingErr({
+									title: '❌ Failed to Copy to Clipboard',
+									description:
+										'We encountered an issue while copying the transcription to your clipboard. Please try again.',
+									action: { type: 'more-details', error: copyResult.error },
+								});
+							}
+						}
+
+						if (settings.value.isPasteContentsOnSuccessEnabled) {
+							const pasteResult = await ClipboardService.writeTextToCursor(
+								updatedRecording.transcribedText,
+							);
+							if (!pasteResult.ok) {
+								if (pasteResult.error._tag === 'WhisperingError') {
+									return Err(pasteResult.error);
+								}
+								return WhisperingErr({
+									title: '❌ Failed to Paste to Cursor',
+									description:
+										'We encountered an issue while pasting the transcription to your cursor. Please try again.',
+									action: { type: 'more-details', error: pasteResult.error },
+								});
+							}
+						}
+						return Ok(undefined);
 					},
-				});
-
-			if (transcribedText === '') return Ok(transcribedText);
-
-			if (settings.value.isCopyToClipboardEnabled) {
-				const copyResult =
-					await ClipboardService.setClipboardText(transcribedText);
-				if (!copyResult.ok) {
-					if (copyResult.error._tag === 'WhisperingError') {
-						return Err(copyResult.error);
-					}
-					return WhisperingErr({
-						title: '❌ Failed to Copy to Clipboard',
-						description:
-							'We encountered an issue while copying the transcription to your clipboard. Please try again.',
-						action: { type: 'more-details', error: copyResult.error },
-					});
-				}
-			}
-
-			if (settings.value.isPasteContentsOnSuccessEnabled) {
-				const pasteResult =
-					await ClipboardService.writeTextToCursor(transcribedText);
-				if (!pasteResult.ok) {
-					if (pasteResult.error._tag === 'WhisperingError') {
-						return Err(pasteResult.error);
-					}
-					return WhisperingErr({
-						title: '❌ Failed to Paste to Cursor',
-						description:
-							'We encountered an issue while pasting the transcription to your cursor. Please try again.',
-						action: { type: 'more-details', error: pasteResult.error },
-					});
-				}
-			}
-
-			return Ok(transcribedText);
+					onError: (error) => renderErrAsToast(error),
+				}),
+				closeSessionWithToastIfNeeded(),
+			]);
+			return Ok(undefined);
 		},
 		onMutate: () => {
 			const localToast = createLocalToastFns();
@@ -302,9 +277,6 @@ function createRecorder() {
 			return Ok({ localToast });
 		},
 		onSuccess: (_, { context: { localToast } }) => {
-			setRecorderState(
-				settings.value.isFasterRerecordEnabled ? 'SESSION' : 'IDLE',
-			);
 			localToast.success({
 				title: '✨ Recording Complete!',
 				description: settings.value.isFasterRerecordEnabled
@@ -400,9 +372,9 @@ function createRecorder() {
 		closeRecordingSession,
 		toggleRecording() {
 			if (isInRecordingSession) {
-				stopRecording(undefined);
+				stopRecordingWithToast(undefined);
 			} else {
-				startRecording(undefined);
+				startRecordingWithToast(undefined);
 			}
 		},
 		cancelRecording: () => cancelRecording(undefined),
