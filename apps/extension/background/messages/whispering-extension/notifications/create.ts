@@ -1,21 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-	WhisperingResult,
-} from '@repo/shared';
+import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/notifications/create'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/notifications/create'>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ notifyOptions: ToastAndNotifyOptions },
+	WhisperingResult<string>
 > = async ({ body }, res) => {
 	const createNotification = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.notifyOptions) {

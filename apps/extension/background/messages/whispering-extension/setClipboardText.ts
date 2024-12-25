@@ -1,23 +1,12 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import {
-	WhisperingErr,
-	type ExternalMessageBody,
-	type ExternalMessageReturnType,
-	type WhisperingResult,
-} from '@repo/shared';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/setClipboardText'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/setClipboardText'>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ transcribedText: string },
+	WhisperingResult<string>
 > = async ({ body }, res) => {
 	const setClipboardText = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.transcribedText) {

@@ -1,20 +1,11 @@
 import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-} from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/notifyWhisperingTabReady'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/notifyWhisperingTabReady'>;
-
-const handler: PlasmoMessaging.MessageHandler<RequestBody, ResponseBody> = (
-	{ body },
-	res,
-) => {
+const handler: PlasmoMessaging.MessageHandler<
+	void,
+	WhisperingResult<undefined>
+> = ({ body }, res) => {
 	res.send(Ok(undefined));
 };
 

@@ -1,23 +1,19 @@
 import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
+	type Settings,
+	WhisperingErr,
+	type WhisperingResult,
 	parseJson,
 	settingsSchema,
-	WhisperingErr,
-	type Settings,
-	type WhisperingResult,
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import type { WhisperingStorageKey } from '~lib/storage/keys';
 
-export type RequestBody = Record<string, never>;
-
-export type ResponseBody = WhisperingResult<Settings>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	never,
+	WhisperingResult<Settings>
 > = async (_req, res) => {
 	const getSettings = async () => {
 		const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();

@@ -1,20 +1,15 @@
+import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import {
-	type ExternalMessageBody,
-	type ExternalMessageReturnType,
 	WhisperingErr,
+	type WhisperingResult,
+	type WhisperingSoundNames,
 } from '@repo/shared';
 import { getActiveTabId } from '~lib/getActiveTabId';
-import { Ok } from '@epicenterhq/result';
-
-export type RequestBody = ExternalMessageBody<'whispering-extension/playSound'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/playSound'>;
 
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	WhisperingSoundNames,
+	WhisperingResult<undefined>
 > = async ({ body: sound }, res) => {
 	const playSound = async () => {
 		if (!sound) {

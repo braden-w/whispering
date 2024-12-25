@@ -1,21 +1,12 @@
 import { Ok } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-} from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/notifications/clear'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/notifications/clear'>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ notificationId: string },
+	WhisperingResult<void>
 > = async ({ body }, res) => {
 	const clearNotification = async () => {
 		if (!body?.notificationId) {

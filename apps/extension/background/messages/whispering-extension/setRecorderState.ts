@@ -1,13 +1,9 @@
-import { Ok, tryAsync } from '@epicenterhq/result';
-import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-	WhisperingRecordingState
-} from '@repo/shared';
-import { WhisperingErr } from '@repo/shared';
 import redLargeSquare from 'data-base64:~assets/red_large_square.png';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import type { PlasmoMessaging } from '@plasmohq/messaging';
+import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
+import { WhisperingErr } from '@repo/shared';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 const iconPaths = {
@@ -16,15 +12,9 @@ const iconPaths = {
 	'SESSION+RECORDING': redLargeSquare,
 } as const satisfies Record<WhisperingRecordingState, string>;
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/setRecorderState'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/setRecorderState'>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ recorderState: WhisperingRecordingState },
+	WhisperingResult<undefined>
 > = async ({ body }, res) => {
 	const setRecorderState = async () => {
 		if (!body?.recorderState) {

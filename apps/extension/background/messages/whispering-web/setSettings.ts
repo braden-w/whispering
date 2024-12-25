@@ -8,13 +8,9 @@ import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import type { WhisperingStorageKey } from '~lib/storage/keys';
 
-export type RequestBody = { settings: Settings };
-
-export type ResponseBody = WhisperingResult<Settings>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ settings: Settings },
+	WhisperingResult<Settings>
 > = async ({ body }, res) => {
 	const setSettings = async () => {
 		if (!body || !body.settings) {

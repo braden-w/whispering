@@ -1,5 +1,5 @@
 {
-	"name": "extension",
+	"name": "@repo/extension",
 	"displayName": "Whispering",
 	"version": "5.1.2",
 	"private": true,

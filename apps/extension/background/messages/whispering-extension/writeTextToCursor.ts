@@ -8,15 +8,9 @@ import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 
-export type RequestBody =
-	ExternalMessageBody<'whispering-extension/writeTextToCursor'>;
-
-export type ResponseBody =
-	ExternalMessageReturnType<'whispering-extension/writeTextToCursor'>;
-
 const handler: PlasmoMessaging.MessageHandler<
-	RequestBody,
-	ResponseBody
+	{ transcribedText: string },
+	WhisperingResult<string>
 > = async ({ body }, res) => {
 	const writeTextToCursor = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.transcribedText) {
