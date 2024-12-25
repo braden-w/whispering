@@ -20,7 +20,7 @@ export const SendMessageToExtensionErr = (
 		...args,
 	} as const);
 
-export const sendToBackgroundResult = async (
+export const sendMessageToExtension = async (
 	...args: Parameters<typeof sendToBackgroundViaRelay>
 ) => {
 	const result = await tryAsync({

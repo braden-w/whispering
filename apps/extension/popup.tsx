@@ -1,9 +1,14 @@
+import GithubIcon from 'react:./components/icons/github.svg';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
 import { tryAsync } from '@epicenterhq/result';
 import { sendToBackground } from '@plasmohq/messaging';
-import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
+import {
+	WHISPERING_RECORDINGS_PATHNAME,
+	WhisperingErr,
+	type WhisperingResult,
+} from '@repo/shared';
 import {
 	ClipboardIcon,
 	ListIcon,
@@ -12,9 +17,6 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
-import GithubIcon from 'react:./components/icons/github.svg';
-import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
-import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { WhisperingButton } from '~components/WhisperingButton';
 import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
@@ -36,13 +38,9 @@ function IndexPopup() {
 	);
 }
 
-async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
-	const sendToToggleRecordingResult = await tryAsync({
-		try: () =>
-			sendToBackground<
-				ToggleRecording.RequestBody,
-				ToggleRecording.ResponseBody
-			>({ name: 'whispering-web/toggleRecording' }),
+async function toggleRecording() {
+	const sendToToggleRecordingResult: WhisperingResult<void> = await tryAsync({
+		try: () => sendToBackground({ name: 'whispering-web/toggleRecording' }),
 		mapErr: (error) =>
 			WhisperingErr({
 				title: 'Unable to toggle recording via background service worker',
@@ -51,20 +49,13 @@ async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
 				action: { type: 'more-details', error },
 			}),
 	});
-	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
-	const toggleRecordingResult = sendToToggleRecordingResult.data;
-	return toggleRecordingResult;
+	if (sendToToggleRecordingResult.ok) return;
+	renderErrorAsNotification(sendToToggleRecordingResult);
 }
 
-async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
-	const sendToCancelRecordingResult = await tryAsync({
-		try: () =>
-			sendToBackground<
-				CancelRecording.RequestBody,
-				CancelRecording.ResponseBody
-			>({
-				name: 'whispering-web/cancelRecording',
-			}),
+async function cancelRecording() {
+	const sendToCancelRecordingResult: WhisperingResult<void> = await tryAsync({
+		try: () => sendToBackground({ name: 'whispering-web/cancelRecording' }),
 		mapErr: (error) =>
 			WhisperingErr({
 				title: 'Unable to cancel recording via background service worker',
@@ -73,9 +64,8 @@ async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
 				action: { type: 'more-details', error },
 			}),
 	});
-	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
-	const cancelRecordingResult = sendToCancelRecordingResult.data;
-	return cancelRecordingResult;
+	if (sendToCancelRecordingResult.ok) return;
+	renderErrorAsNotification(sendToCancelRecordingResult);
 }
 
 function IndexPage() {
@@ -107,11 +97,7 @@ function IndexPage() {
 					<WhisperingButton
 						tooltipContent="Toggle recording"
 						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-						onClick={async () => {
-							const toggleRecordingResult = await toggleRecording();
-							if (!toggleRecordingResult.ok)
-								renderErrorAsNotification(toggleRecordingResult);
-						}}
+						onClick={toggleRecording}
 						aria-label="Toggle recording"
 						variant="ghost"
 					>
@@ -126,11 +112,7 @@ function IndexPage() {
 						<WhisperingButton
 							tooltipContent="Cancel recording"
 							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-							onClick={async () => {
-								const cancelRecordingResult = await cancelRecording();
-								if (!cancelRecordingResult.ok)
-									renderErrorAsNotification(cancelRecordingResult);
-							}}
+							onClick={cancelRecording}
 							aria-label="Cancel recording"
 							variant="ghost"
 						>
