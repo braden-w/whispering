@@ -8,7 +8,7 @@ import type {
 } from 'plasmo';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 import { waitForElement } from './utils/waitForElement';
-import { app } from '~background/messages/app';
+import { app } from '~lib/app';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
 	const element = await waitForElement('div.GrowingTextArea_growWrap__im5W3');

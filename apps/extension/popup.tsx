@@ -11,11 +11,11 @@ import {
 	SunIcon,
 } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
-import { app } from '~background/messages/app';
-import { extension } from '~background/messages/extension';
+import { app } from '~lib/app';
+import { extension } from '~lib/extension';
 import { createNotification } from '~background/messages/extension/createNotification';
 import { WhisperingButton } from '~components/WhisperingButton';
-import { getOrCreateWhisperingTabId } from '~background/messages/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
 	useWhisperingTranscribedText,

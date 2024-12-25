@@ -1,31 +1,33 @@
-import { Err, type Ok, tryAsync } from '@epicenterhq/result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
 	ClearNotificationMessage,
 	ClearNotificationResult,
-} from './extension/clearNotification';
+} from '../background/messages/extension/clearNotification';
 import type {
 	CreateNotificationMessage,
 	CreateNotificationResult,
-} from './extension/createNotification';
+} from '../background/messages/extension/createNotification';
 import type {
 	NotifyWhisperingTabReadyMessage,
 	NotifyWhisperingTabReadyResult,
-} from './extension/notifyWhisperingTabReady';
-import type { PlaySoundMessage, PlaySoundResult } from './extension/playSound';
+} from '../background/messages/extension/notifyWhisperingTabReady';
+import type {
+	PlaySoundMessage,
+	PlaySoundResult,
+} from '../background/messages/extension/playSound';
 import type {
 	SetClipboardTextMessage,
 	SetClipboardTextResult,
-} from './extension/setClipboardText';
+} from '../background/messages/extension/setClipboardText';
 import type {
 	SetRecorderStateMessage,
 	SetRecorderStateResult,
-} from './extension/setRecorderState';
+} from '../background/messages/extension/setRecorderState';
 import type {
 	WriteTextToCursorMessage,
 	WriteTextToCursorResult,
-} from './extension/writeTextToCursor';
+} from '../background/messages/extension/writeTextToCursor';
 
 type SendMessageToExtensionErrProperties = {
 	_tag: 'SendMessageToExtensionError';

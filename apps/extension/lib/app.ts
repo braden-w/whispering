@@ -1,9 +1,9 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { WhisperingErr, type Settings } from '@repo/shared';
-import type { CancelRecordingResponse } from './app/cancelRecording';
-import type { GetSettingsResponse } from './app/getSettings';
-import type { SetSettingsResponse } from './app/setSettings';
-import type { ToggleRecordingResponse } from './app/toggleRecording';
+import type { CancelRecordingResponse } from '../background/messages/app/cancelRecording';
+import type { GetSettingsResponse } from '../background/messages/app/getSettings';
+import type { SetSettingsResponse } from '../background/messages/app/setSettings';
+import type { ToggleRecordingResponse } from '../background/messages/app/toggleRecording';
 
 export const app = {
 	getSettings: async () => {

@@ -8,7 +8,7 @@ import {
 	settingsSchema,
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import type { WhisperingStorageKey } from '~lib/storage/keys';
 
 export type GetSettingsResponse = WhisperingResult<Settings>;

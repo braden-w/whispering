@@ -6,7 +6,7 @@ import type {
 	PlasmoGetStyle,
 	PlasmoMountShadowHost,
 } from 'plasmo';
-import { app } from '~background/messages/app';
+import { app } from '~lib/app';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {

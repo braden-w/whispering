@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
-import { app } from '~background/messages/app';
+import { app } from '~lib/app';
 import { Button } from '~components/ui/button';
 import {
 	Card,

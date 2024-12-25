@@ -5,7 +5,7 @@ import type {
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
-import { app } from '~background/messages/app';
+import { app } from '~lib/app';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 import { waitForElement } from './utils/waitForElement';
 

@@ -4,7 +4,7 @@ import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { nanoid } from 'nanoid';
-import { extension } from '../extension';
+import { extension } from '../../../lib/extension';
 import { gotoTargetUrlInWhisperingTab } from './gotoTargetUrlInWhisperingTab';
 
 export type CreateNotificationMessage = {

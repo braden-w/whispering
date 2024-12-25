@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
-import { getOrCreateWhisperingTabId } from '~background/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
 export type ToggleRecordingResponse = WhisperingResult<void>;
 
