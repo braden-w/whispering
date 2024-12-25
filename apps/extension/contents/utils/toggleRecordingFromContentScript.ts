@@ -1,10 +1,10 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { tryAsyncWhispering } from '@repo/shared';
 import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
 import { renderErrorAsNotification } from '~lib/errors';
+import { tryAsync } from '@epicenterhq/result';
 
 export const toggleRecordingFromContentScript = async (): Promise<void> => {
-	const sendToToggleRecordingResult = await tryAsyncWhispering({
+	const sendToToggleRecordingResult = await tryAsync({
 		try: () =>
 			sendToBackground<
 				ToggleRecording.RequestBody,
