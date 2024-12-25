@@ -1,6 +1,6 @@
 import { toast } from '$lib/services/ToastService';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import type { Recording } from '$lib/services/recordings-db/db/DbService';
+import type { Recording } from '$lib/services/db';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, createMutation } from '@epicenterhq/result';
 
