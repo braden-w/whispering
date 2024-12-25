@@ -4,11 +4,17 @@ import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
+export type SetClipboardTextMessage = {
+	transcribedText: string;
+};
+
+export type SetClipboardTextResult = WhisperingResult<string>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	{ transcribedText: string },
-	WhisperingResult<string>
+	SetClipboardTextMessage,
+	SetClipboardTextResult
 > = async ({ body }, res) => {
-	const setClipboardText = async (): Promise<WhisperingResult<string>> => {
+	const setClipboardText = async (): Promise<SetClipboardTextResult> => {
 		if (!body?.transcribedText) {
 			return WhisperingErr({
 				title: 'Unable to copy transcribed text to clipboard',

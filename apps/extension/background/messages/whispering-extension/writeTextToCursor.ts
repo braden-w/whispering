@@ -1,18 +1,20 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type {
-	ExternalMessageBody,
-	ExternalMessageReturnType,
-	WhisperingResult,
-} from '@repo/shared';
+import type { WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
 
+export type WriteTextToCursorMessage = {
+	transcribedText: string;
+};
+
+export type WriteTextToCursorResult = WhisperingResult<string>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	{ transcribedText: string },
-	WhisperingResult<string>
+	WriteTextToCursorMessage,
+	WriteTextToCursorResult
 > = async ({ body }, res) => {
-	const writeTextToCursor = async (): Promise<WhisperingResult<string>> => {
+	const writeTextToCursor = async (): Promise<WriteTextToCursorResult> => {
 		if (!body?.transcribedText) {
 			return WhisperingErr({
 				title: 'Error invoking writeTextToCursor command',

@@ -7,18 +7,24 @@ import {
 } from '@repo/shared';
 import { getActiveTabId } from '~lib/getActiveTabId';
 
+export type PlaySoundMessage = {
+	sound: WhisperingSoundNames;
+};
+export type PlaySoundResult = WhisperingResult<undefined>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	WhisperingSoundNames,
-	WhisperingResult<undefined>
-> = async ({ body: sound }, res) => {
+	PlaySoundMessage,
+	PlaySoundResult
+> = async ({ body }, res) => {
 	const playSound = async () => {
-		if (!sound) {
+		if (!body?.sound) {
 			return WhisperingErr({
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
 			});
 		}
+		const { sound } = body;
 		console.info('Playing sound', sound);
 		const getActiveTabIdResult = await getActiveTabId();
 		if (!getActiveTabIdResult.ok) {

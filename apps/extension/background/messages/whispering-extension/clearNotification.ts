@@ -4,9 +4,14 @@ import type { WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
+export type ClearNotificationMessage = {
+	notificationId: string;
+};
+export type ClearNotificationResult = WhisperingResult<void>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	{ notificationId: string },
-	WhisperingResult<void>
+	ClearNotificationMessage,
+	ClearNotificationResult
 > = async ({ body }, res) => {
 	const clearNotification = async () => {
 		if (!body?.notificationId) {

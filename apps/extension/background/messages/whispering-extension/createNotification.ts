@@ -3,9 +3,14 @@ import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
 
+export type CreateNotificationMessage = {
+	notifyOptions: ToastAndNotifyOptions;
+};
+export type CreateNotificationResult = WhisperingResult<string>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	{ notifyOptions: ToastAndNotifyOptions },
-	WhisperingResult<string>
+	CreateNotificationMessage,
+	CreateNotificationResult
 > = async ({ body }, res) => {
 	const createNotification = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.notifyOptions) {

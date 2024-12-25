@@ -12,9 +12,15 @@ const iconPaths = {
 	'SESSION+RECORDING': redLargeSquare,
 } as const satisfies Record<WhisperingRecordingState, string>;
 
+export type SetRecorderStateMessage = {
+	recorderState: WhisperingRecordingState;
+};
+
+export type SetRecorderStateResult = WhisperingResult<undefined>;
+
 const handler: PlasmoMessaging.MessageHandler<
-	{ recorderState: WhisperingRecordingState },
-	WhisperingResult<undefined>
+	SetRecorderStateMessage,
+	SetRecorderStateResult
 > = async ({ body }, res) => {
 	const setRecorderState = async () => {
 		if (!body?.recorderState) {
