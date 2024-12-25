@@ -1,7 +1,6 @@
-import { sendToBackground } from '@plasmohq/messaging';
 import {
-	type Settings,
 	SUPPORTED_LANGUAGES_OPTIONS,
+	type Settings,
 	TRANSCRIPTION_SERVICE_OPTIONS,
 	WHISPERING_URL,
 } from '@repo/shared';
@@ -13,8 +12,8 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { Fragment } from 'react';
-import type * as GetSettings from '~background/messages/whispering-web/getSettings';
-import type * as SetSettings from '~background/messages/whispering-web/setSettings';
+import { toast } from 'sonner';
+import { app } from '~background/messages/whispering-web/app';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -33,13 +32,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '~components/ui/select';
-import { Switch } from '~components/ui/switch';
 import { Skeleton } from '~components/ui/skeleton';
-import './style.css';
-import { AlertTriangleIcon } from 'lucide-react';
 import { Toaster } from '~components/ui/sonner';
-import { toast } from 'sonner';
-import { app } from '~background/messages/whispering-web/app';
+import { Switch } from '~components/ui/switch';
+import './style.css';
 
 const queryClient = new QueryClient();
 
