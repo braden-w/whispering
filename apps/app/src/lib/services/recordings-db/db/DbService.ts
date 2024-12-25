@@ -1,5 +1,5 @@
 import type { Result } from '@epicenterhq/result';
-import { Err } from '@repo/shared/epicenter-result';
+import { Err } from '@epicenterhq/result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 

@@ -2,7 +2,7 @@ import type { Result } from '@epicenterhq/result';
 import type { z } from 'zod';
 import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
 import { createHttpServiceWebLive } from './HttpServiceWebLive';
-import { Err } from '@repo/shared/epicenter-result';
+import { Err } from '@epicenterhq/result';
 
 type HttpServiceErrCodes =
 	| { code: 'NetworkError'; error: unknown }
