@@ -13,7 +13,9 @@ const MAX_FILE_SIZE_MB = 25 as const;
 
 export const createTranscriptionServiceFasterWhisperServerLive = ({
 	HttpService,
-}: { HttpService: HttpService }): TranscriptionService => ({
+}: {
+	HttpService: HttpService;
+}): TranscriptionService => ({
 	transcribe: async (audioBlob) => {
 		const blobSizeInMb = audioBlob.size / (1024 * 1024);
 		if (blobSizeInMb > MAX_FILE_SIZE_MB) {

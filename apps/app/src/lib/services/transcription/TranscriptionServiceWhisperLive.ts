@@ -13,7 +13,9 @@ const MAX_FILE_SIZE_MB = 25 as const;
 
 export const createTranscriptionServiceWhisperLive = ({
 	HttpService,
-}: { HttpService: HttpService }): TranscriptionService => ({
+}: {
+	HttpService: HttpService;
+}): TranscriptionService => ({
 	transcribe: async (audioBlob) => {
 		if (!settings.value.openAiApiKey) {
 			return TranscriptionServiceErr({
