@@ -3,6 +3,8 @@ import type { WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
+export type ToggleRecordingResponse = WhisperingResult<void>;
+
 export const toggleRecording = async () => {
 	const whisperingTabIdResult = await getOrCreateWhisperingTabId();
 	if (!whisperingTabIdResult.ok) return whisperingTabIdResult;
@@ -37,7 +39,7 @@ export const toggleRecording = async () => {
 
 const handler: PlasmoMessaging.MessageHandler<
 	never,
-	WhisperingResult<void>
+	ToggleRecordingResponse
 > = async (_req, res) => {
 	const toggleRecordingResult = await toggleRecording();
 	res.send(toggleRecordingResult);

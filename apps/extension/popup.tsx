@@ -2,13 +2,7 @@ import GithubIcon from 'react:./components/icons/github.svg';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
-import { tryAsync } from '@epicenterhq/result';
-import { sendToBackground } from '@plasmohq/messaging';
-import {
-	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
-	type WhisperingResult,
-} from '@repo/shared';
+import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
 import {
 	ClipboardIcon,
 	ListIcon,
@@ -17,6 +11,7 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
+import { app } from '~background/messages/whispering-web/app';
 import { WhisperingButton } from '~components/WhisperingButton';
 import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
@@ -39,33 +34,15 @@ function IndexPopup() {
 }
 
 async function toggleRecording() {
-	const sendToToggleRecordingResult: WhisperingResult<void> = await tryAsync({
-		try: () => sendToBackground({ name: 'whispering-web/toggleRecording' }),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: 'Unable to toggle recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
-	});
-	if (sendToToggleRecordingResult.ok) return;
-	renderErrorAsNotification(sendToToggleRecordingResult);
+	const toggleRecordingResult = await app.toggleRecording();
+	if (!toggleRecordingResult.ok)
+		renderErrorAsNotification(toggleRecordingResult);
 }
 
 async function cancelRecording() {
-	const sendToCancelRecordingResult: WhisperingResult<void> = await tryAsync({
-		try: () => sendToBackground({ name: 'whispering-web/cancelRecording' }),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: 'Unable to cancel recording via background service worker',
-				description:
-					'There was likely an issue sending the message to the background service worker from the popup.',
-				action: { type: 'more-details', error },
-			}),
-	});
-	if (sendToCancelRecordingResult.ok) return;
-	renderErrorAsNotification(sendToCancelRecordingResult);
+	const cancelRecordingResult = await app.cancelRecording();
+	if (!cancelRecordingResult.ok)
+		renderErrorAsNotification(cancelRecordingResult);
 }
 
 function IndexPage() {

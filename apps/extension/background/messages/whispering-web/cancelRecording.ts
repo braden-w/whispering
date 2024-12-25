@@ -3,9 +3,11 @@ import type { WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
+export type CancelRecordingResponse = WhisperingResult<void>;
+
 const handler: PlasmoMessaging.MessageHandler<
 	undefined,
-	WhisperingResult<void>
+	CancelRecordingResponse
 > = async (req, res) => {
 	const cancelRecording = async () => {
 		const whisperingTabIdResult = await getOrCreateWhisperingTabId();

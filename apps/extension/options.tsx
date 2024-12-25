@@ -39,6 +39,7 @@ import './style.css';
 import { AlertTriangleIcon } from 'lucide-react';
 import { Toaster } from '~components/ui/sonner';
 import { toast } from 'sonner';
+import { app } from '~background/messages/whispering-web/app';
 
 const queryClient = new QueryClient();
 
@@ -64,12 +65,7 @@ function SettingsCard() {
 	} = useQuery({
 		queryKey: ['settings'],
 		queryFn: async () => {
-			const response = await sendToBackground<
-				GetSettings.RequestBody,
-				GetSettings.ResponseBody
-			>({
-				name: 'whispering-web/getSettings',
-			});
+			const response = await app.getSettings();
 			if (!response.ok) throw response.error;
 			return response.data;
 		},
@@ -77,15 +73,8 @@ function SettingsCard() {
 
 	const { mutate: setSettings } = useMutation({
 		mutationFn: async (settings: Settings) => {
-			const response = await sendToBackground<
-				SetSettings.RequestBody,
-				SetSettings.ResponseBody
-			>({
-				name: 'whispering-web/setSettings',
-				body: { settings },
-			});
+			const response = await app.setSettings(settings);
 			if (!response.ok) throw response.error;
-			return response.data;
 		},
 		onSuccess: () => {
 			toast.success('Settings updated!');
