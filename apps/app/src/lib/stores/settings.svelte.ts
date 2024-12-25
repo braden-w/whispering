@@ -4,11 +4,11 @@ import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {
 	getDefaultSettings,
 	settingsSchema,
-	tryAsyncWhispering,
-	trySyncWhispering,
+	WhisperingErr,
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
+import { tryAsync, trySync } from '@epicenterhq/result';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',
@@ -28,18 +28,18 @@ export const settings = createPersistedState({
 type RegisterShortcutJob = Promise<void>;
 
 const unregisterAllLocalShortcuts = () =>
-	trySyncWhispering({
+	trySync({
 		try: () => hotkeys.unbind(),
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Error unregistering all shortcuts',
-			description: 'Please try again.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Error unregistering all shortcuts',
+				description: 'Please try again.',
+				action: { type: 'more-details', error },
+			}),
 	});
 
 const unregisterAllGlobalShortcuts = () =>
-	tryAsyncWhispering({
+	tryAsync({
 		try: async () => {
 			if (!window.__TAURI_INTERNALS__) return;
 			const { unregisterAll } = await import(
@@ -47,12 +47,12 @@ const unregisterAllGlobalShortcuts = () =>
 			);
 			return await unregisterAll();
 		},
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Error unregistering all shortcuts',
-			description: 'Please try again.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Error unregistering all shortcuts',
+				description: 'Please try again.',
+				action: { type: 'more-details', error },
+			}),
 	});
 
 function registerLocalShortcut({
@@ -65,19 +65,19 @@ function registerLocalShortcut({
 	const unregisterAllLocalShortcutsResult = unregisterAllLocalShortcuts();
 	if (!unregisterAllLocalShortcutsResult.ok)
 		return unregisterAllLocalShortcutsResult;
-	return trySyncWhispering({
+	return trySync({
 		try: () =>
 			hotkeys(shortcut, (event) => {
 				// Prevent the default refresh event under WINDOWS system
 				event.preventDefault();
 				callback();
 			}),
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Error registering local shortcut',
-			description: 'Please make sure it is a valid keyboard shortcut.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Error registering local shortcut',
+				description: 'Please make sure it is a valid keyboard shortcut.',
+				action: { type: 'more-details', error },
+			}),
 	});
 }
 
@@ -92,7 +92,7 @@ async function registerGlobalShortcut({
 		await unregisterAllGlobalShortcuts();
 	if (!unregisterAllGlobalShortcutsResult.ok)
 		return unregisterAllGlobalShortcutsResult;
-	return tryAsyncWhispering({
+	return tryAsync({
 		try: async () => {
 			if (!window.__TAURI_INTERNALS__) return;
 			const { register } = await import('@tauri-apps/plugin-global-shortcut');
@@ -102,12 +102,13 @@ async function registerGlobalShortcut({
 				}
 			});
 		},
-		mapErr: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Error registering global shortcut.',
-			description: 'Please make sure it is a valid Electron keyboard shortcut.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Error registering global shortcut.',
+				description:
+					'Please make sure it is a valid Electron keyboard shortcut.',
+				action: { type: 'more-details', error },
+			}),
 	});
 }
 
