@@ -1,8 +1,7 @@
-import GithubIcon from 'react:./components/icons/github.svg';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
-import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
+import { WHISPERING_RECORDINGS_PATHNAME } from '@repo/shared';
 import {
 	ClipboardIcon,
 	ListIcon,
@@ -11,16 +10,17 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
+import GithubIcon from 'react:./components/icons/github.svg';
 import { app } from '~background/messages/app';
+import { extension } from '~background/messages/whispering-extension';
+import { createNotification } from '~background/messages/whispering-extension/createNotification';
 import { WhisperingButton } from '~components/WhisperingButton';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
 	useWhisperingTranscribedText,
 } from '~lib/storage/useWhisperingStorage';
 import './style.css';
-import { extension } from '~background/messages/whispering-extension';
 
 function IndexPopup() {
 	return (
@@ -181,17 +181,20 @@ function NavItems() {
 				tooltipContent="Recordings"
 				onClick={async () => {
 					const whisperingTabIdResult = await getOrCreateWhisperingTabId();
-					if (!whisperingTabIdResult.ok)
-						return renderErrorAsNotification(whisperingTabIdResult);
+					if (!whisperingTabIdResult.ok) {
+						createNotification(whisperingTabIdResult.error);
+						return;
+					}
 					const whisperingTabId = whisperingTabIdResult.data;
 					const tab = await chrome.tabs.get(whisperingTabId);
-					if (!tab.url)
-						return renderErrorAsNotification(
-							WhisperingErr({
-								title: 'Whispering tab has no URL',
-								description: 'The Whispering tab has no URL.',
-							}),
-						);
+					if (!tab.url) {
+						createNotification({
+							title: 'Whispering tab has no URL',
+							description: 'The Whispering tab has no URL.',
+							variant: 'error',
+						});
+						return;
+					}
 					const url = new URL(tab.url);
 
 					if (url.pathname === WHISPERING_RECORDINGS_PATHNAME) {

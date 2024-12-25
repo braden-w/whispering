@@ -12,7 +12,7 @@ export type CreateNotificationMessage = {
 };
 export type CreateNotificationResult = WhisperingResult<string>;
 
-const createNotification = async ({
+export const createNotification = async ({
 	id = nanoid(),
 	title,
 	description,
