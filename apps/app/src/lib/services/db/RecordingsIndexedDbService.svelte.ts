@@ -33,49 +33,6 @@ type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 export const createRecordingsIndexedDbService = (): DbService => {
 	let recordings = $state<Recording[]>([]);
 
-	const syncDbToRecordingsState = async () => {
-		const allRecordingsFromDbResult = await tryAsync({
-			try: async () => {
-				const tx = (await dbPromise).transaction(
-					[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-					'readonly',
-				);
-				const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
-				const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-				const metadata = await recordingMetadataStore.getAll();
-				const blobs = await recordingBlobStore.getAll();
-				await tx.done;
-				return metadata
-					.map((recording) => {
-						const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-						return blob ? { ...recording, blob } : null;
-					})
-					.filter((r) => r !== null);
-			},
-			mapErr: (error) =>
-				DbError({
-					title: 'Error getting recordings from indexedDB',
-					description: 'Please try again',
-					error,
-				}),
-		});
-		if (!allRecordingsFromDbResult.ok) {
-			return renderErrAsToast({
-				variant: 'error',
-				title: 'Failed to initialize recordings',
-				description:
-					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
-				action: {
-					type: 'more-details',
-					error: allRecordingsFromDbResult.error,
-				},
-			});
-		}
-		recordings = allRecordingsFromDbResult.data;
-	};
-
-	syncDbToRecordingsState();
-
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 		async upgrade(db, oldVersion, newVersion, transaction) {
 			if (oldVersion === 0) {
@@ -123,6 +80,49 @@ export const createRecordingsIndexedDbService = (): DbService => {
 			}
 		},
 	});
+
+	const syncDbToRecordingsState = async () => {
+		const allRecordingsFromDbResult = await tryAsync({
+			try: async () => {
+				const tx = (await dbPromise).transaction(
+					[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+					'readonly',
+				);
+				const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
+				const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
+				const metadata = await recordingMetadataStore.getAll();
+				const blobs = await recordingBlobStore.getAll();
+				await tx.done;
+				return metadata
+					.map((recording) => {
+						const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
+						return blob ? { ...recording, blob } : null;
+					})
+					.filter((r) => r !== null);
+			},
+			mapErr: (error) =>
+				DbError({
+					title: 'Error getting recordings from indexedDB',
+					description: 'Please try again',
+					error,
+				}),
+		});
+		if (!allRecordingsFromDbResult.ok) {
+			return renderErrAsToast({
+				variant: 'error',
+				title: 'Failed to initialize recordings',
+				description:
+					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
+				action: {
+					type: 'more-details',
+					error: allRecordingsFromDbResult.error,
+				},
+			});
+		}
+		recordings = allRecordingsFromDbResult.data;
+	};
+
+	syncDbToRecordingsState();
 
 	return {
 		get recordings() {
