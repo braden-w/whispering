@@ -1,4 +1,4 @@
-import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { Ok, type Result, tryAsync } from '@epicenterhq/result';
 import {
 	WhisperingErr,
 	type WhisperingErrProperties,

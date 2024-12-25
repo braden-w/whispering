@@ -1,17 +1,16 @@
 import { Ok } from '@epicenterhq/result';
 
 import { settings } from '$lib/stores/settings.svelte';
-import { TranscriptionServiceGroqLive } from '../transcribe-recordings/transcription/TranscriptionServiceGroqLive';
-import { TranscriptionServiceFasterWhisperServerLive } from '../transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { TranscriptionServiceWhisperLive } from '../transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
-import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import type { TranscriptionServiceErr } from '../transcribe-recordings/transcription/TranscriptionService';
-import { recordings, type DbServiceResult, type Recording } from '.';
+import type { WhisperingResult } from '@repo/shared';
+import { type Recording, recordings } from '.';
 import { renderErrAsToast } from '../renderErrorAsToast';
+import { TranscriptionServiceFasterWhisperServerLive } from '../transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
+import { TranscriptionServiceGroqLive } from '../transcribe-recordings/transcription/TranscriptionServiceGroqLive';
+import { TranscriptionServiceWhisperLive } from '../transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
 
 const transcribingRecordingIds = $state(new Set<string>());
 
-export async function transcribeRecording(
+export async function transcribeRecordingAndUpdateDb(
 	recording: Recording,
 ): Promise<WhisperingResult<Recording>> {
 	const selectedTranscriptionService = {

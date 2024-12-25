@@ -1,6 +1,6 @@
 import { Ok } from '@epicenterhq/result';
 import type { NotificationService } from '@repo/shared';
-import { tryAsync } from '@repo/shared';
+import { tryAsync } from '@epicenterhq/result';
 import {
 	isPermissionGranted,
 	requestPermission,
