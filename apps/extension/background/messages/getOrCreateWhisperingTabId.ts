@@ -31,6 +31,42 @@ export const getOrCreateWhisperingTabId = async (): Promise<
 	return Ok(bestWhisperingTabId);
 };
 
+function getAllWhisperingTabs() {
+	return tryAsync({
+		try: () => chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Error getting Whispering tabs',
+				description: 'Error querying for Whispering tabs in the browser.',
+				action: { type: 'more-details', error },
+			}),
+	});
+}
+
+async function createAndSetupNewTab(): Promise<WhisperingResult<number>> {
+	const createWhisperingTabResult = await createWhisperingTab();
+	if (!createWhisperingTabResult.ok) return createWhisperingTabResult;
+	const newTabId = createWhisperingTabResult.data;
+	const makeTabUndiscardableByIdResult =
+		await makeTabUndiscardableById(newTabId);
+	if (!makeTabUndiscardableByIdResult.ok) return makeTabUndiscardableByIdResult;
+	const pinTabByIdResult = await pinTabById(newTabId);
+	if (!pinTabByIdResult.ok) return pinTabByIdResult;
+	return Ok(newTabId);
+}
+
+function pinTabById(tabId: number) {
+	return tryAsync({
+		try: () => chrome.tabs.update(tabId, { pinned: true }),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: 'Unable to pin Whispering tab',
+				description: 'Error pinning Whispering tab.',
+				action: { type: 'more-details', error },
+			}),
+	});
+}
+
 async function getBestWhisperingTab(
 	tabs: chrome.tabs.Tab[],
 ): Promise<WhisperingResult<number>> {
@@ -61,29 +97,6 @@ async function checkTabResponsiveness(tabId: number) {
 	if (!injectScriptResult.ok) return false;
 	return true;
 }
-
-async function createAndSetupNewTab(): Promise<WhisperingResult<number>> {
-	const createWhisperingTabResult = await createWhisperingTab();
-	if (!createWhisperingTabResult.ok) return createWhisperingTabResult;
-	const newTabId = createWhisperingTabResult.data;
-	const makeTabUndiscardableByIdResult =
-		await makeTabUndiscardableById(newTabId);
-	if (!makeTabUndiscardableByIdResult.ok) return makeTabUndiscardableByIdResult;
-	const pinTabByIdResult = await pinTabById(newTabId);
-	if (!pinTabByIdResult.ok) return pinTabByIdResult;
-	return Ok(newTabId);
-}
-
-const getAllWhisperingTabs = () =>
-	tryAsync({
-		try: () => chrome.tabs.query({ url: WHISPERING_URL_WILDCARD }),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: 'Error getting Whispering tabs',
-				description: 'Error querying for Whispering tabs in the browser.',
-				action: { type: 'more-details', error },
-			}),
-	});
 
 /**
  * Creates a new Whispering tab, then waits for a Whispering content script to
@@ -128,18 +141,6 @@ function makeTabUndiscardableById(tabId: number) {
 			WhisperingErr({
 				title: 'Unable to make Whispering tab undiscardable',
 				description: 'Error updating Whispering tab to make it undiscardable.',
-				action: { type: 'more-details', error },
-			}),
-	});
-}
-
-function pinTabById(tabId: number) {
-	return tryAsync({
-		try: () => chrome.tabs.update(tabId, { pinned: true }),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: 'Unable to pin Whispering tab',
-				description: 'Error pinning Whispering tab.',
 				action: { type: 'more-details', error },
 			}),
 	});
