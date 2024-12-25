@@ -3,8 +3,8 @@ import {
 	HttpServiceErrIntoTranscriptionServiceErr,
 	type TranscriptionService,
 	TranscriptionServiceErr,
-} from '$lib/services/transcribe-recordings/transcription/TranscriptionService';
-import { WhisperResponseSchema } from '$lib/services/transcribe-recordings/transcription/WhisperResponseSchema';
+} from '$lib/services/transcription/TranscriptionService';
+import { WhisperResponseSchema } from '$lib/services/transcription/WhisperResponseSchema';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';

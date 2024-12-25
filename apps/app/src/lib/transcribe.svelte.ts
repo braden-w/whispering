@@ -3,9 +3,9 @@ import { settings } from '$lib/stores/settings.svelte';
 import type { WhisperingResult } from '@repo/shared';
 import { type Recording, recordings } from './services/db';
 import { renderErrAsToast } from './services/renderErrorAsToast';
-import { TranscriptionServiceFasterWhisperServerLive } from './services/transcribe-recordings/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { TranscriptionServiceGroqLive } from './services/transcribe-recordings/transcription/TranscriptionServiceGroqLive';
-import { TranscriptionServiceWhisperLive } from './services/transcribe-recordings/transcription/TranscriptionServiceWhisperLive';
+import { TranscriptionServiceFasterWhisperServerLive } from './services/transcription/TranscriptionServiceFasterWhisperServerLive';
+import { TranscriptionServiceGroqLive } from './services/transcription/TranscriptionServiceGroqLive';
+import { TranscriptionServiceWhisperLive } from './services/transcription/TranscriptionServiceWhisperLive';
 
 export const transcribingRecordingIds = $state(new Set<string>());
 
