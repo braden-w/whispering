@@ -1,8 +1,6 @@
-import { Ok } from '@epicenterhq/result';
+import { Ok, trySync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
-import type { WhisperingResult } from '@repo/shared';
-import { WhisperingErr } from '@repo/shared';
-import { NotificationServiceBgswLive } from '~lib/services/NotificationServiceBgswLive';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 
 export type ClearNotificationMessage = {
 	notificationId: string;
@@ -13,17 +11,24 @@ const handler: PlasmoMessaging.MessageHandler<
 	ClearNotificationMessage,
 	ClearNotificationResult
 > = async ({ body }, res) => {
-	const clearNotification = async () => {
+	const clearNotification = async (): Promise<WhisperingResult<void>> => {
 		if (!body?.notificationId) {
 			return WhisperingErr({
-				title: 'Error invoking notify command',
+				title: 'Error invoking clearNotification command',
 				description:
-					'Notify/clear must be provided notificationId in the request body of the message',
+					'ClearNotification must be provided notificationId in the request body of the message',
 			});
 		}
-		const clearResult = await NotificationServiceBgswLive.clear(
-			body.notificationId,
-		);
+		const clearResult = trySync({
+			try: () => chrome.notifications.clear(body.notificationId),
+			mapErr: (error) =>
+				WhisperingErr({
+					title: 'Error invoking clearNotification command',
+					description:
+						'There was an error clearing the notification in the background service worker.',
+					action: { type: 'more-details', error },
+				}),
+		});
 		if (!clearResult.ok) return clearResult;
 		return Ok(undefined);
 	};
