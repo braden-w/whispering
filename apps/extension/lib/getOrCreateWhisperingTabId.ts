@@ -1,11 +1,9 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import {
-	type ExternalMessageBody,
 	WHISPERING_URL,
 	WHISPERING_URL_WILDCARD,
 	WhisperingErr,
 	type WhisperingResult,
-	externalMessageSchema,
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 
