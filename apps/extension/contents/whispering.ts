@@ -9,10 +9,10 @@ export const config: PlasmoCSConfig = {
 	],
 };
 
-relayMessage({ name: 'whispering-extension/notifications/clear' });
-relayMessage({ name: 'whispering-extension/notifications/create' });
-relayMessage({ name: 'whispering-extension/notifyWhisperingTabReady' });
-relayMessage({ name: 'whispering-extension/playSound' });
-relayMessage({ name: 'whispering-extension/setClipboardText' });
-relayMessage({ name: 'whispering-extension/setRecorderState' });
-relayMessage({ name: 'whispering-extension/writeTextToCursor' });
+relayMessage({ name: 'extension/clearNotification' });
+relayMessage({ name: 'extension/createNotification' });
+relayMessage({ name: 'extension/notifyWhisperingTabReady' });
+relayMessage({ name: 'extension/playSound' });
+relayMessage({ name: 'extension/setClipboardText' });
+relayMessage({ name: 'extension/setRecorderState' });
+relayMessage({ name: 'extension/writeTextToCursor' });
