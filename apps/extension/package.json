@@ -6,7 +6,7 @@
 	"description": "Seamlessly integrate speech-to-text transcriptions on ChatGPT and anywhere on the web. Powered by OpenAI's Whisper API.",
 	"author": "Braden Wong <whispering@bradenwong.com>",
 	"exports": {
-		".": "./background/messages/whispering-extension/index.ts"
+		".": "./background/messages/extension/index.ts"
 	},
 	"scripts": {
 		"dev": "plasmo dev",
