@@ -41,8 +41,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	never,
 	ToggleRecordingResponse
 > = async (_req, res) => {
-	const toggleRecordingResult = await toggleRecording();
-	res.send(toggleRecordingResult);
+	res.send(await toggleRecording());
 };
 
 export default handler;

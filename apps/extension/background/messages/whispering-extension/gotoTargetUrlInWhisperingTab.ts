@@ -57,12 +57,13 @@ const handler: PlasmoMessaging.MessageHandler<
 	GotoTargetUrlInWhisperingTabResult
 > = async ({ body }, res) => {
 	if (!body?.path) {
-		return res.send(
+		res.send(
 			WhisperingErr({
 				title: 'Path required',
 				description: 'A valid path is required for navigation.',
 			}),
 		);
+		return;
 	}
 	res.send(await gotoTargetUrlInWhisperingTab(body.path));
 };

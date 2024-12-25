@@ -12,124 +12,131 @@ export type CreateNotificationMessage = {
 };
 export type CreateNotificationResult = WhisperingResult<string>;
 
-const handler: PlasmoMessaging.MessageHandler<
-	CreateNotificationMessage,
-	CreateNotificationResult
-> = async ({ body }, res) => {
-	const createNotification = async (): Promise<WhisperingResult<string>> => {
-		if (!body?.notifyOptions) {
-			return WhisperingErr({
-				title: 'Error invoking notify command',
-				description:
-					'ToastOptions must be provided in the request body of the message',
-			});
-		}
-		const { id = nanoid(), title, description, action } = body.notifyOptions;
-		switch (action?.type) {
-			case 'link': {
-				const createLinkNotificationResult = await tryAsync({
-					try: async () => {
-						chrome.notifications.create(id, {
-							priority: 2,
-							title,
-							message: description,
-							type: 'basic',
-							buttons: [{ title: action.label }],
-							iconUrl: studioMicrophone,
-						});
+const createNotification = async ({
+	id = nanoid(),
+	title,
+	description,
+	action,
+}: ToastAndNotifyOptions): Promise<WhisperingResult<string>> => {
+	switch (action?.type) {
+		case 'link': {
+			const createLinkNotificationResult = await tryAsync({
+				try: async () => {
+					chrome.notifications.create(id, {
+						priority: 2,
+						title,
+						message: description,
+						type: 'basic',
+						buttons: [{ title: action.label }],
+						iconUrl: studioMicrophone,
+					});
 
-						chrome.notifications.onClicked.addListener(async (clickedId) => {
-							if (clickedId === id) {
+					chrome.notifications.onClicked.addListener(async (clickedId) => {
+						if (clickedId === id) {
+							chrome.notifications.clear(id);
+							const gotoTargetUrlInWhisperingTabResult =
+								await gotoTargetUrlInWhisperingTab(action.goto);
+							if (!gotoTargetUrlInWhisperingTabResult.ok) {
+								extension.createNotification({
+									notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
+								});
+							}
+						}
+					});
+
+					chrome.notifications.onButtonClicked.addListener(
+						async (id, buttonIndex) => {
+							if (buttonIndex === 0) {
 								chrome.notifications.clear(id);
 								const gotoTargetUrlInWhisperingTabResult =
 									await gotoTargetUrlInWhisperingTab(action.goto);
 								if (!gotoTargetUrlInWhisperingTabResult.ok) {
-									extension.createNotification({
+									return extension.createNotification({
 										notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
 									});
 								}
 							}
-						});
-
-						chrome.notifications.onButtonClicked.addListener(
-							async (id, buttonIndex) => {
-								if (buttonIndex === 0) {
-									chrome.notifications.clear(id);
-									const gotoTargetUrlInWhisperingTabResult =
-										await gotoTargetUrlInWhisperingTab(action.goto);
-									if (!gotoTargetUrlInWhisperingTabResult.ok) {
-										return extension.createNotification({
-											notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
-										});
-									}
-								}
-							},
-						);
-						return id;
-					},
-					mapErr: (error) =>
-						WhisperingErr({
-							title: 'Failed to show notification',
-							description:
-								'There was an error showing the notification in the background service worker.',
-							action: { type: 'more-details', error },
-						}),
-				});
-				if (!createLinkNotificationResult.ok)
-					return createLinkNotificationResult;
-				return Ok(createLinkNotificationResult.data);
-			}
-			case 'more-details': {
-				const createNotificationResult = await tryAsync({
-					try: async () => {
-						chrome.notifications.create(id, {
-							priority: 2,
-							requireInteraction: true,
-							title,
-							message: description,
-							type: 'basic',
-							iconUrl: studioMicrophone,
-						});
-						return id;
-					},
-					mapErr: (error) =>
-						WhisperingErr({
-							title: 'Failed to show notification',
-							description:
-								'There was an error showing the notification in the background service worker.',
-							action: { type: 'more-details', error },
-						}),
-				});
-				if (!createNotificationResult.ok) return createNotificationResult;
-				return Ok(createNotificationResult.data);
-			}
-			default: {
-				const createNotificationResult = await tryAsync({
-					try: async () => {
-						chrome.notifications.create(id, {
-							priority: 2,
-							requireInteraction: true,
-							title,
-							message: description,
-							type: 'basic',
-							iconUrl: studioMicrophone,
-						});
-						return id;
-					},
-					mapErr: (error) =>
-						WhisperingErr({
-							title: 'Failed to show notification',
-							description:
-								'There was an error showing the notification in the background service worker.',
-							action: { type: 'more-details', error },
-						}),
-				});
-				if (!createNotificationResult.ok) return createNotificationResult;
-				return Ok(createNotificationResult.data);
-			}
+						},
+					);
+					return id;
+				},
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Failed to show notification',
+						description:
+							'There was an error showing the notification in the background service worker.',
+						action: { type: 'more-details', error },
+					}),
+			});
+			if (!createLinkNotificationResult.ok) return createLinkNotificationResult;
+			return Ok(createLinkNotificationResult.data);
 		}
-	};
-	res.send(await createNotification());
+		case 'more-details': {
+			const createNotificationResult = await tryAsync({
+				try: async () => {
+					chrome.notifications.create(id, {
+						priority: 2,
+						requireInteraction: true,
+						title,
+						message: description,
+						type: 'basic',
+						iconUrl: studioMicrophone,
+					});
+					return id;
+				},
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Failed to show notification',
+						description:
+							'There was an error showing the notification in the background service worker.',
+						action: { type: 'more-details', error },
+					}),
+			});
+			if (!createNotificationResult.ok) return createNotificationResult;
+			return Ok(createNotificationResult.data);
+		}
+		default: {
+			const createNotificationResult = await tryAsync({
+				try: async () => {
+					chrome.notifications.create(id, {
+						priority: 2,
+						requireInteraction: true,
+						title,
+						message: description,
+						type: 'basic',
+						iconUrl: studioMicrophone,
+					});
+					return id;
+				},
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Failed to show notification',
+						description:
+							'There was an error showing the notification in the background service worker.',
+						action: { type: 'more-details', error },
+					}),
+			});
+			if (!createNotificationResult.ok) return createNotificationResult;
+			return Ok(createNotificationResult.data);
+		}
+	}
+};
+
+const handler: PlasmoMessaging.MessageHandler<
+	CreateNotificationMessage,
+	CreateNotificationResult
+> = async ({ body }, res) => {
+	if (!body?.notifyOptions) {
+		res.send(
+			WhisperingErr({
+				title: 'Error invoking notify command',
+				description:
+					'ToastOptions must be provided in the request body of the message',
+			}),
+		);
+		return;
+	}
+	res.send(await createNotification(body.notifyOptions));
 };
 
 export default handler;
