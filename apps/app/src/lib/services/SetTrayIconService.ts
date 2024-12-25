@@ -1,4 +1,3 @@
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
 import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';

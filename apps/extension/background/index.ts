@@ -1,5 +1,5 @@
 import { toggleRecording } from '~background/messages/app/toggleRecording';
-import { extension } from './messages/whispering-extension';
+import { extension } from './messages/extension';
 
 chrome.runtime.onInstalled.addListener(async (details) => {
 	if (details.reason === 'install') await chrome.runtime.openOptionsPage();

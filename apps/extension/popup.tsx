@@ -12,10 +12,10 @@ import {
 } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
 import { app } from '~background/messages/app';
-import { extension } from '~background/messages/whispering-extension';
-import { createNotification } from '~background/messages/whispering-extension/createNotification';
+import { extension } from '~background/messages/extension';
+import { createNotification } from '~background/messages/extension/createNotification';
 import { WhisperingButton } from '~components/WhisperingButton';
-import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
+import { getOrCreateWhisperingTabId } from '~background/messages/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
 	useWhisperingTranscribedText,
