@@ -172,9 +172,7 @@ function createRecorder() {
 					mutationFn: async (_, { context: { localToast } }) => {
 						const stopResult = await MediaRecorderService.stopRecording(
 							undefined,
-							{
-								sendStatus: localToast.loading,
-							},
+							{ sendStatus: localToast.loading },
 						);
 						if (!stopResult.ok) return stopResult;
 						setRecorderState('SESSION');
@@ -243,11 +241,23 @@ function createRecorder() {
 								const updatedRecording =
 									transcribeRecordingAndUpdateDbResult.data;
 
+								if (!settings.value.isCopyToClipboardEnabled) {
+									toast.success({
+										title: 'Recording transcribed!',
+										description: updatedRecording.transcribedText,
+										descriptionClass: 'line-clamp-2',
+									});
+								}
 								if (settings.value.isCopyToClipboardEnabled) {
 									const copyResult = await ClipboardService.setClipboardText(
 										updatedRecording.transcribedText,
 									);
 									if (!copyResult.ok) {
+										toast.success({
+											title: 'Recording transcribed!',
+											description: updatedRecording.transcribedText,
+											descriptionClass: 'line-clamp-2',
+										});
 										if (copyResult.error._tag === 'WhisperingError') {
 											return Err(copyResult.error);
 										}
@@ -268,6 +278,11 @@ function createRecorder() {
 										updatedRecording.transcribedText,
 									);
 									if (!pasteResult.ok) {
+										toast.success({
+											title: 'Recording transcribed and copied to clipboard!',
+											description: updatedRecording.transcribedText,
+											descriptionClass: 'line-clamp-2',
+										});
 										if (pasteResult.error._tag === 'WhisperingError') {
 											return Err(pasteResult.error);
 										}
@@ -282,6 +297,12 @@ function createRecorder() {
 										});
 									}
 								}
+								toast.success({
+									title:
+										'Recording transcribed, copied to clipboard, and pasted!',
+									description: updatedRecording.transcribedText,
+									descriptionClass: 'line-clamp-2',
+								});
 								return Ok(undefined);
 							},
 							onError: (error) => renderErrAsToast(error),
