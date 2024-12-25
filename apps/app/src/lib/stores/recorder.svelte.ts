@@ -1,4 +1,3 @@
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
