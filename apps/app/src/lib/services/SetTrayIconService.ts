@@ -1,7 +1,7 @@
 import { recorder } from '$lib/stores/recorder.svelte';
-import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
-import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
+import type { WhisperingRecordingState } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
@@ -34,11 +34,6 @@ export function createSetTrayIconWebService(): SetTrayIconService {
 				recorderState: icon,
 			});
 			if (!sendMessageToExtensionResult.ok) return SetTrayIconServiceErr(icon);
-
-			const setExtensionRecorderStateResult = sendMessageToExtensionResult.data;
-			if (!setExtensionRecorderStateResult.ok)
-				return SetTrayIconServiceErr(icon);
-
 			return Ok(undefined);
 		},
 	};
