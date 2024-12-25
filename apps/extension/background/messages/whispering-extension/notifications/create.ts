@@ -20,11 +20,9 @@ const handler: PlasmoMessaging.MessageHandler<
 	const createNotification = async (): Promise<WhisperingResult<string>> => {
 		if (!body?.notifyOptions) {
 			return WhisperingErr({
-				_tag: 'WhisperingError',
 				title: 'Error invoking notify command',
 				description:
 					'ToastOptions must be provided in the request body of the message',
-				action: { type: 'none' },
 			});
 		}
 		const notifyResult = await NotificationServiceBgswLive.notify(

@@ -1,7 +1,5 @@
 import {
 	type NotificationService,
-	Ok,
-	tryAsyncWhispering,
 	WhisperingErr,
 	type WhisperingResult,
 } from '@repo/shared';
@@ -10,12 +8,13 @@ import { nanoid } from 'nanoid/non-secure';
 import { injectScript } from '~background/injectScript';
 import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
+import { Ok, tryAsync } from '@epicenterhq/result';
 
 const createNotificationServiceBgswLive = (): NotificationService => ({
 	async notify({ id: maybeId, title, description, action }) {
 		const id = maybeId ?? nanoid();
 
-		const createNotificationResult = await tryAsyncWhispering({
+		const createNotificationResult = await tryAsync({
 			try: async () => {
 				if (action?.type !== 'link') {
 					chrome.notifications.create(id, {
@@ -44,10 +43,8 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 						const whisperingTabId = getWhisperingTabIdResult.data;
 						if (!whisperingTabId)
 							return WhisperingErr({
-								_tag: 'WhisperingError',
 								title: 'Whispering tab not found',
 								description: 'The Whispering tab was not found.',
-								action: { type: 'none' },
 							});
 						const injectScriptResult = await injectScript<undefined, [string]>({
 							tabId: whisperingTabId,
@@ -61,6 +58,7 @@ const createNotificationServiceBgswLive = (): NotificationService => ({
 										ok: false,
 										error: {
 											_tag: 'WhisperingError',
+											variant: 'error',
 											title: `Unable to go to route ${route} in Whispering tab`,
 											description:
 												'There was an error going to the route in the Whispering tab.',

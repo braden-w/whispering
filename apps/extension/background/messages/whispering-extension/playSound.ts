@@ -24,7 +24,6 @@ const handler: PlasmoMessaging.MessageHandler<
 				title: 'Error invoking playSound command',
 				description:
 					'Sound must be provided in the request body of the message',
-				action: { type: 'none' },
 			});
 		}
 		console.info('Playing sound', sound);
@@ -46,7 +45,6 @@ const handler: PlasmoMessaging.MessageHandler<
 				_tag: 'WhisperingError',
 				title: 'Failed to get active tab ID',
 				description: 'Failed to get active tab ID to play sound',
-				action: { type: 'none' },
 			});
 		}
 		const sendMessageResult = await chrome.tabs.sendMessage(activeTabId, {

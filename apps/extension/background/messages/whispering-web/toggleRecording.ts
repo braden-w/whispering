@@ -23,6 +23,7 @@ export const toggleRecording = async () => {
 					ok: false,
 					error: {
 						_tag: 'WhisperingError',
+						variant: 'error',
 						title: 'Unable to toggle recording',
 						description:
 							'There was an error toggling the recording. Please try again.',

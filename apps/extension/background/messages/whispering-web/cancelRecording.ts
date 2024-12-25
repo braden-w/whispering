@@ -27,6 +27,7 @@ const handler: PlasmoMessaging.MessageHandler<
 						ok: false,
 						error: {
 							_tag: 'WhisperingError',
+							variant: 'error',
 							title: 'Unable to cancel recording',
 							description:
 								'There was an error canceling the recording. Please try again.',

@@ -22,7 +22,6 @@ const handler: PlasmoMessaging.MessageHandler<
 				_tag: 'WhisperingError',
 				title: 'Error setting Whispering settings',
 				description: 'Settings must be provided in the message request body',
-				action: { type: 'none' },
 			});
 		}
 		const { settings } = body;
@@ -44,6 +43,7 @@ const handler: PlasmoMessaging.MessageHandler<
 						ok: false,
 						error: {
 							_tag: 'WhisperingError',
+							variant: 'error',
 							title: 'Unable to set Whispering settings',
 							description:
 								'An error occurred while setting Whispering settings.',

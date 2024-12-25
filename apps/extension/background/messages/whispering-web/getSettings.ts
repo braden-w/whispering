@@ -40,6 +40,7 @@ const handler: PlasmoMessaging.MessageHandler<
 						ok: false,
 						error: {
 							_tag: 'WhisperingError',
+							variant: 'error',
 							title: 'Unable to get Whispering settings',
 							description:
 								'There was an error getting the Whispering settings from localStorage.',

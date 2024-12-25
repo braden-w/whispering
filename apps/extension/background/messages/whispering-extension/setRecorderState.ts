@@ -35,7 +35,6 @@ const handler: PlasmoMessaging.MessageHandler<
 				title: 'Error invoking setRecorderState command',
 				description:
 					'RecorderState must be provided in the request body of the message',
-				action: { type: 'none' },
 			});
 		}
 

@@ -21,11 +21,9 @@ const handler: PlasmoMessaging.MessageHandler<
 	const clearNotification = async () => {
 		if (!body?.notificationId) {
 			return WhisperingErr({
-				_tag: 'WhisperingError',
 				title: 'Error invoking notify command',
 				description:
 					'Notify/clear must be provided notificationId in the request body of the message',
-				action: { type: 'none' },
 			});
 		}
 		const clearResult = await NotificationServiceBgswLive.clear(
