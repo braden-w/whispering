@@ -1,9 +1,9 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
+	RecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
-	RecorderService,
 } from '.';
 
 const TIMESLICE_MS = 1000;
