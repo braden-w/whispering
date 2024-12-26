@@ -1,32 +1,14 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Err, Ok, tryAsync, type Result } from '@epicenterhq/result';
-import type { MaybePromise, WhisperingErrProperties } from '@repo/shared';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
-
-type DownloadServiceErrorProperties = Pick<
-	WhisperingErrProperties,
-	'title' | 'description' | 'action'
-> & {
-	_tag: 'DownloadServiceError';
-};
-
-export type DownloadServiceErr = Err<DownloadServiceErrorProperties>;
-
-export type DownloadServiceResult<T> = Ok<T> | DownloadServiceErr;
-
-export const DownloadServiceErr = (
-	args: Pick<
-		DownloadServiceErrorProperties,
-		'title' | 'description' | 'action'
-	>,
-): DownloadServiceErr => Err({ _tag: 'DownloadServiceError', ...args });
 
 export type DownloadService = {
 	downloadBlob: (args: {
 		name: string;
 		blob: Blob;
-	}) => MaybePromise<DownloadServiceResult<void>>;
+	}) => Promise<WhisperingResult<void>>;
 };
 
 export const DownloadService = window.__TAURI_INTERNALS__
@@ -45,7 +27,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 					return path;
 				},
 				mapErr: (error) =>
-					DownloadServiceErr({
+					WhisperingErr({
 						title: 'Error saving recording',
 						description:
 							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
@@ -55,7 +37,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 			if (!saveResult.ok) return saveResult;
 			const path = saveResult.data;
 			if (path === null) {
-				return DownloadServiceErr({
+				return WhisperingErr({
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
@@ -68,7 +50,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 					await writeFile(path, contents);
 				},
 				mapErr: (error) =>
-					DownloadServiceErr({
+					WhisperingErr({
 						title: 'Error saving recording',
 						description:
 							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
@@ -97,7 +79,7 @@ function createDownloadServiceWebLive(): DownloadService {
 					URL.revokeObjectURL(url);
 				},
 				mapErr: (error) =>
-					DownloadServiceErr({
+					WhisperingErr({
 						title: 'Error saving recording',
 						description:
 							'There was an error saving the recording in your browser. Please try again.',
