@@ -120,9 +120,17 @@ function createRecorder() {
 			});
 		},
 
-		toggleRecording() {
+		toggleRecordingWithToast: async () => {
 			if (isInRecordingSession) {
 				const stopRecordingWithToast = createMutation({
+					onMutate: () => {
+						const localToast = createLocalToastFns();
+						localToast.loading({
+							title: '⏸️ Stopping recording...',
+							description: 'Finalizing your audio capture...',
+						});
+						return Ok({ localToast });
+					},
 					mutationFn: async (_, { context: { localToast } }) => {
 						const stopResult = await WhisperingRecorderService.stopRecording(
 							undefined,
@@ -283,14 +291,6 @@ function createRecorder() {
 						]);
 						return Ok(undefined);
 					},
-					onMutate: () => {
-						const localToast = createLocalToastFns();
-						localToast.loading({
-							title: '⏸️ Stopping recording...',
-							description: 'Finalizing your audio capture...',
-						});
-						return Ok({ localToast });
-					},
 					onSuccess: (_, { context: { localToast } }) => {
 						localToast.success({
 							title: '✨ Recording Complete!',
@@ -313,6 +313,14 @@ function createRecorder() {
 				stopRecordingWithToast(undefined);
 			} else {
 				const startRecordingWithToast = createMutation({
+					onMutate: () => {
+						const localToast = createLocalToastFns();
+						localToast.loading({
+							title: '🎙️ Preparing to record...',
+							description: 'Setting up your recording environment...',
+						});
+						return Ok({ localToast });
+					},
 					mutationFn: async (_, { context: { localToast } }) => {
 						if (!isInRecordingSession) {
 							const initResult =
@@ -347,14 +355,6 @@ function createRecorder() {
 							});
 						}
 						return Ok(undefined);
-					},
-					onMutate: () => {
-						const localToast = createLocalToastFns();
-						localToast.loading({
-							title: '🎙️ Preparing to record...',
-							description: 'Setting up your recording environment...',
-						});
-						return Ok({ localToast });
 					},
 					onSuccess: (_, { context: { localToast } }) => {
 						setRecorderState('SESSION+RECORDING');
