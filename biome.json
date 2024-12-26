@@ -9,6 +9,7 @@
 		"ignoreUnknown": false,
 		"ignore": [
 			"apps/app/src-tauri/**",
+			"apps/app/.svelte-kit/**",
 			"*.svelte",
 			".DS_Store",
 			".turbo",
