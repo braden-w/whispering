@@ -18,6 +18,16 @@
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
+	let blobUrl = $state<string | null>(null);
+
+	$effect(() => {
+		if (isDialogOpen && recording.blob) {
+			blobUrl = URL.createObjectURL(recording.blob);
+		} else if (!isDialogOpen && blobUrl) {
+			URL.revokeObjectURL(blobUrl);
+			blobUrl = null;
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -77,11 +87,13 @@
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="blob" class="text-right">Blob</Label>
-				<audio
-					src={recording.blob ? URL.createObjectURL(recording.blob) : ''}
-					controls
-					class="col-span-3 mt-2 h-8 w-full"
-				></audio>
+				{#if blobUrl}
+					<audio
+						src={blobUrl}
+						controls
+						class="col-span-3 mt-2 h-8 w-full"
+					></audio>
+				{/if}
 			</div>
 			<Dialog.Footer>
 				<Button

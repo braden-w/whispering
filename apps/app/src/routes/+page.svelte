@@ -11,6 +11,7 @@
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { copyRecordingText } from './(config)/recordings/recordingMutations';
+	import { onDestroy } from 'svelte';
 
 	const latestRecording = $derived<Recording>(
 		recordings.recordings.at(-1) ?? {
@@ -24,11 +25,24 @@
 		},
 	);
 
-	const maybeLatestAudioSrc = $derived(
-		latestRecording.blob
-			? URL.createObjectURL(latestRecording.blob)
-			: undefined,
-	);
+	let latestAudioSrc = $state<string | undefined>(undefined);
+
+	$effect(() => {
+		if (latestRecording.blob) {
+			const newUrl = URL.createObjectURL(latestRecording.blob);
+			// Cleanup old URL before creating new one
+			if (latestAudioSrc) {
+				URL.revokeObjectURL(latestAudioSrc);
+			}
+			latestAudioSrc = newUrl;
+		}
+	});
+
+	onDestroy(() => {
+		if (latestAudioSrc) {
+			URL.revokeObjectURL(latestAudioSrc);
+		}
+	});
 
 	const recorderStateAsIcon = $derived(
 		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
@@ -100,8 +114,7 @@
 				{/if}
 			</WhisperingButton>
 		</div>
-		{#if maybeLatestAudioSrc}
-			{@const latestAudioSrc = maybeLatestAudioSrc}
+		{#if latestAudioSrc}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
