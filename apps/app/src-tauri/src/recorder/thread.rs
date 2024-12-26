@@ -10,7 +10,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UserRecordingSessionConfig {
     pub device_name: String,
     pub bits_per_sample: u16,
