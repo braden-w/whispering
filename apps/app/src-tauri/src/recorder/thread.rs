@@ -82,8 +82,8 @@ pub fn spawn_audio_thread(
                 }
                 AudioCommand::InitRecordingSession(recording_session_config) => {
                     if current_recording_session.is_some() {
-                        response_tx.send(AudioResponse::Error(
-                            "Stream already initialized".to_string(),
+                        response_tx.send(AudioResponse::Success(
+                            "Recording session already initialized".to_string(),
                         ))?;
                         continue;
                     }
@@ -309,8 +309,8 @@ pub fn spawn_audio_thread(
                             "Recording session closed successfully".to_string(),
                         ))?;
                     } else {
-                        response_tx.send(AudioResponse::Error(
-                            "No active recording session to close".to_string(),
+                        response_tx.send(AudioResponse::Success(
+                            "No active recording session".to_string(),
                         ))?;
                     }
                 }
