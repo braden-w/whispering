@@ -26,6 +26,11 @@ export const toastAndNotificationOptionsSchema = z.object({
 				type: z.literal('more-details'),
 				error: z.unknown(),
 			}),
+			z.object({
+				type: z.literal('button'),
+				label: z.string(),
+				onClick: z.function().args().returns(z.void()),
+			}),
 		])
 		.optional(),
 });
