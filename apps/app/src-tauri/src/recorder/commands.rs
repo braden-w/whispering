@@ -1,5 +1,6 @@
-use crate::thread::{spawn_audio_thread, AudioCommand, AudioResponse, UserRecordingSessionConfig};
+use super::thread::{spawn_audio_thread, AudioCommand, AudioResponse, UserRecordingSessionConfig};
 use once_cell::sync::Lazy;
+use serde::Serialize;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
 use thiserror::Error;
@@ -30,9 +31,9 @@ pub enum RecorderError {
     LockError(String),
 }
 
-type Result<T> = std::result::Result<T, RecorderError>;
+pub type Result<T> = std::result::Result<T, RecorderError>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct DeviceInfo {
     pub device_id: String,
     pub label: String,
@@ -48,7 +49,7 @@ fn ensure_thread_initialized() -> Result<()> {
         debug!("Thread not initialized, creating new audio thread...");
         let (response_tx, response_rx) = mpsc::channel();
         let command_tx =
-            spawn_audio_thread(response_tx).map_err(|e| RecorderError::SendError(e.to_string()))?;
+            spawn_audio_thread(response_tx).map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
         *thread = Some((command_tx, response_rx));
         info!("Audio thread created successfully");
     } else {
@@ -69,7 +70,8 @@ where
     f(tx, rx)
 }
 
-pub fn enumerate_recording_devices() -> Result<Vec<DeviceInfo>> {
+#[tauri::command]
+pub async fn enumerate_recording_devices() -> Result<Vec<DeviceInfo>> {
     debug!("Enumerating recording devices");
     with_thread(|tx, rx| {
         tx.send(AudioCommand::EnumerateRecordingDevices)
@@ -102,7 +104,8 @@ pub fn enumerate_recording_devices() -> Result<Vec<DeviceInfo>> {
     })
 }
 
-pub fn init_recording_session(settings: UserRecordingSessionConfig) -> Result<()> {
+#[tauri::command]
+pub async fn init_recording_session(settings: UserRecordingSessionConfig) -> Result<()> {
     info!(
         "Starting init_recording_session with settings: {:?}",
         settings
@@ -134,7 +137,8 @@ pub fn init_recording_session(settings: UserRecordingSessionConfig) -> Result<()
     })
 }
 
-pub fn close_recording_session() -> Result<()> {
+#[tauri::command]
+pub async fn close_recording_session() -> Result<()> {
     with_thread(|tx, rx| {
         tx.send(AudioCommand::CloseRecordingSession)
             .map_err(|e| RecorderError::SendError(e.to_string()))?;
@@ -151,7 +155,7 @@ pub fn close_recording_session() -> Result<()> {
     })
 }
 
-pub fn close_thread() -> Result<()> {
+pub async fn close_thread() -> Result<()> {
     let mut thread = AUDIO_THREAD
         .lock()
         .map_err(|e| RecorderError::LockError(e.to_string()))?;
@@ -185,7 +189,8 @@ pub fn close_thread() -> Result<()> {
     }
 }
 
-pub fn start_recording(recording_id: String) -> Result<()> {
+#[tauri::command]
+pub async fn start_recording(recording_id: String) -> Result<()> {
     let filename = format!("{}.wav", recording_id);
 
     with_thread(|tx, rx| {
@@ -204,7 +209,8 @@ pub fn start_recording(recording_id: String) -> Result<()> {
     })
 }
 
-pub fn stop_recording() -> Result<Vec<u8>> {
+#[tauri::command]
+pub async fn stop_recording() -> Result<Vec<u8>> {
     debug!("Stopping recording");
     with_thread(|tx, rx| {
         let current_recording = CURRENT_RECORDING
@@ -249,7 +255,8 @@ pub fn stop_recording() -> Result<Vec<u8>> {
     })
 }
 
-pub fn cancel_recording() -> Result<()> {
+#[tauri::command]
+pub async fn cancel_recording() -> Result<()> {
     with_thread(|tx, rx| {
         let current_recording = CURRENT_RECORDING.lock().unwrap().clone();
         let filename = current_recording.ok_or(RecorderError::NoActiveRecording)?;
