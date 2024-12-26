@@ -2,8 +2,8 @@ import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
 import { createRecorderServiceTauri } from './RecorderServiceTauri';
 import { createRecorderServiceWeb } from './RecorderServiceWeb';
 
-// export const WhisperingRecorderService = createTauriRecorderService();
-export const WhisperingRecorderService = createRecorderServiceWeb();
+// export const RecorderService = createTauriRecorderService();
+export const RecorderService = createRecorderServiceWeb();
 
 export type WhisperingRecorderErrProperties = WhisperingErrProperties;
 
@@ -17,7 +17,7 @@ export type RecordingSessionSettings = {
 	bitsPerSecond: number;
 };
 
-export type WhisperingRecorderService = {
+export type RecorderService = {
 	enumerateRecordingDevices: () => Promise<
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;

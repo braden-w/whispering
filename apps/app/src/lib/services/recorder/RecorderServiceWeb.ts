@@ -3,7 +3,7 @@ import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
-	WhisperingRecorderService,
+	RecorderService,
 } from '.';
 
 const TIMESLICE_MS = 1000;
@@ -18,7 +18,7 @@ type RecordingSession = {
 	} | null;
 };
 
-export const createRecorderServiceWeb = (): WhisperingRecorderService => {
+export const createRecorderServiceWeb = (): RecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	const acquireStream = async (

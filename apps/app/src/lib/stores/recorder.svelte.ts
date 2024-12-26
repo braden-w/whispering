@@ -5,7 +5,7 @@ import { clipboard } from '$lib/services/clipboard';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 import { type Recording, RecordingsService } from '$lib/services/db';
 import { HttpService } from '$lib/services/http/HttpService';
-import { WhisperingRecorderService } from '$lib/services/recorder';
+import { RecorderService } from '$lib/services/recorder';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
 import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/TranscriptionServiceGroqLive';
@@ -83,13 +83,10 @@ function createRecorder() {
 				description: 'Finalizing your audio capture...',
 			});
 
-			const stopResult = await WhisperingRecorderService.stopRecording(
-				undefined,
-				{
-					sendStatus: (options) =>
-						toast.loading({ id: stopRecordingToastId, ...options }),
-				},
-			);
+			const stopResult = await RecorderService.stopRecording(undefined, {
+				sendStatus: (options) =>
+					toast.loading({ id: stopRecordingToastId, ...options }),
+			});
 
 			if (!stopResult.ok) {
 				toast.error({
@@ -272,7 +269,7 @@ function createRecorder() {
 						description: 'Wrapping up your recording session...',
 					});
 					const closeSessionResult =
-						await WhisperingRecorderService.closeRecordingSession(undefined, {
+						await RecorderService.closeRecordingSession(undefined, {
 							sendStatus: (options) =>
 								toast.loading({ id: stopRecordingToastId, ...options }),
 						});
@@ -299,7 +296,7 @@ function createRecorder() {
 			description: 'Setting up your recording environment...',
 		});
 		if (!isInRecordingSession) {
-			const initResult = await WhisperingRecorderService.initRecordingSession(
+			const initResult = await RecorderService.initRecordingSession(
 				{
 					deviceId: settings.value.selectedAudioInputDeviceId,
 					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
@@ -320,7 +317,7 @@ function createRecorder() {
 				return;
 			}
 		}
-		const startRecordingResult = await WhisperingRecorderService.startRecording(
+		const startRecordingResult = await RecorderService.startRecording(
 			nanoid(),
 			{
 				sendStatus: (options) =>
@@ -374,7 +371,7 @@ function createRecorder() {
 				title: '⏳ Closing recording session...',
 				description: 'Wrapping things up, just a moment...',
 			});
-			const closeResult = await WhisperingRecorderService.closeRecordingSession(
+			const closeResult = await RecorderService.closeRecordingSession(
 				undefined,
 				{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
 			);
@@ -405,12 +402,9 @@ function createRecorder() {
 				title: '🔄 Cancelling recording...',
 				description: 'Discarding the current recording...',
 			});
-			const cancelResult = await WhisperingRecorderService.cancelRecording(
-				undefined,
-				{
-					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-				},
-			);
+			const cancelResult = await RecorderService.cancelRecording(undefined, {
+				sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+			});
 			if (!cancelResult.ok) {
 				toast.error({
 					id: toastId,
@@ -434,10 +428,12 @@ function createRecorder() {
 					title: '⏳ Closing session...',
 					description: 'Wrapping up your recording session...',
 				});
-				const closeSessionResult =
-					await WhisperingRecorderService.closeRecordingSession(undefined, {
+				const closeSessionResult = await RecorderService.closeRecordingSession(
+					undefined,
+					{
 						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-					});
+					},
+				);
 				if (!closeSessionResult.ok) {
 					toast.error({
 						id: toastId,
