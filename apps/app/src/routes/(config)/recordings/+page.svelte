@@ -34,8 +34,8 @@
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
-		TrashIcon,
 	} from 'lucide-svelte';
+	import { TrashIcon } from '$lib/components/icons';
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import { deleteRecordingsByIdWithToast } from './recordingMutations';
