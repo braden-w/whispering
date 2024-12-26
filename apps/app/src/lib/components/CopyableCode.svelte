@@ -1,9 +1,6 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { toast } from '$lib/services/ToastService';
-	import { createMutation } from '@epicenterhq/result';
+	import { clipboard } from '$lib/services/clipboard';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
 	const { codeText }: { codeText: string } = $props();
@@ -16,30 +13,6 @@
 			}, 2000);
 		}
 	});
-
-	const setClipboardText = createMutation({
-		mutationFn: (text: string) => ClipboardService.setClipboardText(text),
-		onError: (error) => {
-			if (error._tag === 'ClipboardError') {
-				renderErrAsToast({
-					_tag: 'WhisperingError',
-					title: 'Error copying transcription to clipboard',
-					description: 'Please try again.',
-					action: { type: 'more-details', error: error },
-				});
-				return;
-			}
-			renderErrAsToast(error);
-		},
-		onSuccess: (_, { input: text }) => {
-			toast.success({
-				title: 'Copied transcription to clipboard!',
-				description: text,
-				descriptionClass: 'line-clamp-2',
-			});
-			hasCopied = true;
-		},
-	});
 </script>
 
 <pre
@@ -49,7 +22,11 @@
 		size="icon"
 		variant="ghost"
 		class="absolute right-4 top-4 h-4 w-4"
-		onclick={() => setClipboardText(codeText)}>
+		onclick={() =>
+			clipboard.copyTextToClipboardWithToast({
+				label: 'code',
+				text: codeText,
+			})}>
 			<span class="sr-only">Copy</span>
     {#if hasCopied}
 			<CheckIcon />

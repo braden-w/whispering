@@ -6,12 +6,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/db';
+	import { recordings, type Recording } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
-	import {
-		deleteRecordingByIdWithToast,
-		updateRecordingWithToast,
-	} from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -52,7 +48,7 @@
 			onsubmit={async (e) => {
 				e.preventDefault();
 				isSaving = true;
-				await updateRecordingWithToast(recording);
+				await recordings.updateRecordingWithToast(recording);
 				isSaving = false;
 				isDialogOpen = false;
 			}}
@@ -88,19 +84,16 @@
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="blob" class="text-right">Blob</Label>
 				{#if blobUrl}
-					<audio
-						src={blobUrl}
-						controls
-						class="col-span-3 mt-2 h-8 w-full"
+					<audio src={blobUrl} controls class="col-span-3 mt-2 h-8 w-full"
 					></audio>
 				{/if}
 			</div>
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={() => {
+					onclick={async () => {
 						isDeleting = true;
-						deleteRecordingByIdWithToast(recording.id);
+						await recordings.deleteRecordingByIdWithToast(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

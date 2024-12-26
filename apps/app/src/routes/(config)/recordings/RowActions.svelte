@@ -4,6 +4,7 @@
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { DownloadService } from '$lib/services/DownloadService';
 	import { toast } from '$lib/services/ToastService';
+	import { clipboard } from '$lib/services/clipboard';
 	import type { Recording } from '$lib/services/db';
 	import { recordings } from '$lib/services/db';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
@@ -17,7 +18,6 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { copyRecordingText } from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -61,7 +61,11 @@
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
-		onclick={() => copyRecordingText(recording)}
+		onclick={() =>
+			clipboard.copyTextToClipboardWithToast({
+				label: 'transcribed text',
+				text: recording.transcribedText,
+			})}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({
@@ -87,7 +91,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => recordings.deleteRecordingById(recording.id),
+				onConfirm: () => recordings.deleteRecordingByIdWithToast(recording.id),
 			});
 		}}
 		variant="ghost"

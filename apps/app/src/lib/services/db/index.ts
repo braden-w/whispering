@@ -1,8 +1,59 @@
-import type { Ok, Result } from '@epicenterhq/result';
+import type { Ok } from '@epicenterhq/result';
 import { Err } from '@epicenterhq/result';
+import { toast } from '../ToastService';
 import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.svelte';
 
-export const recordings = createRecordingsIndexedDbService();
+export const RecordingsService = createRecordingsIndexedDbService();
+
+export const recordings = {
+	updateRecordingWithToast: async (recording: Recording) => {
+		const result = await RecordingsService.updateRecording(recording);
+		if (!result.ok) {
+			toast.error({
+				title: 'Failed to update recording!',
+				description: 'Your recording could not be updated.',
+			});
+			return;
+		}
+		toast.success({
+			title: 'Updated recording!',
+			description: 'Your recording has been updated successfully.',
+		});
+		return;
+	},
+
+	deleteRecordingByIdWithToast: async (id: string) => {
+		const result = await RecordingsService.deleteRecordingById(id);
+		if (!result.ok) {
+			toast.error({
+				title: 'Failed to delete recording!',
+				description: 'Your recording could not be deleted.',
+			});
+			return;
+		}
+		toast.success({
+			title: 'Deleted recording!',
+			description: 'Your recording has been deleted successfully.',
+		});
+		return;
+	},
+
+	deleteRecordingsByIdWithToast: async (ids: string[]) => {
+		const result = await RecordingsService.deleteRecordingsById(ids);
+		if (!result.ok) {
+			toast.error({
+				title: 'Failed to delete recordings!',
+				description: 'Your recordings could not be deleted.',
+			});
+			return;
+		}
+		toast.success({
+			title: 'Deleted recordings!',
+			description: 'Your recordings have been deleted successfully.',
+		});
+		return;
+	},
+};
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 

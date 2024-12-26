@@ -5,12 +5,12 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { clipboard } from '$lib/services/clipboard';
 	import { recordings, type Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
-	import { copyRecordingText } from './(config)/recordings/recordingMutations';
 	import { onDestroy } from 'svelte';
 
 	const latestRecording = $derived<Recording>(
@@ -100,7 +100,11 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={() => copyRecordingText(latestRecording)}
+				onclick={() =>
+					clipboard.copyTextToClipboardWithToast({
+						label: 'transcribed text',
+						text: latestRecording.transcribedText,
+					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
