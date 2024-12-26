@@ -177,95 +177,94 @@ function createRecorder() {
 
 			// transcribeAndCopyAndPaste, closeSessionIfNeeded
 
-			const transcribeRecordingCopyPasteWithToast = async () => {
-				const selectedTranscriptionService = {
-					OpenAI: TranscriptionServiceWhisperLive,
-					Groq: TranscriptionServiceGroqLive,
-					'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
-				}[settings.value.selectedTranscriptionService];
+			const [
+				_transcribeAndCopyAndPasteWithToastResult,
+				_closeSessionWithToastResult,
+			] = await Promise.all([
+				(async () => {
+					const selectedTranscriptionService = {
+						OpenAI: TranscriptionServiceWhisperLive,
+						Groq: TranscriptionServiceGroqLive,
+						'faster-whisper-server':
+							TranscriptionServiceFasterWhisperServerLive,
+					}[settings.value.selectedTranscriptionService];
 
-				const setStatusTranscribingResult =
-					await RecordingsService.updateRecording({
+					const setStatusTranscribingResult =
+						await RecordingsService.updateRecording({
+							...newRecording,
+							transcriptionStatus: 'TRANSCRIBING',
+						});
+					if (!setStatusTranscribingResult.ok) {
+						toast.warning({
+							title:
+								'Unable to set recording transcription status to transcribing',
+							description: 'Continuing with the transcription process...',
+							action: {
+								type: 'more-details',
+								error: setStatusTranscribingResult.error,
+							},
+						});
+					}
+
+					transcribingRecordingIds.add(newRecording.id);
+					const transcribeResult =
+						await selectedTranscriptionService.transcribe(newRecording.blob);
+					transcribingRecordingIds.delete(newRecording.id);
+					if (!transcribeResult.ok) {
+						toast.error({
+							id: stopRecordingToastId,
+							title: '❌ Failed to transcribe recording',
+							description:
+								'This is likely due to a temporary issue with the transcription service. Please try again later.',
+							action: { type: 'more-details', error: transcribeResult.error },
+						});
+						return;
+					}
+					const transcribedText = transcribeResult.data;
+
+					const updatedRecording = {
 						...newRecording,
-						transcriptionStatus: 'TRANSCRIBING',
-					});
-				if (!setStatusTranscribingResult.ok) {
-					toast.warning({
-						title:
-							'Unable to set recording transcription status to transcribing',
-						description: 'Continuing with the transcription process...',
-						action: {
-							type: 'more-details',
-							error: setStatusTranscribingResult.error,
-						},
-					});
-				}
-
-				transcribingRecordingIds.add(newRecording.id);
-				const transcribeResult = await selectedTranscriptionService.transcribe(
-					newRecording.blob,
-				);
-				transcribingRecordingIds.delete(newRecording.id);
-				if (!transcribeResult.ok) {
-					toast.error({
+						transcribedText,
+						transcriptionStatus: 'DONE',
+					} satisfies Recording;
+					const saveRecordingToDatabaseResult =
+						await RecordingsService.updateRecording(updatedRecording);
+					if (!saveRecordingToDatabaseResult.ok) {
+						toast.error({
+							id: stopRecordingToastId,
+							title: 'Unable to update recording after transcription',
+							description:
+								"Transcription completed but unable to update recording's transcribed text and status in database",
+							action: {
+								type: 'more-details',
+								error: saveRecordingToDatabaseResult.error,
+							},
+						});
+					}
+				})(),
+				(async () => {
+					toast.loading({
 						id: stopRecordingToastId,
-						title: '❌ Failed to transcribe recording',
-						description:
-							'This is likely due to a temporary issue with the transcription service. Please try again later.',
-						action: { type: 'more-details', error: transcribeResult.error },
+						title: '⏳ Closing recording session...',
+						description: 'Wrapping things up, just a moment...',
 					});
-					return;
-				}
-				const transcribedText = transcribeResult.data;
-
-				const updatedRecording = {
-					...newRecording,
-					transcribedText,
-					transcriptionStatus: 'DONE',
-				} satisfies Recording;
-				const saveRecordingToDatabaseResult =
-					await RecordingsService.updateRecording(updatedRecording);
-				if (!saveRecordingToDatabaseResult.ok) {
-					toast.error({
-						id: stopRecordingToastId,
-						title: 'Unable to update recording after transcription',
-						description:
-							"Transcription completed but unable to update recording's transcribed text and status in database",
-						action: {
-							type: 'more-details',
-							error: saveRecordingToDatabaseResult.error,
-						},
-					});
-				}
-			};
-
-			const closeSessionIfNeededWithToast = async () => {
-				toast.loading({
-					id: stopRecordingToastId,
-					title: '⏳ Closing recording session...',
-					description: 'Wrapping things up, just a moment...',
-				});
-				const closeSessionResult =
-					await WhisperingRecorderService.closeRecordingSession(undefined, {
-						sendStatus: (options) =>
-							toast.loading({ id: stopRecordingToastId, ...options }),
-					});
-				if (!closeSessionResult.ok) {
-					toast.warning({
-						id: stopRecordingToastId,
-						title: 'Unable to close session after recording',
-						description:
-							'You might need to restart the application to continue recording',
-						action: { type: 'more-details', error: closeSessionResult.error },
-					});
-					return;
-				}
-			};
-
-			void (await Promise.all([
-				transcribeRecordingCopyPasteWithToast(),
-				closeSessionIfNeededWithToast(),
-			]));
+					const closeSessionResult =
+						await WhisperingRecorderService.closeRecordingSession(undefined, {
+							sendStatus: (options) =>
+								toast.loading({ id: stopRecordingToastId, ...options }),
+						});
+					if (!closeSessionResult.ok) {
+						toast.warning({
+							id: stopRecordingToastId,
+							title: 'Unable to close session after recording',
+							description:
+								'You might need to restart the application to continue recording',
+							action: { type: 'more-details', error: closeSessionResult.error },
+						});
+						return;
+					}
+				})(),
+			]);
 		};
 
 	return {
