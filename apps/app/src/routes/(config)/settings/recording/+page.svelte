@@ -54,7 +54,7 @@
 				selected={settings.value.selectedAudioInputDeviceId}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					await recorder.closeRecordingSession();
+					await recorder.closeRecordingSessionWithToast();
 					settings.value = {
 						...settings.value,
 						selectedAudioInputDeviceId: selected,

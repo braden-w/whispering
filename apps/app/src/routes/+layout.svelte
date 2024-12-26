@@ -63,7 +63,7 @@
 
 	onMount(async () => {
 		window.toggleRecording = recorder.toggleRecording;
-		window.cancelRecording = recorder.cancelRecording;
+		window.cancelRecording = recorder.cancelRecordingWithToast;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
 			const sendMessageToExtensionResult =

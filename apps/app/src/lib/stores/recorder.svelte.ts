@@ -88,96 +88,38 @@ function createRecorder() {
 		void updateTrayIcon();
 	};
 
-	const closeRecordingSession = async () => {
-		const toastId = nanoid();
-		toast.loading({
-			id: toastId,
-			title: '⏳ Closing recording session...',
-			description: 'Wrapping things up, just a moment...',
-		});
-		const closeResult = await WhisperingRecorderService.closeRecordingSession(
-			undefined,
-			{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
-		);
-		if (!closeResult.ok) {
-			toast.error({ id: toastId, ...closeResult.error });
-			return;
-		}
-		setRecorderState('IDLE');
-		toast.success({
-			id: toastId,
-			title: '✨ Session Closed Successfully',
-			description: 'Your recording session has been neatly wrapped up',
-		});
-	};
-
-	const cancelRecording = async () => {
-		const toastId = nanoid();
-		toast.loading({
-			id: toastId,
-			title: '🔄 Cancelling recording...',
-			description: 'Discarding the current recording...',
-		});
-		const cancelResult = await WhisperingRecorderService.cancelRecording(
-			undefined,
-			{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
-		);
-		if (!cancelResult.ok) {
-			toast.error({
-				id: toastId,
-				title: '❌ Failed to Cancel Recording',
-				description:
-					'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
-				action: { type: 'more-details', error: cancelResult.error },
-			});
-			return;
-		}
-		setRecorderState('SESSION');
-		if (settings.value.isFasterRerecordEnabled) {
-			toast.success({
-				title: '🚫 Recording Cancelled',
-				description:
-					'Recording discarded, but session remains open for a new take',
-			});
-		} else {
-			toast.loading({
-				id: toastId,
-				title: '⏳ Closing session...',
-				description: 'Wrapping up your recording session...',
-			});
-			const closeSessionResult =
-				await WhisperingRecorderService.closeRecordingSession(undefined, {
-					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-				});
-			if (!closeSessionResult.ok) {
-				toast.error({
-					id: toastId,
-					title: '❌ Failed to close session while cancelling recording',
-					description:
-						'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
-					action: { type: 'more-details', error: closeSessionResult.error },
-				});
-				return;
-			}
-			toast.success({
-				id: toastId,
-				title: '✅ All Done!',
-				description: 'Recording cancelled and session closed successfully',
-			});
-		}
-		void playSound('cancel');
-		setRecorderState('IDLE');
-		console.info('Recording cancelled');
-	};
-
 	return {
 		get recorderState() {
 			return recorderState;
 		},
+
 		get isInRecordingSession() {
 			return isInRecordingSession;
 		},
-		closeRecordingSession,
+
+		closeRecordingSessionWithToast: async () => {
+			const toastId = nanoid();
+			toast.loading({
+				id: toastId,
+				title: '⏳ Closing recording session...',
+				description: 'Wrapping things up, just a moment...',
+			});
+			const closeResult = await WhisperingRecorderService.closeRecordingSession(
+				undefined,
+				{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
+			);
+			if (!closeResult.ok) {
+				toast.error({ id: toastId, ...closeResult.error });
+				return;
+			}
+			setRecorderState('IDLE');
+			toast.success({
+				id: toastId,
+				title: '✨ Session Closed Successfully',
+				description: 'Your recording session has been neatly wrapped up',
+			});
+		},
+
 		toggleRecording() {
 			if (isInRecordingSession) {
 				const stopRecordingWithToast = createMutation({
@@ -446,7 +388,67 @@ function createRecorder() {
 				startRecordingWithToast(undefined);
 			}
 		},
-		cancelRecording: () => cancelRecording(undefined),
+
+		cancelRecordingWithToast: async () => {
+			const toastId = nanoid();
+			toast.loading({
+				id: toastId,
+				title: '🔄 Cancelling recording...',
+				description: 'Discarding the current recording...',
+			});
+			const cancelResult = await WhisperingRecorderService.cancelRecording(
+				undefined,
+				{
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				},
+			);
+			if (!cancelResult.ok) {
+				toast.error({
+					id: toastId,
+					title: '❌ Failed to Cancel Recording',
+					description:
+						'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
+					action: { type: 'more-details', error: cancelResult.error },
+				});
+				return;
+			}
+			setRecorderState('SESSION');
+			if (settings.value.isFasterRerecordEnabled) {
+				toast.success({
+					title: '🚫 Recording Cancelled',
+					description:
+						'Recording discarded, but session remains open for a new take',
+				});
+			} else {
+				toast.loading({
+					id: toastId,
+					title: '⏳ Closing session...',
+					description: 'Wrapping up your recording session...',
+				});
+				const closeSessionResult =
+					await WhisperingRecorderService.closeRecordingSession(undefined, {
+						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+					});
+				if (!closeSessionResult.ok) {
+					toast.error({
+						id: toastId,
+						title: '❌ Failed to close session while cancelling recording',
+						description:
+							'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
+						action: { type: 'more-details', error: closeSessionResult.error },
+					});
+					return;
+				}
+				toast.success({
+					id: toastId,
+					title: '✅ All Done!',
+					description: 'Recording cancelled and session closed successfully',
+				});
+			}
+			void playSound('cancel');
+			setRecorderState('IDLE');
+			console.info('Recording cancelled');
+		},
 	};
 }
 
