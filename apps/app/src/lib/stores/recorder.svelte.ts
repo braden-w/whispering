@@ -200,6 +200,7 @@ function createRecorder() {
 						},
 					});
 				}
+
 				transcribingRecordingIds.add(newRecording.id);
 				const transcribeResult = await selectedTranscriptionService.transcribe(
 					newRecording.blob,
@@ -216,6 +217,7 @@ function createRecorder() {
 					return;
 				}
 				const transcribedText = transcribeResult.data;
+
 				const updatedRecording = {
 					...newRecording,
 					transcribedText,
@@ -228,7 +230,7 @@ function createRecorder() {
 						id: stopRecordingToastId,
 						title: 'Unable to update recording after transcription',
 						description:
-							"Transcription completed but unable to update recording's transcribed text and staus in database",
+							"Transcription completed but unable to update recording's transcribed text and status in database",
 						action: {
 							type: 'more-details',
 							error: saveRecordingToDatabaseResult.error,
@@ -238,20 +240,23 @@ function createRecorder() {
 			};
 
 			const closeSessionIfNeededWithToast = async () => {
+				toast.loading({
+					id: stopRecordingToastId,
+					title: '⏳ Closing recording session...',
+					description: 'Wrapping things up, just a moment...',
+				});
 				const closeSessionResult =
 					await WhisperingRecorderService.closeRecordingSession(undefined, {
 						sendStatus: (options) =>
 							toast.loading({ id: stopRecordingToastId, ...options }),
 					});
 				if (!closeSessionResult.ok) {
-					toast.error({
+					toast.warning({
 						id: stopRecordingToastId,
-						title: '❌ Failed to close session',
-						description: 'Unable to close session after recording',
-						action: {
-							type: 'more-details',
-							error: closeSessionResult.error,
-						},
+						title: 'Unable to close session after recording',
+						description:
+							'You might need to restart the application to continue recording',
+						action: { type: 'more-details', error: closeSessionResult.error },
 					});
 					return;
 				}
