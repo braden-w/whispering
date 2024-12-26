@@ -71,6 +71,7 @@ function createRecorder() {
 	const isInRecordingSession = $derived(
 		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
 	);
+
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
 		const updateTrayIcon = async () => {
@@ -87,32 +88,28 @@ function createRecorder() {
 		void updateTrayIcon();
 	};
 
-	const closeRecordingSession = createMutation({
-		mutationFn: (_, { context: { localToast } }) =>
-			WhisperingRecorderService.closeRecordingSession(undefined, {
-				sendStatus: localToast.loading,
-			}),
-		onMutate: () => {
-			const localToast = createLocalToastFns();
-			localToast.loading({
-				title: '⏳ Closing recording session...',
-				description: 'Wrapping things up, just a moment...',
-			});
-			return Ok({ localToast });
-		},
-		onSuccess: (_, { context: { localToast } }) => {
-			setRecorderState('IDLE');
-			localToast.success({
-				title: '✨ Session Closed Successfully',
-				description: 'Your recording session has been neatly wrapped up',
-			});
-		},
-		onError: (error, { contextResult }) => {
-			if (!contextResult.ok) return;
-			const { localToast } = contextResult.data;
-			localToast.error(error);
-		},
-	});
+	const closeRecordingSession = async () => {
+		const toastId = nanoid();
+		toast.loading({
+			id: toastId,
+			title: '⏳ Closing recording session...',
+			description: 'Wrapping things up, just a moment...',
+		});
+		const closeResult = await WhisperingRecorderService.closeRecordingSession(
+			undefined,
+			{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
+		);
+		if (!closeResult.ok) {
+			toast.error({ id: toastId, ...closeResult.error });
+			return;
+		}
+		setRecorderState('IDLE');
+		toast.success({
+			id: toastId,
+			title: '✨ Session Closed Successfully',
+			description: 'Your recording session has been neatly wrapped up',
+		});
+	};
 
 	const cancelRecording = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
