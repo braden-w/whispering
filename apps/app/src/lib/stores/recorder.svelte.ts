@@ -365,10 +365,13 @@ function createRecorder() {
 				return;
 			}
 		}
-		const startRecordingResult = await WhisperingRecorderService.startRecording(nanoid(), {
-			sendStatus: (options) =>
-				toast.loading({ id: startRecordingToastId, ...options }),
-		});
+		const startRecordingResult = await WhisperingRecorderService.startRecording(
+			nanoid(),
+			{
+				sendStatus: (options) =>
+					toast.loading({ id: startRecordingToastId, ...options }),
+			},
+		);
 		if (!startRecordingResult.ok) {
 			toast.error({
 				id: startRecordingToastId,
@@ -432,11 +435,11 @@ function createRecorder() {
 			});
 		},
 
-		toggleRecordingWithToast: async () => {
+		toggleRecordingWithToast: () => {
 			if (isInRecordingSession) {
-				void (await stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast());
+				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 			} else {
-				void (await startRecordingWithToast());
+				void startRecordingWithToast();
 			}
 		},
 
