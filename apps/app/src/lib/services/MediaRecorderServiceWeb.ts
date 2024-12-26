@@ -1,45 +1,14 @@
 import { Ok, type Result, tryAsync } from '@epicenterhq/result';
-import {
-	WhisperingErr,
-	type WhisperingErrProperties,
-	type WhisperingResult,
-} from '@repo/shared';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
+import type {
+	MediaRecorderErrProperties,
+	MediaRecorderService,
+	RecordingSessionSettings,
+	UpdateStatusMessageFn,
+} from './MediaRecorderService';
 
 const TIMESLICE_MS = 1000;
-
-type MediaRecorderErrProperties = WhisperingErrProperties;
-
-export type UpdateStatusMessageFn = (args: {
-	title: string;
-	description: string;
-}) => void;
-
-type MediaRecorderService = {
-	enumerateRecordingDevices: () => Promise<
-		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
-	>;
-	initRecordingSession: (
-		settings: RecordingSessionSettings,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
-	closeRecordingSession: (
-		_: undefined,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
-	startRecording: (
-		recordingId: string,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
-	stopRecording: (
-		_: undefined,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<Blob>>;
-	cancelRecording: (
-		_: undefined,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
-};
 
 type RecordingSession = {
 	settings: RecordingSessionSettings;
@@ -49,11 +18,6 @@ type RecordingSession = {
 		recordedChunks: Blob[];
 		recordingId: string;
 	} | null;
-};
-
-type RecordingSessionSettings = {
-	deviceId: string;
-	bitsPerSecond: number;
 };
 
 export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
