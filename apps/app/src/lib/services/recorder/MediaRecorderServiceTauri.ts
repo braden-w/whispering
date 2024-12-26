@@ -37,7 +37,7 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 				description:
 					'Initializing your recording session and checking microphone access...',
 			});
-			const result = await invoke('init_recording_session');
+			const result = await invoke('init_recording_session', settings);
 			if (!result.ok)
 				return WhisperingErr({
 					title: '🎤 Unable to Start Recording Session',
@@ -113,9 +113,9 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 	};
 };
 
-async function invoke<T>(command: string) {
+async function invoke<T>(command: string, args?: Record<string, unknown>) {
 	return tryAsync({
-		try: async () => await tauriInvoke<T>(command),
+		try: async () => await tauriInvoke<T>(command, args),
 		mapErr: (error) =>
 			Err({ _tag: 'TauriInvokeError', command, error } as const),
 	});
