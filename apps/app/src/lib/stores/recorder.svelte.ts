@@ -104,7 +104,7 @@ function createRecorder() {
 			if (!result.ok) {
 				renderErrAsToast({
 					variant: 'warning',
-					title: `Could not set tray icon to ${recorderState} icon...`,
+					title: `🚫 Could not set tray icon to ${recorderState} icon...`,
 					description: 'Please check your system tray settings',
 					action: { type: 'more-details', error: result.error },
 				});
@@ -204,7 +204,7 @@ function createRecorder() {
 					if (!setStatusTranscribingResult.ok) {
 						toast.warning({
 							title:
-								'Unable to set recording transcription status to transcribing',
+								'⚠️ Unable to set recording transcription status to transcribing',
 							description: 'Continuing with the transcription process...',
 							action: {
 								type: 'more-details',
@@ -239,7 +239,7 @@ function createRecorder() {
 					if (!saveRecordingToDatabaseResult.ok) {
 						toast.error({
 							id: stopRecordingToastId,
-							title: 'Unable to update recording after transcription',
+							title: '⚠️ Unable to update recording after transcription',
 							description:
 								"Transcription completed but unable to update recording's transcribed text and status in database",
 							action: {
@@ -261,7 +261,7 @@ function createRecorder() {
 						if (!copyResult.ok) {
 							toast.success({
 								id: stopRecordingToastId,
-								title: 'Recording transcribed!',
+								title: '📝 Recording transcribed!',
 								description:
 									"We couldn't copy the transcription to your clipboard, though. You can copy it manually.",
 								descriptionClass: 'line-clamp-2',
@@ -282,7 +282,7 @@ function createRecorder() {
 					if (!settings.value.isPasteContentsOnSuccessEnabled) {
 						toast.success({
 							id: stopRecordingToastId,
-							title: 'Recording transcribed and copied to clipboard!',
+							title: '📋 Recording transcribed and copied to clipboard!',
 							description: updatedRecording.transcribedText,
 							descriptionClass: 'line-clamp-2',
 							action: {
@@ -304,7 +304,7 @@ function createRecorder() {
 					if (!pasteResult.ok) {
 						toast.success({
 							id: stopRecordingToastId,
-							title: 'Recording transcribed and copied to clipboard!',
+							title: '📋 Recording transcribed and copied to clipboard!',
 							description: updatedRecording.transcribedText,
 							descriptionClass: 'line-clamp-2',
 						});
@@ -312,7 +312,7 @@ function createRecorder() {
 					}
 					toast.success({
 						id: stopRecordingToastId,
-						title: 'Recording transcribed, copied to clipboard, and pasted!',
+						title: '✅ Recording transcribed, copied to clipboard, and pasted!',
 						description: updatedRecording.transcribedText,
 						descriptionClass: 'line-clamp-2',
 					});
@@ -332,7 +332,7 @@ function createRecorder() {
 					if (!closeSessionResult.ok) {
 						toast.warning({
 							id: stopRecordingToastId,
-							title: 'Unable to close session after recording',
+							title: '⚠️ Unable to close session after recording',
 							description:
 								'You might need to restart the application to continue recording',
 							action: { type: 'more-details', error: closeSessionResult.error },
