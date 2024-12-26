@@ -18,7 +18,7 @@ type RecordingSession = {
 	} | null;
 };
 
-export const createWebMediaRecorderService = (): WhisperingRecorderService => {
+export const createRecorderServiceWeb = (): WhisperingRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	const acquireStream = async (

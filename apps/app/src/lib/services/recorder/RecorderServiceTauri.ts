@@ -1,12 +1,9 @@
-import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
-import type {
-	WhisperingRecorderErrProperties,
-	WhisperingRecorderService,
-} from '.';
+import type { WhisperingRecorderService } from '.';
 
-export const createTauriRecorderService = (): WhisperingRecorderService => {
+export const createRecorderServiceTauri = (): WhisperingRecorderService => {
 	return {
 		enumerateRecordingDevices: async () => {
 			const invokeResult = await invoke<string[]>(
