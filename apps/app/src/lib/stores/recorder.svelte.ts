@@ -336,6 +336,70 @@ function createRecorder() {
 			]);
 		};
 
+	const startRecordingWithToast = async () => {
+		const startRecordingToastId = nanoid();
+		toast.loading({
+			id: startRecordingToastId,
+			title: '🎙️ Preparing to record...',
+			description: 'Setting up your recording environment...',
+		});
+		if (!isInRecordingSession) {
+			const initResult = await WhisperingRecorderService.initRecordingSession(
+				{
+					deviceId: settings.value.selectedAudioInputDeviceId,
+					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+				},
+				{
+					sendStatus: (options) =>
+						toast.loading({ id: startRecordingToastId, ...options }),
+				},
+			);
+			if (!initResult.ok) {
+				toast.error({
+					id: startRecordingToastId,
+					title: '❌ Failed to Initialize Recording Session',
+					description:
+						'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
+					action: { type: 'more-details', error: initResult.error },
+				});
+				return;
+			}
+		}
+		const startRecordingResult = await WhisperingRecorderService.startRecording(nanoid(), {
+			sendStatus: (options) =>
+				toast.loading({ id: startRecordingToastId, ...options }),
+		});
+		if (!startRecordingResult.ok) {
+			toast.error({
+				id: startRecordingToastId,
+				title: '❌ Failed to Start Recording',
+				description:
+					'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
+				action: { type: 'more-details', error: startRecordingResult.error },
+			});
+			return;
+		}
+		setRecorderState('SESSION+RECORDING');
+		toast.success({
+			id: startRecordingToastId,
+			title: '🎯 Recording Started!',
+			description: 'Your voice is being captured crystal clear',
+		});
+		console.info('Recording started');
+		void playSound('start');
+		void NotificationService.notify({
+			variant: 'info',
+			id: IS_RECORDING_NOTIFICATION_ID,
+			title: '🎙️ Whispering is recording...',
+			description: 'Click to go to recorder',
+			action: {
+				type: 'link',
+				label: 'Go to recorder',
+				goto: '/',
+			},
+		});
+	};
+
 	return {
 		get recorderState() {
 			return recorderState;
@@ -370,82 +434,9 @@ function createRecorder() {
 
 		toggleRecordingWithToast: async () => {
 			if (isInRecordingSession) {
-				stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
+				void (await stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast());
 			} else {
-				const startRecordingWithToast = createMutation({
-					onMutate: () => {
-						const localToast = createLocalToastFns();
-						localToast.loading({
-							title: '🎙️ Preparing to record...',
-							description: 'Setting up your recording environment...',
-						});
-						return Ok({ localToast });
-					},
-					mutationFn: async (_, { context: { localToast } }) => {
-						if (!isInRecordingSession) {
-							const initResult =
-								await WhisperingRecorderService.initRecordingSession(
-									{
-										deviceId: settings.value.selectedAudioInputDeviceId,
-										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-									},
-									{ sendStatus: localToast.loading },
-								);
-							if (!initResult.ok) {
-								return WhisperingErr({
-									title: '❌ Failed to Initialize Recording Session',
-									description:
-										'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
-									action: { type: 'more-details', error: initResult.error },
-								});
-							}
-						}
-						const result = await WhisperingRecorderService.startRecording(
-							nanoid(),
-							{
-								sendStatus: localToast.loading,
-							},
-						);
-						if (!result.ok) {
-							return WhisperingErr({
-								title: '❌ Failed to Start Recording',
-								description:
-									'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
-								action: { type: 'more-details', error: result.error },
-							});
-						}
-						return Ok(undefined);
-					},
-					onSuccess: (_, { context: { localToast } }) => {
-						setRecorderState('SESSION+RECORDING');
-						localToast.success({
-							title: '🎯 Recording Started!',
-							description: 'Your voice is being captured crystal clear',
-						});
-						console.info('Recording started');
-						void playSound('start');
-						void NotificationService.notify({
-							variant: 'info',
-							id: IS_RECORDING_NOTIFICATION_ID,
-							title: '🎙️ Whispering is recording...',
-							description: 'Click to go to recorder',
-							action: {
-								type: 'link',
-								label: 'Go to recorder',
-								goto: '/',
-							},
-						});
-					},
-					onError: (error, { contextResult }) => {
-						if (!contextResult.ok) {
-							toast.error(contextResult.error);
-							return;
-						}
-						const { localToast } = contextResult.data;
-						localToast.error(error);
-					},
-				});
-				startRecordingWithToast(undefined);
+				void (await startRecordingWithToast());
 			}
 		},
 
