@@ -3,6 +3,7 @@ use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
     Stream,
 };
+use serde::{Deserialize, Serialize};
 use std::sync::mpsc::{self, SendError};
 use std::{
     fs::File,
@@ -10,7 +11,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UserRecordingSessionConfig {
     pub device_name: String,
     pub bits_per_sample: u16,

@@ -1,6 +1,6 @@
 use super::thread::{spawn_audio_thread, AudioCommand, AudioResponse, UserRecordingSessionConfig};
 use once_cell::sync::Lazy;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
 use thiserror::Error;
