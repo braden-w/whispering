@@ -4,13 +4,13 @@ export const waitForElement = (selector: string): Promise<Element> =>
 		if (element) return resolve(element);
 
 		const observer = new MutationObserver((mutations) => {
-			mutations.forEach(() => {
+			for (const _ of mutations) {
 				const element = document.querySelector(selector);
 				if (element) {
 					resolve(element);
 					observer.disconnect();
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {
