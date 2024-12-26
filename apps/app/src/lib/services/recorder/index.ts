@@ -1,9 +1,9 @@
 import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
-import { createMediaRecorderServiceWeb } from './MediaRecorderServiceWeb';
+import { createMediaRecorder } from './MediaRecorderService';
 
-export const MediaRecorderService = createMediaRecorderServiceWeb();
+export const WhisperingRecorderService = createMediaRecorder();
 
-export type MediaRecorderErrProperties = WhisperingErrProperties;
+export type WhisperingRecorderErrProperties = WhisperingErrProperties;
 
 export type UpdateStatusMessageFn = (args: {
 	title: string;
@@ -15,7 +15,7 @@ export type RecordingSessionSettings = {
 	bitsPerSecond: number;
 };
 
-export type MediaRecorderService = {
+export type WhisperingRecorderService = {
 	enumerateRecordingDevices: () => Promise<
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;

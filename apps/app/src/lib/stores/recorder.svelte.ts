@@ -1,4 +1,4 @@
-import { MediaRecorderService } from '$lib/services/recorder';
+import { WhisperingRecorderService } from '$lib/services/recorder';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
@@ -89,7 +89,7 @@ function createRecorder() {
 
 	const closeRecordingSession = createMutation({
 		mutationFn: (_, { context: { localToast } }) =>
-			MediaRecorderService.closeRecordingSession(undefined, {
+			WhisperingRecorderService.closeRecordingSession(undefined, {
 				sendStatus: localToast.loading,
 			}),
 		onMutate: () => {
@@ -116,7 +116,7 @@ function createRecorder() {
 
 	const cancelRecording = createMutation({
 		mutationFn: async (_, { context: { localToast } }) => {
-			const cancelResult = await MediaRecorderService.cancelRecording(
+			const cancelResult = await WhisperingRecorderService.cancelRecording(
 				undefined,
 				{ sendStatus: localToast.loading },
 			);
@@ -135,7 +135,7 @@ function createRecorder() {
 				title: '⏳ Closing session...',
 				description: 'Wrapping up your recording session...',
 			});
-			const closeResult = await MediaRecorderService.closeRecordingSession(
+			const closeResult = await WhisperingRecorderService.closeRecordingSession(
 				undefined,
 				{ sendStatus: localToast.loading },
 			);
@@ -192,7 +192,7 @@ function createRecorder() {
 			if (isInRecordingSession) {
 				const stopRecordingWithToast = createMutation({
 					mutationFn: async (_, { context: { localToast } }) => {
-						const stopResult = await MediaRecorderService.stopRecording(
+						const stopResult = await WhisperingRecorderService.stopRecording(
 							undefined,
 							{ sendStatus: localToast.loading },
 						);
@@ -233,9 +233,12 @@ function createRecorder() {
 									description: 'Wrapping up your recording session...',
 								});
 								const closeSessionResult =
-									await MediaRecorderService.closeRecordingSession(undefined, {
-										sendStatus: localToast.loading,
-									});
+									await WhisperingRecorderService.closeRecordingSession(
+										undefined,
+										{
+											sendStatus: localToast.loading,
+										},
+									);
 								if (!closeSessionResult.ok) {
 									return WhisperingErr({
 										title: '❌ Failed to Close Session After Recording',
@@ -381,7 +384,7 @@ function createRecorder() {
 					mutationFn: async (_, { context: { localToast } }) => {
 						if (!isInRecordingSession) {
 							const initResult =
-								await MediaRecorderService.initRecordingSession(
+								await WhisperingRecorderService.initRecordingSession(
 									{
 										deviceId: settings.value.selectedAudioInputDeviceId,
 										bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
@@ -397,9 +400,12 @@ function createRecorder() {
 								});
 							}
 						}
-						const result = await MediaRecorderService.startRecording(nanoid(), {
-							sendStatus: localToast.loading,
-						});
+						const result = await WhisperingRecorderService.startRecording(
+							nanoid(),
+							{
+								sendStatus: localToast.loading,
+							},
+						);
 						if (!result.ok) {
 							return WhisperingErr({
 								title: '❌ Failed to Start Recording',

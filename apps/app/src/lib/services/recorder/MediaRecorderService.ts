@@ -2,8 +2,8 @@ import { Ok, type Result, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type {
-	MediaRecorderErrProperties,
-	MediaRecorderService,
+	WhisperingRecorderErrProperties,
+	WhisperingRecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
 } from '.';
@@ -20,7 +20,7 @@ type RecordingSession = {
 	} | null;
 };
 
-export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
+export const createMediaRecorder = (): WhisperingRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	const acquireStream = async (
@@ -301,7 +301,7 @@ export const createMediaRecorderServiceWeb = (): MediaRecorderService => {
 	};
 };
 
-const createMediaRecorderServiceNative = (): MediaRecorderService => {
+const createMediaRecorderServiceNative = (): WhisperingRecorderService => {
 	return {
 		enumerateRecordingDevices: async () => {
 			const invokeResult = await invoke<string[]>(
@@ -380,7 +380,7 @@ const createMediaRecorderServiceNative = (): MediaRecorderService => {
 
 async function invoke<T>(
 	command: string,
-): Promise<Result<T, MediaRecorderErrProperties>> {
+): Promise<Result<T, WhisperingRecorderErrProperties>> {
 	return tryAsync({
 		try: async () => await tauriInvoke<T>(command),
 		mapErr: (error) =>
