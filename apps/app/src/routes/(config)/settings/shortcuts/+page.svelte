@@ -30,7 +30,7 @@
 				settings.value = { ...settings.value, currentLocalShortcut: value };
 				registerShortcuts.registerLocalShortcut({
 					shortcut: value,
-					callback: () => recorder.toggleRecording(),
+					callback: () => recorder.toggleRecordingWithToast(),
 				});
 			}}
 		/>
@@ -46,7 +46,7 @@
 					settings.value = { ...settings.value, currentGlobalShortcut: value };
 					registerShortcuts.registerGlobalShortcut({
 						shortcut: value,
-						callback: () => recorder.toggleRecording(),
+						callback: () => recorder.toggleRecordingWithToast(),
 					});
 				}}
 			/>

@@ -52,43 +52,6 @@ const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
 
-/**
- * Creates a set of toast functions that are scoped to a single mutation.
- * This is useful for creating multiple toasts in a single mutation.
- */
-const createLocalToastFns = () => {
-	const toastId = nanoid();
-	return {
-		success: (
-			options: Pick<
-				ToastAndNotifyOptions,
-				'title' | 'description' | 'descriptionClass'
-			>,
-		) => {
-			console.log('🚀 ~ createLocalToastFns ~ success:', options);
-			return toast.success({ id: toastId, ...options });
-		},
-		error: (
-			options: Pick<
-				ToastAndNotifyOptions,
-				'title' | 'description' | 'descriptionClass'
-			>,
-		) => {
-			console.log('🚀 ~ createLocalToastFns ~ error:', options);
-			return toast.error({ id: toastId, ...options });
-		},
-		loading: (
-			options: Pick<
-				ToastAndNotifyOptions,
-				'title' | 'description' | 'descriptionClass'
-			>,
-		) => {
-			console.log('🚀 ~ createLocalToastFns ~ loading:', options);
-			return toast.loading({ id: toastId, ...options });
-		},
-	};
-};
-
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 	const transcribingRecordingIds = $state(new Set<string>());

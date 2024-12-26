@@ -66,7 +66,7 @@
 	<div class="relative">
 		<WhisperingButton
 			tooltipContent="Toggle recording"
-			onclick={recorder.toggleRecording}
+			onclick={recorder.toggleRecordingWithToast}
 			variant="ghost"
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>

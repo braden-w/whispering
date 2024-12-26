@@ -58,7 +58,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			tooltip: 'Your App Name',
 			action: (e) => {
 				if ('click' in e) {
-					recorder.toggleRecording();
+					recorder.toggleRecordingWithToast();
 				}
 			},
 		});

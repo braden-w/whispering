@@ -1,7 +1,7 @@
 import { Ok } from '@epicenterhq/result';
 import { settings } from '$lib/stores/settings.svelte';
 import type { WhisperingResult } from '@repo/shared';
-import { type Recording, recordings } from './services/db';
+import { type Recording, recordings, RecordingsService } from './services/db';
 import { renderErrAsToast } from './services/renderErrorAsToast';
 import { createTranscriptionServiceFasterWhisperServerLive } from './services/transcription/TranscriptionServiceFasterWhisperServerLive';
 import { createTranscriptionServiceGroqLive } from './services/transcription/TranscriptionServiceGroqLive';
@@ -9,26 +9,8 @@ import { createTranscriptionServiceWhisperLive } from './services/transcription/
 import { HttpService } from './services/http/HttpService';
 
 export const transcriptionManager = createTranscriptionManager();
-
-const TranscriptionServiceWhisperLive = createTranscriptionServiceWhisperLive({
-	HttpService,
-});
-
-const TranscriptionServiceGroqLive = createTranscriptionServiceGroqLive({
-	HttpService,
-});
-
-const TranscriptionServiceFasterWhisperServerLive =
-	createTranscriptionServiceFasterWhisperServerLive({
-		HttpService,
-	});
-
 function createTranscriptionManager() {
-	const transcribingRecordingIds = $state(new Set<string>());
 	return {
-		get transcribingRecordingIds() {
-			return transcribingRecordingIds;
-		},
 		get isCurrentlyTranscribing() {
 			return transcribingRecordingIds.size > 0;
 		},
@@ -41,10 +23,11 @@ function createTranscriptionManager() {
 				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
 			}[settings.value.selectedTranscriptionService];
 
-			const setStatusTranscribingResult = await recordings.updateRecording({
-				...recording,
-				transcriptionStatus: 'TRANSCRIBING',
-			});
+			const setStatusTranscribingResult =
+				await RecordingsService.updateRecording({
+					...recording,
+					transcriptionStatus: 'TRANSCRIBING',
+				});
 
 			if (!setStatusTranscribingResult.ok)
 				renderErrAsToast({

@@ -1,6 +1,8 @@
 import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
+import { createTauriRecorderService } from './MediaRecorderServiceTauri';
 import { createWebMediaRecorderService } from './MediaRecorderServiceWeb';
 
+// export const WhisperingRecorderService = createTauriRecorderService();
 export const WhisperingRecorderService = createWebMediaRecorderService();
 
 export type WhisperingRecorderErrProperties = WhisperingErrProperties;

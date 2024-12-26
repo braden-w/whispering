@@ -122,11 +122,11 @@ function createRegisterShortcuts() {
 		await unregisterAllGlobalShortcuts();
 		registerLocalShortcut({
 			shortcut: settings.value.currentLocalShortcut,
-			callback: recorder.toggleRecording,
+			callback: recorder.toggleRecordingWithToast,
 		});
 		await registerGlobalShortcut({
 			shortcut: settings.value.currentGlobalShortcut,
-			callback: recorder.toggleRecording,
+			callback: recorder.toggleRecordingWithToast,
 		});
 	};
 

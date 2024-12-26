@@ -62,7 +62,7 @@
 	});
 
 	onMount(async () => {
-		window.toggleRecording = recorder.toggleRecording;
+		window.toggleRecording = recorder.toggleRecordingWithToast;
 		window.cancelRecording = recorder.cancelRecordingWithToast;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
@@ -108,7 +108,7 @@
 
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	onclick={recorder.toggleRecording}
+	onclick={recorder.toggleRecordingWithToast}
 >
 	<span
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"

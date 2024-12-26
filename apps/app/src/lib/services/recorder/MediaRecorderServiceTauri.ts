@@ -37,7 +37,13 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 				description:
 					'Initializing your recording session and checking microphone access...',
 			});
-			const result = await invoke('init_recording_session', settings);
+			const result = await invoke('init_recording_session', {
+				settings: {
+					deviceName: 'MacBook Pro Microphone',
+					// deviceName: settings.deviceId,
+					bitsPerSample: settings.bitsPerSecond,
+				},
+			});
 			if (!result.ok)
 				return WhisperingErr({
 					title: '🎤 Unable to Start Recording Session',
@@ -68,7 +74,9 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 				title: '🎯 Starting Up',
 				description: 'Preparing your microphone and initializing recording...',
 			});
-			const result = await invoke('start_recording');
+			const result = await invoke('start_recording', {
+				recordingId,
+			});
 			if (!result.ok)
 				return WhisperingErr({
 					title: '🎤 Recording Start Failed',
@@ -84,7 +92,7 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 				description:
 					'Saving your recording and preparing the final audio file...',
 			});
-			const result = await invoke<Blob>('stop_recording');
+			const result = await invoke<number[]>('stop_recording');
 			console.log('🚀 ~ stopRecording: ~ result:', result);
 			if (!result.ok)
 				return WhisperingErr({
@@ -92,7 +100,10 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 					description: 'Unable to save your recording. Please try again.',
 					action: { type: 'more-details', error: result.error },
 				});
-			return Ok(result.data);
+
+			const uint8Array = new Uint8Array(result.data);
+			const blob = new Blob([uint8Array], { type: 'audio/wav' });
+			return Ok(blob);
 		},
 		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
 			sendUpdateStatus({

@@ -28,7 +28,7 @@
 	<CancelOrEndRecordingSessionButton />
 	<WhisperingButton
 		tooltipContent="Toggle recording"
-		onclick={recorder.toggleRecording}
+		onclick={recorder.toggleRecordingWithToast}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: microphone-icon"
