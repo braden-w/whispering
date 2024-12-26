@@ -20,7 +20,7 @@ type RecordingSession = {
 	} | null;
 };
 
-export const createMediaRecorder = (): WhisperingRecorderService => {
+export const createWebMediaRecorderService = (): WhisperingRecorderService => {
 	let currentSession: RecordingSession | null = null;
 
 	const acquireStream = async (
@@ -301,7 +301,7 @@ export const createMediaRecorder = (): WhisperingRecorderService => {
 	};
 };
 
-const createMediaRecorderServiceNative = (): WhisperingRecorderService => {
+const createTauriRecorderService = (): WhisperingRecorderService => {
 	return {
 		enumerateRecordingDevices: async () => {
 			const invokeResult = await invoke<string[]>(

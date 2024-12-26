@@ -1,7 +1,7 @@
 import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
-import { createMediaRecorder } from './MediaRecorderService';
+import { createWebMediaRecorderService } from './MediaRecorderServiceWeb';
 
-export const WhisperingRecorderService = createMediaRecorder();
+export const WhisperingRecorderService = createWebMediaRecorderService();
 
 export type WhisperingRecorderErrProperties = WhisperingErrProperties;
 
