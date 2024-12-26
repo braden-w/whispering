@@ -1,27 +1,50 @@
 <script lang="ts">
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { DownloadService } from '$lib/services/DownloadService';
+	import { toast } from '$lib/services/ToastService';
+	import type { Recording } from '$lib/services/db';
+	import { recordings } from '$lib/services/db';
+	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { transcriptionManager } from '$lib/transcribe.svelte';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { createMutation, Ok } from '@epicenterhq/result';
 	import {
 		DownloadIcon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { copyRecordingText } from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
+
+	const downloadRecording = createMutation({
+		mutationFn: async (recording: Recording) => {
+			const downloadResult = await DownloadService.downloadBlob({
+				blob: recording.blob,
+				name: `whispering_recording_${recording.id}`,
+			});
+			if (!downloadResult.ok) return downloadResult;
+			return Ok(recording);
+		},
+		onSuccess: () => {
+			toast.success({
+				title: 'Recording downloading!',
+				description: 'Your recording is being downloaded.',
+			});
+		},
+		onError: (error) => renderErrAsToast(error),
+	});
 </script>
 
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() => recordings.transcribeRecording(recording.id)}
+		onclick={() =>
+			transcriptionManager.transcribeRecordingAndUpdateDb(recording)}
 		variant="ghost"
 		size="icon"
 	>
@@ -38,17 +61,7 @@
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
-		onclick={() =>
-			recordings.copyRecordingText(recording, {
-				onSuccess: (transcribedText) => {
-					toast.success({
-						title: 'Copied transcription to clipboard!',
-						description: transcribedText,
-						descriptionClass: 'line-clamp-2',
-					});
-				},
-				onError: renderErrAsToast,
-			})}
+		onclick={() => copyRecordingText(recording)}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: {createRecordingViewTransitionName({
@@ -61,16 +74,7 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() =>
-			recordings.downloadRecording(recording.id, {
-				onSuccess: () => {
-					toast.success({
-						title: 'Recording downloaded!',
-						description: 'Your recording has been downloaded successfully.',
-					});
-				},
-				onError: renderErrAsToast,
-			})}
+		onclick={() => downloadRecording(recording)}
 		variant="ghost"
 		size="icon"
 	>
@@ -83,16 +87,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () =>
-					recordings.deleteRecordingById(recording.id, {
-						onSuccess: () => {
-							toast.success({
-								title: 'Deleted recording!',
-								description: 'Your recording has been deleted successfully.',
-							});
-						},
-						onError: renderErrAsToast,
-					}),
+				onConfirm: () => recordings.deleteRecordingById(recording.id),
 			});
 		}}
 		variant="ghost"

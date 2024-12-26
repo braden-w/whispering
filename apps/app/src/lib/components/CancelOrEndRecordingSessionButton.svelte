@@ -1,15 +1,13 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { mediaStream } from '$lib/services/MediaStreamService.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 
 	let { class: className }: { class?: string | undefined } = $props();
 </script>
 
-{#if recorder.recorderState === 'RECORDING'}
+{#if recorder.recorderState === 'SESSION+RECORDING'}
 	<WhisperingButton
 		tooltipContent="Cancel recording"
 		onclick={recorder.cancelRecording}
@@ -20,9 +18,9 @@
 	>
 		🚫
 	</WhisperingButton>
-{:else if mediaStream.isStreamValid}
+{:else if recorder.isInRecordingSession}
 	<WhisperingButton
-		onclick={mediaStream.destroy}
+		onclick={recorder.closeRecordingSession}
 		variant="ghost"
 		size="icon"
 		class={className}

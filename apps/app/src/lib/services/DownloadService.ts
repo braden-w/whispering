@@ -1,17 +1,14 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
-import {
-	type WhisperingResult,
-	tryAsyncWhispering,
-	trySyncWhispering,
-} from '@repo/shared';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 
-type DownloadService = {
-	readonly downloadBlob: (config: {
+export type DownloadService = {
+	downloadBlob: (args: {
 		name: string;
 		blob: Blob;
-	}) => Promise<WhisperingResult<void>> | WhisperingResult<void>;
+	}) => Promise<WhisperingResult<void>>;
 };
 
 export const DownloadService = window.__TAURI_INTERNALS__
@@ -20,25 +17,48 @@ export const DownloadService = window.__TAURI_INTERNALS__
 
 function createDownloadServiceDesktopLive(): DownloadService {
 	return {
-		async downloadBlob({ name, blob }) {
+		downloadBlob: async ({ name, blob }) => {
 			const extension = getExtensionFromAudioBlob(blob);
-			return await tryAsyncWhispering({
+			const saveResult = await tryAsync({
 				try: async () => {
 					const path = await save({
 						filters: [{ name, extensions: [extension] }],
 					});
-					if (path === null) return;
-					const contents = new Uint8Array(await blob.arrayBuffer());
-					return writeFile(path, contents);
+					return path;
 				},
-				catch: (error) => ({
-					_tag: 'WhisperingError',
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Error saving recording',
+						description:
+							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
+						action: { type: 'more-details', error },
+					}),
+			});
+			if (!saveResult.ok) return saveResult;
+			const path = saveResult.data;
+			if (path === null) {
+				return WhisperingErr({
 					title: 'Error saving recording',
 					description:
 						'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
-					action: { type: 'more-details', error },
-				}),
+					action: { type: 'more-details', error: 'path is null' },
+				});
+			}
+			const writeResult = await tryAsync({
+				try: async () => {
+					const contents = new Uint8Array(await blob.arrayBuffer());
+					await writeFile(path, contents);
+				},
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Error saving recording',
+						description:
+							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
+						action: { type: 'more-details', error },
+					}),
 			});
+			if (!writeResult.ok) return writeResult;
+			return Ok(undefined);
 		},
 	};
 }
@@ -46,8 +66,8 @@ function createDownloadServiceDesktopLive(): DownloadService {
 function createDownloadServiceWebLive(): DownloadService {
 	return {
 		downloadBlob: ({ name, blob }) =>
-			trySyncWhispering({
-				try: () => {
+			tryAsync({
+				try: async () => {
 					const file = new File([blob], name, { type: blob.type });
 					const url = URL.createObjectURL(file);
 					const a = document.createElement('a');
@@ -58,16 +78,13 @@ function createDownloadServiceWebLive(): DownloadService {
 					document.body.removeChild(a);
 					URL.revokeObjectURL(url);
 				},
-				catch: (error) => ({
-					_tag: 'WhisperingError',
-					title: 'Error saving recording',
-					description:
-						'There was an error saving the recording in your browser. Please try again.',
-					action: {
-						type: 'more-details',
-						error,
-					},
-				}),
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Error saving recording',
+						description:
+							'There was an error saving the recording in your browser. Please try again.',
+						action: { type: 'more-details', error },
+					}),
 			}),
 	};
 }

@@ -1,28 +1,27 @@
-import { toast as sonnerToast, type ExternalToast } from 'svelte-sonner';
-
-type ToastVariant = 'success' | 'info' | 'loading' | 'error' | 'warning';
-type ToastOptions = { id?: string; title: string } & Pick<
-	ExternalToast,
-	'description' | 'descriptionClass' | 'action'
->;
+import { goto } from '$app/navigation';
+import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import type { ToastAndNotifyOptions } from '@repo/shared';
+import { toast as sonnerToast } from 'svelte-sonner';
 
 export const toast = createToastService();
 
 function createToastService() {
 	const createToastFn =
-		(variant: ToastVariant) =>
-		({ title, ...options }: ToastOptions) => {
+		(variant: ToastAndNotifyOptions['variant']) =>
+		({ title, action, ...options }: Omit<ToastAndNotifyOptions, 'variant'>) => {
 			const getDurationInMs = () => {
-				if (variant === 'loading') return 60_000;
+				if (variant === 'loading') return 5000;
 				if (variant === 'error' || variant === 'warning') return 5000;
-				if (options.action) return 4000;
+				if (action) return 4000;
 				return 3000;
 			};
+
 			const durationInMs = getDurationInMs();
 
 			const id = sonnerToast[variant](title, {
 				...options,
 				duration: durationInMs,
+				action: convertActionToToastAction(action),
 			});
 			return String(id);
 		};
@@ -35,4 +34,21 @@ function createToastService() {
 		warning: createToastFn('warning'),
 		dismiss: sonnerToast.dismiss,
 	};
+}
+
+function convertActionToToastAction(action: ToastAndNotifyOptions['action']) {
+	switch (action?.type) {
+		case 'link':
+			return {
+				label: action.label,
+				onClick: () => goto(action.goto),
+			};
+		case 'more-details':
+			return {
+				label: 'More details',
+				onClick: () => errorMoreDetailsDialog.openWithError(action.error),
+			};
+		default:
+			return undefined;
+	}
 }

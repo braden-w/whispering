@@ -1,13 +1,12 @@
-import cssText from 'data-text:~/style.css';
-
 import { recorderStateToIcons } from '@repo/shared';
+import cssText from 'data-text:~/style.css';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
+import { app } from '~lib/app';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
-import { toggleRecordingFromContentScript } from './utils/toggleRecordingFromContentScript';
 import { waitForElement } from './utils/waitForElement';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
@@ -35,7 +34,7 @@ function RecorderStateAsIcon() {
 	return (
 		<button
 			className="group relative z-10 h-10 w-10 rounded-md text-2xl"
-			onClick={toggleRecordingFromContentScript}
+			onClick={app.toggleRecording}
 		>
 			<div className="absolute inset-0 rounded-md bg-black bg-opacity-0 transition-opacity duration-300 group-hover:bg-opacity-10" />
 			{recorderStateAsIcon}

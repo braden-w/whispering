@@ -1,4 +1,3 @@
-import { sendToBackground } from '@plasmohq/messaging';
 import {
 	SUPPORTED_LANGUAGES_OPTIONS,
 	type Settings,
@@ -13,8 +12,8 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query';
 import { Fragment } from 'react';
-import type * as GetSettings from '~background/messages/whispering-web/getSettings';
-import type * as SetSettings from '~background/messages/whispering-web/setSettings';
+import { toast } from 'sonner';
+import { app } from '~lib/app';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -33,12 +32,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '~components/ui/select';
-import { Switch } from '~components/ui/switch';
 import { Skeleton } from '~components/ui/skeleton';
-import './style.css';
-import { AlertTriangleIcon } from 'lucide-react';
 import { Toaster } from '~components/ui/sonner';
-import { toast } from 'sonner';
+import { Switch } from '~components/ui/switch';
+import './style.css';
 
 const queryClient = new QueryClient();
 
@@ -64,12 +61,7 @@ function SettingsCard() {
 	} = useQuery({
 		queryKey: ['settings'],
 		queryFn: async () => {
-			const response = await sendToBackground<
-				GetSettings.RequestBody,
-				GetSettings.ResponseBody
-			>({
-				name: 'whispering-web/getSettings',
-			});
+			const response = await app.getSettings();
 			if (!response.ok) throw response.error;
 			return response.data;
 		},
@@ -77,15 +69,8 @@ function SettingsCard() {
 
 	const { mutate: setSettings } = useMutation({
 		mutationFn: async (settings: Settings) => {
-			const response = await sendToBackground<
-				SetSettings.RequestBody,
-				SetSettings.ResponseBody
-			>({
-				name: 'whispering-web/setSettings',
-				body: { settings },
-			});
+			const response = await app.setSettings(settings);
 			if (!response.ok) throw response.error;
-			return response.data;
 		},
 		onSuccess: () => {
 			toast.success('Settings updated!');
@@ -120,6 +105,7 @@ function SettingsCard() {
 				<CardContent className="space-y-6">
 					{/* Switch skeletons */}
 					{Array.from({ length: 3 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: Use index as key for skeleton
 						<div key={i} className="flex items-center gap-2">
 							<Skeleton className="h-6 w-10" />
 							<Skeleton className="h-4 w-48" />
@@ -128,6 +114,7 @@ function SettingsCard() {
 
 					{/* Select and Input skeletons */}
 					{Array.from({ length: 4 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: Use index as key for skeleton
 						<div key={i} className="grid gap-2">
 							<Skeleton className="h-4 w-24" />
 							<Skeleton className="h-10 w-full" />

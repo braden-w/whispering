@@ -3,10 +3,11 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
-	import { sendMessageToExtension } from '$lib/sendMessageToExtension';
+	import { extension } from '@repo/extension';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recorder, recorderState } from '$lib/stores/recorder.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
@@ -28,8 +29,8 @@
 				break;
 			case 'When Recording and Transcribing':
 				if (
-					recorderState.value === 'RECORDING' ||
-					recorderState.value === 'LOADING'
+					recorder.recorderState === 'SESSION+RECORDING' ||
+					transcriptionManager.isCurrentlyTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {
@@ -37,7 +38,7 @@
 				}
 				break;
 			case 'When Recording':
-				if (recorderState.value === 'RECORDING') {
+				if (recorder.recorderState === 'SESSION+RECORDING') {
 					void setAlwaysOnTop(true);
 				} else {
 					void setAlwaysOnTop(false);
@@ -64,18 +65,32 @@
 		window.toggleRecording = recorder.toggleRecording;
 		window.cancelRecording = recorder.cancelRecording;
 		window.goto = goto;
-		window.addEventListener('beforeunload', () => {
-			if (recorderState.value === 'RECORDING') {
-				recorderState.value = 'IDLE';
-			}
-		});
 		if (!window.__TAURI_INTERNALS__) {
-			const sendMessageToExtensionResult = await sendMessageToExtension({
-				name: 'whispering-extension/notifyWhisperingTabReady',
-				body: {},
-			});
-			if (!sendMessageToExtensionResult.ok)
-				return renderErrAsToast(sendMessageToExtensionResult);
+			const sendMessageToExtensionResult =
+				await extension.notifyWhisperingTabReady();
+			if (!sendMessageToExtensionResult.ok) {
+				renderErrAsToast({
+					variant: 'error',
+					title: 'Error notifying extension that tab is ready',
+					description: 'Error sending message to extension',
+					action: {
+						type: 'more-details',
+						error: sendMessageToExtensionResult.error,
+					},
+				});
+			}
+			const notifyWhisperingTabReadyResult = sendMessageToExtensionResult.data;
+			if (!notifyWhisperingTabReadyResult.ok) {
+				renderErrAsToast({
+					variant: 'error',
+					title: 'Error notifying extension that tab is ready',
+					description: 'Error sending message to extension',
+					action: {
+						type: 'more-details',
+						error: notifyWhisperingTabReadyResult.error,
+					},
+				});
+			}
 		}
 	});
 
@@ -99,7 +114,7 @@
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
 		class="text-[48px] leading-none"
 	>
-		{#if recorder.recorderState === 'RECORDING'}
+		{#if recorder.recorderState === 'SESSION+RECORDING'}
 			🔲
 		{:else}
 			🎙️

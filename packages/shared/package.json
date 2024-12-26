@@ -8,10 +8,11 @@
 		".": "./src/index.ts"
 	},
 	"devDependencies": {
+		"@types/node": "^22.10.2",
 		"typescript": "^5.7.2"
 	},
 	"dependencies": {
-		"@epicenterhq/result": "^0.1.1",
+		"@epicenterhq/result": "^0.5.2",
 		"zod": "^3.24.1"
 	}
 }

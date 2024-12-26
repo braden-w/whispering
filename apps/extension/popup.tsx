@@ -1,28 +1,20 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
-import { sendToBackground } from '@plasmohq/messaging';
-
-import {
-	Ok,
-	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
-	recorderStateToIcons,
-	tryAsyncWhispering,
-} from '@repo/shared';
+import { WHISPERING_RECORDINGS_PATHNAME } from '@repo/shared';
 import {
 	ClipboardIcon,
 	ListIcon,
+	Loader2Icon,
 	MoonIcon,
 	SlidersVerticalIcon,
 	SunIcon,
-	Loader2Icon,
 } from 'lucide-react';
 import GithubIcon from 'react:./components/icons/github.svg';
-import type * as CancelRecording from '~background/messages/whispering-web/cancelRecording';
-import type * as ToggleRecording from '~background/messages/whispering-web/toggleRecording';
+import { app } from '~lib/app';
+import { extension } from '~lib/extension';
+import { createNotification } from '~background/messages/extension/createNotification';
 import { WhisperingButton } from '~components/WhisperingButton';
-import { renderErrorAsNotification } from '~lib/errors';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
@@ -42,53 +34,30 @@ function IndexPopup() {
 	);
 }
 
-async function toggleRecording(): Promise<ToggleRecording.ResponseBody> {
-	const sendToToggleRecordingResult = await tryAsyncWhispering({
-		try: () =>
-			sendToBackground<
-				ToggleRecording.RequestBody,
-				ToggleRecording.ResponseBody
-			>({ name: 'whispering-web/toggleRecording' }),
-		catch: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Unable to toggle recording via background service worker',
-			description:
-				'There was likely an issue sending the message to the background service worker from the popup.',
-			action: { type: 'more-details', error },
-		}),
-	});
-	if (!sendToToggleRecordingResult.ok) return sendToToggleRecordingResult;
-	const toggleRecordingResult = sendToToggleRecordingResult.data;
-	return toggleRecordingResult;
+async function toggleRecording() {
+	const toggleRecordingResult = await app.toggleRecording();
+	if (!toggleRecordingResult.ok) {
+		extension.createNotification({
+			notifyOptions: toggleRecordingResult.error,
+		});
+	}
 }
 
-async function cancelRecording(): Promise<CancelRecording.ResponseBody> {
-	const sendToCancelRecordingResult = await tryAsyncWhispering({
-		try: () =>
-			sendToBackground<
-				CancelRecording.RequestBody,
-				CancelRecording.ResponseBody
-			>({
-				name: 'whispering-web/cancelRecording',
-			}),
-		catch: (error) => ({
-			_tag: 'WhisperingError',
-			title: 'Unable to cancel recording via background service worker',
-			description:
-				'There was likely an issue sending the message to the background service worker from the popup.',
-			action: { type: 'more-details', error },
-		}),
-	});
-	if (!sendToCancelRecordingResult.ok) return sendToCancelRecordingResult;
-	const cancelRecordingResult = sendToCancelRecordingResult.data;
-	return cancelRecordingResult;
+async function cancelRecording() {
+	const cancelRecordingResult = await app.cancelRecording();
+	if (!cancelRecordingResult.ok) {
+		extension.createNotification({
+			notifyOptions: cancelRecordingResult.error,
+		});
+	}
 }
 
 function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
 
-	const recorderStateAsIcon = recorderState === 'RECORDING' ? '🔲' : '🎙️';
+	const recorderStateAsIcon =
+		recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
 
 	const copyToClipboardText = (() => {
 		if (recorderState === 'LOADING') return '...';
@@ -112,11 +81,7 @@ function IndexPage() {
 					<WhisperingButton
 						tooltipContent="Toggle recording"
 						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-						onClick={async () => {
-							const toggleRecordingResult = await toggleRecording();
-							if (!toggleRecordingResult.ok)
-								renderErrorAsNotification(toggleRecordingResult);
-						}}
+						onClick={toggleRecording}
 						aria-label="Toggle recording"
 						variant="ghost"
 					>
@@ -127,15 +92,11 @@ function IndexPage() {
 							{recorderStateAsIcon}
 						</span>
 					</WhisperingButton>
-					{recorderState === 'RECORDING' && (
+					{recorderState === 'SESSION+RECORDING' && (
 						<WhisperingButton
 							tooltipContent="Cancel recording"
 							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-							onClick={async () => {
-								const cancelRecordingResult = await cancelRecording();
-								if (!cancelRecordingResult.ok)
-									renderErrorAsNotification(cancelRecordingResult);
-							}}
+							onClick={cancelRecording}
 							aria-label="Cancel recording"
 							variant="ghost"
 						>
@@ -220,17 +181,20 @@ function NavItems() {
 				tooltipContent="Recordings"
 				onClick={async () => {
 					const whisperingTabIdResult = await getOrCreateWhisperingTabId();
-					if (!whisperingTabIdResult.ok)
-						return renderErrorAsNotification(whisperingTabIdResult);
+					if (!whisperingTabIdResult.ok) {
+						createNotification(whisperingTabIdResult.error);
+						return;
+					}
 					const whisperingTabId = whisperingTabIdResult.data;
 					const tab = await chrome.tabs.get(whisperingTabId);
-					if (!tab.url)
-						return renderErrorAsNotification(
-							WhisperingErr({
-								title: 'Whispering tab has no URL',
-								description: 'The Whispering tab has no URL.',
-							}),
-						);
+					if (!tab.url) {
+						createNotification({
+							title: 'Whispering tab has no URL',
+							description: 'The Whispering tab has no URL.',
+							variant: 'error',
+						});
+						return;
+					}
 					const url = new URL(tab.url);
 
 					if (url.pathname === WHISPERING_RECORDINGS_PATHNAME) {

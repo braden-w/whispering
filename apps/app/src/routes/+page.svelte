@@ -5,17 +5,15 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { recordings, type Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
+	import { copyRecordingText } from './(config)/recordings/recordingMutations';
 
 	const latestRecording = $derived<Recording>(
-		recordings.value.at(-1) ?? {
+		recordings.recordings.at(-1) ?? {
 			id: '',
 			title: '',
 			subtitle: '',
@@ -33,7 +31,7 @@
 	);
 
 	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'RECORDING' ? '🔲' : '🎙️',
+		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
 	);
 </script>
 
@@ -88,17 +86,7 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={() =>
-					recordings.copyRecordingText(latestRecording, {
-						onSuccess: (transcribedText) => {
-							toast.success({
-								title: 'Copied transcription to clipboard!',
-								description: transcribedText,
-								descriptionClass: 'line-clamp-2',
-							});
-						},
-						onError: renderErrAsToast,
-					})}
+				onclick={() => copyRecordingText(latestRecording)}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,

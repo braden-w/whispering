@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import {
-		enumerateRecordingDevices,
-		mediaStream,
-	} from '$lib/services/MediaStreamService.svelte';
 	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { BITRATE_OPTIONS, BITRATE_VALUES_KBPS } from '@repo/shared';
+	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
+	import { MediaRecorderService } from '$lib/services/MediaRecorderService';
 
 	const getMediaDevices = async () => {
-		const enumerateRecordingDevicesResult = await enumerateRecordingDevices();
+		const enumerateRecordingDevicesResult =
+			await MediaRecorderService.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
-			renderErrAsToast(enumerateRecordingDevicesResult);
+			renderErrAsToast(enumerateRecordingDevicesResult.error);
 			return [];
 		}
 		return enumerateRecordingDevicesResult.data;
@@ -55,11 +54,11 @@
 				selected={settings.value.selectedAudioInputDeviceId}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
+					await recorder.closeRecordingSession();
 					settings.value = {
 						...settings.value,
 						selectedAudioInputDeviceId: selected,
 					};
-					await mediaStream.refreshStream();
 				}}
 				placeholder="Select a device"
 			/>

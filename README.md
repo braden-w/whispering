@@ -182,7 +182,7 @@ The Whispering app is built using the following technologies and libraries:
 - [Effect-TS](https://github.com/Effect-TS/effect): To sprinkle some functional programming and write extremely type-safe functions, where errors are included in the return type of the function signature.
 - [Svelte Sonner](https://svelte-sonner.vercel.app/): A simple, customizable toast library for Svelte applications. Used to capture and display errors bubbled up via Effect-TS using the `renderAsToast` function.
 - [TanStack Table](https://tanstack.com/table): To power all data tables.
-- [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API): A low-level API for storing large amounts of structured data in the browser. Synchronized with Tanstack Table using an Effect service in [RecordingDbServiceIndexedDbLive.svelte.ts](https://github.com/braden-w/whispering/blob/main/apps/app/src/lib/services/RecordingDbServiceIndexedDbLive.svelte.ts).
+- [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API): A low-level API for storing large amounts of structured data in the browser. Synchronized with Tanstack Table using an Effect service in [IndexedDbLive.svelte.ts](https://github.com/braden-w/whispering/blob/main/apps/app/src/lib/services/IndexedDbLive.svelte.ts).
 - [ShadCN-Svelte](https://github.com/huntabyte/shadcn-svelte): The UI component library of choice.
 - [TailwindCSS](https://tailwindcss.com/docs): A utility-first CSS framework for rapidly building custom user interfaces.
 - [Turborepo](https://turborepo.org/): For monorepo management, so that `apps/app` and `apps/extension` can share the same codebase, drastically reducing code duplication and more importantly, keeping a single source of truth.

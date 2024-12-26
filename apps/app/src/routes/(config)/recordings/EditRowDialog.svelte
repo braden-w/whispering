@@ -6,11 +6,12 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/RecordingDbService';
-	import { toast } from '$lib/services/ToastService';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import type { Recording } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
+	import {
+		deleteRecordingByIdWithToast,
+		updateRecordingWithToast,
+	} from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -38,24 +39,12 @@
 		</Dialog.Header>
 		<form
 			class="grid gap-4 py-4"
-			onsubmit={(e) => {
+			onsubmit={async (e) => {
 				e.preventDefault();
-				void recordings.updateRecording(recording, {
-					onStart: () => {
-						isSaving = true;
-					},
-					onSuccess: () => {
-						toast.success({
-							title: 'Updated recording!',
-							description: 'Your recording has been updated successfully.',
-						});
-					},
-					onError: renderErrAsToast,
-					onSettled: () => {
-						isSaving = false;
-						isDialogOpen = false;
-					},
-				});
+				isSaving = true;
+				await updateRecordingWithToast(recording);
+				isSaving = false;
+				isDialogOpen = false;
 			}}
 		>
 			<div class="grid grid-cols-4 items-center gap-4">
@@ -97,17 +86,9 @@
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={async () => {
+					onclick={() => {
 						isDeleting = true;
-						await recordings.deleteRecordingById(recording.id, {
-							onSuccess: () => {
-								toast.success({
-									title: 'Deleted recording!',
-									description: 'Your recording has been deleted successfully.',
-								});
-							},
-							onError: renderErrAsToast,
-						});
+						deleteRecordingByIdWithToast(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

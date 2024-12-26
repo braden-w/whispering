@@ -1,16 +1,20 @@
 {
-	"name": "extension",
+	"name": "@repo/extension",
 	"displayName": "Whispering",
 	"version": "5.1.2",
 	"private": true,
 	"description": "Seamlessly integrate speech-to-text transcriptions on ChatGPT and anywhere on the web. Powered by OpenAI's Whisper API.",
 	"author": "Braden Wong <whispering@bradenwong.com>",
+	"exports": {
+		".": "./lib/extension.ts"
+	},
 	"scripts": {
 		"dev": "plasmo dev",
 		"build": "plasmo build",
 		"package": "plasmo package"
 	},
 	"dependencies": {
+		"@epicenterhq/result": "^0.5.2",
 		"@plasmohq/messaging": "^0.6.2",
 		"@plasmohq/storage": "^1.13.0",
 		"@radix-ui/react-label": "^2.1.1",
@@ -18,6 +22,7 @@
 		"@radix-ui/react-slot": "^1.1.1",
 		"@radix-ui/react-switch": "^1.1.2",
 		"@radix-ui/react-tooltip": "^1.1.6",
+		"@repo/shared": "workspace:*",
 		"@tanstack/react-query": "^5.62.8",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",

@@ -1,18 +1,26 @@
-import { sendMessageToExtension } from '$lib/sendMessageToExtension';
 import { recorder } from '$lib/stores/recorder.svelte';
-import {
-	type WhisperingRecordingState,
-	type WhisperingResult,
-	tryAsyncWhispering,
-} from '@repo/shared';
+import { Err, Ok, tryAsync } from '@epicenterhq/result';
+import { extension } from '@repo/extension';
+import type { WhisperingRecordingState } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 
+export type SetTrayIconServiceErr = Err<{
+	_tag: 'TrayIconError';
+	icon: WhisperingRecordingState;
+}>;
+
+export type SetTrayIconServiceResult<T> = Ok<T> | SetTrayIconServiceErr;
+
+export const SetTrayIconServiceErr = (
+	icon: WhisperingRecordingState,
+): SetTrayIconServiceErr => Err({ _tag: 'TrayIconError', icon });
+
 type SetTrayIconService = {
 	setTrayIcon: (
 		icon: WhisperingRecordingState,
-	) => Promise<WhisperingResult<void>>;
+	) => Promise<SetTrayIconServiceResult<void>>;
 };
 
 export const SetTrayIconService = window.__TAURI_INTERNALS__
@@ -21,11 +29,13 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
-		setTrayIcon: (icon: WhisperingRecordingState) =>
-			sendMessageToExtension({
-				name: 'whispering-extension/setRecorderState',
-				body: { recorderState: icon },
-			}),
+		setTrayIcon: async (icon: WhisperingRecordingState) => {
+			const sendMessageToExtensionResult = await extension.setRecorderState({
+				recorderState: icon,
+			});
+			if (!sendMessageToExtensionResult.ok) return SetTrayIconServiceErr(icon);
+			return Ok(undefined);
+		},
 	};
 }
 
@@ -56,30 +66,22 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 	})();
 	return {
 		setTrayIcon: (recorderState: WhisperingRecordingState) =>
-			tryAsyncWhispering({
+			tryAsync({
 				try: async () => {
 					const iconPath = await getIconPath(recorderState);
 					const tray = await trayPromise;
 					return tray.setIcon(iconPath);
 				},
-				catch: (error) => ({
-					_tag: 'WhisperingError',
-					isWarning: true,
-					title: `Could not set tray icon to ${recorderState} icon...`,
-					description: 'Please check your system tray settings',
-					action: {
-						type: 'more-details',
-						error,
-					},
-				}),
+				mapErr: (error) => SetTrayIconServiceErr(recorderState),
 			}),
 	};
 }
+
 async function getIconPath(recorderState: WhisperingRecordingState) {
 	const iconPaths = {
 		IDLE: 'recorder-state-icons/studio_microphone.png',
-		RECORDING: 'recorder-state-icons/red_large_square.png',
-		LOADING: 'recorder-state-icons/arrows_counterclockwise.png',
-	} as const;
+		SESSION: 'recorder-state-icons/studio_microphone.png',
+		'SESSION+RECORDING': 'recorder-state-icons/red_large_square.png',
+	} as const satisfies Record<WhisperingRecordingState, string>;
 	return await resolveResource(iconPaths[recorderState]);
 }

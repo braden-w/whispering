@@ -14,7 +14,7 @@
  * const [recorderState] = useWhisperingStorage<RecorderState>(SHARED_STATE_KEYS.RECORDER_STATE);
  *
  * // In background service worker
- * await storage.setItem(SHARED_STATE_KEYS.RECORDER_STATE, 'RECORDING');
+ * await storage.setItem(SHARED_STATE_KEYS.RECORDER_STATE, 'SESSION+RECORDING');
  * ```
  */
 

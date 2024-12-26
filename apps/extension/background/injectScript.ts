@@ -1,4 +1,5 @@
-import { WhisperingErr, type WhisperingResult, tryAsyncWhispering } from '@repo/shared';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
+import { tryAsync } from '@epicenterhq/result';
 
 export async function injectScript<T, Args extends unknown[]>({
 	tabId,
@@ -11,7 +12,7 @@ export async function injectScript<T, Args extends unknown[]>({
 	func: (...args: Args) => WhisperingResult<T>;
 	args: Args;
 }): Promise<WhisperingResult<T>> {
-	const injectionResult = await tryAsyncWhispering({
+	const injectionResult = await tryAsync({
 		try: () =>
 			chrome.scripting.executeScript<Args, WhisperingResult<T>>({
 				target: { tabId },
@@ -19,13 +20,13 @@ export async function injectScript<T, Args extends unknown[]>({
 				func,
 				args,
 			}),
-		catch: (error) => ({
-			_tag: 'WhisperingError',
-			title: `Unable to execute "${commandName}" script in Whispering tab`,
-			description:
-				'This might be due to the tab not being awake or not in the correct domain.',
-			action: { type: 'more-details', error },
-		}),
+		mapErr: (error) =>
+			WhisperingErr({
+				title: `Unable to execute "${commandName}" script in Whispering tab`,
+				description:
+					'This might be due to the tab not being awake or not in the correct domain.',
+				action: { type: 'more-details', error },
+			}),
 	});
 	if (!injectionResult.ok) return injectionResult;
 	const [executeScriptResult] = injectionResult.data;
@@ -37,7 +38,6 @@ export async function injectScript<T, Args extends unknown[]>({
 		return WhisperingErr({
 			title: `Unable to execute "${commandName}" script in Whispering tab`,
 			description: 'The result of the script injection is undefined',
-			action: { type: 'none' },
 		});
 	}
 	const { result } = executeScriptResult;
