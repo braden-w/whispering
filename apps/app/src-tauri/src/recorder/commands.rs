@@ -39,7 +39,7 @@ pub struct DeviceInfo {
     pub label: String,
 }
 
-fn ensure_thread_initialized() -> Result<()> {
+pub fn ensure_thread_initialized() -> Result<()> {
     debug!("Ensuring thread is initialized...");
     let mut thread = AUDIO_THREAD
         .lock()
