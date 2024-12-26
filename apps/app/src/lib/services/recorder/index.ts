@@ -5,8 +5,6 @@ import { createRecorderServiceWeb } from './RecorderServiceWeb';
 // export const RecorderService = createTauriRecorderService();
 export const RecorderService = createRecorderServiceWeb();
 
-export type WhisperingRecorderErrProperties = WhisperingErrProperties;
-
 export type UpdateStatusMessageFn = (args: {
 	title: string;
 	description: string;
