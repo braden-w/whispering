@@ -1,7 +1,4 @@
-import {
-	ClipboardServiceErr,
-	type ClipboardService,
-} from '$lib/services/clipboard/ClipboardService';
+import type { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr, WhisperingWarning } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';
@@ -12,10 +9,11 @@ const writeTextToCursor = (text: string) =>
 	tryAsync({
 		try: () => invoke<void>('write_text', { text }),
 		mapErr: (error) =>
-			ClipboardServiceErr({
-				message:
+			WhisperingErr({
+				title: 'Unable to paste from clipboard',
+				description:
 					'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
-				error,
+				action: { type: 'more-details', error },
 			}),
 	});
 
@@ -24,10 +22,11 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 		tryAsync({
 			try: () => writeText(text),
 			mapErr: (error) =>
-				ClipboardServiceErr({
-					message:
+				WhisperingErr({
+					title: 'Unable to copy to clipboard',
+					description:
 						'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
-					error,
+					action: { type: 'more-details', error },
 				}),
 		}),
 
@@ -36,9 +35,8 @@ export const createClipboardServiceDesktopLive = (): ClipboardService => ({
 
 		if (!isMacos) {
 			const result = await writeTextToCursor(text);
-			if (!result.ok) {
-				return result;
-			}
+			if (!result.ok) return result;
+
 			return Ok(undefined);
 		}
 
