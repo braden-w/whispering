@@ -53,7 +53,11 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 					'Safely closing your recording session and freeing up resources...',
 			});
 			const result = await invoke('close_recording_session');
-			if (!result.ok) return WhisperingErr(result.error);
+			if (!result.ok) return WhisperingErr({
+				title: '⚠️ Session Close Failed',
+				description: 'Unable to properly close the recording session. Please try again.',
+				action: { type: 'more-details', error: result.error }
+			});
 			return Ok(undefined);
 		},
 		startRecording: async (recordingId, { sendStatus: sendUpdateStatus }) => {
@@ -62,7 +66,11 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 				description: 'Preparing your microphone and initializing recording...',
 			});
 			const result = await invoke('start_recording');
-			if (!result.ok) return WhisperingErr(result.error);
+			if (!result.ok) return WhisperingErr({
+				title: '🎤 Recording Start Failed',
+				description: 'Unable to start recording. Please check your microphone and try again.',
+				action: { type: 'more-details', error: result.error }
+			});
 			return Ok(undefined);
 		},
 		stopRecording: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -72,7 +80,11 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 					'Saving your recording and preparing the final audio file...',
 			});
 			const result = await invoke<Blob>('stop_recording');
-			if (!result.ok) return WhisperingErr(result.error);
+			if (!result.ok) return WhisperingErr({
+				title: '⏹️ Recording Stop Failed',
+				description: 'Unable to save your recording. Please try again.',
+				action: { type: 'more-details', error: result.error }
+			});
 			return Ok(result.data);
 		},
 		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -82,7 +94,11 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 					'Safely stopping your recording and cleaning up resources...',
 			});
 			const result = await invoke('cancel_recording');
-			if (!result.ok) return WhisperingErr(result.error);
+			if (!result.ok) return WhisperingErr({
+				title: '⚠️ Cancel Failed',
+				description: 'Unable to cancel the recording. Please try closing the app and starting again.',
+				action: { type: 'more-details', error: result.error }
+			});
 			return Ok(undefined);
 		},
 	};
