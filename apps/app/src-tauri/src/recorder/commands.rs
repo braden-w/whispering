@@ -13,7 +13,7 @@ static AUDIO_THREAD: Lazy<Mutex<Option<(Sender<AudioCommand>, Receiver<AudioResp
 // Track current recording state
 static CURRENT_RECORDING: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Serialize)]
 pub enum RecorderError {
     #[error("Audio thread not initialized")]
     ThreadNotInitialized,
@@ -24,7 +24,7 @@ pub enum RecorderError {
     #[error("Audio error: {0}")]
     AudioError(String),
     #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
+    IoError(String),
     #[error("No active recording session")]
     NoActiveRecording,
     #[error("Failed to acquire lock: {0}")]
@@ -48,8 +48,8 @@ pub fn ensure_thread_initialized() -> Result<()> {
     if thread.is_none() {
         debug!("Thread not initialized, creating new audio thread...");
         let (response_tx, response_rx) = mpsc::channel();
-        let command_tx =
-            spawn_audio_thread(response_tx).map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
+        let command_tx = spawn_audio_thread(response_tx)
+            .map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
         *thread = Some((command_tx, response_rx));
         info!("Audio thread created successfully");
     } else {
@@ -225,7 +225,8 @@ pub async fn stop_recording() -> Result<Vec<u8>> {
         match rx.recv() {
             Ok(AudioResponse::Success(_)) => {
                 debug!("Reading WAV file contents");
-                let contents = std::fs::read(&filename)?;
+                let contents =
+                    std::fs::read(&filename).map_err(|e| RecorderError::IoError(e.to_string()))?;
 
                 debug!("Cleaning up temporary file");
                 if let Err(e) = std::fs::remove_file(&filename) {
