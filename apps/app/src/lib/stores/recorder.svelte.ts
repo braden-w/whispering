@@ -113,14 +113,6 @@ function createRecorder() {
 		void updateTrayIcon();
 	};
 
-	// const stopRecording: () => Blob
-	// play sound
-	// notify
-	// close session
-	// transcribe recording // update db // cancel session if needed
-	// copy to clipboard if needed
-	// paste to cursor if needed
-
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
 		async () => {
 			const stopRecordingToastId = nanoid();
