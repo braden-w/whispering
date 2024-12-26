@@ -5,7 +5,7 @@
 	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+	import { MediaRecorderService } from '$lib/services/recorder';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =

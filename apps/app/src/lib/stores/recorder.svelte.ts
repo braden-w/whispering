@@ -1,4 +1,4 @@
-import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+import { MediaRecorderService } from '$lib/services/recorder';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';

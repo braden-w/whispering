@@ -6,7 +6,7 @@ import type {
 	MediaRecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
-} from './MediaRecorderService';
+} from '.';
 
 const TIMESLICE_MS = 1000;
 
