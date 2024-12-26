@@ -105,6 +105,7 @@ function SettingsCard() {
 				<CardContent className="space-y-6">
 					{/* Switch skeletons */}
 					{Array.from({ length: 3 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: Use index as key for skeleton
 						<div key={i} className="flex items-center gap-2">
 							<Skeleton className="h-6 w-10" />
 							<Skeleton className="h-4 w-48" />
@@ -113,6 +114,7 @@ function SettingsCard() {
 
 					{/* Select and Input skeletons */}
 					{Array.from({ length: 4 }).map((_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: Use index as key for skeleton
 						<div key={i} className="grid gap-2">
 							<Skeleton className="h-4 w-24" />
 							<Skeleton className="h-10 w-full" />
