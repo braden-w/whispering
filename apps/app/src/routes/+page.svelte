@@ -14,7 +14,7 @@
 	import { onDestroy } from 'svelte';
 
 	const latestRecording = $derived<Recording>(
-		recordings.recordings.at(-1) ?? {
+		recordings.value.at(-1) ?? {
 			id: '',
 			title: '',
 			subtitle: '',

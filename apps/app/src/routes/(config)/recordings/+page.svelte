@@ -12,7 +12,7 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { clipboard } from '$lib/services/clipboard';
 	import { recordings, type Recording } from '$lib/services/db';
-	import { transcriptionManager } from '$lib/transcribe.svelte';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -189,7 +189,7 @@
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordings.recordings;
+			return recordings.value;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -294,19 +294,19 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									transcriptionManager.transcribeRecordingAndUpdateDb(
+									recorder.transcribeAndUpdateRecordingWithToast(
 										recording.original,
 									),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.recordings.find((r) => r.id === id);
+							const currentRow = recordings.value.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.recordings.find((r) => r.id === id);
+							const currentRow = recordings.value.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />
@@ -387,7 +387,7 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () => recordings.(ids),
+								onConfirm: () => recordings.deleteRecordingsByIdWithToast(ids),
 							});
 						}}
 					>

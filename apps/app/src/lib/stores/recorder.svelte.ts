@@ -1,20 +1,21 @@
-import { WhisperingRecorderService } from '$lib/services/recorder';
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
+import { clipboard } from '$lib/services/clipboard';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import {
-	recordings,
-	RecordingsService,
-	type Recording,
-} from '$lib/services/db';
+import { type Recording, RecordingsService } from '$lib/services/db';
+import { HttpService } from '$lib/services/http/HttpService';
+import { WhisperingRecorderService } from '$lib/services/recorder';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
+import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/TranscriptionServiceGroqLive';
+import { createTranscriptionServiceWhisperLive } from '$lib/services/transcription/TranscriptionServiceWhisperLive';
 import { settings } from '$lib/stores/settings.svelte';
-import { Err, Ok, createMutation } from '@epicenterhq/result';
+import { Ok } from '@epicenterhq/result';
+import { extension } from '@repo/extension';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	WhisperingErr,
-	type ToastAndNotifyOptions,
 	type WhisperingRecordingState,
 	type WhisperingResult,
 	type WhisperingSoundNames,
@@ -23,26 +24,6 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { transcriptionManager } from '$lib/transcribe.svelte';
-import { extension } from '@repo/extension';
-import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/TranscriptionServiceGroqLive';
-import { createTranscriptionServiceWhisperLive } from '$lib/services/transcription/TranscriptionServiceWhisperLive';
-import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { HttpService } from '$lib/services/http/HttpService';
-import { clipboard } from '$lib/services/clipboard';
-
-const TranscriptionServiceWhisperLive = createTranscriptionServiceWhisperLive({
-	HttpService,
-});
-
-const TranscriptionServiceGroqLive = createTranscriptionServiceGroqLive({
-	HttpService,
-});
-
-const TranscriptionServiceFasterWhisperServerLive =
-	createTranscriptionServiceFasterWhisperServerLive({
-		HttpService,
-	});
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -59,6 +40,23 @@ function createRecorder() {
 	const isInRecordingSession = $derived(
 		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
 	);
+
+	const TranscriptionService = $derived.by(() => {
+		switch (settings.value.selectedTranscriptionService) {
+			case 'OpenAI':
+				return createTranscriptionServiceWhisperLive({
+					HttpService,
+				});
+			case 'Groq':
+				return createTranscriptionServiceGroqLive({
+					HttpService,
+				});
+			case 'faster-whisper-server':
+				return createTranscriptionServiceFasterWhisperServerLive({
+					HttpService,
+				});
+		}
+	});
 
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
@@ -144,13 +142,6 @@ function createRecorder() {
 				_closeSessionIfNeededWithToastResult,
 			] = await Promise.all([
 				(async () => {
-					const selectedTranscriptionService = {
-						OpenAI: TranscriptionServiceWhisperLive,
-						Groq: TranscriptionServiceGroqLive,
-						'faster-whisper-server':
-							TranscriptionServiceFasterWhisperServerLive,
-					}[settings.value.selectedTranscriptionService];
-
 					const setStatusTranscribingResult =
 						await RecordingsService.updateRecording({
 							...newRecording,
@@ -169,8 +160,9 @@ function createRecorder() {
 					}
 
 					transcribingRecordingIds.add(newRecording.id);
-					const transcribeResult =
-						await selectedTranscriptionService.transcribe(newRecording.blob);
+					const transcribeResult = await TranscriptionService.transcribe(
+						newRecording.blob,
+					);
 					transcribingRecordingIds.delete(newRecording.id);
 					if (!transcribeResult.ok) {
 						toast.error({
@@ -465,6 +457,44 @@ function createRecorder() {
 			void playSound('cancel');
 			setRecorderState('IDLE');
 			console.info('Recording cancelled');
+		},
+
+		transcribeAndUpdateRecordingWithToast: async (recording: Recording) => {
+			const toastId = nanoid();
+			const transcriptionResult = await TranscriptionService.transcribe(
+				recording.blob,
+			);
+			if (!transcriptionResult.ok) {
+				toast.error({ id: toastId, ...transcriptionResult.error });
+				return;
+			}
+			const transcribedText = transcriptionResult.data;
+			const updatedRecording = {
+				...recording,
+				transcribedText,
+				transcriptionStatus: 'DONE',
+			} satisfies Recording;
+			const updateRecordingResult =
+				await RecordingsService.updateRecording(updatedRecording);
+			if (!updateRecordingResult.ok) {
+				toast.error({ id: toastId, ...updateRecordingResult.error });
+				return;
+			}
+			toast.success({
+				id: toastId,
+				title: '📋 Recording transcribed!',
+				description: transcribedText,
+				descriptionClass: 'line-clamp-2',
+				action: {
+					type: 'button',
+					label: 'Go to recordings',
+					onClick: () =>
+						clipboard.copyTextToClipboardWithToast({
+							label: 'transcribed text',
+							text: transcribedText,
+						}),
+				},
+			});
 		},
 	};
 }

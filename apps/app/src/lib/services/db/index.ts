@@ -6,6 +6,9 @@ import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.s
 export const RecordingsService = createRecordingsIndexedDbService();
 
 export const recordings = {
+	get value() {
+		return RecordingsService.recordings;
+	},
 	updateRecordingWithToast: async (recording: Recording) => {
 		const result = await RecordingsService.updateRecording(recording);
 		if (!result.ok) {
