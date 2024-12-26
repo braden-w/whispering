@@ -40,8 +40,9 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 			const result = await invoke('init_recording_session');
 			if (!result.ok)
 				return WhisperingErr({
-					title: '🎤 Device Access Error',
-					description: 'Unable to connect to your selected microphone',
+					title: '🎤 Unable to Start Recording Session',
+					description:
+						'We encountered an issue while setting up your recording session. This could be because:\n\n• Your microphone is being used by another app\n• Your microphone permissions are denied\n• The selected recording device is disconnected',
 					action: { type: 'more-details', error: result.error },
 				});
 			return Ok(undefined);
