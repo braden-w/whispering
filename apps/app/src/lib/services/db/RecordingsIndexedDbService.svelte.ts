@@ -1,7 +1,7 @@
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { type DBSchema, openDB } from 'idb';
-import { DbError, type DbService, type Recording } from '.';
+import { DbServiceErr, type DbService, type Recording } from '.';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -101,7 +101,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					.filter((r) => r !== null);
 			},
 			mapErr: (error) =>
-				DbError({
+				DbServiceErr({
 					title: 'Error getting recordings from indexedDB',
 					description: 'Please try again',
 					error,
@@ -149,7 +149,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					return null;
 				},
 				mapErr: (error) =>
-					DbError({
+					DbServiceErr({
 						title: 'Error getting recording from indexedDB',
 						description: 'Please try again',
 						error,
@@ -176,7 +176,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					]);
 				},
 				mapErr: (error) =>
-					DbError({
+					DbServiceErr({
 						title: 'Error adding recording to indexedDB',
 						description: 'Please try again',
 						error,
@@ -200,7 +200,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					]);
 				},
 				mapErr: (error) =>
-					DbError({
+					DbServiceErr({
 						title: 'Error updating recording in indexedDB',
 						description: 'Please try again',
 						error,
@@ -231,7 +231,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					]);
 				},
 				mapErr: (error) =>
-					DbError({
+					DbServiceErr({
 						title: 'Error deleting recording from indexedDB',
 						description: 'Please try again',
 						error,
@@ -260,7 +260,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					await tx.done;
 				},
 				mapErr: (error) =>
-					DbError({
+					DbServiceErr({
 						title: 'Error deleting recordings from indexedDB',
 						description: 'Please try again',
 						error,

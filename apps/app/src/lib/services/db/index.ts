@@ -23,7 +23,7 @@ export type Recording = {
 };
 
 type DbErrorProperties = {
-	_tag: 'DbError';
+	_tag: 'DbServiceError';
 	title: string;
 	description: string;
 	error: unknown;
@@ -32,11 +32,11 @@ type DbErrorProperties = {
 export type DbServiceErr = Err<DbErrorProperties>;
 export type DbServiceResult<T> = Ok<T> | DbServiceErr;
 
-export const DbError = (
+export const DbServiceErr = (
 	properties: Omit<DbErrorProperties, '_tag'>,
 ): DbServiceErr => {
 	return Err({
-		_tag: 'DbError',
+		_tag: 'DbServiceError',
 		...properties,
 	});
 };
