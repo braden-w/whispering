@@ -1,11 +1,9 @@
-import { Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type {
-	WhisperingRecorderErrProperties,
-	WhisperingRecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
+	WhisperingRecorderService,
 } from '.';
 
 const TIMESLICE_MS = 1000;
@@ -300,98 +298,6 @@ export const createWebMediaRecorderService = (): WhisperingRecorderService => {
 		},
 	};
 };
-
-const createTauriRecorderService = (): WhisperingRecorderService => {
-	return {
-		enumerateRecordingDevices: async () => {
-			const invokeResult = await invoke<string[]>(
-				'enumerate_recording_devices',
-			);
-			if (!invokeResult.ok) {
-				return WhisperingErr({
-					title: '🎤 Device Access Error',
-					description:
-						'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-					action: { type: 'more-details', error: invokeResult.error },
-				});
-			}
-			const deviceNames = invokeResult.data;
-			return Ok(
-				deviceNames.map((deviceName) => ({
-					deviceId: deviceName,
-					label: deviceName,
-				})),
-			);
-		},
-		initRecordingSession: async (
-			settings,
-			{ sendStatus: sendUpdateStatus },
-		) => {
-			sendUpdateStatus({
-				title: '🎤 Setting Up',
-				description:
-					'Initializing your recording session and checking microphone access...',
-			});
-			const result = await invoke('init_recording_session');
-			if (!result.ok) return WhisperingErr(result.error);
-			return Ok(undefined);
-		},
-		closeRecordingSession: async (_, { sendStatus: sendUpdateStatus }) => {
-			sendUpdateStatus({
-				title: '🔄 Closing Session',
-				description:
-					'Safely closing your recording session and freeing up resources...',
-			});
-			const result = await invoke('close_recording_session');
-			if (!result.ok) return WhisperingErr(result.error);
-			return Ok(undefined);
-		},
-		startRecording: async (recordingId, { sendStatus: sendUpdateStatus }) => {
-			sendUpdateStatus({
-				title: '🎯 Starting Up',
-				description: 'Preparing your microphone and initializing recording...',
-			});
-			const result = await invoke('start_recording');
-			if (!result.ok) return WhisperingErr(result.error);
-			return Ok(undefined);
-		},
-		stopRecording: async (_, { sendStatus: sendUpdateStatus }) => {
-			sendUpdateStatus({
-				title: '⏸️ Finishing Up',
-				description:
-					'Saving your recording and preparing the final audio file...',
-			});
-			const result = await invoke<Blob>('stop_recording');
-			if (!result.ok) return WhisperingErr(result.error);
-			return Ok(result.data);
-		},
-		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
-			sendUpdateStatus({
-				title: '🛑 Cancelling',
-				description:
-					'Safely stopping your recording and cleaning up resources...',
-			});
-			const result = await invoke('cancel_recording');
-			if (!result.ok) return WhisperingErr(result.error);
-			return Ok(undefined);
-		},
-	};
-};
-
-async function invoke<T>(
-	command: string,
-): Promise<Result<T, WhisperingRecorderErrProperties>> {
-	return tryAsync({
-		try: async () => await tauriInvoke<T>(command),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: '🎤 Device Access Error',
-				description:
-					'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-				action: { type: 'more-details', error },
-			}),
-	});
-}
 
 async function getFirstAvailableStream() {
 	const recordingDevicesResult = await tryAsync({
