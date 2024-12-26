@@ -177,11 +177,16 @@ function createRecorder() {
 				return;
 			}
 
-			// transcribeAndCopyAndPaste, closeSessionIfNeeded
+			toast.loading({
+				title: '✨ Recording Complete!',
+				description: settings.value.isFasterRerecordEnabled
+					? 'Recording saved! Ready for another take'
+					: 'Recording saved and session closed successfully',
+			});
 
 			const [
 				_transcribeAndCopyAndPasteWithToastResult,
-				_closeSessionWithToastResult,
+				_closeSessionIfNeededWithToastResult,
 			] = await Promise.all([
 				(async () => {
 					const selectedTranscriptionService = {
@@ -373,23 +378,7 @@ function createRecorder() {
 
 		toggleRecordingWithToast: async () => {
 			if (isInRecordingSession) {
-				if (!settings.value.isCopyToClipboardEnabled) {
-					toast.success({
-						id: stopRecordingToastId,
-						title: 'Recording transcribed!',
-						description: updatedRecording.transcribedText,
-						descriptionClass: 'line-clamp-2',
-					});
-				}
-
-				return Ok(undefined);
-
-				localToast.success({
-					title: '✨ Recording Complete!',
-					description: settings.value.isFasterRerecordEnabled
-						? 'Recording saved! Ready for another take'
-						: 'Recording saved and session closed successfully',
-				});
+				stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 			} else {
 				const startRecordingWithToast = createMutation({
 					onMutate: () => {
