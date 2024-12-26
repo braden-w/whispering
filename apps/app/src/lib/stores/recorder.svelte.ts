@@ -111,71 +111,64 @@ function createRecorder() {
 		});
 	};
 
-	const cancelRecording = createMutation({
-		mutationFn: async (_, { context: { localToast } }) => {
-			const cancelResult = await WhisperingRecorderService.cancelRecording(
-				undefined,
-				{ sendStatus: localToast.loading },
-			);
-			if (!cancelResult.ok) {
-				return WhisperingErr({
-					title: '❌ Failed to Cancel Recording',
-					description:
-						'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
-					action: { type: 'more-details', error: cancelResult.error },
-				});
-			}
-			setRecorderState('SESSION');
-			if (settings.value.isFasterRerecordEnabled) return Ok(undefined);
-
-			localToast.loading({
+	const cancelRecording = async () => {
+		const toastId = nanoid();
+		toast.loading({
+			id: toastId,
+			title: '🔄 Cancelling recording...',
+			description: 'Discarding the current recording...',
+		});
+		const cancelResult = await WhisperingRecorderService.cancelRecording(
+			undefined,
+			{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
+		);
+		if (!cancelResult.ok) {
+			toast.error({
+				id: toastId,
+				title: '❌ Failed to Cancel Recording',
+				description:
+					'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
+				action: { type: 'more-details', error: cancelResult.error },
+			});
+			return;
+		}
+		setRecorderState('SESSION');
+		if (settings.value.isFasterRerecordEnabled) {
+			toast.success({
+				title: '🚫 Recording Cancelled',
+				description:
+					'Recording discarded, but session remains open for a new take',
+			});
+		} else {
+			toast.loading({
+				id: toastId,
 				title: '⏳ Closing session...',
 				description: 'Wrapping up your recording session...',
 			});
-			const closeResult = await WhisperingRecorderService.closeRecordingSession(
-				undefined,
-				{ sendStatus: localToast.loading },
-			);
-			if (!closeResult.ok) {
-				return WhisperingErr({
-					title: '❌ Failed to Close Session',
-					description: 'We encountered an issue while closing your session',
-					action: { type: 'more-details', error: closeResult.error },
+			const closeSessionResult =
+				await WhisperingRecorderService.closeRecordingSession(undefined, {
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 				});
-			}
-			setRecorderState('IDLE');
-			return Ok(undefined);
-		},
-		onMutate: () => {
-			const localToast = createLocalToastFns();
-			localToast.loading({
-				title: '🔄 Cancelling recording...',
-				description: 'Discarding the current recording...',
-			});
-			return Ok({ localToast });
-		},
-		onSuccess: async (_, { context: { localToast } }) => {
-			void playSound('cancel');
-			console.info('Recording cancelled');
-			if (settings.value.isFasterRerecordEnabled) {
-				localToast.success({
-					title: '🚫 Recording Cancelled',
+			if (!closeSessionResult.ok) {
+				toast.error({
+					id: toastId,
+					title: '❌ Failed to close session while cancelling recording',
 					description:
-						'Recording discarded, but session remains open for a new take',
+						'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
+					action: { type: 'more-details', error: closeSessionResult.error },
 				});
-			} else {
-				localToast.success({
-					title: '✅ All Done!',
-					description: 'Recording cancelled and session closed successfully',
-				});
+				return;
 			}
-		},
-		onError: (error, { contextResult }) => {
-			if (!contextResult.ok) return;
-			const { localToast } = contextResult.data;
-			localToast.error(error);
-		},
-	});
+			toast.success({
+				id: toastId,
+				title: '✅ All Done!',
+				description: 'Recording cancelled and session closed successfully',
+			});
+		}
+		void playSound('cancel');
+		setRecorderState('IDLE');
+		console.info('Recording cancelled');
+	};
 
 	return {
 		get recorderState() {
