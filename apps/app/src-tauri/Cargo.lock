@@ -119,6 +119,7 @@ dependencies = [
  "core-foundation-sys",
  "cpal",
  "enigo",
+ "hound",
  "once_cell",
  "serde",
  "serde_json",
@@ -2042,6 +2043,12 @@ checksum = "589533453244b0995c858700322199b2becb13b627df2851f64a2775d024abcf"
 dependencies = [
  "windows-sys 0.59.0",
 ]
+
+[[package]]
+name = "hound"
+version = "3.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62adaabb884c94955b19907d60019f4e145d091c75345379e70d1ee696f7854f"
 
 [[package]]
 name = "html5ever"
