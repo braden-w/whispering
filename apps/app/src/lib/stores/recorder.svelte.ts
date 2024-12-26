@@ -12,6 +12,7 @@ import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { settings } from '$lib/stores/settings.svelte';
 import { Err, Ok, createMutation } from '@epicenterhq/result';
 import {
+	WHISPERING_RECORDINGS_PATHNAME,
 	WhisperingErr,
 	type ToastAndNotifyOptions,
 	type WhisperingRecordingState,
@@ -28,6 +29,7 @@ import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/
 import { createTranscriptionServiceWhisperLive } from '$lib/services/transcription/TranscriptionServiceWhisperLive';
 import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
 import { HttpService } from '$lib/services/http/HttpService';
+import { clipboard } from '$lib/services/clipboard';
 
 const TranscriptionServiceWhisperLive = createTranscriptionServiceWhisperLive({
 	HttpService,
@@ -241,12 +243,81 @@ function createRecorder() {
 							},
 						});
 					}
-				})(),
-				(async () => {
+
+					if (settings.value.isCopyToClipboardEnabled) {
+						toast.loading({
+							id: stopRecordingToastId,
+							title: '⏳ Copying to clipboard...',
+							description: 'Copying the transcription to your clipboard...',
+						});
+						const copyResult = await ClipboardService.setClipboardText(
+							updatedRecording.transcribedText,
+						);
+						if (!copyResult.ok) {
+							toast.success({
+								id: stopRecordingToastId,
+								title: 'Recording transcribed!',
+								description:
+									"We couldn't copy the transcription to your clipboard, though. You can copy it manually.",
+								descriptionClass: 'line-clamp-2',
+								action: {
+									type: 'button',
+									label: 'Copy to clipboard',
+									onClick: () =>
+										clipboard.copyTextToClipboardWithToast({
+											label: 'transcribed text',
+											text: updatedRecording.transcribedText,
+										}),
+								},
+							});
+							return;
+						}
+					}
+
+					if (!settings.value.isPasteContentsOnSuccessEnabled) {
+						toast.success({
+							id: stopRecordingToastId,
+							title: 'Recording transcribed and copied to clipboard!',
+							description: updatedRecording.transcribedText,
+							descriptionClass: 'line-clamp-2',
+							action: {
+								type: 'link',
+								label: 'Go to recordings',
+								goto: WHISPERING_RECORDINGS_PATHNAME,
+							},
+						});
+						return;
+					}
 					toast.loading({
 						id: stopRecordingToastId,
-						title: '⏳ Closing recording session...',
-						description: 'Wrapping things up, just a moment...',
+						title: '⏳ Pasting ...',
+						description: 'Pasting the transcription to your cursor...',
+					});
+					const pasteResult = await ClipboardService.writeTextToCursor(
+						updatedRecording.transcribedText,
+					);
+					if (!pasteResult.ok) {
+						toast.success({
+							id: stopRecordingToastId,
+							title: 'Recording transcribed and copied to clipboard!',
+							description: updatedRecording.transcribedText,
+							descriptionClass: 'line-clamp-2',
+						});
+						return;
+					}
+					toast.success({
+						id: stopRecordingToastId,
+						title: 'Recording transcribed, copied to clipboard, and pasted!',
+						description: updatedRecording.transcribedText,
+						descriptionClass: 'line-clamp-2',
+					});
+				})(),
+				(async () => {
+					if (settings.value.isFasterRerecordEnabled) return;
+					toast.loading({
+						id: stopRecordingToastId,
+						title: '⏳ Closing session...',
+						description: 'Wrapping up your recording session...',
 					});
 					const closeSessionResult =
 						await WhisperingRecorderService.closeRecordingSession(undefined, {
@@ -263,6 +334,7 @@ function createRecorder() {
 						});
 						return;
 					}
+					setRecorderState('IDLE');
 				})(),
 			]);
 		};
@@ -301,22 +373,6 @@ function createRecorder() {
 
 		toggleRecordingWithToast: async () => {
 			if (isInRecordingSession) {
-				if (!transcribeRecordingAndUpdateDbResult.ok) {
-					toast.error({
-						id: stopRecordingToastId,
-						title: '❌ Failed to Transcribe Recording',
-						description:
-							'Your recording was completed but could not be transcribed. This might be due to a temporary issue with the transcription service.',
-						action: {
-							type: 'more-details',
-							error: transcribeRecordingAndUpdateDbResult.error,
-						},
-					});
-					return;
-				}
-
-				const updatedRecording = transcribeRecordingAndUpdateDbResult.data;
-
 				if (!settings.value.isCopyToClipboardEnabled) {
 					toast.success({
 						id: stopRecordingToastId,
@@ -326,99 +382,6 @@ function createRecorder() {
 					});
 				}
 
-				if (settings.value.isFasterRerecordEnabled) {
-				} else {
-					toast.loading({
-						id: stopRecordingToastId,
-						title: '⏳ Closing session...',
-						description: 'Wrapping up your recording session...',
-					});
-					const closeSessionResult =
-						await WhisperingRecorderService.closeRecordingSession(undefined, {
-							sendStatus: (options) =>
-								toast.loading({ id: stopRecordingToastId, ...options }),
-						});
-					if (!closeSessionResult.ok) {
-						return WhisperingErr({
-							title: '❌ Failed to Close Session After Recording',
-							description:
-								'Your recording was saved but we encountered an issue while closing the session. You may need to restart the application.',
-							action: {
-								type: 'more-details',
-								error: closeSessionResult.error,
-							},
-						});
-					}
-					setRecorderState('IDLE');
-				}
-
-				if (settings.value.isCopyToClipboardEnabled) {
-					toast.loading({
-						id: stopRecordingToastId,
-						title: '⏳ Copying to clipboard...',
-						description: 'Copying the transcription to your clipboard...',
-					});
-					const copyResult = await ClipboardService.setClipboardText(
-						updatedRecording.transcribedText,
-					);
-					if (!copyResult.ok) {
-						toast.success({
-							id: stopRecordingToastId,
-							title: 'Recording transcribed!',
-							description: updatedRecording.transcribedText,
-							descriptionClass: 'line-clamp-2',
-						});
-						if (copyResult.error._tag === 'WhisperingError') {
-							return Err(copyResult.error);
-						}
-						return WhisperingErr({
-							title: '❌ Failed to Copy to Clipboard',
-							description:
-								'We encountered an issue while copying the transcription to your clipboard. Please try again.',
-							action: {
-								type: 'more-details',
-								error: copyResult.error,
-							},
-						});
-					}
-				}
-
-				if (settings.value.isPasteContentsOnSuccessEnabled) {
-					toast.loading({
-						id: stopRecordingToastId,
-						title: '⏳ Pasting ...',
-						description: 'Pasting the transcription to your cursor...',
-					});
-					const pasteResult = await ClipboardService.writeTextToCursor(
-						updatedRecording.transcribedText,
-					);
-					if (!pasteResult.ok) {
-						toast.success({
-							id: stopRecordingToastId,
-							title: 'Recording transcribed and copied to clipboard!',
-							description: updatedRecording.transcribedText,
-							descriptionClass: 'line-clamp-2',
-						});
-						if (pasteResult.error._tag === 'WhisperingError') {
-							return Err(pasteResult.error);
-						}
-						return WhisperingErr({
-							title: '❌ Failed to Paste to Cursor',
-							description:
-								'We encountered an issue while pasting the transcription to your cursor. Please try again.',
-							action: {
-								type: 'more-details',
-								error: pasteResult.error,
-							},
-						});
-					}
-				}
-				toast.success({
-					id: stopRecordingToastId,
-					title: 'Recording transcribed, copied to clipboard, and pasted!',
-					description: updatedRecording.transcribedText,
-					descriptionClass: 'line-clamp-2',
-				});
 				return Ok(undefined);
 
 				localToast.success({
