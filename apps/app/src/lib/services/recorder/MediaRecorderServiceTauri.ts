@@ -1,4 +1,4 @@
-import { Ok, type Result, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type {
@@ -38,7 +38,12 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 					'Initializing your recording session and checking microphone access...',
 			});
 			const result = await invoke('init_recording_session');
-			if (!result.ok) return WhisperingErr(result.error);
+			if (!result.ok)
+				return WhisperingErr({
+					title: '🎤 Device Access Error',
+					description: 'Unable to connect to your selected microphone',
+					action: { type: 'more-details', error: result.error },
+				});
 			return Ok(undefined);
 		},
 		closeRecordingSession: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -83,17 +88,10 @@ export const createTauriRecorderService = (): WhisperingRecorderService => {
 	};
 };
 
-async function invoke<T>(
-	command: string,
-): Promise<Result<T, WhisperingRecorderErrProperties>> {
+async function invoke<T>(command: string) {
 	return tryAsync({
 		try: async () => await tauriInvoke<T>(command),
 		mapErr: (error) =>
-			WhisperingErr({
-				title: '🎤 Device Access Error',
-				description:
-					'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-				action: { type: 'more-details', error },
-			}),
+			Err({ _tag: 'TauriInvokeError', command, error } as const),
 	});
 }
