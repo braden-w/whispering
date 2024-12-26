@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import type { ToastAndNotifyOptions } from '@repo/shared';
@@ -17,6 +18,27 @@ function createToastService() {
 			};
 
 			const durationInMs = getDurationInMs();
+
+			if (dev) {
+				const logData = { title, action, ...options };
+				switch (variant) {
+					case 'error':
+						console.error('[Toast]', logData);
+						break;
+					case 'warning':
+						console.warn('[Toast]', logData);
+						break;
+					case 'info':
+						console.info('[Toast]', logData);
+						break;
+					case 'loading':
+						console.info('[Toast]', logData);
+						break;
+					case 'success':
+						console.log('[Toast]', logData);
+						break;
+				}
+			}
 
 			const id = sonnerToast[variant](title, {
 				...options,
