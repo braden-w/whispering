@@ -1,4 +1,4 @@
-import type { ClipboardService } from '$lib/services/clipboard/ClipboardService';
+import type { ClipboardService } from './ClipboardService';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr, WhisperingWarning } from '@repo/shared';
 import { invoke } from '@tauri-apps/api/core';

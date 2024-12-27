@@ -1,5 +1,5 @@
-import type { HttpService } from '$lib/services/http/HttpService';
-import { HttpServiceErr } from '$lib/services/http/HttpService';
+import type { HttpService } from './HttpService';
+import { HttpServiceErr } from './HttpService';
 import { tryAsync } from '@epicenterhq/result';
 
 export const createHttpServiceWebLive = (): HttpService => ({

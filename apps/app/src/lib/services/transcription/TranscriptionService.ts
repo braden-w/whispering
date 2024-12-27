@@ -1,6 +1,6 @@
-import type { HttpServiceErr } from '$lib/services/http/HttpService';
 import { Err, type Ok } from '@epicenterhq/result';
 import type { WhisperingErr, WhisperingErrProperties } from '@repo/shared';
+import type { HttpServiceErr } from '../http/HttpService';
 
 export type TranscriptionServiceErr = WhisperingErr;
 export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;

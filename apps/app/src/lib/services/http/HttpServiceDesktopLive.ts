@@ -1,7 +1,4 @@
-import {
-	type HttpService,
-	HttpServiceErr,
-} from '$lib/services/http/HttpService';
+import { type HttpService, HttpServiceErr } from './HttpService';
 import { tryAsync } from '@epicenterhq/result';
 import { fetch } from '@tauri-apps/plugin-http';
 
