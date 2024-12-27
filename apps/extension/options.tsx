@@ -13,7 +13,6 @@ import {
 } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
-import { app } from '~lib/app';
 import { Button } from '~components/ui/button';
 import {
 	Card,
@@ -35,6 +34,7 @@ import {
 import { Skeleton } from '~components/ui/skeleton';
 import { Toaster } from '~components/ui/sonner';
 import { Switch } from '~components/ui/switch';
+import { app } from '~lib/app';
 import './style.css';
 
 const queryClient = new QueryClient();

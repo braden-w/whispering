@@ -1,6 +1,6 @@
+import { tryAsync } from '@epicenterhq/result';
 import type { HttpService } from './HttpService';
 import { HttpServiceErr } from './HttpService';
-import { tryAsync } from '@epicenterhq/result';
 
 export function createHttpServiceWeb(): HttpService {
 	return {

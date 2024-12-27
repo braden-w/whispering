@@ -6,9 +6,9 @@ import type {
 	PlasmoGetInlineAnchor,
 	PlasmoGetStyle,
 } from 'plasmo';
+import { app } from '~lib/app';
 import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
 import { waitForElement } from './utils/waitForElement';
-import { app } from '~lib/app';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {
 	const element = await waitForElement('div.GrowingTextArea_growWrap__im5W3');

@@ -1,9 +1,9 @@
+import redLargeSquare from 'data-base64:~assets/red_large_square.png';
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
-import redLargeSquare from 'data-base64:~assets/red_large_square.png';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { whisperingStorage } from '~lib/storage/whisperingStorage';
 
 const iconPaths = {

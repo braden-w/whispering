@@ -1,3 +1,6 @@
+import { settings } from '$lib/stores/settings.svelte.js';
+import { getExtensionFromAudioBlob } from '$lib/utils';
+import { Ok } from '@epicenterhq/result';
 import type { HttpService } from '../http/HttpService';
 import {
 	HttpServiceErrIntoTranscriptionServiceErr,
@@ -5,9 +8,6 @@ import {
 	TranscriptionServiceErr,
 } from './TranscriptionService';
 import { whisperApiResponseSchema } from './schemas';
-import { settings } from '$lib/stores/settings.svelte.js';
-import { getExtensionFromAudioBlob } from '$lib/utils';
-import { Ok } from '@epicenterhq/result';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 

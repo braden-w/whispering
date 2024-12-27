@@ -1,3 +1,4 @@
+import GithubIcon from 'react:./components/icons/github.svg';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeProvider, useTheme } from '@/components/ui/theme-provider';
@@ -10,11 +11,10 @@ import {
 	SlidersVerticalIcon,
 	SunIcon,
 } from 'lucide-react';
-import GithubIcon from 'react:./components/icons/github.svg';
-import { app } from '~lib/app';
-import { extension } from '~lib/extension';
 import { createNotification } from '~background/messages/extension/createNotification';
 import { WhisperingButton } from '~components/WhisperingButton';
+import { app } from '~lib/app';
+import { extension } from '~lib/extension';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,

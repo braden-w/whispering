@@ -1,5 +1,5 @@
-import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { tryAsync } from '@epicenterhq/result';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 
 export async function injectScript<T, Args extends unknown[]>({
 	tabId,

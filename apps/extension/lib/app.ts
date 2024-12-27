@@ -1,5 +1,5 @@
 import { sendToBackground } from '@plasmohq/messaging';
-import { WhisperingErr, type Settings } from '@repo/shared';
+import { type Settings, WhisperingErr } from '@repo/shared';
 import type { CancelRecordingResponse } from '../background/messages/app/cancelRecording';
 import type { GetSettingsResponse } from '../background/messages/app/getSettings';
 import type { SetSettingsResponse } from '../background/messages/app/setSettings';

@@ -1,14 +1,14 @@
-import { toast } from '$lib/utils/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+import { toast } from '$lib/utils/toast';
+import { tryAsync, trySync } from '@epicenterhq/result';
 import {
+	WhisperingErr,
 	getDefaultSettings,
 	settingsSchema,
-	WhisperingErr,
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
 import { recorder } from './recorder.svelte';
-import { tryAsync, trySync } from '@epicenterhq/result';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',

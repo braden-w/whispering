@@ -1,5 +1,5 @@
-import { recorderStateToIcons } from '@repo/shared';
 import cssText from 'data-text:~/style.css';
+import { recorderStateToIcons } from '@repo/shared';
 import type {
 	PlasmoCSConfig,
 	PlasmoGetInlineAnchor,

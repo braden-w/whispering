@@ -1,8 +1,8 @@
+import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
-import studioMicrophone from 'data-base64:~assets/studio_microphone.png';
 import { nanoid } from 'nanoid';
 import { extension } from '../../../lib/extension';
 import { gotoTargetUrlInWhisperingTab } from './gotoTargetUrlInWhisperingTab';
