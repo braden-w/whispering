@@ -45,13 +45,7 @@ pub enum AudioResponse {
     Success(String),
 }
 
-struct RecordingSessionSettings {
-    device_name: String,
-    bits_per_sample: u16,
-}
-
 struct RecordingSession {
-    settings: RecordingSessionSettings,
     stream: Stream,
     spec: hound::WavSpec,
 }
@@ -236,10 +230,6 @@ pub fn spawn_audio_thread(
                     }
 
                     current_recording_session = Some(RecordingSession {
-                        settings: RecordingSessionSettings {
-                            device_name: recording_session_config.device_name,
-                            bits_per_sample: recording_session_config.bits_per_sample,
-                        },
                         stream: stream,
                         spec: spec,
                     });

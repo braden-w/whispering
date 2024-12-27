@@ -26,11 +26,11 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|app| {
+        .setup(|| {
             let _ = ensure_thread_initialized();
             Ok(())
         })
-        .on_window_event(|window, event| {
+        .on_window_event(|_, event| {
             if let tauri::WindowEvent::Destroyed = event {
                 let _ = close_thread();
             }
