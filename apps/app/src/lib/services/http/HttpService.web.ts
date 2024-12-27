@@ -2,7 +2,7 @@ import type { HttpService } from './HttpService';
 import { HttpServiceErr } from './HttpService';
 import { tryAsync } from '@epicenterhq/result';
 
-export const createHttpServiceWebLive = (): HttpService => ({
+export const createHttpServiceWeb = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
 		const responseResult = await tryAsync({
 			try: () =>

@@ -2,7 +2,7 @@ import { type HttpService, HttpServiceErr } from './HttpService';
 import { tryAsync } from '@epicenterhq/result';
 import { fetch } from '@tauri-apps/plugin-http';
 
-export const createHttpServiceDesktopLive = (): HttpService => ({
+export const createHttpServiceDesktop = (): HttpService => ({
 	async post({ formData, url, schema, headers }) {
 		const responseResult = await tryAsync({
 			try: () =>

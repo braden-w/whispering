@@ -1,7 +1,7 @@
 import type { Settings } from '@repo/shared';
 import {
-	createDownloadServiceDesktopLive,
-	createDownloadServiceWebLive,
+	createDownloadServiceDesktop,
+	createDownloadServiceWeb,
 } from './DownloadService';
 import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
 import { NotificationServiceWebLive } from './notifications/NotificationService.web';
@@ -9,34 +9,34 @@ import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
 } from './SetTrayIconService';
-import { createClipboardServiceDesktopLive } from './clipboard/ClipboardService.desktop';
-import { createClipboardServiceWebLive } from './clipboard/ClipboardService.web';
+import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
+import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
 import { createRecordingsIndexedDbService } from './db/RecordingsService.indexedDb';
-import { createHttpServiceDesktopLive } from './http/HttpService.desktop';
-import { createHttpServiceWebLive } from './http/HttpService.web';
+import { createHttpServiceDesktop } from './http/HttpService.desktop';
+import { createHttpServiceWeb } from './http/HttpService.web';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
-import { createTranscriptionServiceFasterWhisperServerLive } from './transcription/TranscriptionService.fasterWhisperServer';
-import { createTranscriptionServiceGroqLive } from './transcription/TranscriptionService.groq';
-import { createTranscriptionServiceWhisperLive } from './transcription/TranscriptionService.whisper';
+import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
+import { createTranscriptionServiceGroq } from './transcription/TranscriptionService.groq';
+import { createTranscriptionServiceWhisper } from './transcription/TranscriptionService.whisper';
 
 export const DownloadService = window.__TAURI_INTERNALS__
-	? createDownloadServiceDesktopLive()
-	: createDownloadServiceWebLive();
+	? createDownloadServiceDesktop()
+	: createDownloadServiceWeb();
 
 export const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktopLive()
-	: createHttpServiceWebLive();
+	? createHttpServiceDesktop()
+	: createHttpServiceWeb();
 
 export const createTranscriptionService = (
 	selectedTranscriptionService: Settings['selectedTranscriptionService'],
 ) => {
 	switch (selectedTranscriptionService) {
 		case 'OpenAI':
-			return createTranscriptionServiceWhisperLive({ HttpService });
+			return createTranscriptionServiceWhisper({ HttpService });
 		case 'Groq':
-			return createTranscriptionServiceGroqLive({ HttpService });
+			return createTranscriptionServiceGroq({ HttpService });
 		case 'faster-whisper-server':
-			return createTranscriptionServiceFasterWhisperServerLive({ HttpService });
+			return createTranscriptionServiceFasterWhisperServer({ HttpService });
 	}
 };
 
@@ -48,8 +48,8 @@ export const NotificationService = window.__TAURI_INTERNALS__
 export const RecorderService = createRecorderServiceWeb();
 
 export const ClipboardService = window.__TAURI_INTERNALS__
-	? createClipboardServiceDesktopLive()
-	: createClipboardServiceWebLive();
+	? createClipboardServiceDesktop()
+	: createClipboardServiceWeb();
 
 export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()

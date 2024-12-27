@@ -17,7 +17,7 @@ const writeTextToCursor = (text: string) =>
 			}),
 	});
 
-export const createClipboardServiceDesktopLive = (): ClipboardService => ({
+export const createClipboardServiceDesktop = (): ClipboardService => ({
 	setClipboardText: (text) =>
 		tryAsync({
 			try: () => writeText(text),

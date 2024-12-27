@@ -11,7 +11,7 @@ import { Ok } from '@epicenterhq/result';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const createTranscriptionServiceGroqLive = ({
+export const createTranscriptionServiceGroq = ({
 	HttpService,
 }: {
 	HttpService: HttpService;
@@ -71,7 +71,10 @@ export const createTranscriptionServiceGroqLive = ({
 			return TranscriptionServiceErr({
 				title: 'Server error from Groq API',
 				description: 'This is likely a problem with Groq, not you.',
-				action: { type: 'more-details', error: whisperApiResponse.error.message },
+				action: {
+					type: 'more-details',
+					error: whisperApiResponse.error.message,
+				},
 			});
 		}
 		return Ok(whisperApiResponse.text.trim());

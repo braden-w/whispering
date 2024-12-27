@@ -11,7 +11,7 @@ import { Ok } from '@epicenterhq/result';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-export const createTranscriptionServiceFasterWhisperServerLive = ({
+export const createTranscriptionServiceFasterWhisperServer = ({
 	HttpService,
 }: {
 	HttpService: HttpService;

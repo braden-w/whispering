@@ -11,7 +11,7 @@ export type DownloadService = {
 	}) => Promise<WhisperingResult<void>>;
 };
 
-export function createDownloadServiceDesktopLive(): DownloadService {
+export function createDownloadServiceDesktop(): DownloadService {
 	return {
 		downloadBlob: async ({ name, blob }) => {
 			const extension = getExtensionFromAudioBlob(blob);
@@ -59,7 +59,7 @@ export function createDownloadServiceDesktopLive(): DownloadService {
 	};
 }
 
-export function createDownloadServiceWebLive(): DownloadService {
+export function createDownloadServiceWeb(): DownloadService {
 	return {
 		downloadBlob: ({ name, blob }) =>
 			tryAsync({

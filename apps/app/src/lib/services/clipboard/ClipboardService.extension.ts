@@ -2,7 +2,7 @@ import { tryAsync, trySync } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
-export const createClipboardServiceExtensionLive = (): ClipboardService => ({
+export const createClipboardServiceExtension = (): ClipboardService => ({
 	setClipboardText: (text) =>
 		tryAsync({
 			try: () => navigator.clipboard.writeText(text),

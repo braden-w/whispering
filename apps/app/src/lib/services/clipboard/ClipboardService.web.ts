@@ -3,7 +3,7 @@ import { extension } from '@repo/extension';
 import { WhisperingErr } from '@repo/shared';
 import type { ClipboardService } from './ClipboardService';
 
-export const createClipboardServiceWebLive = (): ClipboardService => ({
+export const createClipboardServiceWeb = (): ClipboardService => ({
 	setClipboardText: async (text) => {
 		const setClipboardResult = await tryAsync({
 			try: () => navigator.clipboard.writeText(text),
