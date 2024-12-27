@@ -67,7 +67,7 @@
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
 			const sendMessageToExtensionResult =
-				await extension.notifyWhisperingTabReady();
+				await extension.notifyWhisperingTabReady(undefined);
 			if (!sendMessageToExtensionResult.ok) {
 				renderErrAsToast({
 					variant: 'error',

@@ -101,10 +101,7 @@ export const extension = {
 	},
 	notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
 		const result = await sendMessageToExtension<NotifyWhisperingTabReadyResult>(
-			{
-				name: 'extension/notifyWhisperingTabReady',
-				body,
-			},
+			{ name: 'extension/notifyWhisperingTabReady', body },
 		);
 		return result;
 	},
