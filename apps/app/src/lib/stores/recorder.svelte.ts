@@ -106,6 +106,7 @@ function createRecorder() {
 			}
 
 			toast.loading({
+				id: stopRecordingToastId,
 				title: '✨ Recording Complete!',
 				description: settings.value.isFasterRerecordEnabled
 					? 'Recording saved! Ready for another take'
