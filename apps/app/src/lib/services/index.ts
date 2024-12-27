@@ -5,7 +5,7 @@ import {
 } from './SetTrayIconService';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import { createRecordingsIndexedDbService } from './db/RecordingsService.indexedDb';
+import { createRecordingsIndexedDbService } from './db/RecordingsService.svelte.indexedDb';
 import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './download/DownloadService.web';
 import { createHttpServiceDesktop } from './http/HttpService.desktop';
