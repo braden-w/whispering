@@ -1,28 +1,19 @@
 import { Ok } from '@epicenterhq/result';
-import { settings } from '$lib/stores/settings.svelte';
 import type { WhisperingResult } from '@repo/shared';
-import { type Recording, recordings, RecordingsService } from './services/db';
+import {
+	type Recording,
+	RecordingsService,
+	recordings,
+} from './services/db/recordings.svelte';
 import { renderErrAsToast } from './services/renderErrorAsToast';
-import { createTranscriptionServiceFasterWhisperServerLive } from './services/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { createTranscriptionServiceGroqLive } from './services/transcription/TranscriptionServiceGroqLive';
-import { createTranscriptionServiceWhisperLive } from './services/transcription/TranscriptionServiceWhisperLive';
-import { HttpService } from './services/http/HttpService';
 
 export const transcriptionManager = createTranscriptionManager();
+
 function createTranscriptionManager() {
 	return {
-		get isCurrentlyTranscribing() {
-			return transcribingRecordingIds.size > 0;
-		},
 		transcribeRecordingAndUpdateDb: async (
 			recording: Recording,
 		): Promise<WhisperingResult<Recording>> => {
-			const selectedTranscriptionService = {
-				OpenAI: TranscriptionServiceWhisperLive,
-				Groq: TranscriptionServiceGroqLive,
-				'faster-whisper-server': TranscriptionServiceFasterWhisperServerLive,
-			}[settings.value.selectedTranscriptionService];
-
 			const setStatusTranscribingResult =
 				await RecordingsService.updateRecording({
 					...recording,
