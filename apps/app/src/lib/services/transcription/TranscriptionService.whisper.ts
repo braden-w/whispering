@@ -16,7 +16,7 @@ export function createTranscriptionServiceWhisper({
 }: {
 	HttpService: HttpService;
 }): TranscriptionService {
-	return ({
+	return {
 		transcribe: async (audioBlob) => {
 			if (!settings.value.openAiApiKey) {
 				return TranscriptionServiceErr({
@@ -52,7 +52,7 @@ export function createTranscriptionServiceWhisper({
 			formData.append(
 				'file',
 				audioBlob,
-				`recording.${getExtensionFromAudioBlob(audioBlob)}`
+				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 			);
 			formData.append('model', 'whisper-1');
 			if (settings.value.outputLanguage !== 'auto') {
@@ -80,5 +80,5 @@ export function createTranscriptionServiceWhisper({
 			}
 			return Ok(whisperApiResponse.text.trim());
 		},
-	});
+	};
 }
