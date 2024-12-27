@@ -5,7 +5,6 @@
 	import { clipboard } from '$lib/services/clipboard';
 	import type { Recording } from '$lib/services/db/recordings.svelte';
 	import { recordings } from '$lib/services/db/recordings.svelte';
-	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {
 		DownloadIcon,
@@ -21,8 +20,7 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() =>
-			transcriptionManager.transcribeRecordingAndUpdateDb(recording)}
+		onclick={() => recordings.transcribeAndUpdateRecordingWithToast(recording)}
 		variant="ghost"
 		size="icon"
 	>

@@ -122,10 +122,10 @@ function createRecorder() {
 			] = await Promise.all([
 				(async () => {
 					const transcribeAndUpdateWithToastResult =
-						await recordings.transcribeAndUpdateRecordingWithToast({
-							recording: newRecording,
-							toastId: stopRecordingToastId,
-						});
+						await recordings.transcribeAndUpdateRecordingWithToast(
+							newRecording,
+							{ toastId: stopRecordingToastId, },
+						);
 					if (!transcribeAndUpdateWithToastResult.ok) return;
 
 					const { transcribedText } = transcribeAndUpdateWithToastResult.data;

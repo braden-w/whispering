@@ -92,13 +92,10 @@ function createRecordings() {
 			return;
 		},
 
-		transcribeAndUpdateRecordingWithToast: async ({
-			recording,
-			toastId,
-		}: {
-			recording: Recording;
-			toastId: string;
-		}) => {
+		transcribeAndUpdateRecordingWithToast: async (
+			recording: Recording,
+			{ toastId = nanoid() }: { toastId?: string } = {},
+		) => {
 			const setStatusTranscribingResult =
 				await RecordingsService.updateRecording({
 					...recording,
