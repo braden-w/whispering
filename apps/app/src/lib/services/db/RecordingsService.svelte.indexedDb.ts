@@ -23,10 +23,7 @@ interface RecordingsDbSchemaV2 extends DBSchema {
 }
 
 interface RecordingsDbSchemaV1 extends DBSchema {
-	[DEPRECATED_RECORDING_STORE]: {
-		key: Recording['id'];
-		value: Recording;
-	};
+	[DEPRECATED_RECORDING_STORE]: { key: Recording['id']; value: Recording };
 }
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
@@ -53,15 +50,11 @@ export function createRecordingsIndexedDbService(): DbService {
 				);
 				const metadataStore = transaction.db.createObjectStore(
 					RECORDING_METADATA_STORE,
-					{
-						keyPath: 'id',
-					},
+					{ keyPath: 'id' },
 				);
 				const blobStore = transaction.db.createObjectStore(
 					RECORDING_BLOB_STORE,
-					{
-						keyPath: 'id',
-					},
+					{ keyPath: 'id' },
 				);
 
 				const recordings = await recordingsStore.getAll();
