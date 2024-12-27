@@ -11,7 +11,7 @@ export function createHttpServiceDesktop(): HttpService {
 					fetch(url, {
 						method: 'POST',
 						body: formData,
-						headers: { 'Content-Type': 'multipart/form-data', ...headers },
+						headers: headers,
 					}),
 				mapErr: (error) => HttpServiceErr({ code: 'NetworkError', error }),
 			});
