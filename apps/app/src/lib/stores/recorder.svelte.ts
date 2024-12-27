@@ -136,6 +136,7 @@ function createRecorder() {
 						const copyResult =
 							await ClipboardService.setClipboardText(transcribedText);
 						if (!copyResult.ok) {
+							toast.warning(copyResult.error);
 							toast.success({
 								id: stopRecordingToastId,
 								title: '📝 Recording transcribed!',
@@ -178,6 +179,7 @@ function createRecorder() {
 					const pasteResult =
 						await ClipboardService.writeTextToCursor(transcribedText);
 					if (!pasteResult.ok) {
+						toast.warning(pasteResult.error);
 						toast.success({
 							id: stopRecordingToastId,
 							title: '📝📋 Recording transcribed and copied to clipboard!',
