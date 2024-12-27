@@ -89,8 +89,10 @@ export function createRecorderServiceTauri(): RecorderService {
 					action: { type: 'more-details', error: result.error },
 				});
 
-			const uint8Array = new Float32Array(result.data);
-			const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
+			const float32Array = new Float32Array(result.data);
+			console.log('🚀 ~ stopRecording: ~ float32Array:', float32Array);
+			const blob = createWavFromFloat32(float32Array);
+			console.log('🚀 ~ stopRecording: ~ blob:', blob);
 			return Ok(blob);
 		},
 		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
@@ -118,4 +120,53 @@ async function invoke<T>(command: string, args?: Record<string, unknown>) {
 		mapErr: (error) =>
 			Err({ _tag: 'TauriInvokeError', command, error } as const),
 	});
+}
+
+function createWavFromFloat32(float32Array: Float32Array, sampleRate = 32000) {
+	// WAV header parameters
+	const numChannels = 1; // Mono
+	const bitsPerSample = 32;
+	const bytesPerSample = bitsPerSample / 8;
+
+	// Calculate sizes
+	const dataSize = float32Array.length * bytesPerSample;
+	const headerSize = 44; // Standard WAV header size
+	const totalSize = headerSize + dataSize;
+
+	// Create the buffer
+	const buffer = new ArrayBuffer(totalSize);
+	const view = new DataView(buffer);
+
+	// Write WAV header
+	// "RIFF" chunk descriptor
+	writeString(view, 0, 'RIFF');
+	view.setUint32(4, totalSize - 8, true);
+	writeString(view, 8, 'WAVE');
+
+	// "fmt " sub-chunk
+	writeString(view, 12, 'fmt ');
+	view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+	view.setUint16(20, 3, true); // AudioFormat (3 for Float)
+	view.setUint16(22, numChannels, true);
+	view.setUint32(24, sampleRate, true);
+	view.setUint32(28, sampleRate * numChannels * bytesPerSample, true); // ByteRate
+	view.setUint16(32, numChannels * bytesPerSample, true); // BlockAlign
+	view.setUint16(34, bitsPerSample, true);
+
+	// "data" sub-chunk
+	writeString(view, 36, 'data');
+	view.setUint32(40, dataSize, true);
+
+	// Write audio data
+	const dataView = new Float32Array(buffer, headerSize);
+	dataView.set(float32Array);
+
+	// Create and return blob
+	return new Blob([buffer], { type: 'audio/wav' });
+}
+
+function writeString(view: DataView, offset: number, string: string) {
+	for (let i = 0; i < string.length; i++) {
+		view.setUint8(offset + i, string.charCodeAt(i));
+	}
 }
