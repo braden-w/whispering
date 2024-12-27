@@ -5,19 +5,19 @@ import { invoke } from '@tauri-apps/api/core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
 
-const writeTextToCursor = (text: string) =>
-	tryAsync({
-		try: () => invoke<void>('write_text', { text }),
-		mapErr: (error) =>
-			WhisperingErr({
-				title: 'Unable to paste from clipboard',
-				description:
-					'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
-				action: { type: 'more-details', error },
-			}),
-	});
-
 export function createClipboardServiceDesktop(): ClipboardService {
+	const writeTextToCursor = (text: string) =>
+		tryAsync({
+			try: () => invoke<void>('write_text', { text }),
+			mapErr: (error) =>
+				WhisperingErr({
+					title: 'Unable to paste from clipboard',
+					description:
+						'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
+					action: { type: 'more-details', error },
+				}),
+		});
+
 	return {
 		setClipboardText: (text) =>
 			tryAsync({
