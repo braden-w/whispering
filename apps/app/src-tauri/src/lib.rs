@@ -25,7 +25,6 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             let _ = ensure_thread_initialized();

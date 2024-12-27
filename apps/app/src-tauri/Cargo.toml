@@ -36,10 +36,6 @@ thiserror = "2.0.9"
 tracing = "0.1.41"
 hound = "3.5.1"
 
-[dependencies.tauri-plugin-sql]
-features = ["sqlite"]
-version = "2"
-
 [target.'cfg(target_os = "macos")'.dependencies]
 accessibility-sys =  "0.1.3"
 core-foundation-sys =  "0.8.7"

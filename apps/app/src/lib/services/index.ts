@@ -16,6 +16,7 @@ import { createRecorderServiceWeb } from './recorder/RecorderService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroq } from './transcription/TranscriptionService.groq';
 import { createTranscriptionServiceWhisper } from './transcription/TranscriptionService.whisper';
+import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
 
 export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktop()
@@ -42,8 +43,8 @@ export const NotificationService = window.__TAURI_INTERNALS__
 	? NotificationServiceDesktopLive
 	: NotificationServiceWebLive;
 
-// export const RecorderService = createTauriRecorderService();
-export const RecorderService = createRecorderServiceWeb();
+export const RecorderService = createRecorderServiceTauri();
+// export const RecorderService = createRecorderServiceWeb();
 
 export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
