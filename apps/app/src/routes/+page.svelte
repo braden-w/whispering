@@ -25,23 +25,14 @@
 		},
 	);
 
-	let latestAudioSrc = $state<string | undefined>(undefined);
+	let prevAudioSrc: string | undefined = undefined;
+	let latestAudioSrc = $derived.by(() => {
+		if (!latestRecording.blob) return undefined;
 
-	$effect(() => {
-		if (latestRecording.blob) {
-			const newUrl = URL.createObjectURL(latestRecording.blob);
-			// Cleanup old URL before creating new one
-			if (latestAudioSrc) {
-				URL.revokeObjectURL(latestAudioSrc);
-			}
-			latestAudioSrc = newUrl;
-		}
-	});
-
-	onDestroy(() => {
-		if (latestAudioSrc) {
-			URL.revokeObjectURL(latestAudioSrc);
-		}
+		if (prevAudioSrc) URL.revokeObjectURL(prevAudioSrc);
+		const newUrl = URL.createObjectURL(latestRecording.blob);
+		prevAudioSrc = newUrl;
+		return newUrl;
 	});
 
 	const recorderStateAsIcon = $derived(
