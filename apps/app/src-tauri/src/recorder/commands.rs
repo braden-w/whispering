@@ -35,6 +35,7 @@ pub type Result<T> = std::result::Result<T, RecorderError>;
 
 #[derive(Debug, Serialize)]
 pub struct DeviceInfo {
+    #[serde(rename = "deviceId")]
     pub device_id: String,
     pub label: String,
 }

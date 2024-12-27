@@ -6,7 +6,7 @@ import type { RecorderService } from './RecorderService';
 export function createRecorderServiceTauri(): RecorderService {
 	return {
 		enumerateRecordingDevices: async () => {
-			const invokeResult = await invoke<string[]>(
+			const invokeResult = await invoke<{ deviceId: string; label: string }[]>(
 				'enumerate_recording_devices',
 			);
 			if (!invokeResult.ok) {
@@ -17,13 +17,8 @@ export function createRecorderServiceTauri(): RecorderService {
 					action: { type: 'more-details', error: invokeResult.error },
 				});
 			}
-			const deviceNames = invokeResult.data;
-			return Ok(
-				deviceNames.map((deviceName) => ({
-					deviceId: deviceName,
-					label: deviceName,
-				})),
-			);
+			const deviceInfos = invokeResult.data;
+			return Ok(deviceInfos)
 		},
 		initRecordingSession: async (
 			settings,
