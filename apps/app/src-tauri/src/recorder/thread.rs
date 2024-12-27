@@ -34,7 +34,6 @@ pub enum AudioResponse {
 pub struct RecordingSession {
     stream: Stream,
     is_recording: Arc<AtomicBool>,
-    producer: Arc<Mutex<Caching<Arc<SharedRb<Heap<f32>>>, true, false>>>,
     consumer: Arc<Mutex<Caching<Arc<SharedRb<Heap<f32>>>, false, true>>>,
 }
 
@@ -126,7 +125,6 @@ pub fn spawn_audio_thread(
                     current_session = Some(RecordingSession {
                         stream,
                         is_recording,
-                        producer,
                         consumer,
                     });
 
