@@ -245,10 +245,10 @@ export function createRecordingsIndexedDbService(): DbService {
 						RECORDING_METADATA_STORE,
 					);
 					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					for (const id of ids) {
-						await recordingMetadataStore.delete(id);
-						await recordingBlobStore.delete(id);
-					}
+					await Promise.all([
+						...ids.map((id) => recordingMetadataStore.delete(id)),
+						...ids.map((id) => recordingBlobStore.delete(id)),
+					]);
 					await tx.done;
 				},
 				mapErr: (error) =>
