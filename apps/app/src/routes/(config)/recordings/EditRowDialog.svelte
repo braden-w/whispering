@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { recordings, type Recording } from '$lib/services/db/recordings.svelte';
+	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
 
 	let { recording }: { recording: Recording } = $props();
