@@ -45,16 +45,20 @@ pub fn ensure_thread_initialized() -> Result<()> {
         .lock()
         .map_err(|e| RecorderError::LockError(e.to_string()))?;
 
-    if thread.is_none() {
-        debug!("Thread not initialized, creating new audio thread...");
-        let (response_tx, response_rx) = mpsc::channel();
-        let command_tx = spawn_audio_thread(response_tx)
-            .map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
-        *thread = Some((command_tx, response_rx));
-        info!("Audio thread created successfully");
-    } else {
+    if thread.is_some() {
         debug!("Thread already initialized");
+        return Ok(());
     }
+
+    debug!("Thread not initialized, creating new audio thread...");
+    let (response_tx, response_rx) = mpsc::channel();
+
+    let command_tx = spawn_audio_thread(response_tx)
+        .map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
+
+    *thread = Some((command_tx, response_rx));
+
+    info!("Audio thread created successfully");
     Ok(())
 }
 
