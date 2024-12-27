@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { toast } from '$lib/utils/toast';
+	import { RecorderService } from '$lib/services';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { toast } from '$lib/utils/toast';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import { RecorderService } from '$lib/services';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { SettingsIcon } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { invoke } from '@tauri-apps/api/core';
+	import { SettingsIcon } from 'lucide-svelte';
 </script>
 
 <svelte:head>

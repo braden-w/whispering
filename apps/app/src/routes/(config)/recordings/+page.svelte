@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
@@ -9,10 +10,9 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { clipboard } from '$lib/utils/clipboard';
-	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
+	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
+	import { clipboard } from '$lib/utils/clipboard';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
 		FlexRender,
