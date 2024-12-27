@@ -2,6 +2,7 @@ import {
 	DownloadService,
 	RecordingsService,
 	createTranscriptionService,
+	userConfiguredServices,
 } from '$lib/services';
 import type { Recording } from '$lib/services/db/RecordingsService';
 import { settings } from '$lib/stores/settings.svelte';
@@ -18,10 +19,6 @@ export const recordings = createRecordings();
 function createRecordings() {
 	const transcribingRecordingIds = $state(new Set<string>());
 	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
-
-	const TranscriptionService = $derived(
-		createTranscriptionService(settings.value.selectedTranscriptionService),
-	);
 
 	return {
 		get value() {
@@ -109,9 +106,10 @@ function createRecordings() {
 				});
 			}
 			transcribingRecordingIds.add(recording.id);
-			const transcriptionResult = await TranscriptionService.transcribe(
-				recording.blob,
-			);
+			const transcriptionResult =
+				await userConfiguredServices.TranscriptionService.transcribe(
+					recording.blob,
+				);
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
 				toast.error({

@@ -1,4 +1,4 @@
-import type { Settings } from '@repo/shared';
+import { settings } from '$lib/stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
@@ -12,11 +12,39 @@ import { createHttpServiceDesktop } from './http/HttpService.desktop';
 import { createHttpServiceWeb } from './http/HttpService.web';
 import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
 import { NotificationServiceWebLive } from './notifications/NotificationService.web';
+import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroq } from './transcription/TranscriptionService.groq';
 import { createTranscriptionServiceWhisper } from './transcription/TranscriptionService.whisper';
-import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
+
+/**
+ * Services that are determined by the user's settings.
+ */
+export const userConfiguredServices = createServices();
+
+function createServices() {
+	const TranscriptionService = $derived.by(() => {
+		switch (settings.value.selectedTranscriptionService) {
+			case 'OpenAI':
+				return createTranscriptionServiceWhisper({ HttpService });
+			case 'Groq':
+				return createTranscriptionServiceGroq({ HttpService });
+			case 'faster-whisper-server':
+				return createTranscriptionServiceFasterWhisperServer({ HttpService });
+		}
+	});
+
+	const RecorderService = $derived(
+		settings.value.selectedRecorderService === 'Tauri'
+			? createRecorderServiceTauri()
+			: createRecorderServiceWeb(),
+	);
+
+	return { TranscriptionService, RecorderService };
+}
+
+// Services that are not determined by the user's settings, but by the platform.
 
 export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktop()
@@ -26,25 +54,9 @@ export const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
 	: createHttpServiceWeb();
 
-export function createTranscriptionService(
-	selectedTranscriptionService: Settings['selectedTranscriptionService'],
-) {
-	switch (selectedTranscriptionService) {
-		case 'OpenAI':
-			return createTranscriptionServiceWhisper({ HttpService });
-		case 'Groq':
-			return createTranscriptionServiceGroq({ HttpService });
-		case 'faster-whisper-server':
-			return createTranscriptionServiceFasterWhisperServer({ HttpService });
-	}
-}
-
 export const NotificationService = window.__TAURI_INTERNALS__
 	? NotificationServiceDesktopLive
 	: NotificationServiceWebLive;
-
-export const RecorderService = createRecorderServiceTauri();
-// export const RecorderService = createRecorderServiceWeb();
 
 export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
