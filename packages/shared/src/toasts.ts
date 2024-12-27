@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { WhisperingResult } from '../index.js';
 
 const toastVariantSchema = z.enum([
 	'error',
