@@ -4,7 +4,7 @@ use serde::Serialize;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
 use thiserror::Error;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 // Global static mutex to hold the audio thread sender and state
 static AUDIO_THREAD: Lazy<Mutex<Option<(Sender<AudioCommand>, Receiver<AudioResponse>)>>> =
