@@ -18,6 +18,30 @@ import { createTranscriptionServiceFasterWhisperServer } from './services/transc
 import { createTranscriptionServiceGroq } from './services/transcription/TranscriptionService.groq';
 import { createTranscriptionServiceWhisper } from './services/transcription/TranscriptionService.whisper';
 
+// Services that are not determined by the user's settings, but by the platform.
+
+export const DownloadService = window.__TAURI_INTERNALS__
+	? createDownloadServiceDesktop()
+	: createDownloadServiceWeb();
+
+export const HttpService = window.__TAURI_INTERNALS__
+	? createHttpServiceDesktop()
+	: createHttpServiceWeb();
+
+export const NotificationService = window.__TAURI_INTERNALS__
+	? NotificationServiceDesktopLive
+	: NotificationServiceWebLive;
+
+export const ClipboardService = window.__TAURI_INTERNALS__
+	? createClipboardServiceDesktop()
+	: createClipboardServiceWeb();
+
+export const SetTrayIconService = window.__TAURI_INTERNALS__
+	? createSetTrayIconDesktopService()
+	: createSetTrayIconWebService();
+
+export const RecordingsService = createRecordingsIndexedDbService();
+
 /**
  * Services that are determined by the user's settings.
  */
@@ -43,27 +67,3 @@ function createServices() {
 
 	return { TranscriptionService, RecorderService };
 }
-
-// Services that are not determined by the user's settings, but by the platform.
-
-export const DownloadService = window.__TAURI_INTERNALS__
-	? createDownloadServiceDesktop()
-	: createDownloadServiceWeb();
-
-export const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktop()
-	: createHttpServiceWeb();
-
-export const NotificationService = window.__TAURI_INTERNALS__
-	? NotificationServiceDesktopLive
-	: NotificationServiceWebLive;
-
-export const ClipboardService = window.__TAURI_INTERNALS__
-	? createClipboardServiceDesktop()
-	: createClipboardServiceWeb();
-
-export const SetTrayIconService = window.__TAURI_INTERNALS__
-	? createSetTrayIconDesktopService()
-	: createSetTrayIconWebService();
-
-export const RecordingsService = createRecordingsIndexedDbService();
