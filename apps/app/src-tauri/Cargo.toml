@@ -35,7 +35,6 @@ once_cell = "1.20.2"
 thiserror = "2.0.9"
 tracing = "0.1.41"
 hound = "3.5.1"
-ringbuf = "0.4.7"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 accessibility-sys =  "0.1.3"

@@ -1,9 +1,5 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::Stream;
-use ringbuf::storage::Heap;
-use ringbuf::traits::{Consumer, Producer, Split};
-use ringbuf::wrap::caching::Caching;
-use ringbuf::{HeapRb, SharedRb};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::sync::{
@@ -11,7 +7,7 @@ use std::sync::{
     Arc,
 };
 
-const RING_BUFFER_SIZE: usize = 5_760_000; // 5,760,000 samples minimum
+const INITIAL_BUFFER_CAPACITY: usize = 5_760_000; // Pre-allocate for ~2 minutes at 48kHz
 
 #[derive(Debug)]
 pub enum AudioCommand {
@@ -34,7 +30,7 @@ pub enum AudioResponse {
 pub struct RecordingSession {
     stream: Stream,
     is_recording: Arc<AtomicBool>,
-    consumer: Arc<Mutex<Caching<Arc<SharedRb<Heap<f32>>>, false, true>>>,
+    audio_buffer: Arc<Mutex<Vec<f32>>>,
 }
 
 pub fn spawn_audio_thread(
@@ -60,15 +56,12 @@ pub fn spawn_audio_thread(
                 }
 
                 AudioCommand::InitRecordingSession(device_name) => {
-                    // Create a new ring buffer and wrap it in Arc for thread-safe sharing
-                    let rb = HeapRb::<f32>::new(RING_BUFFER_SIZE);
-                    let (rb_producer, rb_consumer) = rb.split();
-
-                    let producer = Arc::new(Mutex::new(rb_producer));
-                    let consumer = Arc::new(Mutex::new(rb_consumer));
+                    // Create a new pre-allocated buffer for storing audio data
+                    let audio_buffer =
+                        Arc::new(Mutex::new(Vec::with_capacity(INITIAL_BUFFER_CAPACITY)));
                     let is_recording: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
                     let is_recording_producer = is_recording.clone();
-                    let producer_clone = producer.clone();
+                    let buffer_clone = audio_buffer.clone();
 
                     let device = match host.input_devices() {
                         Ok(mut devices) => {
@@ -109,19 +102,15 @@ pub fn spawn_audio_thread(
                         &config.into(),
                         move |data: &[f32], _: &_| {
                             if is_recording_producer.load(Ordering::Relaxed) {
-                                if let Ok(mut producer) = producer_clone.lock() {
+                                if let Ok(mut buffer) = buffer_clone.lock() {
+                                    // Extend the buffer with new samples
+                                    buffer.extend_from_slice(data);
                                     println!(
-                                        "Audio callback received {} samples at {} Hz",
+                                        "Recorded {} samples, total length: {} ({:.2} seconds)",
                                         data.len(),
-                                        sample_rate
+                                        buffer.len(),
+                                        buffer.len() as f32 / sample_rate as f32
                                     );
-                                    let mut pushed = 0;
-                                    for &sample in data {
-                                        if producer.try_push(sample).is_ok() {
-                                            pushed += 1;
-                                        }
-                                    }
-                                    println!("Successfully pushed {} samples", pushed);
                                 }
                             }
                         },
@@ -141,7 +130,7 @@ pub fn spawn_audio_thread(
                     current_session = Some(RecordingSession {
                         stream,
                         is_recording,
-                        consumer,
+                        audio_buffer,
                     });
 
                     response_tx.send(AudioResponse::Success(
@@ -151,6 +140,11 @@ pub fn spawn_audio_thread(
 
                 AudioCommand::StartRecording => {
                     if let Some(session) = &current_session {
+                        // Clear any existing data when starting a new recording
+                        if let Ok(mut buffer) = session.audio_buffer.lock() {
+                            buffer.clear();
+                        }
+
                         session.is_recording.store(true, Ordering::Relaxed);
                         if let Err(e) = session.stream.play() {
                             response_tx.send(AudioResponse::Error(format!(
@@ -173,16 +167,16 @@ pub fn spawn_audio_thread(
                         // First stop recording to prevent new data from coming in
                         session.is_recording.store(false, Ordering::Relaxed);
 
-                        // Then collect all available audio data
-                        let mut audio_data = Vec::new();
-                        if let Ok(mut consumer) = session.consumer.lock() {
-                            while let Some(sample) = consumer.try_pop() {
-                                audio_data.push(sample);
-                            }
-                        }
-                        println!("Collected {} samples from recording", audio_data.len());
+                        // Get a copy of all recorded audio data
+                        let audio_data = if let Ok(buffer) = session.audio_buffer.lock() {
+                            buffer.clone()
+                        } else {
+                            Vec::new()
+                        };
 
-                        // Finally stop the stream
+                        println!("Recorded {} samples total", audio_data.len());
+
+                        // Stop the stream
                         session.stream.pause().unwrap_or_default();
 
                         response_tx.send(AudioResponse::AudioData(audio_data))?;
