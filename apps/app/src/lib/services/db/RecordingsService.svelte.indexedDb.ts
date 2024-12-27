@@ -18,7 +18,7 @@ interface RecordingsDbSchemaV2 extends DBSchema {
 	};
 	[RECORDING_BLOB_STORE]: {
 		key: Recording['id'];
-		value: { id: Recording['id']; blob: Blob };
+		value: { id: Recording['id']; blob: Blob | undefined };
 	};
 }
 
@@ -94,12 +94,10 @@ export function createRecordingsIndexedDbService(): DbService {
 				const metadata = await recordingMetadataStore.getAll();
 				const blobs = await recordingBlobStore.getAll();
 				await tx.done;
-				return metadata
-					.map((recording) => {
-						const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-						return blob ? { ...recording, blob } : null;
-					})
-					.filter((r) => r !== null);
+				return metadata.map((recording) => {
+					const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
+					return { ...recording, blob };
+				});
 			},
 			mapErr: (error) =>
 				DbServiceErr({
