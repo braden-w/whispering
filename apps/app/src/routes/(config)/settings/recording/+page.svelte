@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { RecorderService } from '$lib/services/recorder';
-	import { toast } from '$lib/services/ToastService';
+	import { toast } from '$lib/utils/toast';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';

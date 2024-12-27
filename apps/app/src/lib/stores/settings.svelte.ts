@@ -1,4 +1,4 @@
-import { toast } from '$lib/services/ToastService';
+import { toast } from '$lib/utils/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {

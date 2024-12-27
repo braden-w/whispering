@@ -1,4 +1,4 @@
-import { toast } from '$lib/services/ToastService';
+import { toast } from '$lib/utils/toast';
 import { ClipboardService } from './ClipboardService';
 
 export const clipboard = {

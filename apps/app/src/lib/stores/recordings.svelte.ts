@@ -1,5 +1,5 @@
 import { DownloadService } from '$lib/services/DownloadService';
-import { toast } from '$lib/services/ToastService';
+import { toast } from '$lib/utils/toast';
 import { clipboard } from '$lib/services/clipboard';
 import { type Recording, RecordingsService } from '$lib/services/db';
 import { HttpService } from '$lib/services/http/HttpService';
