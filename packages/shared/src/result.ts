@@ -1,4 +1,4 @@
-import { Err, type Ok, type Result } from '@epicenterhq/result';
+import { Err, type Ok } from '@epicenterhq/result';
 import type { ToastAndNotifyOptions } from './toasts.js';
 
 export type WhisperingErrProperties = {

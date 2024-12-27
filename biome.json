@@ -38,6 +38,9 @@
 					"level": "warn",
 					"fix": "safe"
 				}
+			},
+			"correctness": {
+				"noUnusedImports": "error"
 			}
 		}
 	},
