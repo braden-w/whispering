@@ -26,7 +26,7 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|| {
+        .setup(|_| {
             let _ = ensure_thread_initialized();
             Ok(())
         })
