@@ -3,7 +3,7 @@ import { WhisperingErr } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type { RecorderService } from './RecorderService';
 
-export const createRecorderServiceTauri = (): RecorderService => {
+export function createRecorderServiceTauri(): RecorderService {
 	return {
 		enumerateRecordingDevices: async () => {
 			const invokeResult = await invoke<string[]>(
@@ -119,7 +119,7 @@ export const createRecorderServiceTauri = (): RecorderService => {
 			return Ok(undefined);
 		},
 	};
-};
+}
 
 async function invoke<T>(command: string, args?: Record<string, unknown>) {
 	return tryAsync({

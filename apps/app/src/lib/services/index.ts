@@ -27,9 +27,9 @@ export const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
 	: createHttpServiceWeb();
 
-export const createTranscriptionService = (
+export function createTranscriptionService(
 	selectedTranscriptionService: Settings['selectedTranscriptionService'],
-) => {
+) {
 	switch (selectedTranscriptionService) {
 		case 'OpenAI':
 			return createTranscriptionServiceWhisper({ HttpService });
@@ -38,7 +38,7 @@ export const createTranscriptionService = (
 		case 'faster-whisper-server':
 			return createTranscriptionServiceFasterWhisperServer({ HttpService });
 	}
-};
+}
 
 export const NotificationService = window.__TAURI_INTERNALS__
 	? NotificationServiceDesktopLive

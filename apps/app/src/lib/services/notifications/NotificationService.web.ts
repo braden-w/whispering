@@ -2,7 +2,7 @@ import { Ok } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
 import type { NotificationService } from './NotificationService';
 
-export const createNotificationServiceWeb = (): NotificationService => {
+export function createNotificationServiceWeb(): NotificationService {
 	return {
 		notify: async (notifyOptions) => {
 			const createNotificationResult = await extension.createNotification({
@@ -20,6 +20,6 @@ export const createNotificationServiceWeb = (): NotificationService => {
 			return Ok(undefined);
 		},
 	};
-};
+}
 
 export const NotificationServiceWebLive = createNotificationServiceWeb();

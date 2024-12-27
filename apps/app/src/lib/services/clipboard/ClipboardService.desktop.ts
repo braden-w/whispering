@@ -17,65 +17,67 @@ const writeTextToCursor = (text: string) =>
 			}),
 	});
 
-export const createClipboardServiceDesktop = (): ClipboardService => ({
-	setClipboardText: (text) =>
-		tryAsync({
-			try: () => writeText(text),
-			mapErr: (error) =>
-				WhisperingErr({
-					title: 'Unable to copy to clipboard',
+export function createClipboardServiceDesktop(): ClipboardService {
+	return {
+		setClipboardText: (text) =>
+			tryAsync({
+				try: () => writeText(text),
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Unable to copy to clipboard',
+						description:
+							'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
+						action: { type: 'more-details', error },
+					}),
+			}),
+
+		writeTextToCursor: async (text) => {
+			const isMacos = type() === 'macos';
+
+			if (!isMacos) {
+				const result = await writeTextToCursor(text);
+				if (!result.ok) return result;
+
+				return Ok(undefined);
+			}
+
+			const isAccessibilityEnabledResult = await tryAsync({
+				try: () =>
+					invoke<boolean>('is_macos_accessibility_enabled', {
+						askIfNotAllowed: false,
+					}),
+				mapErr: (error) =>
+					WhisperingErr({
+						title: 'Unable to ensure accessibility is enabled',
+						description:
+							'There was an error checking if accessibility is enabled using the Tauri Invoke API. Please try again.',
+						action: { type: 'more-details', error },
+					}),
+			});
+
+			if (!isAccessibilityEnabledResult.ok) {
+				return isAccessibilityEnabledResult;
+			}
+			const isAccessibilityEnabled = isAccessibilityEnabledResult.data;
+
+			if (!isAccessibilityEnabled) {
+				return WhisperingWarning({
+					title:
+						'Please enable or re-enable accessibility to paste transcriptions!',
 					description:
-						'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
-					action: { type: 'more-details', error },
-				}),
-		}),
+						'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
+					action: {
+						type: 'link',
+						label: 'Open Directions',
+						goto: '/macos-enable-accessibility',
+					},
+				});
+			}
 
-	writeTextToCursor: async (text) => {
-		const isMacos = type() === 'macos';
-
-		if (!isMacos) {
 			const result = await writeTextToCursor(text);
 			if (!result.ok) return result;
 
 			return Ok(undefined);
-		}
-
-		const isAccessibilityEnabledResult = await tryAsync({
-			try: () =>
-				invoke<boolean>('is_macos_accessibility_enabled', {
-					askIfNotAllowed: false,
-				}),
-			mapErr: (error) =>
-				WhisperingErr({
-					title: 'Unable to ensure accessibility is enabled',
-					description:
-						'There was an error checking if accessibility is enabled using the Tauri Invoke API. Please try again.',
-					action: { type: 'more-details', error },
-				}),
-		});
-
-		if (!isAccessibilityEnabledResult.ok) {
-			return isAccessibilityEnabledResult;
-		}
-		const isAccessibilityEnabled = isAccessibilityEnabledResult.data;
-
-		if (!isAccessibilityEnabled) {
-			return WhisperingWarning({
-				title:
-					'Please enable or re-enable accessibility to paste transcriptions!',
-				description:
-					'Accessibility must be enabled or re-enabled for Whispering after install or update. Follow the link below for instructions.',
-				action: {
-					type: 'link',
-					label: 'Open Directions',
-					goto: '/macos-enable-accessibility',
-				},
-			});
-		}
-
-		const result = await writeTextToCursor(text);
-		if (!result.ok) return result;
-
-		return Ok(undefined);
-	},
-});
+		},
+	};
+}

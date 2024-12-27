@@ -18,7 +18,7 @@ type RecordingSession = {
 	} | null;
 };
 
-export const createRecorderServiceWeb = (): RecorderService => {
+export function createRecorderServiceWeb(): RecorderService {
 	let currentSession: RecordingSession | null = null;
 
 	const acquireStream = async (
@@ -297,7 +297,7 @@ export const createRecorderServiceWeb = (): RecorderService => {
 			return Ok(undefined);
 		},
 	};
-};
+}
 
 async function getFirstAvailableStream() {
 	const recordingDevicesResult = await tryAsync({
