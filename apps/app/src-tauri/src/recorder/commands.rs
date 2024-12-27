@@ -238,3 +238,32 @@ pub async fn stop_recording() -> Result<Vec<f32>> {
         }
     })
 }
+
+#[tauri::command]
+pub async fn cancel_recording() -> Result<()> {
+    debug!("Canceling recording");
+    with_thread(|tx, rx| {
+        tx.send(AudioCommand::StopRecording)
+            .map_err(|e| RecorderError::SendError(e.to_string()))?;
+
+        match rx.recv() {
+            Ok(AudioResponse::AudioData(_)) => {
+                *IS_RECORDING.lock().unwrap() = false;
+                info!("Recording canceled successfully");
+                Ok(())
+            }
+            Ok(AudioResponse::Error(e)) => {
+                error!("Failed to cancel recording: {}", e);
+                Err(RecorderError::AudioError(e))
+            }
+            Ok(_) => {
+                error!("Unexpected response while canceling recording");
+                Err(RecorderError::AudioError("Unexpected response".to_string()))
+            }
+            Err(e) => {
+                error!("Failed to receive cancel recording response: {}", e);
+                Err(RecorderError::ReceiveError(e.to_string()))
+            }
+        }
+    })
+}
