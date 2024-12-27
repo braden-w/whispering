@@ -36,53 +36,6 @@ function createRecordings() {
 		}
 	});
 
-	const transcribeAndUpdateRecording = async ({
-		recording,
-		toastId,
-	}: {
-		recording: Recording;
-		toastId: string;
-	}) => {
-		transcribingRecordingIds.add(recording.id);
-		const transcriptionResult = await TranscriptionService.transcribe(
-			recording.blob,
-		);
-		transcribingRecordingIds.delete(recording.id);
-		if (!transcriptionResult.ok) {
-			return WhisperingErr({
-				id: toastId,
-				title: '❌ Failed to transcribe recording',
-				description:
-					'This is likely due to a temporary issue with the transcription service. Please try again later.',
-				action: {
-					type: 'more-details',
-					error: transcriptionResult.error,
-				},
-			});
-		}
-		const transcribedText = transcriptionResult.data;
-		const updatedRecording = {
-			...recording,
-			transcribedText,
-			transcriptionStatus: 'DONE',
-		} satisfies Recording;
-		const saveRecordingToDatabaseResult =
-			await RecordingsService.updateRecording(updatedRecording);
-		if (!saveRecordingToDatabaseResult.ok) {
-			return WhisperingErr({
-				id: toastId,
-				title: '⚠️ Unable to update recording after transcription',
-				description:
-					"Transcription completed but unable to update recording's transcribed text and status in database",
-				action: {
-					type: 'more-details',
-					error: saveRecordingToDatabaseResult.error,
-				},
-			});
-		}
-		return Ok(updatedRecording);
-	};
-
 	return {
 		get value() {
 			return RecordingsService.recordings;
@@ -139,20 +92,69 @@ function createRecordings() {
 			return;
 		},
 
-		transcribeAndUpdateRecording,
-
-		transcribeAndUpdateRecordingWithToast: async (recording: Recording) => {
-			const toastId = nanoid();
-			const transcribeAndUpdateRecordingResult =
-				await transcribeAndUpdateRecording({
-					recording,
-					toastId,
+		transcribeAndUpdateRecordingWithToast: async ({
+			recording,
+			toastId,
+		}: {
+			recording: Recording;
+			toastId: string;
+		}) => {
+			const setStatusTranscribingResult =
+				await RecordingsService.updateRecording({
+					...recording,
+					transcriptionStatus: 'TRANSCRIBING',
 				});
-			if (!transcribeAndUpdateRecordingResult.ok) {
-				toast.error(transcribeAndUpdateRecordingResult.error);
-				return;
+			if (!setStatusTranscribingResult.ok) {
+				toast.warning({
+					id: toastId,
+					title:
+						'⚠️ Unable to set recording transcription status to transcribing',
+					description: 'Continuing with the transcription process...',
+					action: {
+						type: 'more-details',
+						error: setStatusTranscribingResult.error,
+					},
+				});
 			}
-			const { transcribedText } = transcribeAndUpdateRecordingResult.data;
+			transcribingRecordingIds.add(recording.id);
+			const transcriptionResult = await TranscriptionService.transcribe(
+				recording.blob,
+			);
+			transcribingRecordingIds.delete(recording.id);
+			if (!transcriptionResult.ok) {
+				toast.error({
+					id: toastId,
+					title: '❌ Failed to transcribe recording',
+					description:
+						'This is likely due to a temporary issue with the transcription service. Please try again later.',
+					action: {
+						type: 'more-details',
+						error: transcriptionResult.error,
+					},
+				});
+				return transcriptionResult;
+			}
+			const transcribedText = transcriptionResult.data;
+			const updatedRecording = {
+				...recording,
+				transcribedText,
+				transcriptionStatus: 'DONE',
+			} satisfies Recording;
+			const saveRecordingToDatabaseResult =
+				await RecordingsService.updateRecording(updatedRecording);
+			if (!saveRecordingToDatabaseResult.ok) {
+				toast.error({
+					id: toastId,
+					title: '⚠️ Unable to update recording after transcription',
+					description:
+						"Transcription completed but unable to update recording's transcribed text and status in database",
+					action: {
+						type: 'more-details',
+						error: saveRecordingToDatabaseResult.error,
+					},
+				});
+				return saveRecordingToDatabaseResult;
+			}
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
@@ -168,6 +170,7 @@ function createRecordings() {
 						}),
 				},
 			});
+			return Ok(updatedRecording);
 		},
 
 		downloadRecordingWithToast: async (recording: Recording) => {

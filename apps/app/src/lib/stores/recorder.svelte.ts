@@ -121,33 +121,14 @@ function createRecorder() {
 				_closeSessionIfNeededWithToastResult,
 			] = await Promise.all([
 				(async () => {
-					const setStatusTranscribingResult =
-						await RecordingsService.updateRecording({
-							...newRecording,
-							transcriptionStatus: 'TRANSCRIBING',
-						});
-					if (!setStatusTranscribingResult.ok) {
-						toast.warning({
-							title:
-								'⚠️ Unable to set recording transcription status to transcribing',
-							description: 'Continuing with the transcription process...',
-							action: {
-								type: 'more-details',
-								error: setStatusTranscribingResult.error,
-							},
-						});
-					}
-
-					const transcribeAndUpdateResult =
-						await recordings.transcribeAndUpdateRecording({
+					const transcribeAndUpdateWithToastResult =
+						await recordings.transcribeAndUpdateRecordingWithToast({
 							recording: newRecording,
 							toastId: stopRecordingToastId,
 						});
-					if (!transcribeAndUpdateResult.ok) {
-						toast.error(transcribeAndUpdateResult.error);
-						return;
-					}
-					const { transcribedText } = transcribeAndUpdateResult.data;
+					if (!transcribeAndUpdateWithToastResult.ok) return;
+
+					const { transcribedText } = transcribeAndUpdateWithToastResult.data;
 
 					if (settings.value.isCopyToClipboardEnabled) {
 						toast.loading({
