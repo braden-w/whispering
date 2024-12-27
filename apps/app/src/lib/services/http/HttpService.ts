@@ -1,8 +1,6 @@
-import type { Ok, Result } from '@epicenterhq/result';
-import type { z } from 'zod';
-import { createHttpServiceDesktopLive } from './HttpServiceDesktopLive';
-import { createHttpServiceWebLive } from './HttpServiceWebLive';
+import type { Ok } from '@epicenterhq/result';
 import { Err } from '@epicenterhq/result';
+import type { z } from 'zod';
 
 type HttpServiceErrCodes =
 	| { code: 'NetworkError'; error: unknown }
@@ -35,7 +33,3 @@ export type HttpService = {
 		headers?: Record<string, string>;
 	}) => Promise<HttpServiceResult<z.infer<TSchema>>>;
 };
-
-export const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktopLive()
-	: createHttpServiceWebLive();

@@ -7,7 +7,7 @@ import {
 } from '@tauri-apps/plugin-notification';
 import type { NotificationService } from './NotificationService';
 
-const createNotificationServiceDesktop = (): NotificationService => {
+function createNotificationServiceDesktop(): NotificationService {
 	return {
 		async notify({ title, description }) {
 			const notifyResult = await tryAsync({
@@ -37,7 +37,7 @@ const createNotificationServiceDesktop = (): NotificationService => {
 		},
 		clear: () => Ok(undefined),
 	};
-};
+}
 
 export const NotificationServiceDesktopLive =
 	createNotificationServiceDesktop();

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { WhisperingResult } from '../index.js';
 
 const toastVariantSchema = z.enum([
 	'error',
@@ -25,6 +24,11 @@ export const toastAndNotificationOptionsSchema = z.object({
 			z.object({
 				type: z.literal('more-details'),
 				error: z.unknown(),
+			}),
+			z.object({
+				type: z.literal('button'),
+				label: z.string(),
+				onClick: z.function().args().returns(z.void()),
 			}),
 		])
 		.optional(),

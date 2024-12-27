@@ -1,7 +1,8 @@
-import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { type DBSchema, openDB } from 'idb';
-import { DbServiceErr, type DbService, type Recording } from '.';
+import { toast } from '../../utils/toast';
+import type { DbService } from './RecordingsService';
+import { DbServiceErr, type Recording } from './RecordingsService';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -17,20 +18,17 @@ interface RecordingsDbSchemaV2 extends DBSchema {
 	};
 	[RECORDING_BLOB_STORE]: {
 		key: Recording['id'];
-		value: { id: Recording['id']; blob: Blob };
+		value: { id: Recording['id']; blob: Blob | undefined };
 	};
 }
 
 interface RecordingsDbSchemaV1 extends DBSchema {
-	[DEPRECATED_RECORDING_STORE]: {
-		key: Recording['id'];
-		value: Recording;
-	};
+	[DEPRECATED_RECORDING_STORE]: { key: Recording['id']; value: Recording };
 }
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
-export const createRecordingsIndexedDbService = (): DbService => {
+export function createRecordingsIndexedDbService(): DbService {
 	let recordings = $state<Recording[]>([]);
 
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
@@ -52,15 +50,11 @@ export const createRecordingsIndexedDbService = (): DbService => {
 				);
 				const metadataStore = transaction.db.createObjectStore(
 					RECORDING_METADATA_STORE,
-					{
-						keyPath: 'id',
-					},
+					{ keyPath: 'id' },
 				);
 				const blobStore = transaction.db.createObjectStore(
 					RECORDING_BLOB_STORE,
-					{
-						keyPath: 'id',
-					},
+					{ keyPath: 'id' },
 				);
 
 				const recordings = await recordingsStore.getAll();
@@ -93,12 +87,10 @@ export const createRecordingsIndexedDbService = (): DbService => {
 				const metadata = await recordingMetadataStore.getAll();
 				const blobs = await recordingBlobStore.getAll();
 				await tx.done;
-				return metadata
-					.map((recording) => {
-						const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-						return blob ? { ...recording, blob } : null;
-					})
-					.filter((r) => r !== null);
+				return metadata.map((recording) => {
+					const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
+					return { ...recording, blob };
+				});
 			},
 			mapErr: (error) =>
 				DbServiceErr({
@@ -108,8 +100,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 				}),
 		});
 		if (!allRecordingsFromDbResult.ok) {
-			return renderErrAsToast({
-				variant: 'error',
+			toast.error({
 				title: 'Failed to initialize recordings',
 				description:
 					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
@@ -118,6 +109,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					error: allRecordingsFromDbResult.error,
 				},
 			});
+			return;
 		}
 		recordings = allRecordingsFromDbResult.data;
 	};
@@ -253,10 +245,10 @@ export const createRecordingsIndexedDbService = (): DbService => {
 						RECORDING_METADATA_STORE,
 					);
 					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					for (const id of ids) {
-						await recordingMetadataStore.delete(id);
-						await recordingBlobStore.delete(id);
-					}
+					await Promise.all([
+						...ids.map((id) => recordingMetadataStore.delete(id)),
+						...ids.map((id) => recordingBlobStore.delete(id)),
+					]);
 					await tx.done;
 				},
 				mapErr: (error) =>
@@ -271,4 +263,4 @@ export const createRecordingsIndexedDbService = (): DbService => {
 			return Ok(undefined);
 		},
 	};
-};
+}

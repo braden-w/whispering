@@ -3,11 +3,11 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
-	import { extension } from '@repo/extension';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/utils/toast';
 	import { recorder } from '$lib/stores/recorder.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { transcriptionManager } from '$lib/transcribe.svelte';
+	import { extension } from '@repo/extension';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
@@ -30,7 +30,7 @@
 			case 'When Recording and Transcribing':
 				if (
 					recorder.recorderState === 'SESSION+RECORDING' ||
-					transcriptionManager.isCurrentlyTranscribing
+					recordings.isCurrentlyTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {
@@ -62,27 +62,14 @@
 	});
 
 	onMount(async () => {
-		window.toggleRecording = recorder.toggleRecording;
-		window.cancelRecording = recorder.cancelRecording;
+		window.toggleRecording = recorder.toggleRecordingWithToast;
+		window.cancelRecording = recorder.cancelRecordingWithToast;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
-			const sendMessageToExtensionResult =
-				await extension.notifyWhisperingTabReady();
-			if (!sendMessageToExtensionResult.ok) {
-				renderErrAsToast({
-					variant: 'error',
-					title: 'Error notifying extension that tab is ready',
-					description: 'Error sending message to extension',
-					action: {
-						type: 'more-details',
-						error: sendMessageToExtensionResult.error,
-					},
-				});
-			}
-			const notifyWhisperingTabReadyResult = sendMessageToExtensionResult.data;
+			const notifyWhisperingTabReadyResult =
+				await extension.notifyWhisperingTabReady(undefined);
 			if (!notifyWhisperingTabReadyResult.ok) {
-				renderErrAsToast({
-					variant: 'error',
+				toast.error({
 					title: 'Error notifying extension that tab is ready',
 					description: 'Error sending message to extension',
 					action: {
@@ -108,7 +95,7 @@
 
 <button
 	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	onclick={recorder.toggleRecording}
+	onclick={recorder.toggleRecordingWithToast}
 >
 	<span
 		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"

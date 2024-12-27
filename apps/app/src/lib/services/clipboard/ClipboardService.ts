@@ -1,6 +1,4 @@
 import type { MaybePromise, WhisperingResult } from '@repo/shared';
-import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
-import { createClipboardServiceWebLive } from './ClipboardServiceWebLive';
 
 export type ClipboardService = {
 	/**
@@ -17,7 +15,3 @@ export type ClipboardService = {
 	 */
 	writeTextToCursor: (text: string) => MaybePromise<WhisperingResult<void>>;
 };
-
-export const ClipboardService = window.__TAURI_INTERNALS__
-	? createClipboardServiceDesktopLive()
-	: createClipboardServiceWebLive();

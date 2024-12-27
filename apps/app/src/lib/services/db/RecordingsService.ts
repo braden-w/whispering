@@ -1,8 +1,4 @@
-import type { Ok, Result } from '@epicenterhq/result';
-import { Err } from '@epicenterhq/result';
-import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.svelte';
-
-export const recordings = createRecordingsIndexedDbService();
+import { Err, type Ok } from '@epicenterhq/result';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -12,7 +8,7 @@ export type Recording = {
 	subtitle: string;
 	timestamp: string;
 	transcribedText: string;
-	blob: Blob;
+	blob: Blob | undefined;
 	/**
 	 * A recording
 	 * 1. Begins in an 'UNPROCESSED' state

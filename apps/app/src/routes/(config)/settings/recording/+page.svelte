@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/utils/toast';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { MediaRecorderService } from '$lib/services/MediaRecorderService';
+	import { RecorderService } from '$lib/services';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
-			await MediaRecorderService.enumerateRecordingDevices();
+			await RecorderService.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
-			renderErrAsToast(enumerateRecordingDevicesResult.error);
+			toast.warning(enumerateRecordingDevicesResult.error);
 			return [];
 		}
 		return enumerateRecordingDevicesResult.data;
@@ -54,7 +54,7 @@
 				selected={settings.value.selectedAudioInputDeviceId}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					await recorder.closeRecordingSession();
+					await recorder.closeRecordingSessionWithToast();
 					settings.value = {
 						...settings.value,
 						selectedAudioInputDeviceId: selected,

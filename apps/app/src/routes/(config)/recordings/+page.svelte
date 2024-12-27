@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import { ClipboardIcon } from '$lib/components/icons';
+	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -10,14 +10,10 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-	import { recordings, type Recording } from '$lib/services/db';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-	import { toast } from '$lib/services/ToastService';
-	import { transcriptionManager } from '$lib/transcribe.svelte';
+	import { clipboard } from '$lib/utils/clipboard';
+	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-	import { createMutation } from '@epicenterhq/result';
 	import {
 		FlexRender,
 		createTable,
@@ -35,10 +31,8 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
-	import { TrashIcon } from '$lib/components/icons';
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
-	import { deleteRecordingsByIdWithToast } from './recordingMutations';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -194,7 +188,7 @@
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordings.recordings;
+			return recordings.value;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -237,7 +231,7 @@
 
 	let isDialogOpen = $state(false);
 
-	let text = $derived.by(() => {
+	let joinedTranscriptionsText = $derived.by(() => {
 		const transcriptions = selectedRecordingRows
 			.map(({ original }) => original)
 			.filter((recording) => recording.transcribedText !== '')
@@ -259,31 +253,7 @@
 					}
 				}),
 			);
-		const text = transcriptions.join(delimiter);
-		return text;
-	});
-
-	const copyToClipboardWithToast = createMutation({
-		mutationFn: ClipboardService.setClipboardText,
-		onSuccess: (_, { input: text }) => {
-			toast.success({
-				title: 'Copied transcription to clipboard!',
-				description: text,
-				descriptionClass: 'line-clamp-2',
-			});
-		},
-		onError: (error) => {
-			if (error._tag === 'ClipboardError') {
-				renderErrAsToast({
-					variant: 'error',
-					title: 'Error copying transcription to clipboard',
-					description: 'Please try again.',
-					action: { type: 'more-details', error: error },
-				});
-				return;
-			}
-			renderErrAsToast(error);
-		},
+		return transcriptions.join(delimiter);
 	});
 </script>
 
@@ -323,19 +293,19 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									transcriptionManager.transcribeRecordingAndUpdateDb(
+									recordings.transcribeAndUpdateRecordingWithToast(
 										recording.original,
 									),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.recordings.find((r) => r.id === id);
+							const currentRow = recordings.value.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.recordings.find((r) => r.id === id);
+							const currentRow = recordings.value.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />
@@ -387,13 +357,16 @@
 								placeholder="Preview of copied text"
 								readonly
 								class="h-32"
-								value={text}
+								value={joinedTranscriptionsText}
 							/>
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
 									onclick={async () => {
-										await copyToClipboardWithToast(text);
+										await clipboard.copyTextToClipboardWithToast({
+											label: 'transcribed text (joined)',
+											text: joinedTranscriptionsText,
+										});
 										isDialogOpen = false;
 									}}
 									type="submit"
@@ -413,7 +386,7 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () => deleteRecordingsByIdWithToast(ids),
+								onConfirm: () => recordings.deleteRecordingsByIdWithToast(ids),
 							});
 						}}
 					>

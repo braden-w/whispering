@@ -6,18 +6,24 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import type { Recording } from '$lib/services/db';
+	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
-	import {
-		deleteRecordingByIdWithToast,
-		updateRecordingWithToast,
-	} from './recordingMutations';
 
 	let { recording }: { recording: Recording } = $props();
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
+	let blobUrl = $state<string | null>(null);
+
+	$effect(() => {
+		if (isDialogOpen && recording.blob) {
+			blobUrl = URL.createObjectURL(recording.blob);
+		} else if (!isDialogOpen && blobUrl) {
+			URL.revokeObjectURL(blobUrl);
+			blobUrl = null;
+		}
+	});
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -42,7 +48,7 @@
 			onsubmit={async (e) => {
 				e.preventDefault();
 				isSaving = true;
-				await updateRecordingWithToast(recording);
+				await recordings.updateRecordingWithToast(recording);
 				isSaving = false;
 				isDialogOpen = false;
 			}}
@@ -77,18 +83,17 @@
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="blob" class="text-right">Blob</Label>
-				<audio
-					src={recording.blob ? URL.createObjectURL(recording.blob) : ''}
-					controls
-					class="col-span-3 mt-2 h-8 w-full"
-				></audio>
+				{#if blobUrl}
+					<audio src={blobUrl} controls class="col-span-3 mt-2 h-8 w-full"
+					></audio>
+				{/if}
 			</div>
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={() => {
+					onclick={async () => {
 						isDeleting = true;
-						deleteRecordingByIdWithToast(recording.id);
+						await recordings.deleteRecordingByIdWithToast(recording.id);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

@@ -5,15 +5,16 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { recordings, type Recording } from '$lib/services/db';
+	import { clipboard } from '$lib/utils/clipboard';
+	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
-	import { copyRecordingText } from './(config)/recordings/recordingMutations';
+	import { onDestroy } from 'svelte';
 
 	const latestRecording = $derived<Recording>(
-		recordings.recordings.at(-1) ?? {
+		recordings.value.at(-1) ?? {
 			id: '',
 			title: '',
 			subtitle: '',
@@ -24,11 +25,15 @@
 		},
 	);
 
-	const maybeLatestAudioSrc = $derived(
-		latestRecording.blob
-			? URL.createObjectURL(latestRecording.blob)
-			: undefined,
-	);
+	let prevAudioSrc: string | undefined = undefined;
+	let latestAudioSrc = $derived.by(() => {
+		if (!latestRecording.blob) return undefined;
+
+		if (prevAudioSrc) URL.revokeObjectURL(prevAudioSrc);
+		const newUrl = URL.createObjectURL(latestRecording.blob);
+		prevAudioSrc = newUrl;
+		return newUrl;
+	});
 
 	const recorderStateAsIcon = $derived(
 		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
@@ -52,7 +57,7 @@
 	<div class="relative">
 		<WhisperingButton
 			tooltipContent="Toggle recording"
-			onclick={recorder.toggleRecording}
+			onclick={recorder.toggleRecordingWithToast}
 			variant="ghost"
 			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
 		>
@@ -86,7 +91,11 @@
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
-				onclick={() => copyRecordingText(latestRecording)}
+				onclick={() =>
+					clipboard.copyTextToClipboardWithToast({
+						label: 'transcribed text',
+						text: latestRecording.transcribedText,
+					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
@@ -100,8 +109,7 @@
 				{/if}
 			</WhisperingButton>
 		</div>
-		{#if maybeLatestAudioSrc}
-			{@const latestAudioSrc = maybeLatestAudioSrc}
+		{#if latestAudioSrc}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,

@@ -10,7 +10,7 @@
 {#if recorder.recorderState === 'SESSION+RECORDING'}
 	<WhisperingButton
 		tooltipContent="Cancel recording"
-		onclick={recorder.cancelRecording}
+		onclick={recorder.cancelRecordingWithToast}
 		variant="ghost"
 		size="icon"
 		class={className}
@@ -20,7 +20,7 @@
 	</WhisperingButton>
 {:else if recorder.isInRecordingSession}
 	<WhisperingButton
-		onclick={recorder.closeRecordingSession}
+		onclick={recorder.closeRecordingSessionWithToast}
 		variant="ghost"
 		size="icon"
 		class={className}

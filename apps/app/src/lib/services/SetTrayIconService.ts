@@ -23,17 +23,13 @@ type SetTrayIconService = {
 	) => Promise<SetTrayIconServiceResult<void>>;
 };
 
-export const SetTrayIconService = window.__TAURI_INTERNALS__
-	? createSetTrayIconDesktopService()
-	: createSetTrayIconWebService();
-
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
 		setTrayIcon: async (icon: WhisperingRecordingState) => {
-			const sendMessageToExtensionResult = await extension.setRecorderState({
+			const setRecorderStateResult = await extension.setRecorderState({
 				recorderState: icon,
 			});
-			if (!sendMessageToExtensionResult.ok) return SetTrayIconServiceErr(icon);
+			if (!setRecorderStateResult.ok) return SetTrayIconServiceErr(icon);
 			return Ok(undefined);
 		},
 	};
@@ -58,7 +54,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			tooltip: 'Your App Name',
 			action: (e) => {
 				if ('click' in e) {
-					recorder.toggleRecording();
+					recorder.toggleRecordingWithToast();
 				}
 			},
 		});

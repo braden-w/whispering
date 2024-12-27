@@ -1,4 +1,4 @@
-import { toast } from '$lib/services/ToastService';
+import { toast } from '$lib/utils/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 import {
@@ -122,11 +122,11 @@ function createRegisterShortcuts() {
 		await unregisterAllGlobalShortcuts();
 		registerLocalShortcut({
 			shortcut: settings.value.currentLocalShortcut,
-			callback: recorder.toggleRecording,
+			callback: recorder.toggleRecordingWithToast,
 		});
 		await registerGlobalShortcut({
 			shortcut: settings.value.currentGlobalShortcut,
-			callback: recorder.toggleRecording,
+			callback: recorder.toggleRecordingWithToast,
 		});
 	};
 
