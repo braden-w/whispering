@@ -11,7 +11,7 @@ static AUDIO_THREAD: Lazy<Mutex<Option<(Sender<AudioCommand>, Receiver<AudioResp
     Lazy::new(|| Mutex::new(None));
 
 // Track current recording state
-static CURRENT_RECORDING: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
+static IS_RECORDING: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 
 #[derive(Debug, Error, Serialize)]
 pub enum RecorderError {
@@ -23,9 +23,7 @@ pub enum RecorderError {
     ReceiveError(String),
     #[error("Audio error: {0}")]
     AudioError(String),
-    #[error("IO error: {0}")]
-    IoError(String),
-    #[error("No active recording session")]
+    #[error("No active recording")]
     NoActiveRecording,
     #[error("Failed to acquire lock: {0}")]
     LockError(String),
@@ -47,8 +45,8 @@ pub fn ensure_thread_initialized() -> Result<()> {
     debug!("Thread not initialized, creating new audio thread...");
     let (response_tx, response_rx) = mpsc::channel();
 
-    let command_tx = spawn_audio_thread(response_tx)
-        .map_err(|e: mpsc::SendError<AudioCommand>| RecorderError::SendError(e.to_string()))?;
+    let command_tx =
+        spawn_audio_thread(response_tx).map_err(|e| RecorderError::SendError(e.to_string()))?;
 
     *thread = Some((command_tx, response_rx));
 
@@ -150,7 +148,7 @@ pub async fn close_recording_session() -> Result<()> {
 
         match rx.recv() {
             Ok(AudioResponse::Success(_)) => {
-                *CURRENT_RECORDING.lock().unwrap() = None;
+                *IS_RECORDING.lock().unwrap() = false;
                 Ok(())
             }
             Ok(AudioResponse::Error(e)) => Err(RecorderError::AudioError(e)),
@@ -195,16 +193,14 @@ pub async fn close_thread() -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn start_recording(recording_id: String) -> Result<()> {
-    let filename = format!("{}.wav", recording_id);
-
+pub async fn start_recording() -> Result<()> {
     with_thread(|tx, rx| {
-        tx.send(AudioCommand::StartRecording(filename.clone()))
+        tx.send(AudioCommand::StartRecording)
             .map_err(|e| RecorderError::SendError(e.to_string()))?;
 
         match rx.recv() {
             Ok(AudioResponse::Success(_)) => {
-                *CURRENT_RECORDING.lock().unwrap() = Some(filename);
+                *IS_RECORDING.lock().unwrap() = true;
                 Ok(())
             }
             Ok(AudioResponse::Error(e)) => Err(RecorderError::AudioError(e)),
@@ -215,35 +211,17 @@ pub async fn start_recording(recording_id: String) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn stop_recording() -> Result<Vec<u8>> {
+pub async fn stop_recording() -> Result<Vec<f32>> {
     debug!("Stopping recording");
     with_thread(|tx, rx| {
-        let current_recording = CURRENT_RECORDING
-            .lock()
-            .map_err(|e| RecorderError::LockError(e.to_string()))?
-            .clone();
-        let filename = current_recording.ok_or(RecorderError::NoActiveRecording)?;
-
         tx.send(AudioCommand::StopRecording)
             .map_err(|e| RecorderError::SendError(e.to_string()))?;
 
         match rx.recv() {
-            Ok(AudioResponse::Success(_)) => {
-                debug!("Reading WAV file contents");
-                let contents =
-                    std::fs::read(&filename).map_err(|e| RecorderError::IoError(e.to_string()))?;
-
-                debug!("Cleaning up temporary file");
-                if let Err(e) = std::fs::remove_file(&filename) {
-                    warn!("Failed to clean up temporary file: {}", e);
-                }
-
-                *CURRENT_RECORDING
-                    .lock()
-                    .map_err(|e| RecorderError::LockError(e.to_string()))? = None;
-
-                info!("Recording stopped successfully ({} bytes)", contents.len());
-                Ok(contents)
+            Ok(AudioResponse::AudioData(data)) => {
+                *IS_RECORDING.lock().unwrap() = false;
+                info!("Recording stopped successfully ({} samples)", data.len());
+                Ok(data)
             }
             Ok(AudioResponse::Error(e)) => {
                 error!("Failed to stop recording: {}", e);
@@ -257,27 +235,6 @@ pub async fn stop_recording() -> Result<Vec<u8>> {
                 error!("Failed to receive stop recording response: {}", e);
                 Err(RecorderError::ReceiveError(e.to_string()))
             }
-        }
-    })
-}
-
-#[tauri::command]
-pub async fn cancel_recording() -> Result<()> {
-    with_thread(|tx, rx| {
-        let current_recording = CURRENT_RECORDING.lock().unwrap().clone();
-        let filename = current_recording.ok_or(RecorderError::NoActiveRecording)?;
-
-        tx.send(AudioCommand::CancelRecording(filename))
-            .map_err(|e| RecorderError::SendError(e.to_string()))?;
-
-        match rx.recv() {
-            Ok(AudioResponse::Success(_)) => {
-                *CURRENT_RECORDING.lock().unwrap() = None;
-                Ok(())
-            }
-            Ok(AudioResponse::Error(e)) => Err(RecorderError::AudioError(e)),
-            Ok(_) => Err(RecorderError::AudioError("Unexpected response".to_string())),
-            Err(e) => Err(RecorderError::ReceiveError(e.to_string())),
         }
     })
 }
