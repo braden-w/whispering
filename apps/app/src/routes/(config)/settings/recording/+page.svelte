@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { RecorderService } from '$lib/services';
+	import { userConfiguredServices } from '$lib/services';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';
@@ -9,7 +9,7 @@
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
-			await RecorderService.enumerateRecordingDevices();
+			await userConfiguredServices.RecorderService.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
 			toast.warning(enumerateRecordingDevicesResult.error);
 			return [];

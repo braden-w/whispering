@@ -1,9 +1,9 @@
 import {
 	ClipboardService,
 	NotificationService,
-	RecorderService,
 	RecordingsService,
 	SetTrayIconService,
+	userConfiguredServices,
 } from '$lib/services';
 import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
@@ -61,10 +61,11 @@ function createRecorder() {
 				description: 'Finalizing your audio capture...',
 			});
 
-			const stopResult = await RecorderService.stopRecording(undefined, {
-				sendStatus: (options) =>
-					toast.loading({ id: stopRecordingToastId, ...options }),
-			});
+			const stopResult =
+				await userConfiguredServices.RecorderService.stopRecording(undefined, {
+					sendStatus: (options) =>
+						toast.loading({ id: stopRecordingToastId, ...options }),
+				});
 
 			if (!stopResult.ok) {
 				toast.error({
@@ -204,10 +205,13 @@ function createRecorder() {
 						description: 'Wrapping up your recording session...',
 					});
 					const closeSessionResult =
-						await RecorderService.closeRecordingSession(undefined, {
-							sendStatus: (options) =>
-								toast.loading({ id: stopRecordingToastId, ...options }),
-						});
+						await userConfiguredServices.RecorderService.closeRecordingSession(
+							undefined,
+							{
+								sendStatus: (options) =>
+									toast.loading({ id: stopRecordingToastId, ...options }),
+							},
+						);
 					if (!closeSessionResult.ok) {
 						toast.warning({
 							id: stopRecordingToastId,
@@ -231,16 +235,17 @@ function createRecorder() {
 			description: 'Setting up your recording environment...',
 		});
 		if (!isInRecordingSession) {
-			const initResult = await RecorderService.initRecordingSession(
-				{
-					deviceId: settings.value.selectedAudioInputDeviceId,
-					bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
-				},
-				{
-					sendStatus: (options) =>
-						toast.loading({ id: startRecordingToastId, ...options }),
-				},
-			);
+			const initResult =
+				await userConfiguredServices.RecorderService.initRecordingSession(
+					{
+						deviceId: settings.value.selectedAudioInputDeviceId,
+						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+					},
+					{
+						sendStatus: (options) =>
+							toast.loading({ id: startRecordingToastId, ...options }),
+					},
+				);
 			if (!initResult.ok) {
 				toast.error({
 					id: startRecordingToastId,
@@ -252,13 +257,11 @@ function createRecorder() {
 				return;
 			}
 		}
-		const startRecordingResult = await RecorderService.startRecording(
-			nanoid(),
-			{
+		const startRecordingResult =
+			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
 				sendStatus: (options) =>
 					toast.loading({ id: startRecordingToastId, ...options }),
-			},
-		);
+			});
 		if (!startRecordingResult.ok) {
 			toast.error({
 				id: startRecordingToastId,
@@ -306,10 +309,13 @@ function createRecorder() {
 				title: '⏳ Closing recording session...',
 				description: 'Wrapping things up, just a moment...',
 			});
-			const closeResult = await RecorderService.closeRecordingSession(
-				undefined,
-				{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
-			);
+			const closeResult =
+				await userConfiguredServices.RecorderService.closeRecordingSession(
+					undefined,
+					{
+						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+					},
+				);
 			if (!closeResult.ok) {
 				toast.error({ id: toastId, ...closeResult.error });
 				return;
@@ -337,9 +343,13 @@ function createRecorder() {
 				title: '🔄 Cancelling recording...',
 				description: 'Discarding the current recording...',
 			});
-			const cancelResult = await RecorderService.cancelRecording(undefined, {
-				sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-			});
+			const cancelResult =
+				await userConfiguredServices.RecorderService.cancelRecording(
+					undefined,
+					{
+						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+					},
+				);
 			if (!cancelResult.ok) {
 				toast.error({
 					id: toastId,
@@ -363,12 +373,14 @@ function createRecorder() {
 					title: '⏳ Closing session...',
 					description: 'Wrapping up your recording session...',
 				});
-				const closeSessionResult = await RecorderService.closeRecordingSession(
-					undefined,
-					{
-						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-					},
-				);
+				const closeSessionResult =
+					await userConfiguredServices.RecorderService.closeRecordingSession(
+						undefined,
+						{
+							sendStatus: (options) =>
+								toast.loading({ id: toastId, ...options }),
+						},
+					);
 				if (!closeSessionResult.ok) {
 					toast.error({
 						id: toastId,
