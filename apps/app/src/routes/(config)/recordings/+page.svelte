@@ -122,7 +122,11 @@
 			},
 			header: 'Audio',
 			cell: ({ getValue }) => {
-				const { id, blob } = getValue<{ id: string; blob: Blob }>();
+				const { id, blob } = getValue<{
+					id: string;
+					blob: Recording['blob'];
+				}>();
+				if (!blob) return null;
 				const audioUrl = URL.createObjectURL(blob);
 				return renderComponent(RenderAudioUrl, { recordingId: id, audioUrl });
 			},
