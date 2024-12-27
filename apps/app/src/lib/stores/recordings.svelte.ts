@@ -8,6 +8,7 @@ import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
+import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid';
 
 export type { Recording } from '$lib/services/db/RecordingsService';
@@ -83,11 +84,12 @@ function createRecordings() {
 			{ toastId = nanoid() }: { toastId?: string } = {},
 		) => {
 			if (!recording.blob) {
-				toast.error({
+				const whisperingErr = WhisperingErr({
 					title: '⚠️ Recording blob not found',
 					description: "Your recording doesn't have a blob to transcribe.",
 				});
-				return;
+				toast.error(whisperingErr.error);
+				return whisperingErr;
 			}
 			const setStatusTranscribingResult =
 				await RecordingsService.updateRecording({
