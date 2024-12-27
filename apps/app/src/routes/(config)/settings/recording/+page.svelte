@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { userConfiguredServices } from '$lib/services';
+	import { userConfiguredServices } from '$lib/services.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';

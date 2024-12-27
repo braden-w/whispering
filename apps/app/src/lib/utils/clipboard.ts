@@ -1,4 +1,4 @@
-import { ClipboardService } from '$lib/services';
+import { ClipboardService } from '$lib/services.svelte';
 import { toast } from '$lib/utils/toast';
 
 export const clipboard = {

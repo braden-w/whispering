@@ -4,7 +4,7 @@ import {
 	RecordingsService,
 	SetTrayIconService,
 	userConfiguredServices,
-} from '$lib/services';
+} from '$lib/services.svelte';
 import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';

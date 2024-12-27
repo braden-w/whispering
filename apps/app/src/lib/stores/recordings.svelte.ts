@@ -2,7 +2,7 @@ import {
 	DownloadService,
 	RecordingsService,
 	userConfiguredServices,
-} from '$lib/services';
+} from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db/RecordingsService';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';

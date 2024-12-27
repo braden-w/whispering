@@ -2,21 +2,21 @@ import { settings } from '$lib/stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
-} from './SetTrayIconService';
-import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
-import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import { createRecordingsIndexedDbService } from './db/RecordingsService.svelte.indexedDb';
-import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
-import { createDownloadServiceWeb } from './download/DownloadService.web';
-import { createHttpServiceDesktop } from './http/HttpService.desktop';
-import { createHttpServiceWeb } from './http/HttpService.web';
-import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
-import { NotificationServiceWebLive } from './notifications/NotificationService.web';
-import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
-import { createRecorderServiceWeb } from './recorder/RecorderService.web';
-import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
-import { createTranscriptionServiceGroq } from './transcription/TranscriptionService.groq';
-import { createTranscriptionServiceWhisper } from './transcription/TranscriptionService.whisper';
+} from './services/SetTrayIconService';
+import { createClipboardServiceDesktop } from './services/clipboard/ClipboardService.desktop';
+import { createClipboardServiceWeb } from './services/clipboard/ClipboardService.web';
+import { createRecordingsIndexedDbService } from './services/db/RecordingsService.svelte.indexedDb';
+import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
+import { createDownloadServiceWeb } from './services/download/DownloadService.web';
+import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
+import { createHttpServiceWeb } from './services/http/HttpService.web';
+import { NotificationServiceDesktopLive } from './services/notifications/NotificationService.desktop';
+import { NotificationServiceWebLive } from './services/notifications/NotificationService.web';
+import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
+import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
+import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
+import { createTranscriptionServiceGroq } from './services/transcription/TranscriptionService.groq';
+import { createTranscriptionServiceWhisper } from './services/transcription/TranscriptionService.whisper';
 
 /**
  * Services that are determined by the user's settings.
