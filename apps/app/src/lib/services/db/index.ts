@@ -1,62 +1,88 @@
 import type { Ok } from '@epicenterhq/result';
 import { Err } from '@epicenterhq/result';
+import { DownloadService } from '../DownloadService';
 import { toast } from '../ToastService';
 import { createRecordingsIndexedDbService } from './RecordingsIndexedDbService.svelte';
 
 export const RecordingsService = createRecordingsIndexedDbService();
 
-export const recordings = {
-	get value() {
-		return RecordingsService.recordings;
-	},
-	updateRecordingWithToast: async (recording: Recording) => {
-		const result = await RecordingsService.updateRecording(recording);
-		if (!result.ok) {
-			toast.error({
-				title: 'Failed to update recording!',
-				description: 'Your recording could not be updated.',
-			});
-			return;
-		}
-		toast.success({
-			title: 'Updated recording!',
-			description: 'Your recording has been updated successfully.',
-		});
-		return;
-	},
+export const recordings = createRecordings();
 
-	deleteRecordingByIdWithToast: async (id: string) => {
-		const result = await RecordingsService.deleteRecordingById(id);
-		if (!result.ok) {
-			toast.error({
-				title: 'Failed to delete recording!',
-				description: 'Your recording could not be deleted.',
-			});
-			return;
-		}
-		toast.success({
-			title: 'Deleted recording!',
-			description: 'Your recording has been deleted successfully.',
-		});
-		return;
-	},
+function createRecordings() {
+	return {
+		get value() {
+			return RecordingsService.recordings;
+		},
 
-	deleteRecordingsByIdWithToast: async (ids: string[]) => {
-		const result = await RecordingsService.deleteRecordingsById(ids);
-		if (!result.ok) {
-			toast.error({
-				title: 'Failed to delete recordings!',
-				description: 'Your recordings could not be deleted.',
+		updateRecordingWithToast: async (recording: Recording) => {
+			const result = await RecordingsService.updateRecording(recording);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to update recording!',
+					description: 'Your recording could not be updated.',
+				});
+				return;
+			}
+			toast.success({
+				title: 'Updated recording!',
+				description: 'Your recording has been updated successfully.',
 			});
 			return;
-		}
-		toast.success({
-			title: 'Deleted recordings!',
-			description: 'Your recordings have been deleted successfully.',
-		});
-		return;
-	},
-};
+		},
+
+		deleteRecordingByIdWithToast: async (id: string) => {
+			const result = await RecordingsService.deleteRecordingById(id);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to delete recording!',
+					description: 'Your recording could not be deleted.',
+				});
+				return;
+			}
+			toast.success({
+				title: 'Deleted recording!',
+				description: 'Your recording has been deleted successfully.',
+			});
+			return;
+		},
+
+		deleteRecordingsByIdWithToast: async (ids: string[]) => {
+			const result = await RecordingsService.deleteRecordingsById(ids);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to delete recordings!',
+					description: 'Your recordings could not be deleted.',
+				});
+				return;
+			}
+			toast.success({
+				title: 'Deleted recordings!',
+				description: 'Your recordings have been deleted successfully.',
+			});
+			return;
+		},
+
+		downloadRecordingWithToast: async (recording: Recording) => {
+			const result = await DownloadService.downloadBlob({
+				name: `whispering_recording_${recording.id}`,
+				blob: recording.blob,
+			});
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to download recording!',
+					description: 'Your recording could not be downloaded.',
+					action: { type: 'more-details', error: result.error },
+				});
+				return;
+			}
+			toast.success({
+				title: 'Recording downloading!',
+				description: 'Your recording is being downloaded.',
+			});
+			return;
+		},
+	};
+}
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
