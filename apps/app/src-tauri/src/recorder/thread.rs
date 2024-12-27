@@ -11,7 +11,7 @@ use std::sync::{
     Arc,
 };
 
-const RING_BUFFER_SIZE: usize = 32768; // 32KB buffer
+const RING_BUFFER_SIZE: usize = 5_760_000; // 5,760,000 samples minimum
 
 #[derive(Debug)]
 pub enum AudioCommand {
@@ -91,19 +91,30 @@ pub fn spawn_audio_thread(
                     };
 
                     let config = match device.default_input_config() {
-                        Ok(config) => config,
+                        Ok(config) => {
+                            println!(
+                                "Initializing recording with sample rate: {} Hz",
+                                config.sample_rate().0
+                            );
+                            config
+                        }
                         Err(e) => {
                             response_tx.send(AudioResponse::Error(e.to_string()))?;
                             continue;
                         }
                     };
 
+                    let sample_rate = config.sample_rate().0;
                     let stream = match device.build_input_stream(
                         &config.into(),
                         move |data: &[f32], _: &_| {
                             if is_recording_producer.load(Ordering::Relaxed) {
                                 if let Ok(mut producer) = producer_clone.lock() {
-                                    println!("Audio callback received {} samples", data.len());
+                                    println!(
+                                        "Audio callback received {} samples at {} Hz",
+                                        data.len(),
+                                        sample_rate
+                                    );
                                     let mut pushed = 0;
                                     for &sample in data {
                                         if producer.try_push(sample).is_ok() {
@@ -159,31 +170,20 @@ pub fn spawn_audio_thread(
 
                 AudioCommand::StopRecording => {
                     if let Some(session) = &current_session {
-                        // First collect all audio data while the stream is still running
+                        // First stop recording to prevent new data from coming in
+                        session.is_recording.store(false, Ordering::Relaxed);
+
+                        // Then collect all available audio data
                         let mut audio_data = Vec::new();
                         if let Ok(mut consumer) = session.consumer.lock() {
                             while let Some(sample) = consumer.try_pop() {
                                 audio_data.push(sample);
                             }
                         }
-                        println!("First drain collected {} samples", audio_data.len());
+                        println!("Collected {} samples from recording", audio_data.len());
 
-                        // Then stop the recording and stream
-                        session.is_recording.store(false, Ordering::Relaxed);
+                        // Finally stop the stream
                         session.stream.pause().unwrap_or_default();
-
-                        // Give a small delay to collect any remaining samples
-                        std::thread::sleep(std::time::Duration::from_millis(100));
-                        
-                        // Collect any remaining samples
-                        let initial_len = audio_data.len();
-                        if let Ok(mut consumer) = session.consumer.lock() {
-                            while let Some(sample) = consumer.try_pop() {
-                                audio_data.push(sample);
-                            }
-                        }
-                        println!("Second drain collected {} additional samples", audio_data.len() - initial_len);
-                        println!("Total samples collected: {}", audio_data.len());
 
                         response_tx.send(AudioResponse::AudioData(audio_data))?;
                     } else {
