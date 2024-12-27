@@ -7,4 +7,4 @@ pub use commands::{
     RecorderError,
 };
 
-pub use thread::{AudioCommand, AudioResponse, RecordingState};
+pub use thread::{AudioCommand, AudioResponse, RecordingSession};

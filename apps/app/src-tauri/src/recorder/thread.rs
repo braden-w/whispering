@@ -1,7 +1,7 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::Stream;
 use ringbuf::storage::Heap;
-use ringbuf::traits::Split;
+use ringbuf::traits::{Consumer, Producer, Split};
 use ringbuf::wrap::caching::Caching;
 use ringbuf::{HeapRb, SharedRb};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -72,7 +72,7 @@ pub fn spawn_audio_thread(
                     let producer_clone = producer.clone();
 
                     let device = match host.input_devices() {
-                        Ok(devices) => {
+                        Ok(mut devices) => {
                             match devices
                                 .find(|d| matches!(d.name(), Ok(name) if name == device_name))
                             {
@@ -105,7 +105,7 @@ pub fn spawn_audio_thread(
                             if is_recording_producer.load(Ordering::Relaxed) {
                                 if let Ok(mut producer) = producer_clone.lock() {
                                     for &sample in data {
-                                        let _ = producer.push(sample);
+                                        let _ = producer.try_push(sample);
                                     }
                                 }
                             }
@@ -161,7 +161,7 @@ pub fn spawn_audio_thread(
 
                         let mut audio_data = Vec::new();
                         if let Ok(mut consumer) = session.consumer.lock() {
-                            while let Some(sample) = consumer.pop() {
+                            while let Some(sample) = consumer.try_pop() {
                                 audio_data.push(sample);
                             }
                         }
