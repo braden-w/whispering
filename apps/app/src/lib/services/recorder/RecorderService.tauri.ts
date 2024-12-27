@@ -47,7 +47,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				description:
 					'Safely closing your recording session and freeing up resources...',
 			});
-			const result = await invoke('close_recording_session');
+			const result = await invoke<void>('close_recording_session');
 			if (!result.ok)
 				return WhisperingErr({
 					title: '⚠️ Session Close Failed',
@@ -62,7 +62,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				title: '🎯 Starting Up',
 				description: 'Preparing your microphone and initializing recording...',
 			});
-			const result = await invoke('start_recording', {
+			const result = await invoke<void>('start_recording', {
 				recordingId,
 			});
 			if (!result.ok)
