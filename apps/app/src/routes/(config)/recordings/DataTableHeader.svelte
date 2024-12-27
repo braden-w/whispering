@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import type { Recording } from '$lib/services/db';
+	import type { Recording } from '$lib/services/db/recordings.svelte';
 	import type { HeaderContext } from '@tanstack/table-core';
 	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-svelte';
 

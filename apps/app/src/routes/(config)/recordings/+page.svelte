@@ -11,8 +11,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { clipboard } from '$lib/services/clipboard';
-	import { recordings, type Recording } from '$lib/services/db';
-	import { recorder } from '$lib/stores/recorder.svelte';
+	import { recordings, type Recording } from '$lib/services/db/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -294,7 +293,7 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recorder.transcribeAndUpdateRecordingWithToast(
+									recordings.transcribeAndUpdateRecordingWithToast(
 										recording.original,
 									),
 								),

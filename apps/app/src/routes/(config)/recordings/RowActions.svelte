@@ -3,8 +3,8 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { clipboard } from '$lib/services/clipboard';
-	import type { Recording } from '$lib/services/db';
-	import { recordings } from '$lib/services/db';
+	import type { Recording } from '$lib/services/db/recordings.svelte';
+	import { recordings } from '$lib/services/db/recordings.svelte';
 	import { transcriptionManager } from '$lib/transcribe.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {

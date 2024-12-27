@@ -1,7 +1,7 @@
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { type DBSchema, openDB } from 'idb';
-import { DbServiceErr, type DbService, type Recording } from '.';
+import { DbServiceErr, type DbService, type Recording } from './recordings.svelte';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;

@@ -3,13 +3,13 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { clipboard } from '$lib/services/clipboard';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import { type Recording, RecordingsService } from '$lib/services/db';
-import { HttpService } from '$lib/services/http/HttpService';
+import {
+	type Recording,
+	RecordingsService,
+	recordings,
+} from '$lib/services/db/recordings.svelte';
 import { RecorderService } from '$lib/services/recorder';
 import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
-import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/TranscriptionServiceGroqLive';
-import { createTranscriptionServiceWhisperLive } from '$lib/services/transcription/TranscriptionServiceWhisperLive';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
@@ -35,28 +35,10 @@ export const recorder = createRecorder();
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
-	const transcribingRecordingIds = $state(new Set<string>());
 
 	const isInRecordingSession = $derived(
 		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
 	);
-
-	const TranscriptionService = $derived.by(() => {
-		switch (settings.value.selectedTranscriptionService) {
-			case 'OpenAI':
-				return createTranscriptionServiceWhisperLive({
-					HttpService,
-				});
-			case 'Groq':
-				return createTranscriptionServiceGroqLive({
-					HttpService,
-				});
-			case 'faster-whisper-server':
-				return createTranscriptionServiceFasterWhisperServerLive({
-					HttpService,
-				});
-		}
-	});
 
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
@@ -72,50 +54,6 @@ function createRecorder() {
 			}
 		};
 		void updateTrayIcon();
-	};
-
-	const transcribeAndUpdateRecording = async ({
-		recording,
-		toastId,
-	}: {
-		recording: Recording;
-		toastId: string;
-	}) => {
-		transcribingRecordingIds.add(recording.id);
-		const transcriptionResult = await TranscriptionService.transcribe(
-			recording.blob,
-		);
-		transcribingRecordingIds.delete(recording.id);
-		if (!transcriptionResult.ok) {
-			return WhisperingErr({
-				id: toastId,
-				title: '❌ Failed to transcribe recording',
-				description:
-					'This is likely due to a temporary issue with the transcription service. Please try again later.',
-				action: { type: 'more-details', error: transcriptionResult.error },
-			});
-		}
-		const transcribedText = transcriptionResult.data;
-		const updatedRecording = {
-			...recording,
-			transcribedText,
-			transcriptionStatus: 'DONE',
-		} satisfies Recording;
-		const saveRecordingToDatabaseResult =
-			await RecordingsService.updateRecording(updatedRecording);
-		if (!saveRecordingToDatabaseResult.ok) {
-			return WhisperingErr({
-				id: toastId,
-				title: '⚠️ Unable to update recording after transcription',
-				description:
-					"Transcription completed but unable to update recording's transcribed text and status in database",
-				action: {
-					type: 'more-details',
-					error: saveRecordingToDatabaseResult.error,
-				},
-			});
-		}
-		return Ok(updatedRecording);
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
@@ -200,10 +138,11 @@ function createRecorder() {
 						});
 					}
 
-					const transcribeAndUpdateResult = await transcribeAndUpdateRecording({
-						recording: newRecording,
-						toastId: stopRecordingToastId,
-					});
+					const transcribeAndUpdateResult =
+						await recordings.transcribeAndUpdateRecording({
+							recording: newRecording,
+							toastId: stopRecordingToastId,
+						});
 					if (!transcribeAndUpdateResult.ok) {
 						toast.error(transcribeAndUpdateResult.error);
 						return;
@@ -468,35 +407,6 @@ function createRecorder() {
 			void playSound('cancel');
 			setRecorderState('IDLE');
 			console.info('Recording cancelled');
-		},
-
-		transcribeAndUpdateRecordingWithToast: async (recording: Recording) => {
-			const toastId = nanoid();
-			const transcribeAndUpdateRecordingResult =
-				await transcribeAndUpdateRecording({
-					recording,
-					toastId,
-				});
-			if (!transcribeAndUpdateRecordingResult.ok) {
-				toast.error(transcribeAndUpdateRecordingResult.error);
-				return;
-			}
-			const { transcribedText } = transcribeAndUpdateRecordingResult.data;
-			toast.success({
-				id: toastId,
-				title: '📋 Recording transcribed!',
-				description: transcribedText,
-				descriptionClass: 'line-clamp-2',
-				action: {
-					type: 'button',
-					label: 'Go to recordings',
-					onClick: () =>
-						clipboard.copyTextToClipboardWithToast({
-							label: 'transcribed text',
-							text: transcribedText,
-						}),
-				},
-			});
 		},
 	};
 }

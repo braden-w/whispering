@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { clipboard } from '$lib/services/clipboard';
-	import { recordings, type Recording } from '$lib/services/db';
+	import { recordings, type Recording } from '$lib/services/db/recordings.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
