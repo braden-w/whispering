@@ -9,9 +9,9 @@ import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
 } from './SetTrayIconService';
-import { createClipboardServiceDesktopLive } from './clipboard/ClipboardServiceDesktopLive';
-import { createClipboardServiceWebLive } from './clipboard/ClipboardServiceWebLive';
-import { createRecordingsIndexedDbService } from './db/RecordingsIndexedDbService.svelte';
+import { createClipboardServiceDesktopLive } from './clipboard/ClipboardService.desktop';
+import { createClipboardServiceWebLive } from './clipboard/ClipboardService.web';
+import { createRecordingsIndexedDbService } from './db/RecordingsService.indexedDb';
 import { createHttpServiceDesktopLive } from './http/HttpService.desktop';
 import { createHttpServiceWebLive } from './http/HttpService.web';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';

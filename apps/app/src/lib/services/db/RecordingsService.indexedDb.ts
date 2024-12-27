@@ -1,7 +1,7 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { type DBSchema, openDB } from 'idb';
-import type { DbService } from '.';
-import { DbServiceErr, type Recording } from '.';
+import type { DbService } from './RecordingsService';
+import { DbServiceErr, type Recording } from './RecordingsService';
 import { toast } from '../../utils/toast';
 
 const DB_NAME = 'RecordingDB' as const;

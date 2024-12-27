@@ -1,6 +1,6 @@
 import type { MaybePromise, WhisperingResult } from '@repo/shared';
-import { createClipboardServiceDesktopLive } from './ClipboardServiceDesktopLive';
-import { createClipboardServiceWebLive } from './ClipboardServiceWebLive';
+import { createClipboardServiceDesktopLive } from './ClipboardService.desktop';
+import { createClipboardServiceWebLive } from './ClipboardService.web';
 
 export type ClipboardService = {
 	/**

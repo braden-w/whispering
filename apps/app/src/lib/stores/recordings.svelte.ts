@@ -1,12 +1,15 @@
 import { DownloadService, createTranscriptionService } from '$lib/services';
-import { type Recording, RecordingsService } from '$lib/services/db';
+import {
+	type Recording,
+	RecordingsService,
+} from '$lib/services/db/RecordingsService';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { nanoid } from 'nanoid';
 
-export type { Recording } from '$lib/services/db';
+export type { Recording } from '$lib/services/db/RecordingsService';
 
 export const recordings = createRecordings();
 
