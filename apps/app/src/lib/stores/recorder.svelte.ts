@@ -159,7 +159,7 @@ function createRecorder() {
 					if (!settings.value.isPasteContentsOnSuccessEnabled) {
 						toast.success({
 							id: stopRecordingToastId,
-							title: '📋 Recording transcribed and copied to clipboard!',
+							title: '📝📋 Recording transcribed and copied to clipboard!',
 							description: transcribedText,
 							descriptionClass: 'line-clamp-2',
 							action: {
@@ -180,7 +180,7 @@ function createRecorder() {
 					if (!pasteResult.ok) {
 						toast.success({
 							id: stopRecordingToastId,
-							title: '📋 Recording transcribed and copied to clipboard!',
+							title: '📝📋 Recording transcribed and copied to clipboard!',
 							description: transcribedText,
 							descriptionClass: 'line-clamp-2',
 						});
@@ -188,7 +188,8 @@ function createRecorder() {
 					}
 					toast.success({
 						id: stopRecordingToastId,
-						title: '✅ Recording transcribed, copied to clipboard, and pasted!',
+						title:
+							'📝📋✍️ Recording transcribed, copied to clipboard, and pasted!',
 						description: transcribedText,
 						descriptionClass: 'line-clamp-2',
 					});
