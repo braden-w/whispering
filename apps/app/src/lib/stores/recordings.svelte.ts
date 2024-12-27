@@ -1,6 +1,6 @@
 import { DownloadService } from '$lib/services/DownloadService';
 import { toast } from '$lib/utils/toast';
-import { clipboard } from '$lib/services/clipboard';
+import { clipboard } from '$lib/utils/clipboard';
 import { type Recording, RecordingsService } from '$lib/services/db';
 import { HttpService } from '$lib/services/http/HttpService';
 import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';

@@ -1,7 +1,7 @@
 import { NotificationService } from '$lib/services/NotificationService';
 import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/utils/toast';
-import { clipboard } from '$lib/services/clipboard';
+import { clipboard } from '$lib/utils/clipboard';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
 import { RecordingsService } from '$lib/services/db';
 import { RecorderService } from '$lib/services/recorder';

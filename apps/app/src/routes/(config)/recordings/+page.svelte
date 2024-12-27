@@ -10,7 +10,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { clipboard } from '$lib/services/clipboard';
+	import { clipboard } from '$lib/utils/clipboard';
 	import { recordings, type Recording } from '$lib/stores/recordings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';

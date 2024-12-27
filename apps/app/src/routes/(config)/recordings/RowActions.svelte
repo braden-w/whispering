@@ -2,7 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
-	import { clipboard } from '$lib/services/clipboard';
+	import { clipboard } from '$lib/utils/clipboard';
 	import type { Recording } from '$lib/stores/recordings.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
