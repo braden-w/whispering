@@ -74,6 +74,50 @@ function createRecorder() {
 		void updateTrayIcon();
 	};
 
+	const transcribeAndUpdateRecording = async ({
+		recording,
+		toastId,
+	}: {
+		recording: Recording;
+		toastId: string;
+	}) => {
+		transcribingRecordingIds.add(recording.id);
+		const transcriptionResult = await TranscriptionService.transcribe(
+			recording.blob,
+		);
+		transcribingRecordingIds.delete(recording.id);
+		if (!transcriptionResult.ok) {
+			return WhisperingErr({
+				id: toastId,
+				title: '❌ Failed to transcribe recording',
+				description:
+					'This is likely due to a temporary issue with the transcription service. Please try again later.',
+				action: { type: 'more-details', error: transcriptionResult.error },
+			});
+		}
+		const transcribedText = transcriptionResult.data;
+		const updatedRecording = {
+			...recording,
+			transcribedText,
+			transcriptionStatus: 'DONE',
+		} satisfies Recording;
+		const saveRecordingToDatabaseResult =
+			await RecordingsService.updateRecording(updatedRecording);
+		if (!saveRecordingToDatabaseResult.ok) {
+			return WhisperingErr({
+				id: toastId,
+				title: '⚠️ Unable to update recording after transcription',
+				description:
+					"Transcription completed but unable to update recording's transcribed text and status in database",
+				action: {
+					type: 'more-details',
+					error: saveRecordingToDatabaseResult.error,
+				},
+			});
+		}
+		return Ok(updatedRecording);
+	};
+
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
 		async () => {
 			const stopRecordingToastId = nanoid();
@@ -156,42 +200,15 @@ function createRecorder() {
 						});
 					}
 
-					transcribingRecordingIds.add(newRecording.id);
-					const transcribeResult = await TranscriptionService.transcribe(
-						newRecording.blob,
-					);
-					transcribingRecordingIds.delete(newRecording.id);
-					if (!transcribeResult.ok) {
-						toast.error({
-							id: stopRecordingToastId,
-							title: '❌ Failed to transcribe recording',
-							description:
-								'This is likely due to a temporary issue with the transcription service. Please try again later.',
-							action: { type: 'more-details', error: transcribeResult.error },
-						});
+					const transcribeAndUpdateResult = await transcribeAndUpdateRecording({
+						recording: newRecording,
+						toastId: stopRecordingToastId,
+					});
+					if (!transcribeAndUpdateResult.ok) {
+						toast.error(transcribeAndUpdateResult.error);
 						return;
 					}
-					const transcribedText = transcribeResult.data;
-
-					const updatedRecording = {
-						...newRecording,
-						transcribedText,
-						transcriptionStatus: 'DONE',
-					} satisfies Recording;
-					const saveRecordingToDatabaseResult =
-						await RecordingsService.updateRecording(updatedRecording);
-					if (!saveRecordingToDatabaseResult.ok) {
-						toast.error({
-							id: stopRecordingToastId,
-							title: '⚠️ Unable to update recording after transcription',
-							description:
-								"Transcription completed but unable to update recording's transcribed text and status in database",
-							action: {
-								type: 'more-details',
-								error: saveRecordingToDatabaseResult.error,
-							},
-						});
-					}
+					const { transcribedText } = transcribeAndUpdateResult.data;
 
 					if (settings.value.isCopyToClipboardEnabled) {
 						toast.loading({
@@ -199,9 +216,8 @@ function createRecorder() {
 							title: '⏳ Copying to clipboard...',
 							description: 'Copying the transcription to your clipboard...',
 						});
-						const copyResult = await ClipboardService.setClipboardText(
-							updatedRecording.transcribedText,
-						);
+						const copyResult =
+							await ClipboardService.setClipboardText(transcribedText);
 						if (!copyResult.ok) {
 							toast.success({
 								id: stopRecordingToastId,
@@ -215,7 +231,7 @@ function createRecorder() {
 									onClick: () =>
 										clipboard.copyTextToClipboardWithToast({
 											label: 'transcribed text',
-											text: updatedRecording.transcribedText,
+											text: transcribedText,
 										}),
 								},
 							});
@@ -227,7 +243,7 @@ function createRecorder() {
 						toast.success({
 							id: stopRecordingToastId,
 							title: '📋 Recording transcribed and copied to clipboard!',
-							description: updatedRecording.transcribedText,
+							description: transcribedText,
 							descriptionClass: 'line-clamp-2',
 							action: {
 								type: 'link',
@@ -242,14 +258,13 @@ function createRecorder() {
 						title: '⏳ Pasting ...',
 						description: 'Pasting the transcription to your cursor...',
 					});
-					const pasteResult = await ClipboardService.writeTextToCursor(
-						updatedRecording.transcribedText,
-					);
+					const pasteResult =
+						await ClipboardService.writeTextToCursor(transcribedText);
 					if (!pasteResult.ok) {
 						toast.success({
 							id: stopRecordingToastId,
 							title: '📋 Recording transcribed and copied to clipboard!',
-							description: updatedRecording.transcribedText,
+							description: transcribedText,
 							descriptionClass: 'line-clamp-2',
 						});
 						return;
@@ -257,7 +272,7 @@ function createRecorder() {
 					toast.success({
 						id: stopRecordingToastId,
 						title: '✅ Recording transcribed, copied to clipboard, and pasted!',
-						description: updatedRecording.transcribedText,
+						description: transcribedText,
 						descriptionClass: 'line-clamp-2',
 					});
 				})(),
@@ -457,25 +472,16 @@ function createRecorder() {
 
 		transcribeAndUpdateRecordingWithToast: async (recording: Recording) => {
 			const toastId = nanoid();
-			const transcriptionResult = await TranscriptionService.transcribe(
-				recording.blob,
-			);
-			if (!transcriptionResult.ok) {
-				toast.error({ id: toastId, ...transcriptionResult.error });
+			const transcribeAndUpdateRecordingResult =
+				await transcribeAndUpdateRecording({
+					recording,
+					toastId,
+				});
+			if (!transcribeAndUpdateRecordingResult.ok) {
+				toast.error(transcribeAndUpdateRecordingResult.error);
 				return;
 			}
-			const transcribedText = transcriptionResult.data;
-			const updatedRecording = {
-				...recording,
-				transcribedText,
-				transcriptionStatus: 'DONE',
-			} satisfies Recording;
-			const updateRecordingResult =
-				await RecordingsService.updateRecording(updatedRecording);
-			if (!updateRecordingResult.ok) {
-				toast.error({ id: toastId, ...updateRecordingResult.error });
-				return;
-			}
+			const { transcribedText } = transcribeAndUpdateRecordingResult.data;
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
