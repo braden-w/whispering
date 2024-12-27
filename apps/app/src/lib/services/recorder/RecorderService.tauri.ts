@@ -122,7 +122,7 @@ async function invoke<T>(command: string, args?: Record<string, unknown>) {
 	});
 }
 
-function createWavFromFloat32(float32Array: Float32Array, sampleRate = 32000) {
+function createWavFromFloat32(float32Array: Float32Array, sampleRate = 96000) {
 	// WAV header parameters
 	const numChannels = 1; // Mono
 	const bitsPerSample = 32;
