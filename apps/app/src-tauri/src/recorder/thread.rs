@@ -2,20 +2,14 @@ use cpal::{
     traits::{DeviceTrait, HostTrait, StreamTrait},
     Stream,
 };
-use ringbuf::{Consumer, HeapRb, Producer};
-use serde::{Deserialize, Serialize};
-use std::sync::mpsc::{self, SendError};
+use ringbuf::{HeapRb, SharedRb};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{
+    mpsc::{self, SendError},
+    Arc,
+};
 
 const RING_BUFFER_SIZE: usize = 32768; // 32KB buffer
-
-#[derive(Debug, Clone)]
-pub enum RecordingState {
-    Idle,
-    Initialized,
-    Recording,
-    Paused,
-    Error(String),
-}
 
 #[derive(Debug)]
 pub enum AudioCommand {
@@ -35,10 +29,10 @@ pub enum AudioResponse {
     Success(String),
 }
 
-struct RecordingSession {
+pub struct RecordingSession {
     stream: Stream,
-    producer: Producer<f32>,
-    consumer: Consumer<f32>,
+    rb: Arc<HeapRb<f32>>,
+    is_recording: Arc<AtomicBool>,
 }
 
 pub fn spawn_audio_thread(
@@ -48,7 +42,7 @@ pub fn spawn_audio_thread(
 
     std::thread::spawn(move || -> Result<(), SendError<AudioResponse>> {
         let host = cpal::default_host();
-        let mut current_recording_session: Option<RecordingSession> = None;
+        let mut current_session: Option<RecordingSession> = None;
 
         while let Ok(cmd) = rx.recv() {
             match cmd {
@@ -62,13 +56,13 @@ pub fn spawn_audio_thread(
                         });
                     response_tx.send(AudioResponse::RecordingDeviceList(devices))?;
                 }
+
                 AudioCommand::InitRecordingSession(device_name) => {
-                    if current_recording_session.is_some() {
-                        response_tx.send(AudioResponse::Success(
-                            "Recording session already initialized".to_string(),
-                        ))?;
-                        continue;
-                    }
+                    // Create a new ring buffer and wrap it in Arc for thread-safe sharing
+                    let rb = Arc::new(HeapRb::new(RING_BUFFER_SIZE));
+                    let rb_producer = rb.clone();
+                    let is_recording = Arc::new(AtomicBool::new(false));
+                    let is_recording_producer = is_recording.clone();
 
                     let device = match host.input_devices() {
                         Ok(devices) => {
@@ -98,17 +92,13 @@ pub fn spawn_audio_thread(
                         }
                     };
 
-                    let ring_buffer = HeapRb::new(RING_BUFFER_SIZE);
-                    let (producer, consumer) = ring_buffer.split();
-
-                    let producer_clone = producer.clone();
                     let stream = match device.build_input_stream(
                         &config.into(),
                         move |data: &[f32], _: &_| {
-                            // Write to ring buffer in the audio callback
-                            for &sample in data {
-                                // Non-blocking write - drop samples if buffer is full
-                                let _ = producer_clone.push(sample);
+                            if is_recording_producer.load(Ordering::Relaxed) {
+                                for &sample in data {
+                                    let _ = rb_producer.push(sample);
+                                }
                             }
                         },
                         |err| eprintln!("Error in audio stream: {}", err),
@@ -124,18 +114,20 @@ pub fn spawn_audio_thread(
                         }
                     };
 
-                    current_recording_session = Some(RecordingSession {
+                    current_session = Some(RecordingSession {
                         stream,
-                        producer,
-                        consumer,
+                        rb,
+                        is_recording,
                     });
 
                     response_tx.send(AudioResponse::Success(
                         "Recording session initialized".to_string(),
                     ))?;
                 }
+
                 AudioCommand::StartRecording => {
-                    if let Some(session) = &current_recording_session {
+                    if let Some(session) = &current_session {
+                        session.is_recording.store(true, Ordering::Relaxed);
                         if let Err(e) = session.stream.play() {
                             response_tx.send(AudioResponse::Error(format!(
                                 "Failed to start stream: {}",
@@ -151,13 +143,14 @@ pub fn spawn_audio_thread(
                         ))?;
                     }
                 }
+
                 AudioCommand::StopRecording => {
-                    if let Some(session) = &current_recording_session {
+                    if let Some(session) = &current_session {
+                        session.is_recording.store(false, Ordering::Relaxed);
                         session.stream.pause().unwrap_or_default();
 
-                        // Collect any remaining data from the ring buffer
                         let mut audio_data = Vec::new();
-                        while let Some(sample) = session.consumer.pop() {
+                        while let Some(sample) = session.rb.pop() {
                             audio_data.push(sample);
                         }
 
@@ -167,8 +160,10 @@ pub fn spawn_audio_thread(
                             .send(AudioResponse::Error("No active recording".to_string()))?;
                     }
                 }
+
                 AudioCommand::CloseRecordingSession => {
-                    if let Some(session) = current_recording_session.take() {
+                    if let Some(session) = current_session.take() {
+                        session.is_recording.store(false, Ordering::Relaxed);
                         drop(session.stream);
                         response_tx.send(AudioResponse::Success(
                             "Recording session closed".to_string(),
@@ -179,8 +174,10 @@ pub fn spawn_audio_thread(
                         ))?;
                     }
                 }
+
                 AudioCommand::CloseThread => {
-                    if let Some(session) = current_recording_session.take() {
+                    if let Some(session) = current_session.take() {
+                        session.is_recording.store(false, Ordering::Relaxed);
                         drop(session.stream);
                     }
                     response_tx.send(AudioResponse::Success("Thread closed".to_string()))?;
