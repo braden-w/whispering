@@ -4,7 +4,7 @@ import type {
 	RecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
-} from '.';
+} from './RecorderService';
 
 const TIMESLICE_MS = 1000;
 

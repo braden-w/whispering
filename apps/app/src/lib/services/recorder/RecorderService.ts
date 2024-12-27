@@ -1,6 +1,6 @@
 import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
-import { createRecorderServiceTauri } from './RecorderServiceTauri';
-import { createRecorderServiceWeb } from './RecorderServiceWeb';
+import { createRecorderServiceTauri } from './RecorderService.tauri';
+import { createRecorderServiceWeb } from './RecorderService.web';
 
 export type UpdateStatusMessageFn = (args: {
 	title: string;

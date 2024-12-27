@@ -1,13 +1,10 @@
-import { createTranscriptionServiceFasterWhisperServerLive } from './transcription/TranscriptionServiceFasterWhisperServerLive';
-import { createTranscriptionServiceGroqLive } from './transcription/TranscriptionServiceGroqLive';
-import { createTranscriptionServiceWhisperLive } from './transcription/TranscriptionServiceWhisperLive';
 import type { Settings } from '@repo/shared';
 import {
 	createDownloadServiceDesktopLive,
 	createDownloadServiceWebLive,
 } from './DownloadService';
-import { NotificationServiceDesktopLive } from './NotificationServiceDesktopLive';
-import { NotificationServiceWebLive } from './NotificationServiceWebLive';
+import { NotificationServiceDesktopLive } from './NotificationService.desktop';
+import { NotificationServiceWebLive } from './NotificationService.web';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
@@ -15,9 +12,12 @@ import {
 import { createClipboardServiceDesktopLive } from './clipboard/ClipboardServiceDesktopLive';
 import { createClipboardServiceWebLive } from './clipboard/ClipboardServiceWebLive';
 import { createRecordingsIndexedDbService } from './db/RecordingsIndexedDbService.svelte';
-import { createHttpServiceDesktopLive } from './http/HttpServiceDesktopLive';
-import { createHttpServiceWebLive } from './http/HttpServiceWebLive';
-import { createRecorderServiceWeb } from './recorder/RecorderServiceWeb';
+import { createHttpServiceDesktopLive } from './http/HttpService.desktop';
+import { createHttpServiceWebLive } from './http/HttpService.web';
+import { createRecorderServiceWeb } from './recorder/RecorderService.web';
+import { createTranscriptionServiceFasterWhisperServerLive } from './transcription/TranscriptionService.fasterWhisperServer';
+import { createTranscriptionServiceGroqLive } from './transcription/TranscriptionService.groq';
+import { createTranscriptionServiceWhisperLive } from './transcription/TranscriptionService.whisper';
 
 export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktopLive()
