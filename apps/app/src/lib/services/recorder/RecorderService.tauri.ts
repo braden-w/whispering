@@ -89,8 +89,8 @@ export function createRecorderServiceTauri(): RecorderService {
 					action: { type: 'more-details', error: result.error },
 				});
 
-			const uint8Array = new Uint8Array(result.data);
-			const blob = new Blob([uint8Array], { type: 'audio/wav' });
+			const uint8Array = new Float32Array(result.data);
+			const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
 			return Ok(blob);
 		},
 		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
