@@ -3,9 +3,9 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { toast } from '$lib/services/ToastService';
 	import { recorder } from '$lib/stores/recorder.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -66,23 +66,10 @@
 		window.cancelRecording = recorder.cancelRecordingWithToast;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
-			const sendMessageToExtensionResult =
+			const notifyWhisperingTabReadyResult =
 				await extension.notifyWhisperingTabReady(undefined);
-			if (!sendMessageToExtensionResult.ok) {
-				renderErrAsToast({
-					variant: 'error',
-					title: 'Error notifying extension that tab is ready',
-					description: 'Error sending message to extension',
-					action: {
-						type: 'more-details',
-						error: sendMessageToExtensionResult.error,
-					},
-				});
-			}
-			const notifyWhisperingTabReadyResult = sendMessageToExtensionResult.data;
 			if (!notifyWhisperingTabReadyResult.ok) {
-				renderErrAsToast({
-					variant: 'error',
+				toast.error({
 					title: 'Error notifying extension that tab is ready',
 					description: 'Error sending message to extension',
 					action: {

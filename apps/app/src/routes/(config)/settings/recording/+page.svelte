@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+	import { RecorderService } from '$lib/services/recorder';
+	import { toast } from '$lib/services/ToastService';
+	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { RecorderService } from '$lib/services/recorder';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
 			await RecorderService.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
-			renderErrAsToast(enumerateRecordingDevicesResult.error);
+			toast.warning(enumerateRecordingDevicesResult.error);
 			return [];
 		}
 		return enumerateRecordingDevicesResult.data;

@@ -3,9 +3,9 @@ import { SetTrayIconService } from '$lib/services/SetTrayIconService';
 import { toast } from '$lib/services/ToastService';
 import { clipboard } from '$lib/services/clipboard';
 import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import { type Recording, recordings } from '$lib/stores/recordings.svelte';
+import { RecordingsService } from '$lib/services/db';
 import { RecorderService } from '$lib/services/recorder';
-import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
+import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
@@ -20,7 +20,6 @@ import { nanoid } from 'nanoid/non-secure';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-import { RecordingsService } from '$lib/services/db';
 
 const startSound = new Audio(startSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
@@ -39,18 +38,16 @@ function createRecorder() {
 
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		const updateTrayIcon = async () => {
+		void (async () => {
 			const result = await SetTrayIconService.setTrayIcon(newValue);
 			if (!result.ok) {
-				renderErrAsToast({
-					variant: 'warning',
+				toast.warning({
 					title: `🚫 Could not set tray icon to ${recorderState} icon...`,
 					description: 'Please check your system tray settings',
 					action: { type: 'more-details', error: result.error },
 				});
 			}
-		};
-		void updateTrayIcon();
+		})();
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =

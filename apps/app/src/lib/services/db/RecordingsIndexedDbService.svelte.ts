@@ -1,8 +1,8 @@
-import { renderErrAsToast } from '$lib/services/renderErrorAsToast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { type DBSchema, openDB } from 'idb';
 import type { DbService } from '.';
 import { DbServiceErr, type Recording } from '.';
+import { toast } from '../ToastService';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 2 as const;
@@ -109,8 +109,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 				}),
 		});
 		if (!allRecordingsFromDbResult.ok) {
-			return renderErrAsToast({
-				variant: 'error',
+			toast.error({
 				title: 'Failed to initialize recordings',
 				description:
 					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
@@ -119,6 +118,7 @@ export const createRecordingsIndexedDbService = (): DbService => {
 					error: allRecordingsFromDbResult.error,
 				},
 			});
+			return;
 		}
 		recordings = allRecordingsFromDbResult.data;
 	};
