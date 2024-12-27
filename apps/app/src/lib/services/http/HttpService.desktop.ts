@@ -1,6 +1,7 @@
-import { type HttpService, HttpServiceErr } from './HttpService';
 import { tryAsync } from '@epicenterhq/result';
 import { fetch } from '@tauri-apps/plugin-http';
+import type { HttpService } from './HttpService';
+import { HttpServiceErr } from './HttpService';
 
 export function createHttpServiceDesktop(): HttpService {
 	return {
