@@ -1,4 +1,4 @@
-use super::thread::{spawn_audio_thread, AudioCommand, AudioResponse, UserRecordingSessionConfig};
+use super::thread::{spawn_audio_thread, AudioCommand, AudioResponse};
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::sync::mpsc::{self, Receiver, Sender};
@@ -69,8 +69,8 @@ where
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DeviceInfo {
-    #[serde(rename = "deviceId")]
     device_id: String,
     label: String,
 }
@@ -110,14 +110,14 @@ pub async fn enumerate_recording_devices() -> Result<Vec<DeviceInfo>> {
 }
 
 #[tauri::command]
-pub async fn init_recording_session(settings: UserRecordingSessionConfig) -> Result<()> {
+pub async fn init_recording_session(device_name: String) -> Result<()> {
     info!(
-        "Starting init_recording_session with settings: {:?}",
-        settings
+        "Starting init_recording_session with device_name: {}",
+        device_name
     );
     with_thread(|tx, rx| {
         debug!("Sending InitRecordingSession command...");
-        tx.send(AudioCommand::InitRecordingSession(settings))
+        tx.send(AudioCommand::InitRecordingSession(device_name))
             .map_err(|e| RecorderError::SendError(e.to_string()))?;
 
         debug!("Waiting for response...");

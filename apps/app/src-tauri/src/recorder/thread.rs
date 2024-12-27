@@ -11,13 +11,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct UserRecordingSessionConfig {
-    pub device_name: String,
-    pub bits_per_sample: u16,
-}
-
 #[derive(Debug, Clone)]
 pub enum RecordingState {
     Idle,
@@ -31,7 +24,7 @@ pub enum RecordingState {
 pub enum AudioCommand {
     CloseThread,
     EnumerateRecordingDevices,
-    InitRecordingSession(UserRecordingSessionConfig),
+    InitRecordingSession(String),
     CloseRecordingSession,
     StartRecording(String),
     StopRecording,
@@ -68,13 +61,13 @@ pub fn spawn_audio_thread(
                     let devices = host
                         .input_devices()
                         .map(|devices| devices.filter_map(|d| d.name().ok()).collect())
-                        .unwrap_or_else(|e| {
+                        .unwrap_or_else(|e: cpal::DevicesError| {
                             let _ = response_tx.send(AudioResponse::Error(e.to_string()));
                             vec![]
                         });
                     response_tx.send(AudioResponse::RecordingDeviceList(devices))?;
                 }
-                AudioCommand::InitRecordingSession(recording_session_config) => {
+                AudioCommand::InitRecordingSession(device_name) => {
                     if current_recording_session.is_some() {
                         response_tx.send(AudioResponse::Success(
                             "Recording session already initialized".to_string(),
@@ -86,7 +79,7 @@ pub fn spawn_audio_thread(
                         Ok(devices) => {
                             let device_result = devices
                                 .into_iter()
-                                .find(|d| matches!(d.name(), Ok(name) if name == recording_session_config.device_name));
+                                .find(|d| matches!(d.name(), Ok(name) if name == device_name));
 
                             match device_result {
                                 Some(device) => device,
