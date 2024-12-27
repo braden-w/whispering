@@ -103,13 +103,18 @@ pub fn spawn_audio_thread(
                         move |data: &[f32], _: &_| {
                             if is_recording_producer.load(Ordering::Relaxed) {
                                 if let Ok(mut producer) = producer_clone.lock() {
+                                    println!("Audio callback received {} samples", data.len());
+                                    let mut pushed = 0;
                                     for &sample in data {
-                                        let _ = producer.try_push(sample);
+                                        if producer.try_push(sample).is_ok() {
+                                            pushed += 1;
+                                        }
                                     }
+                                    println!("Successfully pushed {} samples", pushed);
                                 }
                             }
                         },
-                        |err| eprintln!("Error in audio stream: {}", err),
+                        |err| eprintln!("Error in stream: {}", err),
                         None,
                     ) {
                         Ok(stream) => stream,
@@ -154,15 +159,31 @@ pub fn spawn_audio_thread(
 
                 AudioCommand::StopRecording => {
                     if let Some(session) = &current_session {
-                        session.is_recording.store(false, Ordering::Relaxed);
-                        session.stream.pause().unwrap_or_default();
-
+                        // First collect all audio data while the stream is still running
                         let mut audio_data = Vec::new();
                         if let Ok(mut consumer) = session.consumer.lock() {
                             while let Some(sample) = consumer.try_pop() {
                                 audio_data.push(sample);
                             }
                         }
+                        println!("First drain collected {} samples", audio_data.len());
+
+                        // Then stop the recording and stream
+                        session.is_recording.store(false, Ordering::Relaxed);
+                        session.stream.pause().unwrap_or_default();
+
+                        // Give a small delay to collect any remaining samples
+                        std::thread::sleep(std::time::Duration::from_millis(100));
+                        
+                        // Collect any remaining samples
+                        let initial_len = audio_data.len();
+                        if let Ok(mut consumer) = session.consumer.lock() {
+                            while let Some(sample) = consumer.try_pop() {
+                                audio_data.push(sample);
+                            }
+                        }
+                        println!("Second drain collected {} additional samples", audio_data.len() - initial_len);
+                        println!("Total samples collected: {}", audio_data.len());
 
                         response_tx.send(AudioResponse::AudioData(audio_data))?;
                     } else {
