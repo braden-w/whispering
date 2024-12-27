@@ -83,13 +83,52 @@ pub fn spawn_audio_thread(
                         }
                     };
 
-                    let config = match device.default_input_config() {
-                        Ok(config) => {
-                            println!(
-                                "Initializing recording with sample rate: {} Hz",
-                                config.sample_rate().0
-                            );
-                            config
+                    // Config can sometimes be overkill (96kHz with 3 channels)
+                    // Attempt to create config with lower voice-friendly parameters, otherwise use default config
+                    let config = match device.supported_input_configs() {
+                        Ok(mut supported_configs) => {
+                            // Find a config with voice-friendly parameters
+                            let voice_config = supported_configs.find(|config| {
+                                let min_rate = config.min_sample_rate().0;
+                                let max_rate = config.max_sample_rate().0;
+                                let channels = config.channels();
+
+                                // Look for mono or stereo config that supports common voice sample rates
+                                (channels == 1 || channels == 2)
+                                    && (min_rate..=max_rate).contains(&16000)
+                            });
+
+                            match voice_config {
+                                Some(config) => {
+                                    // Use 16kHz for voice and prefer mono if available
+                                    let config = config.with_sample_rate(cpal::SampleRate(16000));
+                                    println!(
+                                        "Using voice-optimized config: {} Hz, {} channels",
+                                        config.sample_rate().0,
+                                        config.channels()
+                                    );
+                                    config
+                                }
+                                None => {
+                                    // If no voice-friendly config found, try to get default and optimize it
+                                    let default_config = match device.default_input_config() {
+                                        Ok(config) => config,
+                                        Err(e) => {
+                                            response_tx.send(AudioResponse::Error(format!(
+                                                "Failed to get default input config: {}",
+                                                e
+                                            )))?;
+                                            continue;
+                                        }
+                                    };
+                                    println!(
+                                        "No voice-optimized config found. Default config: {} Hz, {} channels",
+                                        default_config.sample_rate().0,
+                                        default_config.channels()
+                                    );
+                                    default_config
+                                }
+                            }
                         }
                         Err(e) => {
                             response_tx.send(AudioResponse::Error(e.to_string()))?;
