@@ -1,19 +1,17 @@
 import type { Settings } from '@repo/shared';
 import {
-	createDownloadServiceDesktop,
-	createDownloadServiceWeb,
-} from './DownloadService';
-import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
-import { NotificationServiceWebLive } from './notifications/NotificationService.web';
-import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
 } from './SetTrayIconService';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
 import { createRecordingsIndexedDbService } from './db/RecordingsService.indexedDb';
+import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
+import { createDownloadServiceWeb } from './download/DownloadService.web';
 import { createHttpServiceDesktop } from './http/HttpService.desktop';
 import { createHttpServiceWeb } from './http/HttpService.web';
+import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
+import { NotificationServiceWebLive } from './notifications/NotificationService.web';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroq } from './transcription/TranscriptionService.groq';
