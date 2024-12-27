@@ -17,20 +17,20 @@ export const createClipboardServiceWebLive = (): ClipboardService => ({
 		});
 
 		if (!setClipboardResult.ok) {
-			const sendMessageToExtensionResult = await extension.setClipboardText({
+			const setClipboardTextResult = await extension.setClipboardText({
 				transcribedText: text,
 			});
-			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+			if (!setClipboardTextResult.ok) return setClipboardTextResult;
 			return Ok(undefined);
 		}
 		return Ok(undefined);
 	},
 
 	writeTextToCursor: async (text) => {
-		const sendMessageToExtensionResult = await extension.writeTextToCursor({
+		const writeTextToCursorResult = await extension.writeTextToCursor({
 			transcribedText: text,
 		});
-		if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
+		if (!writeTextToCursorResult.ok) return writeTextToCursorResult;
 		return Ok(undefined);
 	},
 });

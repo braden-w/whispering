@@ -406,15 +406,15 @@ async function playSound(
 		return Ok(undefined);
 	}
 
-	const sendMessageToExtensionResult = await extension.playSound({ sound });
+	const playSoundResult = await extension.playSound({ sound });
 
-	if (!sendMessageToExtensionResult.ok)
+	if (!playSoundResult.ok)
 		return WhisperingErr({
 			title: '❌ Failed to Play Sound',
 			description: `We encountered an issue while playing the ${sound} sound`,
 			action: {
 				type: 'more-details',
-				error: sendMessageToExtensionResult.error,
+				error: playSoundResult.error,
 			},
 		});
 	return Ok(undefined);

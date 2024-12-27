@@ -30,10 +30,10 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
 		setTrayIcon: async (icon: WhisperingRecordingState) => {
-			const sendMessageToExtensionResult = await extension.setRecorderState({
+			const setRecorderStateResult = await extension.setRecorderState({
 				recorderState: icon,
 			});
-			if (!sendMessageToExtensionResult.ok) return SetTrayIconServiceErr(icon);
+			if (!setRecorderStateResult.ok) return SetTrayIconServiceErr(icon);
 			return Ok(undefined);
 		},
 	};

@@ -1,23 +1,23 @@
+import { Ok } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
 import type { NotificationService } from './NotificationService';
 
 export const createNotificationServiceWeb = (): NotificationService => {
 	return {
 		notify: async (notifyOptions) => {
-			const sendMessageToExtensionResult = await extension.createNotification({
+			const createNotificationResult = await extension.createNotification({
 				notifyOptions,
 			});
-			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
-			const createNotificationResult = sendMessageToExtensionResult.data;
-			return createNotificationResult;
+			if (!createNotificationResult.ok) return createNotificationResult;
+			const notificationId = createNotificationResult.data;
+			return Ok(notificationId);
 		},
 		clear: async (notificationId: string) => {
-			const sendMessageToExtensionResult = await extension.clearNotification({
+			const clearNotificationResult = await extension.clearNotification({
 				notificationId,
 			});
-			if (!sendMessageToExtensionResult.ok) return sendMessageToExtensionResult;
-			const clearNotificationResult = sendMessageToExtensionResult.data;
-			return clearNotificationResult;
+			if (!clearNotificationResult.ok) return clearNotificationResult;
+			return Ok(undefined);
 		},
 	};
 };
