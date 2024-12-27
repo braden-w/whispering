@@ -4,7 +4,7 @@ import {
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from './TranscriptionService';
-import { WhisperResponseSchema } from './WhisperResponseSchema';
+import { whisperApiResponseSchema } from './schemas';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
@@ -61,19 +61,22 @@ export const createTranscriptionServiceWhisperLive = ({
 			formData,
 			url: 'https://api.openai.com/v1/audio/transcriptions',
 			headers: { Authorization: `Bearer ${settings.value.openAiApiKey}` },
-			schema: WhisperResponseSchema,
+			schema: whisperApiResponseSchema,
 		});
 		if (!postResponseResult.ok) {
 			return HttpServiceErrIntoTranscriptionServiceErr(postResponseResult);
 		}
-		const data = postResponseResult.data;
-		if ('error' in data) {
+		const whisperApiResponse = postResponseResult.data;
+		if ('error' in whisperApiResponse) {
 			return TranscriptionServiceErr({
 				title: 'Server error from Whisper API',
 				description: 'This is likely a problem with OpenAI, not you.',
-				action: { type: 'more-details', error: data.error.message },
+				action: {
+					type: 'more-details',
+					error: whisperApiResponse.error.message,
+				},
 			});
 		}
-		return Ok(data.text.trim());
+		return Ok(whisperApiResponse.text.trim());
 	},
 });

@@ -4,7 +4,7 @@ import {
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from './TranscriptionService';
-import { WhisperResponseSchema } from './WhisperResponseSchema';
+import { whisperApiResponseSchema } from './schemas';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
@@ -60,20 +60,20 @@ export const createTranscriptionServiceGroqLive = ({
 		const postResult = await HttpService.post({
 			url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 			formData,
-			schema: WhisperResponseSchema,
+			schema: whisperApiResponseSchema,
 			headers: { Authorization: `Bearer ${settings.value.groqApiKey}` },
 		});
 		if (!postResult.ok) {
 			return HttpServiceErrIntoTranscriptionServiceErr(postResult);
 		}
-		const data = postResult.data;
-		if ('error' in data) {
+		const whisperApiResponse = postResult.data;
+		if ('error' in whisperApiResponse) {
 			return TranscriptionServiceErr({
 				title: 'Server error from Groq API',
 				description: 'This is likely a problem with Groq, not you.',
-				action: { type: 'more-details', error: data.error.message },
+				action: { type: 'more-details', error: whisperApiResponse.error.message },
 			});
 		}
-		return Ok(data.text.trim());
+		return Ok(whisperApiResponse.text.trim());
 	},
 });

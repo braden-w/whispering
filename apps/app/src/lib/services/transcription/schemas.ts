@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const WhisperResponseSchema = z.union([
+export const whisperApiResponseSchema = z.union([
 	z.object({
 		text: z.string(),
 	}),

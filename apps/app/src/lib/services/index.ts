@@ -3,8 +3,8 @@ import {
 	createDownloadServiceDesktopLive,
 	createDownloadServiceWebLive,
 } from './DownloadService';
-import { NotificationServiceDesktopLive } from './NotificationService.desktop';
-import { NotificationServiceWebLive } from './NotificationService.web';
+import { NotificationServiceDesktopLive } from './notifications/NotificationService.desktop';
+import { NotificationServiceWebLive } from './notifications/NotificationService.web';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,

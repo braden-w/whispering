@@ -4,7 +4,7 @@ import {
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from './TranscriptionService';
-import { WhisperResponseSchema } from './WhisperResponseSchema';
+import { whisperApiResponseSchema } from './schemas';
 import { settings } from '$lib/stores/settings.svelte.js';
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
@@ -37,19 +37,22 @@ export const createTranscriptionServiceFasterWhisperServerLive = ({
 		const postResult = await HttpService.post({
 			url: `${settings.value.fasterWhisperServerUrl}/v1/audio/transcriptions`,
 			formData,
-			schema: WhisperResponseSchema,
+			schema: whisperApiResponseSchema,
 		});
 		if (!postResult.ok) {
 			return HttpServiceErrIntoTranscriptionServiceErr(postResult);
 		}
-		const data = postResult.data;
-		if ('error' in data) {
+		const whisperApiResponse = postResult.data;
+		if ('error' in whisperApiResponse) {
 			return TranscriptionServiceErr({
 				title: 'faster-whisper-server error',
 				description: 'Please check your faster-whisper-server server settings',
-				action: { type: 'more-details', error: data.error.message },
+				action: {
+					type: 'more-details',
+					error: whisperApiResponse.error.message,
+				},
 			});
 		}
-		return Ok(data.text);
+		return Ok(whisperApiResponse.text);
 	},
 });
