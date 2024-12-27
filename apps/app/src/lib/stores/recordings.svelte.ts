@@ -1,11 +1,9 @@
 import {
 	DownloadService,
 	RecordingsService,
-	createTranscriptionService,
 	userConfiguredServices,
 } from '$lib/services';
 import type { Recording } from '$lib/services/db/RecordingsService';
-import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
