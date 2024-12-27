@@ -1,9 +1,11 @@
-use cpal::{
-    traits::{DeviceTrait, HostTrait, StreamTrait},
-    Stream,
-};
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::Stream;
+use ringbuf::storage::Heap;
+use ringbuf::traits::Split;
+use ringbuf::wrap::caching::Caching;
 use ringbuf::{HeapRb, SharedRb};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
 use std::sync::{
     mpsc::{self, SendError},
     Arc,
@@ -31,8 +33,9 @@ pub enum AudioResponse {
 
 pub struct RecordingSession {
     stream: Stream,
-    rb: Arc<HeapRb<f32>>,
     is_recording: Arc<AtomicBool>,
+    producer: Arc<Mutex<Caching<Arc<SharedRb<Heap<f32>>>, true, false>>>,
+    consumer: Arc<Mutex<Caching<Arc<SharedRb<Heap<f32>>>, false, true>>>,
 }
 
 pub fn spawn_audio_thread(
@@ -59,10 +62,14 @@ pub fn spawn_audio_thread(
 
                 AudioCommand::InitRecordingSession(device_name) => {
                     // Create a new ring buffer and wrap it in Arc for thread-safe sharing
-                    let rb = Arc::new(HeapRb::new(RING_BUFFER_SIZE));
-                    let rb_producer = rb.clone();
-                    let is_recording = Arc::new(AtomicBool::new(false));
+                    let rb = HeapRb::<f32>::new(RING_BUFFER_SIZE);
+                    let (rb_producer, rb_consumer) = rb.split();
+
+                    let producer = Arc::new(Mutex::new(rb_producer));
+                    let consumer = Arc::new(Mutex::new(rb_consumer));
+                    let is_recording: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
                     let is_recording_producer = is_recording.clone();
+                    let producer_clone = producer.clone();
 
                     let device = match host.input_devices() {
                         Ok(devices) => {
@@ -96,8 +103,10 @@ pub fn spawn_audio_thread(
                         &config.into(),
                         move |data: &[f32], _: &_| {
                             if is_recording_producer.load(Ordering::Relaxed) {
-                                for &sample in data {
-                                    let _ = rb_producer.push(sample);
+                                if let Ok(mut producer) = producer_clone.lock() {
+                                    for &sample in data {
+                                        let _ = producer.push(sample);
+                                    }
                                 }
                             }
                         },
@@ -116,8 +125,9 @@ pub fn spawn_audio_thread(
 
                     current_session = Some(RecordingSession {
                         stream,
-                        rb,
                         is_recording,
+                        producer,
+                        consumer,
                     });
 
                     response_tx.send(AudioResponse::Success(
@@ -150,8 +160,10 @@ pub fn spawn_audio_thread(
                         session.stream.pause().unwrap_or_default();
 
                         let mut audio_data = Vec::new();
-                        while let Some(sample) = session.rb.pop() {
-                            audio_data.push(sample);
+                        if let Ok(mut consumer) = session.consumer.lock() {
+                            while let Some(sample) = consumer.pop() {
+                                audio_data.push(sample);
+                            }
                         }
 
                         response_tx.send(AudioResponse::AudioData(audio_data))?;
