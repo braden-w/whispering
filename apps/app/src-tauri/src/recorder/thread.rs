@@ -103,35 +103,15 @@ pub fn spawn_audio_thread(
                         }
                     };
 
-                    let supported_configs = match device.supported_input_configs() {
-                        Ok(configs) => configs,
+                    let default_device_config = match device.default_input_config() {
+                        Ok(config) => config,
                         Err(e) => {
                             let _ = response_tx.send(AudioResponse::Error(e.to_string()));
                             continue;
                         }
                     };
 
-                    let config = supported_configs
-                        .filter(|config| {
-                            let rate = config.min_sample_rate().0;
-                            rate == 48000 || rate == 44100
-                        })
-                        .next()
-                        .map(|range| range.with_sample_rate(cpal::SampleRate(48000)))
-                        .or_else(|| {
-                            // If we can't find 48kHz or 44.1kHz, fall back to default config
-                            device.default_input_config().ok()
-                        });
-
-                    let config = match config {
-                        Some(config) => config,
-                        None => {
-                            let _ = response_tx.send(AudioResponse::Error(
-                                "No suitable audio configuration found".to_string(),
-                            ));
-                            continue;
-                        }
-                    };
+                    let config: cpal::SupportedStreamConfig = default_device_config.into();
 
                     println!("Stream config: {:?}", config);
 
