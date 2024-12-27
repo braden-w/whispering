@@ -1,12 +1,14 @@
-import { NotificationService } from '$lib/services/NotificationService';
-import { SetTrayIconService } from '$lib/services/SetTrayIconService';
-import { toast } from '$lib/utils/toast';
-import { clipboard } from '$lib/utils/clipboard';
-import { ClipboardService } from '$lib/services/clipboard/ClipboardService';
-import { RecordingsService } from '$lib/services/db';
-import { RecorderService } from '$lib/services/recorder';
+import {
+	ClipboardService,
+	NotificationService,
+	RecorderService,
+	RecordingsService,
+	SetTrayIconService,
+} from '$lib/services';
 import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
+import { clipboard } from '$lib/utils/clipboard';
+import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
 import {

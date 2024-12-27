@@ -1,5 +1,5 @@
+import { ClipboardService } from '$lib/services';
 import { toast } from '$lib/utils/toast';
-import { ClipboardService } from '../services/clipboard/ClipboardService';
 
 export const clipboard = {
 	copyTextToClipboardWithToast: async ({

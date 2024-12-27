@@ -2,9 +2,6 @@ import type { WhisperingErrProperties, WhisperingResult } from '@repo/shared';
 import { createRecorderServiceTauri } from './RecorderServiceTauri';
 import { createRecorderServiceWeb } from './RecorderServiceWeb';
 
-// export const RecorderService = createTauriRecorderService();
-export const RecorderService = createRecorderServiceWeb();
-
 export type UpdateStatusMessageFn = (args: {
 	title: string;
 	description: string;

@@ -1,12 +1,8 @@
-import { DownloadService } from '$lib/services/DownloadService';
-import { toast } from '$lib/utils/toast';
-import { clipboard } from '$lib/utils/clipboard';
+import { DownloadService, createTranscriptionService } from '$lib/services';
 import { type Recording, RecordingsService } from '$lib/services/db';
-import { HttpService } from '$lib/services/http/HttpService';
-import { createTranscriptionServiceFasterWhisperServerLive } from '$lib/services/transcription/TranscriptionServiceFasterWhisperServerLive';
-import { createTranscriptionServiceGroqLive } from '$lib/services/transcription/TranscriptionServiceGroqLive';
-import { createTranscriptionServiceWhisperLive } from '$lib/services/transcription/TranscriptionServiceWhisperLive';
 import { settings } from '$lib/stores/settings.svelte';
+import { clipboard } from '$lib/utils/clipboard';
+import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { nanoid } from 'nanoid';
 
@@ -18,22 +14,9 @@ function createRecordings() {
 	const transcribingRecordingIds = $state(new Set<string>());
 	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
 
-	const TranscriptionService = $derived.by(() => {
-		switch (settings.value.selectedTranscriptionService) {
-			case 'OpenAI':
-				return createTranscriptionServiceWhisperLive({
-					HttpService,
-				});
-			case 'Groq':
-				return createTranscriptionServiceGroqLive({
-					HttpService,
-				});
-			case 'faster-whisper-server':
-				return createTranscriptionServiceFasterWhisperServerLive({
-					HttpService,
-				});
-		}
-	});
+	const TranscriptionService = $derived(
+		createTranscriptionService(settings.value.selectedTranscriptionService),
+	);
 
 	return {
 		get value() {

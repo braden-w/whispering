@@ -31,7 +31,7 @@ interface RecordingsDbSchemaV1 extends DBSchema {
 
 type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
 
-export const createRecordingsIndexedDbService = (): DbService => {
+export function createRecordingsIndexedDbService(): DbService {
 	let recordings = $state<Recording[]>([]);
 
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
@@ -272,4 +272,4 @@ export const createRecordingsIndexedDbService = (): DbService => {
 			return Ok(undefined);
 		},
 	};
-};
+}

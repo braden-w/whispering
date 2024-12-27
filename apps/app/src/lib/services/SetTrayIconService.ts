@@ -23,10 +23,6 @@ type SetTrayIconService = {
 	) => Promise<SetTrayIconServiceResult<void>>;
 };
 
-export const SetTrayIconService = window.__TAURI_INTERNALS__
-	? createSetTrayIconDesktopService()
-	: createSetTrayIconWebService();
-
 export function createSetTrayIconWebService(): SetTrayIconService {
 	return {
 		setTrayIcon: async (icon: WhisperingRecordingState) => {

@@ -17,7 +17,3 @@ export type ClipboardService = {
 	 */
 	writeTextToCursor: (text: string) => MaybePromise<WhisperingResult<void>>;
 };
-
-export const ClipboardService = window.__TAURI_INTERNALS__
-	? createClipboardServiceDesktopLive()
-	: createClipboardServiceWebLive();

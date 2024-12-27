@@ -1,7 +1,4 @@
-import { createRecordingsIndexedDbService } from '$lib/services/db/RecordingsIndexedDbService.svelte';
 import { Err, type Ok } from '@epicenterhq/result';
-
-export const RecordingsService = createRecordingsIndexedDbService();
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 

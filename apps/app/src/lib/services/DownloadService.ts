@@ -11,11 +11,7 @@ export type DownloadService = {
 	}) => Promise<WhisperingResult<void>>;
 };
 
-export const DownloadService = window.__TAURI_INTERNALS__
-	? createDownloadServiceDesktopLive()
-	: createDownloadServiceWebLive();
-
-function createDownloadServiceDesktopLive(): DownloadService {
+export function createDownloadServiceDesktopLive(): DownloadService {
 	return {
 		downloadBlob: async ({ name, blob }) => {
 			const extension = getExtensionFromAudioBlob(blob);
@@ -63,7 +59,7 @@ function createDownloadServiceDesktopLive(): DownloadService {
 	};
 }
 
-function createDownloadServiceWebLive(): DownloadService {
+export function createDownloadServiceWebLive(): DownloadService {
 	return {
 		downloadBlob: ({ name, blob }) =>
 			tryAsync({
