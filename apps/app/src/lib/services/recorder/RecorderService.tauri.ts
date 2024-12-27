@@ -18,7 +18,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				});
 			}
 			const deviceInfos = invokeResult.data;
-			return Ok(deviceInfos)
+			return Ok(deviceInfos);
 		},
 		initRecordingSession: async (
 			settings,
@@ -30,11 +30,7 @@ export function createRecorderServiceTauri(): RecorderService {
 					'Initializing your recording session and checking microphone access...',
 			});
 			const result = await invoke('init_recording_session', {
-				settings: {
-					deviceName: 'MacBook Pro Microphone',
-					// deviceName: settings.deviceId,
-					bitsPerSample: settings.bitsPerSecond,
-				},
+				deviceName: settings.deviceId,
 			});
 			if (!result.ok)
 				return WhisperingErr({
