@@ -33,13 +33,6 @@ pub enum RecorderError {
 
 pub type Result<T> = std::result::Result<T, RecorderError>;
 
-#[derive(Debug, Serialize)]
-pub struct DeviceInfo {
-    #[serde(rename = "deviceId")]
-    pub device_id: String,
-    pub label: String,
-}
-
 pub fn ensure_thread_initialized() -> Result<()> {
     debug!("Ensuring thread is initialized...");
     let mut thread = AUDIO_THREAD
@@ -73,6 +66,13 @@ where
         .map_err(|e| RecorderError::LockError(e.to_string()))?;
     let (tx, rx) = thread.as_ref().ok_or(RecorderError::ThreadNotInitialized)?;
     f(tx, rx)
+}
+
+#[derive(Debug, Serialize)]
+pub struct DeviceInfo {
+    #[serde(rename = "deviceId")]
+    device_id: String,
+    label: String,
 }
 
 #[tauri::command]
