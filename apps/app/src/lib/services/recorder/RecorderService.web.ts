@@ -286,18 +286,21 @@ async function hasExistingAudioPermission(): Promise<boolean> {
 		const permissions = await navigator.permissions.query({
 			name: 'microphone' as PermissionName,
 		});
-		if (permissions.state === 'granted') return true;
-		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: {
-				...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
-			},
-		});
-		for (const track of stream.getTracks()) {
-			track.stop();
-		}
-		return false;
+		return permissions.state === 'granted';
 	} catch {
-		return false;
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+				},
+			});
+			for (const track of stream.getTracks()) {
+				track.stop();
+			}
+			return true;
+		} catch {
+			return false;
+		}
 	}
 }
 
@@ -327,6 +330,7 @@ async function getFirstAvailableStream() {
 
 async function enumerateRecordingDevices() {
 	const hasPermission = await hasExistingAudioPermission();
+	console.log('🚀 ~ enumerateRecordingDevices ~ hasPermission:', hasPermission);
 	if (!hasPermission) {
 		await extension.openWhisperingTab({});
 	}
@@ -358,6 +362,7 @@ async function enumerateRecordingDevices() {
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
 	const hasPermission = await hasExistingAudioPermission();
+	console.log('🚀 ~ getStreamForDeviceId ~ hasPermission:', hasPermission);
 	if (!hasPermission) {
 		await extension.openWhisperingTab({});
 	}
