@@ -84,7 +84,9 @@ export function createRecorderServiceWeb(): RecorderService {
 				try: async () => {
 					const allAudioDevicesStream =
 						await navigator.mediaDevices.getUserMedia({
-							audio: true,
+							audio: {
+								...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+							},
 						});
 					const devices = await navigator.mediaDevices.enumerateDevices();
 					for (const track of allAudioDevicesStream.getTracks()) {
@@ -310,7 +312,11 @@ async function hasExistingAudioPermission(): Promise<boolean> {
 			name: 'microphone' as PermissionName,
 		});
 		if (permissions.state === 'granted') return true;
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		const stream = await navigator.mediaDevices.getUserMedia({
+			audio: {
+				...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+			},
+		});
 		for (const track of stream.getTracks()) {
 			track.stop();
 		}
