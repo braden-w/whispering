@@ -221,7 +221,7 @@
 		return '';
 	}
 	let filterQuery = $state(getInitialFilterValue());
-	let selectedRecordingRows = $derived(
+	const selectedRecordingRows = $derived(
 		table.getFilteredSelectedRowModel().rows,
 	);
 
@@ -230,7 +230,7 @@
 
 	let isDialogOpen = $state(false);
 
-	let joinedTranscriptionsText = $derived.by(() => {
+	const joinedTranscriptionsText = $derived.by(() => {
 		const transcriptions = selectedRecordingRows
 			.map(({ original }) => original)
 			.filter((recording) => recording.transcribedText !== '')
