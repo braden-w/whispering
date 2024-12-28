@@ -6,23 +6,26 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
+	import { onDestroy } from 'svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
-	let blobUrl = $state<string | null>(null);
 
-	$effect(() => {
-		if (isDialogOpen && recording.blob) {
-			blobUrl = URL.createObjectURL(recording.blob);
-		} else if (!isDialogOpen && blobUrl) {
-			URL.revokeObjectURL(blobUrl);
-			blobUrl = null;
-		}
+	const blobUrlManager = createBlobUrlManager();
+
+	const blobUrl = $derived.by(() => {
+		if (!recording.blob) return undefined;
+		return blobUrlManager.createUrl(recording.blob);
+	});
+
+	onDestroy(() => {
+		blobUrlManager.revokeCurrentUrl();
 	});
 </script>
 

@@ -5,6 +5,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -25,19 +26,20 @@
 		},
 	);
 
-	let prevAudioSrc: string | undefined = undefined;
-	let latestAudioSrc = $derived.by(() => {
-		if (!latestRecording.blob) return undefined;
-
-		if (prevAudioSrc) URL.revokeObjectURL(prevAudioSrc);
-		const newUrl = URL.createObjectURL(latestRecording.blob);
-		prevAudioSrc = newUrl;
-		return newUrl;
-	});
-
 	const recorderStateAsIcon = $derived(
 		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
 	);
+
+	const blobUrlManager = createBlobUrlManager();
+
+	const blobUrl = $derived.by(() => {
+		if (!latestRecording.blob) return undefined;
+		return blobUrlManager.createUrl(latestRecording.blob);
+	});
+
+	onDestroy(() => {
+		blobUrlManager.revokeCurrentUrl();
+	});
 </script>
 
 <svelte:head>
@@ -109,13 +111,13 @@
 				{/if}
 			</WhisperingButton>
 		</div>
-		{#if latestAudioSrc}
+		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
 					propertyName: 'blob',
 				})}"
-				src={latestAudioSrc}
+				src={blobUrl}
 				controls
 				class="h-8 w-full"
 			></audio>

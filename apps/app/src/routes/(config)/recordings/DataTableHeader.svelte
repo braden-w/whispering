@@ -5,7 +5,7 @@
 	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-svelte';
 
 	let { column }: HeaderContext<Recording, unknown> = $props();
-	let headerText = $derived(column.columnDef.meta?.headerText);
+	const headerText = $derived(column.columnDef.meta?.headerText);
 </script>
 
 <Button
