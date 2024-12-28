@@ -8,6 +8,10 @@ import type {
 import { extension } from '@repo/extension';
 
 const TIMESLICE_MS = 1000;
+const PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS = {
+	channelCount: 1,
+	sampleRate: 16000,
+} satisfies MediaTrackConstraints;
 
 type RecordingSession = {
 	settings: RecordingSessionSettings;
@@ -324,7 +328,9 @@ async function getFirstAvailableStream() {
 				await extension.openWhisperingTab({});
 			}
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-				audio: true,
+				audio: {
+					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+				},
 			});
 			const devices = await navigator.mediaDevices.enumerateDevices();
 			for (const track of allAudioDevicesStream.getTracks()) {
@@ -370,8 +376,7 @@ async function getStreamForDeviceId(recordingDeviceId: string) {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
 					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
+					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 				},
 			});
 			return stream;
