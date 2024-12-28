@@ -1,23 +1,25 @@
-import { onDestroy } from 'svelte';
+export function createBlobUrlManager() {
+	let currentUrl: string | undefined;
 
-/*
- * Creates a URL that is synced to the blob.
- * The URL is revoked when the blob changes.
- */
-export function createUrlSyncedToBlob(blob: Blob) {
-	let previousBlobUrl: string | undefined = undefined;
+	return {
+		createUrl: (blob: Blob | undefined): string | undefined => {
+			if (!blob) return undefined;
 
-	const blobUrl = $derived.by(() => {
-		if (!blob) return undefined;
-		const newUrl = URL.createObjectURL(blob);
-		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
-		previousBlobUrl = newUrl;
-		return newUrl;
-	});
+			// Cleanup previous URL if it exists
+			if (currentUrl) {
+				URL.revokeObjectURL(currentUrl);
+			}
 
-	onDestroy(() => {
-		if (blobUrl) URL.revokeObjectURL(blobUrl);
-	});
+			// Create and store new URL
+			currentUrl = URL.createObjectURL(blob);
+			return currentUrl;
+		},
 
-	return blobUrl;
+		revokeCurrentUrl: () => {
+			if (currentUrl) {
+				URL.revokeObjectURL(currentUrl);
+				currentUrl = undefined;
+			}
+		},
+	};
 }
