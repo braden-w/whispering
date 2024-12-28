@@ -5,8 +5,8 @@ import { WhisperingErr } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
-export async function gotoTargetUrlInWhisperingTab(
-	path: string,
+export async function openWhisperingTab(
+	path?: string,
 ): Promise<WhisperingResult<void>> {
 	const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
 	if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
@@ -16,45 +16,47 @@ export async function gotoTargetUrlInWhisperingTab(
 			title: 'Whispering tab not found',
 			description: 'The Whispering tab was not found.',
 		});
-	const injectScriptResult = await injectScript<undefined, [string]>({
-		tabId: whisperingTabId,
-		commandName: 'goto',
-		func: (route) => {
-			try {
-				window.goto(route);
-				return { ok: true, data: undefined } as const;
-			} catch (error) {
-				return {
-					ok: false,
-					error: {
-						_tag: 'WhisperingError',
-						variant: 'error',
-						title: `Unable to go to route ${route} in Whispering tab`,
-						description:
-							'There was an error going to the route in the Whispering tab.',
-						action: {
-							type: 'more-details',
-							error,
-						},
-					},
-				} as const;
-			}
-		},
-		args: [path],
-	});
-	if (!injectScriptResult.ok) return injectScriptResult;
 	await chrome.tabs.update(whisperingTabId, { active: true });
+	if (path) {
+		const injectScriptResult = await injectScript<undefined, [string]>({
+			tabId: whisperingTabId,
+			commandName: 'goto',
+			func: (route) => {
+				try {
+					window.goto(route);
+					return { ok: true, data: undefined } as const;
+				} catch (error) {
+					return {
+						ok: false,
+						error: {
+							_tag: 'WhisperingError',
+							variant: 'error',
+							title: `Unable to go to route ${route} in Whispering tab`,
+							description:
+								'There was an error going to the route in the Whispering tab.',
+							action: {
+								type: 'more-details',
+								error,
+							},
+						},
+					} as const;
+				}
+			},
+			args: [path],
+		});
+		if (!injectScriptResult.ok) return injectScriptResult;
+	}
 	return Ok(undefined);
 }
 
-export type GotoTargetUrlInWhisperingTabMessage = {
-	path: string;
+export type OpenWhisperingTabMessage = {
+	path?: string;
 };
-export type GotoTargetUrlInWhisperingTabResult = WhisperingResult<void>;
+export type OpenWhisperingTabResult = WhisperingResult<void>;
 
 const handler: PlasmoMessaging.MessageHandler<
-	GotoTargetUrlInWhisperingTabMessage,
-	GotoTargetUrlInWhisperingTabResult
+	OpenWhisperingTabMessage,
+	OpenWhisperingTabResult
 > = async ({ body }, res) => {
 	if (!body?.path) {
 		res.send(
@@ -65,7 +67,7 @@ const handler: PlasmoMessaging.MessageHandler<
 		);
 		return;
 	}
-	res.send(await gotoTargetUrlInWhisperingTab(body.path));
+	res.send(await openWhisperingTab(body.path));
 };
 
 export default handler;

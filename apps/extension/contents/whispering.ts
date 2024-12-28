@@ -16,3 +16,4 @@ relayMessage({ name: 'extension/playSound' });
 relayMessage({ name: 'extension/setClipboardText' });
 relayMessage({ name: 'extension/setRecorderState' });
 relayMessage({ name: 'extension/writeTextToCursor' });
+relayMessage({ name: 'extension/openWhisperingTab' });

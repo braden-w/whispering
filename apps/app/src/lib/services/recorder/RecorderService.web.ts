@@ -5,6 +5,7 @@ import type {
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
 } from './RecorderService';
+import { extension } from '@repo/extension';
 
 const TIMESLICE_MS = 1000;
 
@@ -299,9 +300,29 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 }
 
+async function hasExistingAudioPermission(): Promise<boolean> {
+	try {
+		const permissions = await navigator.permissions.query({
+			name: 'microphone' as PermissionName,
+		});
+		if (permissions.state === 'granted') return true;
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		for (const track of stream.getTracks()) {
+			track.stop();
+		}
+		return false;
+	} catch {
+		return false;
+	}
+}
+
 async function getFirstAvailableStream() {
 	const recordingDevicesResult = await tryAsync({
 		try: async () => {
+			const hasPermission = await hasExistingAudioPermission();
+			if (!hasPermission) {
+				await extension.openWhisperingTab({});
+			}
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
 				audio: true,
 			});
@@ -340,6 +361,10 @@ async function getFirstAvailableStream() {
 }
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
+	const hasPermission = await hasExistingAudioPermission();
+	if (!hasPermission) {
+		await extension.openWhisperingTab({});
+	}
 	return tryAsync({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
