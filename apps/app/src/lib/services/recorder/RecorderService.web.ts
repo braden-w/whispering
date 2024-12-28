@@ -9,8 +9,8 @@ import { extension } from '@repo/extension';
 
 const TIMESLICE_MS = 1000;
 const PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS = {
-	channelCount: 1,
-	sampleRate: 16000,
+	channelCount: { ideal: 1 },
+	sampleRate: { ideal: 16000 },
 } satisfies MediaTrackConstraints;
 
 type RecordingSession = {
