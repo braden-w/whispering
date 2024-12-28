@@ -25,14 +25,17 @@
 		},
 	);
 
-	let prevAudioSrc: string | undefined = undefined;
-	let latestAudioSrc = $derived.by(() => {
+	let previousBlobUrl: string | undefined = undefined;
+	let blobUrl = $derived.by(() => {
 		if (!latestRecording.blob) return undefined;
-
-		if (prevAudioSrc) URL.revokeObjectURL(prevAudioSrc);
 		const newUrl = URL.createObjectURL(latestRecording.blob);
-		prevAudioSrc = newUrl;
+		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
+		previousBlobUrl = newUrl;
 		return newUrl;
+	});
+
+	onDestroy(() => {
+		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
 	});
 
 	const recorderStateAsIcon = $derived(
@@ -109,13 +112,13 @@
 				{/if}
 			</WhisperingButton>
 		</div>
-		{#if latestAudioSrc}
+		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
 					recordingId: latestRecording.id,
 					propertyName: 'blob',
 				})}"
-				src={latestAudioSrc}
+				src={blobUrl}
 				controls
 				class="h-8 w-full"
 			></audio>

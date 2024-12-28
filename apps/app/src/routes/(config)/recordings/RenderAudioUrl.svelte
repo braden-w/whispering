@@ -1,38 +1,33 @@
 <script lang="ts">
+	import { type Recording } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { onDestroy } from 'svelte';
 
-	let { recordingId, audioUrl }: { recordingId: string; audioUrl: string } =
-		$props();
-	let managedAudioUrl = $state<string | null>(null);
+	let { id, blob }: Pick<Recording, 'id' | 'blob'> = $props();
 
-	$effect(() => {
-		// Only create new URL if audioUrl changes
-		if (audioUrl !== managedAudioUrl) {
-			// Cleanup old URL if it exists
-			if (managedAudioUrl) {
-				URL.revokeObjectURL(managedAudioUrl);
-			}
-			managedAudioUrl = audioUrl;
-		}
+	let previousBlobUrl: string | null = null;
+	let blobUrl = $derived.by(() => {
+		if (!blob) return null;
+		const newUrl = URL.createObjectURL(blob);
+		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
+		previousBlobUrl = newUrl;
+		return newUrl;
 	});
 
 	onDestroy(() => {
-		if (managedAudioUrl) {
-			URL.revokeObjectURL(managedAudioUrl);
-		}
+		if (blobUrl) URL.revokeObjectURL(blobUrl);
 	});
 </script>
 
-{#if managedAudioUrl}
+{#if blobUrl}
 	<audio
 		class="h-8"
 		style="view-transition-name: {createRecordingViewTransitionName({
-			recordingId,
+			recordingId: id,
 			propertyName: 'blob',
 		})}"
 		controls
-		src={managedAudioUrl}
+		src={blobUrl}
 	>
 		Your browser does not support the audio element.
 	</audio>

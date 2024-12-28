@@ -8,21 +8,26 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
+	import { onDestroy } from 'svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
-	let blobUrl = $state<string | null>(null);
 
-	$effect(() => {
-		if (isDialogOpen && recording.blob) {
-			blobUrl = URL.createObjectURL(recording.blob);
-		} else if (!isDialogOpen && blobUrl) {
-			URL.revokeObjectURL(blobUrl);
-			blobUrl = null;
-		}
+	let previousBlobUrl: string | undefined = undefined;
+
+	const blobUrl = $derived.by(() => {
+		if (!recording.blob) return undefined;
+		const newUrl = URL.createObjectURL(recording.blob);
+		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
+		previousBlobUrl = newUrl;
+		return newUrl;
+	});
+
+	onDestroy(() => {
+		if (blobUrl) URL.revokeObjectURL(blobUrl);
 	});
 </script>
 
