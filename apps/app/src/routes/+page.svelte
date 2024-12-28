@@ -5,6 +5,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { createBlobUrlManager } from '$lib/services/BlobToUrlService';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -25,22 +26,20 @@
 		},
 	);
 
-	let previousBlobUrl: string | undefined = undefined;
-	let blobUrl = $derived.by(() => {
-		if (!latestRecording.blob) return undefined;
-		const newUrl = URL.createObjectURL(latestRecording.blob);
-		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
-		previousBlobUrl = newUrl;
-		return newUrl;
-	});
-
-	onDestroy(() => {
-		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
-	});
-
 	const recorderStateAsIcon = $derived(
 		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
 	);
+
+	const blobUrlManager = createBlobUrlManager();
+
+	const blobUrl = $derived.by(() => {
+		if (!latestRecording.blob) return undefined;
+		return blobUrlManager.createUrl(latestRecording.blob);
+	});
+
+	onDestroy(() => {
+		blobUrlManager.revokeCurrentUrl();
+	});
 </script>
 
 <svelte:head>

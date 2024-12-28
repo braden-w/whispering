@@ -6,6 +6,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { createBlobUrlManager } from '$lib/services/BlobToUrlService';
 	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
@@ -16,18 +17,15 @@
 	let isDeleting = $state(false);
 	let isSaving = $state(false);
 
-	let previousBlobUrl: string | undefined = undefined;
+	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
 		if (!recording.blob) return undefined;
-		const newUrl = URL.createObjectURL(recording.blob);
-		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
-		previousBlobUrl = newUrl;
-		return newUrl;
+		return blobUrlManager.createUrl(recording.blob);
 	});
 
 	onDestroy(() => {
-		if (blobUrl) URL.revokeObjectURL(blobUrl);
+		blobUrlManager.revokeCurrentUrl();
 	});
 </script>
 

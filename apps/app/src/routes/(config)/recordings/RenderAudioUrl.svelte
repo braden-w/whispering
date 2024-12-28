@@ -1,21 +1,20 @@
 <script lang="ts">
+	import { createBlobUrlManager } from '$lib/services/BlobToUrlService';
 	import { type Recording } from '$lib/stores/recordings.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { onDestroy } from 'svelte';
 
 	let { id, blob }: Pick<Recording, 'id' | 'blob'> = $props();
 
-	let previousBlobUrl: string | null = null;
-	let blobUrl = $derived.by(() => {
-		if (!blob) return null;
-		const newUrl = URL.createObjectURL(blob);
-		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
-		previousBlobUrl = newUrl;
-		return newUrl;
+	const blobUrlManager = createBlobUrlManager();
+
+	const blobUrl = $derived.by(() => {
+		if (!blob) return undefined;
+		return blobUrlManager.createUrl(blob);
 	});
 
 	onDestroy(() => {
-		if (blobUrl) URL.revokeObjectURL(blobUrl);
+		blobUrlManager.revokeCurrentUrl();
 	});
 </script>
 
