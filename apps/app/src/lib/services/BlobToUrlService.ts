@@ -1,21 +1,23 @@
-export const blobToUrlService = createBlobToUrlService();
+import { onDestroy } from 'svelte';
 
-function createBlobToUrlService() {
-	const blobToUrl = new Map<Blob, string>();
+/*
+ * Creates a URL that is synced to the blob.
+ * The URL is revoked when the blob changes.
+ */
+export function createUrlSyncedToBlob(blob: Blob) {
+	let previousBlobUrl: string | undefined = undefined;
 
-	return {
-		createBlobUrl(blob: Blob) {
-			if (blobToUrl.has(blob)) return blobToUrl.get(blob);
-			const url = URL.createObjectURL(blob);
-			blobToUrl.set(blob, url);
-			return url;
-		},
-		revokeBlobUrl(blob: Blob) {
-			const url = blobToUrl.get(blob);
-			if (url) {
-				URL.revokeObjectURL(url);
-				blobToUrl.delete(blob);
-			}
-		},
-	};
+	const blobUrl = $derived.by(() => {
+		if (!blob) return undefined;
+		const newUrl = URL.createObjectURL(blob);
+		if (previousBlobUrl) URL.revokeObjectURL(previousBlobUrl);
+		previousBlobUrl = newUrl;
+		return newUrl;
+	});
+
+	onDestroy(() => {
+		if (blobUrl) URL.revokeObjectURL(blobUrl);
+	});
+
+	return blobUrl;
 }
