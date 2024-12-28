@@ -79,32 +79,7 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 
 	return {
-		enumerateRecordingDevices: async () =>
-			tryAsync({
-				try: async () => {
-					const allAudioDevicesStream =
-						await navigator.mediaDevices.getUserMedia({
-							audio: {
-								...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
-							},
-						});
-					const devices = await navigator.mediaDevices.enumerateDevices();
-					for (const track of allAudioDevicesStream.getTracks()) {
-						track.stop();
-					}
-					const audioInputDevices = devices.filter(
-						(device) => device.kind === 'audioinput',
-					);
-					return audioInputDevices;
-				},
-				mapErr: (error) =>
-					WhisperingErr({
-						title: '🎤 Device Access Error',
-						description:
-							'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-						action: { type: 'more-details', error },
-					}),
-			}),
+		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {
 			if (currentSession) {
@@ -327,12 +302,36 @@ async function hasExistingAudioPermission(): Promise<boolean> {
 }
 
 async function getFirstAvailableStream() {
-	const recordingDevicesResult = await tryAsync({
+	const enumerateDevicesResult = await enumerateRecordingDevices();
+	if (!enumerateDevicesResult.ok)
+		return WhisperingErr({
+			title:
+				'Error enumerating recording devices and acquiring first available stream',
+			description:
+				'Please make sure you have given permission to access your audio devices',
+			action: { type: 'more-details', error: enumerateDevicesResult.error },
+		});
+	const recordingDevices = enumerateDevicesResult.data;
+	for (const device of recordingDevices) {
+		const streamResult = await getStreamForDeviceId(device.deviceId);
+		if (streamResult.ok) {
+			return streamResult;
+		}
+	}
+	return WhisperingErr({
+		title: '🎤 Microphone Access Error',
+		description: 'Unable to connect to your selected microphone',
+		action: { type: 'more-details', error: undefined },
+	});
+}
+
+async function enumerateRecordingDevices() {
+	const hasPermission = await hasExistingAudioPermission();
+	if (!hasPermission) {
+		await extension.openWhisperingTab({});
+	}
+	return tryAsync({
 		try: async () => {
-			const hasPermission = await hasExistingAudioPermission();
-			if (!hasPermission) {
-				await extension.openWhisperingTab({});
-			}
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
 				audio: {
 					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
@@ -349,26 +348,11 @@ async function getFirstAvailableStream() {
 		},
 		mapErr: (error) =>
 			WhisperingErr({
-				title:
-					'Error enumerating recording devices and acquiring first available stream',
+				title: '🎤 Device Access Error',
 				description:
-					'Please make sure you have given permission to access your audio devices',
+					'Oops! We need permission to see your microphones. Check your browser settings and try again!',
 				action: { type: 'more-details', error },
 			}),
-	});
-	if (!recordingDevicesResult.ok) return recordingDevicesResult;
-	const recordingDevices = recordingDevicesResult.data;
-
-	for (const device of recordingDevices) {
-		const streamResult = await getStreamForDeviceId(device.deviceId);
-		if (streamResult.ok) {
-			return streamResult;
-		}
-	}
-	return WhisperingErr({
-		title: '🎤 Microphone Access Error',
-		description: 'Unable to connect to your selected microphone',
-		action: { type: 'more-details', error: undefined },
 	});
 }
 
