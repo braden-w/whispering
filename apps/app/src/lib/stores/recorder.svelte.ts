@@ -16,8 +16,6 @@ import {
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
-const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
-
 export const recorder = createRecorder();
 
 function createRecorder() {
@@ -244,22 +242,11 @@ function createRecorder() {
 		setRecorderState('SESSION+RECORDING');
 		toast.success({
 			id: startRecordingToastId,
-			title: '🎯 Recording Started!',
-			description: 'Your voice is being captured crystal clear',
+			title: '🎙️ Whispering is recording...',
+			description: 'Speak now and stop recording when done',
 		});
 		console.info('Recording started');
 		void PlaySoundService.playSound('start');
-		void NotificationService.notify({
-			variant: 'info',
-			id: IS_RECORDING_NOTIFICATION_ID,
-			title: '🎙️ Whispering is recording...',
-			description: 'Click to go to recorder',
-			action: {
-				type: 'link',
-				label: 'Go to recorder',
-				goto: '/',
-			},
-		});
 	};
 
 	return {

@@ -16,12 +16,12 @@ function createToastService() {
 				void extension.openWhisperingTab({});
 			}
 
-			const notificationResult = NotificationService.notify({
-				variant: toastVariant,
-				...toastOptions,
-			}).then((result) => {
-				console.log('🚀 ~ createToastService ~ notificationResult:', result);
-			});
+			if (toastVariant !== 'loading') {
+				void NotificationService.notify({
+					variant: toastVariant,
+					...toastOptions,
+				});
+			}
 
 			const getDurationInMs = () => {
 				if (toastVariant === 'loading') return 5000;
