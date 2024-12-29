@@ -92,12 +92,7 @@ export function createRecorderServiceWeb(): RecorderService {
 		},
 
 		closeRecordingSession: async (_, { sendStatus }) => {
-			if (!currentSession) {
-				return WhisperingErr({
-					title: '❌ No Active Session',
-					description: "There's no recording session to close at the moment",
-				});
-			}
+			if (!currentSession) return Ok(undefined);
 			sendStatus({
 				title: '🎙️ Cleaning Up',
 				description:
