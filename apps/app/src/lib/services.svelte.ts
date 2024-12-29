@@ -10,8 +10,8 @@ import { createDownloadServiceDesktop } from './services/download/DownloadServic
 import { createDownloadServiceWeb } from './services/download/DownloadService.web';
 import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
 import { createHttpServiceWeb } from './services/http/HttpService.web';
-import { NotificationServiceDesktopLive } from './services/notifications/NotificationService.desktop';
-import { NotificationServiceWebLive } from './services/notifications/NotificationService.web';
+import { createNotificationServiceDesktop } from './services/notifications/NotificationService.desktop';
+import { createNotificationServiceWeb } from './services/notifications/NotificationService.web';
 import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
@@ -29,8 +29,8 @@ export const HttpService = window.__TAURI_INTERNALS__
 	: createHttpServiceWeb();
 
 export const NotificationService = window.__TAURI_INTERNALS__
-	? NotificationServiceDesktopLive
-	: NotificationServiceWebLive;
+	? createNotificationServiceDesktop()
+	: createNotificationServiceWeb();
 
 export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
