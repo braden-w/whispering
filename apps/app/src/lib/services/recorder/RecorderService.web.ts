@@ -5,8 +5,13 @@ import type {
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
 } from './RecorderService';
+import { extension } from '@repo/extension';
 
 const TIMESLICE_MS = 1000;
+const PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS = {
+	channelCount: { ideal: 1 },
+	sampleRate: { ideal: 16000 },
+} satisfies MediaTrackConstraints;
 
 type RecordingSession = {
 	settings: RecordingSessionSettings;
@@ -74,30 +79,7 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 
 	return {
-		enumerateRecordingDevices: async () =>
-			tryAsync({
-				try: async () => {
-					const allAudioDevicesStream =
-						await navigator.mediaDevices.getUserMedia({
-							audio: true,
-						});
-					const devices = await navigator.mediaDevices.enumerateDevices();
-					for (const track of allAudioDevicesStream.getTracks()) {
-						track.stop();
-					}
-					const audioInputDevices = devices.filter(
-						(device) => device.kind === 'audioinput',
-					);
-					return audioInputDevices;
-				},
-				mapErr: (error) =>
-					WhisperingErr({
-						title: '🎤 Device Access Error',
-						description:
-							'Oops! We need permission to see your microphones. Check your browser settings and try again!',
-						action: { type: 'more-details', error },
-					}),
-			}),
+		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {
 			if (currentSession) {
@@ -299,33 +281,38 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 }
 
-async function getFirstAvailableStream() {
-	const recordingDevicesResult = await tryAsync({
-		try: async () => {
-			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-				audio: true,
+async function hasExistingAudioPermission(): Promise<boolean> {
+	try {
+		const permissions = await navigator.permissions.query({
+			name: 'microphone' as PermissionName,
+		});
+		return permissions.state === 'granted';
+	} catch {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 			});
-			const devices = await navigator.mediaDevices.enumerateDevices();
-			for (const track of allAudioDevicesStream.getTracks()) {
+			for (const track of stream.getTracks()) {
 				track.stop();
 			}
-			const audioInputDevices = devices.filter(
-				(device) => device.kind === 'audioinput',
-			);
-			return audioInputDevices;
-		},
-		mapErr: (error) =>
-			WhisperingErr({
-				title:
-					'Error enumerating recording devices and acquiring first available stream',
-				description:
-					'Please make sure you have given permission to access your audio devices',
-				action: { type: 'more-details', error },
-			}),
-	});
-	if (!recordingDevicesResult.ok) return recordingDevicesResult;
-	const recordingDevices = recordingDevicesResult.data;
+			return true;
+		} catch {
+			return false;
+		}
+	}
+}
 
+async function getFirstAvailableStream() {
+	const enumerateDevicesResult = await enumerateRecordingDevices();
+	if (!enumerateDevicesResult.ok)
+		return WhisperingErr({
+			title:
+				'Error enumerating recording devices and acquiring first available stream',
+			description:
+				'Please make sure you have given permission to access your audio devices',
+			action: { type: 'more-details', error: enumerateDevicesResult.error },
+		});
+	const recordingDevices = enumerateDevicesResult.data;
 	for (const device of recordingDevices) {
 		const streamResult = await getStreamForDeviceId(device.deviceId);
 		if (streamResult.ok) {
@@ -339,14 +326,46 @@ async function getFirstAvailableStream() {
 	});
 }
 
+async function enumerateRecordingDevices() {
+	const hasPermission = await hasExistingAudioPermission();
+	if (!hasPermission) {
+		void extension.openWhisperingTab({});
+	}
+	return tryAsync({
+		try: async () => {
+			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
+				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+			});
+			const devices = await navigator.mediaDevices.enumerateDevices();
+			for (const track of allAudioDevicesStream.getTracks()) {
+				track.stop();
+			}
+			const audioInputDevices = devices.filter(
+				(device) => device.kind === 'audioinput',
+			);
+			return audioInputDevices;
+		},
+		mapErr: (error) =>
+			WhisperingErr({
+				title: '🎤 Device Access Error',
+				description:
+					'Oops! We need permission to see your microphones. Check your browser settings and try again!',
+				action: { type: 'more-details', error },
+			}),
+	});
+}
+
 async function getStreamForDeviceId(recordingDeviceId: string) {
+	const hasPermission = await hasExistingAudioPermission();
+	if (!hasPermission) {
+		void extension.openWhisperingTab({});
+	}
 	return tryAsync({
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
 					deviceId: { exact: recordingDeviceId },
-					channelCount: 1, // Mono audio is usually sufficient for voice recording
-					sampleRate: 16000, // 16 kHz is a good balance for voice
+					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 				},
 			});
 			return stream;

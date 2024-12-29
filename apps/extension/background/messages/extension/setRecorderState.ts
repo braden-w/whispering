@@ -4,7 +4,7 @@ import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
-import { whisperingStorage } from '~lib/storage/whisperingStorage';
+import { whisperingStorage } from '~lib/storage';
 
 const iconPaths = {
 	IDLE: studioMicrophone,
@@ -19,7 +19,7 @@ export type SetRecorderStateMessage = {
 export type SetRecorderStateResult = WhisperingResult<undefined>;
 
 const setRecorderState = async (recorderState: WhisperingRecordingState) => {
-	whisperingStorage.setItem('whispering-recorder-state', recorderState);
+	whisperingStorage.setRecorderState(recorderState);
 	const path = iconPaths[recorderState];
 	const setIconResult = await tryAsync({
 		try: () => chrome.action.setIcon({ path }),

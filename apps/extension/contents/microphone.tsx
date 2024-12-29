@@ -7,7 +7,7 @@ import type {
 	PlasmoMountShadowHost,
 } from 'plasmo';
 import { app } from '~lib/app';
-import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
+import { useWhisperingRecorderState } from '~lib/storage';
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () => {
 	const allEditableElements = document.querySelectorAll(

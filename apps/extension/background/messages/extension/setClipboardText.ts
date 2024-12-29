@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from '@plasmohq/messaging';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getActiveTabId } from '~lib/getActiveTabId';
-import { whisperingStorage } from '~lib/storage/whisperingStorage';
+import { whisperingStorage } from '~lib/storage';
 
 export type SetClipboardTextMessage = {
 	transcribedText: string;
@@ -30,10 +30,7 @@ const setClipboardText = async (
 		});
 	}
 
-	whisperingStorage.setItem(
-		'whispering-latest-recording-transcribed-text',
-		transcribedText,
-	);
+	whisperingStorage.setLatestRecordingTranscribedText(transcribedText);
 
 	const injectScriptResult = await injectScript<string, [string]>({
 		tabId: activeTabId,

@@ -5,7 +5,7 @@ import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid';
 import { extension } from '../../../lib/extension';
-import { gotoTargetUrlInWhisperingTab } from './gotoTargetUrlInWhisperingTab';
+import { openWhisperingTab } from './openWhisperingTab';
 
 export type CreateNotificationMessage = {
 	notifyOptions: ToastAndNotifyOptions;
@@ -35,7 +35,7 @@ export const createNotification = async ({
 						if (clickedId === id) {
 							chrome.notifications.clear(id);
 							const gotoTargetUrlInWhisperingTabResult =
-								await gotoTargetUrlInWhisperingTab(action.goto);
+								await openWhisperingTab(action.goto);
 							if (!gotoTargetUrlInWhisperingTabResult.ok) {
 								extension.createNotification({
 									notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
@@ -49,7 +49,7 @@ export const createNotification = async ({
 							if (buttonIndex === 0) {
 								chrome.notifications.clear(id);
 								const gotoTargetUrlInWhisperingTabResult =
-									await gotoTargetUrlInWhisperingTab(action.goto);
+									await openWhisperingTab(action.goto);
 								if (!gotoTargetUrlInWhisperingTabResult.ok) {
 									return extension.createNotification({
 										notifyOptions: gotoTargetUrlInWhisperingTabResult.error,

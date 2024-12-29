@@ -29,6 +29,10 @@ import type {
 	WriteTextToCursorMessage,
 	WriteTextToCursorResult,
 } from '../background/messages/extension/writeTextToCursor';
+import type {
+	OpenWhisperingTabMessage,
+	OpenWhisperingTabResult,
+} from '~background/messages/extension/openWhisperingTab';
 
 type SendMessageToExtensionErrProperties = {
 	_tag: 'SendMessageToExtensionError';
@@ -103,6 +107,13 @@ export const extension = {
 		const result = await sendMessageToExtension<NotifyWhisperingTabReadyResult>(
 			{ name: 'extension/notifyWhisperingTabReady', body },
 		);
+		return result;
+	},
+	openWhisperingTab: async (body: OpenWhisperingTabMessage) => {
+		const result = await sendMessageToExtension<OpenWhisperingTabResult>({
+			name: 'extension/openWhisperingTab',
+			body,
+		});
 		return result;
 	},
 	playSound: async (body: PlaySoundMessage) => {
