@@ -254,12 +254,6 @@ function createRecorder() {
 			return recorderState;
 		},
 
-		get isInRecordingSession() {
-			return (
-				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
-			);
-		},
-
 		closeRecordingSessionWithToast: async () => {
 			const toastId = nanoid();
 			toast.loading({
