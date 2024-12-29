@@ -19,7 +19,7 @@ import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 import {
 	useWhisperingRecorderState,
 	useWhisperingTranscribedText,
-} from '~lib/storage/useWhisperingStorage';
+} from '~lib/storage';
 import './style.css';
 
 function IndexPopup() {

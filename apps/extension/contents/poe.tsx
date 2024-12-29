@@ -7,7 +7,7 @@ import type {
 	PlasmoGetStyle,
 } from 'plasmo';
 import { app } from '~lib/app';
-import { useWhisperingRecorderState } from '~lib/storage/useWhisperingStorage';
+import { useWhisperingRecorderState } from '~lib/storage';
 import { waitForElement } from './utils/waitForElement';
 
 export const getInlineAnchor: PlasmoGetInlineAnchor = async () => {

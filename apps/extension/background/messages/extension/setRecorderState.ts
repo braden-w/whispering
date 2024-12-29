@@ -4,7 +4,7 @@ import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
-import { whisperingStorage } from '~lib/storage/whisperingStorage';
+import { whisperingStorage } from '~lib/storage';
 
 const iconPaths = {
 	IDLE: studioMicrophone,

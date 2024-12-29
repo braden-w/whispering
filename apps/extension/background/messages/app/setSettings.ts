@@ -6,7 +6,7 @@ import {
 } from '@repo/shared';
 import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
-import type { WhisperingStorageKey } from '~lib/storage/keys';
+import type { WhisperingStorageKey } from '~lib/storage';
 
 export type SetSettingsResponse = WhisperingResult<Settings>;
 
