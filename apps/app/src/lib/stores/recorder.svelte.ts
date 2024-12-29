@@ -34,10 +34,6 @@ export const recorder = createRecorder();
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
-	const isInRecordingSession = $derived(
-		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
-	);
-
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
 		void (async () => {
@@ -229,7 +225,7 @@ function createRecorder() {
 			title: '🎙️ Preparing to record...',
 			description: 'Setting up your recording environment...',
 		});
-		if (!isInRecordingSession) {
+		if (recorderState === 'IDLE') {
 			const initResult =
 				await userConfiguredServices.RecorderService.initRecordingSession(
 					{
@@ -245,6 +241,7 @@ function createRecorder() {
 				toast.error({ id: startRecordingToastId, ...initResult.error });
 				return;
 			}
+			setRecorderState('SESSION');
 		}
 		const startRecordingResult =
 			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
@@ -282,7 +279,9 @@ function createRecorder() {
 		},
 
 		get isInRecordingSession() {
-			return isInRecordingSession;
+			return (
+				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
+			);
 		},
 
 		closeRecordingSessionWithToast: async () => {
@@ -312,10 +311,10 @@ function createRecorder() {
 		},
 
 		toggleRecordingWithToast: () => {
-			if (isInRecordingSession) {
-				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
-			} else {
+			if (recorderState === 'IDLE') {
 				void startRecordingWithToast();
+			} else {
+				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 			}
 		},
 
