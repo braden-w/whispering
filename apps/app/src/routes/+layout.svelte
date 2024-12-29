@@ -62,8 +62,7 @@
 	});
 
 	onMount(async () => {
-		window.toggleRecording = recorder.toggleRecordingWithToast;
-		window.cancelRecording = recorder.cancelRecordingWithToast;
+		window.recorder = recorder;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
 			const notifyWhisperingTabReadyResult =
