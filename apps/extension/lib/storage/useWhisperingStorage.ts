@@ -6,10 +6,7 @@ function useWhisperingStorage<T extends WhisperingStorageKey>(
 	key: T,
 	defaultValue: WhisperingStorageKeyMap[T],
 ) {
-	const [value] = useStorage<WhisperingStorageKeyMap[T]>({
-		key,
-		instance: new Storage({ area: 'session' }),
-	});
+	const [value] = useStorage<WhisperingStorageKeyMap[T]>(key);
 	return value ?? defaultValue;
 }
 
