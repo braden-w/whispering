@@ -5,8 +5,16 @@ import { NotificationService } from '$lib/services.svelte';
 import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export const toast = createToastService();
+
+const isFocused = async () => {
+	const isDocumentFocused = document.hasFocus();
+	if (!window.__TAURI_INTERNALS__) return isDocumentFocused;
+	const isWindowFocused = await getCurrentWindow().isFocused();
+	return isWindowFocused && isDocumentFocused;
+};
 
 function createToastService() {
 	const createToastFn =
@@ -16,12 +24,17 @@ function createToastService() {
 				void extension.openWhisperingTab({});
 			}
 
-			if (toastVariant !== 'loading') {
-				void NotificationService.notify({
-					variant: toastVariant,
-					...toastOptions,
-				});
-			}
+			(async () => {
+				if (toastVariant !== 'loading' && !(await isFocused())) {
+					const notifyResult = await NotificationService.notify({
+						variant: toastVariant,
+						...toastOptions,
+					});
+					if (!notifyResult.ok) {
+						console.error('[Toast]', notifyResult.error);
+					}
+				}
+			})();
 
 			const getDurationInMs = () => {
 				if (toastVariant === 'loading') return 5000;
