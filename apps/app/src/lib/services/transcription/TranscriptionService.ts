@@ -25,28 +25,93 @@ export function HttpServiceErrIntoTranscriptionServiceErr(
 	switch (code) {
 		case 'NetworkError':
 			return TranscriptionServiceErr({
-				title: '🌐 Network Hiccup!',
+				title: '🌐 Network Connection Failed',
 				description:
 					error instanceof Error
-						? `Oops! The internet gremlins are at it again: ${error.message}`
-						: 'The internet seems to be playing hide and seek. Please try again later!',
+						? `Unable to reach the transcription service: ${error.message}. Please check your internet connection and try again.`
+						: 'Unable to establish a connection to our transcription service. This could be due to a firewall, VPN, or network connectivity issue.',
 				action: { type: 'more-details', error },
 			});
 
-		case 'HttpError':
+		case 'HttpError': {
+			const status = err.error.status;
+
+			if (status === 401) {
+				return TranscriptionServiceErr({
+					title: '🔑 Authentication Failed',
+					description:
+						'Your API key is invalid or has expired. Please check your API key in the settings.',
+					action: { type: 'more-details', error },
+				});
+			}
+
+			if (status === 403) {
+				return TranscriptionServiceErr({
+					title: '⛔ Access Denied',
+					description:
+						"You don't have permission to use this service. This could be due to account restrictions or exceeded usage limits.",
+					action: { type: 'more-details', error },
+				});
+			}
+
+			if (status === 413) {
+				return TranscriptionServiceErr({
+					title: '📦 Audio File Too Large',
+					description:
+						'The audio file exceeds the maximum size limit. Try splitting it into smaller segments or reducing the audio quality.',
+					action: { type: 'more-details', error },
+				});
+			}
+
+			if (status === 415) {
+				return TranscriptionServiceErr({
+					title: '🎵 Unsupported Audio Format',
+					description:
+						'The audio file format is not supported. Please use MP3, WAV, or other common audio formats.',
+					action: { type: 'more-details', error },
+				});
+			}
+
+			// Rate limiting
+			if (status === 429) {
+				return TranscriptionServiceErr({
+					title: '⏳ Rate Limit Exceeded',
+					description:
+						"You've made too many requests. Please wait a moment before trying again or upgrade your plan for higher limits.",
+					action: { type: 'more-details', error },
+				});
+			}
+
+			if (status >= 500) {
+				return TranscriptionServiceErr({
+					title: '🔧 Server Error',
+					description: `The transcription service is experiencing technical difficulties (Error ${status}).`,
+					action: { type: 'more-details', error },
+				});
+			}
+
 			return TranscriptionServiceErr({
-				title: '🚫 Request Hit a Snag',
-				description: `Houston, we have a problem! The server responded with status ${err.error.status}. Let's try that again, shall we?`,
+				title: '❌ Request Failed',
+				description: `The transcription request failed with status ${status}. This might be temporary - please try again.`,
 				action: { type: 'more-details', error },
 			});
+		}
 
 		case 'ParseError':
 			return TranscriptionServiceErr({
-				title: '🤔 Data Puzzle',
+				title: '🔍 Invalid Response',
 				description:
 					error instanceof Error
-						? `Looks like we got some unexpected data: ${error.message}`
-						: 'The data we received is not quite what we expected. Mind trying again?',
+						? `The transcription service returned an unexpected response format: ${error.message}. This might indicate an API version mismatch.`
+						: "The transcription service response couldn't be processed. This might be due to a service upgrade or temporary issue.",
+				action: { type: 'more-details', error },
+			});
+
+		default:
+			return TranscriptionServiceErr({
+				title: '❓ Unexpected Error',
+				description:
+					'An unexpected error occurred during transcription. Please try again or contact support if the issue persists.',
 				action: { type: 'more-details', error },
 			});
 	}
