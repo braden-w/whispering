@@ -247,21 +247,12 @@ export function createRecorderServiceWeb(): RecorderService {
 			}
 			sendStatus({
 				title: '🛑 Cancelling',
-				description:
-					'Safely stopping your recording and cleaning up resources...',
-			});
-			for (const track of currentSession.stream.getTracks()) {
-				track.stop();
-			}
-			sendStatus({
-				title: '🧹 Almost Done',
-				description: 'Closing recording session and freeing up resources...',
+				description: 'Safely cancelling your recording...',
 			});
 			currentSession.recorder.mediaRecorder.stop();
 			sendStatus({
 				title: '✨ Cancelled',
-				description:
-					'Recording successfully cancelled and all resources cleaned up',
+				description: 'Recording successfully cancelled!',
 			});
 			currentSession.recorder = null;
 			return Ok(undefined);
