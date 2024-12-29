@@ -205,11 +205,7 @@ export function createRecorderServiceWeb(): RecorderService {
 							'stop',
 							() => {
 								if (!currentSession?.recorder?.mediaRecorder) {
-									reject(
-										new Error(
-											'Media recorder was nullified before stop event listener',
-										),
-									);
+									reject(new Error('Media recorder nullified before stop'));
 									return;
 								}
 								const audioBlob = new Blob(
@@ -220,10 +216,6 @@ export function createRecorderServiceWeb(): RecorderService {
 							},
 						);
 						currentSession.recorder.mediaRecorder.stop();
-						sendStatus({
-							title: '✅ Recording Complete',
-							description: 'Successfully saved your audio recording!',
-						});
 					}),
 				mapErr: (error) =>
 					WhisperingErr({
@@ -233,6 +225,10 @@ export function createRecorderServiceWeb(): RecorderService {
 					}),
 			});
 			if (!stopResult.ok) return stopResult;
+			sendStatus({
+				title: '✅ Recording Complete',
+				description: 'Successfully saved your audio recording!',
+			});
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
