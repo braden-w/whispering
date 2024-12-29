@@ -1,6 +1,9 @@
 import { Storage } from '@plasmohq/storage';
 import { useStorage } from '@plasmohq/storage/hook';
 import type { Settings, WhisperingRecordingState } from '@repo/shared';
+
+const storage = new Storage({ area: 'local' });
+
 /**
  * Shared state keys used for communication between extension components:
  * - Content Scripts (injected into web pages)
@@ -32,7 +35,6 @@ export type WhisperingStorageKey = keyof WhisperingStorageKeyMap;
 export const whisperingStorage = createWhisperingStorage();
 
 function createWhisperingStorage() {
-	const storage = new Storage();
 	return {
 		setItem: <K extends WhisperingStorageKey>(
 			key: K,
@@ -47,7 +49,10 @@ function useWhisperingStorage<T extends WhisperingStorageKey>(
 	key: T,
 	defaultValue: WhisperingStorageKeyMap[T],
 ) {
-	const [value] = useStorage<WhisperingStorageKeyMap[T]>(key);
+	const [value] = useStorage<WhisperingStorageKeyMap[T]>({
+		key,
+		instance: storage,
+	});
 	return value ?? defaultValue;
 }
 
