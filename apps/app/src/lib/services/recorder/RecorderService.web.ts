@@ -82,13 +82,6 @@ export function createRecorderServiceWeb(): RecorderService {
 		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {
-			if (currentSession) {
-				return WhisperingErr({
-					title: '🚫 Already in a Recording Session',
-					description:
-						"Looks like we're already in a recording session. Please close the current session before starting a new one.",
-				});
-			}
 			const acquireStreamResult = await acquireStream(settings, {
 				sendStatus,
 			});
