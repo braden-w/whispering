@@ -1,7 +1,7 @@
 import { Storage } from '@plasmohq/storage';
 import type { WhisperingStorageKey, WhisperingStorageKeyMap } from './keys';
 
-const createWhisperingStorage = () => {
+function createWhisperingStorage() {
 	const storage = new Storage({ area: 'session' });
 	return {
 		setItem: <K extends WhisperingStorageKey>(
@@ -11,6 +11,6 @@ const createWhisperingStorage = () => {
 			storage.setItem(key, value);
 		},
 	};
-};
+}
 
 export const whisperingStorage = createWhisperingStorage();

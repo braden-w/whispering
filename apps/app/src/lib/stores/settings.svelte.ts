@@ -27,8 +27,8 @@ export const settings = createPersistedState({
 
 type RegisterShortcutJob = Promise<void>;
 
-const unregisterAllLocalShortcuts = () =>
-	trySync({
+function unregisterAllLocalShortcuts() {
+	return trySync({
 		try: () => hotkeys.unbind(),
 		mapErr: (error) =>
 			WhisperingErr({
@@ -37,9 +37,10 @@ const unregisterAllLocalShortcuts = () =>
 				action: { type: 'more-details', error },
 			}),
 	});
+}
 
-const unregisterAllGlobalShortcuts = () =>
-	tryAsync({
+function unregisterAllGlobalShortcuts() {
+	return tryAsync({
 		try: async () => {
 			if (!window.__TAURI_INTERNALS__) return;
 			const { unregisterAll } = await import(
@@ -54,6 +55,7 @@ const unregisterAllGlobalShortcuts = () =>
 				action: { type: 'more-details', error },
 			}),
 	});
+}
 
 function registerLocalShortcut({
 	shortcut,
