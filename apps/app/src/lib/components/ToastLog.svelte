@@ -25,54 +25,44 @@
 </script>
 
 <script lang="ts">
+	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import type { ToastAndNotifyOptions } from '@repo/shared';
 	import {
-		LogsIcon,
 		AlertCircle,
+		AlertTriangle,
 		CheckCircle2,
 		Info,
 		Loader2,
-		AlertTriangle,
+		LogsIcon,
 	} from 'lucide-svelte';
-	import { Button } from '$lib/components/ui/button';
-	import * as Alert from '$lib/components/ui/alert';
-	import { cn } from '$lib/utils';
-	import type { ToastAndNotifyOptions } from '@repo/shared';
+	import type { Snippet } from 'svelte';
 
-	const variantConfig = {
-		error: {
-			icon: AlertCircle,
-			class:
-				'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
-		},
-		success: {
-			icon: CheckCircle2,
-			class:
-				'border-success/50 text-success dark:border-success [&>svg]:text-success',
-		},
-		info: {
-			icon: Info,
-			class:
-				'border-sky-500/50 text-sky-500 dark:border-sky-500 [&>svg]:text-sky-500',
-		},
-		loading: {
-			icon: Loader2,
-			class: 'border-muted text-muted-foreground [&>svg]:animate-spin',
-		},
-		warning: {
-			icon: AlertTriangle,
-			class:
-				'border-warning/50 text-warning dark:border-warning [&>svg]:text-warning',
-		},
+	const getVariantClass = (variant: ToastAndNotifyOptions['variant']) => {
+		switch (variant) {
+			case 'error':
+				return 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive';
+			case 'warning':
+				return 'border-warning/50 text-warning dark:border-warning [&>svg]:text-warning';
+			case 'success':
+				return 'border-success/50 text-success dark:border-success [&>svg]:text-success';
+			case 'info':
+				return 'border-sky-500/50 text-sky-500 dark:border-sky-500 [&>svg]:text-sky-500';
+			case 'loading':
+				return 'border-muted text-muted-foreground [&>svg]:animate-spin';
+		}
 	};
 </script>
 
 <Dialog.Root bind:open={toastLogDialog.isOpen}>
 	<Dialog.Trigger>
-		<Button variant="outline">
-			<LogsIcon />
-			Logging
-		</Button>
+		{#snippet child({ props })}
+			<Button variant="outline" {...props}>
+				<LogsIcon />
+				Logging
+			</Button>
+		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
 		<Dialog.Header>
@@ -83,15 +73,22 @@
 		</Dialog.Header>
 		<div class="space-y-3 py-4">
 			{#each toastLogDialog.logs as log}
-				{@const config = variantConfig[log.variant]}
-				<Alert.Root class={cn('transition-colors', config.class)}>
-					<svelte:component this={config.icon} class="h-4 w-4" />
-					<Alert.Title
-						class="text-sm font-semibold leading-none tracking-tight"
-					>
+				<Alert.Root class={getVariantClass(log.variant)}>
+					{#if log.variant === 'error'}
+						<AlertCircle class="h-4 w-4" />
+					{:else if log.variant === 'warning'}
+						<AlertTriangle class="h-4 w-4" />
+					{:else if log.variant === 'success'}
+						<CheckCircle2 class="h-4 w-4" />
+					{:else if log.variant === 'info'}
+						<Info class="h-4 w-4" />
+					{:else if log.variant === 'loading'}
+						<Loader2 class="h-4 w-4 animate-spin" />
+					{/if}
+					<Alert.Title>
 						{log.title}
 					</Alert.Title>
-					<Alert.Description class="text-sm opacity-90">
+					<Alert.Description>
 						{log.description}
 					</Alert.Description>
 				</Alert.Root>
