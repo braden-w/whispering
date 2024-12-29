@@ -30,10 +30,7 @@ const setClipboardText = async (
 		});
 	}
 
-	whisperingStorage.setItem(
-		'whispering-latest-recording-transcribed-text',
-		transcribedText,
-	);
+	whisperingStorage.setLatestRecordingTranscribedText(transcribedText);
 
 	const injectScriptResult = await injectScript<string, [string]>({
 		tabId: activeTabId,

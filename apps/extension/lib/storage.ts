@@ -35,12 +35,17 @@ export type WhisperingStorageKey = keyof WhisperingStorageKeyMap;
 export const whisperingStorage = createWhisperingStorage();
 
 function createWhisperingStorage() {
+	const setItem = <K extends WhisperingStorageKey>(
+		key: K,
+		value: WhisperingStorageKeyMap[K],
+	) => storage.setItem(key, value);
+
 	return {
-		setItem: <K extends WhisperingStorageKey>(
-			key: K,
-			value: WhisperingStorageKeyMap[K],
-		) => {
-			storage.setItem(key, value);
+		setRecorderState: (recorderState: WhisperingRecordingState) => {
+			setItem('whispering-recorder-state', recorderState);
+		},
+		setLatestRecordingTranscribedText: (transcribedText: string) => {
+			setItem('whispering-latest-recording-transcribed-text', transcribedText);
 		},
 	};
 }
