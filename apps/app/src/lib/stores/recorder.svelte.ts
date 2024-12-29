@@ -10,14 +10,9 @@ import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
-import { Ok } from '@epicenterhq/result';
-import { extension } from '@repo/extension';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
 	type WhisperingRecordingState,
-	type WhisperingResult,
-	type WhisperingSoundNames,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
