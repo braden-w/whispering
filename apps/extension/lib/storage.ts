@@ -29,6 +29,20 @@ type WhisperingStorageKeyMap = {
 
 export type WhisperingStorageKey = keyof WhisperingStorageKeyMap;
 
+export const whisperingStorage = createWhisperingStorage();
+
+function createWhisperingStorage() {
+	const storage = new Storage();
+	return {
+		setItem: <K extends WhisperingStorageKey>(
+			key: K,
+			value: WhisperingStorageKeyMap[K],
+		) => {
+			storage.setItem(key, value);
+		},
+	};
+}
+
 function useWhisperingStorage<T extends WhisperingStorageKey>(
 	key: T,
 	defaultValue: WhisperingStorageKeyMap[T],
@@ -47,17 +61,3 @@ export function useWhisperingTranscribedText() {
 		'',
 	);
 }
-
-function createWhisperingStorage() {
-	const storage = new Storage();
-	return {
-		setItem: <K extends WhisperingStorageKey>(
-			key: K,
-			value: WhisperingStorageKeyMap[K],
-		) => {
-			storage.setItem(key, value);
-		},
-	};
-}
-
-export const whisperingStorage = createWhisperingStorage();
