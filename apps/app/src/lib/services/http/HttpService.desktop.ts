@@ -22,7 +22,7 @@ export function createHttpServiceDesktop(): HttpService {
 				return HttpServiceErr({
 					code: 'HttpError',
 					status: response.status,
-					error: response,
+					error: await response.json(),
 				});
 			}
 			const parseResult = await tryAsync({

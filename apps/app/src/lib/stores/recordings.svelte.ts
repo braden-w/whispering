@@ -112,13 +112,7 @@ function createRecordings() {
 			if (!transcriptionResult.ok) {
 				toast.error({
 					id: toastId,
-					title: '❌ Failed to transcribe recording',
-					description:
-						'This is likely due to a temporary issue with the transcription service. Please try again later.',
-					action: {
-						type: 'more-details',
-						error: transcriptionResult.error,
-					},
+					...transcriptionResult.error,
 				});
 				return transcriptionResult;
 			}
