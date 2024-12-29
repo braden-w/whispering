@@ -86,6 +86,11 @@ function createRecordings() {
 				toast.error(whisperingErr.error);
 				return whisperingErr;
 			}
+			toast.loading({
+				id: toastId,
+				title: '📋 Transcribing...',
+				description: 'Your recording is being transcribed...',
+			});
 			const setStatusTranscribingResult =
 				await RecordingsService.updateRecording({
 					...recording,
