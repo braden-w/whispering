@@ -1,9 +1,7 @@
+import type { recorder } from '../app/src/lib/stores/recorder.svelte';
 declare global {
 	interface Window {
-		toggleRecording: () => void;
-		cancelRecording: () => void;
+		recorder: typeof recorder;
 		goto: (url: string) => Promise<void>;
 	}
 }
-
-export {};

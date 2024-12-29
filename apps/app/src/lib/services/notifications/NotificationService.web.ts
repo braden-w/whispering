@@ -22,4 +22,3 @@ export function createNotificationServiceWeb(): NotificationService {
 	};
 }
 
-export const NotificationServiceWebLive = createNotificationServiceWeb();

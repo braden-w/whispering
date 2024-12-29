@@ -1,51 +1,72 @@
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import { NotificationService } from '$lib/services.svelte';
 import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export const toast = createToastService();
 
+const isFocused = async () => {
+	const isDocumentFocused = document.hasFocus();
+	if (!window.__TAURI_INTERNALS__) return isDocumentFocused;
+	const isWindowFocused = await getCurrentWindow().isFocused();
+	return isWindowFocused && isDocumentFocused;
+};
+
 function createToastService() {
 	const createToastFn =
-		(variant: ToastAndNotifyOptions['variant']) =>
-		({ title, action, ...options }: Omit<ToastAndNotifyOptions, 'variant'>) => {
-			if (variant === 'error') {
+		(toastVariant: ToastAndNotifyOptions['variant']) =>
+		(toastOptions: Omit<ToastAndNotifyOptions, 'variant'>) => {
+			if (toastVariant === 'error') {
 				void extension.openWhisperingTab({});
 			}
 
+			(async () => {
+				if (toastVariant !== 'loading' && !(await isFocused())) {
+					const notifyResult = await NotificationService.notify({
+						variant: toastVariant,
+						...toastOptions,
+					});
+					if (!notifyResult.ok) {
+						console.error('[Toast]', notifyResult.error);
+					}
+				}
+			})();
+
 			const getDurationInMs = () => {
-				if (variant === 'loading') return 5000;
-				if (variant === 'error' || variant === 'warning') return 5000;
-				if (action) return 4000;
+				if (toastVariant === 'loading') return 5000;
+				if (toastVariant === 'error' || toastVariant === 'warning') return 5000;
+				if (toastOptions.action) return 4000;
 				return 3000;
 			};
 
 			const durationInMs = getDurationInMs();
 
 			if (dev) {
-				const logData = { title, action, ...options };
-				switch (variant) {
+				switch (toastVariant) {
 					case 'error':
-						console.error('[Toast]', logData);
+						console.error('[Toast]', toastOptions);
 						break;
 					case 'warning':
-						console.warn('[Toast]', logData);
+						console.warn('[Toast]', toastOptions);
 						break;
 					case 'info':
-						console.info('[Toast]', logData);
+						console.info('[Toast]', toastOptions);
 						break;
 					case 'loading':
-						console.info('[Toast]', logData);
+						console.info('[Toast]', toastOptions);
 						break;
 					case 'success':
-						console.log('[Toast]', logData);
+						console.log('[Toast]', toastOptions);
 						break;
 				}
 			}
 
-			const id = sonnerToast[variant](title, {
+			const { title, action, ...options } = toastOptions;
+			const id = sonnerToast[toastVariant](title, {
 				...options,
 				duration: durationInMs,
 				action: convertActionToToastAction(action),

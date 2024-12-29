@@ -1,6 +1,7 @@
 import {
 	ClipboardService,
 	NotificationService,
+	PlaySoundService,
 	RecordingsService,
 	SetTrayIconService,
 	userConfiguredServices,
@@ -9,43 +10,27 @@ import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
-import { Ok } from '@epicenterhq/result';
-import { extension } from '@repo/extension';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
 	type WhisperingRecordingState,
-	type WhisperingResult,
-	type WhisperingSoundNames,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-
-const startSound = new Audio(startSoundSrc);
-const stopSound = new Audio(stopSoundSrc);
-const cancelSound = new Audio(cancelSoundSrc);
-
-const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
 export const recorder = createRecorder();
 
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
-	const setRecorderState = (newValue: WhisperingRecordingState) => {
+	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		void (async () => {
-			const result = await SetTrayIconService.setTrayIcon(newValue);
-			if (!result.ok) {
-				toast.warning({
-					title: `🚫 Could not set tray icon to ${recorderState} icon...`,
-					description: 'Please check your system tray settings',
-					action: { type: 'more-details', error: result.error },
-				});
-			}
-		})();
+		const result = await SetTrayIconService.setTrayIcon(newValue);
+		if (!result.ok) {
+			toast.warning({
+				title: `🚫 Could not set tray icon to ${recorderState} icon...`,
+				description: 'Please check your system tray settings',
+				action: { type: 'more-details', error: result.error },
+			});
+		}
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
@@ -67,9 +52,9 @@ function createRecorder() {
 				toast.error({ id: stopRecordingToastId, ...stopResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 			console.info('Recording stopped');
-			void playSound('stop');
+			void PlaySoundService.playSound('stop');
 
 			const blob = stopResult.data;
 			const newRecording: Recording = {
@@ -213,7 +198,7 @@ function createRecorder() {
 						});
 						return;
 					}
-					setRecorderState('IDLE');
+					await setRecorderState('IDLE');
 				})(),
 			]);
 		};
@@ -241,7 +226,7 @@ function createRecorder() {
 				toast.error({ id: startRecordingToastId, ...initResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 		}
 		const startRecordingResult =
 			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
@@ -252,36 +237,19 @@ function createRecorder() {
 			toast.error({ id: startRecordingToastId, ...startRecordingResult.error });
 			return;
 		}
-		setRecorderState('SESSION+RECORDING');
+		await setRecorderState('SESSION+RECORDING');
 		toast.success({
 			id: startRecordingToastId,
-			title: '🎯 Recording Started!',
-			description: 'Your voice is being captured crystal clear',
+			title: '🎙️ Whispering is recording...',
+			description: 'Speak now and stop recording when done',
 		});
 		console.info('Recording started');
-		void playSound('start');
-		void NotificationService.notify({
-			variant: 'info',
-			id: IS_RECORDING_NOTIFICATION_ID,
-			title: '🎙️ Whispering is recording...',
-			description: 'Click to go to recorder',
-			action: {
-				type: 'link',
-				label: 'Go to recorder',
-				goto: '/',
-			},
-		});
+		void PlaySoundService.playSound('start');
 	};
 
 	return {
 		get recorderState() {
 			return recorderState;
-		},
-
-		get isInRecordingSession() {
-			return (
-				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
-			);
 		},
 
 		closeRecordingSessionWithToast: async () => {
@@ -302,7 +270,7 @@ function createRecorder() {
 				toast.error({ id: toastId, ...closeResult.error });
 				return;
 			}
-			setRecorderState('IDLE');
+			await setRecorderState('IDLE');
 			toast.success({
 				id: toastId,
 				title: '✨ Session Closed Successfully',
@@ -336,7 +304,7 @@ function createRecorder() {
 				toast.error({ id: toastId, ...cancelResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 			if (settings.value.isFasterRerecordEnabled) {
 				toast.success({
 					id: toastId,
@@ -344,7 +312,7 @@ function createRecorder() {
 					description:
 						'Recording discarded, but session remains open for a new take',
 				});
-				setRecorderState('SESSION');
+				await setRecorderState('SESSION');
 			} else {
 				toast.loading({
 					id: toastId,
@@ -374,44 +342,10 @@ function createRecorder() {
 					title: '✅ All Done!',
 					description: 'Recording cancelled and session closed successfully',
 				});
-				setRecorderState('IDLE');
+				await setRecorderState('IDLE');
 			}
-			void playSound('cancel');
+			void PlaySoundService.playSound('cancel');
 			console.info('Recording cancelled');
 		},
 	};
-}
-
-async function playSound(
-	sound: WhisperingSoundNames,
-): Promise<WhisperingResult<void>> {
-	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
-
-	if (!document.hidden) {
-		switch (sound) {
-			case 'start':
-				await startSound.play();
-				break;
-			case 'stop':
-				await stopSound.play();
-				break;
-			case 'cancel':
-				await cancelSound.play();
-				break;
-		}
-		return Ok(undefined);
-	}
-
-	const playSoundResult = await extension.playSound({ sound });
-
-	if (!playSoundResult.ok)
-		return WhisperingErr({
-			title: '❌ Failed to Play Sound',
-			description: `We encountered an issue while playing the ${sound} sound`,
-			action: {
-				type: 'more-details',
-				error: playSoundResult.error,
-			},
-		});
-	return Ok(undefined);
 }

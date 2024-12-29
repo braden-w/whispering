@@ -18,7 +18,7 @@
 	>
 		🚫
 	</WhisperingButton>
-{:else if recorder.isInRecordingSession}
+{:else if recorder.recorderState === 'SESSION'}
 	<WhisperingButton
 		onclick={recorder.closeRecordingSessionWithToast}
 		variant="ghost"

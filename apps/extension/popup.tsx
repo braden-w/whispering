@@ -34,24 +34,6 @@ function IndexPopup() {
 	);
 }
 
-async function toggleRecording() {
-	const toggleRecordingResult = await app.toggleRecording();
-	if (!toggleRecordingResult.ok) {
-		extension.createNotification({
-			notifyOptions: toggleRecordingResult.error,
-		});
-	}
-}
-
-async function cancelRecording() {
-	const cancelRecordingResult = await app.cancelRecording();
-	if (!cancelRecordingResult.ok) {
-		extension.createNotification({
-			notifyOptions: cancelRecordingResult.error,
-		});
-	}
-}
-
 function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
@@ -81,7 +63,14 @@ function IndexPage() {
 					<WhisperingButton
 						tooltipContent="Toggle recording"
 						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
-						onClick={toggleRecording}
+						onClick={async () => {
+							const toggleRecordingResult = await app.toggleRecording();
+							if (!toggleRecordingResult.ok) {
+								extension.createNotification({
+									notifyOptions: toggleRecordingResult.error,
+								});
+							}
+						}}
 						aria-label="Toggle recording"
 						variant="ghost"
 					>
@@ -96,11 +85,37 @@ function IndexPage() {
 						<WhisperingButton
 							tooltipContent="Cancel recording"
 							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
-							onClick={cancelRecording}
+							onClick={async () => {
+								const cancelRecordingResult = await app.cancelRecording();
+								if (!cancelRecordingResult.ok) {
+									extension.createNotification({
+										notifyOptions: cancelRecordingResult.error,
+									});
+								}
+							}}
 							aria-label="Cancel recording"
 							variant="ghost"
 						>
 							🚫
+						</WhisperingButton>
+					)}
+					{recorderState === 'SESSION' && (
+						<WhisperingButton
+							tooltipContent="End recording session"
+							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+							onClick={async () => {
+								const closeRecordingSessionResult =
+									await app.closeRecordingSession();
+								if (!closeRecordingSessionResult.ok) {
+									extension.createNotification({
+										notifyOptions: closeRecordingSessionResult.error,
+									});
+								}
+							}}
+							aria-label="End recording session"
+							variant="ghost"
+						>
+							🔴
 						</WhisperingButton>
 					)}
 				</div>

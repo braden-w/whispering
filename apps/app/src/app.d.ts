@@ -1,4 +1,5 @@
 import '@tanstack/svelte-table';
+import type { recorder } from './lib/stores/recorder.svelte';
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
@@ -12,8 +13,7 @@ declare global {
 	}
 	interface Window {
 		__TAURI_INTERNALS__: Record<string, unknown>;
-		toggleRecording: () => void;
-		cancelRecording: () => void;
+		recorder: typeof recorder;
 		goto: (url: string) => Promise<void>;
 	}
 }

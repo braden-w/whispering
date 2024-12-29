@@ -2,6 +2,7 @@ import {
 	SUPPORTED_LANGUAGES_OPTIONS,
 	type Settings,
 	TRANSCRIPTION_SERVICE_OPTIONS,
+	WHISPERING_SETTINGS_PATHNAME,
 	WHISPERING_URL,
 } from '@repo/shared';
 import {
@@ -161,7 +162,11 @@ function SettingsCard() {
 					<Button
 						variant="link"
 						size="inline"
-						onClick={() => chrome.tabs.create({ url: WHISPERING_URL })}
+						onClick={() =>
+							chrome.tabs.create({
+								url: `${WHISPERING_URL}${WHISPERING_SETTINGS_PATHNAME}` as const,
+							})
+						}
 					>
 						Whispering website
 					</Button>
