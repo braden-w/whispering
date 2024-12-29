@@ -1,6 +1,7 @@
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
 
@@ -10,6 +11,10 @@ function createToastService() {
 	const createToastFn =
 		(variant: ToastAndNotifyOptions['variant']) =>
 		({ title, action, ...options }: Omit<ToastAndNotifyOptions, 'variant'>) => {
+			if (variant === 'error') {
+				void extension.openWhisperingTab({});
+			}
+
 			const getDurationInMs = () => {
 				if (variant === 'loading') return 5000;
 				if (variant === 'error' || variant === 'warning') return 5000;
