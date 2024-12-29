@@ -6,7 +6,7 @@ import { injectScript } from '~background/injectScript';
 import { getOrCreateWhisperingTabId } from '~lib/getOrCreateWhisperingTabId';
 
 export async function openWhisperingTab(
-	path?: string,
+	{ path }: OpenWhisperingTabMessage | undefined = { path: undefined },
 ): Promise<WhisperingResult<void>> {
 	const getWhisperingTabIdResult = await getOrCreateWhisperingTabId();
 	if (!getWhisperingTabIdResult.ok) return getWhisperingTabIdResult;
@@ -58,16 +58,7 @@ const handler: PlasmoMessaging.MessageHandler<
 	OpenWhisperingTabMessage,
 	OpenWhisperingTabResult
 > = async ({ body }, res) => {
-	if (!body?.path) {
-		res.send(
-			WhisperingErr({
-				title: 'Path required',
-				description: 'A valid path is required for navigation.',
-			}),
-		);
-		return;
-	}
-	res.send(await openWhisperingTab(body.path));
+	res.send(await openWhisperingTab(body));
 };
 
 export default handler;
