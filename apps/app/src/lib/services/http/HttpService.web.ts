@@ -21,7 +21,7 @@ export function createHttpServiceWeb(): HttpService {
 				return HttpServiceErr({
 					code: 'HttpError',
 					status: response.status,
-					error: response,
+					error: await response.json(),
 				});
 			}
 			const parseResult = await tryAsync({
