@@ -3,7 +3,7 @@ import { Ok, tryAsync } from '@epicenterhq/result';
 import type { PlasmoMessaging } from '@plasmohq/messaging';
 import type { ToastAndNotifyOptions, WhisperingResult } from '@repo/shared';
 import { WhisperingErr } from '@repo/shared';
-import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid/non-secure';
 import { extension } from '../../../lib/extension';
 import { openWhisperingTab } from './openWhisperingTab';
 
@@ -35,7 +35,7 @@ export const createNotification = async ({
 						if (clickedId === id) {
 							chrome.notifications.clear(id);
 							const gotoTargetUrlInWhisperingTabResult =
-								await openWhisperingTab(action.goto);
+								await openWhisperingTab({ path: action.goto });
 							if (!gotoTargetUrlInWhisperingTabResult.ok) {
 								extension.createNotification({
 									notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
@@ -49,7 +49,7 @@ export const createNotification = async ({
 							if (buttonIndex === 0) {
 								chrome.notifications.clear(id);
 								const gotoTargetUrlInWhisperingTabResult =
-									await openWhisperingTab(action.goto);
+									await openWhisperingTab({ path: action.goto });
 								if (!gotoTargetUrlInWhisperingTabResult.ok) {
 									return extension.createNotification({
 										notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
