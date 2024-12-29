@@ -1,6 +1,7 @@
 import { Err, type Ok } from '@epicenterhq/result';
 import type { WhisperingErr, WhisperingErrProperties } from '@repo/shared';
 import type { HttpServiceErr } from '../http/HttpService';
+import { goto } from '$app/navigation';
 
 export type TranscriptionServiceErr = WhisperingErr;
 export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
@@ -40,7 +41,12 @@ export function HttpServiceErrIntoTranscriptionServiceErr({
 					title: '🔑 Authentication Failed',
 					description:
 						'Your current API key is invalid or has expired. Head to settings to enter a valid key and continue transcribing!',
-					action: { type: 'more-details', error: error.error },
+					// action: { type: 'more-details', error: error.error },
+					action: {
+						type: 'link',
+						label: 'Go to settings',
+						goto: '/settings/transcription',
+					},
 				});
 			}
 
