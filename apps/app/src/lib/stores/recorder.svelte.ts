@@ -311,10 +311,10 @@ function createRecorder() {
 		},
 
 		toggleRecordingWithToast: () => {
-			if (recorderState === 'IDLE') {
-				void startRecordingWithToast();
-			} else {
+			if (recorderState === 'SESSION+RECORDING') {
 				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
+			} else {
+				void startRecordingWithToast();
 			}
 		},
 
