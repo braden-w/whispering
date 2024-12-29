@@ -21,18 +21,16 @@ export const recorder = createRecorder();
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
-	const setRecorderState = (newValue: WhisperingRecordingState) => {
+	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		void (async () => {
-			const result = await SetTrayIconService.setTrayIcon(newValue);
-			if (!result.ok) {
-				toast.warning({
-					title: `🚫 Could not set tray icon to ${recorderState} icon...`,
-					description: 'Please check your system tray settings',
-					action: { type: 'more-details', error: result.error },
-				});
-			}
-		})();
+		const result = await SetTrayIconService.setTrayIcon(newValue);
+		if (!result.ok) {
+			toast.warning({
+				title: `🚫 Could not set tray icon to ${recorderState} icon...`,
+				description: 'Please check your system tray settings',
+				action: { type: 'more-details', error: result.error },
+			});
+		}
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
@@ -54,7 +52,7 @@ function createRecorder() {
 				toast.error({ id: stopRecordingToastId, ...stopResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 			console.info('Recording stopped');
 			void PlaySoundService.playSound('stop');
 
@@ -200,7 +198,7 @@ function createRecorder() {
 						});
 						return;
 					}
-					setRecorderState('IDLE');
+					await setRecorderState('IDLE');
 				})(),
 			]);
 		};
@@ -228,7 +226,7 @@ function createRecorder() {
 				toast.error({ id: startRecordingToastId, ...initResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 		}
 		const startRecordingResult =
 			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
@@ -239,7 +237,7 @@ function createRecorder() {
 			toast.error({ id: startRecordingToastId, ...startRecordingResult.error });
 			return;
 		}
-		setRecorderState('SESSION+RECORDING');
+		await setRecorderState('SESSION+RECORDING');
 		toast.success({
 			id: startRecordingToastId,
 			title: '🎙️ Whispering is recording...',
@@ -272,7 +270,7 @@ function createRecorder() {
 				toast.error({ id: toastId, ...closeResult.error });
 				return;
 			}
-			setRecorderState('IDLE');
+			await setRecorderState('IDLE');
 			toast.success({
 				id: toastId,
 				title: '✨ Session Closed Successfully',
@@ -306,7 +304,7 @@ function createRecorder() {
 				toast.error({ id: toastId, ...cancelResult.error });
 				return;
 			}
-			setRecorderState('SESSION');
+			await setRecorderState('SESSION');
 			if (settings.value.isFasterRerecordEnabled) {
 				toast.success({
 					id: toastId,
@@ -314,7 +312,7 @@ function createRecorder() {
 					description:
 						'Recording discarded, but session remains open for a new take',
 				});
-				setRecorderState('SESSION');
+				await setRecorderState('SESSION');
 			} else {
 				toast.loading({
 					id: toastId,
@@ -344,7 +342,7 @@ function createRecorder() {
 					title: '✅ All Done!',
 					description: 'Recording cancelled and session closed successfully',
 				});
-				setRecorderState('IDLE');
+				await setRecorderState('IDLE');
 			}
 			void PlaySoundService.playSound('cancel');
 			console.info('Recording cancelled');
