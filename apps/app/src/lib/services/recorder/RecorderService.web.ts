@@ -58,7 +58,7 @@ export function createRecorderServiceWeb(): RecorderService {
 		);
 		if (!getPreferredStreamResult.ok) {
 			sendStatus({
-				title: '⚠️ Connection Failed',
+				title: '⚠️ Finding a New Microphone',
 				description:
 					"That microphone isn't working. Let's try finding another one...",
 			});
