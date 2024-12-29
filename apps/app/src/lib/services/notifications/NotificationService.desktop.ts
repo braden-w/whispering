@@ -55,7 +55,7 @@ export function createNotificationServiceDesktop(): NotificationService {
 						permissionGranted = permission === 'granted';
 					}
 					if (permissionGranted) {
-						sendNotification({ id: id, title });
+						sendNotification({ id: id, title, body: description });
 					}
 				},
 				mapErr: (error) =>
