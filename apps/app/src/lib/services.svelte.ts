@@ -14,6 +14,8 @@ import { createNotificationServiceDesktop } from './services/notifications/Notif
 import { createNotificationServiceWeb } from './services/notifications/NotificationService.web';
 import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
+import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService.desktop';
+import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroq } from './services/transcription/TranscriptionService.groq';
 import { createTranscriptionServiceWhisper } from './services/transcription/TranscriptionService.whisper';
@@ -39,6 +41,10 @@ export const ClipboardService = window.__TAURI_INTERNALS__
 export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
+
+export const PlaySoundService = window.__TAURI_INTERNALS__
+	? createPlaySoundServiceDesktop()
+	: createPlaySoundServiceWeb();
 
 export const RecordingsService = createRecordingsIndexedDbService();
 

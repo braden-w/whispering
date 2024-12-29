@@ -1,6 +1,7 @@
 import {
 	ClipboardService,
 	NotificationService,
+	PlaySoundService,
 	RecordingsService,
 	SetTrayIconService,
 	userConfiguredServices,
@@ -19,13 +20,6 @@ import {
 	type WhisperingSoundNames,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
-import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
-
-const startSound = new Audio(startSoundSrc);
-const stopSound = new Audio(stopSoundSrc);
-const cancelSound = new Audio(cancelSoundSrc);
 
 const IS_RECORDING_NOTIFICATION_ID = 'WHISPERING_RECORDING_NOTIFICATION';
 
@@ -69,7 +63,7 @@ function createRecorder() {
 			}
 			setRecorderState('SESSION');
 			console.info('Recording stopped');
-			void playSound('stop');
+			void PlaySoundService.playSound('stop');
 
 			const blob = stopResult.data;
 			const newRecording: Recording = {
@@ -259,7 +253,7 @@ function createRecorder() {
 			description: 'Your voice is being captured crystal clear',
 		});
 		console.info('Recording started');
-		void playSound('start');
+		void PlaySoundService.playSound('start');
 		void NotificationService.notify({
 			variant: 'info',
 			id: IS_RECORDING_NOTIFICATION_ID,
@@ -376,42 +370,8 @@ function createRecorder() {
 				});
 				setRecorderState('IDLE');
 			}
-			void playSound('cancel');
+			void PlaySoundService.playSound('cancel');
 			console.info('Recording cancelled');
 		},
 	};
-}
-
-async function playSound(
-	sound: WhisperingSoundNames,
-): Promise<WhisperingResult<void>> {
-	if (!settings.value.isPlaySoundEnabled) return Ok(undefined);
-
-	if (!document.hidden) {
-		switch (sound) {
-			case 'start':
-				await startSound.play();
-				break;
-			case 'stop':
-				await stopSound.play();
-				break;
-			case 'cancel':
-				await cancelSound.play();
-				break;
-		}
-		return Ok(undefined);
-	}
-
-	const playSoundResult = await extension.playSound({ sound });
-
-	if (!playSoundResult.ok)
-		return WhisperingErr({
-			title: '❌ Failed to Play Sound',
-			description: `We encountered an issue while playing the ${sound} sound`,
-			action: {
-				type: 'more-details',
-				error: playSoundResult.error,
-			},
-		});
-	return Ok(undefined);
 }
