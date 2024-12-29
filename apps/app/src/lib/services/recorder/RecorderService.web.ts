@@ -82,13 +82,6 @@ export function createRecorderServiceWeb(): RecorderService {
 		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {
-			if (currentSession) {
-				return WhisperingErr({
-					title: '🚫 Already in a Recording Session',
-					description:
-						"Looks like we're already in a recording session. Please close the current session before starting a new one.",
-				});
-			}
 			const acquireStreamResult = await acquireStream(settings, {
 				sendStatus,
 			});
@@ -99,12 +92,7 @@ export function createRecorderServiceWeb(): RecorderService {
 		},
 
 		closeRecordingSession: async (_, { sendStatus }) => {
-			if (!currentSession) {
-				return WhisperingErr({
-					title: '❌ No Active Session',
-					description: "There's no recording session to close at the moment",
-				});
-			}
+			if (!currentSession) return Ok(undefined);
 			sendStatus({
 				title: '🎙️ Cleaning Up',
 				description:
@@ -217,11 +205,7 @@ export function createRecorderServiceWeb(): RecorderService {
 							'stop',
 							() => {
 								if (!currentSession?.recorder?.mediaRecorder) {
-									reject(
-										new Error(
-											'Media recorder was nullified before stop event listener',
-										),
-									);
+									reject(new Error('Media recorder nullified before stop'));
 									return;
 								}
 								const audioBlob = new Blob(
@@ -232,10 +216,6 @@ export function createRecorderServiceWeb(): RecorderService {
 							},
 						);
 						currentSession.recorder.mediaRecorder.stop();
-						sendStatus({
-							title: '✅ Recording Complete',
-							description: 'Successfully saved your audio recording!',
-						});
 					}),
 				mapErr: (error) =>
 					WhisperingErr({
@@ -245,6 +225,10 @@ export function createRecorderServiceWeb(): RecorderService {
 					}),
 			});
 			if (!stopResult.ok) return stopResult;
+			sendStatus({
+				title: '✅ Recording Complete',
+				description: 'Successfully saved your audio recording!',
+			});
 			const blob = stopResult.data;
 			return Ok(blob);
 		},
@@ -259,21 +243,12 @@ export function createRecorderServiceWeb(): RecorderService {
 			}
 			sendStatus({
 				title: '🛑 Cancelling',
-				description:
-					'Safely stopping your recording and cleaning up resources...',
-			});
-			for (const track of currentSession.stream.getTracks()) {
-				track.stop();
-			}
-			sendStatus({
-				title: '🧹 Almost Done',
-				description: 'Closing recording session and freeing up resources...',
+				description: 'Safely cancelling your recording...',
 			});
 			currentSession.recorder.mediaRecorder.stop();
 			sendStatus({
 				title: '✨ Cancelled',
-				description:
-					'Recording successfully cancelled and all resources cleaned up',
+				description: 'Recording successfully cancelled!',
 			});
 			currentSession.recorder = null;
 			return Ok(undefined);

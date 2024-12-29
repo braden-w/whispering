@@ -34,10 +34,6 @@ export const recorder = createRecorder();
 function createRecorder() {
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
-	const isInRecordingSession = $derived(
-		recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION',
-	);
-
 	const setRecorderState = (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
 		void (async () => {
@@ -68,12 +64,7 @@ function createRecorder() {
 				});
 
 			if (!stopResult.ok) {
-				toast.error({
-					id: stopRecordingToastId,
-					title: '❌ Failed to Stop Recording',
-					description: 'We encountered an issue while stopping your recording',
-					action: { type: 'more-details', error: stopResult.error },
-				});
+				toast.error({ id: stopRecordingToastId, ...stopResult.error });
 				return;
 			}
 			setRecorderState('SESSION');
@@ -234,7 +225,7 @@ function createRecorder() {
 			title: '🎙️ Preparing to record...',
 			description: 'Setting up your recording environment...',
 		});
-		if (!isInRecordingSession) {
+		if (recorderState === 'IDLE') {
 			const initResult =
 				await userConfiguredServices.RecorderService.initRecordingSession(
 					{
@@ -247,15 +238,10 @@ function createRecorder() {
 					},
 				);
 			if (!initResult.ok) {
-				toast.error({
-					id: startRecordingToastId,
-					title: '❌ Failed to Initialize Recording Session',
-					description:
-						'Could not start a new recording session. This might be due to microphone permissions or device connectivity issues. Please check your audio settings and try again.',
-					action: { type: 'more-details', error: initResult.error },
-				});
+				toast.error({ id: startRecordingToastId, ...initResult.error });
 				return;
 			}
+			setRecorderState('SESSION');
 		}
 		const startRecordingResult =
 			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
@@ -263,13 +249,7 @@ function createRecorder() {
 					toast.loading({ id: startRecordingToastId, ...options }),
 			});
 		if (!startRecordingResult.ok) {
-			toast.error({
-				id: startRecordingToastId,
-				title: '❌ Failed to Start Recording',
-				description:
-					'Unable to begin recording audio. Please check if your microphone is properly connected and permissions are granted.',
-				action: { type: 'more-details', error: startRecordingResult.error },
-			});
+			toast.error({ id: startRecordingToastId, ...startRecordingResult.error });
 			return;
 		}
 		setRecorderState('SESSION+RECORDING');
@@ -299,7 +279,9 @@ function createRecorder() {
 		},
 
 		get isInRecordingSession() {
-			return isInRecordingSession;
+			return (
+				recorderState === 'SESSION+RECORDING' || recorderState === 'SESSION'
+			);
 		},
 
 		closeRecordingSessionWithToast: async () => {
@@ -329,7 +311,7 @@ function createRecorder() {
 		},
 
 		toggleRecordingWithToast: () => {
-			if (isInRecordingSession) {
+			if (recorderState === 'SESSION+RECORDING') {
 				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 			} else {
 				void startRecordingWithToast();
@@ -351,22 +333,18 @@ function createRecorder() {
 					},
 				);
 			if (!cancelResult.ok) {
-				toast.error({
-					id: toastId,
-					title: '❌ Failed to Cancel Recording',
-					description:
-						'Unable to cancel the current recording. The recording may still be in progress. Try stopping it instead.',
-					action: { type: 'more-details', error: cancelResult.error },
-				});
+				toast.error({ id: toastId, ...cancelResult.error });
 				return;
 			}
 			setRecorderState('SESSION');
 			if (settings.value.isFasterRerecordEnabled) {
 				toast.success({
+					id: toastId,
 					title: '🚫 Recording Cancelled',
 					description:
 						'Recording discarded, but session remains open for a new take',
 				});
+				setRecorderState('SESSION');
 			} else {
 				toast.loading({
 					id: toastId,
@@ -396,9 +374,9 @@ function createRecorder() {
 					title: '✅ All Done!',
 					description: 'Recording cancelled and session closed successfully',
 				});
+				setRecorderState('IDLE');
 			}
 			void playSound('cancel');
-			setRecorderState('IDLE');
 			console.info('Recording cancelled');
 		},
 	};
