@@ -344,6 +344,7 @@ function createRecorder() {
 					description:
 						'Recording discarded, but session remains open for a new take',
 				});
+				setRecorderState('SESSION');
 			} else {
 				toast.loading({
 					id: toastId,
@@ -373,9 +374,9 @@ function createRecorder() {
 					title: '✅ All Done!',
 					description: 'Recording cancelled and session closed successfully',
 				});
+				setRecorderState('IDLE');
 			}
 			void playSound('cancel');
-			setRecorderState('IDLE');
 			console.info('Recording cancelled');
 		},
 	};
