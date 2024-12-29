@@ -328,9 +328,8 @@ async function getFirstAvailableStream() {
 
 async function enumerateRecordingDevices() {
 	const hasPermission = await hasExistingAudioPermission();
-	console.log('🚀 ~ enumerateRecordingDevices ~ hasPermission:', hasPermission);
 	if (!hasPermission) {
-		await extension.openWhisperingTab({});
+		void extension.openWhisperingTab({});
 	}
 	return tryAsync({
 		try: async () => {
@@ -358,9 +357,8 @@ async function enumerateRecordingDevices() {
 
 async function getStreamForDeviceId(recordingDeviceId: string) {
 	const hasPermission = await hasExistingAudioPermission();
-	console.log('🚀 ~ getStreamForDeviceId ~ hasPermission:', hasPermission);
 	if (!hasPermission) {
-		await extension.openWhisperingTab({});
+		void extension.openWhisperingTab({});
 	}
 	return tryAsync({
 		try: async () => {
