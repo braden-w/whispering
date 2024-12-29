@@ -290,9 +290,7 @@ async function hasExistingAudioPermission(): Promise<boolean> {
 	} catch {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
-				},
+				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 			});
 			for (const track of stream.getTracks()) {
 				track.stop();
@@ -337,9 +335,7 @@ async function enumerateRecordingDevices() {
 	return tryAsync({
 		try: async () => {
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
-				},
+				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 			});
 			const devices = await navigator.mediaDevices.enumerateDevices();
 			for (const track of allAudioDevicesStream.getTracks()) {
