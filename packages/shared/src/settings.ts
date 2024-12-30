@@ -32,6 +32,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		fasterWhisperServerUrl: 'http://localhost:8000',
 		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
 		outputLanguage: 'auto',
+		prompt: '',
+		temperature: '0',
 
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
@@ -61,6 +63,8 @@ export const settingsSchema = z.object({
 	fasterWhisperServerUrl: z.string(),
 	fasterWhisperServerModel: z.string(),
 	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
+	prompt: z.string(),
+	temperature: z.string(),
 
 	currentLocalShortcut: z.string(),
 	currentGlobalShortcut: z.string(),
