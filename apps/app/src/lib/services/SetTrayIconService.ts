@@ -75,25 +75,15 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 					text: 'Show Window',
 					action: () => getCurrentWindow().show(),
 				}),
+
 				await MenuItem.new({
 					id: 'minimize',
 					text: 'Hide Window',
 					action: () => getCurrentWindow().minimize(),
 				}),
 
-				// Recording Controls Section
-				await MenuItem.new({
-					id: 'toggle-recording',
-					text: 'Toggle Recording',
-					action: () => recorder.toggleRecordingWithToast(),
-				}),
-
 				// Always on Top Section
-				await MenuItem.new({
-					id: 'always-on-top',
-					text: 'Always on Top',
-					action: () => alwaysOnTopMenu.popup(),
-				}),
+				...alwaysOnTopItems,
 
 				// Quit Section
 				await MenuItem.new({
