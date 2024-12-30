@@ -98,8 +98,12 @@ async function initTray() {
 				action: () => getCurrentWindow().hide(),
 			}),
 
+			await MenuItem.new({ id: 'separator1', text: '' }),
+
 			// Always on Top Section
 			...alwaysOnTopItems,
+
+			await MenuItem.new({ id: 'separator2', text: '' }),
 
 			// Settings Section
 			await MenuItem.new({
@@ -137,6 +141,7 @@ async function initTray() {
 			return false;
 		},
 	});
+
 	return tray;
 }
 
