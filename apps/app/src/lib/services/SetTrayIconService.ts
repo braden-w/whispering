@@ -8,6 +8,8 @@ import { TrayIcon } from '@tauri-apps/api/tray';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/plugin-process';
 
+const TRAY_ID = 'whispering-tray';
+
 export type SetTrayIconServiceErr = Err<{
 	_tag: 'TrayIconError';
 	icon: WhisperingRecordingState;
@@ -39,6 +41,9 @@ export function createSetTrayIconWebService(): SetTrayIconService {
 
 export function createSetTrayIconDesktopService(): SetTrayIconService {
 	const trayPromise = (async () => {
+		const existingTray = await TrayIcon.getById(TRAY_ID);
+		if (existingTray) return existingTray;
+
 		const quitMenuItem = await MenuItem.new({
 			text: 'Quit',
 			action: () => void exit(0),
@@ -50,7 +55,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 		});
 
 		const tray = await TrayIcon.new({
-			id: 'tray',
+			id: TRAY_ID,
 			icon: await getIconPath('IDLE'),
 			menu: trayMenu,
 			tooltip: 'Whispering',
