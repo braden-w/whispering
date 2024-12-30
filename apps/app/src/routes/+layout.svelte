@@ -12,7 +12,7 @@
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
-	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop';
+	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
 	import { closeToTrayIfEnabled } from './+layout/closeToTray';
 
 	let { children } = $props();
