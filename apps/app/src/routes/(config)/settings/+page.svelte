@@ -41,9 +41,12 @@
 		<Switch
 			id="copy-to-clipboard"
 			aria-labelledby="copy-to-clipboard"
-			checked={settings.value.isCopyToClipboardEnabled}
+			checked={settings.value['transcription.clipboard.copyOnSuccess']}
 			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isCopyToClipboardEnabled: v };
+				settings.value = {
+					...settings.value,
+					'transcription.clipboard.copyOnSuccess': v,
+				};
 			}}
 		/>
 		<Label for="copy-to-clipboard"

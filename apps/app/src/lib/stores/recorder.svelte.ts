@@ -97,7 +97,7 @@ function createRecorder() {
 
 					const { transcribedText } = transcribeAndUpdateWithToastResult.data;
 
-					if (settings.value.isCopyToClipboardEnabled) {
+					if (settings.value['transcription.clipboard.copyOnSuccess']) {
 						toast.loading({
 							id: stopRecordingToastId,
 							title: '⏳ Copying to clipboard...',
@@ -127,7 +127,7 @@ function createRecorder() {
 						}
 					}
 
-					if (!settings.value.isPasteContentsOnSuccessEnabled) {
+					if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
 						toast.success({
 							id: stopRecordingToastId,
 							title: '📝📋 Recording transcribed and copied to clipboard!',

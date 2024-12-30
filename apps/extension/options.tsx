@@ -191,11 +191,11 @@ function SettingsCard() {
 					<Switch
 						id="copy-to-clipboard"
 						aria-labelledby="copy-to-clipboard"
-						checked={settings.isCopyToClipboardEnabled}
+						checked={settings['transcription.clipboard.copyOnSuccess']}
 						onCheckedChange={(newValue) =>
 							setSettings({
 								...settings,
-								isCopyToClipboardEnabled: newValue,
+								'transcription.clipboard.copyOnSuccess': newValue,
 							})
 						}
 					/>
@@ -207,11 +207,11 @@ function SettingsCard() {
 					<Switch
 						id="paste-from-clipboard"
 						aria-labelledby="paste-from-clipboard"
-						checked={settings.isPasteContentsOnSuccessEnabled}
+						checked={settings['transcription.clipboard.pasteOnSuccess']}
 						onCheckedChange={(newValue) =>
 							setSettings({
 								...settings,
-								isPasteContentsOnSuccessEnabled: newValue,
+								'transcription.clipboard.pasteOnSuccess': newValue,
 							})
 						}
 					/>

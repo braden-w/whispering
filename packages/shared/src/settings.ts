@@ -10,8 +10,8 @@ import {
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
-		isCopyToClipboardEnabled: true,
-		isPasteContentsOnSuccessEnabled: true,
+		'transcription.clipboard.copyOnSuccess': true,
+		'transcription.clipboard.pasteOnSuccess': true,
 		isFasterRerecordEnabled: false,
 		'system.closeToTray': false,
 		'system.alwaysOnTop': 'Never',
@@ -43,8 +43,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 
 export const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
-	isCopyToClipboardEnabled: z.boolean(),
-	isPasteContentsOnSuccessEnabled: z.boolean(),
+	'transcription.clipboard.copyOnSuccess': z.boolean(),
+	'transcription.clipboard.pasteOnSuccess': z.boolean(),
 	isFasterRerecordEnabled: z.boolean(),
 
 	'system.closeToTray': z.boolean(),
