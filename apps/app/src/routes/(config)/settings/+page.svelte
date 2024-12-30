@@ -116,13 +116,14 @@
 	<div class="grid gap-2">
 		<SettingsLabelSelect
 			id="recording-retention-strategy"
-			label="Retention Retention"
+			label="Recording Retention"
 			items={[
 				{ value: 'keep-forever', label: 'Keep All Recordings' },
 				{ value: 'limit-count', label: 'Keep Limited Number' },
 			]}
 			selected={settings.value.recordingRetentionStrategy}
 			onSelectedChange={(selected) => {
+				if (!selected) return;
 				settings.value = {
 					...settings.value,
 					recordingRetentionStrategy: selected,
@@ -146,6 +147,7 @@
 				]}
 				selected={settings.value.maxRecordingCount}
 				onSelectedChange={(selected) => {
+					if (!selected) return;
 					settings.value = { ...settings.value, maxRecordingCount: selected };
 				}}
 				placeholder="Select maximum recordings"

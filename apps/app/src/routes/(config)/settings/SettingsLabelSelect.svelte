@@ -19,7 +19,7 @@
 			disabled?: boolean;
 		}[];
 		selected: T;
-		onSelectedChange: (selected: T) => void;
+		onSelectedChange: (selected: T | '') => void;
 		placeholder?: string;
 		disabled?: boolean;
 	} = $props();
