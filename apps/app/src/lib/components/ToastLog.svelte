@@ -25,7 +25,6 @@
 </script>
 
 <script lang="ts">
-	import { mode } from 'mode-watcher';
 	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -38,22 +37,7 @@
 		Loader2,
 		LogsIcon,
 	} from 'lucide-svelte';
-	import type { Snippet } from 'svelte';
-
-	const getVariantClass = (variant: ToastAndNotifyOptions['variant']) => {
-		switch (variant) {
-			case 'error':
-				return 'data-sonner-toast bg-[var(--error-bg)] border-[var(--error-border)] text-[var(--error-text)] [&>svg]:text-[var(--error-text)]';
-			case 'warning':
-				return 'data-sonner-toast bg-[var(--warning-bg)] border-[var(--warning-border)] text-[var(--warning-text)] [&>svg]:text-[var(--warning-text)]';
-			case 'success':
-				return 'data-sonner-toast bg-[var(--success-bg)] border-[var(--success-border)] text-[var(--success-text)] [&>svg]:text-[var(--success-text)]';
-			case 'info':
-				return 'data-sonner-toast bg-[var(--info-bg)] border-[var(--info-border)] text-[var(--info-text)] [&>svg]:text-[var(--info-text)]';
-			case 'loading':
-				return 'data-sonner-toast bg-[var(--normal-bg)] border-[var(--normal-border)] text-[var(--normal-text)] [&>svg]:animate-spin';
-		}
-	};
+	import { mode } from 'mode-watcher';
 </script>
 
 <Dialog.Root bind:open={toastLogDialog.isOpen}>
@@ -72,38 +56,41 @@
 				System notifications and status updates
 			</Dialog.Description>
 		</Dialog.Header>
-		{#each toastLogDialog.logs as log}
-			<Alert.Root
-				data-sonner-toast
-				data-theme={$mode}
-				data-rich-colors
-				data-type={log.variant}
-				data-styled="true"
-				data-mounted="true"
-				data-sonner-toaster
-			>
-				{#if log.variant === 'error'}
-					<AlertCircle class="h-4 w-4" data-icon />
-				{:else if log.variant === 'warning'}
-					<AlertTriangle class="h-4 w-4" data-icon />
-				{:else if log.variant === 'success'}
-					<CheckCircle2 class="h-4 w-4" data-icon />
-				{:else if log.variant === 'info'}
-					<Info class="h-4 w-4" data-icon />
-				{:else if log.variant === 'loading'}
-					<Loader2 class="h-4 w-4 animate-spin" data-icon />
-				{/if}
-				<div data-content>
-					<Alert.Title data-title>
-						{log.title}
-					</Alert.Title>
-					<Alert.Description data-description>
-						{log.description}
-					</Alert.Description>
-				</div>
-			</Alert.Root>
-		{/each}
-
+		<div
+			class="space-y-3 py-4"
+			data-sonner-toaster
+			data-theme={$mode}
+			data-rich-colors="true"
+		>
+			{#each toastLogDialog.logs as log}
+				<Alert.Root
+					data-sonner-toast
+					data-type={log.variant}
+					data-styled="true"
+					data-mounted="true"
+				>
+					{#if log.variant === 'error'}
+						<div data-icon><AlertCircle class="h-4 w-4" /></div>
+					{:else if log.variant === 'warning'}
+						<div data-icon><AlertTriangle class="h-4 w-4" /></div>
+					{:else if log.variant === 'success'}
+						<div data-icon><CheckCircle2 class="h-4 w-4" /></div>
+					{:else if log.variant === 'info'}
+						<div data-icon><Info class="h-4 w-4" /></div>
+					{:else if log.variant === 'loading'}
+						<div data-icon><Loader2 class="h-4 w-4 animate-spin" /></div>
+					{/if}
+					<div data-content>
+						<Alert.Title data-title>
+							{log.title}
+						</Alert.Title>
+						<Alert.Description data-description>
+							{log.description}
+						</Alert.Description>
+					</div>
+				</Alert.Root>
+			{/each}
+		</div>
 		{#if toastLogDialog.logs.length === 0}
 			<div class="py-4 text-center text-muted-foreground">
 				No logs to display
@@ -111,7 +98,3 @@
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>
-
-<style lang="postcss">
-	/* Copy the entire Sonner CSS here */
-</style>
