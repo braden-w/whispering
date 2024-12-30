@@ -197,4 +197,8 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	}),
 );
 
-export type WhisperingSoundNames = 'start' | 'stop' | 'cancel';
+export type WhisperingSoundNames =
+	| 'start'
+	| 'stop'
+	| 'cancel'
+	| 'transcription-complete';

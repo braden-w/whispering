@@ -1,5 +1,6 @@
 import {
 	DownloadService,
+	PlaySoundService,
 	RecordingsService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
@@ -142,6 +143,8 @@ function createRecordings() {
 				});
 				return saveRecordingToDatabaseResult;
 			}
+
+			void PlaySoundService.playSound('transcription-complete');
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
