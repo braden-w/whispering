@@ -13,7 +13,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
 		isFasterRerecordEnabled: false,
-		closeToTray: true,
+		closeToTray: false,
 		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
