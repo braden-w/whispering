@@ -271,8 +271,8 @@ export function createRecordingsIndexedDbService(): DbService {
 		},
 
 		async cleanupExpiredRecordings({
-			recordingRetentionStrategy,
-			maxRecordingCount,
+			'database.recordingRetentionStrategy': recordingRetentionStrategy,
+			'database.maxRecordingCount': maxRecordingCount,
 		}) {
 			switch (recordingRetentionStrategy) {
 				case 'keep-forever': {

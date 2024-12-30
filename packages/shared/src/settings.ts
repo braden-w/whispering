@@ -17,8 +17,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'system.alwaysOnTop': 'Never',
 
 		// Recording retention defaults
-		recordingRetentionStrategy: 'keep-forever',
-		maxRecordingCount: '5',
+		'database.recordingRetentionStrategy': 'keep-forever',
+		'database.maxRecordingCount': '5',
 
 		'recording.selectedAudioInputDeviceId': 'default',
 		'recording.bitrateKbps': DEFAULT_BITRATE_KBPS,
@@ -50,8 +50,11 @@ export const settingsSchema = z.object({
 	'system.closeToTray': z.boolean(),
 	'system.alwaysOnTop': z.enum(ALWAYS_ON_TOP_VALUES),
 
-	recordingRetentionStrategy: z.enum(['keep-forever', 'limit-count'] as const),
-	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
+	'database.recordingRetentionStrategy': z.enum([
+		'keep-forever',
+		'limit-count',
+	] as const),
+	'database.maxRecordingCount': z.string().regex(/^\d+$/, 'Must be a number'),
 
 	'recording.selectedAudioInputDeviceId': z.string(),
 	'recording.bitrateKbps': z

@@ -53,9 +53,6 @@ export type DbService = {
 	 * 3. When retention settings change
 	 */
 	cleanupExpiredRecordings: (
-		settings: Pick<
-			Settings,
-			'recordingRetentionStrategy' | 'maxRecordingCount'
-		>,
+		settings: Settings,
 	) => Promise<DbServiceResult<void>>;
 };

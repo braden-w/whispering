@@ -26,10 +26,7 @@
 	$effect(() => {
 		recorder.recorderState;
 		recordings.value;
-		void RecordingsService.cleanupExpiredRecordings({
-			recordingRetentionStrategy: settings.value.recordingRetentionStrategy,
-			maxRecordingCount: settings.value.maxRecordingCount,
-		});
+		void RecordingsService.cleanupExpiredRecordings(settings.value);
 	});
 
 	onNavigate((navigation) => {

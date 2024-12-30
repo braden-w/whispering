@@ -267,14 +267,17 @@ function SettingsCard() {
 							{ value: 'keep-forever', label: 'Keep All Recordings' },
 							{ value: 'limit-count', label: 'Keep Limited Number' },
 						]}
-						value={settings.recordingRetentionStrategy}
+						value={settings['database.recordingRetentionStrategy']}
 						onValueChange={(value) =>
-							setSettings({ ...settings, recordingRetentionStrategy: value })
+							setSettings({
+								...settings,
+								'database.recordingRetentionStrategy': value,
+							})
 						}
 					/>
 				</div>
 
-				{settings.recordingRetentionStrategy === 'limit-count' && (
+				{settings['database.recordingRetentionStrategy'] === 'limit-count' && (
 					<div className="grid gap-2">
 						<SettingsLabelSelect
 							id="max-recording-count"
@@ -286,9 +289,12 @@ function SettingsCard() {
 								{ value: '50', label: '50 Recordings' },
 								{ value: '100', label: '100 Recordings' },
 							]}
-							value={settings.maxRecordingCount}
+							value={settings['database.maxRecordingCount']}
 							onValueChange={(value) =>
-								setSettings({ ...settings, maxRecordingCount: value })
+								setSettings({
+									...settings,
+									'database.maxRecordingCount': value,
+								})
 							}
 						/>
 					</div>

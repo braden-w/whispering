@@ -127,19 +127,19 @@
 				{ value: 'keep-forever', label: 'Keep All Recordings' },
 				{ value: 'limit-count', label: 'Keep Limited Number' },
 			]}
-			selected={settings.value.recordingRetentionStrategy}
+			selected={settings.value['database.recordingRetentionStrategy']}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					recordingRetentionStrategy: selected,
+					'database.recordingRetentionStrategy': selected,
 				};
 			}}
 			placeholder="Select retention strategy"
 		/>
 	</div>
 
-	{#if settings.value.recordingRetentionStrategy === 'limit-count'}
+	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
 		<div class="grid gap-2">
 			<SettingsLabelSelect
 				id="max-recording-count"
@@ -151,10 +151,13 @@
 					{ value: '50', label: '50 Recordings' },
 					{ value: '100', label: '100 Recordings' },
 				]}
-				selected={settings.value.maxRecordingCount}
+				selected={settings.value['database.maxRecordingCount']}
 				onSelectedChange={(selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, maxRecordingCount: selected };
+					settings.value = {
+						...settings.value,
+						'database.maxRecordingCount': selected,
+					};
 				}}
 				placeholder="Select maximum recordings"
 			/>
