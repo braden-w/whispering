@@ -7,9 +7,6 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
 
-// Recording retention configuration
-export const RETENTION_STRATEGIES = ['keep-forever', 'limit-count'] as const;
-
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
@@ -49,11 +46,11 @@ export const settingsSchema = z.object({
 	isCopyToClipboardEnabled: z.boolean(),
 	isPasteContentsOnSuccessEnabled: z.boolean(),
 	isFasterRerecordEnabled: z.boolean(),
+
 	closeToTray: z.boolean(),
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
-	// Auto delete recordings settings
-	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
+	recordingRetentionStrategy: z.enum(['keep-forever', 'limit-count'] as const),
 	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
 
 	'recording.selectedAudioInputDeviceId': z.string(),
