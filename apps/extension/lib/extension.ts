@@ -55,13 +55,28 @@ export const SendMessageToExtensionErr = (
 		...args,
 	} as const);
 
+const TIMEOUT_SECONDS = 1;
+
 export const sendMessageToExtension = async <
 	R extends WhisperingResult<unknown>,
 >(
 	...args: Parameters<typeof sendToBackgroundViaRelay>
 ): Promise<R | WhisperingErr> => {
 	const sendResult = (await tryAsync({
-		try: () => sendToBackgroundViaRelay(...args),
+		try: async () => {
+			const timeoutPromise = new Promise((_, reject) => {
+				setTimeout(() => {
+					reject(
+						new Error(
+							`Extension messaging timeout after ${TIMEOUT_SECONDS} seconds`,
+						),
+					);
+				}, TIMEOUT_SECONDS * 1000);
+			});
+
+			const messagePromise = sendToBackgroundViaRelay(...args);
+			return Promise.race([messagePromise, timeoutPromise]);
+		},
 		mapErr: (error) => {
 			const { name, body } = args[0];
 			return SendMessageToExtensionErr({
