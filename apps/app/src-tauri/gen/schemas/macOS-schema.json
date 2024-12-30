@@ -5145,26 +5145,6 @@
           "const": "http:deny-fetch-send"
         },
         {
-          "description": "Enables the block command without any pre-configured scope.",
-          "type": "string",
-          "const": "nosleep:allow-block"
-        },
-        {
-          "description": "Enables the unblock command without any pre-configured scope.",
-          "type": "string",
-          "const": "nosleep:allow-unblock"
-        },
-        {
-          "description": "Denies the block command without any pre-configured scope.",
-          "type": "string",
-          "const": "nosleep:deny-block"
-        },
-        {
-          "description": "Denies the unblock command without any pre-configured scope.",
-          "type": "string",
-          "const": "nosleep:deny-unblock"
-        },
-        {
           "description": "This permission set configures which\nnotification features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all notification related features.\n\n",
           "type": "string",
           "const": "notification:default"
