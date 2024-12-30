@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
+	import { macOSAppNapExplainedDialog } from '$lib/components/MacOSAppNapExplainedDialog.svelte';
+	import MacOSAppNapExplainedDialog from '$lib/components/MacOSAppNapExplainedDialog.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
@@ -7,6 +9,7 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
+	import { type } from '@tauri-apps/plugin-os';
 </script>
 
 <svelte:head>
@@ -90,7 +93,18 @@
 					settings.value = { ...settings.value, closeToTray: v };
 				}}
 			/>
-			<Label for="close-to-tray">Close to tray instead of quitting</Label>
+			<Label for="close-to-tray">
+				Close to tray instead of quitting
+				{#if window.__TAURI_INTERNALS__ && type() === 'macos'}
+					<Button
+						variant="link"
+						size="inline"
+						onclick={() => macOSAppNapExplainedDialog.open()}
+					>
+						(Not recommended for macOS)
+					</Button>
+				{/if}
+			</Label>
 		</div>
 		<div class="grid gap-2">
 			<SettingsLabelSelect
@@ -107,3 +121,5 @@
 		</div>
 	{/if}
 </div>
+
+<MacOSAppNapExplainedDialog />
