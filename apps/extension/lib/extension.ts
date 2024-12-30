@@ -104,60 +104,64 @@ export const sendMessageToExtension = async <
 	return commandAsWhisperingResult;
 };
 
-export const extension = {
-	createNotification: async (body: CreateNotificationMessage) => {
-		const result = await sendMessageToExtension<CreateNotificationResult>({
-			name: 'extension/createNotification',
-			body,
-		});
-		return result;
-	},
-	clearNotification: async (body: ClearNotificationMessage) => {
-		const result = await sendMessageToExtension<ClearNotificationResult>({
-			name: 'extension/clearNotification',
-			body,
-		});
-		return result;
-	},
-	notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
-		const result = await sendMessageToExtension<NotifyWhisperingTabReadyResult>(
-			{ name: 'extension/notifyWhisperingTabReady', body },
-		);
-		return result;
-	},
-	openWhisperingTab: async (body: OpenWhisperingTabMessage) => {
-		const result = await sendMessageToExtension<OpenWhisperingTabResult>({
-			name: 'extension/openWhisperingTab',
-			body,
-		});
-		return result;
-	},
-	playSound: async (body: PlaySoundMessage) => {
-		const result = await sendMessageToExtension<PlaySoundResult>({
-			name: 'extension/playSound',
-			body,
-		});
-		return result;
-	},
-	setClipboardText: async (body: SetClipboardTextMessage) => {
-		const result = await sendMessageToExtension<SetClipboardTextResult>({
-			name: 'extension/setClipboardText',
-			body,
-		});
-		return result;
-	},
-	setRecorderState: async (body: SetRecorderStateMessage) => {
-		const result = await sendMessageToExtension<SetRecorderStateResult>({
-			name: 'extension/setRecorderState',
-			body,
-		});
-		return result;
-	},
-	writeTextToCursor: async (body: WriteTextToCursorMessage) => {
-		const result = await sendMessageToExtension<WriteTextToCursorResult>({
-			name: 'extension/writeTextToCursor',
-			body,
-		});
-		return result;
-	},
-};
+export const extension = (() => {
+	return {
+		createNotification: async (body: CreateNotificationMessage) => {
+			const result = await sendMessageToExtension<CreateNotificationResult>({
+				name: 'extension/createNotification',
+				body,
+			});
+			return result;
+		},
+		clearNotification: async (body: ClearNotificationMessage) => {
+			const result = await sendMessageToExtension<ClearNotificationResult>({
+				name: 'extension/clearNotification',
+				body,
+			});
+			return result;
+		},
+		notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
+			const result =
+				await sendMessageToExtension<NotifyWhisperingTabReadyResult>({
+					name: 'extension/notifyWhisperingTabReady',
+					body,
+				});
+			return result;
+		},
+		openWhisperingTab: async (body: OpenWhisperingTabMessage) => {
+			const result = await sendMessageToExtension<OpenWhisperingTabResult>({
+				name: 'extension/openWhisperingTab',
+				body,
+			});
+			return result;
+		},
+		playSound: async (body: PlaySoundMessage) => {
+			const result = await sendMessageToExtension<PlaySoundResult>({
+				name: 'extension/playSound',
+				body,
+			});
+			return result;
+		},
+		setClipboardText: async (body: SetClipboardTextMessage) => {
+			const result = await sendMessageToExtension<SetClipboardTextResult>({
+				name: 'extension/setClipboardText',
+				body,
+			});
+			return result;
+		},
+		setRecorderState: async (body: SetRecorderStateMessage) => {
+			const result = await sendMessageToExtension<SetRecorderStateResult>({
+				name: 'extension/setRecorderState',
+				body,
+			});
+			return result;
+		},
+		writeTextToCursor: async (body: WriteTextToCursorMessage) => {
+			const result = await sendMessageToExtension<WriteTextToCursorResult>({
+				name: 'extension/writeTextToCursor',
+				body,
+			});
+			return result;
+		},
+	};
+})();
