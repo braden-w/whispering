@@ -17,7 +17,7 @@ export function createTranscriptionServiceGroq({
 	HttpService: HttpService;
 }): TranscriptionService {
 	return {
-		transcribe: async (audioBlob) => {
+		transcribe: async (audioBlob, options) => {
 			if (!settings.value.groqApiKey) {
 				return TranscriptionServiceErr({
 					title: 'Groq API Key not provided.',
@@ -56,8 +56,11 @@ export function createTranscriptionServiceGroq({
 			const formData = new FormData();
 			formData.append('file', formDataFile);
 			formData.append('model', 'whisper-large-v3');
-			if (settings.value.outputLanguage !== 'auto')
-				formData.append('language', settings.value.outputLanguage);
+			if (options.outputLanguage !== 'auto')
+				formData.append('language', options.outputLanguage);
+			if (options.prompt) formData.append('prompt', options.prompt);
+			if (options.temperature)
+				formData.append('temperature', options.temperature);
 			const postResult = await HttpService.post({
 				url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 				formData,

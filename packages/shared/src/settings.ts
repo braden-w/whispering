@@ -27,11 +27,16 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		bitrateKbps: DEFAULT_BITRATE_KBPS,
 
 		selectedTranscriptionService: 'OpenAI',
+		outputLanguage: 'auto',
+		prompt: '',
+		temperature: '0',
+
 		openAiApiKey: '',
+
 		groqApiKey: '',
+
 		fasterWhisperServerUrl: 'http://localhost:8000',
 		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
-		outputLanguage: 'auto',
 
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
@@ -56,11 +61,16 @@ export const settingsSchema = z.object({
 		.default(DEFAULT_BITRATE_KBPS),
 
 	selectedTranscriptionService: z.enum(TRANSCRIPTION_SERVICES),
+	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
+	prompt: z.string(),
+	temperature: z.string(),
+
 	openAiApiKey: z.string(),
+
 	groqApiKey: z.string(),
+
 	fasterWhisperServerUrl: z.string(),
 	fasterWhisperServerModel: z.string(),
-	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
 
 	currentLocalShortcut: z.string(),
 	currentGlobalShortcut: z.string(),

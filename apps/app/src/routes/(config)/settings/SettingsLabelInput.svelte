@@ -14,7 +14,7 @@
 	}: HTMLInputAttributes & {
 		label: string;
 		value: string;
-		type?: 'text' | 'password';
+		type?: 'text' | 'password' | 'number';
 		placeholder?: string;
 		disabled?: boolean;
 	} = $props();

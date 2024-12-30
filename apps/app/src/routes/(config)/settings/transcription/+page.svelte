@@ -12,6 +12,7 @@
 	} from '@repo/shared';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+	import SettingsLabelTextarea from '../SettingsLabelTextarea.svelte';
 </script>
 
 <svelte:head>
@@ -195,6 +196,39 @@
 				settings.value = { ...settings.value, outputLanguage: selected };
 			}}
 			placeholder="Select a language"
+		/>
+	</div>
+
+	<div class="grid gap-2">
+		<SettingsLabelInput
+			id="temperature"
+			label="Temperature"
+			type="number"
+			min="0"
+			max="1"
+			step="0.1"
+			placeholder="0"
+			value={settings.value.temperature}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = { ...settings.value, temperature: value };
+			}}
+		/>
+		<div class="text-muted-foreground text-sm">
+			Controls randomness in the model's output. 0 is focused and deterministic,
+			1 is more creative.
+		</div>
+	</div>
+
+	<div class="grid gap-2">
+		<SettingsLabelTextarea
+			id="transcription-prompt"
+			label="System Prompt"
+			placeholder="Optional system prompt to guide the transcription"
+			value={settings.value.prompt}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = { ...settings.value, prompt: value };
+			}}
+			description="Custom instructions to guide the transcription process. Leave empty for default behavior."
 		/>
 	</div>
 </div>
