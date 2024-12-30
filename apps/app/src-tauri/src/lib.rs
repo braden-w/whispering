@@ -27,15 +27,21 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|_| {
+        .setup(|app| {
             // Create a background window that is not visible to ensure that the app is always running and the event loop isn't paused or throttled (known inssue in MacOS)
-            tauri::WindowBuilder::new(
+            let background = tauri::WebviewWindow::builder(
                 app,
                 "background",
-                tauri::WindowUrl::App("background.html".into()),
+                tauri::WebviewUrl::App("index.html".into()),
             )
+            .inner_size(1.0, 1.0)
             .visible(false)
+            .decorations(false)
             .build()?;
+
+            #[cfg(target_os = "macos")]
+            background.set_skip_taskbar(true)?;
+
             let _ = ensure_thread_initialized();
             Ok(())
         })
