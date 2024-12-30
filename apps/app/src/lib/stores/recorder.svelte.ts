@@ -23,14 +23,7 @@ function createRecorder() {
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		const result = await SetTrayIconService.setTrayIcon(newValue);
-		if (!result.ok) {
-			toast.warning({
-				title: `🚫 Could not set tray icon to ${recorderState} icon...`,
-				description: 'Please check your system tray settings',
-				action: { type: 'more-details', error: result.error },
-			});
-		}
+		const _setTrayIconResult = await SetTrayIconService.setTrayIcon(newValue);
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
