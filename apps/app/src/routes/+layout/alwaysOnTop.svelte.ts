@@ -5,7 +5,7 @@ import { recorder } from '$lib/stores/recorder.svelte';
 
 export function syncWindowAlwaysOnTopWithRecorderState() {
 	$effect(() => {
-		switch (settings.value.alwaysOnTop) {
+		switch (settings.value['system.alwaysOnTop']) {
 			case 'Always':
 				void setAlwaysOnTop(true);
 				break;

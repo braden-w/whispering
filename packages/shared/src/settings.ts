@@ -13,8 +13,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
 		isFasterRerecordEnabled: false,
-		closeToTray: false,
-		alwaysOnTop: 'Never',
+		'system.closeToTray': false,
+		'system.alwaysOnTop': 'Never',
 
 		// Recording retention defaults
 		recordingRetentionStrategy: 'keep-forever',
@@ -47,8 +47,8 @@ export const settingsSchema = z.object({
 	isPasteContentsOnSuccessEnabled: z.boolean(),
 	isFasterRerecordEnabled: z.boolean(),
 
-	closeToTray: z.boolean(),
-	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
+	'system.closeToTray': z.boolean(),
+	'system.alwaysOnTop': z.enum(ALWAYS_ON_TOP_VALUES),
 
 	recordingRetentionStrategy: z.enum(['keep-forever', 'limit-count'] as const),
 	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),

@@ -9,7 +9,7 @@ export function closeToTrayIfEnabled() {
 	onMount(async () => {
 		unlisten = await getCurrentWindow().onCloseRequested(async (event) => {
 			event.preventDefault();
-			if (settings.value.closeToTray) {
+			if (settings.value['system.closeToTray']) {
 				getCurrentWindow().hide();
 			} else {
 				void exit(0);

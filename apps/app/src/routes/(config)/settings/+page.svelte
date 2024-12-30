@@ -91,9 +91,9 @@
 			<Switch
 				id="close-to-tray"
 				aria-labelledby="close-to-tray"
-				checked={settings.value.closeToTray}
+				checked={settings.value['system.closeToTray']}
 				onCheckedChange={(v) => {
-					settings.value = { ...settings.value, closeToTray: v };
+					settings.value = { ...settings.value, 'system.closeToTray': v };
 				}}
 			/>
 			<Label for="close-to-tray">
@@ -161,10 +161,13 @@
 				id="always-on-top"
 				label="Always On Top"
 				items={ALWAYS_ON_TOP_OPTIONS}
-				selected={settings.value.alwaysOnTop}
+				selected={settings.value['system.alwaysOnTop']}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, alwaysOnTop: selected };
+					settings.value = {
+						...settings.value,
+						'system.alwaysOnTop': selected,
+					};
 				}}
 				placeholder="Select a language"
 			/>
