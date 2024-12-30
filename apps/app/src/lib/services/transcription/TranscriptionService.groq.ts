@@ -18,7 +18,7 @@ export function createTranscriptionServiceGroq({
 }): TranscriptionService {
 	return {
 		transcribe: async (audioBlob, options) => {
-			if (!settings.value.groqApiKey) {
+			if (!settings.value['transcription.groq.apiKey']) {
 				return TranscriptionServiceErr({
 					title: 'Groq API Key not provided.',
 					description: 'Please enter your Groq API key in the settings',
@@ -30,7 +30,7 @@ export function createTranscriptionServiceGroq({
 				});
 			}
 
-			if (!settings.value.groqApiKey.startsWith('gsk_')) {
+			if (!settings.value['transcription.groq.apiKey'].startsWith('gsk_')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid Groq API Key',
 					description: 'The Groq API Key must start with "gsk_"',
@@ -65,7 +65,9 @@ export function createTranscriptionServiceGroq({
 				url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 				formData,
 				schema: whisperApiResponseSchema,
-				headers: { Authorization: `Bearer ${settings.value.groqApiKey}` },
+				headers: {
+					Authorization: `Bearer ${settings.value['transcription.groq.apiKey']}`,
+				},
 			});
 			if (!postResult.ok) {
 				return HttpServiceErrIntoTranscriptionServiceErr(postResult);

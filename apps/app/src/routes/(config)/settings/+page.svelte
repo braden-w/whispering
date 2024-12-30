@@ -41,9 +41,12 @@
 		<Switch
 			id="copy-to-clipboard"
 			aria-labelledby="copy-to-clipboard"
-			checked={settings.value.isCopyToClipboardEnabled}
+			checked={settings.value['transcription.clipboard.copyOnSuccess']}
 			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isCopyToClipboardEnabled: v };
+				settings.value = {
+					...settings.value,
+					'transcription.clipboard.copyOnSuccess': v,
+				};
 			}}
 		/>
 		<Label for="copy-to-clipboard"
@@ -54,11 +57,11 @@
 		<Switch
 			id="paste-from-clipboard"
 			aria-labelledby="paste-from-clipboard"
-			checked={settings.value.isPasteContentsOnSuccessEnabled}
+			checked={settings.value['transcription.clipboard.pasteOnSuccess']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					isPasteContentsOnSuccessEnabled: v,
+					'transcription.clipboard.pasteOnSuccess': v,
 				};
 			}}
 		/>
@@ -70,9 +73,12 @@
 		<Switch
 			id="faster-rerecord"
 			aria-labelledby="faster-rerecord"
-			checked={settings.value.isFasterRerecordEnabled}
+			checked={settings.value['recording.isFasterRerecordEnabled']}
 			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isFasterRerecordEnabled: v };
+				settings.value = {
+					...settings.value,
+					'recording.isFasterRerecordEnabled': v,
+				};
 			}}
 		/>
 		<Label for="faster-rerecord">
@@ -91,9 +97,9 @@
 			<Switch
 				id="close-to-tray"
 				aria-labelledby="close-to-tray"
-				checked={settings.value.closeToTray}
+				checked={settings.value['system.closeToTray']}
 				onCheckedChange={(v) => {
-					settings.value = { ...settings.value, closeToTray: v };
+					settings.value = { ...settings.value, 'system.closeToTray': v };
 				}}
 			/>
 			<Label for="close-to-tray">
@@ -121,19 +127,19 @@
 				{ value: 'keep-forever', label: 'Keep All Recordings' },
 				{ value: 'limit-count', label: 'Keep Limited Number' },
 			]}
-			selected={settings.value.recordingRetentionStrategy}
+			selected={settings.value['database.recordingRetentionStrategy']}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					recordingRetentionStrategy: selected,
+					'database.recordingRetentionStrategy': selected,
 				};
 			}}
 			placeholder="Select retention strategy"
 		/>
 	</div>
 
-	{#if settings.value.recordingRetentionStrategy === 'limit-count'}
+	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
 		<div class="grid gap-2">
 			<SettingsLabelSelect
 				id="max-recording-count"
@@ -145,10 +151,13 @@
 					{ value: '50', label: '50 Recordings' },
 					{ value: '100', label: '100 Recordings' },
 				]}
-				selected={settings.value.maxRecordingCount}
+				selected={settings.value['database.maxRecordingCount']}
 				onSelectedChange={(selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, maxRecordingCount: selected };
+					settings.value = {
+						...settings.value,
+						'database.maxRecordingCount': selected,
+					};
 				}}
 				placeholder="Select maximum recordings"
 			/>
@@ -161,10 +170,13 @@
 				id="always-on-top"
 				label="Always On Top"
 				items={ALWAYS_ON_TOP_OPTIONS}
-				selected={settings.value.alwaysOnTop}
+				selected={settings.value['system.alwaysOnTop']}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
-					settings.value = { ...settings.value, alwaysOnTop: selected };
+					settings.value = {
+						...settings.value,
+						'system.alwaysOnTop': selected,
+					};
 				}}
 				placeholder="Select a language"
 			/>

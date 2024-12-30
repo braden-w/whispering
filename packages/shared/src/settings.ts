@@ -7,73 +7,75 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
 
-// Recording retention configuration
-export const RETENTION_STRATEGIES = ['keep-forever', 'limit-count'] as const;
-
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
-		isCopyToClipboardEnabled: true,
-		isPasteContentsOnSuccessEnabled: true,
-		isFasterRerecordEnabled: false,
-		closeToTray: false,
-		alwaysOnTop: 'Never',
+		'transcription.clipboard.copyOnSuccess': true,
+		'transcription.clipboard.pasteOnSuccess': true,
+		'recording.isFasterRerecordEnabled': false,
+		'system.closeToTray': false,
+		'system.alwaysOnTop': 'Never',
 
 		// Recording retention defaults
-		recordingRetentionStrategy: 'keep-forever',
-		maxRecordingCount: '5',
+		'database.recordingRetentionStrategy': 'keep-forever',
+		'database.maxRecordingCount': '5',
 
-		selectedAudioInputDeviceId: 'default',
-		bitrateKbps: DEFAULT_BITRATE_KBPS,
+		'recording.selectedAudioInputDeviceId': 'default',
+		'recording.bitrateKbps': DEFAULT_BITRATE_KBPS,
 
-		selectedTranscriptionService: 'OpenAI',
-		outputLanguage: 'auto',
-		prompt: '',
-		temperature: '0',
+		'transcription.selectedTranscriptionService': 'OpenAI',
+		'transcription.outputLanguage': 'auto',
+		'transcription.prompt': '',
+		'transcription.temperature': '0',
 
-		openAiApiKey: '',
+		'transcription.openAi.apiKey': '',
 
-		groqApiKey: '',
+		'transcription.groq.apiKey': '',
 
-		fasterWhisperServerUrl: 'http://localhost:8000',
-		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
+		'transcription.fasterWhisperServer.serverUrl': 'http://localhost:8000',
+		'transcription.fasterWhisperServer.serverModel':
+			'Systran/faster-whisper-medium.en',
 
-		currentLocalShortcut: 'space',
-		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		'shortcuts.currentLocalShortcut': 'space',
+		'shortcuts.currentGlobalShortcut':
+			platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
-	isCopyToClipboardEnabled: z.boolean(),
-	isPasteContentsOnSuccessEnabled: z.boolean(),
-	isFasterRerecordEnabled: z.boolean(),
-	closeToTray: z.boolean(),
-	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
+	'transcription.clipboard.copyOnSuccess': z.boolean(),
+	'transcription.clipboard.pasteOnSuccess': z.boolean(),
+	'recording.isFasterRerecordEnabled': z.boolean(),
 
-	// Auto delete recordings settings
-	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
-	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
+	'system.closeToTray': z.boolean(),
+	'system.alwaysOnTop': z.enum(ALWAYS_ON_TOP_VALUES),
 
-	selectedAudioInputDeviceId: z.string(),
-	bitrateKbps: z
+	'database.recordingRetentionStrategy': z.enum([
+		'keep-forever',
+		'limit-count',
+	] as const),
+	'database.maxRecordingCount': z.string().regex(/^\d+$/, 'Must be a number'),
+
+	'recording.selectedAudioInputDeviceId': z.string(),
+	'recording.bitrateKbps': z
 		.enum(BITRATE_VALUES_KBPS)
 		.optional()
 		.default(DEFAULT_BITRATE_KBPS),
 
-	selectedTranscriptionService: z.enum(TRANSCRIPTION_SERVICES),
-	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
-	prompt: z.string(),
-	temperature: z.string(),
+	// Shared transcription settings
+	'transcription.selectedTranscriptionService': z.enum(TRANSCRIPTION_SERVICES),
+	'transcription.outputLanguage': z.enum(SUPPORTED_LANGUAGES),
+	'transcription.prompt': z.string(),
+	'transcription.temperature': z.string(),
 
-	openAiApiKey: z.string(),
+	// Service-specific settings
+	'transcription.openAi.apiKey': z.string(),
+	'transcription.groq.apiKey': z.string(),
+	'transcription.fasterWhisperServer.serverUrl': z.string(),
+	'transcription.fasterWhisperServer.serverModel': z.string(),
 
-	groqApiKey: z.string(),
-
-	fasterWhisperServerUrl: z.string(),
-	fasterWhisperServerModel: z.string(),
-
-	currentLocalShortcut: z.string(),
-	currentGlobalShortcut: z.string(),
+	'shortcuts.currentLocalShortcut': z.string(),
+	'shortcuts.currentGlobalShortcut': z.string(),
 });
 
 export type Settings = z.infer<typeof settingsSchema>;

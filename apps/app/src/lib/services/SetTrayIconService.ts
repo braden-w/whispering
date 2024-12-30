@@ -68,9 +68,9 @@ async function initTray() {
 			CheckMenuItem.new({
 				id: `always-on-top-${value}`,
 				text: `Always on Top: ${value}`,
-				checked: settings.value.alwaysOnTop === value,
+				checked: settings.value['system.alwaysOnTop'] === value,
 				action: async (id) => {
-					settings.value = { ...settings.value, alwaysOnTop: value };
+					settings.value = { ...settings.value, 'system.alwaysOnTop': value };
 
 					// Update all menu items to ensure only the selected one is checked
 					await Promise.all(

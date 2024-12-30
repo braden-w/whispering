@@ -5,7 +5,6 @@ import type {
 	WhisperingErrProperties,
 } from '@repo/shared';
 import type { HttpServiceErr } from '../http/HttpService';
-import { goto } from '$app/navigation';
 
 export type TranscriptionServiceErr = WhisperingErr;
 export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
@@ -16,7 +15,7 @@ export type TranscriptionService = {
 		options: {
 			prompt: string;
 			temperature: string;
-			outputLanguage: Settings['outputLanguage'];
+			outputLanguage: Settings['transcription.outputLanguage'];
 		},
 	) => Promise<TranscriptionServiceResult<string>>;
 };

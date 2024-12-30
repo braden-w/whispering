@@ -33,27 +33,30 @@
 			id="selected-transcription-service"
 			label="Transcription Service"
 			items={TRANSCRIPTION_SERVICE_OPTIONS}
-			selected={settings.value.selectedTranscriptionService}
+			selected={settings.value['transcription.selectedTranscriptionService']}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					selectedTranscriptionService: selected,
+					'transcription.selectedTranscriptionService': selected,
 				};
 			}}
 			placeholder="Select a transcription service"
 		/>
 	</div>
-	{#if settings.value.selectedTranscriptionService === 'OpenAI'}
+	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="openai-api-key"
 				label="OpenAI API Key"
 				type="password"
 				placeholder="Your OpenAI API Key"
-				value={settings.value.openAiApiKey}
+				value={settings.value['transcription.openAi.apiKey']}
 				oninput={({ currentTarget: { value } }) => {
-					settings.value = { ...settings.value, openAiApiKey: value };
+					settings.value = {
+						...settings.value,
+						'transcription.openAi.apiKey': value,
+					};
 				}}
 			/>
 			<div class="text-muted-foreground text-sm">
@@ -77,16 +80,19 @@
 				is enabled.
 			</div>
 		</div>
-	{:else if settings.value.selectedTranscriptionService === 'Groq'}
+	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
 		<div class="grid gap-2">
 			<SettingsLabelInput
 				id="groq-api-key"
 				label="Groq API Key"
 				type="password"
 				placeholder="Your Groq API Key"
-				value={settings.value.groqApiKey}
+				value={settings.value['transcription.groq.apiKey']}
 				oninput={({ currentTarget: { value } }) => {
-					settings.value = { ...settings.value, groqApiKey: value };
+					settings.value = {
+						...settings.value,
+						'transcription.groq.apiKey': value,
+					};
 				}}
 			/>
 			<div class="text-muted-foreground text-sm">
@@ -101,7 +107,7 @@
 				</Button>.
 			</div>
 		</div>
-	{:else if settings.value.selectedTranscriptionService === 'faster-whisper-server'}
+	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
 				<Card.Title class="text-xl">
@@ -164,9 +170,12 @@
 				id="faster-whisper-server-url"
 				label="faster-whisper-server URL"
 				placeholder="Your faster-whisper-server URL"
-				value={settings.value.fasterWhisperServerUrl}
+				value={settings.value['transcription.fasterWhisperServer.serverUrl']}
 				oninput={({ currentTarget: { value } }) => {
-					settings.value = { ...settings.value, fasterWhisperServerUrl: value };
+					settings.value = {
+						...settings.value,
+						'transcription.fasterWhisperServer.serverUrl': value,
+					};
 				}}
 			/>
 		</div>
@@ -175,11 +184,11 @@
 				id="faster-whisper-server-model"
 				label="faster-whisper-server Model"
 				placeholder="Your faster-whisper-server Model"
-				value={settings.value.fasterWhisperServerModel}
+				value={settings.value['transcription.fasterWhisperServer.serverModel']}
 				oninput={({ currentTarget: { value } }) => {
 					settings.value = {
 						...settings.value,
-						fasterWhisperServerModel: value,
+						'transcription.fasterWhisperServer.serverModel': value,
 					};
 				}}
 			/>
@@ -190,10 +199,13 @@
 			id="output-language"
 			label="Output Language"
 			items={SUPPORTED_LANGUAGES_OPTIONS}
-			selected={settings.value.outputLanguage}
+			selected={settings.value['transcription.outputLanguage']}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
-				settings.value = { ...settings.value, outputLanguage: selected };
+				settings.value = {
+					...settings.value,
+					'transcription.outputLanguage': selected,
+				};
 			}}
 			placeholder="Select a language"
 		/>
@@ -208,9 +220,12 @@
 			max="1"
 			step="0.1"
 			placeholder="0"
-			value={settings.value.temperature}
+			value={settings.value['transcription.temperature']}
 			oninput={({ currentTarget: { value } }) => {
-				settings.value = { ...settings.value, temperature: value };
+				settings.value = {
+					...settings.value,
+					'transcription.temperature': value,
+				};
 			}}
 		/>
 		<div class="text-muted-foreground text-sm">
@@ -224,9 +239,12 @@
 			id="transcription-prompt"
 			label="System Prompt"
 			placeholder="Optional system prompt to guide the transcription"
-			value={settings.value.prompt}
+			value={settings.value['transcription.prompt']}
 			oninput={({ currentTarget: { value } }) => {
-				settings.value = { ...settings.value, prompt: value };
+				settings.value = {
+					...settings.value,
+					'transcription.prompt': value,
+				};
 			}}
 			description="Custom instructions to guide the transcription process. Leave empty for default behavior."
 		/>

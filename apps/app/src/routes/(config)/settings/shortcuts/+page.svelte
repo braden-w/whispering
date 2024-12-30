@@ -25,9 +25,12 @@
 			id="local-shortcut"
 			label="Local Shortcut"
 			placeholder="Local Shortcut to toggle recording"
-			value={settings.value.currentLocalShortcut}
+			value={settings.value['shortcuts.currentLocalShortcut']}
 			onchange={({ currentTarget: { value } }) => {
-				settings.value = { ...settings.value, currentLocalShortcut: value };
+				settings.value = {
+					...settings.value,
+					'shortcuts.currentLocalShortcut': value,
+				};
 				registerShortcuts.registerLocalShortcut({
 					shortcut: value,
 					callback: () => recorder.toggleRecordingWithToast(),
@@ -41,9 +44,12 @@
 				id="global-shortcut"
 				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"
-				value={settings.value.currentGlobalShortcut}
+				value={settings.value['shortcuts.currentGlobalShortcut']}
 				onchange={({ currentTarget: { value } }) => {
-					settings.value = { ...settings.value, currentGlobalShortcut: value };
+					settings.value = {
+						...settings.value,
+						'shortcuts.currentGlobalShortcut': value,
+					};
 					registerShortcuts.registerGlobalShortcut({
 						shortcut: value,
 						callback: () => recorder.toggleRecordingWithToast(),
@@ -56,7 +62,7 @@
 				<Input
 					id="global-shortcut"
 					placeholder="Global Shortcut to toggle recording"
-					value={settings.value.currentGlobalShortcut}
+					value={settings.value['shortcuts.currentGlobalShortcut']}
 					type="text"
 					autocomplete="off"
 					disabled

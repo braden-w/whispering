@@ -18,7 +18,7 @@ export function createTranscriptionServiceWhisper({
 }): TranscriptionService {
 	return {
 		transcribe: async (audioBlob, options) => {
-			if (!settings.value.openAiApiKey) {
+			if (!settings.value['transcription.openAi.apiKey']) {
 				return TranscriptionServiceErr({
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
@@ -30,7 +30,7 @@ export function createTranscriptionServiceWhisper({
 				});
 			}
 
-			if (!settings.value.openAiApiKey.startsWith('sk-')) {
+			if (!settings.value['transcription.openAi.apiKey'].startsWith('sk-')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',
@@ -65,7 +65,9 @@ export function createTranscriptionServiceWhisper({
 			const postResponseResult = await HttpService.post({
 				formData,
 				url: 'https://api.openai.com/v1/audio/transcriptions',
-				headers: { Authorization: `Bearer ${settings.value.openAiApiKey}` },
+				headers: {
+					Authorization: `Bearer ${settings.value['transcription.openAi.apiKey']}`,
+				},
 				schema: whisperApiResponseSchema,
 			});
 			if (!postResponseResult.ok) {

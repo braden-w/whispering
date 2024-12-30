@@ -78,7 +78,7 @@ function createRecorder() {
 			toast.loading({
 				id: stopRecordingToastId,
 				title: '✨ Recording Complete!',
-				description: settings.value.isFasterRerecordEnabled
+				description: settings.value['recording.isFasterRerecordEnabled']
 					? 'Recording saved! Ready for another take'
 					: 'Recording saved and session closed successfully',
 			});
@@ -97,7 +97,7 @@ function createRecorder() {
 
 					const { transcribedText } = transcribeAndUpdateWithToastResult.data;
 
-					if (settings.value.isCopyToClipboardEnabled) {
+					if (settings.value['transcription.clipboard.copyOnSuccess']) {
 						toast.loading({
 							id: stopRecordingToastId,
 							title: '⏳ Copying to clipboard...',
@@ -127,7 +127,7 @@ function createRecorder() {
 						}
 					}
 
-					if (!settings.value.isPasteContentsOnSuccessEnabled) {
+					if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
 						toast.success({
 							id: stopRecordingToastId,
 							title: '📝📋 Recording transcribed and copied to clipboard!',
@@ -167,7 +167,7 @@ function createRecorder() {
 					});
 				})(),
 				(async () => {
-					if (settings.value.isFasterRerecordEnabled) return;
+					if (settings.value['recording.isFasterRerecordEnabled']) return;
 					toast.loading({
 						id: stopRecordingToastId,
 						title: '⏳ Closing session...',
@@ -207,8 +207,9 @@ function createRecorder() {
 			const initResult =
 				await userConfiguredServices.RecorderService.initRecordingSession(
 					{
-						deviceId: settings.value.selectedAudioInputDeviceId,
-						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
+						bitsPerSecond:
+							Number(settings.value['recording.bitrateKbps']) * 1000,
 					},
 					{
 						sendStatus: (options) =>
@@ -298,7 +299,7 @@ function createRecorder() {
 				return;
 			}
 			await setRecorderState('SESSION');
-			if (settings.value.isFasterRerecordEnabled) {
+			if (settings.value['recording.isFasterRerecordEnabled']) {
 				toast.success({
 					id: toastId,
 					title: '🚫 Recording Cancelled',

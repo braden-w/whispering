@@ -115,9 +115,9 @@ function createRecordings() {
 				await userConfiguredServices.TranscriptionService.transcribe(
 					recording.blob,
 					{
-						outputLanguage: settings.value.outputLanguage,
-						prompt: settings.value.prompt,
-						temperature: settings.value.temperature,
+						outputLanguage: settings.value['transcription.outputLanguage'],
+						prompt: settings.value['transcription.prompt'],
+						temperature: settings.value['transcription.temperature'],
 					},
 				);
 			transcribingRecordingIds.delete(recording.id);

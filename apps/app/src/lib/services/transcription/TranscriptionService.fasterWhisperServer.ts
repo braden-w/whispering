@@ -32,14 +32,17 @@ export function createTranscriptionServiceFasterWhisperServer({
 			);
 			const formData = new FormData();
 			formData.append('file', formDataFile);
-			formData.append('model', settings.value.fasterWhisperServerModel);
+			formData.append(
+				'model',
+				settings.value['transcription.fasterWhisperServer.serverModel'],
+			);
 			if (options.outputLanguage !== 'auto')
 				formData.append('language', options.outputLanguage);
 			if (options.prompt) formData.append('prompt', options.prompt);
 			if (options.temperature)
 				formData.append('temperature', options.temperature);
 			const postResult = await HttpService.post({
-				url: `${settings.value.fasterWhisperServerUrl}/v1/audio/transcriptions`,
+				url: `${settings.value['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
 				formData,
 				schema: whisperApiResponseSchema,
 			});
