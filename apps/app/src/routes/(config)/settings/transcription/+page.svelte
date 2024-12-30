@@ -12,6 +12,8 @@
 	} from '@repo/shared';
 	import SettingsLabelInput from '../SettingsLabelInput.svelte';
 	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { Label } from '$lib/components/ui/label';
 </script>
 
 <svelte:head>
@@ -219,13 +221,12 @@
 	</div>
 
 	<div class="grid gap-2">
-		<label for="prompt" class="text-sm font-medium">System Prompt</label>
-		<textarea
-			id="prompt"
-			class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+		<Label for="transcription-prompt" class="text-sm">System Prompt</Label>
+		<Textarea
+			id="transcription-prompt"
 			placeholder="Optional system prompt to guide the transcription"
 			value={settings.value.prompt}
-			on:input={({ currentTarget: { value } }) => {
+			oninput={({ currentTarget: { value } }) => {
 				settings.value = { ...settings.value, prompt: value };
 			}}
 		/>
