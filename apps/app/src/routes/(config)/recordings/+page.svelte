@@ -381,11 +381,13 @@
 						variant="outline"
 						size="icon"
 						onclick={() => {
-							const ids = selectedRecordingRows.map(({ id }) => id);
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () => recordings.deleteRecordingsByIdWithToast(ids),
+								onConfirm: () =>
+									recordings.deleteRecordingsWithToast(
+										selectedRecordingRows.map(({ original }) => original),
+									),
 							});
 						}}
 					>

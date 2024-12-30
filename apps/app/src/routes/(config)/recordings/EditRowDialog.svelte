@@ -96,7 +96,7 @@
 					class="mr-auto"
 					onclick={async () => {
 						isDeleting = true;
-						await recordings.deleteRecordingByIdWithToast(recording.id);
+						await recordings.deleteRecordingWithToast(recording);
 						isDeleting = false;
 						isDialogOpen = false;
 					}}

@@ -43,8 +43,8 @@ export type DbService = {
 	getRecording: (id: string) => Promise<DbServiceResult<Recording | null>>;
 	addRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
-	deleteRecordingById: (id: string) => Promise<DbServiceResult<void>>;
-	deleteRecordingsById: (ids: string[]) => Promise<DbServiceResult<void>>;
+	deleteRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
+	deleteRecordings: (recordings: Recording[]) => Promise<DbServiceResult<void>>;
 	/**
 	 * Checks and deletes expired recordings based on current settings.
 	 * This should be called:
