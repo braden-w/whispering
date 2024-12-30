@@ -10,6 +10,7 @@ import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { settings } from './settings.svelte';
 
 export type { Recording } from '$lib/services/db/RecordingsService';
 
@@ -113,6 +114,7 @@ function createRecordings() {
 			const transcriptionResult =
 				await userConfiguredServices.TranscriptionService.transcribe(
 					recording.blob,
+					{ outputLanguage: settings.value.outputLanguage },
 				);
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {

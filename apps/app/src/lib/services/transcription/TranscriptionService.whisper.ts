@@ -17,7 +17,7 @@ export function createTranscriptionServiceWhisper({
 	HttpService: HttpService;
 }): TranscriptionService {
 	return {
-		transcribe: async (audioBlob, options = {}) => {
+		transcribe: async (audioBlob, options) => {
 			if (!settings.value.openAiApiKey) {
 				return TranscriptionServiceErr({
 					title: 'OpenAI API Key not provided.',
@@ -55,8 +55,8 @@ export function createTranscriptionServiceWhisper({
 				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 			);
 			formData.append('model', 'whisper-1');
-			if (settings.value.outputLanguage !== 'auto') {
-				formData.append('language', settings.value.outputLanguage);
+			if (options.outputLanguage !== 'auto') {
+				formData.append('language', options.outputLanguage);
 			}
 			if (options.prompt) formData.append('prompt', options.prompt);
 			if (options.temperature)

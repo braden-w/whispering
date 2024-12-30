@@ -17,7 +17,7 @@ export function createTranscriptionServiceFasterWhisperServer({
 	HttpService: HttpService;
 }): TranscriptionService {
 	return {
-		transcribe: async (audioBlob, options = {}) => {
+		transcribe: async (audioBlob, options) => {
 			const blobSizeInMb = audioBlob.size / (1024 * 1024);
 			if (blobSizeInMb > MAX_FILE_SIZE_MB) {
 				return TranscriptionServiceErr({
@@ -33,8 +33,8 @@ export function createTranscriptionServiceFasterWhisperServer({
 			const formData = new FormData();
 			formData.append('file', formDataFile);
 			formData.append('model', settings.value.fasterWhisperServerModel);
-			if (settings.value.outputLanguage !== 'auto')
-				formData.append('language', settings.value.outputLanguage);
+			if (options.outputLanguage !== 'auto')
+				formData.append('language', options.outputLanguage);
 			if (options.prompt) formData.append('prompt', options.prompt);
 			if (options.temperature)
 				formData.append('temperature', options.temperature);

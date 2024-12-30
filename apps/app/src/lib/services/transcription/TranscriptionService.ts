@@ -1,5 +1,9 @@
 import { Err, type Ok } from '@epicenterhq/result';
-import type { WhisperingErr, WhisperingErrProperties } from '@repo/shared';
+import type {
+	Settings,
+	WhisperingErr,
+	WhisperingErrProperties,
+} from '@repo/shared';
 import type { HttpServiceErr } from '../http/HttpService';
 import { goto } from '$app/navigation';
 
@@ -9,9 +13,10 @@ export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
 export type TranscriptionService = {
 	transcribe: (
 		audioBlob: Blob,
-		options?: {
+		options: {
 			prompt?: string;
 			temperature?: string;
+			outputLanguage: Settings['outputLanguage'];
 		},
 	) => Promise<TranscriptionServiceResult<string>>;
 };
