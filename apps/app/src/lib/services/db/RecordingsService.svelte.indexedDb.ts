@@ -1,4 +1,5 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
+import type { Settings } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
 import { toast } from '../../utils/toast';
 import type { DbService } from './RecordingsService';
@@ -205,7 +206,7 @@ export function createRecordingsIndexedDbService(): DbService {
 			return Ok(undefined);
 		},
 
-		async deleteRecordingById(id: string) {
+		async deleteRecording(recording: Recording) {
 			const deleteRecordingByIdResult = await tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
@@ -217,8 +218,8 @@ export function createRecordingsIndexedDbService(): DbService {
 					);
 					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 					await Promise.all([
-						recordingMetadataStore.delete(id),
-						recordingBlobStore.delete(id),
+						recordingMetadataStore.delete(recording.id),
+						recordingBlobStore.delete(recording.id),
 						tx.done,
 					]);
 				},
@@ -230,11 +231,11 @@ export function createRecordingsIndexedDbService(): DbService {
 					}),
 			});
 			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
-			recordings = recordings.filter((r) => r.id !== id);
+			recordings = recordings.filter((r) => r.id !== recording.id);
 			return Ok(undefined);
 		},
 
-		async deleteRecordingsById(ids: string[]) {
+		async deleteRecordings(recordingsToDelete: Recording[]) {
 			const deleteRecordingsByIdResult = await tryAsync({
 				try: async () => {
 					const tx = (await dbPromise).transaction(
@@ -246,8 +247,12 @@ export function createRecordingsIndexedDbService(): DbService {
 					);
 					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
 					await Promise.all([
-						...ids.map((id) => recordingMetadataStore.delete(id)),
-						...ids.map((id) => recordingBlobStore.delete(id)),
+						...recordingsToDelete.map((recording) =>
+							recordingMetadataStore.delete(recording.id),
+						),
+						...recordingsToDelete.map((recording) =>
+							recordingBlobStore.delete(recording.id),
+						),
 					]);
 					await tx.done;
 				},
@@ -259,8 +264,52 @@ export function createRecordingsIndexedDbService(): DbService {
 					}),
 			});
 			if (!deleteRecordingsByIdResult.ok) return deleteRecordingsByIdResult;
-			recordings = recordings.filter((r) => !ids.includes(r.id));
+			recordings = recordings.filter(
+				(r) => !recordingsToDelete.some((toDelete) => toDelete.id === r.id),
+			);
 			return Ok(undefined);
+		},
+
+		async cleanupExpiredRecordings({
+			recordingRetentionStrategy,
+			maxRecordingCount,
+		}) {
+			switch (recordingRetentionStrategy) {
+				case 'keep-forever': {
+					return Ok(undefined);
+				}
+				case 'limit-count': {
+					if (recordings.length === 0) return Ok(undefined);
+
+					const maxCount = Number.parseInt(maxRecordingCount);
+					if (recordings.length <= maxCount) return Ok(undefined);
+
+					// Sort recordings by timestamp (oldest first)
+					const sortedRecordings = [...recordings].sort(
+						(a, b) =>
+							new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+					);
+
+					// Get recordings to delete (all recordings beyond the max count, starting from oldest)
+					const recordingsToDelete = sortedRecordings.slice(
+						0,
+						sortedRecordings.length - maxCount,
+					);
+
+					if (recordingsToDelete.length === 0) return Ok(undefined);
+
+					const deleteRecordingsResult =
+						await this.deleteRecordings(recordingsToDelete);
+					if (!deleteRecordingsResult.ok) {
+						return DbServiceErr({
+							title: 'Unable to clean up old recordings',
+							description: 'Some old recordings could not be deleted',
+							error: deleteRecordingsResult.error,
+						});
+					}
+					return Ok(undefined);
+				}
+			}
 		},
 	};
 }

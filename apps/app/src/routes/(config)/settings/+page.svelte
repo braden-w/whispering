@@ -23,7 +23,9 @@
 			Configure your general Whispering preferences.
 		</p>
 	</div>
+
 	<Separator />
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="play-sound-enabled"
@@ -83,6 +85,7 @@
 			</Button>
 		</Label>
 	</div>
+
 	{#if window.__TAURI_INTERNALS__}
 		<div class="flex items-center gap-2">
 			<Switch
@@ -106,6 +109,53 @@
 				{/if}
 			</Label>
 		</div>
+	{/if}
+
+	<Separator />
+
+	<div class="grid gap-2">
+		<SettingsLabelSelect
+			id="recording-retention-strategy"
+			label="Auto Delete Recordings"
+			items={[
+				{ value: 'keep-forever', label: 'Keep All Recordings' },
+				{ value: 'limit-count', label: 'Keep Limited Number' },
+			]}
+			selected={settings.value.recordingRetentionStrategy}
+			onSelectedChange={(selected) => {
+				if (!selected) return;
+				settings.value = {
+					...settings.value,
+					recordingRetentionStrategy: selected,
+				};
+			}}
+			placeholder="Select retention strategy"
+		/>
+	</div>
+
+	{#if settings.value.recordingRetentionStrategy === 'limit-count'}
+		<div class="grid gap-2">
+			<SettingsLabelSelect
+				id="max-recording-count"
+				label="Maximum Recordings"
+				items={[
+					{ value: '5', label: '5 Recordings' },
+					{ value: '10', label: '10 Recordings' },
+					{ value: '25', label: '25 Recordings' },
+					{ value: '50', label: '50 Recordings' },
+					{ value: '100', label: '100 Recordings' },
+				]}
+				selected={settings.value.maxRecordingCount}
+				onSelectedChange={(selected) => {
+					if (!selected) return;
+					settings.value = { ...settings.value, maxRecordingCount: selected };
+				}}
+				placeholder="Select maximum recordings"
+			/>
+		</div>
+	{/if}
+
+	{#if window.__TAURI_INTERNALS__}
 		<div class="grid gap-2">
 			<SettingsLabelSelect
 				id="always-on-top"

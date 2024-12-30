@@ -43,8 +43,8 @@ function createRecordings() {
 			return;
 		},
 
-		deleteRecordingByIdWithToast: async (id: string) => {
-			const result = await RecordingsService.deleteRecordingById(id);
+		deleteRecordingWithToast: async (recording: Recording) => {
+			const result = await RecordingsService.deleteRecording(recording);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete recording!',
@@ -59,8 +59,8 @@ function createRecordings() {
 			return;
 		},
 
-		deleteRecordingsByIdWithToast: async (ids: string[]) => {
-			const result = await RecordingsService.deleteRecordingsById(ids);
+		deleteRecordingsWithToast: async (recordings: Recording[]) => {
+			const result = await RecordingsService.deleteRecordings(recordings);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete recordings!',

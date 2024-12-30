@@ -67,7 +67,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => recordings.deleteRecordingByIdWithToast(recording.id),
+				onConfirm: () => recordings.deleteRecordingWithToast(recording),
 			});
 		}}
 		variant="ghost"

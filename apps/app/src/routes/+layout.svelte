@@ -14,11 +14,23 @@
 	import '../app.css';
 	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
 	import { closeToTrayIfEnabled } from './+layout/closeToTray';
+	import { RecordingsService } from '$lib/services.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
 
 	let { children } = $props();
 
 	syncWindowAlwaysOnTopWithRecorderState();
 	closeToTrayIfEnabled();
+
+	$effect(() => {
+		recorder.recorderState;
+		recordings.value;
+		void RecordingsService.cleanupExpiredRecordings({
+			recordingRetentionStrategy: settings.value.recordingRetentionStrategy,
+			maxRecordingCount: settings.value.maxRecordingCount,
+		});
+	});
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;

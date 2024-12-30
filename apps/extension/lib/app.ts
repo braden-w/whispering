@@ -3,7 +3,10 @@ import { type Settings, WhisperingErr } from '@repo/shared';
 import type { CancelRecordingResponse } from '~background/messages/app/cancelRecording';
 import type { CloseRecordingSessionResponse } from '~background/messages/app/closeRecordingSession';
 import type { GetSettingsResponse } from '~background/messages/app/getSettings';
-import type { SetSettingsResponse } from '~background/messages/app/setSettings';
+import type {
+	SetSettingsRequest,
+	SetSettingsResponse,
+} from '~background/messages/app/setSettings';
 import type { ToggleRecordingResponse } from '~background/messages/app/toggleRecording';
 
 export const app = {
@@ -16,7 +19,7 @@ export const app = {
 	setSettings: async (settings: Settings) => {
 		const response = (await sendToBackground({
 			name: 'app/setSettings',
-			body: settings,
+			body: { settings } satisfies SetSettingsRequest,
 		})) as SetSettingsResponse;
 		return response;
 	},

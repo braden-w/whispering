@@ -7,6 +7,9 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
 
+// Recording retention configuration
+export const RETENTION_STRATEGIES = ['keep-forever', 'limit-count'] as const;
+
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
@@ -15,6 +18,10 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isFasterRerecordEnabled: false,
 		closeToTray: false,
 		alwaysOnTop: 'When Recording',
+
+		// Recording retention defaults
+		recordingRetentionStrategy: 'keep-forever',
+		maxRecordingCount: '5',
 
 		selectedAudioInputDeviceId: 'default',
 		bitrateKbps: DEFAULT_BITRATE_KBPS,
@@ -37,6 +44,10 @@ export const settingsSchema = z.object({
 	isFasterRerecordEnabled: z.boolean(),
 	closeToTray: z.boolean(),
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
+
+	// Auto delete recordings settings
+	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
+	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
 
 	selectedAudioInputDeviceId: z.string(),
 	bitrateKbps: z
