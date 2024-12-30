@@ -268,13 +268,23 @@ export function createRecordingsIndexedDbService(): DbService {
 			recordingRetentionStrategy,
 			recordingRetentionMinutes,
 		}) {
-			const expiredRecordings = recordings.filter((recording) =>
-				isRecordingExpired({
-					recording,
-					recordingRetentionStrategy,
-					recordingRetentionMinutes,
-				}),
-			);
+			if (recordingRetentionStrategy === 'keep-forever') return Ok(undefined);
+			let expiredRecordings: Recording[] = [];
+			switch (recordingRetentionStrategy) {
+				case 'never-save':
+					expiredRecordings = recordings;
+					break;
+				case 'expire-after-duration':
+					expiredRecordings = recordings.filter((recording) => {
+						const retentionMinutes = Number.parseInt(recordingRetentionMinutes);
+						const recordingDate = new Date(recording.timestamp);
+						const expirationDate = new Date(
+							recordingDate.getTime() + retentionMinutes * 60 * 1000,
+						);
+						return new Date() > expirationDate;
+					});
+					break;
+			}
 			if (expiredRecordings.length === 0) return Ok(undefined);
 
 			const expiredIds = expiredRecordings.map((r) => r.id);
@@ -290,33 +300,4 @@ export function createRecordingsIndexedDbService(): DbService {
 			return Ok(undefined);
 		},
 	};
-}
-
-/**
- * Checks if a recording should be expired based on the retention settings and its timestamp
- */
-function isRecordingExpired({
-	recording,
-	recordingRetentionStrategy,
-	recordingRetentionMinutes,
-}: {
-	recording: Recording;
-	recordingRetentionStrategy: Settings['recordingRetentionStrategy'];
-	recordingRetentionMinutes: Settings['recordingRetentionMinutes'];
-}): boolean {
-	switch (recordingRetentionStrategy) {
-		case 'keep-forever':
-			return false;
-		case 'never-save':
-			return true;
-		case 'expire-after-duration': {
-			const retentionMinutes = Number.parseInt(recordingRetentionMinutes);
-			const recordingDate = new Date(recording.timestamp);
-			const expirationDate = new Date(
-				recordingDate.getTime() + retentionMinutes * 60 * 1000,
-			);
-
-			return new Date() > expirationDate;
-		}
-	}
 }
