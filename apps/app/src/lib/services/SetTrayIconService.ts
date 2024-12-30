@@ -1,3 +1,4 @@
+import { goto } from '$app/navigation';
 import { recorder } from '$lib/stores/recorder.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { Err, Ok, tryAsync } from '@epicenterhq/result';
@@ -6,7 +7,7 @@ import {
 	ALWAYS_ON_TOP_VALUES,
 	type WhisperingRecordingState,
 } from '@repo/shared';
-import { Menu, MenuItem, CheckMenuItem } from '@tauri-apps/api/menu';
+import { CheckMenuItem, Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -99,6 +100,16 @@ async function initTray() {
 
 			// Always on Top Section
 			...alwaysOnTopItems,
+
+			// Settings Section
+			await MenuItem.new({
+				id: 'settings',
+				text: 'Settings',
+				action: () => {
+					goto('/settings');
+					return getCurrentWindow().show();
+				},
+			}),
 
 			// Quit Section
 			await MenuItem.new({
