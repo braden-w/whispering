@@ -26,17 +26,18 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		selectedAudioInputDeviceId: 'default',
 		bitrateKbps: DEFAULT_BITRATE_KBPS,
 
-		selectedTranscriptionService: 'OpenAI',
-		outputLanguage: 'auto',
-		prompt: '',
-		temperature: '0',
+		'transcription.selectedTranscriptionService': 'OpenAI',
+		'transcription.outputLanguage': 'auto',
+		'transcription.prompt': '',
+		'transcription.temperature': '0',
 
-		openAiApiKey: '',
+		'transcription.openAi.apiKey': '',
 
-		groqApiKey: '',
+		'transcription.groq.apiKey': '',
 
-		fasterWhisperServerUrl: 'http://localhost:8000',
-		fasterWhisperServerModel: 'Systran/faster-whisper-medium.en',
+		'transcription.fasterWhisperServer.serverUrl': 'http://localhost:8000',
+		'transcription.fasterWhisperServer.serverModel':
+			'Systran/faster-whisper-medium.en',
 
 		currentLocalShortcut: 'space',
 		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
@@ -60,17 +61,17 @@ export const settingsSchema = z.object({
 		.optional()
 		.default(DEFAULT_BITRATE_KBPS),
 
-	selectedTranscriptionService: z.enum(TRANSCRIPTION_SERVICES),
-	outputLanguage: z.enum(SUPPORTED_LANGUAGES),
-	prompt: z.string(),
-	temperature: z.string(),
+	// Shared transcription settings
+	'transcription.selectedTranscriptionService': z.enum(TRANSCRIPTION_SERVICES),
+	'transcription.outputLanguage': z.enum(SUPPORTED_LANGUAGES),
+	'transcription.prompt': z.string(),
+	'transcription.temperature': z.string(),
 
-	openAiApiKey: z.string(),
-
-	groqApiKey: z.string(),
-
-	fasterWhisperServerUrl: z.string(),
-	fasterWhisperServerModel: z.string(),
+	// Service-specific settings
+	'transcription.openAi.apiKey': z.string(),
+	'transcription.groq.apiKey': z.string(),
+	'transcription.fasterWhisperServer.serverUrl': z.string(),
+	'transcription.fasterWhisperServer.serverModel': z.string(),
 
 	currentLocalShortcut: z.string(),
 	currentGlobalShortcut: z.string(),

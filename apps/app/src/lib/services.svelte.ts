@@ -55,7 +55,7 @@ export const userConfiguredServices = createServices();
 
 function createServices() {
 	const TranscriptionService = $derived.by(() => {
-		switch (settings.value.selectedTranscriptionService) {
+		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
 				return createTranscriptionServiceWhisper({ HttpService });
 			case 'Groq':
@@ -66,7 +66,7 @@ function createServices() {
 	});
 
 	const RecorderService = $derived(
-		settings.value.selectedRecorderService === 'Tauri'
+		settings.value.selectedAudioInputDeviceId === 'default'
 			? createRecorderServiceTauri()
 			: createRecorderServiceWeb(),
 	);

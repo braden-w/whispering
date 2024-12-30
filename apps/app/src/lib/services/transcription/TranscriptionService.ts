@@ -16,7 +16,7 @@ export type TranscriptionService = {
 		options: {
 			prompt: string;
 			temperature: string;
-			outputLanguage: Settings['outputLanguage'];
+			outputLanguage: Settings['transcription.outputLanguage'];
 		},
 	) => Promise<TranscriptionServiceResult<string>>;
 };

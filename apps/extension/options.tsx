@@ -225,9 +225,12 @@ function SettingsCard() {
 						id="output-language"
 						label="Output Language"
 						options={SUPPORTED_LANGUAGES_OPTIONS}
-						value={settings.outputLanguage}
+						value={settings['transcription.outputLanguage']}
 						onValueChange={(value) =>
-							setSettings({ ...settings, outputLanguage: value })
+							setSettings({
+								...settings,
+								'transcription.outputLanguage': value,
+							})
 						}
 					/>
 				</div>
@@ -296,23 +299,26 @@ function SettingsCard() {
 						id="selected-transcription-service"
 						label="Transcription Service"
 						options={TRANSCRIPTION_SERVICE_OPTIONS}
-						value={settings.selectedTranscriptionService}
+						value={settings['transcription.selectedTranscriptionService']}
 						onValueChange={(value) =>
-							setSettings({ ...settings, selectedTranscriptionService: value })
+							setSettings({
+								...settings,
+								'transcription.selectedTranscriptionService': value,
+							})
 						}
 					/>
 				</div>
 
-				{settings.selectedTranscriptionService === 'OpenAI' ? (
+				{settings['transcription.selectedTranscriptionService'] === 'OpenAI' ? (
 					<div className="grid gap-2">
 						<SettingsLabelInput
 							id="openai-api-key"
 							label="OpenAI API Key"
-							value={settings.openAiApiKey}
+							value={settings['transcription.openAi.apiKey']}
 							onChange={(value) =>
 								setSettings({
 									...settings,
-									openAiApiKey: value,
+									'transcription.openAi.apiKey': value,
 								})
 							}
 							placeholder="Your OpenAI API Key"
@@ -346,16 +352,17 @@ function SettingsCard() {
 							is enabled.
 						</div>
 					</div>
-				) : settings.selectedTranscriptionService === 'Groq' ? (
+				) : settings['transcription.selectedTranscriptionService'] ===
+					'Groq' ? (
 					<div className="grid gap-2">
 						<SettingsLabelInput
 							id="groq-api-key"
 							label="Groq API Key"
-							value={settings.groqApiKey}
+							value={settings['transcription.groq.apiKey']}
 							onChange={(value) =>
 								setSettings({
 									...settings,
-									groqApiKey: value,
+									'transcription.groq.apiKey': value,
 								})
 							}
 							placeholder="Your Groq API Key"
@@ -381,17 +388,19 @@ function SettingsCard() {
 				<Button
 					onClick={() => {
 						if (
-							settings.selectedTranscriptionService === 'OpenAI' &&
-							!settings.openAiApiKey
+							settings['transcription.selectedTranscriptionService'] ===
+								'OpenAI' &&
+							!settings['transcription.openAi.apiKey']
 						) {
 							alert('Please enter an OpenAI API Key');
 							return;
 						}
 						if (
-							settings.selectedTranscriptionService === 'Groq' &&
-							!settings.groqApiKey
+							settings['transcription.selectedTranscriptionService'] ===
+								'Groq' &&
+							!settings['transcription.groq.apiKey']
 						) {
-							alert('Please enter an Groq API Key');
+							alert('Please enter a Groq API Key');
 							return;
 						}
 						window.close();
