@@ -197,4 +197,41 @@
 			placeholder="Select a language"
 		/>
 	</div>
+
+	<div class="grid gap-2">
+		<SettingsLabelInput
+			id="temperature"
+			label="Temperature"
+			type="number"
+			min="0"
+			max="1"
+			step="0.1"
+			placeholder="0"
+			value={settings.value.temperature}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = { ...settings.value, temperature: value };
+			}}
+		/>
+		<div class="text-muted-foreground text-sm">
+			Controls randomness in the model's output. 0 is focused and deterministic,
+			1 is more creative.
+		</div>
+	</div>
+
+	<div class="grid gap-2">
+		<label for="prompt" class="text-sm font-medium">System Prompt</label>
+		<textarea
+			id="prompt"
+			class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+			placeholder="Optional system prompt to guide the transcription"
+			value={settings.value.prompt}
+			on:input={({ currentTarget: { value } }) => {
+				settings.value = { ...settings.value, prompt: value };
+			}}
+		/>
+		<div class="text-muted-foreground text-sm">
+			Custom instructions to guide the transcription process. Leave empty for
+			default behavior.
+		</div>
+	</div>
 </div>
