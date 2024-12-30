@@ -10,6 +10,7 @@
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 	import { type } from '@tauri-apps/plugin-os';
+	import * as Card from '$lib/components/ui/card';
 </script>
 
 <svelte:head>
@@ -26,17 +27,72 @@
 
 	<Separator />
 
-	<div class="flex items-center gap-2">
-		<Switch
-			id="play-sound-enabled"
-			aria-labelledby="play-sound-enabled"
-			checked={settings.value.isPlaySoundEnabled}
-			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isPlaySoundEnabled: v };
-			}}
-		/>
-		<Label for="play-sound-enabled">Play sound on toggle on and off</Label>
-	</div>
+	<Card.Root>
+		<Card.Header>
+			<Card.Title class="text-sm">Sound Settings</Card.Title>
+		</Card.Header>
+		<Card.Content class="space-y-2">
+			<div class="flex items-center gap-2">
+				<Switch
+					id="play-sound-start"
+					aria-labelledby="play-sound-start"
+					checked={settings.value['sound.playOnStartSuccess']}
+					onCheckedChange={(v) => {
+						settings.value = {
+							...settings.value,
+							'sound.playOnStartSuccess': v,
+						};
+					}}
+				/>
+				<Label for="play-sound-start">Play sound when recording starts</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
+					id="play-sound-stop"
+					aria-labelledby="play-sound-stop"
+					checked={settings.value['sound.playOnStopSuccess']}
+					onCheckedChange={(v) => {
+						settings.value = {
+							...settings.value,
+							'sound.playOnStopSuccess': v,
+						};
+					}}
+				/>
+				<Label for="play-sound-stop">Play sound when recording stops</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
+					id="play-sound-cancel"
+					aria-labelledby="play-sound-cancel"
+					checked={settings.value['sound.playOnCancelSuccess']}
+					onCheckedChange={(v) => {
+						settings.value = {
+							...settings.value,
+							'sound.playOnCancelSuccess': v,
+						};
+					}}
+				/>
+				<Label for="play-sound-cancel">Play sound when recording cancels</Label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Switch
+					id="play-sound-transcription"
+					aria-labelledby="play-sound-transcription"
+					checked={settings.value['sound.playOnTranscriptionSuccess']}
+					onCheckedChange={(v) => {
+						settings.value = {
+							...settings.value,
+							'sound.playOnTranscriptionSuccess': v,
+						};
+					}}
+				/>
+				<Label for="play-sound-transcription">
+					Play sound after transcription
+				</Label>
+			</div>
+		</Card.Content>
+	</Card.Root>
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="copy-to-clipboard"
