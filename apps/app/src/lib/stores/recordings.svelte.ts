@@ -114,7 +114,11 @@ function createRecordings() {
 			const transcriptionResult =
 				await userConfiguredServices.TranscriptionService.transcribe(
 					recording.blob,
-					{ outputLanguage: settings.value.outputLanguage },
+					{
+						outputLanguage: settings.value.outputLanguage,
+						prompt: settings.value.prompt,
+						temperature: settings.value.temperature,
+					},
 				);
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {

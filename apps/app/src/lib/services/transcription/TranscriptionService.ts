@@ -14,8 +14,8 @@ export type TranscriptionService = {
 	transcribe: (
 		audioBlob: Blob,
 		options: {
-			prompt?: string;
-			temperature?: string;
+			prompt: string;
+			temperature: string;
 			outputLanguage: Settings['outputLanguage'];
 		},
 	) => Promise<TranscriptionServiceResult<string>>;
