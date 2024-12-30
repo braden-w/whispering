@@ -29,6 +29,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import type { ToastAndNotifyOptions } from '@repo/shared';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import {
 		AlertCircle,
 		AlertTriangle,
@@ -56,8 +57,8 @@
 				System notifications and status updates
 			</Dialog.Description>
 		</Dialog.Header>
-		<div
-			class="space-y-3 py-4"
+		<ScrollArea
+			class="max-w-3xl h-full max-h-96 rounded-lg border"
 			data-sonner-toaster
 			data-theme={$mode}
 			data-rich-colors="true"
@@ -90,7 +91,7 @@
 					</div>
 				</Alert.Root>
 			{/each}
-		</div>
+		</ScrollArea>
 		{#if toastLogDialog.logs.length === 0}
 			<div class="py-4 text-center text-muted-foreground">
 				No logs to display
