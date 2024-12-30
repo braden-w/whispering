@@ -52,7 +52,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			ALWAYS_ON_TOP_VALUES.map(async (value) =>
 				CheckMenuItem.new({
 					id: `always-on-top-${value}`,
-					text: value,
+					text: `Always on Top: ${value}`,
 					checked: settings.value.alwaysOnTop === value,
 					action: () => {
 						settings.value = { ...settings.value, alwaysOnTop: value };
@@ -60,12 +60,6 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 				}),
 			),
 		);
-
-		// Create Always on Top menu
-		const alwaysOnTopMenu = await Menu.new({
-			id: 'always-on-top-menu',
-			items: alwaysOnTopItems,
-		});
 
 		const trayMenu = await Menu.new({
 			items: [
