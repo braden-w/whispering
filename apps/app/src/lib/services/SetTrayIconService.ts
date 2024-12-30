@@ -6,6 +6,7 @@ import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { exit } from '@tauri-apps/plugin-process';
 
 export type SetTrayIconServiceErr = Err<{
 	_tag: 'TrayIconError';
@@ -40,7 +41,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 	const trayPromise = (async () => {
 		const quitMenuItem = await MenuItem.new({
 			text: 'Quit',
-			action: () => getCurrentWindow().close(),
+			action: () => void exit(0),
 		});
 
 		const trayMenu = await Menu.new({
