@@ -14,13 +14,14 @@ export const RETENTION_STRATEGIES = [
 	'never-save',
 ] as const;
 
-export const RETENTION_PERIODS_DAYS = [
+export const RETENTION_PERIODS_MINUTES = [
 	'1',
-	'2',
-	'7',
-	'14',
-	'30',
-	'90',
+	'5',
+	'15',
+	'60',
+	'360',
+	'1440',
+	'10080',
 ] as const;
 
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
@@ -34,7 +35,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 
 		// Recording retention defaults
 		recordingRetentionStrategy: 'keep-forever',
-		recordingRetentionDays: '30',
+		recordingRetentionMinutes: '5',
 
 		selectedAudioInputDeviceId: 'default',
 		bitrateKbps: DEFAULT_BITRATE_KBPS,
@@ -60,7 +61,7 @@ export const settingsSchema = z.object({
 
 	// Recording retention settings
 	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
-	recordingRetentionDays: z.enum(RETENTION_PERIODS_DAYS),
+	recordingRetentionMinutes: z.enum(RETENTION_PERIODS_MINUTES),
 
 	selectedAudioInputDeviceId: z.string(),
 	bitrateKbps: z
