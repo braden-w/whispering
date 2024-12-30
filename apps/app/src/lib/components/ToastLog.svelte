@@ -42,13 +42,13 @@
 	const getVariantClass = (variant: ToastAndNotifyOptions['variant']) => {
 		switch (variant) {
 			case 'error':
-				return 'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive';
+				return 'border-destructive text-destructive dark:border-destructive [&>svg]:text-destructive';
 			case 'warning':
-				return 'border-amber-500/50 text-amber-500 dark:border-amber-500 [&>svg]:text-amber-500';
+				return 'border-orange-500 text-orange-500 dark:border-orange-500 [&>svg]:text-orange-500';
 			case 'success':
-				return 'border-green-500/50 text-green-500 dark:border-green-500 [&>svg]:text-green-500';
+				return 'border-emerald-500 text-emerald-500 dark:border-emerald-500 [&>svg]:text-emerald-500';
 			case 'info':
-				return 'border-sky-500/50 text-sky-500 dark:border-sky-500 [&>svg]:text-sky-500';
+				return 'border-primary text-primary dark:border-primary [&>svg]:text-primary';
 			case 'loading':
 				return 'border-muted text-muted-foreground [&>svg]:animate-spin';
 		}
