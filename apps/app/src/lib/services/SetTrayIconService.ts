@@ -44,12 +44,13 @@ export function createSetTrayIconWebService(): SetTrayIconService {
 }
 
 export function createSetTrayIconDesktopService(): SetTrayIconService {
+	const trayPromise = initTray();
 	return {
 		setTrayIcon: (recorderState: WhisperingRecordingState) =>
 			tryAsync({
 				try: async () => {
 					const iconPath = await getIconPath(recorderState);
-					const tray = await initTray();
+					const tray = await trayPromise;
 					return tray.setIcon(iconPath);
 				},
 				mapErr: (error) => SetTrayIconServiceErr(recorderState),
