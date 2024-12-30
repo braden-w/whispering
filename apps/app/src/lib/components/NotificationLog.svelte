@@ -47,7 +47,7 @@
 		{#snippet child({ props })}
 			<WhisperingButton
 				tooltipContent="Notification History"
-				class="fixed bottom-4 right-4 z-50"
+				class="fixed bottom-4 right-4 z-50 hidden xs:inline-flex"
 				variant="outline"
 				size="icon"
 				{...props}
