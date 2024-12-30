@@ -48,8 +48,8 @@
 	"dependencies": {
 		"@epicenterhq/result": "^0.5.2",
 		"@plasmohq/messaging": "^0.6.2",
-		"@repo/shared": "workspace:*",
 		"@repo/extension": "workspace:*",
+		"@repo/shared": "workspace:*",
 		"@tanstack/svelte-table": "^9.0.0-alpha.10",
 		"@tanstack/table-core": "^9.0.0-alpha.10",
 		"@tauri-apps/api": "^2.1.1",
@@ -60,6 +60,7 @@
 		"@tauri-apps/plugin-http": "^2.2.0",
 		"@tauri-apps/plugin-notification": "^2.2.0",
 		"@tauri-apps/plugin-os": "^2.2.0",
+		"@tauri-apps/plugin-process": "^2.2.0",
 		"@tauri-apps/plugin-shell": "^2.2.0",
 		"@tauri-apps/plugin-sql": "^2.2.0",
 		"@tauri-apps/plugin-window-state": "^2.2.0",
