@@ -3,6 +3,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
+	import NotificationLog from '$lib/components/NotificationLog.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -112,8 +113,14 @@
 	{@render children()}
 </div>
 
-<Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
+<Toaster
+	offset={16}
+	class="xs:block hidden"
+	theme={$mode}
+	{...TOASTER_SETTINGS}
+/>
 <ModeWatcher />
 <FasterRerecordExplainedDialog />
 <ConfirmationDialog />
 <MoreDetailsDialog />
+<NotificationLog />
