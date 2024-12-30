@@ -71,7 +71,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 				}),
 
 				await MenuItem.new({
-					id: 'minimize',
+					id: 'hide',
 					text: 'Hide Window',
 					action: () => getCurrentWindow().hide(),
 				}),
