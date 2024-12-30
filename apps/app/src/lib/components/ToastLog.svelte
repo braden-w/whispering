@@ -39,15 +39,21 @@
 		LogsIcon,
 	} from 'lucide-svelte';
 	import { mode } from 'mode-watcher';
+	import WhisperingButton from './WhisperingButton.svelte';
 </script>
 
 <Dialog.Root bind:open={toastLogDialog.isOpen}>
 	<Dialog.Trigger>
 		{#snippet child({ props })}
-			<Button variant="outline" {...props}>
+			<WhisperingButton
+				tooltipContent="View Toast Logs"
+				class="fixed bottom-2 right-2 z-50"
+				variant="outline"
+				size="icon"
+				{...props}
+			>
 				<LogsIcon />
-				Logging
-			</Button>
+			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
