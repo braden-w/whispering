@@ -12,7 +12,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPlaySoundEnabled: true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
-		isFasterRerecordEnabled: false,
+		'recording.isFasterRerecordEnabled': false,
 		'system.closeToTray': false,
 		'system.alwaysOnTop': 'Never',
 
@@ -45,7 +45,7 @@ export const settingsSchema = z.object({
 	isPlaySoundEnabled: z.boolean(),
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
 	'transcription.clipboard.pasteOnSuccess': z.boolean(),
-	isFasterRerecordEnabled: z.boolean(),
+	'recording.isFasterRerecordEnabled': z.boolean(),
 
 	'system.closeToTray': z.boolean(),
 	'system.alwaysOnTop': z.enum(ALWAYS_ON_TOP_VALUES),

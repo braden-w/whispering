@@ -78,7 +78,7 @@ function createRecorder() {
 			toast.loading({
 				id: stopRecordingToastId,
 				title: '✨ Recording Complete!',
-				description: settings.value.isFasterRerecordEnabled
+				description: settings.value['recording.isFasterRerecordEnabled']
 					? 'Recording saved! Ready for another take'
 					: 'Recording saved and session closed successfully',
 			});
@@ -167,7 +167,7 @@ function createRecorder() {
 					});
 				})(),
 				(async () => {
-					if (settings.value.isFasterRerecordEnabled) return;
+					if (settings.value['recording.isFasterRerecordEnabled']) return;
 					toast.loading({
 						id: stopRecordingToastId,
 						title: '⏳ Closing session...',
@@ -299,7 +299,7 @@ function createRecorder() {
 				return;
 			}
 			await setRecorderState('SESSION');
-			if (settings.value.isFasterRerecordEnabled) {
+			if (settings.value['recording.isFasterRerecordEnabled']) {
 				toast.success({
 					id: toastId,
 					title: '🚫 Recording Cancelled',

@@ -57,11 +57,11 @@
 		<Switch
 			id="paste-from-clipboard"
 			aria-labelledby="paste-from-clipboard"
-			checked={settings.value.isPasteContentsOnSuccessEnabled}
+			checked={settings.value['transcription.clipboard.pasteOnSuccess']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					isPasteContentsOnSuccessEnabled: v,
+					'transcription.clipboard.pasteOnSuccess': v,
 				};
 			}}
 		/>
@@ -73,9 +73,12 @@
 		<Switch
 			id="faster-rerecord"
 			aria-labelledby="faster-rerecord"
-			checked={settings.value.isFasterRerecordEnabled}
+			checked={settings.value['recording.isFasterRerecordEnabled']}
 			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isFasterRerecordEnabled: v };
+				settings.value = {
+					...settings.value,
+					'recording.isFasterRerecordEnabled': v,
+				};
 			}}
 		/>
 		<Label for="faster-rerecord">
