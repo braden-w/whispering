@@ -1,4 +1,5 @@
 import { Err, type Ok } from '@epicenterhq/result';
+import type { Settings } from '@repo/shared';
 
 type TranscriptionStatus = 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
 
@@ -44,4 +45,17 @@ export type DbService = {
 	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	deleteRecordingById: (id: string) => Promise<DbServiceResult<void>>;
 	deleteRecordingsById: (ids: string[]) => Promise<DbServiceResult<void>>;
+	/**
+	 * Checks and deletes expired recordings based on current settings.
+	 * This should be called:
+	 * 1. On initial load
+	 * 2. Before adding new recordings
+	 * 3. When retention settings change
+	 */
+	cleanupExpiredRecordings: (
+		settings: Pick<
+			Settings,
+			'recordingRetentionStrategy' | 'recordingRetentionMinutes'
+		>,
+	) => Promise<DbServiceResult<void>>;
 };

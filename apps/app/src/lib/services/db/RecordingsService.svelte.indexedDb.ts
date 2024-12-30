@@ -1,4 +1,5 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
+import type { Settings } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
 import { toast } from '../../utils/toast';
 import type { DbService } from './RecordingsService';
@@ -262,5 +263,60 @@ export function createRecordingsIndexedDbService(): DbService {
 			recordings = recordings.filter((r) => !ids.includes(r.id));
 			return Ok(undefined);
 		},
+
+		async cleanupExpiredRecordings({
+			recordingRetentionStrategy,
+			recordingRetentionMinutes,
+		}) {
+			const expiredRecordings = recordings.filter((recording) =>
+				isRecordingExpired({
+					recording,
+					recordingRetentionStrategy,
+					recordingRetentionMinutes,
+				}),
+			);
+			if (expiredRecordings.length === 0) return Ok(undefined);
+
+			const expiredIds = expiredRecordings.map((r) => r.id);
+			const deleteExpiredRecordingsResult =
+				await this.deleteRecordingsById(expiredIds);
+			if (!deleteExpiredRecordingsResult.ok) {
+				return DbServiceErr({
+					title: 'Unable to clean up expired recordings',
+					description: 'Some expired recordings could not be deleted',
+					error: deleteExpiredRecordingsResult.error,
+				});
+			}
+			return Ok(undefined);
+		},
 	};
+}
+
+/**
+ * Checks if a recording should be expired based on the retention settings and its timestamp
+ */
+function isRecordingExpired({
+	recording,
+	recordingRetentionStrategy,
+	recordingRetentionMinutes,
+}: {
+	recording: Recording;
+	recordingRetentionStrategy: Settings['recordingRetentionStrategy'];
+	recordingRetentionMinutes: Settings['recordingRetentionMinutes'];
+}): boolean {
+	switch (recordingRetentionStrategy) {
+		case 'keep-forever':
+			return false;
+		case 'never-save':
+			return true;
+		case 'expire-after-duration': {
+			const retentionMinutes = Number.parseInt(recordingRetentionMinutes);
+			const recordingDate = new Date(recording.timestamp);
+			const expirationDate = new Date(
+				recordingDate.getTime() + retentionMinutes * 60 * 1000,
+			);
+
+			return new Date() > expirationDate;
+		}
+	}
 }
