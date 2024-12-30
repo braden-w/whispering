@@ -13,6 +13,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isCopyToClipboardEnabled: true,
 		isPasteContentsOnSuccessEnabled: true,
 		isFasterRerecordEnabled: false,
+		closeToTray: true,
 		alwaysOnTop: 'When Recording',
 
 		selectedAudioInputDeviceId: 'default',
@@ -34,6 +35,7 @@ export const settingsSchema = z.object({
 	isCopyToClipboardEnabled: z.boolean(),
 	isPasteContentsOnSuccessEnabled: z.boolean(),
 	isFasterRerecordEnabled: z.boolean(),
+	closeToTray: z.boolean(),
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
 	selectedAudioInputDeviceId: z.string(),
