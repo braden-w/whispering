@@ -7,6 +7,22 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
 
+// Recording retention configuration
+export const RETENTION_STRATEGIES = [
+	'keep-forever',
+	'expire-after-duration',
+	'never-save',
+] as const;
+
+export const RETENTION_PERIODS_DAYS = [
+	'1',
+	'2',
+	'7',
+	'14',
+	'30',
+	'90',
+] as const;
+
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
@@ -15,6 +31,10 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isFasterRerecordEnabled: false,
 		closeToTray: false,
 		alwaysOnTop: 'When Recording',
+
+		// Recording retention defaults
+		recordingRetentionStrategy: 'keep-forever',
+		recordingRetentionDays: '30',
 
 		selectedAudioInputDeviceId: 'default',
 		bitrateKbps: DEFAULT_BITRATE_KBPS,
@@ -37,6 +57,10 @@ export const settingsSchema = z.object({
 	isFasterRerecordEnabled: z.boolean(),
 	closeToTray: z.boolean(),
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
+
+	// Recording retention settings
+	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
+	recordingRetentionDays: z.enum(RETENTION_PERIODS_DAYS),
 
 	selectedAudioInputDeviceId: z.string(),
 	bitrateKbps: z
