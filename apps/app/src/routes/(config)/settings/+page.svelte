@@ -116,7 +116,7 @@
 	<div class="grid gap-2">
 		<SettingsLabelSelect
 			id="recording-retention-strategy"
-			label="Recording Retention"
+			label="Auto Delete Recordings"
 			items={[
 				{ value: 'keep-forever', label: 'Keep All Recordings' },
 				{ value: 'limit-count', label: 'Keep Limited Number' },

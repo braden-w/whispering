@@ -45,7 +45,7 @@ export const settingsSchema = z.object({
 	closeToTray: z.boolean(),
 	alwaysOnTop: z.enum(ALWAYS_ON_TOP_VALUES),
 
-	// Recording retention settings
+	// Auto delete recordings settings
 	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
 	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
 
