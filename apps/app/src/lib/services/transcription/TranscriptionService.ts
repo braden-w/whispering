@@ -7,7 +7,13 @@ export type TranscriptionServiceErr = WhisperingErr;
 export type TranscriptionServiceResult<T> = Ok<T> | WhisperingErr;
 
 export type TranscriptionService = {
-	transcribe: (audioBlob: Blob) => Promise<TranscriptionServiceResult<string>>;
+	transcribe: (
+		audioBlob: Blob,
+		options?: {
+			prompt?: string;
+			temperature?: string;
+		},
+	) => Promise<TranscriptionServiceResult<string>>;
 };
 
 export const TranscriptionServiceErr = (
