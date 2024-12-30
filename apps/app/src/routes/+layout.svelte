@@ -3,7 +3,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
-	import ToastLog from '$lib/components/ToastLog.svelte';
+	import NotificationLog from '$lib/components/NotificationLog.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -123,4 +123,4 @@
 <FasterRerecordExplainedDialog />
 <ConfirmationDialog />
 <MoreDetailsDialog />
-<ToastLog />
+<NotificationLog />

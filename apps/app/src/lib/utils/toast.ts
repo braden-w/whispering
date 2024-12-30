@@ -6,7 +6,7 @@ import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { toastLogDialog } from '$lib/components/ToastLog.svelte';
+import { notificationLog } from '$lib/components/NotificationLog.svelte';
 
 export const toast = createToastService();
 
@@ -46,7 +46,7 @@ function createToastService() {
 
 			const durationInMs = getDurationInMs();
 
-			toastLogDialog.addLog({ variant: toastVariant, ...toastOptions });
+			notificationLog.addLog({ variant: toastVariant, ...toastOptions });
 
 			if (dev) {
 				switch (toastVariant) {

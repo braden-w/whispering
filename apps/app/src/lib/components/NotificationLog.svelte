@@ -1,5 +1,5 @@
 <script module lang="ts">
-	const toastLogDialog = (() => {
+	const notificationLog = (() => {
 		let isOpen = $state(false);
 		let logs = $state<ToastAndNotifyOptions[]>([]);
 		return {
@@ -21,7 +21,7 @@
 		};
 	})();
 
-	export { toastLogDialog };
+	export { notificationLog };
 </script>
 
 <script lang="ts">
@@ -42,11 +42,11 @@
 	import { cn } from '$lib/utils.js';
 </script>
 
-<Popover.Root bind:open={toastLogDialog.isOpen}>
+<Popover.Root bind:open={notificationLog.isOpen}>
 	<Popover.Trigger>
 		{#snippet child({ props })}
 			<WhisperingButton
-				tooltipContent="View Toast Logs"
+				tooltipContent="Notification History"
 				class="fixed bottom-4 right-4 z-50"
 				variant="outline"
 				size="icon"
@@ -62,10 +62,8 @@
 		)}
 	>
 		<div class="flex flex-col space-y-1.5">
-			<h1 class="text-lg font-semibold">Logs</h1>
-			<h2 class="text-sm text-muted-foreground">
-				System notifications and status updates
-			</h2>
+			<h1 class="text-lg font-semibold">Notification History</h1>
+			<h2 class="text-sm text-muted-foreground">View past notifications</h2>
 		</div>
 
 		<ScrollArea
@@ -74,7 +72,7 @@
 			data-theme={$mode}
 			data-rich-colors="true"
 		>
-			{#each toastLogDialog.logs as log}
+			{#each notificationLog.logs as log}
 				<Alert.Root
 					class="mb-2 last:mb-0"
 					data-sonner-toast
@@ -116,7 +114,7 @@
 				</Alert.Root>
 			{/each}
 
-			{#if toastLogDialog.logs.length === 0}
+			{#if notificationLog.logs.length === 0}
 				<div
 					class="flex h-32 items-center justify-center text-sm text-muted-foreground"
 				>
