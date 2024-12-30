@@ -51,13 +51,13 @@
 				id="recording-device"
 				label="Recording Device"
 				{items}
-				selected={settings.value.selectedAudioInputDeviceId}
+				selected={settings.value['recording.selectedAudioInputDeviceId']}
 				onSelectedChange={async (selected) => {
 					if (!selected) return;
 					await recorder.closeRecordingSessionWithToast();
 					settings.value = {
 						...settings.value,
-						selectedAudioInputDeviceId: selected,
+						'recording.selectedAudioInputDeviceId': selected,
 					};
 				}}
 				placeholder="Select a device"
@@ -74,12 +74,12 @@
 				value: option.value,
 				label: option.label,
 			}))}
-			selected={settings.value.bitrateKbps}
+			selected={settings.value['recording.bitrateKbps']}
 			onSelectedChange={(selected) => {
 				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					bitrateKbps: selected,
+					'recording.bitrateKbps': selected,
 				};
 			}}
 			placeholder="Select a bitrate"

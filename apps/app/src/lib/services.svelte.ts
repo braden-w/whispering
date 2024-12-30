@@ -66,7 +66,7 @@ function createServices() {
 	});
 
 	const RecorderService = $derived(
-		settings.value.selectedAudioInputDeviceId === 'default'
+		settings.value['recording.selectedAudioInputDeviceId'] === 'default'
 			? createRecorderServiceTauri()
 			: createRecorderServiceWeb(),
 	);

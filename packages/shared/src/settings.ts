@@ -23,8 +23,8 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		recordingRetentionStrategy: 'keep-forever',
 		maxRecordingCount: '5',
 
-		selectedAudioInputDeviceId: 'default',
-		bitrateKbps: DEFAULT_BITRATE_KBPS,
+		'recording.selectedAudioInputDeviceId': 'default',
+		'recording.bitrateKbps': DEFAULT_BITRATE_KBPS,
 
 		'transcription.selectedTranscriptionService': 'OpenAI',
 		'transcription.outputLanguage': 'auto',
@@ -55,8 +55,8 @@ export const settingsSchema = z.object({
 	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
 	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
 
-	selectedAudioInputDeviceId: z.string(),
-	bitrateKbps: z
+	'recording.selectedAudioInputDeviceId': z.string(),
+	'recording.bitrateKbps': z
 		.enum(BITRATE_VALUES_KBPS)
 		.optional()
 		.default(DEFAULT_BITRATE_KBPS),

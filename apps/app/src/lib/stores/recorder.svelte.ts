@@ -207,8 +207,9 @@ function createRecorder() {
 			const initResult =
 				await userConfiguredServices.RecorderService.initRecordingSession(
 					{
-						deviceId: settings.value.selectedAudioInputDeviceId,
-						bitsPerSecond: Number(settings.value.bitrateKbps) * 1000,
+						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
+						bitsPerSecond:
+							Number(settings.value['recording.bitrateKbps']) * 1000,
 					},
 					{
 						sendStatus: (options) =>
