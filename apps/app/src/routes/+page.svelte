@@ -138,7 +138,7 @@
 				<kbd
 					class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
 				>
-					{settings.value.currentLocalShortcut}
+					{settings.value['shortcuts.currentLocalShortcut']}
 				</kbd>
 			</WhisperingButton>{' '}
 			to start recording here.
@@ -155,7 +155,7 @@
 					<kbd
 						class="bg-muted relative rounded px-[0.3rem] py-[0.15rem] font-mono text-sm font-semibold"
 					>
-						{settings.value.currentGlobalShortcut}
+						{settings.value['shortcuts.currentGlobalShortcut']}
 					</kbd>
 				</WhisperingButton>{' '}
 				to start recording anywhere.

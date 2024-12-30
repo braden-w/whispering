@@ -39,8 +39,9 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'transcription.fasterWhisperServer.serverModel':
 			'Systran/faster-whisper-medium.en',
 
-		currentLocalShortcut: 'space',
-		currentGlobalShortcut: platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		'shortcuts.currentLocalShortcut': 'space',
+		'shortcuts.currentGlobalShortcut':
+			platform === 'app' ? 'CommandOrControl+Shift+;' : '',
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({
@@ -73,8 +74,8 @@ export const settingsSchema = z.object({
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
 
-	currentLocalShortcut: z.string(),
-	currentGlobalShortcut: z.string(),
+	'shortcuts.currentLocalShortcut': z.string(),
+	'shortcuts.currentGlobalShortcut': z.string(),
 });
 
 export type Settings = z.infer<typeof settingsSchema>;
