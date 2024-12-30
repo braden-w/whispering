@@ -81,6 +81,17 @@
 		</Label>
 	</div>
 	{#if window.__TAURI_INTERNALS__}
+		<div class="flex items-center gap-2">
+			<Switch
+				id="close-to-tray"
+				aria-labelledby="close-to-tray"
+				checked={settings.value.closeToTray}
+				onCheckedChange={(v) => {
+					settings.value = { ...settings.value, closeToTray: v };
+				}}
+			/>
+			<Label for="close-to-tray">Close to tray instead of quitting</Label>
+		</div>
 		<div class="grid gap-2">
 			<SettingsLabelSelect
 				id="always-on-top"

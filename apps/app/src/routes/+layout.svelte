@@ -5,51 +5,20 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';
 	import { extension } from '@repo/extension';
-	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
 	import { Toaster } from 'svelte-sonner';
 	import '../app.css';
+	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
+	import { closeToTrayIfEnabled } from './+layout/closeToTray';
 
 	let { children } = $props();
 
-	const setAlwaysOnTop = (value: boolean) => {
-		if (!window.__TAURI_INTERNALS__) return;
-		return getCurrentWindow().setAlwaysOnTop(value);
-	};
-
-	$effect(() => {
-		switch (settings.value.alwaysOnTop) {
-			case 'Always':
-				void setAlwaysOnTop(true);
-				break;
-			case 'When Recording and Transcribing':
-				if (
-					recorder.recorderState === 'SESSION+RECORDING' ||
-					recordings.isCurrentlyTranscribing
-				) {
-					void setAlwaysOnTop(true);
-				} else {
-					void setAlwaysOnTop(false);
-				}
-				break;
-			case 'When Recording':
-				if (recorder.recorderState === 'SESSION+RECORDING') {
-					void setAlwaysOnTop(true);
-				} else {
-					void setAlwaysOnTop(false);
-				}
-				break;
-			case 'Never':
-				void setAlwaysOnTop(false);
-				break;
-		}
-	});
+	syncWindowAlwaysOnTopWithRecorderState();
+	closeToTrayIfEnabled();
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;

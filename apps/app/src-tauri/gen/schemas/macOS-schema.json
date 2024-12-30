@@ -5145,6 +5145,26 @@
           "const": "http:deny-fetch-send"
         },
         {
+          "description": "Enables the block command without any pre-configured scope.",
+          "type": "string",
+          "const": "nosleep:allow-block"
+        },
+        {
+          "description": "Enables the unblock command without any pre-configured scope.",
+          "type": "string",
+          "const": "nosleep:allow-unblock"
+        },
+        {
+          "description": "Denies the block command without any pre-configured scope.",
+          "type": "string",
+          "const": "nosleep:deny-block"
+        },
+        {
+          "description": "Denies the unblock command without any pre-configured scope.",
+          "type": "string",
+          "const": "nosleep:deny-unblock"
+        },
+        {
           "description": "This permission set configures which\nnotification features are by default exposed.\n\n#### Granted Permissions\n\nIt allows all notification related features.\n\n",
           "type": "string",
           "const": "notification:default"
@@ -5393,6 +5413,31 @@
           "description": "Denies the version command without any pre-configured scope.",
           "type": "string",
           "const": "os:deny-version"
+        },
+        {
+          "description": "This permission set configures which\nprocess feeatures are by default exposed.\n\n#### Granted Permissions\n\nThis enables to quit via `allow-exit` and restart via `allow-restart`\nthe application.\n",
+          "type": "string",
+          "const": "process:default"
+        },
+        {
+          "description": "Enables the exit command without any pre-configured scope.",
+          "type": "string",
+          "const": "process:allow-exit"
+        },
+        {
+          "description": "Enables the restart command without any pre-configured scope.",
+          "type": "string",
+          "const": "process:allow-restart"
+        },
+        {
+          "description": "Denies the exit command without any pre-configured scope.",
+          "type": "string",
+          "const": "process:deny-exit"
+        },
+        {
+          "description": "Denies the restart command without any pre-configured scope.",
+          "type": "string",
+          "const": "process:deny-restart"
         },
         {
           "description": "This permission set configures which\nshell functionality is exposed by default.\n\n#### Granted Permissions\n\nIt allows to use the `open` functionality without any specific\nscope pre-configured. It will allow opening `http(s)://`,\n`tel:` and `mailto:` links.\n",

@@ -30,9 +30,9 @@ export const DEFAULT_BITRATE_KBPS =
 
 export const ALWAYS_ON_TOP_VALUES = [
 	'Always',
-	'Never',
-	'When Recording',
 	'When Recording and Transcribing',
+	'When Recording',
+	'Never',
 ] as const;
 
 export const ALWAYS_ON_TOP_OPTIONS = ALWAYS_ON_TOP_VALUES.map((option) => ({
