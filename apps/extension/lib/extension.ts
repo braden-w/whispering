@@ -33,6 +33,7 @@ import type {
 	OpenWhisperingTabMessage,
 	OpenWhisperingTabResult,
 } from '~background/messages/extension/openWhisperingTab';
+import type { PingResult } from '~background/messages/extension/ping';
 
 type SendMessageToExtensionErrProperties = {
 	_tag: 'SendMessageToExtensionError';
@@ -55,11 +56,13 @@ export const SendMessageToExtensionErr = (
 		...args,
 	} as const);
 
-export const sendMessageToExtension = async <
+const TIMEOUT_SECONDS = 1;
+
+export async function sendMessageToExtension<
 	R extends WhisperingResult<unknown>,
 >(
 	...args: Parameters<typeof sendToBackgroundViaRelay>
-): Promise<R | WhisperingErr> => {
+): Promise<R | WhisperingErr> {
 	const sendResult = (await tryAsync({
 		try: () => sendToBackgroundViaRelay(...args),
 		mapErr: (error) => {
@@ -86,62 +89,100 @@ export const sendMessageToExtension = async <
 	}
 	const commandAsWhisperingResult = sendResult.data;
 	return commandAsWhisperingResult;
-};
+}
 
-export const extension = {
-	createNotification: async (body: CreateNotificationMessage) => {
-		const result = await sendMessageToExtension<CreateNotificationResult>({
-			name: 'extension/createNotification',
-			body,
-		});
-		return result;
-	},
-	clearNotification: async (body: ClearNotificationMessage) => {
-		const result = await sendMessageToExtension<ClearNotificationResult>({
-			name: 'extension/clearNotification',
-			body,
-		});
-		return result;
-	},
-	notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
-		const result = await sendMessageToExtension<NotifyWhisperingTabReadyResult>(
-			{ name: 'extension/notifyWhisperingTabReady', body },
-		);
-		return result;
-	},
-	openWhisperingTab: async (body: OpenWhisperingTabMessage) => {
-		const result = await sendMessageToExtension<OpenWhisperingTabResult>({
-			name: 'extension/openWhisperingTab',
-			body,
-		});
-		return result;
-	},
-	playSound: async (body: PlaySoundMessage) => {
-		const result = await sendMessageToExtension<PlaySoundResult>({
-			name: 'extension/playSound',
-			body,
-		});
-		return result;
-	},
-	setClipboardText: async (body: SetClipboardTextMessage) => {
-		const result = await sendMessageToExtension<SetClipboardTextResult>({
-			name: 'extension/setClipboardText',
-			body,
-		});
-		return result;
-	},
-	setRecorderState: async (body: SetRecorderStateMessage) => {
-		const result = await sendMessageToExtension<SetRecorderStateResult>({
-			name: 'extension/setRecorderState',
-			body,
-		});
-		return result;
-	},
-	writeTextToCursor: async (body: WriteTextToCursorMessage) => {
-		const result = await sendMessageToExtension<WriteTextToCursorResult>({
-			name: 'extension/writeTextToCursor',
-			body,
-		});
-		return result;
-	},
-};
+const ExtensionNotAvailableErr = () =>
+	Err({
+		_tag: 'ExtensionNotAvailableError',
+	} as const);
+
+export const extension = (() => {
+	let isExtensionAvailable = false;
+
+	const checkExtensionAvailability = async () => {
+		try {
+			const timeoutPromise = new Promise((_, reject) => {
+				setTimeout(() => {
+					reject(
+						new Error(
+							`Extension messaging timeout after ${TIMEOUT_SECONDS} seconds`,
+						),
+					);
+				}, TIMEOUT_SECONDS * 1000);
+			});
+
+			const pingPromise = sendMessageToExtension<PingResult>({
+				name: 'extension/ping',
+			});
+
+			await Promise.race([pingPromise, timeoutPromise]);
+			isExtensionAvailable = true;
+		} catch {
+			isExtensionAvailable = false;
+			console.warn(
+				'Browser extension not available - features will be disabled',
+			);
+		}
+	};
+
+	checkExtensionAvailability();
+
+	return {
+		createNotification: async (body: CreateNotificationMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<CreateNotificationResult>({
+				name: 'extension/createNotification',
+				body,
+			});
+		},
+		clearNotification: async (body: ClearNotificationMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<ClearNotificationResult>({
+				name: 'extension/clearNotification',
+				body,
+			});
+		},
+		notifyWhisperingTabReady: async (body: NotifyWhisperingTabReadyMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<NotifyWhisperingTabReadyResult>({
+				name: 'extension/notifyWhisperingTabReady',
+				body,
+			});
+		},
+		openWhisperingTab: async (body: OpenWhisperingTabMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<OpenWhisperingTabResult>({
+				name: 'extension/openWhisperingTab',
+				body,
+			});
+		},
+		playSound: async (body: PlaySoundMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<PlaySoundResult>({
+				name: 'extension/playSound',
+				body,
+			});
+		},
+		setClipboardText: async (body: SetClipboardTextMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<SetClipboardTextResult>({
+				name: 'extension/setClipboardText',
+				body,
+			});
+		},
+		setRecorderState: async (body: SetRecorderStateMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<SetRecorderStateResult>({
+				name: 'extension/setRecorderState',
+				body,
+			});
+		},
+		writeTextToCursor: async (body: WriteTextToCursorMessage) => {
+			if (!isExtensionAvailable) return ExtensionNotAvailableErr();
+			return await sendMessageToExtension<WriteTextToCursorResult>({
+				name: 'extension/writeTextToCursor',
+				body,
+			});
+		},
+	};
+})();

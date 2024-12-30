@@ -47,18 +47,8 @@
 		window.recorder = recorder;
 		window.goto = goto;
 		if (!window.__TAURI_INTERNALS__) {
-			const notifyWhisperingTabReadyResult =
+			const _notifyWhisperingTabReadyResult =
 				await extension.notifyWhisperingTabReady(undefined);
-			if (!notifyWhisperingTabReadyResult.ok) {
-				toast.error({
-					title: 'Error notifying extension that tab is ready',
-					description: 'Error sending message to extension',
-					action: {
-						type: 'more-details',
-						error: notifyWhisperingTabReadyResult.error,
-					},
-				});
-			}
 		}
 	});
 
