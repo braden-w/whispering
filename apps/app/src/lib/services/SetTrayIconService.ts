@@ -5,6 +5,7 @@ import type { WhisperingRecordingState } from '@repo/shared';
 import { Menu, MenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export type SetTrayIconServiceErr = Err<{
 	_tag: 'TrayIconError';
@@ -39,7 +40,7 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 	const trayPromise = (async () => {
 		const quitMenuItem = await MenuItem.new({
 			text: 'Quit',
-			action: (e) => console.log(e),
+			action: () => getCurrentWindow().close(),
 		});
 
 		const trayMenu = await Menu.new({
@@ -51,10 +52,15 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			id: 'tray',
 			icon: await getIconPath('IDLE'),
 			menu: trayMenu,
-			tooltip: 'Your App Name',
+			tooltip: 'Whispering',
 			action: (e) => {
-				if ('click' in e) {
-					recorder.toggleRecordingWithToast();
+				switch (e.type) {
+					case 'Click':
+						recorder.toggleRecordingWithToast();
+						break;
+					case 'DoubleClick':
+						getCurrentWindow().show();
+						break;
 				}
 			},
 		});
