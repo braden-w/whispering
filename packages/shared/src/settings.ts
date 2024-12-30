@@ -17,7 +17,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		isPasteContentsOnSuccessEnabled: true,
 		isFasterRerecordEnabled: false,
 		closeToTray: false,
-		alwaysOnTop: 'When Recording',
+		alwaysOnTop: 'Never',
 
 		// Recording retention defaults
 		recordingRetentionStrategy: 'keep-forever',
