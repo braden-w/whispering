@@ -1,8 +1,12 @@
 import { recorder } from '$lib/stores/recorder.svelte';
+import { settings } from '$lib/stores/settings.svelte';
 import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
-import type { WhisperingRecordingState } from '@repo/shared';
-import { Menu, MenuItem } from '@tauri-apps/api/menu';
+import {
+	ALWAYS_ON_TOP_VALUES,
+	type WhisperingRecordingState,
+} from '@repo/shared';
+import { Menu, MenuItem, CheckMenuItem } from '@tauri-apps/api/menu';
 import { resolveResource } from '@tauri-apps/api/path';
 import { TrayIcon } from '@tauri-apps/api/tray';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -44,14 +48,60 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 		const existingTray = await TrayIcon.getById(TRAY_ID);
 		if (existingTray) return existingTray;
 
-		const quitMenuItem = await MenuItem.new({
-			text: 'Quit',
-			action: () => void exit(0),
+		const alwaysOnTopItems = await Promise.all(
+			ALWAYS_ON_TOP_VALUES.map(async (value) =>
+				CheckMenuItem.new({
+					id: `always-on-top-${value}`,
+					text: value,
+					checked: settings.value.alwaysOnTop === value,
+					action: () => {
+						settings.value = { ...settings.value, alwaysOnTop: value };
+					},
+				}),
+			),
+		);
+
+		// Create Always on Top menu
+		const alwaysOnTopMenu = await Menu.new({
+			id: 'always-on-top-menu',
+			items: alwaysOnTopItems,
 		});
 
 		const trayMenu = await Menu.new({
-			id: 'quit',
-			items: [quitMenuItem],
+			items: [
+				// Window Controls Section
+				await MenuItem.new({
+					id: 'show',
+					text: 'Show Window',
+					action: () => getCurrentWindow().show(),
+				}),
+				await MenuItem.new({
+					id: 'minimize',
+					text: 'Hide Window',
+					action: () => getCurrentWindow().minimize(),
+				}),
+
+				// Recording Controls Section
+				await MenuItem.new({
+					id: 'toggle-recording',
+					text: 'Toggle Recording',
+					action: () => recorder.toggleRecordingWithToast(),
+				}),
+
+				// Always on Top Section
+				await MenuItem.new({
+					id: 'always-on-top',
+					text: 'Always on Top',
+					action: () => alwaysOnTopMenu.popup(),
+				}),
+
+				// Quit Section
+				await MenuItem.new({
+					id: 'quit',
+					text: 'Quit',
+					action: () => void exit(0),
+				}),
+			],
 		});
 
 		const tray = await TrayIcon.new({
@@ -60,25 +110,20 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			menu: trayMenu,
 			menuOnLeftClick: false,
 			action: (e) => {
-				switch (e.type) {
-					case 'Click':
-						if (e.button === 'Left') {
-							recorder.toggleRecordingWithToast();
-							return true;
-						}
-						break;
-					case 'DoubleClick':
-						if (e.button === 'Left') {
-							getCurrentWindow().show();
-							return true;
-						}
-						break;
+				if (
+					e.type === 'Click' &&
+					e.button === 'Left' &&
+					e.buttonState === 'Down'
+				) {
+					recorder.toggleRecordingWithToast();
+					return true;
 				}
 				return false;
 			},
 		});
 		return tray;
 	})();
+
 	return {
 		setTrayIcon: (recorderState: WhisperingRecordingState) =>
 			tryAsync({
