@@ -256,6 +256,41 @@ function SettingsCard() {
 					</div>
 				</div>
 
+				<div className="grid gap-2">
+					<SettingsLabelSelect
+						id="recording-retention-strategy"
+						label="Recording Retention"
+						options={[
+							{ value: 'keep-forever', label: 'Keep All Recordings' },
+							{ value: 'limit-count', label: 'Keep Limited Number' },
+						]}
+						value={settings.recordingRetentionStrategy}
+						onValueChange={(value) =>
+							setSettings({ ...settings, recordingRetentionStrategy: value })
+						}
+					/>
+				</div>
+
+				{settings.recordingRetentionStrategy === 'limit-count' && (
+					<div className="grid gap-2">
+						<SettingsLabelSelect
+							id="max-recording-count"
+							label="Maximum Recordings"
+							options={[
+								{ value: '5', label: '5 Recordings' },
+								{ value: '10', label: '10 Recordings' },
+								{ value: '25', label: '25 Recordings' },
+								{ value: '50', label: '50 Recordings' },
+								{ value: '100', label: '100 Recordings' },
+							]}
+							value={settings.maxRecordingCount}
+							onValueChange={(value) =>
+								setSettings({ ...settings, maxRecordingCount: value })
+							}
+						/>
+					</div>
+				)}
+
 				<div className="grid-gap-2">
 					<SettingsLabelSelect
 						id="selected-transcription-service"

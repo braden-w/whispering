@@ -28,7 +28,7 @@
 		recordings.value;
 		void RecordingsService.cleanupExpiredRecordings({
 			recordingRetentionStrategy: settings.value.recordingRetentionStrategy,
-			recordingRetentionMinutes: settings.value.recordingRetentionMinutes,
+			maxRecordingCount: settings.value.maxRecordingCount,
 		});
 	});
 

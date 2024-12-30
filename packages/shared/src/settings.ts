@@ -10,14 +10,6 @@ import {
 // Recording retention configuration
 export const RETENTION_STRATEGIES = ['keep-forever', 'limit-count'] as const;
 
-export const MAX_RECORDING_COUNT_VALUES = [
-	'5',
-	'10',
-	'25',
-	'50',
-	'100',
-] as const;
-
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
 		isPlaySoundEnabled: true,
@@ -55,7 +47,7 @@ export const settingsSchema = z.object({
 
 	// Recording retention settings
 	recordingRetentionStrategy: z.enum(RETENTION_STRATEGIES),
-	maxRecordingCount: z.enum(MAX_RECORDING_COUNT_VALUES),
+	maxRecordingCount: z.string().regex(/^\d+$/, 'Must be a number'),
 
 	selectedAudioInputDeviceId: z.string(),
 	bitrateKbps: z
