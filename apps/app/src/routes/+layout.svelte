@@ -113,7 +113,12 @@
 	{@render children()}
 </div>
 
-<Toaster class="xs:block hidden" theme={$mode} {...TOASTER_SETTINGS} />
+<Toaster
+	offset={16}
+	class="xs:block hidden"
+	theme={$mode}
+	{...TOASTER_SETTINGS}
+/>
 <ModeWatcher />
 <FasterRerecordExplainedDialog />
 <ConfirmationDialog />
