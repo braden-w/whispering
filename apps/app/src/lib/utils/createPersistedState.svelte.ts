@@ -35,7 +35,6 @@ const attemptMergeStrategy = <TSchema extends z.ZodTypeAny>({
 			title: `Error updating "${key}" in local storage`,
 			description: 'Reverting to default value.',
 		});
-		localStorage.setItem(key, JSON.stringify(defaultValue));
 		return defaultValue;
 	}
 
@@ -45,7 +44,6 @@ const attemptMergeStrategy = <TSchema extends z.ZodTypeAny>({
 		title: `Successfully updated "${key}" in local storage`,
 		description: 'The value has been updated.',
 	});
-	localStorage.setItem(key, JSON.stringify(updatedValue));
 	return updatedValue;
 };
 
