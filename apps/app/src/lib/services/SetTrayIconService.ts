@@ -44,81 +44,81 @@ export function createSetTrayIconWebService(): SetTrayIconService {
 }
 
 export function createSetTrayIconDesktopService(): SetTrayIconService {
-	const trayPromise = (async () => {
-		const existingTray = await TrayIcon.getById(TRAY_ID);
-		if (existingTray) return existingTray;
-
-		const alwaysOnTopItems = await Promise.all(
-			ALWAYS_ON_TOP_VALUES.map(async (value) =>
-				CheckMenuItem.new({
-					id: `always-on-top-${value}`,
-					text: `Always on Top: ${value}`,
-					checked: settings.value.alwaysOnTop === value,
-					action: () => {
-						settings.value = { ...settings.value, alwaysOnTop: value };
-					},
-				}),
-			),
-		);
-
-		const trayMenu = await Menu.new({
-			items: [
-				// Window Controls Section
-				await MenuItem.new({
-					id: 'show',
-					text: 'Show Window',
-					action: () => getCurrentWindow().show(),
-				}),
-
-				await MenuItem.new({
-					id: 'hide',
-					text: 'Hide Window',
-					action: () => getCurrentWindow().hide(),
-				}),
-
-				// Always on Top Section
-				...alwaysOnTopItems,
-
-				// Quit Section
-				await MenuItem.new({
-					id: 'quit',
-					text: 'Quit',
-					action: () => void exit(0),
-				}),
-			],
-		});
-
-		const tray = await TrayIcon.new({
-			id: TRAY_ID,
-			icon: await getIconPath('IDLE'),
-			menu: trayMenu,
-			menuOnLeftClick: false,
-			action: (e) => {
-				if (
-					e.type === 'Click' &&
-					e.button === 'Left' &&
-					e.buttonState === 'Down'
-				) {
-					recorder.toggleRecordingWithToast();
-					return true;
-				}
-				return false;
-			},
-		});
-		return tray;
-	})();
-
 	return {
 		setTrayIcon: (recorderState: WhisperingRecordingState) =>
 			tryAsync({
 				try: async () => {
 					const iconPath = await getIconPath(recorderState);
-					const tray = await trayPromise;
+					const tray = await initTray();
 					return tray.setIcon(iconPath);
 				},
 				mapErr: (error) => SetTrayIconServiceErr(recorderState),
 			}),
 	};
+}
+
+async function initTray() {
+	const existingTray = await TrayIcon.getById(TRAY_ID);
+	if (existingTray) return existingTray;
+
+	const alwaysOnTopItems = await Promise.all(
+		ALWAYS_ON_TOP_VALUES.map(async (value) =>
+			CheckMenuItem.new({
+				id: `always-on-top-${value}`,
+				text: `Always on Top: ${value}`,
+				checked: settings.value.alwaysOnTop === value,
+				action: () => {
+					settings.value = { ...settings.value, alwaysOnTop: value };
+				},
+			}),
+		),
+	);
+
+	const trayMenu = await Menu.new({
+		items: [
+			// Window Controls Section
+			await MenuItem.new({
+				id: 'show',
+				text: 'Show Window',
+				action: () => getCurrentWindow().show(),
+			}),
+
+			await MenuItem.new({
+				id: 'hide',
+				text: 'Hide Window',
+				action: () => getCurrentWindow().hide(),
+			}),
+
+			// Always on Top Section
+			...alwaysOnTopItems,
+
+			// Quit Section
+			await MenuItem.new({
+				id: 'quit',
+				text: 'Quit',
+				action: () => void exit(0),
+			}),
+		],
+	});
+
+	const tray = await TrayIcon.new({
+		id: TRAY_ID,
+		icon: await getIconPath('IDLE'),
+		menu: trayMenu,
+		menuOnLeftClick: false,
+		action: (e) => {
+			if (
+				e.type === 'Click' &&
+				e.button === 'Left' &&
+				e.buttonState === 'Down'
+			) {
+				recorder.toggleRecordingWithToast();
+				return true;
+			}
+			return false;
+		},
+	});
+	return tray;
 }
 
 async function getIconPath(recorderState: WhisperingRecordingState) {
