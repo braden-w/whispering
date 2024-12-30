@@ -75,7 +75,8 @@ export const sendMessageToExtension = async <
 			});
 
 			const messagePromise = sendToBackgroundViaRelay(...args);
-			return Promise.race([messagePromise, timeoutPromise]);
+			await Promise.race([messagePromise, timeoutPromise]);
+			return await messagePromise;
 		},
 		mapErr: (error) => {
 			const { name, body } = args[0];
