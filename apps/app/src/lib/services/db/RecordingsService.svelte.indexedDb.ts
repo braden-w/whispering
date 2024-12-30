@@ -274,14 +274,25 @@ export function createRecordingsIndexedDbService(): DbService {
 			recordingRetentionStrategy,
 			recordingRetentionMinutes,
 		}) {
-			if (recordingRetentionStrategy === 'keep-forever') return Ok(undefined);
-			let expiredRecordings: Recording[] = [];
 			switch (recordingRetentionStrategy) {
-				case 'never-save':
-					expiredRecordings = recordings;
-					break;
-				case 'expire-after-duration':
-					expiredRecordings = recordings.filter((recording) => {
+				case 'keep-forever': {
+					return Ok(undefined);
+				}
+				case 'never-save': {
+					if (recordings.length === 0) return Ok(undefined);
+					const deleteAllRecordingsResult =
+						await this.deleteRecordings(recordings);
+					if (!deleteAllRecordingsResult.ok) {
+						return DbServiceErr({
+							title: 'Unable to clean up recordings',
+							description: 'Some recordings could not be deleted',
+							error: deleteAllRecordingsResult.error,
+						});
+					}
+					return Ok(undefined);
+				}
+				case 'expire-after-duration': {
+					const expiredRecordings = recordings.filter((recording) => {
 						const retentionMinutes = Number.parseInt(recordingRetentionMinutes);
 						const recordingDate = new Date(recording.timestamp);
 						const expirationDate = new Date(
@@ -289,20 +300,19 @@ export function createRecordingsIndexedDbService(): DbService {
 						);
 						return new Date() > expirationDate;
 					});
-					break;
+					if (expiredRecordings.length === 0) return Ok(undefined);
+					const deleteExpiredRecordingsResult =
+						await this.deleteRecordings(expiredRecordings);
+					if (!deleteExpiredRecordingsResult.ok) {
+						return DbServiceErr({
+							title: 'Unable to clean up expired recordings',
+							description: 'Some expired recordings could not be deleted',
+							error: deleteExpiredRecordingsResult.error,
+						});
+					}
+					return Ok(undefined);
+				}
 			}
-			if (expiredRecordings.length === 0) return Ok(undefined);
-
-			const deleteExpiredRecordingsResult =
-				await this.deleteRecordings(expiredRecordings);
-			if (!deleteExpiredRecordingsResult.ok) {
-				return DbServiceErr({
-					title: 'Unable to clean up expired recordings',
-					description: 'Some expired recordings could not be deleted',
-					error: deleteExpiredRecordingsResult.error,
-				});
-			}
-			return Ok(undefined);
 		},
 	};
 }
