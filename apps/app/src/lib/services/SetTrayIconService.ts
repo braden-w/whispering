@@ -58,16 +58,23 @@ export function createSetTrayIconDesktopService(): SetTrayIconService {
 			id: TRAY_ID,
 			icon: await getIconPath('IDLE'),
 			menu: trayMenu,
-			tooltip: 'Whispering',
+			menuOnLeftClick: false,
 			action: (e) => {
 				switch (e.type) {
 					case 'Click':
-						recorder.toggleRecordingWithToast();
+						if (e.button === 'Left') {
+							recorder.toggleRecordingWithToast();
+							return true;
+						}
 						break;
 					case 'DoubleClick':
-						getCurrentWindow().show();
+						if (e.button === 'Left') {
+							getCurrentWindow().show();
+							return true;
+						}
 						break;
 				}
+				return false;
 			},
 		});
 		return tray;
