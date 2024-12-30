@@ -51,7 +51,7 @@ export const createNotification = async ({
 								const gotoTargetUrlInWhisperingTabResult =
 									await openWhisperingTab({ path: action.goto });
 								if (!gotoTargetUrlInWhisperingTabResult.ok) {
-									return extension.createNotification({
+									await extension.createNotification({
 										notifyOptions: gotoTargetUrlInWhisperingTabResult.error,
 									});
 								}

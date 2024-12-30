@@ -66,7 +66,7 @@ function IndexPage() {
 						onClick={async () => {
 							const toggleRecordingResult = await app.toggleRecording();
 							if (!toggleRecordingResult.ok) {
-								extension.createNotification({
+								await extension.createNotification({
 									notifyOptions: toggleRecordingResult.error,
 								});
 							}
@@ -88,7 +88,7 @@ function IndexPage() {
 							onClick={async () => {
 								const cancelRecordingResult = await app.cancelRecording();
 								if (!cancelRecordingResult.ok) {
-									extension.createNotification({
+									await extension.createNotification({
 										notifyOptions: cancelRecordingResult.error,
 									});
 								}
@@ -107,7 +107,7 @@ function IndexPage() {
 								const closeRecordingSessionResult =
 									await app.closeRecordingSession();
 								if (!closeRecordingSessionResult.ok) {
-									extension.createNotification({
+									await extension.createNotification({
 										notifyOptions: closeRecordingSessionResult.error,
 									});
 								}
