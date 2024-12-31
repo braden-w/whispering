@@ -4,6 +4,13 @@
 		let title = $state<string>('');
 		let description = $state<string>('');
 		let content = $state<unknown>(null);
+		let buttons = $state<
+			{
+				label: string;
+				onClick: () => void;
+			}[]
+		>([]);
+
 		return {
 			get isOpen() {
 				return isOpen;
@@ -26,16 +33,22 @@
 				}
 				return JSON.stringify(content, null, 2);
 			},
-			open: ({
-				title,
-				description,
-				content,
-			}: {
+			get buttons() {
+				return buttons;
+			},
+			open: (payload: {
 				title: string;
 				description: string;
 				content: unknown;
+				buttons?: {
+					label: string;
+					onClick: () => void;
+				}[];
 			}) => {
-				content = e;
+				title = payload.title;
+				description = payload.description;
+				content = payload.content;
+				buttons = payload.buttons ?? [];
 				isOpen = true;
 			},
 		};
@@ -44,6 +57,7 @@
 
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <Dialog.Root bind:open={moreDetailsDialog.isOpen}>
@@ -55,4 +69,16 @@
 		<pre
 			class="bg-muted relative whitespace-pre-wrap break-words rounded p-4 pr-12 font-mono text-sm">{moreDetailsDialog.content}</pre>
 	</Dialog.Content>
+	{#if moreDetailsDialog.buttons.length !== 0}
+		<Dialog.Footer>
+			{#each moreDetailsDialog.buttons as button}
+				<Button onclick={() => {
+					button.onClick();
+					moreDetailsDialog.isOpen = false;
+				}}>
+					{button.label}
+				</Button>
+			{/each}
+		</Dialog.Footer>
+	{/if}
 </Dialog.Root>

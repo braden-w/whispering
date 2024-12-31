@@ -1,10 +1,12 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
-import Dexie from 'dexie';
+import Dexie, { Transaction, Table } from 'dexie';
 import { toast } from '../../utils/toast';
 import type { DbService } from './RecordingsService';
 import { DbServiceErr } from './RecordingsService';
 import type { Recording } from './types/Recordings';
+import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import { DownloadService } from '$lib/services.svelte';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 3;
@@ -28,6 +30,97 @@ class RecordingsDatabase extends Dexie {
 	constructor() {
 		super(DB_NAME);
 
+		const handleUpgradeError = async ({
+			tx,
+			version,
+			error,
+		}: { tx: Transaction; version: number; error: unknown }) => {
+			const DUMP_TABLE_NAMES = [
+				'recordings',
+				'recordingMetadata',
+				'recordingBlobs',
+			] as const;
+
+			const dumpTable = async (tableName: string) => {
+				try {
+					const contents = await tx.table(tableName).toArray();
+					return contents;
+				} catch (error) {
+					return [];
+				}
+			};
+
+			const dumps = await Promise.all(
+				DUMP_TABLE_NAMES.map((name) => dumpTable(name)),
+			);
+
+			const dumpState = {
+				version,
+				tables: Object.fromEntries(
+					DUMP_TABLE_NAMES.map((name, i) => [name, dumps[i]]),
+				),
+			};
+
+			const dumpString = JSON.stringify(dumpState, null, 2);
+
+			moreDetailsDialog.open({
+				title: `Failed to upgrade IndexedDb Database to version ${version}`,
+				description:
+					'Please download the database dump and delete the database to start fresh.',
+				content: dumpString,
+				buttons: [
+					{
+						label: 'Delete Database',
+						onClick: async () => {
+							try {
+								// Delete all tables
+								await Promise.all(
+									DUMP_TABLE_NAMES.map((name) => tx.table(name).clear()),
+								);
+								// Delete the database
+								await this.delete();
+								// Reset the version
+								await Dexie.delete(DB_NAME);
+								toast.success({
+									title: 'Database Deleted',
+									description:
+										'The database has been successfully deleted. Please refresh the page.',
+								});
+								// Force reload to reinitialize the database
+								window.location.reload();
+							} catch (err) {
+								const error =
+									err instanceof Error ? err : new Error(String(err));
+								toast.error({
+									title: 'Failed to Delete Database',
+									description:
+										'There was an error deleting the database. Please try again.',
+									action: {
+										type: 'more-details',
+										error,
+									},
+								});
+							}
+						},
+					},
+					{
+						label: 'Download Database Dump',
+						onClick: () => {
+							const blob = new Blob([dumpString], {
+								type: 'application/json',
+							});
+							DownloadService.downloadBlob({
+								name: 'recording-db-dump.json',
+								blob,
+							});
+						},
+					},
+				],
+			});
+
+			throw error; // Re-throw to trigger rollback
+		};
+
 		// V1: Single recordings table
 		this.version(1).stores({ recordings: '&id, timestamp' });
 
@@ -39,23 +132,29 @@ class RecordingsDatabase extends Dexie {
 				recordingBlobs: '&id',
 			})
 			.upgrade(async (tx) => {
-				// Migrate data from recordings to split tables
-				const oldRecordings = await tx
-					.table<RecordingsDbSchemaV1['recordings']>('recordings')
-					.toArray();
+				try {
+					// Migrate data from recordings to split tables
+					const oldRecordings = await tx
+						.table<RecordingsDbSchemaV1['recordings']>('recordings')
+						.toArray();
 
-				// Create entries in both new tables
-				const metadata = oldRecordings.map(
-					({ blob, ...recording }) => recording,
-				);
-				const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
+					// Create entries in both new tables
+					const metadata = oldRecordings.map(
+						({ blob, ...recording }) => recording,
+					);
+					const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
 
-				await tx
-					.table<RecordingsDbSchemaV2['recordingMetadata']>('recordingMetadata')
-					.bulkAdd(metadata);
-				await tx
-					.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
-					.bulkAdd(blobs);
+					await tx
+						.table<RecordingsDbSchemaV2['recordingMetadata']>(
+							'recordingMetadata',
+						)
+						.bulkAdd(metadata);
+					await tx
+						.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
+						.bulkAdd(blobs);
+				} catch (error) {
+					await handleUpgradeError({ tx, version: 2, error });
+				}
 			});
 
 		// V3: Back to single recordings table
@@ -66,24 +165,36 @@ class RecordingsDatabase extends Dexie {
 				recordingBlobs: null,
 			})
 			.upgrade(async (tx) => {
-				// Get data from both tables
-				const metadata = await tx
-					.table<RecordingsDbSchemaV2['recordingMetadata']>('recordingMetadata')
-					.toArray();
-				const blobs = await tx
-					.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
-					.toArray();
+				try {
+					// Get data from both tables
+					const metadata = await tx
+						.table<RecordingsDbSchemaV2['recordingMetadata']>(
+							'recordingMetadata',
+						)
+						.toArray();
+					const blobs = await tx
+						.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
+						.toArray();
 
-				// Combine and migrate the data
-				const mergedRecordings = metadata.map((record) => {
-					const blob = blobs.find((b) => b.id === record.id)?.blob;
-					return { ...record, blob };
-				});
+					// Combine and migrate the data
+					const mergedRecordings = metadata.map((record) => {
+						const blob = blobs.find((b) => b.id === record.id)?.blob;
+						return { ...record, blob };
+					});
 
-				await tx
-					.table<RecordingsDbSchemaV3['recordings']>('recordings')
-					.bulkAdd(mergedRecordings);
+					await tx
+						.table<RecordingsDbSchemaV3['recordings']>('recordings')
+						.bulkAdd(mergedRecordings);
+				} catch (error) {
+					await handleUpgradeError({ tx, version: 3, error });
+				}
 			});
+	}
+
+	// Method to delete the entire database
+	async deleteDatabase() {
+		await this.delete();
+		console.log('Database deleted successfully');
 	}
 }
 
