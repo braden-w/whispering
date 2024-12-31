@@ -21,6 +21,8 @@ export type RecordingsDbSchemaV4 = {
 		id: string;
 		title: string;
 		description: string;
+		createdAt: string;
+		updatedAt: string;
 	};
 	/**
 	 * A transformation is a single step in a pipeline.
@@ -32,6 +34,7 @@ export type RecordingsDbSchemaV4 = {
 	transformations: {
 		id: string;
 		pipelineId: string;
+		order: number;
 		enabled: boolean;
 		type: 'find_replace' | 'prompt_transform';
 
@@ -43,10 +46,24 @@ export type RecordingsDbSchemaV4 = {
 		'prompt_transform.systemPromptTemplate': string;
 		'prompt_transform.userPromptTemplate': string;
 	};
-	transformationsResults: {
+	pipelineRuns: {
 		id: string;
-		transformationId: string;
+		pipelineId: string;
 		recordingId: string;
+		status: 'running' | 'completed' | 'failed';
+		startedAt: string;
+		completedAt: string | null;
+		error: string | null;
+		finalOutput: string | null;
+	};
+	transformationResults: {
+		id: string;
+		pipelineRunId: string;
+		transformationId: string;
+		status: 'running' | 'completed' | 'failed';
+		startedAt: string;
+		completedAt: string | null;
+		error: string | null;
 		output: string;
 	};
 };
