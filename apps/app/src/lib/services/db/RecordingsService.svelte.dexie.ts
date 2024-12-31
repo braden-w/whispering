@@ -10,11 +10,7 @@ const DB_NAME = 'RecordingDB';
 const DB_VERSION = 3;
 
 class RecordingsDatabase extends Dexie {
-	// V1 and V3
 	recordings!: Dexie.Table<Recording, string>;
-	// V2
-	recordingMetadata!: Dexie.Table<Omit<Recording, 'blob'>, string>;
-	recordingBlobs!: Dexie.Table<{ id: string; blob: Blob | undefined }, string>;
 
 	constructor() {
 		super(DB_NAME);
