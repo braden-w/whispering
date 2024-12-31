@@ -1,31 +1,52 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
-import Dexie, { Transaction, Table } from 'dexie';
+import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
 import type { DbService } from './RecordingsService';
 import { DbServiceErr } from './RecordingsService';
-import type { Recording } from './types/Recordings';
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { DownloadService } from '$lib/services.svelte';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 3;
 
+export type Recording = RecordingsDbSchemaV3['recordings'];
+
+export type RecordingsDbSchemaV4 = {
+	recordings: Omit<RecordingsDbSchemaV3['recordings'], 'timestamp'> & {
+		createdAt: string;
+		updatedAt: string;
+	};
+};
 type RecordingsDbSchemaV3 = {
-	recordings: Recording;
+	recordings: RecordingsDbSchemaV1['recordings'];
 };
 
 type RecordingsDbSchemaV2 = {
-	recordingMetadata: Omit<Recording, 'blob'>;
-	recordingBlobs: { id: Recording['id']; blob: Blob | undefined };
+	recordingMetadata: Omit<RecordingsDbSchemaV1['recordings'], 'blob'>;
+	recordingBlobs: { id: string; blob: Blob | undefined };
 };
 
 type RecordingsDbSchemaV1 = {
-	recordings: Recording;
+	recordings: {
+		id: string;
+		title: string;
+		subtitle: string;
+		timestamp: string;
+		transcribedText: string;
+		blob: Blob | undefined;
+		/**
+		 * A recording
+		 * 1. Begins in an 'UNPROCESSED' state
+		 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
+		 * 3. Finally is marked as 'DONE' when the transcription is complete.
+		 */
+		transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+	};
 };
 
 class RecordingsDatabase extends Dexie {
-	recordings!: Dexie.Table<Recording, string>;
+	recordings!: Dexie.Table<RecordingsDbSchemaV3['recordings'], string>;
 
 	constructor() {
 		super(DB_NAME);
