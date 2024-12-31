@@ -41,9 +41,7 @@ export function createRecordingsIndexedDbService(): DbService {
 
 			if (oldVersion === 0) {
 				// Fresh install - go straight to v3 schema
-				transaction.db.createObjectStore('recordings', {
-					keyPath: 'id',
-				});
+				transaction.db.createObjectStore('recordings', { keyPath: 'id' });
 				return;
 			}
 
@@ -68,10 +66,7 @@ export function createRecordingsIndexedDbService(): DbService {
 				// Combine and migrate the data
 				for (const record of metadata) {
 					const blobData = blobs.find((b) => b.id === record.id);
-					await newRecordingsStore.add({
-						...record,
-						blob: blobData?.blob,
-					});
+					await newRecordingsStore.add({ ...record, blob: blobData?.blob });
 				}
 
 				// Delete old stores
@@ -84,10 +79,7 @@ export function createRecordingsIndexedDbService(): DbService {
 	const syncDbToRecordingsState = async () => {
 		const allRecordingsFromDbResult = await tryAsync({
 			try: async () => {
-				const tx = (await dbPromise).transaction(
-					'recordings' as const,
-					'readonly',
-				);
+				const tx = (await dbPromise).transaction('recordings', 'readonly');
 				const store = tx.objectStore('recordings');
 				const records = await store.getAll();
 				await tx.done;
