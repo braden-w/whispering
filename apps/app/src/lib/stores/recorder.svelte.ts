@@ -36,7 +36,7 @@ function createRecorder() {
 			});
 
 			const stopResult =
-				await userConfiguredServices.RecorderService.stopRecording(undefined, {
+				await userConfiguredServices.recorder.stopRecording(undefined, {
 					sendStatus: (options) =>
 						toast.loading({ id: stopRecordingToastId, ...options }),
 				});
@@ -174,7 +174,7 @@ function createRecorder() {
 						description: 'Wrapping up your recording session...',
 					});
 					const closeSessionResult =
-						await userConfiguredServices.RecorderService.closeRecordingSession(
+						await userConfiguredServices.recorder.closeRecordingSession(
 							undefined,
 							{
 								sendStatus: (options) =>
@@ -205,7 +205,7 @@ function createRecorder() {
 		});
 		if (recorderState === 'IDLE') {
 			const initResult =
-				await userConfiguredServices.RecorderService.initRecordingSession(
+				await userConfiguredServices.recorder.initRecordingSession(
 					{
 						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
 						bitsPerSecond:
@@ -223,7 +223,7 @@ function createRecorder() {
 			await setRecorderState('SESSION');
 		}
 		const startRecordingResult =
-			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
+			await userConfiguredServices.recorder.startRecording(nanoid(), {
 				sendStatus: (options) =>
 					toast.loading({ id: startRecordingToastId, ...options }),
 			});
@@ -254,7 +254,7 @@ function createRecorder() {
 				description: 'Wrapping things up, just a moment...',
 			});
 			const closeResult =
-				await userConfiguredServices.RecorderService.closeRecordingSession(
+				await userConfiguredServices.recorder.closeRecordingSession(
 					undefined,
 					{
 						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
@@ -288,7 +288,7 @@ function createRecorder() {
 				description: 'Discarding the current recording...',
 			});
 			const cancelResult =
-				await userConfiguredServices.RecorderService.cancelRecording(
+				await userConfiguredServices.recorder.cancelRecording(
 					undefined,
 					{
 						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
@@ -314,7 +314,7 @@ function createRecorder() {
 					description: 'Wrapping up your recording session...',
 				});
 				const closeSessionResult =
-					await userConfiguredServices.RecorderService.closeRecordingSession(
+					await userConfiguredServices.recorder.closeRecordingSession(
 						undefined,
 						{
 							sendStatus: (options) =>

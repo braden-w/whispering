@@ -112,14 +112,11 @@ function createRecordings() {
 			}
 			transcribingRecordingIds.add(recording.id);
 			const transcriptionResult =
-				await userConfiguredServices.TranscriptionService.transcribe(
-					recording.blob,
-					{
-						outputLanguage: settings.value['transcription.outputLanguage'],
-						prompt: settings.value['transcription.prompt'],
-						temperature: settings.value['transcription.temperature'],
-					},
-				);
+				await userConfiguredServices.transcription.transcribe(recording.blob, {
+					outputLanguage: settings.value['transcription.outputLanguage'],
+					prompt: settings.value['transcription.prompt'],
+					temperature: settings.value['transcription.temperature'],
+				});
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
 				toast.error({
