@@ -46,7 +46,7 @@ class RecordingsDatabase extends Dexie {
 		// V3: Back to single recordings table
 		this.version(3)
 			.stores({
-				recordings: '&id, title, [timestamp+id]',
+				recordings: '&id, title, timestamp',
 				recordingMetadata: null,
 				recordingBlobs: null,
 			})
@@ -219,7 +219,7 @@ export function createRecordingsIndexedDbService(): DbService {
 					return Ok(undefined);
 				}
 				case 'limit-count': {
-					const getCountResult = await tryAsync({
+					const countResult = await tryAsync({
 						try: () => db.recordings.count(),
 						mapErr: (error) =>
 							DbServiceErr({
@@ -229,8 +229,8 @@ export function createRecordingsIndexedDbService(): DbService {
 								error,
 							}),
 					});
-					if (!getCountResult.ok) return getCountResult;
-					const count = getCountResult.data;
+					if (!countResult.ok) return countResult;
+					const count = countResult.data;
 					if (count === 0) return Ok(undefined);
 
 					const maxCount = Number.parseInt(maxRecordingCount);
