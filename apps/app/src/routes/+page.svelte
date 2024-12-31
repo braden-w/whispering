@@ -5,10 +5,11 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
+	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';

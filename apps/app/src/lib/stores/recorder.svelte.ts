@@ -1,11 +1,11 @@
 import {
 	ClipboardService,
-	NotificationService,
 	RecordingsService,
 	SetTrayIconService,
-	userConfiguredServices,
+	userConfiguredServices
 } from '$lib/services.svelte';
-import { type Recording, recordings } from '$lib/stores/recordings.svelte';
+import type { Recording } from '$lib/services/db';
+import { recordings } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';

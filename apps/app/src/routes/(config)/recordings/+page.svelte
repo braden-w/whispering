@@ -10,7 +10,8 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
+	import { recordings } from '$lib/stores/recordings.svelte';
+	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';

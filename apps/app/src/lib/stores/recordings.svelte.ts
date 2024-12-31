@@ -3,15 +3,12 @@ import {
 	RecordingsService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
-import type { Recording } from '$lib/services/db/RecordingsService';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
-
-export type { Recording } from '$lib/services/db/RecordingsService';
 
 export const recordings = createRecordings();
 
