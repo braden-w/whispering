@@ -27,11 +27,9 @@
 
 	<Separator />
 
-	<Card.Root>
-		<Card.Header>
-			<Card.Title class="text-sm">Sound Settings</Card.Title>
-		</Card.Header>
-		<Card.Content class="space-y-2">
+	<div class="space-y-2">
+		<Label class="text-sm">Sound Settings</Label>
+		<div class="flex flex-col gap-3">
 			<div class="flex items-center gap-2">
 				<Switch
 					id="play-sound-start"
@@ -90,8 +88,8 @@
 					Play sound after transcription
 				</Label>
 			</div>
-		</Card.Content>
-	</Card.Root>
+		</div>
+	</div>
 
 	<div class="flex items-center gap-2">
 		<Switch
@@ -109,6 +107,7 @@
 			>Copy text to clipboard on successful transcription</Label
 		>
 	</div>
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="paste-from-clipboard"
@@ -125,6 +124,7 @@
 			Paste contents from clipboard after successful transcription
 		</Label>
 	</div>
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="faster-rerecord"
