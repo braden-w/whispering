@@ -3,13 +3,21 @@ import type { Settings } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
 import { toast } from '../../utils/toast';
 import type { DbService } from './RecordingsService';
-import { DbServiceErr, type Recording } from './RecordingsService';
+import { DbServiceErr } from './RecordingsService';
+import type { Transformation } from './types/Transformations';
+import type { TransformationResult } from './types/TransformationResults';
+import type { Recording } from './types/Recordings';
 
 const DB_NAME = 'RecordingDB' as const;
 const DB_VERSION = 3 as const;
 
 interface RecordingsDbSchemaV3 extends DBSchema {
 	recordings: { key: Recording['id']; value: Recording };
+	transformations: { key: Transformation['id']; value: Transformation };
+	transformationResults: {
+		key: TransformationResult['id'];
+		value: TransformationResult;
+	};
 }
 
 interface RecordingsDbSchemaV2 extends DBSchema {
