@@ -6,72 +6,77 @@ import type { DbService } from './RecordingsService';
 import { DbServiceErr, type Recording } from './RecordingsService';
 
 const DB_NAME = 'RecordingDB' as const;
-const DB_VERSION = 2 as const;
+const DB_VERSION = 3 as const;
 
-const RECORDING_METADATA_STORE = 'recordingMetadata' as const;
-const RECORDING_BLOB_STORE = 'recordingBlobs' as const;
-const DEPRECATED_RECORDING_STORE = 'recordings' as const;
+interface RecordingsDbSchemaV3 extends DBSchema {
+	recordings: { key: Recording['id']; value: Recording };
+}
 
 interface RecordingsDbSchemaV2 extends DBSchema {
-	[RECORDING_METADATA_STORE]: {
+	recordingMetadata: {
 		key: Recording['id'];
 		value: Omit<Recording, 'blob'>;
 	};
-	[RECORDING_BLOB_STORE]: {
+	recordingBlobs: {
 		key: Recording['id'];
 		value: { id: Recording['id']; blob: Blob | undefined };
 	};
 }
 
 interface RecordingsDbSchemaV1 extends DBSchema {
-	[DEPRECATED_RECORDING_STORE]: { key: Recording['id']; value: Recording };
+	recordings: { key: Recording['id']; value: Recording };
 }
 
-type RecordingsDbSchema = RecordingsDbSchemaV2 & RecordingsDbSchemaV1;
+type RecordingsDbSchema = RecordingsDbSchemaV3 &
+	RecordingsDbSchemaV2 &
+	RecordingsDbSchemaV1;
 
 export function createRecordingsIndexedDbService(): DbService {
 	let recordings = $state<Recording[]>([]);
 
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {
 		async upgrade(db, oldVersion, newVersion, transaction) {
+			if (newVersion !== DB_VERSION)
+				throw new Error('newVersion should be equal to DB_VERSION');
+
 			if (oldVersion === 0) {
-				// Fresh install
-				transaction.db.createObjectStore(RECORDING_METADATA_STORE, {
+				// Fresh install - go straight to v3 schema
+				transaction.db.createObjectStore('recordings', {
 					keyPath: 'id',
 				});
-				transaction.db.createObjectStore(RECORDING_BLOB_STORE, {
-					keyPath: 'id',
-				});
+				return;
 			}
 
-			if (oldVersion === 1 && newVersion === 2) {
-				// Upgrade from v1 to v2
-				const recordingsStore = transaction.objectStore(
-					DEPRECATED_RECORDING_STORE,
-				);
-				const metadataStore = transaction.db.createObjectStore(
-					RECORDING_METADATA_STORE,
-					{ keyPath: 'id' },
-				);
-				const blobStore = transaction.db.createObjectStore(
-					RECORDING_BLOB_STORE,
+			if (oldVersion === 1) {
+				// Upgrade from v1 to v3 (no changes needed)
+				return;
+			}
+
+			if (oldVersion === 2) {
+				// Upgrade from v2 to v3 (combine stores back to single store)
+				const metadataStore = transaction.objectStore('recordingMetadata');
+				const metadata = await metadataStore.getAll();
+
+				const blobStore = transaction.objectStore('recordingBlobs');
+				const blobs = await blobStore.getAll();
+
+				const newRecordingsStore = transaction.db.createObjectStore(
+					'recordings',
 					{ keyPath: 'id' },
 				);
 
-				const recordings = await recordingsStore.getAll();
-				await Promise.all(
-					recordings.map(async (recording) => {
-						const { blob, ...metadata } = recording;
-						await Promise.all([
-							metadataStore.add(metadata),
-							blobStore.add({ id: recording.id, blob }),
-						]);
-					}),
-				);
+				// Combine and migrate the data
+				for (const record of metadata) {
+					const blobData = blobs.find((b) => b.id === record.id);
+					await newRecordingsStore.add({
+						...record,
+						blob: blobData?.blob,
+					});
+				}
 
-				// Delete the old store after migration
-				transaction.db.deleteObjectStore(DEPRECATED_RECORDING_STORE);
-				await transaction.done;
+				// Delete old stores
+				transaction.db.deleteObjectStore('recordingMetadata');
+				transaction.db.deleteObjectStore('recordingBlobs');
 			}
 		},
 	});
@@ -80,18 +85,13 @@ export function createRecordingsIndexedDbService(): DbService {
 		const allRecordingsFromDbResult = await tryAsync({
 			try: async () => {
 				const tx = (await dbPromise).transaction(
-					[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
+					'recordings' as const,
 					'readonly',
 				);
-				const recordingMetadataStore = tx.objectStore(RECORDING_METADATA_STORE);
-				const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-				const metadata = await recordingMetadataStore.getAll();
-				const blobs = await recordingBlobStore.getAll();
+				const store = tx.objectStore('recordings');
+				const records = await store.getAll();
 				await tx.done;
-				return metadata.map((recording) => {
-					const blob = blobs.find((blob) => blob.id === recording.id)?.blob;
-					return { ...recording, blob };
-				});
+				return records;
 			},
 			mapErr: (error) =>
 				DbServiceErr({
@@ -125,21 +125,11 @@ export function createRecordingsIndexedDbService(): DbService {
 		async getRecording(id: string) {
 			return tryAsync({
 				try: async () => {
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readonly',
-					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					const metadata = await recordingMetadataStore.get(id);
-					const blobData = await recordingBlobStore.get(id);
+					const tx = (await dbPromise).transaction('recordings', 'readonly');
+					const store = tx.objectStore('recordings');
+					const recording = await store.get(id);
 					await tx.done;
-					if (metadata && blobData) {
-						return { ...metadata, blob: blobData.blob };
-					}
-					return null;
+					return recording || null;
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -153,20 +143,10 @@ export function createRecordingsIndexedDbService(): DbService {
 		async addRecording(recording: Recording) {
 			const addRecordingResult = await tryAsync({
 				try: async () => {
-					const { blob, ...metadata } = recording;
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readwrite',
-					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					await Promise.all([
-						recordingMetadataStore.add(metadata),
-						recordingBlobStore.add({ id: recording.id, blob }),
-						tx.done,
-					]);
+					const tx = (await dbPromise).transaction('recordings', 'readwrite');
+					const store = tx.objectStore('recordings');
+					await store.add(recording);
+					await tx.done;
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -183,14 +163,10 @@ export function createRecordingsIndexedDbService(): DbService {
 		async updateRecording(recording: Recording) {
 			const updateRecordingResult = await tryAsync({
 				try: async () => {
-					const { blob, ...metadata } = recording;
-					await Promise.all([
-						(await dbPromise).put(RECORDING_METADATA_STORE, metadata),
-						(await dbPromise).put(RECORDING_BLOB_STORE, {
-							id: recording.id,
-							blob,
-						}),
-					]);
+					const tx = (await dbPromise).transaction('recordings', 'readwrite');
+					const store = tx.objectStore('recordings');
+					await store.put(recording);
+					await tx.done;
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -209,19 +185,10 @@ export function createRecordingsIndexedDbService(): DbService {
 		async deleteRecording(recording: Recording) {
 			const deleteRecordingByIdResult = await tryAsync({
 				try: async () => {
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readwrite',
-					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					await Promise.all([
-						recordingMetadataStore.delete(recording.id),
-						recordingBlobStore.delete(recording.id),
-						tx.done,
-					]);
+					const tx = (await dbPromise).transaction('recordings', 'readwrite');
+					const store = tx.objectStore('recordings');
+					await store.delete(recording.id);
+					await tx.done;
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -238,22 +205,11 @@ export function createRecordingsIndexedDbService(): DbService {
 		async deleteRecordings(recordingsToDelete: Recording[]) {
 			const deleteRecordingsByIdResult = await tryAsync({
 				try: async () => {
-					const tx = (await dbPromise).transaction(
-						[RECORDING_METADATA_STORE, RECORDING_BLOB_STORE],
-						'readwrite',
+					const tx = (await dbPromise).transaction('recordings', 'readwrite');
+					const store = tx.objectStore('recordings');
+					await Promise.all(
+						recordingsToDelete.map((recording) => store.delete(recording.id)),
 					);
-					const recordingMetadataStore = tx.objectStore(
-						RECORDING_METADATA_STORE,
-					);
-					const recordingBlobStore = tx.objectStore(RECORDING_BLOB_STORE);
-					await Promise.all([
-						...recordingsToDelete.map((recording) =>
-							recordingMetadataStore.delete(recording.id),
-						),
-						...recordingsToDelete.map((recording) =>
-							recordingBlobStore.delete(recording.id),
-						),
-					]);
 					await tx.done;
 				},
 				mapErr: (error) =>
