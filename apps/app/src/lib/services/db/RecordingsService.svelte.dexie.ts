@@ -24,28 +24,30 @@ export type RecordingsDbSchemaV4 = {
 	};
 	/**
 	 * A transformation is a single step in a pipeline.
-	 * It can be a find and replace operation or an AI transformation.
+	 * It can be one of several types of text transformations:
+	 * - FIND_REPLACE: Replace text patterns with new text
+	 * - PROMPT_TRANSFORM: Use AI to transform text based on prompts
+	 * - CUSTOM_SCRIPT: Run custom JavaScript/TypeScript code
 	 */
 	transformations: {
 		id: string;
 		pipelineId: string;
 		enabled: boolean;
-		type: 'FIND_REPLACE' | 'AI_TRANSFORM';
-		findText: string;
-		replaceText: string;
-		useRegex: boolean;
-		model: string;
-		systemPrompt: string;
-		userPrompt: string;
+		type: 'find_replace' | 'prompt_transform';
+
+		'find_replace.findText': string;
+		'find_replace.replaceText': string;
+		'find_replace.useRegex': boolean;
+
+		'prompt_transform.model': string;
+		'prompt_transform.systemPromptTemplate': string;
+		'prompt_transform.userPromptTemplate': string;
 	};
-	operationsResults: {
+	transformationsResults: {
 		id: string;
-		operationId: string;
+		transformationId: string;
 		recordingId: string;
-		inputText: string;
-		outputText: string;
-		timestamp: string;
-		error?: string;
+		output: string;
 	};
 };
 
