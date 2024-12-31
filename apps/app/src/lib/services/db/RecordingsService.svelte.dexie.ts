@@ -16,13 +16,13 @@ class RecordingsDatabase extends Dexie {
 		super(DB_NAME);
 
 		// V1: Single recordings table
-		this.version(1).stores({ recordings: '&id, title, timestamp' });
+		this.version(1).stores({ recordings: '&id, timestamp' });
 
 		// V2: Split into metadata and blobs
 		this.version(2)
 			.stores({
 				recordings: null,
-				recordingMetadata: '&id, title, timestamp',
+				recordingMetadata: '&id, timestamp',
 				recordingBlobs: '&id',
 			})
 			.upgrade(async (tx) => {
@@ -46,7 +46,7 @@ class RecordingsDatabase extends Dexie {
 		// V3: Back to single recordings table
 		this.version(3)
 			.stores({
-				recordings: '&id, title, timestamp',
+				recordings: '&id, timestamp',
 				recordingMetadata: null,
 				recordingBlobs: null,
 			})
