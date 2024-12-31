@@ -17,13 +17,6 @@ export type RecordingsDbSchemaV4 = {
 		createdAt: string;
 		updatedAt: string;
 	};
-	pipelines: {
-		id: string;
-		title: string;
-		description: string;
-		createdAt: string;
-		updatedAt: string;
-	};
 	/**
 	 * A transformation is a reusable text transformation that can be used in multiple pipelines.
 	 * The actual order and pipeline-specific settings are stored in pipelineTransformations.
@@ -45,26 +38,30 @@ export type RecordingsDbSchemaV4 = {
 		'prompt_transform.systemPromptTemplate': string;
 		'prompt_transform.userPromptTemplate': string;
 	};
-	/**
-	 * Join table that connects pipelines to transformations and stores pipeline-specific settings
-	 * like order and any pipeline-specific configuration
-	 */
-	pipelineTransformations: {
+	pipelines: {
 		id: string;
-		pipelineId: string;
-		transformationId: string;
-		order: number;
-		enabled: boolean;
+		title: string;
+		description: string;
+		createdAt: string;
+		updatedAt: string;
+		transformations: {
+			transformationId: string;
+			enabled: boolean;
+		}[];
 	};
 	pipelineRuns: {
 		id: string;
 		pipelineId: string;
 		recordingId: string;
+		/**
+		 * The input to the pipeline is the transcribed text of the recording.
+		 */
+		input: string;
 		status: 'running' | 'completed' | 'failed';
 		startedAt: string;
 		completedAt: string | null;
 		error: string | null;
-		finalOutput: string | null;
+		output: string | null;
 	};
 	transformationResults: {
 		id: string;
@@ -74,7 +71,7 @@ export type RecordingsDbSchemaV4 = {
 		startedAt: string;
 		completedAt: string | null;
 		error: string | null;
-		output: string;
+		output: string | null;
 	};
 };
 
