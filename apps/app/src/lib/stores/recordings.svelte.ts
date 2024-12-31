@@ -147,7 +147,7 @@ function createRecordings() {
 				return saveRecordingToDatabaseResult;
 			}
 
-			void PlaySoundService.playSound('transcription-complete');
+			void userConfiguredServices.sound.playTranscriptionCompleteSoundIfEnabled();
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
