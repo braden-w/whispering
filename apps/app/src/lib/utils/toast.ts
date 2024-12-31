@@ -1,6 +1,6 @@
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
-import { errorMoreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { NotificationService } from '$lib/services.svelte';
 import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
@@ -97,7 +97,12 @@ function convertActionToToastAction(action: ToastAndNotifyOptions['action']) {
 		case 'more-details':
 			return {
 				label: 'More details',
-				onClick: () => errorMoreDetailsDialog.openWithError(action.error),
+				onClick: () =>
+					moreDetailsDialog.open({
+						title: 'More details',
+						description: 'The following is the raw error message.',
+						error: action.error,
+					}),
 			};
 		default:
 			return undefined;
