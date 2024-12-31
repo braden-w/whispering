@@ -19,7 +19,7 @@
 			disabled?: boolean;
 		}[];
 		selected: T;
-		onSelectedChange: (selected: T | '') => void;
+		onSelectedChange: (selected: T) => void;
 		placeholder?: string;
 		disabled?: boolean;
 	} = $props();
@@ -34,7 +34,11 @@
 	type="single"
 	{items}
 	value={selected}
-	onValueChange={(selected) => onSelectedChange(selected as T)}
+	onValueChange={(selected) => {
+		const selectedValue = selected as T | '';
+		if (!selectedValue) return;
+		onSelectedChange(selectedValue);
+	}}
 	{disabled}
 >
 	<Select.Trigger class="w-full">

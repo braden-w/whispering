@@ -53,7 +53,6 @@
 				{items}
 				selected={settings.value['recording.selectedAudioInputDeviceId']}
 				onSelectedChange={async (selected) => {
-					if (!selected) return;
 					await recorder.closeRecordingSessionWithToast();
 					settings.value = {
 						...settings.value,
@@ -76,7 +75,6 @@
 			}))}
 			selected={settings.value['recording.bitrateKbps']}
 			onSelectedChange={(selected) => {
-				if (!selected) return;
 				settings.value = {
 					...settings.value,
 					'recording.bitrateKbps': selected,

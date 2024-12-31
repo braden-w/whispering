@@ -121,7 +121,6 @@
 			]}
 			selected={settings.value['database.recordingRetentionStrategy']}
 			onSelectedChange={(selected) => {
-				if (!selected) return;
 				settings.value = {
 					...settings.value,
 					'database.recordingRetentionStrategy': selected,
@@ -145,7 +144,6 @@
 				]}
 				selected={settings.value['database.maxRecordingCount']}
 				onSelectedChange={(selected) => {
-					if (!selected) return;
 					settings.value = {
 						...settings.value,
 						'database.maxRecordingCount': selected,
@@ -164,7 +162,6 @@
 				items={ALWAYS_ON_TOP_OPTIONS}
 				selected={settings.value['system.alwaysOnTop']}
 				onSelectedChange={async (selected) => {
-					if (!selected) return;
 					settings.value = {
 						...settings.value,
 						'system.alwaysOnTop': selected,

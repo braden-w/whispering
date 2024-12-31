@@ -3,7 +3,7 @@
 		let isOpen = $state(false);
 		let title = $state<string>('');
 		let description = $state<string>('');
-		let error = $state<unknown>(null);
+		let content = $state<unknown>(null);
 		return {
 			get isOpen() {
 				return isOpen;
@@ -17,17 +17,25 @@
 			get description() {
 				return description;
 			},
-			get error() {
-				if (typeof error === 'string') {
-					return error;
+			get content() {
+				if (typeof content === 'string') {
+					return content;
 				}
-				if (error instanceof Error) {
-					return error.message;
+				if (content instanceof Error) {
+					return content.message;
 				}
-				return JSON.stringify(error, null, 2);
+				return JSON.stringify(content, null, 2);
 			},
-			open: (e: unknown) => {
-				error = e;
+			open: ({
+				title,
+				description,
+				content,
+			}: {
+				title: string;
+				description: string;
+				content: unknown;
+			}) => {
+				content = e;
 				isOpen = true;
 			},
 		};
@@ -45,6 +53,6 @@
 			<Dialog.Description>{moreDetailsDialog.description}</Dialog.Description>
 		</Dialog.Header>
 		<pre
-			class="bg-muted relative whitespace-pre-wrap break-words rounded p-4 pr-12 font-mono text-sm">{moreDetailsDialog.error}</pre>
+			class="bg-muted relative whitespace-pre-wrap break-words rounded p-4 pr-12 font-mono text-sm">{moreDetailsDialog.content}</pre>
 	</Dialog.Content>
 </Dialog.Root>

@@ -35,7 +35,6 @@
 			items={TRANSCRIPTION_SERVICE_OPTIONS}
 			selected={settings.value['transcription.selectedTranscriptionService']}
 			onSelectedChange={(selected) => {
-				if (!selected) return;
 				settings.value = {
 					...settings.value,
 					'transcription.selectedTranscriptionService': selected,
@@ -201,7 +200,6 @@
 			items={SUPPORTED_LANGUAGES_OPTIONS}
 			selected={settings.value['transcription.outputLanguage']}
 			onSelectedChange={(selected) => {
-				if (!selected) return;
 				settings.value = {
 					...settings.value,
 					'transcription.outputLanguage': selected,

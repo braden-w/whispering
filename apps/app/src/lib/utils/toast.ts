@@ -101,7 +101,7 @@ function convertActionToToastAction(action: ToastAndNotifyOptions['action']) {
 					moreDetailsDialog.open({
 						title: 'More details',
 						description: 'The following is the raw error message.',
-						error: action.error,
+						content: action.error,
 					}),
 			};
 		default:
