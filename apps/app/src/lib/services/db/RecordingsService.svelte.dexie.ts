@@ -106,7 +106,17 @@ type RecordingsDbSchemaV1 = {
 };
 
 class RecordingsDatabase extends Dexie {
-	recordings!: Dexie.Table<RecordingsDbSchemaV3['recordings'], string>;
+	recordings!: Dexie.Table<RecordingsDbSchemaV4['recordings'], string>;
+	pipelines!: Dexie.Table<RecordingsDbSchemaV4['pipelines'], string>;
+	transformations!: Dexie.Table<
+		RecordingsDbSchemaV4['transformations'],
+		string
+	>;
+	pipelineRuns!: Dexie.Table<RecordingsDbSchemaV4['pipelineRuns'], string>;
+	transformationResults!: Dexie.Table<
+		RecordingsDbSchemaV4['transformationResults'],
+		string
+	>;
 
 	constructor() {
 		super(DB_NAME);
