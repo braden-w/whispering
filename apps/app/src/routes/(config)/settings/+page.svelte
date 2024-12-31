@@ -39,9 +39,9 @@
 				};
 			}}
 		/>
-		<Label for="copy-to-clipboard"
-			>Copy text to clipboard on successful transcription</Label
-		>
+		<Label for="copy-to-clipboard">
+			Copy text to clipboard on successful transcription
+		</Label>
 	</div>
 
 	<div class="flex items-center gap-2">
