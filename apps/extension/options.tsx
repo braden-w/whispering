@@ -176,19 +176,6 @@ function SettingsCard() {
 			<CardContent className="space-y-6">
 				<div className="flex items-center gap-2">
 					<Switch
-						id="play-sound-enabled"
-						aria-labelledby="play-sound-enabled"
-						checked={settings.isPlaySoundEnabled}
-						onCheckedChange={(newValue) =>
-							setSettings({ ...settings, isPlaySoundEnabled: newValue })
-						}
-					/>
-					<Label htmlFor="play-sound-enabled">
-						Play sound on toggle on and off
-					</Label>
-				</div>
-				<div className="flex items-center gap-2">
-					<Switch
 						id="copy-to-clipboard"
 						aria-labelledby="copy-to-clipboard"
 						checked={settings['transcription.clipboard.copyOnSuccess']}
