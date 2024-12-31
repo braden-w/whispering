@@ -46,7 +46,7 @@ class RecordingsDatabase extends Dexie {
 		// V3: Back to single recordings table
 		this.version(3)
 			.stores({
-				recordings: '&id, title, timestamp',
+				recordings: '&id, title, [timestamp+id]',
 				recordingMetadata: null,
 				recordingBlobs: null,
 			})
@@ -181,14 +181,11 @@ export function createRecordingsIndexedDbService(): DbService {
 		},
 
 		async deleteRecordings(recordingsToDelete: Recording[]) {
-			const deleteRecordingsByIdResult = await tryAsync({
+			const ids = recordingsToDelete.map((r) => r.id);
+			return tryAsync({
 				try: async () => {
 					await db.transaction('rw', db.recordings, async () => {
-						await Promise.all(
-							recordingsToDelete.map((recording) =>
-								db.recordings.delete(recording.id),
-							),
-						);
+						await db.recordings.bulkDelete(ids);
 					});
 				},
 				mapErr: (error) =>
@@ -198,11 +195,6 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
-			if (!deleteRecordingsByIdResult.ok) return deleteRecordingsByIdResult;
-			recordings = recordings.filter(
-				(r) => !recordingsToDelete.some((toDelete) => toDelete.id === r.id),
-			);
-			return Ok(undefined);
 		},
 
 		// Stub implementations for pipeline methods to satisfy the interface
