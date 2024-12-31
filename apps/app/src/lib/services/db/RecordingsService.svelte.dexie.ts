@@ -25,17 +25,16 @@ export type RecordingsDbSchemaV4 = {
 		updatedAt: string;
 	};
 	/**
-	 * A transformation is a single step in a pipeline.
-	 * It can be one of several types of text transformations:
-	 * - FIND_REPLACE: Replace text patterns with new text
-	 * - PROMPT_TRANSFORM: Use AI to transform text based on prompts
-	 * - CUSTOM_SCRIPT: Run custom JavaScript/TypeScript code
+	 * A transformation is a reusable text transformation that can be used in multiple pipelines.
+	 * The actual order and pipeline-specific settings are stored in pipelineTransformations.
 	 */
 	transformations: {
 		id: string;
-		pipelineId: string;
-		order: number;
-		enabled: boolean;
+		name: string;
+		description: string;
+		createdAt: string;
+		updatedAt: string;
+
 		type: 'find_replace' | 'prompt_transform';
 
 		'find_replace.findText': string;
@@ -45,6 +44,17 @@ export type RecordingsDbSchemaV4 = {
 		'prompt_transform.model': string;
 		'prompt_transform.systemPromptTemplate': string;
 		'prompt_transform.userPromptTemplate': string;
+	};
+	/**
+	 * Join table that connects pipelines to transformations and stores pipeline-specific settings
+	 * like order and any pipeline-specific configuration
+	 */
+	pipelineTransformations: {
+		id: string;
+		pipelineId: string;
+		transformationId: string;
+		order: number;
+		enabled: boolean;
 	};
 	pipelineRuns: {
 		id: string;
