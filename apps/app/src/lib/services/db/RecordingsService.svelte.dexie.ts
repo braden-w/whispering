@@ -9,6 +9,19 @@ import type { Recording } from './types/Recordings';
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 3;
 
+type RecordingsDbSchemaV3 = {
+	recordings: Recording;
+};
+
+type RecordingsDbSchemaV2 = {
+	recordingMetadata: Omit<Recording, 'blob'>;
+	recordingBlobs: { id: Recording['id']; blob: Blob | undefined };
+};
+
+type RecordingsDbSchemaV1 = {
+	recordings: Recording;
+};
+
 class RecordingsDatabase extends Dexie {
 	recordings!: Dexie.Table<Recording, string>;
 
@@ -27,7 +40,9 @@ class RecordingsDatabase extends Dexie {
 			})
 			.upgrade(async (tx) => {
 				// Migrate data from recordings to split tables
-				const oldRecordings = await tx.table<Recording>('recordings').toArray();
+				const oldRecordings = await tx
+					.table<RecordingsDbSchemaV1['recordings']>('recordings')
+					.toArray();
 
 				// Create entries in both new tables
 				const metadata = oldRecordings.map(
@@ -36,10 +51,10 @@ class RecordingsDatabase extends Dexie {
 				const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
 
 				await tx
-					.table<Omit<Recording, 'blob'>>('recordingMetadata')
+					.table<RecordingsDbSchemaV2['recordingMetadata']>('recordingMetadata')
 					.bulkAdd(metadata);
 				await tx
-					.table<{ id: string; blob: Blob | undefined }>('recordingBlobs')
+					.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
 					.bulkAdd(blobs);
 			});
 
@@ -53,20 +68,22 @@ class RecordingsDatabase extends Dexie {
 			.upgrade(async (tx) => {
 				// Get data from both tables
 				const metadata = await tx
-					.table<Omit<Recording, 'blob'>>('recordingMetadata')
+					.table<RecordingsDbSchemaV2['recordingMetadata']>('recordingMetadata')
 					.toArray();
 				const blobs = await tx
-					.table<{ id: string; blob: Blob | undefined }>('recordingBlobs')
+					.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
 					.toArray();
 
 				// Combine and migrate the data
 				await Promise.all(
 					metadata.map((record) => {
 						const blob = blobs.find((b) => b.id === record.id)?.blob;
-						return tx.table<Recording>('recordings').add({
-							...record,
-							blob,
-						});
+						return tx
+							.table<RecordingsDbSchemaV3['recordings']>('recordings')
+							.add({
+								...record,
+								blob,
+							});
 					}),
 				);
 			});
