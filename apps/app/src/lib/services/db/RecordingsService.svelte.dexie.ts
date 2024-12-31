@@ -223,34 +223,28 @@ export function createRecordingsIndexedDbService(): DbService {
 					return Ok(undefined);
 				}
 				case 'limit-count': {
-					if (recordings.length === 0) return Ok(undefined);
+					const count = await db.recordings.count();
+					if (count === 0) return Ok(undefined);
 
 					const maxCount = Number.parseInt(maxRecordingCount);
-					if (recordings.length <= maxCount) return Ok(undefined);
 
-					// Sort recordings by timestamp (oldest first)
-					const sortedRecordings = [...recordings].sort(
-						(a, b) =>
-							new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-					);
+					if (count <= maxCount) return Ok(undefined);
 
-					// Get recordings to delete (all recordings beyond the max count, starting from oldest)
-					const recordingsToDelete = sortedRecordings.slice(
-						0,
-						sortedRecordings.length - maxCount,
-					);
+					// Get IDs of oldest recordings that exceed the limit
+					const idsToDelete = await db.recordings
+						.orderBy('timestamp')
+						.limit(count - maxCount)
+						.primaryKeys();
 
-					if (recordingsToDelete.length === 0) return Ok(undefined);
+					await db.recordings.bulkDelete(idsToDelete);
 
-					const deleteRecordingsResult =
-						await this.deleteRecordings(recordingsToDelete);
-					if (!deleteRecordingsResult.ok) {
-						return DbServiceErr({
-							title: 'Unable to clean up old recordings',
-							description: 'Some old recordings could not be deleted',
-							error: deleteRecordingsResult.error,
-						});
-					}
+					// if (!deleteRecordingsResult.ok) {
+					// 	return DbServiceErr({
+					// 		title: 'Unable to clean up old recordings',
+					// 		description: 'Some old recordings could not be deleted',
+					// 		error: deleteRecordingsResult.error,
+					// 	});
+					// }
 					return Ok(undefined);
 				}
 			}
