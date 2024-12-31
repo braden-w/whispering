@@ -183,11 +183,7 @@ export function createRecordingsIndexedDbService(): DbService {
 		async deleteRecordings(recordingsToDelete: Recording[]) {
 			const ids = recordingsToDelete.map((r) => r.id);
 			return tryAsync({
-				try: async () => {
-					await db.transaction('rw', db.recordings, async () => {
-						await db.recordings.bulkDelete(ids);
-					});
-				},
+				try: () => db.recordings.bulkDelete(ids),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error deleting recordings from Dexie',
@@ -223,7 +219,18 @@ export function createRecordingsIndexedDbService(): DbService {
 					return Ok(undefined);
 				}
 				case 'limit-count': {
-					const count = await db.recordings.count();
+					const getCountResult = await tryAsync({
+						try: () => db.recordings.count(),
+						mapErr: (error) =>
+							DbServiceErr({
+								title:
+									'Unable to get recording count while cleaning up old recordings',
+								description: 'Please try again',
+								error,
+							}),
+					});
+					if (!getCountResult.ok) return getCountResult;
+					const count = getCountResult.data;
 					if (count === 0) return Ok(undefined);
 
 					const maxCount = Number.parseInt(maxRecordingCount);
@@ -232,15 +239,11 @@ export function createRecordingsIndexedDbService(): DbService {
 
 					return tryAsync({
 						try: async () => {
-							await db.transaction('rw', db.recordings, async () => {
-								// Get IDs of oldest recordings that exceed the limit
-								const idsToDelete = await db.recordings
-									.orderBy('timestamp')
-									.limit(count - maxCount)
-									.primaryKeys();
-
-								await db.recordings.bulkDelete(idsToDelete);
-							});
+							const idsToDelete = await db.recordings
+								.orderBy('timestamp')
+								.limit(count - maxCount)
+								.primaryKeys();
+							await db.recordings.bulkDelete(idsToDelete);
 						},
 						mapErr: (error) =>
 							DbServiceErr({
