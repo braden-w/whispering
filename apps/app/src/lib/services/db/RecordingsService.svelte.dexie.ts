@@ -75,17 +75,14 @@ class RecordingsDatabase extends Dexie {
 					.toArray();
 
 				// Combine and migrate the data
-				await Promise.all(
-					metadata.map((record) => {
-						const blob = blobs.find((b) => b.id === record.id)?.blob;
-						return tx
-							.table<RecordingsDbSchemaV3['recordings']>('recordings')
-							.add({
-								...record,
-								blob,
-							});
-					}),
-				);
+				const mergedRecordings = metadata.map((record) => {
+					const blob = blobs.find((b) => b.id === record.id)?.blob;
+					return { ...record, blob };
+				});
+
+				await tx
+					.table<RecordingsDbSchemaV3['recordings']>('recordings')
+					.bulkAdd(mergedRecordings);
 			});
 	}
 }
