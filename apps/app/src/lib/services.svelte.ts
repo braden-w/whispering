@@ -25,10 +25,6 @@ export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktop()
 	: createDownloadServiceWeb();
 
-export const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktop()
-	: createHttpServiceWeb();
-
 export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
 	: createNotificationServiceWeb();
@@ -49,6 +45,10 @@ export const RecordingsService = createRecordingsIndexedDbService();
 export const userConfiguredServices = createServices();
 
 function createServices() {
+	const HttpService = window.__TAURI_INTERNALS__
+		? createHttpServiceDesktop()
+		: createHttpServiceWeb();
+
 	const TranscriptionService = $derived.by(() => {
 		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
