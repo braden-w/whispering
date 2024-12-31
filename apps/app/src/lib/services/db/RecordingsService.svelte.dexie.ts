@@ -17,7 +17,38 @@ export type RecordingsDbSchemaV4 = {
 		createdAt: string;
 		updatedAt: string;
 	};
+	pipelines: {
+		id: string;
+		title: string;
+		description: string;
+	};
+	/**
+	 * A transformation is a single step in a pipeline.
+	 * It can be a find and replace operation or an AI transformation.
+	 */
+	transformations: {
+		id: string;
+		pipelineId: string;
+		enabled: boolean;
+		type: 'FIND_REPLACE' | 'AI_TRANSFORM';
+		findText: string;
+		replaceText: string;
+		useRegex: boolean;
+		model: string;
+		systemPrompt: string;
+		userPrompt: string;
+	};
+	operationsResults: {
+		id: string;
+		operationId: string;
+		recordingId: string;
+		inputText: string;
+		outputText: string;
+		timestamp: string;
+		error?: string;
+	};
 };
+
 type RecordingsDbSchemaV3 = {
 	recordings: RecordingsDbSchemaV1['recordings'];
 };
