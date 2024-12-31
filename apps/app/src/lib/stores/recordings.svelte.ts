@@ -1,6 +1,5 @@
 import {
 	DownloadService,
-	PlaySoundService,
 	RecordingsService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
