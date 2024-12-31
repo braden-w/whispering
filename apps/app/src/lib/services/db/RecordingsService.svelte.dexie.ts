@@ -30,18 +30,17 @@ class RecordingsDatabase extends Dexie {
 				const oldRecordings = await tx.table<Recording>('recordings').toArray();
 
 				// Create entries in both new tables
-				await Promise.all([
-					...oldRecordings.map(({ blob, ...recording }) =>
-						tx
-							.table<Omit<Recording, 'blob'>>('recordingMetadata')
-							.add(recording),
-					),
-					...oldRecordings.map(({ blob, ...recording }) =>
-						tx
-							.table<{ id: string; blob: Blob | undefined }>('recordingBlobs')
-							.add({ id: recording.id, blob }),
-					),
-				]);
+				const metadata = oldRecordings.map(
+					({ blob, ...recording }) => recording,
+				);
+				const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
+
+				await tx
+					.table<Omit<Recording, 'blob'>>('recordingMetadata')
+					.bulkAdd(metadata);
+				await tx
+					.table<{ id: string; blob: Blob | undefined }>('recordingBlobs')
+					.bulkAdd(blobs);
 			});
 
 		// V3: Back to single recordings table
