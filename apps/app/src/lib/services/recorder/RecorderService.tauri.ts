@@ -36,7 +36,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				return WhisperingErr({
 					title: '🎤 Unable to Start Recording Session',
 					description:
-						'We encountered an issue while setting up your recording session. This could be because:\n\n• Your microphone is being used by another app\n• Your microphone permissions are denied\n• The selected recording device is disconnected',
+						'We encountered an issue while setting up your recording session. This could be because your microphone is being used by another app, your microphone permissions are denied, or the selected recording device is disconnected',
 					action: { type: 'more-details', error: result.error },
 				});
 			return Ok(undefined);

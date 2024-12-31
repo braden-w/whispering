@@ -1,7 +1,6 @@
 import {
 	ClipboardService,
 	NotificationService,
-	PlaySoundService,
 	RecordingsService,
 	SetTrayIconService,
 	userConfiguredServices,
@@ -35,11 +34,13 @@ function createRecorder() {
 				description: 'Finalizing your audio capture...',
 			});
 
-			const stopResult =
-				await userConfiguredServices.RecorderService.stopRecording(undefined, {
+			const stopResult = await userConfiguredServices.recorder.stopRecording(
+				undefined,
+				{
 					sendStatus: (options) =>
 						toast.loading({ id: stopRecordingToastId, ...options }),
-				});
+				},
+			);
 
 			if (!stopResult.ok) {
 				toast.error({ id: stopRecordingToastId, ...stopResult.error });
@@ -47,7 +48,7 @@ function createRecorder() {
 			}
 			await setRecorderState('SESSION');
 			console.info('Recording stopped');
-			void PlaySoundService.playSound('stop');
+			void userConfiguredServices.sound.playStopSoundIfEnabled();
 
 			const blob = stopResult.data;
 			const newRecording: Recording = {
@@ -174,7 +175,7 @@ function createRecorder() {
 						description: 'Wrapping up your recording session...',
 					});
 					const closeSessionResult =
-						await userConfiguredServices.RecorderService.closeRecordingSession(
+						await userConfiguredServices.recorder.closeRecordingSession(
 							undefined,
 							{
 								sendStatus: (options) =>
@@ -205,7 +206,7 @@ function createRecorder() {
 		});
 		if (recorderState === 'IDLE') {
 			const initResult =
-				await userConfiguredServices.RecorderService.initRecordingSession(
+				await userConfiguredServices.recorder.initRecordingSession(
 					{
 						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
 						bitsPerSecond:
@@ -223,7 +224,7 @@ function createRecorder() {
 			await setRecorderState('SESSION');
 		}
 		const startRecordingResult =
-			await userConfiguredServices.RecorderService.startRecording(nanoid(), {
+			await userConfiguredServices.recorder.startRecording(nanoid(), {
 				sendStatus: (options) =>
 					toast.loading({ id: startRecordingToastId, ...options }),
 			});
@@ -238,7 +239,7 @@ function createRecorder() {
 			description: 'Speak now and stop recording when done',
 		});
 		console.info('Recording started');
-		void PlaySoundService.playSound('start');
+		void userConfiguredServices.sound.playStartSoundIfEnabled();
 	};
 
 	return {
@@ -254,12 +255,9 @@ function createRecorder() {
 				description: 'Wrapping things up, just a moment...',
 			});
 			const closeResult =
-				await userConfiguredServices.RecorderService.closeRecordingSession(
-					undefined,
-					{
-						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-					},
-				);
+				await userConfiguredServices.recorder.closeRecordingSession(undefined, {
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				});
 			if (!closeResult.ok) {
 				toast.error({ id: toastId, ...closeResult.error });
 				return;
@@ -288,12 +286,9 @@ function createRecorder() {
 				description: 'Discarding the current recording...',
 			});
 			const cancelResult =
-				await userConfiguredServices.RecorderService.cancelRecording(
-					undefined,
-					{
-						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-					},
-				);
+				await userConfiguredServices.recorder.cancelRecording(undefined, {
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				});
 			if (!cancelResult.ok) {
 				toast.error({ id: toastId, ...cancelResult.error });
 				return;
@@ -314,7 +309,7 @@ function createRecorder() {
 					description: 'Wrapping up your recording session...',
 				});
 				const closeSessionResult =
-					await userConfiguredServices.RecorderService.closeRecordingSession(
+					await userConfiguredServices.recorder.closeRecordingSession(
 						undefined,
 						{
 							sendStatus: (options) =>
@@ -338,7 +333,7 @@ function createRecorder() {
 				});
 				await setRecorderState('IDLE');
 			}
-			void PlaySoundService.playSound('cancel');
+			void userConfiguredServices.sound.playCancelSoundIfEnabled();
 			console.info('Recording cancelled');
 		},
 	};

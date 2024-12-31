@@ -9,7 +9,10 @@ import {
 
 export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	({
-		isPlaySoundEnabled: true,
+		'sound.playOnStartSuccess': true,
+		'sound.playOnStopSuccess': true,
+		'sound.playOnCancelSuccess': true,
+		'sound.playOnTranscriptionSuccess': true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
 		'recording.isFasterRerecordEnabled': false,
@@ -42,7 +45,10 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({
-	isPlaySoundEnabled: z.boolean(),
+	'sound.playOnStartSuccess': z.boolean(),
+	'sound.playOnStopSuccess': z.boolean(),
+	'sound.playOnCancelSuccess': z.boolean(),
+	'sound.playOnTranscriptionSuccess': z.boolean(),
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
 	'transcription.clipboard.pasteOnSuccess': z.boolean(),
 	'recording.isFasterRerecordEnabled': z.boolean(),

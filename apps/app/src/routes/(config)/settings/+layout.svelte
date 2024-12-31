@@ -9,6 +9,7 @@
 		{ title: 'General', href: '/settings' },
 		{ title: 'Recording', href: '/settings/recording' },
 		{ title: 'Transcription', href: '/settings/transcription' },
+		{ title: 'Sound', href: '/settings/sound' },
 		{ title: 'Shortcuts', href: '/settings/shortcuts' },
 	] as const;
 

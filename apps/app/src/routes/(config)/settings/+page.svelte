@@ -10,6 +10,7 @@
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
 	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 	import { type } from '@tauri-apps/plugin-os';
+	import * as Card from '$lib/components/ui/card';
 </script>
 
 <svelte:head>
@@ -28,17 +29,6 @@
 
 	<div class="flex items-center gap-2">
 		<Switch
-			id="play-sound-enabled"
-			aria-labelledby="play-sound-enabled"
-			checked={settings.value.isPlaySoundEnabled}
-			onCheckedChange={(v) => {
-				settings.value = { ...settings.value, isPlaySoundEnabled: v };
-			}}
-		/>
-		<Label for="play-sound-enabled">Play sound on toggle on and off</Label>
-	</div>
-	<div class="flex items-center gap-2">
-		<Switch
 			id="copy-to-clipboard"
 			aria-labelledby="copy-to-clipboard"
 			checked={settings.value['transcription.clipboard.copyOnSuccess']}
@@ -49,10 +39,11 @@
 				};
 			}}
 		/>
-		<Label for="copy-to-clipboard"
-			>Copy text to clipboard on successful transcription</Label
-		>
+		<Label for="copy-to-clipboard">
+			Copy text to clipboard on successful transcription
+		</Label>
 	</div>
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="paste-from-clipboard"
@@ -69,6 +60,7 @@
 			Paste contents from clipboard after successful transcription
 		</Label>
 	</div>
+
 	<div class="flex items-center gap-2">
 		<Switch
 			id="faster-rerecord"

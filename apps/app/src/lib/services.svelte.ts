@@ -12,7 +12,6 @@ import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
 import { createHttpServiceWeb } from './services/http/HttpService.web';
 import { createNotificationServiceDesktop } from './services/notifications/NotificationService.desktop';
 import { createNotificationServiceWeb } from './services/notifications/NotificationService.web';
-import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
 import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
@@ -26,10 +25,6 @@ export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktop()
 	: createDownloadServiceWeb();
 
-export const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktop()
-	: createHttpServiceWeb();
-
 export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
 	: createNotificationServiceWeb();
@@ -42,10 +37,6 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-export const PlaySoundService = window.__TAURI_INTERNALS__
-	? createPlaySoundServiceDesktop()
-	: createPlaySoundServiceWeb();
-
 export const RecordingsService = createRecordingsIndexedDbService();
 
 /**
@@ -54,6 +45,10 @@ export const RecordingsService = createRecordingsIndexedDbService();
 export const userConfiguredServices = createServices();
 
 function createServices() {
+	const HttpService = window.__TAURI_INTERNALS__
+		? createHttpServiceDesktop()
+		: createHttpServiceWeb();
+
 	const TranscriptionService = $derived.by(() => {
 		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
@@ -65,11 +60,36 @@ function createServices() {
 		}
 	});
 
-	const RecorderService = $derived(
-		settings.value['recording.selectedAudioInputDeviceId'] === 'default'
-			? createRecorderServiceTauri()
-			: createRecorderServiceWeb(),
-	);
+	const RecorderService = createRecorderServiceWeb();
 
-	return { TranscriptionService, RecorderService };
+	const PlaySoundService = window.__TAURI_INTERNALS__
+		? createPlaySoundServiceDesktop()
+		: createPlaySoundServiceWeb();
+
+	return {
+		transcription: TranscriptionService,
+		recorder: RecorderService,
+		sound: {
+			playStartSoundIfEnabled: () => {
+				if (settings.value['sound.playOnStartSuccess']) {
+					void PlaySoundService.playSound('start');
+				}
+			},
+			playStopSoundIfEnabled: () => {
+				if (settings.value['sound.playOnStopSuccess']) {
+					void PlaySoundService.playSound('stop');
+				}
+			},
+			playCancelSoundIfEnabled: () => {
+				if (settings.value['sound.playOnCancelSuccess']) {
+					void PlaySoundService.playSound('cancel');
+				}
+			},
+			playTranscriptionCompleteSoundIfEnabled: () => {
+				if (settings.value['sound.playOnTranscriptionSuccess']) {
+					void PlaySoundService.playSound('transcription-complete');
+				}
+			},
+		},
+	};
 }
