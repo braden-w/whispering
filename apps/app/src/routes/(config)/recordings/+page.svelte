@@ -10,6 +10,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { clipboard } from '$lib/utils/clipboard';
@@ -36,9 +37,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import { DbService } from '$lib/services.svelte';
-	import { createRecordingsQuery } from '$lib/queries/recordings';
+	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -197,6 +196,8 @@
 	const setRowSelection = createUpdater(rowSelection);
 
 	const recordingsQuery = createRecordingsQuery();
+
+	const deleteRecordingsWithToastMutation = createDeleteRecordingsWithToast();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -389,10 +390,11 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () =>
-									recordings.deleteRecordingsWithToast(
+								onConfirm: () => {
+									deleteRecordingsWithToastMutation.mutate(
 										selectedRecordingRows.map(({ original }) => original),
-									),
+									);
+								},
 							});
 						}}
 					>

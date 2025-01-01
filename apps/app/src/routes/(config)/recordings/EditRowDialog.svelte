@@ -12,13 +12,14 @@
 	import type { Recording } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
+	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 
 	let { recording }: { recording: Recording } = $props();
 
-	const updateRecordingWithToast = createUpdateRecordingWithToast();
+	const updateRecordingWithToastMutation = createUpdateRecordingWithToast();
+	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
 
 	let isDialogOpen = $state(false);
-	let isDeleting = $state(false);
 
 	const blobUrlManager = createBlobUrlManager();
 
@@ -53,7 +54,7 @@
 			class="grid gap-4 py-4"
 			onsubmit={async (e) => {
 				e.preventDefault();
-				updateRecordingWithToast.mutate(recording, {
+				updateRecordingWithToastMutation.mutate(recording, {
 					onSettled: () => {
 						isDialogOpen = false;
 					},
@@ -99,15 +100,16 @@
 				<Button
 					class="mr-auto"
 					onclick={async () => {
-						isDeleting = true;
-						await recordings.deleteRecordingWithToast(recording);
-						isDeleting = false;
-						isDialogOpen = false;
+						await deleteRecordingWithToastMutation.mutate(recording, {
+							onSettled: () => {
+								isDialogOpen = false;
+							},
+						});
 					}}
 					variant="destructive"
-					disabled={isDeleting}
+					disabled={deleteRecordingWithToastMutation.isPending}
 				>
-					{#if isDeleting}
+					{#if deleteRecordingWithToastMutation.isPending}
 						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
 					Delete

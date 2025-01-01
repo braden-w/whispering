@@ -15,10 +15,11 @@
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
 	import { createDownloadRecordingWithToast } from '$lib/mutations/recordings';
-
+	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 	let { recording }: { recording: Recording } = $props();
 
 	const downloadRecordingWithToast = createDownloadRecordingWithToast();
+	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
 </script>
 
 <div class="flex items-center">
@@ -75,7 +76,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
-				onConfirm: () => recordings.deleteRecordingWithToast(recording),
+				onConfirm: () => deleteRecordingWithToastMutation.mutate(recording),
 			});
 		}}
 		variant="ghost"
