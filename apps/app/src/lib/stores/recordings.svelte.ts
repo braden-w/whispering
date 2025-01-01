@@ -9,6 +9,7 @@ import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
+import type { Recording } from '$lib/services/db';
 
 export const recordings = createRecordings();
 
