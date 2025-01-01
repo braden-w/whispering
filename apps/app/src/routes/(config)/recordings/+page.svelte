@@ -246,7 +246,10 @@
 			.filter((recording) => recording.transcribedText !== '')
 			.map((recording) =>
 				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-					return key in recording ? recording[key as keyof Recording] : '';
+					if (key in recording && typeof recording[key as keyof Recording] === 'string') {
+						return recording[key as keyof Recording]
+					}
+					return '';
 				}),
 			);
 		return transcriptions.join(delimiter);
