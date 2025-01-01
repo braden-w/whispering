@@ -283,6 +283,45 @@ class RecordingsDatabase extends Dexie {
 					await handleUpgradeError({ tx, version: 3, error });
 				}
 			});
+
+		// V4: Add transformations, pipelines, and pipeline runs tables
+		// Also migrate recordings timestamp to createdAt and updatedAt
+		this.version(4)
+			.stores({
+				recordings: '&id, createdAt, updatedAt',
+				transformations: '&id, createdAt, updatedAt',
+				pipelines: '&id, createdAt, updatedAt',
+				pipelineRuns: '&id, pipelineId, recordingId, startedAt',
+				transformationResults:
+					'&id, pipelineRunId, transformationId, startedAt',
+			})
+			.upgrade(async (tx) => {
+				try {
+					const oldRecordings = await tx
+						.table<RecordingsDbSchemaV3['recordings']>('recordings')
+						.toArray();
+
+					const newRecordings = oldRecordings.map(
+						({ timestamp, ...record }) => ({
+							...record,
+							createdAt: timestamp,
+							updatedAt: timestamp,
+						}),
+					);
+
+					await tx.table('recordings').clear();
+					await tx.table('recordings').bulkAdd(newRecordings);
+
+					// Create new tables for transformations, pipelines, and runs
+					// These will start empty as they're new features
+					await tx.table('transformations').clear();
+					await tx.table('pipelines').clear();
+					await tx.table('pipelineRuns').clear();
+					await tx.table('transformationResults').clear();
+				} catch (error) {
+					await handleUpgradeError({ tx, version: 4, error });
+				}
+			});
 	}
 }
 
