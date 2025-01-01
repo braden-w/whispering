@@ -3,7 +3,7 @@ import { DbService } from '$lib/services.svelte';
 import { createQuery } from '@tanstack/svelte-query';
 
 // Define the query key as a constant array
-const recordingsKeys = {
+export const recordingsKeys = {
 	all: ['recordings'] as const,
 };
 
