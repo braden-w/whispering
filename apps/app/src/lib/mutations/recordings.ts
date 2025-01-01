@@ -21,6 +21,42 @@ export const createUpdateRecordingWithToast = () =>
 		},
 	}));
 
+export const createDeleteRecordingWithToast = () =>
+	createMutation(() => ({
+		mutationFn: async (recording: Recording) => {
+			const result = await DbService.deleteRecording(recording);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to delete recording!',
+					description: 'Your recording could not be deleted.',
+				});
+				return;
+			}
+			toast.success({
+				title: 'Deleted recording!',
+				description: 'Your recording has been deleted successfully.',
+			});
+		},
+	}));
+
+export const createDeleteRecordingsWithToast = () =>
+	createMutation(() => ({
+		mutationFn: async (recordings: Recording[]) => {
+			const result = await DbService.deleteRecordings(recordings);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to delete recordings!',
+					description: 'Your recordings could not be deleted.',
+				});
+				return;
+			}
+			toast.success({
+				title: 'Deleted recordings!',
+				description: 'Your recordings have been deleted successfully.',
+			});
+		},
+	}));
+
 export const createDownloadRecordingWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async (recording: Recording) => {
