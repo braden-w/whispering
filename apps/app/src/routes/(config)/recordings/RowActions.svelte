@@ -11,8 +11,10 @@
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
+		Loader2Icon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
+	import { downloadRecordingWithToast } from '$lib/mutations/recordings';
 
 	let { recording }: { recording: Recording } = $props();
 </script>
@@ -54,11 +56,15 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() => recordings.downloadRecordingWithToast(recording)}
+		onclick={() => downloadRecordingWithToast.mutate(recording)}
 		variant="ghost"
 		size="icon"
 	>
-		<DownloadIcon class="h-4 w-4" />
+		{#if downloadRecordingWithToast.isPending}
+			<Loader2Icon class="h-4 w-4 animate-spin" />
+		{:else}
+			<DownloadIcon class="h-4 w-4" />
+		{/if}
 	</WhisperingButton>
 
 	<WhisperingButton
