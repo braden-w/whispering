@@ -25,22 +25,6 @@ function createRecordings() {
 			return isCurrentlyTranscribing;
 		},
 
-		updateRecordingWithToast: async (recording: Recording) => {
-			const result = await DbService.updateRecording(recording);
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to update recording!',
-					description: 'Your recording could not be updated.',
-				});
-				return;
-			}
-			toast.success({
-				title: 'Updated recording!',
-				description: 'Your recording has been updated successfully.',
-			});
-			return;
-		},
-
 		deleteRecordingWithToast: async (recording: Recording) => {
 			const result = await DbService.deleteRecording(recording);
 			if (!result.ok) {

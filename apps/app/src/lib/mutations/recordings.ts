@@ -1,8 +1,24 @@
 import { DbService, DownloadService } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
-
 import { createMutation } from '@tanstack/svelte-query';
+
+export const updateRecordingWithToast = createMutation(() => ({
+	mutationFn: async (recording: Recording) => {
+		const result = await DbService.updateRecording(recording);
+		if (!result.ok) {
+			toast.error({
+				title: 'Failed to update recording!',
+				description: 'Your recording could not be updated.',
+			});
+			return;
+		}
+		toast.success({
+			title: 'Updated recording!',
+			description: 'Your recording has been updated successfully.',
+		});
+	},
+}));
 
 export const downloadRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {

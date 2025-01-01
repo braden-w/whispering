@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { updateRecordingWithToast } from '$lib/mutations/recordings';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -16,7 +17,6 @@
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
-	let isSaving = $state(false);
 
 	const blobUrlManager = createBlobUrlManager();
 
@@ -51,10 +51,11 @@
 			class="grid gap-4 py-4"
 			onsubmit={async (e) => {
 				e.preventDefault();
-				isSaving = true;
-				await recordings.updateRecordingWithToast(recording);
-				isSaving = false;
-				isDialogOpen = false;
+				updateRecordingWithToast.mutate(recording, {
+					onSettled: () => {
+						isDialogOpen = false;
+					},
+				});
 			}}
 		>
 			<div class="grid grid-cols-4 items-center gap-4">
@@ -112,8 +113,8 @@
 				<Button onclick={() => (isDialogOpen = false)} variant="secondary"
 					>Cancel</Button
 				>
-				<Button type="submit" disabled={isSaving}>
-					{#if isSaving}
+				<Button type="submit" disabled={updateRecordingWithToast.isPending}>
+					{#if updateRecordingWithToast.isPending}
 						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
 					Save
