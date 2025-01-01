@@ -66,6 +66,7 @@
 		"@tauri-apps/plugin-window-state": "^2.2.0",
 		"audio-recorder-polyfill": "^0.4.1",
 		"cross-env": "^7.0.3",
+		"dexie": "^4.0.10",
 		"hotkeys-js": "^3.13.9",
 		"idb": "^8.0.1",
 		"nanoid": "^5.0.9",
