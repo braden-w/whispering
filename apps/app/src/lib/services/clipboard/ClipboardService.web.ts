@@ -18,10 +18,15 @@ export function createClipboardServiceWeb(): ClipboardService {
 			});
 
 			if (!setClipboardResult.ok) {
-				const setClipboardTextResult = await extension.setClipboardText({
+				const extensionSetClipboardResult = await extension.setClipboardText({
 					transcribedText: text,
 				});
-				if (!setClipboardTextResult.ok) return setClipboardTextResult;
+				if (!extensionSetClipboardResult.ok) {
+					const errProperties = extensionSetClipboardResult.error;
+					return errProperties._tag === 'ExtensionNotAvailableError'
+						? setClipboardResult
+						: WhisperingErr(errProperties);
+				}
 				return Ok(undefined);
 			}
 			return Ok(undefined);
@@ -31,7 +36,18 @@ export function createClipboardServiceWeb(): ClipboardService {
 			const writeTextToCursorResult = await extension.writeTextToCursor({
 				transcribedText: text,
 			});
-			if (!writeTextToCursorResult.ok) return writeTextToCursorResult;
+			if (!writeTextToCursorResult.ok) {
+				const errProperties = writeTextToCursorResult.error;
+				if (errProperties._tag === 'ExtensionNotAvailableError') {
+					return WhisperingErr({
+						title: 'Extension Not Available',
+						description:
+							'The Whispering extension is not available. Please install it to enable writing transcribed text to the cursor.',
+						action: { type: 'more-details', error: errProperties },
+					});
+				}
+				return WhisperingErr(errProperties);
+			}
 			return Ok(undefined);
 		},
 	};
