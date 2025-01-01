@@ -31,7 +31,6 @@ export type Recording = RecordingsDbSchemaV4['recordings'];
 export type DbService = {
 	// Recording methods
 	get recordings(): Recording[];
-	getRecording: (id: string) => Promise<DbServiceResult<Recording | null>>;
 	addRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	deleteRecording: (recording: Recording) => Promise<DbServiceResult<void>>;

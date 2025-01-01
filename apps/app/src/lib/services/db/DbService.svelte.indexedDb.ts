@@ -115,24 +115,6 @@ export function createDbIdbService(): DbService {
 			return recordings;
 		},
 
-		async getRecording(id: string) {
-			return tryAsync({
-				try: async () => {
-					const tx = (await dbPromise).transaction('recordings', 'readonly');
-					const store = tx.objectStore('recordings');
-					const recording = await store.get(id);
-					await tx.done;
-					return recording || null;
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting recording from indexedDB',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
 		async addRecording(recording: Recording) {
 			const addRecordingResult = await tryAsync({
 				try: async () => {

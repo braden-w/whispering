@@ -408,21 +408,6 @@ export function createDbIdbService(): DbService {
 			return recordings;
 		},
 
-		async getRecording(id: string) {
-			return tryAsync({
-				try: async () => {
-					const recording = await db.recordings.get(id);
-					return recording || null;
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting recording from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
 		async addRecording(recording: Recording) {
 			const addRecordingResult = await tryAsync({
 				try: async () => {
