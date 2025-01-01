@@ -4,6 +4,7 @@ import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
 import type {
 	DbService,
+	Pipeline,
 	PipelineRun,
 	Transformation,
 	TransformationResult,
@@ -320,12 +321,50 @@ class RecordingsDatabase extends Dexie {
 
 export function createDbIdbService(): DbService {
 	let recordings = $state<Recording[]>([]);
+	let pipelines = $state<Pipeline[]>([]);
+	let transformations = $state<Transformation[]>([]);
+	let pipelineRuns = $state<PipelineRun[]>([]);
+	let transformationResults = $state<TransformationResult[]>([]);
+
 	const db = new RecordingsDatabase();
 
 	const syncDbToRecordingsState = async () => {
-		const allRecordingsFromDbResult = await tryAsync({
+		const allRowsFromDbResult = await tryAsync({
 			try: async () => {
-				return await db.recordings.toArray();
+				// Transaction gets recordings, pipelines, transformations, pipelineRuns, and transformationResults
+				const [
+					recordingsData,
+					pipelinesData,
+					transformationsData,
+					pipelineRunsData,
+					transformationResultsData,
+				] = await db.transaction(
+					'r',
+					[
+						db.recordings,
+						db.pipelines,
+						db.transformations,
+						db.pipelineRuns,
+						db.transformationResults,
+					],
+					async () => {
+						return Promise.all([
+							db.recordings.toArray(),
+							db.pipelines.toArray(),
+							db.transformations.toArray(),
+							db.pipelineRuns.toArray(),
+							db.transformationResults.toArray(),
+						]);
+					},
+				);
+
+				return {
+					recordingsData,
+					pipelinesData,
+					transformationsData,
+					pipelineRunsData,
+					transformationResultsData,
+				};
 			},
 			mapErr: (error) =>
 				DbServiceErr({
@@ -335,19 +374,31 @@ export function createDbIdbService(): DbService {
 				}),
 		});
 
-		if (!allRecordingsFromDbResult.ok) {
+		if (!allRowsFromDbResult.ok) {
 			toast.error({
 				title: 'Failed to initialize recordings',
 				description:
 					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
 				action: {
 					type: 'more-details',
-					error: allRecordingsFromDbResult.error,
+					error: allRowsFromDbResult.error,
 				},
 			});
 			return;
 		}
-		recordings = allRecordingsFromDbResult.data;
+		const {
+			recordingsData,
+			pipelinesData,
+			transformationsData,
+			pipelineRunsData,
+			transformationResultsData,
+		} = allRowsFromDbResult.data;
+
+		recordings = recordingsData;
+		pipelines = pipelinesData;
+		transformations = transformationsData;
+		pipelineRuns = pipelineRunsData;
+		transformationResults = transformationResultsData;
 	};
 
 	syncDbToRecordingsState();
