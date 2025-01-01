@@ -1,6 +1,6 @@
 import {
 	ClipboardService,
-	RecordingsService,
+	DbService,
 	SetTrayIconService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
@@ -64,7 +64,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await RecordingsService.addRecording(newRecording);
+				await DbService.addRecording(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,

@@ -7,8 +7,8 @@ import type {
 	PipelineRun,
 	Transformation,
 	TransformationResult,
-} from './RecordingsService';
-import { DbServiceErr } from './RecordingsService';
+} from './DbService';
+import { DbServiceErr } from './DbService';
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { DownloadService } from '$lib/services.svelte';
 import { nanoid } from 'nanoid/non-secure';
@@ -318,7 +318,7 @@ class RecordingsDatabase extends Dexie {
 	}
 }
 
-export function createRecordingsIndexedDbService(): DbService {
+export function createDbIdbService(): DbService {
 	let recordings = $state<Recording[]>([]);
 	const db = new RecordingsDatabase();
 

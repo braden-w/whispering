@@ -2,8 +2,8 @@ import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
 import { type DBSchema, openDB } from 'idb';
 import { toast } from '../../utils/toast';
-import type { DbService } from './RecordingsService';
-import { DbServiceErr } from './RecordingsService';
+import type { DbService } from './DbService';
+import { DbServiceErr } from './DbService';
 import type { Recording } from './types/Recordings';
 
 const DB_NAME = 'RecordingDB' as const;
@@ -32,7 +32,7 @@ type RecordingsDbSchema = RecordingsDbSchemaV3 &
 	RecordingsDbSchemaV2 &
 	RecordingsDbSchemaV1;
 
-export function createRecordingsIndexedDbService(): DbService {
+export function createDbIdbService(): DbService {
 	let recordings = $state<Recording[]>([]);
 
 	const dbPromise = openDB<RecordingsDbSchema>(DB_NAME, DB_VERSION, {

@@ -5,7 +5,7 @@ import {
 } from './services/SetTrayIconService';
 import { createClipboardServiceDesktop } from './services/clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './services/clipboard/ClipboardService.web';
-import { createRecordingsIndexedDbService } from './services/db/RecordingsService.svelte.indexedDb';
+import { createDbIdbService } from './services/db/DbService.svelte.indexedDb';
 import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './services/download/DownloadService.web';
 import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
@@ -37,7 +37,7 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-export const RecordingsService = createRecordingsIndexedDbService();
+export const DbService = createDbIdbService();
 
 /**
  * Services that are determined by the user's settings.

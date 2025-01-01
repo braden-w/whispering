@@ -1,6 +1,6 @@
 import {
 	DownloadService,
-	RecordingsService,
+	DbService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
 import { clipboard } from '$lib/utils/clipboard';
@@ -19,14 +19,14 @@ function createRecordings() {
 
 	return {
 		get value() {
-			return RecordingsService.recordings;
+			return DbService.recordings;
 		},
 		get isCurrentlyTranscribing() {
 			return isCurrentlyTranscribing;
 		},
 
 		updateRecordingWithToast: async (recording: Recording) => {
-			const result = await RecordingsService.updateRecording(recording);
+			const result = await DbService.updateRecording(recording);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to update recording!',
@@ -42,7 +42,7 @@ function createRecordings() {
 		},
 
 		deleteRecordingWithToast: async (recording: Recording) => {
-			const result = await RecordingsService.deleteRecording(recording);
+			const result = await DbService.deleteRecording(recording);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete recording!',
@@ -58,7 +58,7 @@ function createRecordings() {
 		},
 
 		deleteRecordingsWithToast: async (recordings: Recording[]) => {
-			const result = await RecordingsService.deleteRecordings(recordings);
+			const result = await DbService.deleteRecordings(recordings);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete recordings!',
@@ -90,11 +90,10 @@ function createRecordings() {
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			const setStatusTranscribingResult =
-				await RecordingsService.updateRecording({
-					...recording,
-					transcriptionStatus: 'TRANSCRIBING',
-				});
+			const setStatusTranscribingResult = await DbService.updateRecording({
+				...recording,
+				transcriptionStatus: 'TRANSCRIBING',
+			});
 			if (!setStatusTranscribingResult.ok) {
 				toast.warning({
 					id: toastId,
@@ -129,7 +128,7 @@ function createRecordings() {
 				transcriptionStatus: 'DONE',
 			} satisfies Recording;
 			const saveRecordingToDatabaseResult =
-				await RecordingsService.updateRecording(updatedRecording);
+				await DbService.updateRecording(updatedRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: toastId,
