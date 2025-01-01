@@ -10,7 +10,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { recordings } from '$lib/stores/recordings.svelte';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { clipboard } from '$lib/utils/clipboard';
@@ -37,6 +36,9 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { DbService } from '$lib/services.svelte';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -194,10 +196,12 @@
 	const setVisibility = createUpdater(columnVisibility);
 	const setRowSelection = createUpdater(rowSelection);
 
+	const recordingsQuery = createRecordingsQuery();
+
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordings.value;
+			return recordingsQuery.data ?? [];
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
@@ -300,12 +304,12 @@
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsQuery.data?.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsQuery.data?.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />
