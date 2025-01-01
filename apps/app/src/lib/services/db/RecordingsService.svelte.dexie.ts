@@ -311,13 +311,6 @@ class RecordingsDatabase extends Dexie {
 
 					await tx.table('recordings').clear();
 					await tx.table('recordings').bulkAdd(newRecordings);
-
-					// Create new tables for transformations, pipelines, and runs
-					// These will start empty as they're new features
-					await tx.table('transformations').clear();
-					await tx.table('pipelines').clear();
-					await tx.table('pipelineRuns').clear();
-					await tx.table('transformationResults').clear();
 				} catch (error) {
 					await handleUpgradeError({ tx, version: 4, error });
 				}
