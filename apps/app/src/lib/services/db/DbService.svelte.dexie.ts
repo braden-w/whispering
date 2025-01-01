@@ -408,6 +408,18 @@ export function createDbDexieService(): DbService {
 			return recordings;
 		},
 
+		async getAllRecordings() {
+			return tryAsync({
+				try: () => db.recordings.toArray(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting all recordings from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
 		async addRecording(recording: Recording) {
 			const addRecordingResult = await tryAsync({
 				try: async () => {
