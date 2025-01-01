@@ -505,7 +505,7 @@ export function createRecordingsIndexedDbService(): DbService {
 		},
 
 		async addTransformation(transformation) {
-			return tryAsync({
+			const addTransformationResult = await tryAsync({
 				try: () => db.transformations.add(transformation),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -514,10 +514,12 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
+			if (!addTransformationResult.ok) return addTransformationResult;
+			return Ok(undefined);
 		},
 
 		async updateTransformation(transformation) {
-			return tryAsync({
+			const updateTransformationResult = await tryAsync({
 				try: () => db.transformations.put(transformation),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -526,10 +528,12 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
+			if (!updateTransformationResult.ok) return updateTransformationResult;
+			return Ok(undefined);
 		},
 
 		async deleteTransformation(transformation) {
-			return tryAsync({
+			const deleteTransformationResult = await tryAsync({
 				try: () => db.transformations.delete(transformation.id),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -538,6 +542,8 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
+			if (!deleteTransformationResult.ok) return deleteTransformationResult;
+			return Ok(undefined);
 		},
 
 		// Pipeline execution methods
@@ -555,7 +561,7 @@ export function createRecordingsIndexedDbService(): DbService {
 				output: null,
 			} satisfies PipelineRun;
 
-			const result = await tryAsync({
+			const addPipelineRunResult = await tryAsync({
 				try: () => db.pipelineRuns.add(newPipelineRun),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -564,12 +570,12 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
-
-			return result;
+			if (!addPipelineRunResult.ok) return addPipelineRunResult;
+			return Ok(undefined);
 		},
 
 		async updatePipelineRun(pipelineRun) {
-			return tryAsync({
+			const updatePipelineRunResult = await tryAsync({
 				try: () => db.pipelineRuns.put(pipelineRun),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -578,6 +584,8 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
+			if (!updatePipelineRunResult.ok) return updatePipelineRunResult;
+			return Ok(undefined);
 		},
 
 		async getPipelineRunsByRecording(recording: Recording) {
@@ -621,7 +629,7 @@ export function createRecordingsIndexedDbService(): DbService {
 				completedAt: new Date().toISOString(),
 			} satisfies TransformationResult;
 
-			return tryAsync({
+			const addTransformationResult = await tryAsync({
 				try: () => db.transformationResults.add(newResult),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -630,6 +638,8 @@ export function createRecordingsIndexedDbService(): DbService {
 						error,
 					}),
 			});
+			if (!addTransformationResult.ok) return addTransformationResult;
+			return Ok(undefined);
 		},
 
 		async getTransformationResultsByPipelineRun(pipelineRun: PipelineRun) {

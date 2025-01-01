@@ -70,10 +70,10 @@ export type DbService = {
 	startPipelineRun: (
 		pipeline: Pipeline,
 		recording: Recording,
-	) => Promise<DbServiceResult<string>>;
+	) => Promise<DbServiceResult<void>>;
 	updatePipelineRun: (
 		pipelineRun: PipelineRun,
-	) => Promise<DbServiceResult<string>>;
+	) => Promise<DbServiceResult<void>>;
 	getPipelineRunsByRecording: (
 		recording: Recording,
 	) => Promise<DbServiceResult<PipelineRun[]>>;
@@ -82,7 +82,7 @@ export type DbService = {
 	// Transformation results methods
 	addTransformationResult: (
 		result: TransformationResult,
-	) => Promise<DbServiceResult<string>>;
+	) => Promise<DbServiceResult<void>>;
 	getTransformationResultsByPipelineRun: (
 		pipelineRun: PipelineRun,
 	) => Promise<DbServiceResult<TransformationResult[]>>;
