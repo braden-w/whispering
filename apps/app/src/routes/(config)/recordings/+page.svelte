@@ -11,7 +11,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { recordings } from '$lib/stores/recordings.svelte';
-	import type { Recording, Recording } from '$lib/services/db';
+	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -246,8 +246,9 @@
 			.filter((recording) => recording.transcribedText !== '')
 			.map((recording) =>
 				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-					if (key in recording && typeof recording[key as keyof Recording] === 'string') {
-						return recording[key as keyof Recording]
+					if (key in recording) {
+						const value = recording[key as keyof Recording];
+						return typeof value === 'string' ? value : '';
 					}
 					return '';
 				}),
