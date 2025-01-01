@@ -14,9 +14,11 @@
 		Loader2Icon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { downloadRecordingWithToast } from '$lib/mutations/recordings';
+	import { createDownloadRecordingWithToast } from '$lib/mutations/recordings';
 
 	let { recording }: { recording: Recording } = $props();
+
+	const downloadRecordingWithToast = createDownloadRecordingWithToast();
 </script>
 
 <div class="flex items-center">

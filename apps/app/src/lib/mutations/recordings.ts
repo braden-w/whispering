@@ -3,7 +3,7 @@ import type { Recording } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
 import { createMutation } from '@tanstack/svelte-query';
 
-export const updateRecordingWithToast = createMutation(() => ({
+export const createUpdateRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbService.updateRecording(recording);
 		if (!result.ok) {
@@ -20,7 +20,7 @@ export const updateRecordingWithToast = createMutation(() => ({
 	},
 }));
 
-export const downloadRecordingWithToast = createMutation(() => ({
+export const createDownloadRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		if (!recording.blob) {
 			toast.error({

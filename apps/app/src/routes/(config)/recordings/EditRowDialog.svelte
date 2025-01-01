@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { updateRecordingWithToast } from '$lib/mutations/recordings';
+	import { createUpdateRecordingWithToast } from '$lib/mutations/recordings';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -14,6 +14,8 @@
 	import { onDestroy } from 'svelte';
 
 	let { recording }: { recording: Recording } = $props();
+
+	const updateRecordingWithToast = createUpdateRecordingWithToast();
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
