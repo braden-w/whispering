@@ -2,7 +2,7 @@ import {
 	ClipboardService,
 	RecordingsService,
 	SetTrayIconService,
-	userConfiguredServices
+	userConfiguredServices,
 } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
 import { recordings } from '$lib/stores/recordings.svelte';
@@ -51,11 +51,13 @@ function createRecorder() {
 			void userConfiguredServices.sound.playStopSoundIfEnabled();
 
 			const blob = stopResult.data;
+			const now = new Date().toISOString();
 			const newRecording: Recording = {
 				id: nanoid(),
 				title: '',
 				subtitle: '',
-				timestamp: new Date().toISOString(),
+				createdAt: now,
+				updatedAt: now,
 				transcribedText: '',
 				blob,
 				transcriptionStatus: 'UNPROCESSED',

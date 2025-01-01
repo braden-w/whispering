@@ -689,7 +689,7 @@ export function createRecordingsIndexedDbService(): DbService {
 					return tryAsync({
 						try: async () => {
 							const idsToDelete = await db.recordings
-								.orderBy('timestamp')
+								.orderBy('createdAt')
 								.limit(count - maxCount)
 								.primaryKeys();
 							await db.recordings.bulkDelete(idsToDelete);

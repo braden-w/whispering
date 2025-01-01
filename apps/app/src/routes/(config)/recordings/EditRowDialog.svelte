@@ -70,10 +70,10 @@
 				/>
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="timestamp" class="text-right">Timestamp</Label>
+				<Label for="createdAt" class="text-right">Created At</Label>
 				<Input
-					id="timestamp"
-					bind:value={recording.timestamp}
+					id="createdAt"
+					bind:value={recording.createdAt}
 					class="col-span-3"
 				/>
 			</div>

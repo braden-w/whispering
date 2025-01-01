@@ -233,10 +233,10 @@ export function createRecordingsIndexedDbService(): DbService {
 					const maxCount = Number.parseInt(maxRecordingCount);
 					if (recordings.length <= maxCount) return Ok(undefined);
 
-					// Sort recordings by timestamp (oldest first)
+					// Sort recordings by createdAt (oldest first)
 					const sortedRecordings = [...recordings].sort(
 						(a, b) =>
-							new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+							new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 					);
 
 					// Get recordings to delete (all recordings beyond the max count, starting from oldest)

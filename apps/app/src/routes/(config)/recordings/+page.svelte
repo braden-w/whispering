@@ -11,7 +11,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { recordings } from '$lib/stores/recordings.svelte';
-	import type { Recording } from '$lib/services/db';
+	import type { Recording, Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -83,9 +83,17 @@
 				renderComponent(DataTableHeader, headerContext),
 		},
 		{
-			accessorKey: 'timestamp',
+			accessorKey: 'createdAt',
 			meta: {
-				headerText: 'Timestamp',
+				headerText: 'Created At',
+			},
+			header: (headerContext) =>
+				renderComponent(DataTableHeader, headerContext),
+		},
+		{
+			accessorKey: 'updatedAt',
+			meta: {
+				headerText: 'Updated At',
 			},
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
@@ -143,7 +151,7 @@
 
 	let sorting = createPersistedState({
 		key: 'whispering-data-table-sorting',
-		defaultValue: [{ id: 'timestamp', desc: true }],
+		defaultValue: [{ id: 'createdAt', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = createPersistedState({
@@ -160,7 +168,8 @@
 			id: false,
 			title: false,
 			subtitle: false,
-			timestamp: false,
+			createdAt: false,
+			updatedAt: false,
 		},
 		schema: z.record(z.string(), z.boolean()),
 	});
@@ -226,7 +235,7 @@
 		table.getFilteredSelectedRowModel().rows,
 	);
 
-	let template = $state('{{timestamp}} {{transcribedText}}');
+	let template = $state('{{createdAt}} {{transcribedText}}');
 	let delimiter = $state('\n\n');
 
 	let isDialogOpen = $state(false);
@@ -237,20 +246,7 @@
 			.filter((recording) => recording.transcribedText !== '')
 			.map((recording) =>
 				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-					switch (key) {
-						case 'id':
-							return recording.id;
-						case 'title':
-							return recording.title;
-						case 'subtitle':
-							return recording.subtitle;
-						case 'timestamp':
-							return recording.timestamp;
-						case 'transcribedText':
-							return recording.transcribedText;
-						default:
-							return '';
-					}
+					return key in recording ? recording[key as keyof Recording] : '';
 				}),
 			);
 		return transcriptions.join(delimiter);
