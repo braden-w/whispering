@@ -2,15 +2,21 @@ import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
-import type { DbService } from './RecordingsService';
+import type {
+	DbService,
+	PipelineRun,
+	Transformation,
+	TransformationResult,
+} from './RecordingsService';
 import { DbServiceErr } from './RecordingsService';
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { DownloadService } from '$lib/services.svelte';
+import { nanoid } from 'nanoid/non-secure';
 
 const DB_NAME = 'RecordingDB';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
-export type Recording = RecordingsDbSchemaV3['recordings'];
+export type Recording = RecordingsDbSchemaV4['recordings'];
 
 export type RecordingsDbSchemaV4 = {
 	recordings: Omit<RecordingsDbSchemaV3['recordings'], 'timestamp'> & {
@@ -406,21 +412,241 @@ export function createRecordingsIndexedDbService(): DbService {
 			});
 		},
 
-		// Stub implementations for pipeline methods to satisfy the interface
-		async addPipelineStep() {
-			return Ok(undefined);
+		// Pipeline methods
+		async getAllPipelines() {
+			return tryAsync({
+				try: async () => {
+					return await db.pipelines.toArray();
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting all pipelines from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
-		async updatePipelineStep() {
-			return Ok(undefined);
+
+		async addPipeline(pipeline) {
+			return tryAsync({
+				try: async () => {
+					await db.pipelines.add(pipeline);
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error adding pipeline to Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
-		async deletePipelineStep() {
-			return Ok(undefined);
+
+		async updatePipeline(pipeline) {
+			return tryAsync({
+				try: async () => {
+					await db.pipelines.put(pipeline);
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating pipeline in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
-		async reorderPipeline() {
-			return Ok(undefined);
+
+		async deletePipeline(pipeline) {
+			return tryAsync({
+				try: () => db.pipelines.delete(pipeline.id),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error deleting pipeline from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
-		async addPipelineRun() {
-			return Ok(undefined);
+
+		async deletePipelineWithAssociatedTransformations(pipeline) {
+			return tryAsync({
+				try: async () => {
+					await db.transaction(
+						'rw',
+						[db.pipelines, db.transformations],
+						async () => {
+							await db.pipelines.delete(pipeline.id);
+							const transformationIds = pipeline.transformations.map(
+								(t) => t.transformationId,
+							);
+							await db.transformations.bulkDelete(transformationIds);
+						},
+					);
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error deleting pipeline from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		// Transformation methods
+		async getAllTransformations() {
+			return tryAsync({
+				try: () => db.transformations.toArray(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting all transformations from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async addTransformation(transformation) {
+			return tryAsync({
+				try: () => db.transformations.add(transformation),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error adding transformation to Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async updateTransformation(transformation) {
+			return tryAsync({
+				try: () => db.transformations.put(transformation),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async deleteTransformation(transformation) {
+			return tryAsync({
+				try: () => db.transformations.delete(transformation.id),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error deleting transformation from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		// Pipeline execution methods
+		async startPipelineRun(pipeline, recording) {
+			const now = new Date().toISOString();
+			const newPipelineRun = {
+				id: nanoid(),
+				pipelineId: pipeline.id,
+				recordingId: recording.id,
+				input: recording.transcribedText,
+				status: 'running',
+				startedAt: now,
+				completedAt: null,
+				error: null,
+				output: null,
+			} satisfies PipelineRun;
+
+			const result = await tryAsync({
+				try: () => db.pipelineRuns.add(newPipelineRun),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error starting pipeline run in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+
+			return result;
+		},
+
+		async updatePipelineRun(pipelineRun) {
+			return tryAsync({
+				try: () => db.pipelineRuns.put(pipelineRun),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating pipeline run in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async getPipelineRunsByRecording(recording: Recording) {
+			return tryAsync({
+				try: async () => {
+					return await db.pipelineRuns
+						.where('recordingId')
+						.equals(recording.id)
+						.reverse()
+						.sortBy('startedAt');
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting pipeline runs from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async getPipelineRun(id: string) {
+			return tryAsync({
+				try: async () => {
+					const pipelineRun = await db.pipelineRuns.get(id);
+					return pipelineRun || null;
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting pipeline run from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		// Transformation results methods
+		async addTransformationResult(result) {
+			const newResult = {
+				...result,
+				id: nanoid(),
+				completedAt: new Date().toISOString(),
+			} satisfies TransformationResult;
+
+			return tryAsync({
+				try: () => db.transformationResults.add(newResult),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error adding transformation result to Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async getTransformationResultsByPipelineRun(pipelineRun: PipelineRun) {
+			return tryAsync({
+				try: async () => {
+					return await db.transformationResults
+						.where('pipelineRunId')
+						.equals(pipelineRun.id)
+						.toArray();
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting transformation results from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
 
 		async cleanupExpiredRecordings({
