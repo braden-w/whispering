@@ -111,16 +111,16 @@ type RecordingsDbSchemaV1 = {
 
 class RecordingsDatabase extends Dexie {
 	recordings!: Dexie.Table<RecordingsDbSchemaV4['recordings'], string>;
-	pipelines!: Dexie.Table<RecordingsDbSchemaV4['pipelines'], string>;
-	transformations!: Dexie.Table<
-		RecordingsDbSchemaV4['transformations'],
-		string
-	>;
-	pipelineRuns!: Dexie.Table<RecordingsDbSchemaV4['pipelineRuns'], string>;
-	transformationResults!: Dexie.Table<
-		RecordingsDbSchemaV4['transformationResults'],
-		string
-	>;
+	// pipelines!: Dexie.Table<RecordingsDbSchemaV4['pipelines'], string>;
+	// transformations!: Dexie.Table<
+	// 	RecordingsDbSchemaV4['transformations'],
+	// 	string
+	// >;
+	// pipelineRuns!: Dexie.Table<RecordingsDbSchemaV4['pipelineRuns'], string>;
+	// transformationResults!: Dexie.Table<
+	// 	RecordingsDbSchemaV4['transformationResults'],
+	// 	string
+	// >;
 
 	constructor() {
 		super(DB_NAME);
@@ -290,11 +290,11 @@ class RecordingsDatabase extends Dexie {
 		this.version(4)
 			.stores({
 				recordings: '&id, createdAt, updatedAt',
-				transformations: '&id, createdAt, updatedAt',
-				pipelines: '&id, createdAt, updatedAt',
-				pipelineRuns: '&id, pipelineId, recordingId, startedAt',
-				transformationResults:
-					'&id, pipelineRunId, transformationId, startedAt',
+				// transformations: '&id, createdAt, updatedAt',
+				// pipelines: '&id, createdAt, updatedAt',
+				// pipelineRuns: '&id, pipelineId, recordingId, startedAt',
+				// transformationResults:
+				// 	'&id, pipelineRunId, transformationId, startedAt',
 			})
 			.upgrade(async (tx) => {
 				try {
@@ -319,7 +319,7 @@ class RecordingsDatabase extends Dexie {
 	}
 }
 
-export function createDbIdbService(): DbService {
+export function createDbDexieService(): DbService {
 	let recordings = $state<Recording[]>([]);
 	let pipelines = $state<Pipeline[]>([]);
 	let transformations = $state<Transformation[]>([]);
@@ -334,36 +334,36 @@ export function createDbIdbService(): DbService {
 				// Transaction gets recordings, pipelines, transformations, pipelineRuns, and transformationResults
 				const [
 					recordingsData,
-					pipelinesData,
-					transformationsData,
-					pipelineRunsData,
-					transformationResultsData,
+					// pipelinesData,
+					// transformationsData,
+					// pipelineRunsData,
+					// transformationResultsData,
 				] = await db.transaction(
 					'r',
 					[
 						db.recordings,
-						db.pipelines,
-						db.transformations,
-						db.pipelineRuns,
-						db.transformationResults,
+						// db.pipelines,
+						// db.transformations,
+						// db.pipelineRuns,
+						// db.transformationResults,
 					],
 					async () => {
 						return Promise.all([
 							db.recordings.toArray(),
-							db.pipelines.toArray(),
-							db.transformations.toArray(),
-							db.pipelineRuns.toArray(),
-							db.transformationResults.toArray(),
+							// db.pipelines.toArray(),
+							// db.transformations.toArray(),
+							// db.pipelineRuns.toArray(),
+							// db.transformationResults.toArray(),
 						]);
 					},
 				);
 
 				return {
 					recordingsData,
-					pipelinesData,
-					transformationsData,
-					pipelineRunsData,
-					transformationResultsData,
+					// pipelinesData,
+					// transformationsData,
+					// pipelineRunsData,
+					// transformationResultsData,
 				};
 			},
 			mapErr: (error) =>
@@ -388,17 +388,17 @@ export function createDbIdbService(): DbService {
 		}
 		const {
 			recordingsData,
-			pipelinesData,
-			transformationsData,
-			pipelineRunsData,
-			transformationResultsData,
+			// pipelinesData,
+			// transformationsData,
+			// pipelineRunsData,
+			// transformationResultsData,
 		} = allRowsFromDbResult.data;
 
 		recordings = recordingsData;
-		pipelines = pipelinesData;
-		transformations = transformationsData;
-		pipelineRuns = pipelineRunsData;
-		transformationResults = transformationResultsData;
+		// pipelines = pipelinesData;
+		// transformations = transformationsData;
+		// pipelineRuns = pipelineRunsData;
+		// transformationResults = transformationResultsData;
 	};
 
 	syncDbToRecordingsState();
