@@ -1,10 +1,13 @@
+import { recordingsKeys } from '$lib/queries/recordings';
 import { DbService, DownloadService } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
-import { createMutation } from '@tanstack/svelte-query';
+import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 
-export const createUpdateRecordingWithToast = () =>
-	createMutation(() => ({
+export const createUpdateRecordingWithToast = () => {
+	const queryClient = useQueryClient();
+
+	return createMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbService.updateRecording(recording);
 			if (!result.ok) {
@@ -12,17 +15,29 @@ export const createUpdateRecordingWithToast = () =>
 					title: 'Failed to update recording!',
 					description: 'Your recording could not be updated.',
 				});
-				return;
+				throw result.error;
 			}
 			toast.success({
 				title: 'Updated recording!',
 				description: 'Your recording has been updated successfully.',
 			});
+			return recording;
+		},
+		onSuccess: (updatedRecording) => {
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [updatedRecording];
+				return oldData.map((item) =>
+					item.id === updatedRecording.id ? updatedRecording : item,
+				);
+			});
 		},
 	}));
+};
 
-export const createDeleteRecordingWithToast = () =>
-	createMutation(() => ({
+export const createDeleteRecordingWithToast = () => {
+	const queryClient = useQueryClient();
+
+	return createMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbService.deleteRecording(recording);
 			if (!result.ok) {
@@ -30,17 +45,27 @@ export const createDeleteRecordingWithToast = () =>
 					title: 'Failed to delete recording!',
 					description: 'Your recording could not be deleted.',
 				});
-				return;
+				throw result.error;
 			}
 			toast.success({
 				title: 'Deleted recording!',
 				description: 'Your recording has been deleted successfully.',
 			});
+			return recording;
+		},
+		onSuccess: (deletedRecording) => {
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [];
+				return oldData.filter((item) => item.id !== deletedRecording.id);
+			});
 		},
 	}));
+};
 
-export const createDeleteRecordingsWithToast = () =>
-	createMutation(() => ({
+export const createDeleteRecordingsWithToast = () => {
+	const queryClient = useQueryClient();
+
+	return createMutation(() => ({
 		mutationFn: async (recordings: Recording[]) => {
 			const result = await DbService.deleteRecordings(recordings);
 			if (!result.ok) {
@@ -48,14 +73,23 @@ export const createDeleteRecordingsWithToast = () =>
 					title: 'Failed to delete recordings!',
 					description: 'Your recordings could not be deleted.',
 				});
-				return;
+				throw result.error;
 			}
 			toast.success({
 				title: 'Deleted recordings!',
 				description: 'Your recordings have been deleted successfully.',
 			});
+			return recordings;
+		},
+		onSuccess: (deletedRecordings) => {
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [];
+				const deletedIds = new Set(deletedRecordings.map((r) => r.id));
+				return oldData.filter((item) => !deletedIds.has(item.id));
+			});
 		},
 	}));
+};
 
 export const createDownloadRecordingWithToast = () =>
 	createMutation(() => ({
