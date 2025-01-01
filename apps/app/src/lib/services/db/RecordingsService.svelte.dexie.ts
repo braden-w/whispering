@@ -284,12 +284,6 @@ class RecordingsDatabase extends Dexie {
 				}
 			});
 	}
-
-	// Method to delete the entire database
-	async deleteDatabase() {
-		await this.delete();
-		console.log('Database deleted successfully');
-	}
 }
 
 export function createRecordingsIndexedDbService(): DbService {
