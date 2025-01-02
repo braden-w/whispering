@@ -26,7 +26,7 @@ export type Recording = RecordingsDbSchemaV4['recordings'];
 export type Transformation = RecordingsDbSchemaV4['transformations'];
 export type TransformationResult = RecordingsDbSchemaV4['transformationRuns'];
 
-export function generateDefaultTransformation() {
+export function generateDefaultTransformation(): Transformation {
 	const now = new Date().toISOString();
 	return {
 		id: nanoid(),
@@ -35,10 +35,10 @@ export function generateDefaultTransformation() {
 		createdAt: now,
 		updatedAt: now,
 		steps: [generateDefaultTransformationStep()],
-	} satisfies Transformation;
+	};
 }
 
-export function generateDefaultTransformationStep() {
+export function generateDefaultTransformationStep(): TransformationStep {
 	return {
 		id: nanoid(),
 		type: 'prompt_transform',
@@ -48,7 +48,7 @@ export function generateDefaultTransformationStep() {
 		'find_replace.findText': '',
 		'find_replace.replaceText': '',
 		'find_replace.useRegex': false,
-	} satisfies TransformationStep;
+	};
 }
 
 export type DbService = {

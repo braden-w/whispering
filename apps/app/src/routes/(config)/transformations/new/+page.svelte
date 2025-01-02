@@ -13,6 +13,7 @@
 		generateDefaultTransformation,
 		generateDefaultTransformationStep,
 	} from '$lib/services/db';
+	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
 	import { PlusIcon, TrashIcon, CopyIcon } from 'lucide-svelte';
 
 	let transformation = $state(generateDefaultTransformation());
@@ -115,13 +116,7 @@
 												id="step-type"
 												label="Step Type"
 												selected={step.type}
-												items={[
-													{
-														value: 'prompt_transform',
-														label: 'Prompt Transform',
-													},
-													{ value: 'find_replace', label: 'Find Replace' },
-												]}
+												items={TRANSFORMATION_STEP_TYPE_OPTIONS}
 												onSelectedChange={(value) => {
 													step.type = value;
 												}}

@@ -31,6 +31,12 @@ export type InsertTransformationRun = Omit<
 	'startedAt' | 'completedAt'
 >;
 
+const TRANSFORMATION_STEP_TYPES = ['prompt_transform', 'find_replace'] as const;
+export const TRANSFORMATION_STEP_TYPE_OPTIONS = [
+	{ value: 'prompt_transform', label: 'Prompt Transform' },
+	{ value: 'find_replace', label: 'Find Replace' },
+] satisfies { value: TransformationStep['type']; label: string }[];
+
 export type RecordingsDbSchemaV4 = {
 	recordings: RecordingsDbSchemaV3['recordings'] & {
 		createdAt: string;
@@ -50,7 +56,7 @@ export type RecordingsDbSchemaV4 = {
 		steps: {
 			id: string;
 			// For now, steps don't need titles or descriptions. They can be computed from the type as "Find and Replace" or "Prompt Transform"
-			type: 'prompt_transform' | 'find_replace';
+			type: (typeof TRANSFORMATION_STEP_TYPES)[number];
 
 			'prompt_transform.model': string;
 			'prompt_transform.systemPromptTemplate': string;
