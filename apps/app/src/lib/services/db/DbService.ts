@@ -21,12 +21,9 @@ export const DbServiceErr = (
 	});
 };
 
-export type Pipeline = RecordingsDbSchemaV4['pipelines'];
-export type Transformation = RecordingsDbSchemaV4['transformations'];
-export type PipelineRun = RecordingsDbSchemaV4['pipelineRuns'];
-export type TransformationResult =
-	RecordingsDbSchemaV4['transformationResults'];
 export type Recording = RecordingsDbSchemaV4['recordings'];
+export type Transformation = RecordingsDbSchemaV4['transformations'];
+export type TransformationResult = RecordingsDbSchemaV4['transformationRuns'];
 
 export type DbService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
@@ -45,14 +42,6 @@ export type DbService = {
 		settings: Settings,
 	) => Promise<DbServiceResult<void>>;
 
-	getAllPipelines: () => Promise<DbServiceResult<Pipeline[]>>;
-	addPipeline: (pipeline: Pipeline) => Promise<DbServiceResult<void>>;
-	updatePipeline: (pipeline: Pipeline) => Promise<DbServiceResult<void>>;
-	deletePipeline: (pipeline: Pipeline) => Promise<DbServiceResult<void>>;
-	deletePipelineWithAssociatedTransformations: (
-		pipeline: Pipeline,
-	) => Promise<DbServiceResult<void>>;
-
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
 	addTransformation: (
 		transformation: Transformation,
@@ -63,25 +52,4 @@ export type DbService = {
 	deleteTransformation: (
 		transformation: Transformation,
 	) => Promise<DbServiceResult<void>>;
-
-	// Pipeline execution methods
-	startPipelineRun: (
-		pipeline: Pipeline,
-		recording: Recording,
-	) => Promise<DbServiceResult<void>>;
-	updatePipelineRun: (
-		pipelineRun: PipelineRun,
-	) => Promise<DbServiceResult<void>>;
-	getPipelineRunsByRecording: (
-		recording: Recording,
-	) => Promise<DbServiceResult<PipelineRun[]>>;
-	getPipelineRun: (id: string) => Promise<DbServiceResult<PipelineRun | null>>;
-
-	// Transformation results methods
-	addTransformationResult: (
-		result: TransformationResult,
-	) => Promise<DbServiceResult<void>>;
-	getTransformationResultsByPipelineRun: (
-		pipelineRun: PipelineRun,
-	) => Promise<DbServiceResult<TransformationResult[]>>;
 };

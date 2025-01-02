@@ -4,8 +4,6 @@ import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
 import type {
 	DbService,
-	Pipeline,
-	PipelineRun,
 	Transformation,
 	TransformationResult,
 } from './DbService';
@@ -406,83 +404,50 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		// Pipeline methods
-		async getAllPipelines() {
-			return tryAsync({
-				try: async () => {
-					return await db.pipelines.toArray();
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting all pipelines from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
+		async cleanupExpiredRecordings({
+			'database.recordingRetentionStrategy': recordingRetentionStrategy,
+			'database.maxRecordingCount': maxRecordingCount,
+		}: Settings) {
+			switch (recordingRetentionStrategy) {
+				case 'keep-forever': {
+					return Ok(undefined);
+				}
+				case 'limit-count': {
+					const countResult = await tryAsync({
+						try: () => db.recordings.count(),
+						mapErr: (error) =>
+							DbServiceErr({
+								title:
+									'Unable to get recording count while cleaning up old recordings',
+								description: 'Please try again',
+								error,
+							}),
+					});
+					if (!countResult.ok) return countResult;
+					const count = countResult.data;
+					if (count === 0) return Ok(undefined);
 
-		async addPipeline(pipeline) {
-			return tryAsync({
-				try: async () => {
-					await db.pipelines.add(pipeline);
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error adding pipeline to Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
+					const maxCount = Number.parseInt(maxRecordingCount);
 
-		async updatePipeline(pipeline) {
-			return tryAsync({
-				try: async () => {
-					await db.pipelines.put(pipeline);
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error updating pipeline in Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
+					if (count <= maxCount) return Ok(undefined);
 
-		async deletePipeline(pipeline) {
-			return tryAsync({
-				try: () => db.pipelines.delete(pipeline.id),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error deleting pipeline from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
-		async deletePipelineWithAssociatedTransformations(pipeline) {
-			return tryAsync({
-				try: async () => {
-					await db.transaction(
-						'rw',
-						[db.pipelines, db.transformations],
-						async () => {
-							await db.pipelines.delete(pipeline.id);
-							const transformationIds = pipeline.transformations.map(
-								(t) => t.transformationId,
-							);
-							await db.transformations.bulkDelete(transformationIds);
+					return tryAsync({
+						try: async () => {
+							const idsToDelete = await db.recordings
+								.orderBy('createdAt')
+								.limit(count - maxCount)
+								.primaryKeys();
+							await db.recordings.bulkDelete(idsToDelete);
 						},
-					);
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error deleting pipeline from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
+						mapErr: (error) =>
+							DbServiceErr({
+								title: 'Unable to clean up old recordings',
+								description: 'Some old recordings could not be deleted',
+								error,
+							}),
+					});
+				}
+			}
 		},
 
 		// Transformation methods
@@ -538,165 +503,6 @@ export function createDbDexieService(): DbService {
 			});
 			if (!deleteTransformationResult.ok) return deleteTransformationResult;
 			return Ok(undefined);
-		},
-
-		// Pipeline execution methods
-		async startPipelineRun(pipeline, recording) {
-			const now = new Date().toISOString();
-			const newPipelineRun = {
-				id: nanoid(),
-				pipelineId: pipeline.id,
-				recordingId: recording.id,
-				input: recording.transcribedText,
-				status: 'running',
-				startedAt: now,
-				completedAt: null,
-				error: null,
-				output: null,
-			} satisfies PipelineRun;
-
-			const addPipelineRunResult = await tryAsync({
-				try: () => db.pipelineRuns.add(newPipelineRun),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error starting pipeline run in Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-			if (!addPipelineRunResult.ok) return addPipelineRunResult;
-			return Ok(undefined);
-		},
-
-		async updatePipelineRun(pipelineRun) {
-			const updatePipelineRunResult = await tryAsync({
-				try: () => db.pipelineRuns.put(pipelineRun),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error updating pipeline run in Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-			if (!updatePipelineRunResult.ok) return updatePipelineRunResult;
-			return Ok(undefined);
-		},
-
-		async getPipelineRunsByRecording(recording: Recording) {
-			return tryAsync({
-				try: async () => {
-					return await db.pipelineRuns
-						.where('recordingId')
-						.equals(recording.id)
-						.reverse()
-						.sortBy('startedAt');
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting pipeline runs from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
-		async getPipelineRun(id: string) {
-			return tryAsync({
-				try: async () => {
-					const pipelineRun = await db.pipelineRuns.get(id);
-					return pipelineRun || null;
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting pipeline run from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
-		// Transformation results methods
-		async addTransformationResult(result) {
-			const newResult = {
-				...result,
-				id: nanoid(),
-				completedAt: new Date().toISOString(),
-			} satisfies TransformationResult;
-
-			const addTransformationResult = await tryAsync({
-				try: () => db.transformationResults.add(newResult),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error adding transformation result to Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-			if (!addTransformationResult.ok) return addTransformationResult;
-			return Ok(undefined);
-		},
-
-		async getTransformationResultsByPipelineRun(pipelineRun: PipelineRun) {
-			return tryAsync({
-				try: async () => {
-					return await db.transformationResults
-						.where('pipelineRunId')
-						.equals(pipelineRun.id)
-						.toArray();
-				},
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error getting transformation results from Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-		},
-
-		async cleanupExpiredRecordings({
-			'database.recordingRetentionStrategy': recordingRetentionStrategy,
-			'database.maxRecordingCount': maxRecordingCount,
-		}: Settings) {
-			switch (recordingRetentionStrategy) {
-				case 'keep-forever': {
-					return Ok(undefined);
-				}
-				case 'limit-count': {
-					const countResult = await tryAsync({
-						try: () => db.recordings.count(),
-						mapErr: (error) =>
-							DbServiceErr({
-								title:
-									'Unable to get recording count while cleaning up old recordings',
-								description: 'Please try again',
-								error,
-							}),
-					});
-					if (!countResult.ok) return countResult;
-					const count = countResult.data;
-					if (count === 0) return Ok(undefined);
-
-					const maxCount = Number.parseInt(maxRecordingCount);
-
-					if (count <= maxCount) return Ok(undefined);
-
-					return tryAsync({
-						try: async () => {
-							const idsToDelete = await db.recordings
-								.orderBy('createdAt')
-								.limit(count - maxCount)
-								.primaryKeys();
-							await db.recordings.bulkDelete(idsToDelete);
-						},
-						mapErr: (error) =>
-							DbServiceErr({
-								title: 'Unable to clean up old recordings',
-								description: 'Some old recordings could not be deleted',
-								error,
-							}),
-					});
-				}
-			}
 		},
 	};
 }
