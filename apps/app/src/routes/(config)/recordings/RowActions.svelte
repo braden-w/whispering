@@ -17,7 +17,7 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
-	import EditRowDialog from './EditRowDialog.svelte';
+	import EditRecordingDialog from './EditRecordingDialog.svelte';
 
 	let { recording }: { recording: Recording } = $props();
 
@@ -41,7 +41,7 @@
 		{/if}
 	</WhisperingButton>
 
-	<EditRowDialog {recording}></EditRowDialog>
+	<EditRecordingDialog {recording}></EditRecordingDialog>
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
