@@ -1,6 +1,6 @@
 import { Err, type Ok } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
-import type { RecordingsDbSchemaV4 } from './DbService.svelte.dexie';
+import type { RecordingsDbSchemaV4 } from './DbService.dexie';
 
 type DbErrorProperties = {
 	_tag: 'DbServiceError';
