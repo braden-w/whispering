@@ -8,7 +8,10 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
-	import { generateDefaultTransformation, type Transformation } from '$lib/services/db';
+	import {
+		generateDefaultTransformation,
+		type Transformation,
+	} from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -28,7 +31,7 @@
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import RenderTransformation from './RenderTransformation.svelte';
+	import RenderTransformation from './new/RenderTransformation.svelte';
 	import { nanoid } from 'nanoid/non-secure';
 
 	const columns: ColumnDef<Transformation>[] = [
@@ -255,30 +258,23 @@
 				</div>
 
 				<div class="ml-auto flex items-center gap-2">
-					<Dialog.Root>
-						<Dialog.Trigger>
-							{#snippet child({ props })}
-								<Button {...props}>
-									<PlusIcon class="h-4 w-4" />
-									Create Transformation
-								</Button>
-							{/snippet}
-						</Dialog.Trigger>
+					<Button href="/transformations/new">
+						<PlusIcon class="h-4 w-4" />
+						Create Transformation
+					</Button>
 
-						<Dialog.Content>
-							<Dialog.Header>
-								<Dialog.Title>Create Transformation</Dialog.Title>
-								<Dialog.Description>
-									Create a new transformation to transform text.
-								</Dialog.Description>
-							</Dialog.Header>
-							<RenderTransformation initialTransformation={generateDefaultTransformation()} />
-							<Dialog.Footer>
-								<Dialog.Close>Cancel</Dialog.Close>
-								<Button>Create</Button>
-							</Dialog.Footer>
-						</Dialog.Content>
-					</Dialog.Root>
+					<Dialog.Content>
+						<Dialog.Header>
+							<Dialog.Title>Create Transformation</Dialog.Title>
+							<Dialog.Description>
+								Create a new transformation to transform text.
+							</Dialog.Description>
+						</Dialog.Header>
+						<Dialog.Footer>
+							<Dialog.Close>Cancel</Dialog.Close>
+							<Button>Create</Button>
+						</Dialog.Footer>
+					</Dialog.Content>
 
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger
