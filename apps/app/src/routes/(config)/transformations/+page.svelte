@@ -22,11 +22,12 @@
 		getFilteredRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { ChevronDownIcon } from 'lucide-svelte';
+	import { ChevronDownIcon, PlusIcon } from 'lucide-svelte';
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -251,31 +252,59 @@
 					{table.getFilteredRowModel().rows.length} row(s) selected.
 				</div>
 
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger
-						class={cn(
-							buttonVariants({ variant: 'outline' }),
-							'ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180',
-						)}
-					>
-						Columns
-						<ChevronDownIcon
-							class="ml-2 h-4 w-4 transition-transform duration-200"
-						/>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content>
-						{#each table
-							.getAllColumns()
-							.filter((c) => c.getCanHide()) as column (column.id)}
-							<DropdownMenu.CheckboxItem
-								checked={column.getIsVisible()}
-								onCheckedChange={(value) => column.toggleVisibility(!!value)}
-							>
-								{column.columnDef.meta?.headerText}
-							</DropdownMenu.CheckboxItem>
-						{/each}
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
+				<div class="ml-auto flex items-center gap-2">
+					<Dialog.Root>
+						<Dialog.Trigger>
+							{#snippet child({ props })}
+								<Button {...props}>
+									<PlusIcon class="h-4 w-4" />
+									Create Transformation
+								</Button>
+							{/snippet}
+						</Dialog.Trigger>
+
+						<Dialog.Content>
+							<Dialog.Header>
+								<Dialog.Title>Create Transformation</Dialog.Title>
+								<Dialog.Description>
+									Create a new transformation to transform text.
+								</Dialog.Description>
+							</Dialog.Header>
+							<Input placeholder="Title" />
+							<Input placeholder="Description" />
+							<Dialog.Footer>
+								<Dialog.Close>Cancel</Dialog.Close>
+								<Button>Create</Button>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger
+							class={cn(
+								buttonVariants({ variant: 'outline' }),
+								'transition-all [&[data-state=open]>svg]:rotate-180',
+							)}
+						>
+							Columns
+							<ChevronDownIcon
+								class="ml-2 h-4 w-4 transition-transform duration-200"
+							/>
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content>
+							{#each table
+								.getAllColumns()
+								.filter((c) => c.getCanHide()) as column (column.id)}
+								<DropdownMenu.CheckboxItem
+									checked={column.getIsVisible()}
+									onCheckedChange={(value) => column.toggleVisibility(!!value)}
+								>
+									{column.columnDef.meta?.headerText}
+								</DropdownMenu.CheckboxItem>
+							{/each}
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
+				</div>
 			</div>
 		</div>
 
