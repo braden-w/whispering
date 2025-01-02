@@ -19,6 +19,11 @@ export type InsertTransformation = Omit<
 	'createdAt' | 'updatedAt'
 >;
 
+export type TransformationStep = Transformation['steps'][number];
+export type InsertTransformationStep = Omit<
+	TransformationStep,
+	'createdAt' | 'updatedAt'
+>;
 
 export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
 export type InsertTransformationRun = Omit<
@@ -44,8 +49,7 @@ export type RecordingsDbSchemaV4 = {
 		 */
 		steps: {
 			id: string;
-			title: string;
-			description: string;
+			// For now, steps don't need titles or descriptions. They can be computed from the type as "Find and Replace" or "Prompt Transform"
 			createdAt: string;
 			updatedAt: string;
 
