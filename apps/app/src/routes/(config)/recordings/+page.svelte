@@ -152,12 +152,12 @@
 	];
 
 	let sorting = createPersistedState({
-		key: 'whispering-data-table-sorting',
+		key: 'whispering-recordings-data-table-sorting',
 		defaultValue: [{ id: 'createdAt', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = createPersistedState({
-		key: 'whispering-data-table-column-filters',
+		key: 'whispering-recordings-data-table-column-filters',
 		defaultValue: [],
 		schema: z
 			.object({ id: z.string(), value: z.unknown() })
@@ -165,7 +165,7 @@
 			.array(),
 	});
 	let columnVisibility = createPersistedState({
-		key: 'whispering-data-table-column-visibility',
+		key: 'whispering-recordings-data-table-column-visibility',
 		defaultValue: {
 			id: false,
 			title: false,
@@ -176,7 +176,7 @@
 		schema: z.record(z.string(), z.boolean()),
 	});
 	let rowSelection = createPersistedState({
-		key: 'whispering-data-table-row-selection',
+		key: 'whispering-recordings-data-table-row-selection',
 		defaultValue: {},
 		schema: z.record(z.string(), z.boolean()),
 	});
