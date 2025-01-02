@@ -2,15 +2,15 @@
 	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import { macOSAppNapExplainedDialog } from '$lib/components/MacOSAppNapExplainedDialog.svelte';
 	import MacOSAppNapExplainedDialog from '$lib/components/MacOSAppNapExplainedDialog.svelte';
+	import { SettingsLabelSelect } from '$lib/components/labeled-input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
-	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 	import { type } from '@tauri-apps/plugin-os';
-	import * as Card from '$lib/components/ui/card';
 </script>
 
 <svelte:head>

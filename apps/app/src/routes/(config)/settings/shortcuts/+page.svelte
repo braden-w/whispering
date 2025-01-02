@@ -5,7 +5,7 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
-	import SettingsLabelInput from '../SettingsLabelInput.svelte';
+	import { SettingsLabelInput } from '$lib/components/labeled-input/index.js';
 </script>
 
 <svelte:head>

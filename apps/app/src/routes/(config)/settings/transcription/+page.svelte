@@ -10,9 +10,11 @@
 		TRANSCRIPTION_SERVICE_OPTIONS,
 		WHISPERING_URL,
 	} from '@repo/shared';
-	import SettingsLabelInput from '../SettingsLabelInput.svelte';
-	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import SettingsLabelTextarea from '../SettingsLabelTextarea.svelte';
+	import {
+		SettingsLabelInput,
+		SettingsLabelSelect,
+		SettingsLabelSwitch,
+	} from '$lib/components/labeled-input/index.js';
 </script>
 
 <svelte:head>

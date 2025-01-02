@@ -5,7 +5,7 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';
 	import { BITRATE_OPTIONS } from '@repo/shared';
-	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
+	import { SettingsLabelSelect } from '$lib/components/labeled-input/index.js';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
