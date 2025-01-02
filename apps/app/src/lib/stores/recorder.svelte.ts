@@ -5,7 +5,7 @@ import {
 	userConfiguredServices,
 } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
-import { recordings, transcriber } from '$lib/stores/recordings.svelte';
+import { transcriber } from '$lib/stores/transcriber.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';

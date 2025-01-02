@@ -1,5 +1,5 @@
 import { recorder } from '$lib/stores/recorder.svelte';
-import { transcriber } from '$lib/stores/recordings.svelte';
+import { transcriber } from '$lib/stores/transcriber.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 

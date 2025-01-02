@@ -8,7 +8,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { recordings } from '$lib/stores/recordings.svelte';
 	import type { Recording } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';

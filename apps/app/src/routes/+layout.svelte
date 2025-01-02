@@ -16,7 +16,6 @@
 	import { closeToTrayIfEnabled } from './+layout/closeToTray';
 	import { DbService } from '$lib/services.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
 	import { browser } from '$app/environment';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 
@@ -35,7 +34,6 @@
 
 	$effect(() => {
 		recorder.recorderState;
-		recordings.value;
 		void DbService.cleanupExpiredRecordings(settings.value);
 	});
 

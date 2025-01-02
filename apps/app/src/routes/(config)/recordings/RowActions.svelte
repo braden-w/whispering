@@ -7,7 +7,7 @@
 		createDownloadRecordingWithToast,
 	} from '$lib/mutations/recordings';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/recordings.svelte';
+	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {

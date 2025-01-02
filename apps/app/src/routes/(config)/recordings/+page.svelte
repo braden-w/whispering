@@ -38,7 +38,7 @@
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
-	import { transcriber } from '$lib/stores/recordings.svelte';
+	import { transcriber } from '$lib/stores/transcriber.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
