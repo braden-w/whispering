@@ -5,9 +5,10 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { createRecordingsQuery } from '$lib/queries/recordings';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
