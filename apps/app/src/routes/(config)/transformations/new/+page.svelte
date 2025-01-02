@@ -13,7 +13,7 @@
 		generateDefaultTransformation,
 		generateDefaultTransformationStep,
 	} from '$lib/services/db';
-	import { PlusIcon, TrashIcon } from 'lucide-svelte';
+	import { PlusIcon, TrashIcon, CopyIcon } from 'lucide-svelte';
 
 	let transformation = $state(generateDefaultTransformation());
 
@@ -26,6 +26,16 @@
 
 	function removeStep(index: number) {
 		transformation.steps = transformation.steps.filter((_, i) => i !== index);
+	}
+
+	function duplicateStep(index: number) {
+		const stepToDuplicate = transformation.steps[index];
+		const duplicatedStep = { ...stepToDuplicate, id: crypto.randomUUID() };
+		transformation.steps = [
+			...transformation.steps.slice(0, index + 1),
+			duplicatedStep,
+			...transformation.steps.slice(index + 1),
+		];
 	}
 </script>
 
@@ -80,14 +90,24 @@
 													: 'Find Replace'}
 											</span>
 										</Accordion.Trigger>
-										<Button
-											variant="ghost"
-											size="icon"
-											class="h-8 w-8"
-											onclick={() => removeStep(index)}
-										>
-											<TrashIcon class="h-4 w-4" />
-										</Button>
+										<div class="flex gap-1">
+											<Button
+												variant="ghost"
+												size="icon"
+												class="h-8 w-8"
+												onclick={() => duplicateStep(index)}
+											>
+												<CopyIcon class="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												class="h-8 w-8"
+												onclick={() => removeStep(index)}
+											>
+												<TrashIcon class="h-4 w-4" />
+											</Button>
+										</div>
 									</div>
 									<Accordion.Content>
 										<div class="space-y-4 p-4 pt-2">
