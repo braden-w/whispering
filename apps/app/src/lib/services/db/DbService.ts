@@ -24,7 +24,7 @@ export type TransformationResult = RecordingsDbSchemaV4['transformationRuns'];
 
 export type DbService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
-	addRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
+	createRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	deleteRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	deleteRecordings: (recordings: Recording[]) => Promise<DbServiceResult<void>>;

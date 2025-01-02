@@ -336,8 +336,8 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async addRecording(recording: Recording) {
-			const addRecordingResult = await tryAsync({
+		async createRecording(recording: Recording) {
+			const createRecordingResult = await tryAsync({
 				try: async () => {
 					await db.recordings.add(recording);
 				},
@@ -348,7 +348,7 @@ export function createDbDexieService(): DbService {
 						error,
 					}),
 			});
-			if (!addRecordingResult.ok) return addRecordingResult;
+			if (!createRecordingResult.ok) return createRecordingResult;
 			return Ok(undefined);
 		},
 

@@ -64,7 +64,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await DbService.addRecording(newRecording);
+				await DbService.createRecording(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,
