@@ -61,7 +61,7 @@ export type RecordingsDbSchemaV4 = {
 	transformationRuns: {
 		id: string;
 		/**
-		 * The recording that this transformation is invoked on, if any.
+		 * Recording id if the transformation is invoked on a recording.
 		 *
 		 * Null if the transformation is invoked on arbitrary text input.
 		 */
