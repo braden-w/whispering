@@ -63,17 +63,18 @@ export type RecordingsDbSchemaV4 = {
 	};
 
 	/**
-	 * Can be invoked on a recording or on arbitrary text.
+	 * Represents an execution of a transformation, which can be run on either
+	 * a recording's transcribed text or arbitrary input text.
 	 */
 	transformationRuns: {
 		id: string;
+		transformationId: string;
 		/**
 		 * Recording id if the transformation is invoked on a recording.
-		 *
 		 * Null if the transformation is invoked on arbitrary text input.
 		 */
 		recordingId: string | null;
-		status: 'running' | 'completed' | 'failed';
+		status: 'pending' | 'running' | 'completed' | 'failed';
 		startedAt: string;
 		completedAt: string | null;
 		/**
@@ -81,21 +82,19 @@ export type RecordingsDbSchemaV4 = {
 		 * we store a snapshot of the transcribedText at the time of invoking.
 		 */
 		input: string;
-
-		error: string | null;
 		output: string | null;
+		error: string | null;
 
 		stepRuns: {
 			id: string;
-			status: 'running' | 'completed' | 'failed';
+			stepId: string;
+			status: 'pending' | 'running' | 'completed' | 'failed';
 			startedAt: string;
 			completedAt: string | null;
-
 			input: string;
-
-			error: string | null;
 			output: string | null;
-		};
+			error: string | null;
+		}[];
 	};
 };
 
