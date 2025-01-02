@@ -19,10 +19,10 @@ export type InsertTransformation = Omit<
 	'createdAt' | 'updatedAt'
 >;
 
-export type SelectTransformationRun =
-	RecordingsDbSchemaV4['transformationRuns'];
+
+export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
 export type InsertTransformationRun = Omit<
-	SelectTransformationRun,
+	TransformationRun,
 	'startedAt' | 'completedAt'
 >;
 
