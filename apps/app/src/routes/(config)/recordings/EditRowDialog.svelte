@@ -13,7 +13,8 @@
 	import { onDestroy } from 'svelte';
 	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 
-	let { recording }: { recording: Recording } = $props();
+	let { recording: initialRecording }: { recording: Recording } = $props();
+	let recording = $state(initialRecording);
 
 	const updateRecordingWithToastMutation = createUpdateRecordingWithToast();
 	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
