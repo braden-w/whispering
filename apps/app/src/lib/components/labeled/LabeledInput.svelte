@@ -20,13 +20,15 @@
 	} = $props();
 </script>
 
-<Label class="text-sm" for={id}>{label}</Label>
-<Input
-	{id}
-	bind:value
-	{placeholder}
-	{type}
-	{disabled}
-	autocomplete="off"
-	{...restProps}
-/>
+<div class="flex flex-col gap-2">
+	<Label class="text-sm" for={id}>{label}</Label>
+	<Input
+		{id}
+		bind:value
+		{placeholder}
+		{type}
+		{disabled}
+		autocomplete="off"
+		{...restProps}
+	/>
+</div>

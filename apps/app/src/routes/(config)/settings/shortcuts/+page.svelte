@@ -20,61 +20,59 @@
 		</p>
 	</div>
 	<Separator />
-	<div class="grid gap-2">
+
+	<LabeledInput
+		id="local-shortcut"
+		label="Local Shortcut"
+		placeholder="Local Shortcut to toggle recording"
+		value={settings.value['shortcuts.currentLocalShortcut']}
+		onchange={({ currentTarget: { value } }) => {
+			settings.value = {
+				...settings.value,
+				'shortcuts.currentLocalShortcut': value,
+			};
+			registerShortcuts.registerLocalShortcut({
+				shortcut: value,
+				callback: () => recorder.toggleRecordingWithToast(),
+			});
+		}}
+	/>
+
+	{#if window.__TAURI_INTERNALS__}
 		<LabeledInput
-			id="local-shortcut"
-			label="Local Shortcut"
-			placeholder="Local Shortcut to toggle recording"
-			value={settings.value['shortcuts.currentLocalShortcut']}
+			id="global-shortcut"
+			label="Global Shortcut"
+			placeholder="Global Shortcut to toggle recording"
+			value={settings.value['shortcuts.currentGlobalShortcut']}
 			onchange={({ currentTarget: { value } }) => {
 				settings.value = {
 					...settings.value,
-					'shortcuts.currentLocalShortcut': value,
+					'shortcuts.currentGlobalShortcut': value,
 				};
-				registerShortcuts.registerLocalShortcut({
+				registerShortcuts.registerGlobalShortcut({
 					shortcut: value,
 					callback: () => recorder.toggleRecordingWithToast(),
 				});
 			}}
 		/>
-	</div>
-	<div class="grid gap-2">
-		{#if window.__TAURI_INTERNALS__}
-			<LabeledInput
+	{:else}
+		<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
+		<div class="relative">
+			<Input
 				id="global-shortcut"
-				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"
 				value={settings.value['shortcuts.currentGlobalShortcut']}
-				onchange={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'shortcuts.currentGlobalShortcut': value,
-					};
-					registerShortcuts.registerGlobalShortcut({
-						shortcut: value,
-						callback: () => recorder.toggleRecordingWithToast(),
-					});
-				}}
+				type="text"
+				autocomplete="off"
+				disabled
 			/>
-		{:else}
-			<Label class="text-sm" for="global-shortcut">Global Shortcut</Label>
-			<div class="relative">
-				<Input
-					id="global-shortcut"
-					placeholder="Global Shortcut to toggle recording"
-					value={settings.value['shortcuts.currentGlobalShortcut']}
-					type="text"
-					autocomplete="off"
-					disabled
-				/>
-				<Button
-					class="absolute inset-0 backdrop-blur"
-					href="/global-shortcut"
-					variant="link"
-				>
-					Enable Global Shortcut
-				</Button>
-			</div>
-		{/if}
-	</div>
+			<Button
+				class="absolute inset-0 backdrop-blur"
+				href="/global-shortcut"
+				variant="link"
+			>
+				Enable Global Shortcut
+			</Button>
+		</div>
+	{/if}
 </div>

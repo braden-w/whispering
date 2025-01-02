@@ -45,7 +45,7 @@
 	/>
 
 	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
-		<div class="grid gap-2">
+		
 			<LabeledInput
 				id="openai-api-key"
 				label="OpenAI API Key"
@@ -79,9 +79,9 @@
 				</Button>
 				is enabled.
 			</div>
-		</div>
+		
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
-		<div class="grid gap-2">
+		
 			<LabeledInput
 				id="groq-api-key"
 				label="Groq API Key"
@@ -106,7 +106,7 @@
 					Groq console
 				</Button>.
 			</div>
-		</div>
+		
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
@@ -165,7 +165,7 @@
 			</Card.Content>
 		</Card.Root>
 
-		<div class="grid gap-2">
+		
 			<LabeledInput
 				id="faster-whisper-server-url"
 				label="faster-whisper-server URL"
@@ -178,8 +178,8 @@
 					};
 				}}
 			/>
-		</div>
-		<div class="grid gap-2">
+		
+		
 			<LabeledInput
 				id="faster-whisper-server-model"
 				label="faster-whisper-server Model"
@@ -192,7 +192,7 @@
 					};
 				}}
 			/>
-		</div>
+		
 	{/if}
 
 	<LabeledSelect
@@ -209,7 +209,7 @@
 		placeholder="Select a language"
 	/>
 
-	<div class="grid gap-2">
+	
 		<LabeledInput
 			id="temperature"
 			label="Temperature"
@@ -230,7 +230,7 @@
 			Controls randomness in the model's output. 0 is focused and deterministic,
 			1 is more creative.
 		</div>
-	</div>
+	
 
 	<div class="grid gap-2">
 		<LabeledTextarea
