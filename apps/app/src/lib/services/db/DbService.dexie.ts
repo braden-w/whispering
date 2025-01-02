@@ -11,6 +11,20 @@ const DB_NAME = 'RecordingDB';
 const DB_VERSION = 4;
 
 export type Recording = RecordingsDbSchemaV4['recordings'];
+export type InsertRecording = Omit<Recording, 'createdAt' | 'updatedAt'>;
+
+export type Transformation = RecordingsDbSchemaV4['transformations'];
+export type InsertTransformation = Omit<
+	Transformation,
+	'createdAt' | 'updatedAt'
+>;
+
+export type SelectTransformationRun =
+	RecordingsDbSchemaV4['transformationRuns'];
+export type InsertTransformationRun = Omit<
+	SelectTransformationRun,
+	'startedAt' | 'completedAt'
+>;
 
 export type RecordingsDbSchemaV4 = {
 	recordings: RecordingsDbSchemaV3['recordings'] & {
@@ -24,12 +38,11 @@ export type RecordingsDbSchemaV4 = {
 		createdAt: string;
 		updatedAt: string;
 		/**
-		 * A transformationStep is a single step in a transformation.
 		 * It can be one of several types of text transformations:
 		 * - find_replace: Replace text patterns with new text
 		 * - prompt_transform: Use AI to transform text based on prompts
 		 */
-		transformationSteps: {
+		steps: {
 			id: string;
 			title: string;
 			description: string;
@@ -45,7 +58,7 @@ export type RecordingsDbSchemaV4 = {
 			'prompt_transform.model': string;
 			'prompt_transform.systemPromptTemplate': string;
 			'prompt_transform.userPromptTemplate': string;
-		};
+		}[];
 	};
 
 	/**
@@ -113,15 +126,9 @@ type RecordingsDbSchemaV1 = {
 };
 
 class RecordingsDatabase extends Dexie {
-	recordings!: Dexie.Table<RecordingsDbSchemaV4['recordings'], string>;
-	transformations!: Dexie.Table<
-		RecordingsDbSchemaV4['transformations'],
-		string
-	>;
-	transformationRuns!: Dexie.Table<
-		RecordingsDbSchemaV4['transformationRuns'],
-		string
-	>;
+	recordings!: Dexie.Table<Recording, string>;
+	transformations!: Dexie.Table<Transformation, string>;
+	transformationRuns!: Dexie.Table<SelectTransformationRun, string>;
 
 	constructor() {
 		super(DB_NAME);
@@ -331,10 +338,16 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async createRecording(recording: Recording) {
+		async createRecording(recording: InsertRecording) {
+			const now = new Date().toISOString();
+			const recordingWithTimestamps = {
+				...recording,
+				createdAt: now,
+				updatedAt: now,
+			} satisfies Recording;
 			const createRecordingResult = await tryAsync({
 				try: async () => {
-					await db.recordings.add(recording);
+					await db.recordings.add(recordingWithTimestamps);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -348,9 +361,14 @@ export function createDbDexieService(): DbService {
 		},
 
 		async updateRecording(recording: Recording) {
+			const now = new Date().toISOString();
+			const recordingWithTimestamp = {
+				...recording,
+				updatedAt: now,
+			} satisfies Recording;
 			const updateRecordingResult = await tryAsync({
 				try: async () => {
-					await db.recordings.put(recording);
+					await db.recordings.put(recordingWithTimestamp);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -450,9 +468,15 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async createTransformation(transformation) {
+		async createTransformation(transformation: InsertTransformation) {
+			const now = new Date().toISOString();
+			const transformationWithTimestamps = {
+				...transformation,
+				createdAt: now,
+				updatedAt: now,
+			} satisfies Transformation;
 			const createTransformationResult = await tryAsync({
-				try: () => db.transformations.add(transformation),
+				try: () => db.transformations.add(transformationWithTimestamps),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding transformation to Dexie',
@@ -465,8 +489,13 @@ export function createDbDexieService(): DbService {
 		},
 
 		async updateTransformation(transformation) {
+			const now = new Date().toISOString();
+			const transformationWithTimestamp = {
+				...transformation,
+				updatedAt: now,
+			};
 			const updateTransformationResult = await tryAsync({
-				try: () => db.transformations.put(transformation),
+				try: () => db.transformations.put(transformationWithTimestamp),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation in Dexie',
