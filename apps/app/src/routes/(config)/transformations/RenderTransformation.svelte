@@ -35,8 +35,8 @@
 		label="Step Type"
 		selected={step.type}
 		items={[
-			{ value: 'find_replace', label: 'Find Replace' },
 			{ value: 'prompt_transform', label: 'Prompt Transform' },
+			{ value: 'find_replace', label: 'Find Replace' },
 		]}
 		onSelectedChange={(value) => {
 			step.type = value;

@@ -28,6 +28,8 @@
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import RenderTransformation from './RenderTransformation.svelte';
+	import { nanoid } from 'nanoid/non-secure';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -270,8 +272,27 @@
 									Create a new transformation to transform text.
 								</Dialog.Description>
 							</Dialog.Header>
-							<Input placeholder="Title" />
-							<Input placeholder="Description" />
+							<RenderTransformation
+								initialTransformation={{
+									id: nanoid(),
+									title: '',
+									description: '',
+									createdAt: new Date().toISOString(),
+									updatedAt: new Date().toISOString(),
+									steps: [
+										{
+											id: nanoid(),
+											type: 'prompt_transform',
+											'prompt_transform.model': 'gpt-4o',
+											'prompt_transform.systemPromptTemplate': '',
+											'prompt_transform.userPromptTemplate': '',
+											'find_replace.findText': '',
+											'find_replace.replaceText': '',
+											'find_replace.useRegex': false,
+										},
+									],
+								}}
+							/>
 							<Dialog.Footer>
 								<Dialog.Close>Cancel</Dialog.Close>
 								<Button>Create</Button>

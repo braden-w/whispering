@@ -50,15 +50,15 @@ export type RecordingsDbSchemaV4 = {
 		steps: {
 			id: string;
 			// For now, steps don't need titles or descriptions. They can be computed from the type as "Find and Replace" or "Prompt Transform"
-			type: 'find_replace' | 'prompt_transform';
-
-			'find_replace.findText': string;
-			'find_replace.replaceText': string;
-			'find_replace.useRegex': boolean;
+			type: 'prompt_transform' | 'find_replace';
 
 			'prompt_transform.model': string;
 			'prompt_transform.systemPromptTemplate': string;
 			'prompt_transform.userPromptTemplate': string;
+
+			'find_replace.findText': string;
+			'find_replace.replaceText': string;
+			'find_replace.useRegex': boolean;
 		}[];
 	};
 
