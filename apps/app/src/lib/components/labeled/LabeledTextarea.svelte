@@ -20,8 +20,10 @@
 	} = $props();
 </script>
 
-<Label class="text-sm" for={id}>{label}</Label>
-<Textarea {id} bind:value {placeholder} {disabled} {...restProps} />
-{#if description}
-	<div class="text-muted-foreground text-sm">{description}</div>
-{/if}
+<div class="flex flex-col gap-2">
+	<Label class="text-sm" for={id}>{label}</Label>
+	<Textarea {id} bind:value {placeholder} {disabled} {...restProps} />
+	{#if description}
+		<div class="text-muted-foreground text-sm">{description}</div>
+	{/if}
+</div>

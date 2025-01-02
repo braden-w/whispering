@@ -14,6 +14,7 @@
 		LabeledInput,
 		LabeledSelect,
 		LabeledSwitch,
+		LabeledTextarea,
 	} from '$lib/components/labeled/index.js';
 </script>
 
@@ -232,19 +233,17 @@
 		</div>
 	
 
-	<div class="grid gap-2">
-		<LabeledTextarea
-			id="transcription-prompt"
-			label="System Prompt"
-			placeholder="Optional system prompt to guide the transcription"
-			value={settings.value['transcription.prompt']}
+	<LabeledTextarea
+		id="transcription-prompt"
+		label="System Prompt"
+		placeholder="Optional system prompt to guide the transcription"
+		value={settings.value['transcription.prompt']}
 			oninput={({ currentTarget: { value } }) => {
 				settings.value = {
 					...settings.value,
 					'transcription.prompt': value,
 				};
 			}}
-			description="Custom instructions to guide the transcription process. Leave empty for default behavior."
-		/>
-	</div>
+		description="Custom instructions to guide the transcription process. Leave empty for default behavior."
+	/>
 </div>
