@@ -97,65 +97,59 @@
 
 	<Separator />
 
-	<div class="grid gap-2">
+	<LabeledSelect
+		id="recording-retention-strategy"
+		label="Auto Delete Recordings"
+		items={[
+			{ value: 'keep-forever', label: 'Keep All Recordings' },
+			{ value: 'limit-count', label: 'Keep Limited Number' },
+		]}
+		selected={settings.value['database.recordingRetentionStrategy']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'database.recordingRetentionStrategy': selected,
+			};
+		}}
+		placeholder="Select retention strategy"
+	/>
+
+	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
 		<LabeledSelect
-			id="recording-retention-strategy"
-			label="Auto Delete Recordings"
+			id="max-recording-count"
+			label="Maximum Recordings"
 			items={[
-				{ value: 'keep-forever', label: 'Keep All Recordings' },
-				{ value: 'limit-count', label: 'Keep Limited Number' },
+				{ value: '5', label: '5 Recordings' },
+				{ value: '10', label: '10 Recordings' },
+				{ value: '25', label: '25 Recordings' },
+				{ value: '50', label: '50 Recordings' },
+				{ value: '100', label: '100 Recordings' },
 			]}
-			selected={settings.value['database.recordingRetentionStrategy']}
+			selected={settings.value['database.maxRecordingCount']}
 			onSelectedChange={(selected) => {
 				settings.value = {
 					...settings.value,
-					'database.recordingRetentionStrategy': selected,
+					'database.maxRecordingCount': selected,
 				};
 			}}
-			placeholder="Select retention strategy"
+			placeholder="Select maximum recordings"
 		/>
-	</div>
-
-	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
-		<div class="grid gap-2">
-			<LabeledSelect
-				id="max-recording-count"
-				label="Maximum Recordings"
-				items={[
-					{ value: '5', label: '5 Recordings' },
-					{ value: '10', label: '10 Recordings' },
-					{ value: '25', label: '25 Recordings' },
-					{ value: '50', label: '50 Recordings' },
-					{ value: '100', label: '100 Recordings' },
-				]}
-				selected={settings.value['database.maxRecordingCount']}
-				onSelectedChange={(selected) => {
-					settings.value = {
-						...settings.value,
-						'database.maxRecordingCount': selected,
-					};
-				}}
-				placeholder="Select maximum recordings"
-			/>
-		</div>
 	{/if}
 
 	{#if window.__TAURI_INTERNALS__}
-		<div class="grid gap-2">
-			<LabeledSelect
-				id="always-on-top"
-				label="Always On Top"
-				items={ALWAYS_ON_TOP_OPTIONS}
-				selected={settings.value['system.alwaysOnTop']}
-				onSelectedChange={async (selected) => {
-					settings.value = {
-						...settings.value,
-						'system.alwaysOnTop': selected,
-					};
-				}}
-				placeholder="Select a language"
-			/>
-		</div>
+		<LabeledSelect
+			id="always-on-top"
+			label="Always On Top"
+			items={ALWAYS_ON_TOP_OPTIONS}
+			selected={settings.value['system.alwaysOnTop']}
+			onSelectedChange={async (selected) => {
+				settings.value = {
+					...settings.value,
+					'system.alwaysOnTop': selected,
+				};
+			}}
+			placeholder="Select a language"
+		/>
 	{/if}
 </div>
 

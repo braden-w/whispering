@@ -31,56 +31,54 @@
 		</p>
 	</div>
 	<Separator />
-	<div class="grid gap-2">
-		{#await getMediaDevicesPromise}
-			<LabeledSelect
-				id="recording-device"
-				label="Recording Device"
-				placeholder="Loading devices..."
-				items={[]}
-				selected={''}
-				onSelectedChange={() => {}}
-				disabled
-			/>
-		{:then mediaDevices}
-			{@const items = mediaDevices.map((device) => ({
-				value: device.deviceId,
-				label: device.label,
-			}))}
-			<LabeledSelect
-				id="recording-device"
-				label="Recording Device"
-				{items}
-				selected={settings.value['recording.selectedAudioInputDeviceId']}
-				onSelectedChange={async (selected) => {
-					await recorder.closeRecordingSessionWithToast();
-					settings.value = {
-						...settings.value,
-						'recording.selectedAudioInputDeviceId': selected,
-					};
-				}}
-				placeholder="Select a device"
-			/>
-		{:catch error}
-			<p>Error with listing media devices: {error.message}</p>
-		{/await}
-	</div>
-	<div class="grid gap-2">
+
+	{#await getMediaDevicesPromise}
 		<LabeledSelect
-			id="bit-rate"
-			label="Bitrate"
-			items={BITRATE_OPTIONS.map((option) => ({
-				value: option.value,
-				label: option.label,
-			}))}
-			selected={settings.value['recording.bitrateKbps']}
-			onSelectedChange={(selected) => {
+			id="recording-device"
+			label="Recording Device"
+			placeholder="Loading devices..."
+			items={[]}
+			selected={''}
+			onSelectedChange={() => {}}
+			disabled
+		/>
+	{:then mediaDevices}
+		{@const items = mediaDevices.map((device) => ({
+			value: device.deviceId,
+			label: device.label,
+		}))}
+		<LabeledSelect
+			id="recording-device"
+			label="Recording Device"
+			{items}
+			selected={settings.value['recording.selectedAudioInputDeviceId']}
+			onSelectedChange={async (selected) => {
+				await recorder.closeRecordingSessionWithToast();
 				settings.value = {
 					...settings.value,
-					'recording.bitrateKbps': selected,
+					'recording.selectedAudioInputDeviceId': selected,
 				};
 			}}
-			placeholder="Select a bitrate"
+			placeholder="Select a device"
 		/>
-	</div>
+	{:catch error}
+		<p>Error with listing media devices: {error.message}</p>
+	{/await}
+
+	<LabeledSelect
+		id="bit-rate"
+		label="Bitrate"
+		items={BITRATE_OPTIONS.map((option) => ({
+			value: option.value,
+			label: option.label,
+		}))}
+		selected={settings.value['recording.bitrateKbps']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'recording.bitrateKbps': selected,
+			};
+		}}
+		placeholder="Select a bitrate"
+	/>
 </div>

@@ -30,21 +30,20 @@
 	</div>
 	<Separator />
 
-	<div class="grid gap-2">
-		<LabeledSelect
-			id="selected-transcription-service"
-			label="Transcription Service"
-			items={TRANSCRIPTION_SERVICE_OPTIONS}
-			selected={settings.value['transcription.selectedTranscriptionService']}
-			onSelectedChange={(selected) => {
-				settings.value = {
-					...settings.value,
-					'transcription.selectedTranscriptionService': selected,
-				};
-			}}
-			placeholder="Select a transcription service"
-		/>
-	</div>
+	<LabeledSelect
+		id="selected-transcription-service"
+		label="Transcription Service"
+		items={TRANSCRIPTION_SERVICE_OPTIONS}
+		selected={settings.value['transcription.selectedTranscriptionService']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'transcription.selectedTranscriptionService': selected,
+			};
+		}}
+		placeholder="Select a transcription service"
+	/>
+
 	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
 		<div class="grid gap-2">
 			<LabeledInput
@@ -195,21 +194,20 @@
 			/>
 		</div>
 	{/if}
-	<div class="grid gap-2">
-		<LabeledSelect
-			id="output-language"
-			label="Output Language"
-			items={SUPPORTED_LANGUAGES_OPTIONS}
-			selected={settings.value['transcription.outputLanguage']}
-			onSelectedChange={(selected) => {
-				settings.value = {
-					...settings.value,
-					'transcription.outputLanguage': selected,
-				};
-			}}
-			placeholder="Select a language"
-		/>
-	</div>
+
+	<LabeledSelect
+		id="output-language"
+		label="Output Language"
+		items={SUPPORTED_LANGUAGES_OPTIONS}
+		selected={settings.value['transcription.outputLanguage']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'transcription.outputLanguage': selected,
+			};
+		}}
+		placeholder="Select a language"
+	/>
 
 	<div class="grid gap-2">
 		<LabeledInput
