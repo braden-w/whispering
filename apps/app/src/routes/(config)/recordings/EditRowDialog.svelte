@@ -14,7 +14,11 @@
 	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 
 	let { recording: initialRecording }: { recording: Recording } = $props();
-	let recording = $state(initialRecording);
+	let recording = $state(structuredClone(initialRecording));
+
+	$effect(() => {
+		recording = structuredClone(initialRecording);
+	});
 
 	const updateRecordingWithToastMutation = createUpdateRecordingWithToast();
 	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
