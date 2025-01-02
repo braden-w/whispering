@@ -258,7 +258,8 @@
 							'ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180',
 						)}
 					>
-						Columns <ChevronDownIcon
+						Columns
+						<ChevronDownIcon
 							class="ml-2 h-4 w-4 transition-transform duration-200"
 						/>
 					</DropdownMenu.Trigger>
