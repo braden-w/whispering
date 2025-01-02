@@ -88,7 +88,7 @@ export type RecordingsDbSchemaV4 = {
 		error: string | null;
 		output: string | null;
 
-		transformationStepRuns: {
+		stepRuns: {
 			id: string;
 			status: 'running' | 'completed' | 'failed';
 			startedAt: string;
@@ -132,7 +132,7 @@ type RecordingsDbSchemaV1 = {
 class RecordingsDatabase extends Dexie {
 	recordings!: Dexie.Table<Recording, string>;
 	transformations!: Dexie.Table<Transformation, string>;
-	transformationRuns!: Dexie.Table<SelectTransformationRun, string>;
+	transformationRuns!: Dexie.Table<TransformationRun, string>;
 
 	constructor() {
 		super(DB_NAME);
