@@ -41,7 +41,7 @@
 
 <Card.Root class="w-full">
 	<Card.Header>
-		<Card.Title>Transformation Details</Card.Title>
+		<Card.Title>Create New Transformation</Card.Title>
 		<Card.Description>
 			Configure your transformation's basic information
 		</Card.Description>
