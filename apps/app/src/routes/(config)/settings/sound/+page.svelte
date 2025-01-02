@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SettingsLabelSwitch } from '$lib/components/labeled-input';
+	import { LabeledSwitch } from '$lib/components/labeled';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
@@ -21,7 +21,7 @@
 	<Separator />
 
 	<div class="space-y-4">
-		<SettingsLabelSwitch
+		<LabeledSwitch
 			id="play-sound-start"
 			label="Play sound when recording starts"
 			checked={settings.value['sound.playOnStartSuccess']}
@@ -33,7 +33,7 @@
 			}}
 		/>
 
-		<SettingsLabelSwitch
+		<LabeledSwitch
 			id="play-sound-stop"
 			label="Play sound when recording stops"
 			checked={settings.value['sound.playOnStopSuccess']}
@@ -45,7 +45,7 @@
 			}}
 		/>
 
-		<SettingsLabelSwitch
+		<LabeledSwitch
 			id="play-sound-cancel"
 			label="Play sound when recording cancels"
 			checked={settings.value['sound.playOnCancelSuccess']}
@@ -57,7 +57,7 @@
 			}}
 		/>
 
-		<SettingsLabelSwitch
+		<LabeledSwitch
 			id="play-sound-transcription"
 			label="Play sound after transcription"
 			checked={settings.value['sound.playOnTranscriptionSuccess']}

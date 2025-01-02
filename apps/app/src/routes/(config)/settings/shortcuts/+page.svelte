@@ -5,7 +5,7 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
-	import { SettingsLabelInput } from '$lib/components/labeled-input/index.js';
+	import { LabeledInput } from '$lib/components/labeled/index.js';
 </script>
 
 <svelte:head>
@@ -21,7 +21,7 @@
 	</div>
 	<Separator />
 	<div class="grid gap-2">
-		<SettingsLabelInput
+		<LabeledInput
 			id="local-shortcut"
 			label="Local Shortcut"
 			placeholder="Local Shortcut to toggle recording"
@@ -40,7 +40,7 @@
 	</div>
 	<div class="grid gap-2">
 		{#if window.__TAURI_INTERNALS__}
-			<SettingsLabelInput
+			<LabeledInput
 				id="global-shortcut"
 				label="Global Shortcut"
 				placeholder="Global Shortcut to toggle recording"

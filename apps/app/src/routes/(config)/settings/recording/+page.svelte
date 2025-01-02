@@ -5,7 +5,7 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';
 	import { BITRATE_OPTIONS } from '@repo/shared';
-	import { SettingsLabelSelect } from '$lib/components/labeled-input/index.js';
+	import { LabeledSelect } from '$lib/components/labeled/index.js';
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
@@ -33,7 +33,7 @@
 	<Separator />
 	<div class="grid gap-2">
 		{#await getMediaDevicesPromise}
-			<SettingsLabelSelect
+			<LabeledSelect
 				id="recording-device"
 				label="Recording Device"
 				placeholder="Loading devices..."
@@ -47,7 +47,7 @@
 				value: device.deviceId,
 				label: device.label,
 			}))}
-			<SettingsLabelSelect
+			<LabeledSelect
 				id="recording-device"
 				label="Recording Device"
 				{items}
@@ -66,7 +66,7 @@
 		{/await}
 	</div>
 	<div class="grid gap-2">
-		<SettingsLabelSelect
+		<LabeledSelect
 			id="bit-rate"
 			label="Bitrate"
 			items={BITRATE_OPTIONS.map((option) => ({

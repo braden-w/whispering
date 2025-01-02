@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Transformation } from '$lib/services/db';
 	import {
-		SettingsLabelInput,
-		SettingsLabelSelect,
-		SettingsLabelSwitch,
-	} from '$lib/components/labeled-input/index.js';
+		LabeledInput,
+		LabeledSelect,
+		LabeledSwitch,
+	} from '$lib/components/labeled/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
@@ -40,14 +40,14 @@
 		>
 	</Card.Header>
 	<Card.Content class="space-y-4">
-		<SettingsLabelInput
+		<LabeledInput
 			id="title"
 			label="Title"
 			bind:value={transformation.title}
 			placeholder="Enter a title"
 		/>
 
-		<SettingsLabelInput
+		<LabeledInput
 			id="description"
 			label="Description"
 			bind:value={transformation.description}
@@ -94,7 +94,7 @@
 				</div>
 				<Accordion.Content>
 					<div class="space-y-4 pt-4">
-						<SettingsLabelSelect
+						<LabeledSelect
 							id="step-type"
 							label="Step Type"
 							selected={step.type}
@@ -110,19 +110,19 @@
 						{#if step.type === 'find_replace'}
 							<Card.Root>
 								<Card.Content class="space-y-4 pt-6">
-									<SettingsLabelInput
+									<LabeledInput
 										id="find_replace.findText"
 										label="Find Text"
 										bind:value={step['find_replace.findText']}
 										placeholder="Enter text to find"
 									/>
-									<SettingsLabelInput
+									<LabeledInput
 										id="find_replace.replaceText"
 										label="Replace Text"
 										bind:value={step['find_replace.replaceText']}
 										placeholder="Enter replacement text"
 									/>
-									<SettingsLabelSwitch
+									<LabeledSwitch
 										id="find_replace.useRegex"
 										label="Use Regex"
 										checked={step['find_replace.useRegex']}
@@ -135,7 +135,7 @@
 						{:else if step.type === 'prompt_transform'}
 							<Card.Root>
 								<Card.Content class="space-y-4 pt-6">
-									<SettingsLabelSelect
+									<LabeledSelect
 										id="prompt_transform.model"
 										label="Model"
 										items={[
@@ -148,13 +148,13 @@
 											step['prompt_transform.model'] = value;
 										}}
 									/>
-									<SettingsLabelInput
+									<LabeledInput
 										id="prompt_transform.systemPromptTemplate"
 										label="System Prompt Template"
 										bind:value={step['prompt_transform.systemPromptTemplate']}
 										placeholder="Enter system prompt template"
 									/>
-									<SettingsLabelInput
+									<LabeledInput
 										id="prompt_transform.userPromptTemplate"
 										label="User Prompt Template"
 										bind:value={step['prompt_transform.userPromptTemplate']}

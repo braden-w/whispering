@@ -3,9 +3,9 @@
 	import { macOSAppNapExplainedDialog } from '$lib/components/MacOSAppNapExplainedDialog.svelte';
 	import MacOSAppNapExplainedDialog from '$lib/components/MacOSAppNapExplainedDialog.svelte';
 	import {
-		SettingsLabelSelect,
-		SettingsLabelSwitch,
-	} from '$lib/components/labeled-input/index.js';
+		LabeledSelect,
+		LabeledSwitch,
+	} from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -27,7 +27,7 @@
 
 	<Separator />
 
-	<SettingsLabelSwitch
+	<LabeledSwitch
 		id="copy-to-clipboard"
 		label="Copy text to clipboard on successful transcription"
 		checked={settings.value['transcription.clipboard.copyOnSuccess']}
@@ -39,7 +39,7 @@
 		}}
 	/>
 
-	<SettingsLabelSwitch
+	<LabeledSwitch
 		id="paste-from-clipboard"
 		label="Paste contents from clipboard after successful transcription"
 		checked={settings.value['transcription.clipboard.pasteOnSuccess']}
@@ -51,7 +51,7 @@
 		}}
 	/>
 
-	<SettingsLabelSwitch
+	<LabeledSwitch
 		id="faster-rerecord"
 		checked={settings.value['recording.isFasterRerecordEnabled']}
 		onCheckedChange={(v) => {
@@ -70,10 +70,10 @@
 				(What's that?)
 			</Button>
 		{/snippet}
-	</SettingsLabelSwitch>
+	</LabeledSwitch>
 
 	{#if window.__TAURI_INTERNALS__}
-		<SettingsLabelSwitch
+		<LabeledSwitch
 			id="close-to-tray"
 			checked={settings.value['system.closeToTray']}
 			onCheckedChange={(v) => {
@@ -92,13 +92,13 @@
 					</Button>
 				{/if}
 			{/snippet}
-		</SettingsLabelSwitch>
+		</LabeledSwitch>
 	{/if}
 
 	<Separator />
 
 	<div class="grid gap-2">
-		<SettingsLabelSelect
+		<LabeledSelect
 			id="recording-retention-strategy"
 			label="Auto Delete Recordings"
 			items={[
@@ -118,7 +118,7 @@
 
 	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
 		<div class="grid gap-2">
-			<SettingsLabelSelect
+			<LabeledSelect
 				id="max-recording-count"
 				label="Maximum Recordings"
 				items={[
@@ -142,7 +142,7 @@
 
 	{#if window.__TAURI_INTERNALS__}
 		<div class="grid gap-2">
-			<SettingsLabelSelect
+			<LabeledSelect
 				id="always-on-top"
 				label="Always On Top"
 				items={ALWAYS_ON_TOP_OPTIONS}

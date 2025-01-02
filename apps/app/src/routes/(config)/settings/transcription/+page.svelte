@@ -11,10 +11,10 @@
 		WHISPERING_URL,
 	} from '@repo/shared';
 	import {
-		SettingsLabelInput,
-		SettingsLabelSelect,
-		SettingsLabelSwitch,
-	} from '$lib/components/labeled-input/index.js';
+		LabeledInput,
+		LabeledSelect,
+		LabeledSwitch,
+	} from '$lib/components/labeled/index.js';
 </script>
 
 <svelte:head>
@@ -31,7 +31,7 @@
 	<Separator />
 
 	<div class="grid gap-2">
-		<SettingsLabelSelect
+		<LabeledSelect
 			id="selected-transcription-service"
 			label="Transcription Service"
 			items={TRANSCRIPTION_SERVICE_OPTIONS}
@@ -47,7 +47,7 @@
 	</div>
 	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
 		<div class="grid gap-2">
-			<SettingsLabelInput
+			<LabeledInput
 				id="openai-api-key"
 				label="OpenAI API Key"
 				type="password"
@@ -83,7 +83,7 @@
 		</div>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
 		<div class="grid gap-2">
-			<SettingsLabelInput
+			<LabeledInput
 				id="groq-api-key"
 				label="Groq API Key"
 				type="password"
@@ -167,7 +167,7 @@
 		</Card.Root>
 
 		<div class="grid gap-2">
-			<SettingsLabelInput
+			<LabeledInput
 				id="faster-whisper-server-url"
 				label="faster-whisper-server URL"
 				placeholder="Your faster-whisper-server URL"
@@ -181,7 +181,7 @@
 			/>
 		</div>
 		<div class="grid gap-2">
-			<SettingsLabelInput
+			<LabeledInput
 				id="faster-whisper-server-model"
 				label="faster-whisper-server Model"
 				placeholder="Your faster-whisper-server Model"
@@ -196,7 +196,7 @@
 		</div>
 	{/if}
 	<div class="grid gap-2">
-		<SettingsLabelSelect
+		<LabeledSelect
 			id="output-language"
 			label="Output Language"
 			items={SUPPORTED_LANGUAGES_OPTIONS}
@@ -212,7 +212,7 @@
 	</div>
 
 	<div class="grid gap-2">
-		<SettingsLabelInput
+		<LabeledInput
 			id="temperature"
 			label="Temperature"
 			type="number"
@@ -235,7 +235,7 @@
 	</div>
 
 	<div class="grid gap-2">
-		<SettingsLabelTextarea
+		<LabeledTextarea
 			id="transcription-prompt"
 			label="System Prompt"
 			placeholder="Optional system prompt to guide the transcription"
