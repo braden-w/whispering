@@ -29,8 +29,6 @@ export type TransformationResult =
 export type Recording = RecordingsDbSchemaV4['recordings'];
 
 export type DbService = {
-	// Recording methods
-	get recordings(): Recording[];
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
 	addRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;

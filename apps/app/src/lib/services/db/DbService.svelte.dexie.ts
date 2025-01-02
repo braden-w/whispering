@@ -320,94 +320,9 @@ class RecordingsDatabase extends Dexie {
 }
 
 export function createDbDexieService(): DbService {
-	let recordings = $state<Recording[]>([]);
-	let pipelines = $state<Pipeline[]>([]);
-	let transformations = $state<Transformation[]>([]);
-	let pipelineRuns = $state<PipelineRun[]>([]);
-	let transformationResults = $state<TransformationResult[]>([]);
-
 	const db = new RecordingsDatabase();
 
-	const syncDbToRecordingsState = async () => {
-		const allRowsFromDbResult = await tryAsync({
-			try: async () => {
-				// Transaction gets recordings, pipelines, transformations, pipelineRuns, and transformationResults
-				const [
-					recordingsData,
-					// pipelinesData,
-					// transformationsData,
-					// pipelineRunsData,
-					// transformationResultsData,
-				] = await db.transaction(
-					'r',
-					[
-						db.recordings,
-						// db.pipelines,
-						// db.transformations,
-						// db.pipelineRuns,
-						// db.transformationResults,
-					],
-					async () => {
-						return Promise.all([
-							db.recordings.toArray(),
-							// db.pipelines.toArray(),
-							// db.transformations.toArray(),
-							// db.pipelineRuns.toArray(),
-							// db.transformationResults.toArray(),
-						]);
-					},
-				);
-
-				return {
-					recordingsData,
-					// pipelinesData,
-					// transformationsData,
-					// pipelineRunsData,
-					// transformationResultsData,
-				};
-			},
-			mapErr: (error) =>
-				DbServiceErr({
-					title: 'Error getting recordings from Dexie',
-					description: 'Please try again',
-					error,
-				}),
-		});
-
-		if (!allRowsFromDbResult.ok) {
-			toast.error({
-				title: 'Failed to initialize recordings',
-				description:
-					'Unable to load your recordings from the database. This could be due to browser storage issues or corrupted data.',
-				action: {
-					type: 'more-details',
-					error: allRowsFromDbResult.error,
-				},
-			});
-			return;
-		}
-		const {
-			recordingsData,
-			// pipelinesData,
-			// transformationsData,
-			// pipelineRunsData,
-			// transformationResultsData,
-		} = allRowsFromDbResult.data;
-
-		recordings = recordingsData;
-		// pipelines = pipelinesData;
-		// transformations = transformationsData;
-		// pipelineRuns = pipelineRunsData;
-		// transformationResults = transformationResultsData;
-	};
-
-	syncDbToRecordingsState();
-
 	return {
-		get recordings() {
-			return recordings;
-		},
-
 		async getAllRecordings() {
 			return tryAsync({
 				try: () => db.recordings.toArray(),
@@ -433,7 +348,6 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!addRecordingResult.ok) return addRecordingResult;
-			recordings.push(recording);
 			return Ok(undefined);
 		},
 
@@ -450,9 +364,6 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!updateRecordingResult.ok) return updateRecordingResult;
-			recordings = recordings.map((r) =>
-				r.id === recording.id ? recording : r,
-			);
 			return Ok(undefined);
 		},
 
@@ -469,7 +380,6 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
-			recordings = recordings.filter((r) => r.id !== recording.id);
 			return Ok(undefined);
 		},
 
