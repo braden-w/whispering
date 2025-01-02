@@ -46,68 +46,64 @@
 	/>
 
 	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
-		
-			<LabeledInput
-				id="openai-api-key"
-				label="OpenAI API Key"
-				type="password"
-				placeholder="Your OpenAI API Key"
-				value={settings.value['transcription.openAi.apiKey']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.openAi.apiKey': value,
-					};
-				}}
-			/>
-			<div class="text-muted-foreground text-sm">
-				You can find your API key in your <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/api-keys"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					account settings
-				</Button>. Make sure <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/settings/organization/billing/overview"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					billing
-				</Button>
-				is enabled.
-			</div>
-		
+		<LabeledInput
+			id="openai-api-key"
+			label="OpenAI API Key"
+			type="password"
+			placeholder="Your OpenAI API Key"
+			value={settings.value['transcription.openAi.apiKey']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.openAi.apiKey': value,
+				};
+			}}
+		/>
+		<div class="text-muted-foreground text-sm">
+			You can find your API key in your <Button
+				variant="link"
+				class="px-0.3 py-0.2 h-fit"
+				href="https://platform.openai.com/api-keys"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				account settings
+			</Button>. Make sure <Button
+				variant="link"
+				class="px-0.3 py-0.2 h-fit"
+				href="https://platform.openai.com/settings/organization/billing/overview"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				billing
+			</Button>
+			is enabled.
+		</div>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
-		
-			<LabeledInput
-				id="groq-api-key"
-				label="Groq API Key"
-				type="password"
-				placeholder="Your Groq API Key"
-				value={settings.value['transcription.groq.apiKey']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.groq.apiKey': value,
-					};
-				}}
-			/>
-			<div class="text-muted-foreground text-sm">
-				You can find your Groq API key in your <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://console.groq.com/keys"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Groq console
-				</Button>.
-			</div>
-		
+		<LabeledInput
+			id="groq-api-key"
+			label="Groq API Key"
+			type="password"
+			placeholder="Your Groq API Key"
+			value={settings.value['transcription.groq.apiKey']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.groq.apiKey': value,
+				};
+			}}
+		/>
+		<div class="text-muted-foreground text-sm">
+			You can find your Groq API key in your <Button
+				variant="link"
+				class="px-0.3 py-0.2 h-fit"
+				href="https://console.groq.com/keys"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Groq console
+			</Button>.
+		</div>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
@@ -166,34 +162,31 @@
 			</Card.Content>
 		</Card.Root>
 
-		
-			<LabeledInput
-				id="faster-whisper-server-url"
-				label="faster-whisper-server URL"
-				placeholder="Your faster-whisper-server URL"
-				value={settings.value['transcription.fasterWhisperServer.serverUrl']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.fasterWhisperServer.serverUrl': value,
-					};
-				}}
-			/>
-		
-		
-			<LabeledInput
-				id="faster-whisper-server-model"
-				label="faster-whisper-server Model"
-				placeholder="Your faster-whisper-server Model"
-				value={settings.value['transcription.fasterWhisperServer.serverModel']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.fasterWhisperServer.serverModel': value,
-					};
-				}}
-			/>
-		
+		<LabeledInput
+			id="faster-whisper-server-url"
+			label="faster-whisper-server URL"
+			placeholder="Your faster-whisper-server URL"
+			value={settings.value['transcription.fasterWhisperServer.serverUrl']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.fasterWhisperServer.serverUrl': value,
+				};
+			}}
+		/>
+
+		<LabeledInput
+			id="faster-whisper-server-model"
+			label="faster-whisper-server Model"
+			placeholder="Your faster-whisper-server Model"
+			value={settings.value['transcription.fasterWhisperServer.serverModel']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.fasterWhisperServer.serverModel': value,
+				};
+			}}
+		/>
 	{/if}
 
 	<LabeledSelect
@@ -210,40 +203,38 @@
 		placeholder="Select a language"
 	/>
 
-	
-		<LabeledInput
-			id="temperature"
-			label="Temperature"
-			type="number"
-			min="0"
-			max="1"
-			step="0.1"
-			placeholder="0"
-			value={settings.value['transcription.temperature']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.temperature': value,
-				};
-			}}
-		/>
-		<div class="text-muted-foreground text-sm">
-			Controls randomness in the model's output. 0 is focused and deterministic,
-			1 is more creative.
-		</div>
-	
+	<LabeledInput
+		id="temperature"
+		label="Temperature"
+		type="number"
+		min="0"
+		max="1"
+		step="0.1"
+		placeholder="0"
+		value={settings.value['transcription.temperature']}
+		oninput={({ currentTarget: { value } }) => {
+			settings.value = {
+				...settings.value,
+				'transcription.temperature': value,
+			};
+		}}
+	/>
+	<div class="text-muted-foreground text-sm">
+		Controls randomness in the model's output. 0 is focused and deterministic, 1
+		is more creative.
+	</div>
 
 	<LabeledTextarea
 		id="transcription-prompt"
 		label="System Prompt"
 		placeholder="Optional system prompt to guide the transcription"
 		value={settings.value['transcription.prompt']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.prompt': value,
-				};
-			}}
+		oninput={({ currentTarget: { value } }) => {
+			settings.value = {
+				...settings.value,
+				'transcription.prompt': value,
+			};
+		}}
 		description="Custom instructions to guide the transcription process. Leave empty for default behavior."
 	/>
 </div>
