@@ -15,10 +15,7 @@ export type DbServiceResult<T> = Ok<T> | DbServiceErr;
 export const DbServiceErr = (
 	properties: Omit<DbErrorProperties, '_tag'>,
 ): DbServiceErr => {
-	return Err({
-		_tag: 'DbServiceError',
-		...properties,
-	});
+	return Err({ _tag: 'DbServiceError', ...properties });
 };
 
 export type Recording = RecordingsDbSchemaV4['recordings'];

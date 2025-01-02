@@ -1,16 +1,11 @@
+import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
+import { DownloadService } from '$lib/services.svelte';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
-import type {
-	DbService,
-	Transformation,
-	TransformationResult,
-} from './DbService';
+import type { DbService } from './DbService';
 import { DbServiceErr } from './DbService';
-import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { DownloadService } from '$lib/services.svelte';
-import { nanoid } from 'nanoid/non-secure';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 4;
@@ -119,16 +114,14 @@ type RecordingsDbSchemaV1 = {
 
 class RecordingsDatabase extends Dexie {
 	recordings!: Dexie.Table<RecordingsDbSchemaV4['recordings'], string>;
-	// pipelines!: Dexie.Table<RecordingsDbSchemaV4['pipelines'], string>;
-	// transformations!: Dexie.Table<
-	// 	RecordingsDbSchemaV4['transformations'],
-	// 	string
-	// >;
-	// pipelineRuns!: Dexie.Table<RecordingsDbSchemaV4['pipelineRuns'], string>;
-	// transformationResults!: Dexie.Table<
-	// 	RecordingsDbSchemaV4['transformationResults'],
-	// 	string
-	// >;
+	transformations!: Dexie.Table<
+		RecordingsDbSchemaV4['transformations'],
+		string
+	>;
+	transformationRuns!: Dexie.Table<
+		RecordingsDbSchemaV4['transformationRuns'],
+		string
+	>;
 
 	constructor() {
 		super(DB_NAME);
@@ -450,7 +443,6 @@ export function createDbDexieService(): DbService {
 			}
 		},
 
-		// Transformation methods
 		async getAllTransformations() {
 			return tryAsync({
 				try: () => db.transformations.toArray(),
