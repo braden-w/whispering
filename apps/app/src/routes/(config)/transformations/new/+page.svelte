@@ -39,7 +39,7 @@
 	}
 </script>
 
-<Card.Root class="w-full">
+<Card.Root class="w-full max-w-4xl">
 	<Card.Header>
 		<Card.Title>Create New Transformation</Card.Title>
 		<Card.Description>
