@@ -13,7 +13,7 @@ const DB_VERSION = 4;
 export type Recording = RecordingsDbSchemaV4['recordings'];
 
 export type RecordingsDbSchemaV4 = {
-	recordings: Omit<RecordingsDbSchemaV3['recordings'], 'timestamp'> & {
+	recordings: RecordingsDbSchemaV3['recordings'] & {
 		createdAt: string;
 		updatedAt: string;
 	};
@@ -290,12 +290,9 @@ class RecordingsDatabase extends Dexie {
 		// Also migrate recordings timestamp to createdAt and updatedAt
 		this.version(4)
 			.stores({
-				recordings: '&id, createdAt, updatedAt',
-				// transformations: '&id, createdAt, updatedAt',
-				// pipelines: '&id, createdAt, updatedAt',
-				// pipelineRuns: '&id, pipelineId, recordingId, startedAt',
-				// transformationResults:
-				// 	'&id, pipelineRunId, transformationId, startedAt',
+				recordings: '&id, timestamp, createdAt, updatedAt',
+				transformations: '&id, createdAt, updatedAt',
+				transformationRuns: '&id, recordingId, startedAt',
 			})
 			.upgrade(async (tx) => {
 				try {
@@ -303,13 +300,11 @@ class RecordingsDatabase extends Dexie {
 						.table<RecordingsDbSchemaV3['recordings']>('recordings')
 						.toArray();
 
-					const newRecordings = oldRecordings.map(
-						({ timestamp, ...record }) => ({
-							...record,
-							createdAt: timestamp,
-							updatedAt: timestamp,
-						}),
-					);
+					const newRecordings = oldRecordings.map((record) => ({
+						...record,
+						createdAt: record.timestamp,
+						updatedAt: record.timestamp,
+					}));
 
 					await tx.table('recordings').clear();
 					await tx.table('recordings').bulkAdd(newRecordings);
