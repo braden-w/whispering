@@ -38,6 +38,7 @@
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
+	import { transcriber } from '$lib/stores/recordings.svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -298,7 +299,7 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordings.transcribeAndUpdateRecordingWithToast(
+									transcriber.transcribeAndUpdateRecordingWithToast(
 										recording.original,
 									),
 								),

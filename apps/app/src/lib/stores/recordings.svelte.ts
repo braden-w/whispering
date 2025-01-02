@@ -1,26 +1,19 @@
-import {
-	DownloadService,
-	DbService,
-	userConfiguredServices,
-} from '$lib/services.svelte';
+import { DbService, userConfiguredServices } from '$lib/services.svelte';
+import type { Recording } from '$lib/services/db';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
-import type { Recording } from '$lib/services/db';
 
-export const recordings = createRecordings();
+export const transcriber = createTranscriber();
 
-function createRecordings() {
+function createTranscriber() {
 	const transcribingRecordingIds = $state(new Set<string>());
 	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
 
 	return {
-		get value() {
-			return DbService.recordings;
-		},
 		get isCurrentlyTranscribing() {
 			return isCurrentlyTranscribing;
 		},

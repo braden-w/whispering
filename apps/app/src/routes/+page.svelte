@@ -7,16 +7,17 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
+	const recordingsQuery = createRecordingsQuery();
+
 	const latestRecording = $derived<Recording>(
-		recordings.value.at(-1) ?? {
+		recordingsQuery.data?.at(-1) ?? {
 			id: '',
 			title: '',
 			subtitle: '',

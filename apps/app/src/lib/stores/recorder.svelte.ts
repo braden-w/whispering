@@ -5,7 +5,7 @@ import {
 	userConfiguredServices,
 } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
-import { recordings } from '$lib/stores/recordings.svelte';
+import { recordings, transcriber } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
@@ -92,7 +92,7 @@ function createRecorder() {
 			] = await Promise.all([
 				(async () => {
 					const transcribeAndUpdateWithToastResult =
-						await recordings.transcribeAndUpdateRecordingWithToast(
+						await transcriber.transcribeAndUpdateRecordingWithToast(
 							newRecording,
 							{ toastId: stopRecordingToastId },
 						);

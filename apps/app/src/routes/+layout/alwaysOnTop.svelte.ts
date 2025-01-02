@@ -1,7 +1,7 @@
-import { recordings } from '$lib/stores/recordings.svelte';
+import { recorder } from '$lib/stores/recorder.svelte';
+import { transcriber } from '$lib/stores/recordings.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { recorder } from '$lib/stores/recorder.svelte';
 
 export function syncWindowAlwaysOnTopWithRecorderState() {
 	$effect(() => {
@@ -12,7 +12,7 @@ export function syncWindowAlwaysOnTopWithRecorderState() {
 			case 'When Recording and Transcribing':
 				if (
 					recorder.recorderState === 'SESSION+RECORDING' ||
-					recordings.isCurrentlyTranscribing
+					transcriber.isCurrentlyTranscribing
 				) {
 					void setAlwaysOnTop(true);
 				} else {

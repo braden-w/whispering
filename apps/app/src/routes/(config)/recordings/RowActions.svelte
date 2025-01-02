@@ -2,20 +2,23 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import {
+		createDeleteRecordingWithToast,
+		createDownloadRecordingWithToast,
+	} from '$lib/mutations/recordings';
 	import type { Recording } from '$lib/services/db';
-	import { recordings } from '$lib/stores/recordings.svelte';
+	import { transcriber } from '$lib/stores/recordings.svelte';
 	import { clipboard } from '$lib/utils/clipboard';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {
 		DownloadIcon,
+		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
-		Loader2Icon,
 	} from 'lucide-svelte';
 	import EditRowDialog from './EditRowDialog.svelte';
-	import { createDownloadRecordingWithToast } from '$lib/mutations/recordings';
-	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
+
 	let { recording }: { recording: Recording } = $props();
 
 	const downloadRecordingWithToast = createDownloadRecordingWithToast();
@@ -25,7 +28,7 @@
 <div class="flex items-center">
 	<WhisperingButton
 		tooltipContent="Transcribe recording"
-		onclick={() => recordings.transcribeAndUpdateRecordingWithToast(recording)}
+		onclick={() => transcriber.transcribeAndUpdateRecordingWithToast(recording)}
 		variant="ghost"
 		size="icon"
 	>
