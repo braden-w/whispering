@@ -455,8 +455,8 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async addTransformation(transformation) {
-			const addTransformationResult = await tryAsync({
+		async createTransformation(transformation) {
+			const createTransformationResult = await tryAsync({
 				try: () => db.transformations.add(transformation),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -465,7 +465,7 @@ export function createDbDexieService(): DbService {
 						error,
 					}),
 			});
-			if (!addTransformationResult.ok) return addTransformationResult;
+			if (!createTransformationResult.ok) return createTransformationResult;
 			return Ok(undefined);
 		},
 

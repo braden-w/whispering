@@ -40,7 +40,7 @@ export type DbService = {
 	) => Promise<DbServiceResult<void>>;
 
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
-	addTransformation: (
+	createTransformation: (
 		transformation: Transformation,
 	) => Promise<DbServiceResult<void>>;
 	updateTransformation: (
