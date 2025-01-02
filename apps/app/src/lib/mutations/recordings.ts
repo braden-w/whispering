@@ -1,17 +1,8 @@
 import { recordingsKeys } from '$lib/queries/recordings';
-import {
-	DbService,
-	DownloadService,
-	userConfiguredServices,
-} from '$lib/services.svelte';
+import { DbService, DownloadService } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
-import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
-import { WhisperingErr } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
 import { createMutation, useQueryClient } from '@tanstack/svelte-query';
-import { Ok } from '@epicenterhq/result';
-import { settings } from '$lib/stores/settings.svelte';
 
 export const createUpdateRecordingWithToast = () => {
 	const queryClient = useQueryClient();
