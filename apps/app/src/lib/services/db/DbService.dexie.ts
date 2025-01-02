@@ -24,58 +24,63 @@ export type RecordingsDbSchemaV4 = {
 		createdAt: string;
 		updatedAt: string;
 	};
-	/**
-	 * A transformation is a reusable text transformation that can be used in multiple pipelines.
-	 * The actual order and pipeline-specific settings are stored in pipelineTransformations.
-	 */
 	transformations: {
-		id: string;
-		name: string;
-		description: string;
-		createdAt: string;
-		updatedAt: string;
-
-		type: 'find_replace' | 'prompt_transform';
-
-		'find_replace.findText': string;
-		'find_replace.replaceText': string;
-		'find_replace.useRegex': boolean;
-
-		'prompt_transform.model': string;
-		'prompt_transform.systemPromptTemplate': string;
-		'prompt_transform.userPromptTemplate': string;
-	};
-	pipelines: {
 		id: string;
 		title: string;
 		description: string;
 		createdAt: string;
 		updatedAt: string;
-		transformations: {
-			transformationId: string;
-			enabled: boolean;
-		}[];
-	};
-	pipelineRuns: {
-		id: string;
-		pipelineId: string;
-		recordingId: string;
 		/**
-		 * The input to the pipeline is the transcribed text of the recording.
+		 * A transformationStep is a single step in a transformation.
+		 * It can be one of several types of text transformations:
+		 * - find_replace: Replace text patterns with new text
+		 * - prompt_transform: Use AI to transform text based on prompts
+		 */
+		transformationSteps: {
+			id: string;
+			title: string;
+			description: string;
+			createdAt: string;
+			updatedAt: string;
+
+			type: 'find_replace' | 'prompt_transform';
+
+			'find_replace.findText': string;
+			'find_replace.replaceText': string;
+			'find_replace.useRegex': boolean;
+
+			'prompt_transform.model': string;
+			'prompt_transform.systemPromptTemplate': string;
+			'prompt_transform.userPromptTemplate': string;
+		};
+	};
+
+	/**
+	 * Can be invoked on a recording or on arbitrary text.
+	 */
+	transformationRuns: {
+		id: string;
+		/**
+		 * The recording that this transformation is invoked on, if any.
+		 *
+		 * Null if the transformation is invoked on arbitrary text input.
+		 */
+		recordingId: string | null;
+		/**
+		 * Because the recording's transcribedText can change after invoking,
+		 * we store a snapshot of the transcribedText at the time of invoking.
 		 */
 		input: string;
 		status: 'running' | 'completed' | 'failed';
 		startedAt: string;
-		completedAt: string | null;
-		error: string | null;
-		output: string | null;
-	};
-	transformationResults: {
-		id: string;
-		pipelineRunId: string;
-		transformationId: string;
-		status: 'running' | 'completed' | 'failed';
-		startedAt: string;
+		transformationStepRuns: {
+			id: string;
+			status: 'running' | 'completed' | 'failed';
+			startedAt: string;
+			completedAt: string | null;
+			error: string | null;
+			output: string | null;
+		};
 		completedAt: string | null;
 		error: string | null;
 		output: string | null;
