@@ -6,7 +6,7 @@
 	let {
 		id,
 		label,
-		value,
+		value = $bindable(),
 		placeholder = '',
 		disabled = false,
 		description,

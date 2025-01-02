@@ -3,6 +3,7 @@
 		LabeledInput,
 		LabeledSelect,
 		LabeledSwitch,
+		LabeledTextarea,
 	} from '$lib/components/labeled/index.js';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
@@ -160,7 +161,7 @@
 															step['prompt_transform.model'] = value;
 														}}
 													/>
-													<LabeledInput
+													<LabeledTextarea
 														id="prompt_transform.systemPromptTemplate"
 														label="System Prompt Template"
 														bind:value={step[
@@ -168,7 +169,7 @@
 														]}
 														placeholder="Enter system prompt template"
 													/>
-													<LabeledInput
+													<LabeledTextarea
 														id="prompt_transform.userPromptTemplate"
 														label="User Prompt Template"
 														bind:value={step[
