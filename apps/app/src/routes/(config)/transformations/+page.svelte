@@ -8,7 +8,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
-	import type { Transformation } from '$lib/services/db';
+	import { generateDefaultTransformation, type Transformation } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -272,27 +272,7 @@
 									Create a new transformation to transform text.
 								</Dialog.Description>
 							</Dialog.Header>
-							<RenderTransformation
-								initialTransformation={{
-									id: nanoid(),
-									title: '',
-									description: '',
-									createdAt: new Date().toISOString(),
-									updatedAt: new Date().toISOString(),
-									steps: [
-										{
-											id: nanoid(),
-											type: 'prompt_transform',
-											'prompt_transform.model': 'gpt-4o',
-											'prompt_transform.systemPromptTemplate': '',
-											'prompt_transform.userPromptTemplate': '',
-											'find_replace.findText': '',
-											'find_replace.replaceText': '',
-											'find_replace.useRegex': false,
-										},
-									],
-								}}
-							/>
+							<RenderTransformation initialTransformation={generateDefaultTransformation()} />
 							<Dialog.Footer>
 								<Dialog.Close>Cancel</Dialog.Close>
 								<Button>Create</Button>

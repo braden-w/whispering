@@ -1,6 +1,10 @@
 import { Err, type Ok } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
-import type { RecordingsDbSchemaV4 } from './DbService.dexie';
+import type {
+	RecordingsDbSchemaV4,
+	TransformationStep,
+} from './DbService.dexie';
+import { nanoid } from 'nanoid/non-secure';
 
 type DbErrorProperties = {
 	_tag: 'DbServiceError';
@@ -21,6 +25,31 @@ export const DbServiceErr = (
 export type Recording = RecordingsDbSchemaV4['recordings'];
 export type Transformation = RecordingsDbSchemaV4['transformations'];
 export type TransformationResult = RecordingsDbSchemaV4['transformationRuns'];
+
+export function generateDefaultTransformation() {
+	const now = new Date().toISOString();
+	return {
+		id: nanoid(),
+		title: '',
+		description: '',
+		createdAt: now,
+		updatedAt: now,
+		steps: [generateDefaultTransformationStep()],
+	} satisfies Transformation;
+}
+
+export function generateDefaultTransformationStep() {
+	return {
+		id: nanoid(),
+		type: 'prompt_transform',
+		'prompt_transform.model': 'gpt-4o',
+		'prompt_transform.systemPromptTemplate': '',
+		'prompt_transform.userPromptTemplate': '',
+		'find_replace.findText': '',
+		'find_replace.replaceText': '',
+		'find_replace.useRegex': false,
+	} satisfies TransformationStep;
+}
 
 export type DbService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;

@@ -10,7 +10,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { PlusIcon, TrashIcon } from 'lucide-svelte';
-	import { nanoid } from 'nanoid/non-secure';
+	import { generateDefaultTransformationStep } from '$lib/services/db';
 
 	let { initialTransformation }: { initialTransformation: Transformation } =
 		$props();
@@ -23,16 +23,7 @@
 	function addStep() {
 		transformation.steps = [
 			...transformation.steps,
-			{
-				id: nanoid(),
-				type: 'prompt_transform',
-				'prompt_transform.model': 'gpt-4o',
-				'prompt_transform.systemPromptTemplate': '',
-				'prompt_transform.userPromptTemplate': '',
-				'find_replace.findText': '',
-				'find_replace.replaceText': '',
-				'find_replace.useRegex': false,
-			},
+			generateDefaultTransformationStep(),
 		];
 	}
 
