@@ -98,13 +98,12 @@
 			<Dialog.Footer>
 				<Button
 					class="mr-auto"
-					onclick={async () => {
-						await deleteRecordingWithToastMutation.mutate(recording, {
+					onclick={() =>
+						deleteRecordingWithToastMutation.mutate(recording, {
 							onSettled: () => {
 								isDialogOpen = false;
 							},
-						});
-					}}
+						})}
 					variant="destructive"
 					disabled={deleteRecordingWithToastMutation.isPending}
 				>
@@ -113,11 +112,14 @@
 					{/if}
 					Delete
 				</Button>
-				<Button onclick={() => (isDialogOpen = false)} variant="secondary"
-					>Cancel</Button
+				<Button onclick={() => (isDialogOpen = false)} variant="secondary">
+					Cancel
+				</Button>
+				<Button
+					type="submit"
+					disabled={updateRecordingWithToastMutation.isPending}
 				>
-				<Button type="submit" disabled={updateRecordingWithToast.isPending}>
-					{#if updateRecordingWithToast.isPending}
+					{#if updateRecordingWithToastMutation.isPending}
 						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
 					Save
