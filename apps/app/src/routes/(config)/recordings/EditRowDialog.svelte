@@ -56,7 +56,7 @@
 		</Dialog.Header>
 		<form
 			class="grid gap-4 py-4"
-			onsubmit={async (e) => {
+			onsubmit={(e) => {
 				e.preventDefault();
 				updateRecordingWithToastMutation.mutate(recording, {
 					onSettled: () => {
