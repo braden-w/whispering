@@ -19,11 +19,18 @@
 
 	let transformation = $state(generateDefaultTransformation());
 
+	let currentlyOpenStepId = $state<string | undefined>();
+
 	function addStep() {
 		transformation.steps = [
 			...transformation.steps,
 			generateDefaultTransformationStep(),
 		];
+
+		if (transformation.steps.length > 0) {
+			const lastStep = transformation.steps.at(-1);
+			currentlyOpenStepId = lastStep?.id;
+		}
 	}
 
 	function removeStep(index: number) {
@@ -79,7 +86,11 @@
 				</Button>
 			</Card.Header>
 			<Card.Content class="pt-6">
-				<Accordion.Root type="single" class="w-full space-y-4">
+				<Accordion.Root
+					type="single"
+					class="w-full space-y-4"
+					bind:value={currentlyOpenStepId}
+				>
 					{#each transformation.steps as step, index}
 						<Card.Root>
 							<Card.Content class="p-0">
