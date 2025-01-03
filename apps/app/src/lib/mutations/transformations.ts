@@ -4,6 +4,37 @@ import type { Transformation } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
 import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 
+export const createCreateTransformationWithToast = () => {
+	const queryClient = useQueryClient();
+
+	return createMutation(() => ({
+		mutationFn: async (transformation: Transformation) => {
+			const result = await DbService.createTransformation(transformation);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to create transformation!',
+					description: 'Your transformation could not be created.',
+				});
+				throw result.error;
+			}
+			toast.success({
+				title: 'Created transformation!',
+				description: 'Your transformation has been created successfully.',
+			});
+			return transformation;
+		},
+		onSuccess: (newTransformation) => {
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [newTransformation];
+					return [...oldData, newTransformation];
+				},
+			);
+		},
+	}));
+};
+
 export const createUpdateTransformationWithToast = () => {
 	const queryClient = useQueryClient();
 
@@ -68,33 +99,3 @@ export const createDeleteTransformationWithToast = () => {
 	}));
 };
 
-export const createCreateTransformationWithToast = () => {
-	const queryClient = useQueryClient();
-
-	return createMutation(() => ({
-		mutationFn: async (transformation: Transformation) => {
-			const result = await DbService.createTransformation(transformation);
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to create transformation!',
-					description: 'Your transformation could not be created.',
-				});
-				throw result.error;
-			}
-			toast.success({
-				title: 'Created transformation!',
-				description: 'Your transformation has been created successfully.',
-			});
-			return transformation;
-		},
-		onSuccess: (newTransformation) => {
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [newTransformation];
-					return [...oldData, newTransformation];
-				},
-			);
-		},
-	}));
-};

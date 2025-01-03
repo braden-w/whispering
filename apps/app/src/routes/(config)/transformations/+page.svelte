@@ -195,6 +195,10 @@
 	const selectedTransformationRows = $derived(
 		table.getFilteredSelectedRowModel().rows,
 	);
+
+	let transformation = $state(generateDefaultTransformation());
+	const createTransformationWithToastMutation =
+		createCreateTransformationWithToast();
 </script>
 
 <svelte:head>
@@ -258,23 +262,38 @@
 				</div>
 
 				<div class="ml-auto flex items-center gap-2">
-					<Button href="/transformations/new">
-						<PlusIcon class="h-4 w-4" />
-						Create Transformation
-					</Button>
+					<Dialog.Root>
+						<Dialog.Trigger>
+							{#snippet child({ props })}
+								<Button {...props}>
+									<PlusIcon class="h-4 w-4" />
+									Create Transformation
+								</Button>
+							{/snippet}
+						</Dialog.Trigger>
 
-					<Dialog.Content>
-						<Dialog.Header>
-							<Dialog.Title>Create Transformation</Dialog.Title>
-							<Dialog.Description>
-								Create a new transformation to transform text.
-							</Dialog.Description>
-						</Dialog.Header>
-						<Dialog.Footer>
-							<Dialog.Close>Cancel</Dialog.Close>
-							<Button>Create</Button>
-						</Dialog.Footer>
-					</Dialog.Content>
+						<Dialog.Content>
+							<Dialog.Header>
+								<Dialog.Title>Create Transformation</Dialog.Title>
+								<Dialog.Description>
+									Create a new transformation to transform text.
+								</Dialog.Description>
+							</Dialog.Header>
+							<RenderTransformation
+								title="Create Transformation"
+								description="Configure your transformation's basic information"
+								{transformation}
+								onChange={(newTransformation) => {
+									transformation = newTransformation;
+								}}
+								onSubmit={createTransformationWithToastMutation.mutate}
+							/>
+							<Dialog.Footer>
+								<Dialog.Close>Cancel</Dialog.Close>
+								<Button>Create</Button>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
 
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger
