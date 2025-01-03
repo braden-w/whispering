@@ -13,7 +13,12 @@
 	import { onDestroy } from 'svelte';
 	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 
-	let { recording }: { recording: Recording } = $props();
+	let { recording: initialRecording }: { recording: Recording } = $props();
+	let recording = $state(structuredClone($state.snapshot(initialRecording)));
+
+	$effect(() => {
+		recording = structuredClone($state.snapshot(initialRecording));
+	});
 
 	const updateRecordingWithToastMutation = createUpdateRecordingWithToast();
 	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
@@ -23,8 +28,8 @@
 	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
-		if (!recording.blob) return undefined;
-		return blobUrlManager.createUrl(recording.blob);
+		if (!initialRecording.blob) return undefined;
+		return blobUrlManager.createUrl(initialRecording.blob);
 	});
 
 	onDestroy(() => {
