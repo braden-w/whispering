@@ -14,6 +14,7 @@ export const createUpdateRecordingWithToast = () => {
 				toast.error({
 					title: 'Failed to update recording!',
 					description: 'Your recording could not be updated.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}
@@ -44,6 +45,7 @@ export const createDeleteRecordingWithToast = () => {
 				toast.error({
 					title: 'Failed to delete recording!',
 					description: 'Your recording could not be deleted.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}
@@ -72,6 +74,7 @@ export const createDeleteRecordingsWithToast = () => {
 				toast.error({
 					title: 'Failed to delete recordings!',
 					description: 'Your recordings could not be deleted.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}

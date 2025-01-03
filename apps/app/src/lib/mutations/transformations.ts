@@ -16,6 +16,7 @@ export const createCreateTransformationWithToast = () => {
 				toast.error({
 					title: 'Failed to create transformation!',
 					description: 'Your transformation could not be created.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}
@@ -49,6 +50,7 @@ export const createUpdateTransformationWithToast = () => {
 				toast.error({
 					title: 'Failed to update transformation!',
 					description: 'Your transformation could not be updated.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}
@@ -82,6 +84,7 @@ export const createDeleteTransformationWithToast = () => {
 				toast.error({
 					title: 'Failed to delete transformation!',
 					description: 'Your transformation could not be deleted.',
+					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;
 			}
