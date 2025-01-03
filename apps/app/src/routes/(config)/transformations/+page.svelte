@@ -29,7 +29,10 @@
 	import { z } from 'zod';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
-	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
+	import {
+		createCreateTransformationWithToast,
+		createDeleteTransformationWithToast,
+	} from '$lib/mutations/transformations';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import RenderTransformation from './new/RenderTransformation.svelte';
 	import { nanoid } from 'nanoid/non-secure';
@@ -197,6 +200,7 @@
 	);
 
 	let transformation = $state(generateDefaultTransformation());
+	let isDialogOpen = $state(false);
 	const createTransformationWithToastMutation =
 		createCreateTransformationWithToast();
 </script>
@@ -262,7 +266,7 @@
 				</div>
 
 				<div class="ml-auto flex items-center gap-2">
-					<Dialog.Root>
+					<Dialog.Root bind:open={isDialogOpen}>
 						<Dialog.Trigger>
 							{#snippet child({ props })}
 								<Button {...props}>
@@ -280,17 +284,32 @@
 								</Dialog.Description>
 							</Dialog.Header>
 							<RenderTransformation
-								title="Create Transformation"
-								description="Configure your transformation's basic information"
 								{transformation}
 								onChange={(newTransformation) => {
 									transformation = newTransformation;
 								}}
-								onSubmit={createTransformationWithToastMutation.mutate}
 							/>
 							<Dialog.Footer>
-								<Dialog.Close>Cancel</Dialog.Close>
-								<Button>Create</Button>
+								<Button
+									variant="outline"
+									onclick={() => (isDialogOpen = false)}
+								>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									onclick={() =>
+										createTransformationWithToastMutation.mutate(
+											transformation,
+											{
+												onSuccess: () => {
+													isDialogOpen = false;
+												},
+											},
+										)}
+								>
+									Create
+								</Button>
 							</Dialog.Footer>
 						</Dialog.Content>
 					</Dialog.Root>
