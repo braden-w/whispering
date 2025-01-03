@@ -79,7 +79,7 @@
 				</Button>
 			</Card.Header>
 			<Card.Content class="pt-6">
-				<Accordion.Root type="multiple" class="w-full space-y-4">
+				<Accordion.Root type="single" class="w-full space-y-4">
 					{#each transformation.steps as step, index}
 						<Card.Root>
 							<Card.Content class="p-0">
