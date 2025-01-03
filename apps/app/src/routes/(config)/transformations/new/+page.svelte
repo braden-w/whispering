@@ -83,11 +83,14 @@
 					{#each transformation.steps as step, index}
 						<Card.Root>
 							<Card.Content class="p-0">
-								<Accordion.Item value={step.id}>
+								<Accordion.Item class="border-b-0" value={step.id}>
 									<div class="flex items-center justify-between px-4 py-2">
 										<Accordion.Trigger class="flex-1">
 											<span class="text-sm font-medium">
-												Step {index + 1}: {step.type === 'prompt_transform'
+												{#if transformation.steps.length > 1}
+													Step {index + 1}:
+												{/if}
+												{step.type === 'prompt_transform'
 													? 'Prompt Transform'
 													: 'Find Replace'}
 											</span>
