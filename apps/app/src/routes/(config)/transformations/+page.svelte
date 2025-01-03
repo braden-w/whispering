@@ -276,7 +276,7 @@
 							{/snippet}
 						</Dialog.Trigger>
 
-						<Dialog.Content>
+						<Dialog.Content class="overflow-y-auto max-h-[90vh] max-w-3xl">
 							<Dialog.Header>
 								<Dialog.Title>Create Transformation</Dialog.Title>
 								<Dialog.Description>

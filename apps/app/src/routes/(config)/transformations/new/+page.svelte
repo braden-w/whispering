@@ -14,7 +14,9 @@
 <Card.Root class="w-full max-w-4xl">
 	<Card.Header>
 		<Card.Title>Create Transformation</Card.Title>
-		<Card.Description>Configure your transformation</Card.Description>
+		<Card.Description>
+			Create a new transformation to transform text.
+		</Card.Description>
 	</Card.Header>
 	<Card.Content class="space-y-6">
 		<RenderTransformation
