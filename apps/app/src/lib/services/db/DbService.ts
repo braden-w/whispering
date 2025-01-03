@@ -1,10 +1,10 @@
 import { Err, type Ok } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
+import { nanoid } from 'nanoid/non-secure';
 import type {
-	RecordingsDbSchemaV4,
+	InsertTransformation,
 	TransformationStep,
 } from './DbService.dexie';
-import { nanoid } from 'nanoid/non-secure';
 
 type DbErrorProperties = {
 	_tag: 'DbServiceError';
@@ -22,18 +22,11 @@ export const DbServiceErr = (
 	return Err({ _tag: 'DbServiceError', ...properties });
 };
 
-export type Recording = RecordingsDbSchemaV4['recordings'];
-export type Transformation = RecordingsDbSchemaV4['transformations'];
-export type TransformationResult = RecordingsDbSchemaV4['transformationRuns'];
-
-export function generateDefaultTransformation(): Transformation {
-	const now = new Date().toISOString();
+export function generateDefaultTransformation(): InsertTransformation {
 	return {
 		id: nanoid(),
 		title: '',
 		description: '',
-		createdAt: now,
-		updatedAt: now,
 		steps: [generateDefaultTransformationStep()],
 	};
 }

@@ -1,2 +1,2 @@
 export * from './DbService';
-export * from './DbService.svelte.indexedDb';
+export * from './DbService.dexie';

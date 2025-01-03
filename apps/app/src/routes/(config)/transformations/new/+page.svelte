@@ -1,25 +1,52 @@
 <script lang="ts">
-	import { createCreateTransformationWithToast } from '$lib/mutations/transformations';
-	import { generateDefaultTransformation } from '$lib/services/db';
-	import RenderTransformation from './RenderTransformation.svelte';
 	import { goto } from '$app/navigation';
+	import {
+		LabeledInput,
+		LabeledSelect,
+		LabeledSwitch,
+		LabeledTextarea,
+	} from '$lib/components/labeled/index.js';
+	import * as Accordion from '$lib/components/ui/accordion';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Separator } from '$lib/components/ui/separator';
+	import { createCreateTransformationWithToast } from '$lib/mutations/transformations';
+	import {
+		generateDefaultTransformation,
+		generateDefaultTransformationStep,
+	} from '$lib/services/db';
+	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
+	import { CopyIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+	import RenderTransformation from './RenderTransformation.svelte';
 
 	let transformation = $state(generateDefaultTransformation());
 	const createTransformationWithToastMutation =
 		createCreateTransformationWithToast();
 </script>
 
-<RenderTransformation
-	title="Create New Transformation"
-	description="Configure your transformation's basic information"
-	{transformation}
-	onChange={(newTransformation) => {
-		transformation = newTransformation;
-	}}
-	onSubmit={() =>
-		createTransformationWithToastMutation.mutate(transformation, {
-			onSuccess: () => {
-				goto('/transformations');
-			},
-		})}
-/>
+<Card.Root class="w-full max-w-4xl">
+	<Card.Header>
+		<Card.Title>Create Transformation</Card.Title>
+		<Card.Description>Configure your transformation</Card.Description>
+	</Card.Header>
+	<Card.Content class="space-y-6">
+		<RenderTransformation
+			{transformation}
+			onChange={(newTransformation) => {
+				transformation = newTransformation;
+			}}
+		/>
+		<Card.Footer class="flex justify-end gap-2">
+			<Button
+				onclick={() =>
+					createTransformationWithToastMutation.mutate(transformation, {
+						onSuccess: () => {
+							goto('/transformations');
+						},
+					})}
+			>
+				Create Transformation
+			</Button>
+		</Card.Footer>
+	</Card.Content>
+</Card.Root>
