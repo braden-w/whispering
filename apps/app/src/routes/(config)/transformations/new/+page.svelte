@@ -28,11 +28,10 @@
 		<Card.Footer class="flex justify-end gap-2">
 			<Button
 				onclick={() =>
-					createTransformationWithToastMutation.mutate(transformation, {
-						onSuccess: () => {
-							goto('/transformations');
-						},
-					})}
+					createTransformationWithToastMutation.mutate(
+						$state.snapshot(transformation),
+						{ onSuccess: () => goto('/transformations') },
+					)}
 			>
 				Create Transformation
 			</Button>

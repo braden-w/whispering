@@ -300,7 +300,7 @@
 									type="submit"
 									onclick={() =>
 										createTransformationWithToastMutation.mutate(
-											transformation,
+											$state.snapshot(transformation),
 											{
 												onSuccess: () => {
 													isDialogOpen = false;
