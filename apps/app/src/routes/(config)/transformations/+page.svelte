@@ -304,6 +304,7 @@
 											{
 												onSuccess: () => {
 													isDialogOpen = false;
+													transformation = generateDefaultTransformation();
 												},
 											},
 										)}
