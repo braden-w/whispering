@@ -3,6 +3,7 @@ import type { Settings } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type {
 	InsertTransformation,
+	Transformation,
 	TransformationStep,
 } from './DbService.dexie';
 
@@ -63,11 +64,11 @@ export type DbService = {
 
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
 	createTransformation: (
-		transformation: Transformation,
-	) => Promise<DbServiceResult<void>>;
+		transformation: Omit<Transformation, 'createdAt' | 'updatedAt'>,
+	) => Promise<DbServiceResult<Transformation>>;
 	updateTransformation: (
-		transformation: Transformation,
-	) => Promise<DbServiceResult<void>>;
+		transformation: Omit<Transformation, 'updatedAt'>,
+	) => Promise<DbServiceResult<Transformation>>;
 	deleteTransformation: (
 		transformation: Transformation,
 	) => Promise<DbServiceResult<void>>;

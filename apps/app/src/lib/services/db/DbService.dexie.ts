@@ -474,7 +474,7 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async createTransformation(transformation: InsertTransformation) {
+		async createTransformation(transformation) {
 			const now = new Date().toISOString();
 			const transformationWithTimestamps = {
 				...transformation,
@@ -491,7 +491,7 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!createTransformationResult.ok) return createTransformationResult;
-			return Ok(undefined);
+			return Ok(transformationWithTimestamps);
 		},
 
 		async updateTransformation(transformation) {
@@ -510,7 +510,7 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!updateTransformationResult.ok) return updateTransformationResult;
-			return Ok(undefined);
+			return Ok(transformationWithTimestamp);
 		},
 
 		async deleteTransformation(transformation) {

@@ -8,8 +8,10 @@ export const createCreateTransformationWithToast = () => {
 	const queryClient = useQueryClient();
 
 	return createMutation(() => ({
-		mutationFn: async (transformation: Transformation) => {
-			const result = await DbService.createTransformation(transformation);
+		mutationFn: async (
+			...params: Parameters<typeof DbService.createTransformation>
+		) => {
+			const result = await DbService.createTransformation(...params);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to create transformation!',
@@ -21,7 +23,7 @@ export const createCreateTransformationWithToast = () => {
 				title: 'Created transformation!',
 				description: 'Your transformation has been created successfully.',
 			});
-			return transformation;
+			return result.data;
 		},
 		onSuccess: (newTransformation) => {
 			queryClient.setQueryData<Transformation[]>(
@@ -39,8 +41,10 @@ export const createUpdateTransformationWithToast = () => {
 	const queryClient = useQueryClient();
 
 	return createMutation(() => ({
-		mutationFn: async (transformation: Transformation) => {
-			const result = await DbService.updateTransformation(transformation);
+		mutationFn: async (
+			...params: Parameters<typeof DbService.updateTransformation>
+		) => {
+			const result = await DbService.updateTransformation(...params);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to update transformation!',
@@ -52,7 +56,7 @@ export const createUpdateTransformationWithToast = () => {
 				title: 'Updated transformation!',
 				description: 'Your transformation has been updated successfully.',
 			});
-			return transformation;
+			return result.data;
 		},
 		onSuccess: (updatedTransformation) => {
 			queryClient.setQueryData<Transformation[]>(
@@ -98,4 +102,3 @@ export const createDeleteTransformationWithToast = () => {
 		},
 	}));
 };
-
