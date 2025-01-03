@@ -2,6 +2,7 @@
 	import { createCreateTransformationWithToast } from '$lib/mutations/transformations';
 	import { generateDefaultTransformation } from '$lib/services/db';
 	import RenderTransformation from './RenderTransformation.svelte';
+	import { goto } from '$app/navigation';
 
 	let transformation = $state(generateDefaultTransformation());
 	const createTransformationWithToastMutation =
@@ -15,5 +16,10 @@
 	onChange={(newTransformation) => {
 		transformation = newTransformation;
 	}}
-	onSubmit={createTransformationWithToastMutation.mutate}
+	onSubmit={() =>
+		createTransformationWithToastMutation.mutate(transformation, {
+			onSuccess: () => {
+				goto('/transformations');
+			},
+		})}
 />
