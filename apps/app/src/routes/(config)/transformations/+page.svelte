@@ -378,25 +378,8 @@
 								<Table.Cell>
 									<Skeleton class="h-4 w-4" />
 								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-4 w-[50px]" />
-								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-4 w-[250px]" />
-								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-4 w-[350px]" />
-								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-4 w-[100px]" />
-								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-4 w-[100px]" />
-								</Table.Cell>
-								<Table.Cell>
-									<div class="flex justify-end">
-										<Skeleton class="h-8 w-8" />
-									</div>
+								<Table.Cell colspan={columns.length - 1}>
+									<Skeleton class="h-4 w-full" />
 								</Table.Cell>
 							</Table.Row>
 						{/each}
