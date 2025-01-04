@@ -28,6 +28,7 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'recording.bitrateKbps': DEFAULT_BITRATE_KBPS,
 
 		'transcription.selectedTranscriptionService': 'OpenAI',
+		'transcription.groq.model': 'whisper-large-v3',
 		'transcription.outputLanguage': 'auto',
 		'transcription.prompt': '',
 		'transcription.temperature': '0',
