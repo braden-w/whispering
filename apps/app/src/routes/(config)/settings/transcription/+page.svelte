@@ -93,6 +93,17 @@
 				};
 			}}
 		/>
+		<div class="text-muted-foreground text-sm">
+			You can find more details about the models in the <Button
+				variant="link"
+				class="px-0.3 py-0.2 h-fit"
+				href="https://console.groq.com/docs/speech-text"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Groq docs
+			</Button>.
+		</div>
 		<LabeledInput
 			id="groq-api-key"
 			label="Groq API Key"
