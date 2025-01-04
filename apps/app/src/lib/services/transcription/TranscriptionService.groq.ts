@@ -64,12 +64,12 @@ export function createTranscriptionServiceGroq({
 			if (options.temperature)
 				formData.append('temperature', options.temperature);
 			const postResult = await HttpService.post({
-				url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 				formData,
-				schema: whisperApiResponseSchema,
+				url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 				headers: {
 					Authorization: `Bearer ${settings.value['transcription.groq.apiKey']}`,
 				},
+				schema: whisperApiResponseSchema,
 			});
 			if (!postResult.ok) {
 				return HttpServiceErrIntoTranscriptionServiceErr(postResult);

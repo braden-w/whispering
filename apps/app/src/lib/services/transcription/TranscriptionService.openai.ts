@@ -64,8 +64,7 @@ export function createTranscriptionServiceWhisper({
 			if (options.prompt) formData.append('prompt', options.prompt);
 			if (options.temperature)
 				formData.append('temperature', options.temperature);
-
-			const postResponseResult = await HttpService.post({
+			const postResult = await HttpService.post({
 				formData,
 				url: 'https://api.openai.com/v1/audio/transcriptions',
 				headers: {
@@ -73,10 +72,10 @@ export function createTranscriptionServiceWhisper({
 				},
 				schema: whisperApiResponseSchema,
 			});
-			if (!postResponseResult.ok) {
-				return HttpServiceErrIntoTranscriptionServiceErr(postResponseResult);
+			if (!postResult.ok) {
+				return HttpServiceErrIntoTranscriptionServiceErr(postResult);
 			}
-			const whisperApiResponse = postResponseResult.data;
+			const whisperApiResponse = postResult.data;
 			if ('error' in whisperApiResponse) {
 				return TranscriptionServiceErr({
 					title: 'Server error from Whisper API',
