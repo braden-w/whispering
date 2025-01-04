@@ -10,7 +10,13 @@ import { whisperApiResponseSchema } from './schemas';
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
-interface WhisperServiceConfig {
+export function createWhisperService({
+	HttpService,
+	modelName,
+	postConfig,
+	preValidate,
+	errorConfig,
+}: {
 	HttpService: HttpService;
 	modelName: string;
 	postConfig: {
@@ -22,15 +28,7 @@ interface WhisperServiceConfig {
 		title: string;
 		description: string;
 	};
-}
-
-export function createWhisperService({
-	HttpService,
-	modelName,
-	postConfig,
-	preValidate,
-	errorConfig,
-}: WhisperServiceConfig): TranscriptionService {
+}): TranscriptionService {
 	return {
 		transcribe: async (audioBlob, options) => {
 			const validationResult = await preValidate();
