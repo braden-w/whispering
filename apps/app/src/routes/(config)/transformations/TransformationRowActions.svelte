@@ -26,30 +26,13 @@
 	<EditTransformationDialog {transformation}></EditTransformationDialog>
 
 	<WhisperingButton
-		tooltipContent="Copy transcribed text"
-		onclick={() =>
-			clipboard.copyTextToClipboardWithToast({
-				label: 'transcribed text',
-				text: recording.transcribedText,
-			})}
-		variant="ghost"
-		size="icon"
-		style="view-transition-name: {createRecordingViewTransitionName({
-			recordingId: recording.id,
-			propertyName: 'transcribedText',
-		})}-copy-button"
-	>
-		<ClipboardIcon class="h-4 w-4" />
-	</WhisperingButton>
-
-	<WhisperingButton
 		tooltipContent="Delete transformation"
 		onclick={() => {
 			confirmationDialog.open({
 				title: 'Delete transformation',
 				subtitle: 'Are you sure you want to delete this transformation?',
 				onConfirm: () =>
-					deleteTransformationWithToastMutation.mutate(recording),
+					deleteTransformationWithToastMutation.mutate(transformation),
 			});
 		}}
 		variant="ghost"

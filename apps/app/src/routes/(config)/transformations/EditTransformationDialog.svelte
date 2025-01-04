@@ -12,6 +12,7 @@
 	} from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
+	import RenderTransformation from './new/RenderTransformation.svelte';
 
 	let {
 		transformation: initialTransformation,
@@ -34,79 +35,57 @@
 
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Trigger>
-		<WhisperingButton
-			tooltipContent="Edit transformation"
-			variant="ghost"
-			size="icon"
-		>
-			<EditIcon class="h-4 w-4" />
-		</WhisperingButton>
+		{#snippet child({ props })}
+			<WhisperingButton
+				tooltipContent="Edit transformation"
+				variant="ghost"
+				size="icon"
+				{...props}
+			>
+				<EditIcon class="h-4 w-4" />
+			</WhisperingButton>
+		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="overflow-y-auto max-h-[90vh] max-w-3xl">
 		<Dialog.Header>
 			<Dialog.Title>Edit transformation</Dialog.Title>
 			<Dialog.Description>
 				Make changes to your transformation here. Click save when you're done.
 			</Dialog.Description>
 		</Dialog.Header>
-		<form
-			class="grid gap-4 py-4"
-			onsubmit={(e) => {
-				e.preventDefault();
-				updateTransformationWithToastMutation.mutate(transformation, {
-					onSettled: () => {
-						isDialogOpen = false;
-					},
-				});
+		<RenderTransformation
+			{transformation}
+			onChange={(newTransformation) => {
+				transformation = newTransformation;
 			}}
-		>
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="title" class="text-right">Title</Label>
-				<Input
-					id="title"
-					bind:value={transformation.title}
-					class="col-span-3"
-				/>
-			</div>
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="description" class="text-right">Description</Label>
-				<Textarea
-					id="description"
-					bind:value={transformation.description}
-					class="col-span-3"
-				/>
-			</div>
-
-			<Dialog.Footer>
-				<Button
-					class="mr-auto"
-					onclick={() =>
-						deleteTransformationWithToastMutation.mutate(transformation, {
-							onSettled: () => {
+		/>
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
+				Cancel
+			</Button>
+			<Button
+				type="submit"
+				onclick={() =>
+					updateTransformationWithToastMutation.mutate(
+						$state.snapshot(transformation),
+						{
+							onSuccess: () => {
 								isDialogOpen = false;
 							},
-						})}
-					variant="destructive"
-					disabled={deleteTransformationWithToastMutation.isPending}
-				>
-					{#if deleteTransformationWithToastMutation.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Delete
-				</Button>
-				<Button onclick={() => (isDialogOpen = false)} variant="secondary">
-					Cancel
-				</Button>
-				<Button
-					type="submit"
-					disabled={updateTransformationWithToastMutation.isPending}
-				>
-					{#if updateTransformationWithToastMutation.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Save
-				</Button>
-			</Dialog.Footer>
-		</form>
+						},
+					)}
+			>
+				Create
+			</Button>
+		</Dialog.Footer>
+		<Dialog.Footer>
+			<Button
+				onclick={() => {
+					updateTransformationWithToastMutation.mutate(transformation);
+				}}
+			>
+				Save
+			</Button>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

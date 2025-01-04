@@ -14,22 +14,10 @@ export type Recording = RecordingsDbSchemaV4['recordings'];
 export type InsertRecording = Omit<Recording, 'createdAt' | 'updatedAt'>;
 
 export type Transformation = RecordingsDbSchemaV4['transformations'];
-export type InsertTransformation = Omit<
-	Transformation,
-	'createdAt' | 'updatedAt'
->;
 
 export type TransformationStep = Transformation['steps'][number];
-export type InsertTransformationStep = Omit<
-	TransformationStep,
-	'createdAt' | 'updatedAt'
->;
 
 export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
-export type InsertTransformationRun = Omit<
-	TransformationRun,
-	'startedAt' | 'completedAt'
->;
 
 const TRANSFORMATION_STEP_TYPES = ['prompt_transform', 'find_replace'] as const;
 export const TRANSFORMATION_STEP_TYPE_OPTIONS = [

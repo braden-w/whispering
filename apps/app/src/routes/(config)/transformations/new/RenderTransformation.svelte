@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Separator } from '$lib/components/ui/separator';
-	import type { InsertTransformation } from '$lib/services/db';
+	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
 	import { CopyIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
@@ -18,8 +18,8 @@
 		transformation,
 		onChange,
 	}: {
-		transformation: InsertTransformation;
-		onChange: (transformation: InsertTransformation) => void;
+		transformation: Transformation;
+		onChange: (transformation: Transformation) => void;
 	} = $props();
 
 	let currentlyOpenStepId = $state<string | undefined>();

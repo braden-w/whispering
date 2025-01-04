@@ -2,7 +2,7 @@ import { Err, type Ok } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type {
-	InsertTransformation,
+	Recording,
 	Transformation,
 	TransformationStep,
 } from './DbService.dexie';
@@ -23,12 +23,15 @@ export const DbServiceErr = (
 	return Err({ _tag: 'DbServiceError', ...properties });
 };
 
-export function generateDefaultTransformation(): InsertTransformation {
+export function generateDefaultTransformation(): Transformation {
+	const now = new Date().toISOString();
 	return {
 		id: nanoid(),
 		title: '',
 		description: '',
 		steps: [generateDefaultTransformationStep()],
+		createdAt: now,
+		updatedAt: now,
 	};
 }
 
@@ -64,10 +67,10 @@ export type DbService = {
 
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
 	createTransformation: (
-		transformation: Omit<Transformation, 'createdAt' | 'updatedAt'>,
+		transformation: Transformation,
 	) => Promise<DbServiceResult<Transformation>>;
 	updateTransformation: (
-		transformation: Omit<Transformation, 'updatedAt'>,
+		transformation: Transformation,
 	) => Promise<DbServiceResult<Transformation>>;
 	deleteTransformation: (
 		transformation: Transformation,

@@ -333,7 +333,7 @@
 								<ClipboardIcon class="h-4 w-4" />
 							</WhisperingButton>
 						</Dialog.Trigger>
-						<Dialog.Content class="sm:max-w-[425px]">
+						<Dialog.Content>
 							<Dialog.Header>
 								<Dialog.Title>Copy Transcripts</Dialog.Title>
 								<Dialog.Description>

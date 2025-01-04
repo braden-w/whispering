@@ -39,15 +39,18 @@
 
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Trigger>
-		<WhisperingButton
-			tooltipContent="Edit recording"
-			variant="ghost"
-			size="icon"
-		>
-			<EditIcon class="h-4 w-4" />
-		</WhisperingButton>
+		{#snippet child({ props })}
+			<WhisperingButton
+				tooltipContent="Edit recording"
+				variant="ghost"
+				size="icon"
+				{...props}
+			>
+				<EditIcon class="h-4 w-4" />
+			</WhisperingButton>
+		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Edit recording</Dialog.Title>
 			<Dialog.Description>
