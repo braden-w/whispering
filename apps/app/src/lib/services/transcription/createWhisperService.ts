@@ -6,7 +6,12 @@ import {
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from './TranscriptionService';
-import { whisperApiResponseSchema } from './schemas';
+import { z } from 'zod';
+
+const whisperApiResponseSchema = z.union([
+	z.object({ text: z.string() }),
+	z.object({ error: z.object({ message: z.string() }) }),
+]);
 
 const MAX_FILE_SIZE_MB = 25 as const;
 
