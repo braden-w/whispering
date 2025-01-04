@@ -52,8 +52,8 @@
 			label="Recording Device"
 			{items}
 			selected={settings.value['recording.selectedAudioInputDeviceId']}
-			onSelectedChange={async (selected) => {
-				await recorder.closeRecordingSessionWithToast();
+			onSelectedChange={(selected) => {
+				void recorder.closeRecordingSessionWithToast();
 				settings.value = {
 					...settings.value,
 					'recording.selectedAudioInputDeviceId': selected,
