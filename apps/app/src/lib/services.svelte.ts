@@ -16,7 +16,9 @@ import { createRecorderServiceWeb } from './services/recorder/RecorderService.we
 import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
-import { createTranscriptionServiceGroq } from './services/transcription/TranscriptionService.groq';
+import { createTranscriptionServiceGroqDistil } from './services/transcription/TranscriptionService.groq.distil';
+import { createTranscriptionServiceGroqLarge } from './services/transcription/TranscriptionService.groq.large';
+import { createTranscriptionServiceGroqTurbo } from './services/transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
 
 // Services that are not determined by the user's settings, but by the platform.
@@ -53,8 +55,18 @@ function createServices() {
 		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
 				return createTranscriptionServiceOpenAi({ HttpService });
-			case 'Groq':
-				return createTranscriptionServiceGroq({ HttpService });
+			case 'Groq': {
+				switch (settings.value['transcription.groq.model']) {
+					case 'whisper-large-v3':
+						return createTranscriptionServiceGroqLarge({ HttpService });
+					case 'whisper-large-v3-turbo':
+						return createTranscriptionServiceGroqTurbo({ HttpService });
+					case 'distil-whisper-large-v3-en':
+						return createTranscriptionServiceGroqDistil({ HttpService });
+					default:
+						return createTranscriptionServiceGroqLarge({ HttpService });
+				}
+			}
 			case 'faster-whisper-server':
 				return createTranscriptionServiceFasterWhisperServer({ HttpService });
 		}

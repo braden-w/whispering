@@ -197,6 +197,17 @@ export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	}),
 );
 
+export const GROQ_MODELS = [
+	'whisper-large-v3',
+	'whisper-large-v3-turbo',
+	'distil-whisper-large-v3-en',
+] as const;
+
+export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
+	value: model,
+	label: model,
+}));
+
 export type WhisperingSoundNames =
 	| 'start'
 	| 'stop'

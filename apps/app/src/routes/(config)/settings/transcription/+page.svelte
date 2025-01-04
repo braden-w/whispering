@@ -6,6 +6,7 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
 	import {
+		GROQ_MODELS_OPTIONS,
 		SUPPORTED_LANGUAGES_OPTIONS,
 		TRANSCRIPTION_SERVICE_OPTIONS,
 		WHISPERING_URL,
@@ -80,6 +81,18 @@
 			is enabled.
 		</div>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
+		<LabeledSelect
+			id="groq-model"
+			label="Groq Model"
+			items={GROQ_MODELS_OPTIONS}
+			selected={settings.value['transcription.groq.model']}
+			onSelectedChange={(selected) => {
+				settings.value = {
+					...settings.value,
+					'transcription.groq.model': selected,
+				};
+			}}
+		/>
 		<LabeledInput
 			id="groq-api-key"
 			label="Groq API Key"

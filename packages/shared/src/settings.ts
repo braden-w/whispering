@@ -3,6 +3,7 @@ import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
 	DEFAULT_BITRATE_KBPS,
+	GROQ_MODELS,
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
@@ -77,6 +78,7 @@ export const settingsSchema = z.object({
 	// Service-specific settings
 	'transcription.openAi.apiKey': z.string(),
 	'transcription.groq.apiKey': z.string(),
+	'transcription.groq.model': z.enum(GROQ_MODELS),
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
 
