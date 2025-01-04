@@ -68,21 +68,8 @@
 				onclick={() =>
 					updateTransformationWithToastMutation.mutate(
 						$state.snapshot(transformation),
-						{
-							onSuccess: () => {
-								isDialogOpen = false;
-							},
-						},
+						{ onSuccess: () => (isDialogOpen = false) },
 					)}
-			>
-				Create
-			</Button>
-		</Dialog.Footer>
-		<Dialog.Footer>
-			<Button
-				onclick={() => {
-					updateTransformationWithToastMutation.mutate(transformation);
-				}}
 			>
 				Save
 			</Button>
