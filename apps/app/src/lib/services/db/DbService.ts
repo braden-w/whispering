@@ -29,7 +29,7 @@ export function generateDefaultTransformation(): Transformation {
 		id: nanoid(),
 		title: '',
 		description: '',
-		steps: [generateDefaultTransformationStep()],
+		steps: [],
 		createdAt: now,
 		updatedAt: now,
 	};
