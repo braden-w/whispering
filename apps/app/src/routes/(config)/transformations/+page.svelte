@@ -382,6 +382,17 @@
 								</Table.Cell>
 							{/each}
 						</Table.Row>
+					{:else}
+						<Table.Row>
+							<Table.Cell colspan={columns.length} class="h-24 text-center">
+								{#if filterQuery}
+									No transformations found.
+								{:else}
+									No transformations yet. Click "Create Transformation" to add
+									one.
+								{/if}
+							</Table.Cell>
+						</Table.Row>
 					{/each}
 				</Table.Body>
 			</Table.Root>

@@ -478,6 +478,16 @@
 								</Table.Cell>
 							{/each}
 						</Table.Row>
+					{:else}
+						<Table.Row>
+							<Table.Cell colspan={columns.length} class="h-24 text-center">
+								{#if filterQuery}
+									No recordings found.
+								{:else}
+									No recordings yet. Start recording to add one.
+								{/if}
+							</Table.Cell>
+						</Table.Row>
 					{/each}
 				</Table.Body>
 			</Table.Root>
