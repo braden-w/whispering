@@ -24,15 +24,9 @@ export function createWhisperService({
 }: {
 	HttpService: HttpService;
 	modelName: string;
-	postConfig: {
-		url: string;
-		headers?: Record<string, string>;
-	};
+	postConfig: { url: string; headers?: Record<string, string> };
 	preValidate: () => Promise<Ok<undefined> | TranscriptionServiceErr>;
-	errorConfig: {
-		title: string;
-		description: string;
-	};
+	errorConfig: { title: string; description: string };
 }): TranscriptionService {
 	return {
 		transcribe: async (audioBlob, options) => {
