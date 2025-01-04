@@ -7,7 +7,7 @@ import {
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
 
-export function createTranscriptionServiceWhisper({
+export function createTranscriptionServiceOpenAi({
 	HttpService,
 }: {
 	HttpService: HttpService;
