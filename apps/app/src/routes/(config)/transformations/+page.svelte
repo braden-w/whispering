@@ -42,6 +42,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import RenderTransformation from './new/RenderTransformation.svelte';
 	import { nanoid } from 'nanoid/non-secure';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -371,17 +372,47 @@
 					{/each}
 				</Table.Header>
 				<Table.Body>
-					{#each table.getRowModel().rows as row (row.id)}
-						<Table.Row>
-							{#each row.getVisibleCells() as cell}
+					{#if transformationsQuery.isPending}
+						{#each { length: 5 }}
+							<Table.Row>
 								<Table.Cell>
-									<FlexRender
-										content={cell.column.columnDef.cell}
-										context={cell.getContext()}
-									/>
+									<Skeleton class="h-4 w-4" />
 								</Table.Cell>
-							{/each}
-						</Table.Row>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[50px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[250px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[350px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[100px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[100px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<div class="flex justify-end">
+										<Skeleton class="h-8 w-8" />
+									</div>
+								</Table.Cell>
+							</Table.Row>
+						{/each}
+					{:else if table.getRowModel().rows?.length}
+						{#each table.getRowModel().rows as row (row.id)}
+							<Table.Row>
+								{#each row.getVisibleCells() as cell}
+									<Table.Cell>
+										<FlexRender
+											content={cell.column.columnDef.cell}
+											context={cell.getContext()}
+										/>
+									</Table.Cell>
+								{/each}
+							</Table.Row>
+						{/each}
 					{:else}
 						<Table.Row>
 							<Table.Cell colspan={columns.length} class="h-24 text-center">
@@ -393,7 +424,7 @@
 								{/if}
 							</Table.Cell>
 						</Table.Row>
-					{/each}
+					{/if}
 				</Table.Body>
 			</Table.Root>
 		</div>

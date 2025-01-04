@@ -45,6 +45,7 @@
 	import TranscribedText from './TranscribedText.svelte';
 	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -467,17 +468,56 @@
 					{/each}
 				</Table.Header>
 				<Table.Body>
-					{#each table.getRowModel().rows as row (row.id)}
-						<Table.Row>
-							{#each row.getVisibleCells() as cell}
+					{#if recordingsQuery.isPending}
+						{#each { length: 5 }}
+							<Table.Row>
 								<Table.Cell>
-									<FlexRender
-										content={cell.column.columnDef.cell}
-										context={cell.getContext()}
-									/>
+									<Skeleton class="h-4 w-4" />
 								</Table.Cell>
-							{/each}
-						</Table.Row>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[50px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[150px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[200px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[100px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[100px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-4 w-[350px]" />
+								</Table.Cell>
+								<Table.Cell>
+									<div class="flex justify-center">
+										<Skeleton class="h-8 w-8" />
+									</div>
+								</Table.Cell>
+								<Table.Cell>
+									<div class="flex justify-end gap-2">
+										<Skeleton class="h-8 w-8" />
+										<Skeleton class="h-8 w-8" />
+									</div>
+								</Table.Cell>
+							</Table.Row>
+						{/each}
+					{:else if table.getRowModel().rows?.length}
+						{#each table.getRowModel().rows as row (row.id)}
+							<Table.Row>
+								{#each row.getVisibleCells() as cell}
+									<Table.Cell>
+										<FlexRender
+											content={cell.column.columnDef.cell}
+											context={cell.getContext()}
+										/>
+									</Table.Cell>
+								{/each}
+							</Table.Row>
+						{/each}
 					{:else}
 						<Table.Row>
 							<Table.Cell colspan={columns.length} class="h-24 text-center">
@@ -488,7 +528,7 @@
 								{/if}
 							</Table.Cell>
 						</Table.Row>
-					{/each}
+					{/if}
 				</Table.Body>
 			</Table.Root>
 		</div>
