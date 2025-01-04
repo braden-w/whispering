@@ -50,24 +50,14 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content>
+	<Dialog.Content class="overflow-y-auto max-h-[90vh]">
 		<Dialog.Header>
 			<Dialog.Title>Edit recording</Dialog.Title>
 			<Dialog.Description>
 				Make changes to your recording here. Click save when you're done.
 			</Dialog.Description>
 		</Dialog.Header>
-		<form
-			class="grid gap-4 py-4"
-			onsubmit={(e) => {
-				e.preventDefault();
-				updateRecordingWithToastMutation.mutate(recording, {
-					onSettled: () => {
-						isDialogOpen = false;
-					},
-				});
-			}}
-		>
+		<div class="space-y-4 py-4">
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="title" class="text-right">Title</Label>
 				<Input id="title" bind:value={recording.title} class="col-span-3" />
@@ -96,43 +86,48 @@
 					class="col-span-3"
 				/>
 			</div>
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="blob" class="text-right">Blob</Label>
-				{#if blobUrl}
-					<audio src={blobUrl} controls class="col-span-3 mt-2 h-8 w-full"
-					></audio>
+			{#if blobUrl}
+				<div class="grid grid-cols-4 items-center gap-4">
+					<Label for="blob" class="text-right">Audio</Label>
+					<audio src={blobUrl} controls class="col-span-3 h-8 w-full"></audio>
+				</div>
+			{/if}
+		</div>
+		<Dialog.Footer>
+			<Button
+				class="mr-auto"
+				onclick={() =>
+					deleteRecordingWithToastMutation.mutate(recording, {
+						onSettled: () => {
+							isDialogOpen = false;
+						},
+					})}
+				variant="destructive"
+				disabled={deleteRecordingWithToastMutation.isPending}
+			>
+				{#if deleteRecordingWithToastMutation.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
-			</div>
-			<Dialog.Footer>
-				<Button
-					class="mr-auto"
-					onclick={() =>
-						deleteRecordingWithToastMutation.mutate(recording, {
-							onSettled: () => {
-								isDialogOpen = false;
-							},
-						})}
-					variant="destructive"
-					disabled={deleteRecordingWithToastMutation.isPending}
-				>
-					{#if deleteRecordingWithToastMutation.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Delete
-				</Button>
-				<Button onclick={() => (isDialogOpen = false)} variant="secondary">
-					Cancel
-				</Button>
-				<Button
-					type="submit"
-					disabled={updateRecordingWithToastMutation.isPending}
-				>
-					{#if updateRecordingWithToastMutation.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Save
-				</Button>
-			</Dialog.Footer>
-		</form>
+				Delete
+			</Button>
+			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
+				Cancel
+			</Button>
+			<Button
+				onclick={() => {
+					updateRecordingWithToastMutation.mutate(recording, {
+						onSettled: () => {
+							isDialogOpen = false;
+						},
+					});
+				}}
+				disabled={updateRecordingWithToastMutation.isPending}
+			>
+				{#if updateRecordingWithToastMutation.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				Save
+			</Button>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

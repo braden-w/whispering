@@ -60,17 +60,38 @@
 			}}
 		/>
 		<Dialog.Footer>
+			<Button
+				class="mr-auto"
+				onclick={() =>
+					deleteTransformationWithToastMutation.mutate(transformation, {
+						onSettled: () => {
+							isDialogOpen = false;
+						},
+					})}
+				variant="destructive"
+				disabled={deleteTransformationWithToastMutation.isPending}
+			>
+				{#if deleteTransformationWithToastMutation.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				Delete
+			</Button>
 			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
 				Cancel
 			</Button>
 			<Button
-				type="submit"
-				onclick={() =>
-					updateTransformationWithToastMutation.mutate(
-						$state.snapshot(transformation),
-						{ onSuccess: () => (isDialogOpen = false) },
-					)}
+				onclick={() => {
+					updateTransformationWithToastMutation.mutate($state.snapshot(transformation), {
+						onSettled: () => {
+							isDialogOpen = false;
+						},
+					});
+				}}
+				disabled={updateTransformationWithToastMutation.isPending}
 			>
+				{#if updateTransformationWithToastMutation.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
 				Save
 			</Button>
 		</Dialog.Footer>
