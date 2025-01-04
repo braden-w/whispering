@@ -59,27 +59,28 @@
 					'transcription.openAi.apiKey': value,
 				};
 			}}
-		/>
-		<div class="text-muted-foreground text-sm">
-			You can find your API key in your <Button
-				variant="link"
-				class="px-0.3 py-0.2 h-fit"
-				href="https://platform.openai.com/api-keys"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				account settings
-			</Button>. Make sure <Button
-				variant="link"
-				class="px-0.3 py-0.2 h-fit"
-				href="https://platform.openai.com/settings/organization/billing/overview"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				billing
-			</Button>
-			is enabled.
-		</div>
+		>
+			{#snippet description()}
+				You can find your API key in your <Button
+					variant="link"
+					class="px-0.3 py-0.2 h-fit"
+					href="https://platform.openai.com/api-keys"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					account settings
+				</Button>. Make sure <Button
+					variant="link"
+					class="px-0.3 py-0.2 h-fit"
+					href="https://platform.openai.com/settings/organization/billing/overview"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					billing
+				</Button>
+				is enabled.
+			{/snippet}
+		</LabeledInput>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
 		<LabeledSelect
 			id="groq-model"
@@ -92,18 +93,19 @@
 					'transcription.groq.model': selected,
 				};
 			}}
-		/>
-		<div class="text-muted-foreground text-sm">
-			You can find more details about the models in the <Button
-				variant="link"
-				class="px-0.3 py-0.2 h-fit"
-				href="https://console.groq.com/docs/speech-text"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				Groq docs
-			</Button>.
-		</div>
+		>
+			{#snippet description()}
+				You can find more details about the models in the <Button
+					variant="link"
+					class="px-0.3 py-0.2 h-fit"
+					href="https://console.groq.com/docs/speech-text"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Groq docs
+				</Button>.
+			{/snippet}
+		</LabeledSelect>
 		<LabeledInput
 			id="groq-api-key"
 			label="Groq API Key"
@@ -116,18 +118,19 @@
 					'transcription.groq.apiKey': value,
 				};
 			}}
-		/>
-		<div class="text-muted-foreground text-sm">
-			You can find your Groq API key in your <Button
-				variant="link"
-				class="px-0.3 py-0.2 h-fit"
-				href="https://console.groq.com/keys"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				Groq console
-			</Button>.
-		</div>
+		>
+			{#snippet description()}
+				You can find your Groq API key in your <Button
+					variant="link"
+					class="px-0.3 py-0.2 h-fit"
+					href="https://console.groq.com/keys"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Groq console
+				</Button>.
+			{/snippet}
+		</LabeledInput>
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
@@ -242,11 +245,8 @@
 				'transcription.temperature': value,
 			};
 		}}
+		description="Controls randomness in the model's output. 0 is focused and deterministic, 1 is more creative."
 	/>
-	<div class="text-muted-foreground text-sm">
-		Controls randomness in the model's output. 0 is focused and deterministic, 1
-		is more creative.
-	</div>
 
 	<LabeledTextarea
 		id="transcription-prompt"

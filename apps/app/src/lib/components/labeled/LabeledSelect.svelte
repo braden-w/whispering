@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends string ">
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import type { Snippet } from 'svelte';
 
 	let {
 		id,
@@ -10,6 +11,7 @@
 		onSelectedChange,
 		placeholder = 'Select an option',
 		disabled = false,
+		description,
 	}: {
 		id: string;
 		label: string;
@@ -22,6 +24,7 @@
 		onSelectedChange: (selected: T) => void;
 		placeholder?: string;
 		disabled?: boolean;
+		description?: string | Snippet;
 	} = $props();
 
 	const selectedLabel = $derived(
@@ -55,4 +58,13 @@
 			{/each}
 		</Select.Content>
 	</Select.Root>
+	{#if description}
+		<div class="text-muted-foreground text-sm">
+			{#if typeof description === 'string'}
+				{description}
+			{:else}
+				{@render description()}
+			{/if}
+		</div>
+	{/if}
 </div>
