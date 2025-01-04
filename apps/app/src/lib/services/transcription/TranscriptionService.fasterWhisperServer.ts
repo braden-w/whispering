@@ -25,13 +25,15 @@ export function createTranscriptionServiceFasterWhisperServer({
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 				});
 			}
-			const formDataFile = new File(
-				[audioBlob],
-				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
-				{ type: audioBlob.type },
-			);
 			const formData = new FormData();
-			formData.append('file', formDataFile);
+			formData.append(
+				'file',
+				new File(
+					[audioBlob],
+					`recording.${getExtensionFromAudioBlob(audioBlob)}`,
+					{ type: audioBlob.type },
+				),
+			);
 			formData.append(
 				'model',
 				settings.value['transcription.fasterWhisperServer.serverModel'],
@@ -42,8 +44,8 @@ export function createTranscriptionServiceFasterWhisperServer({
 			if (options.temperature)
 				formData.append('temperature', options.temperature);
 			const postResult = await HttpService.post({
-				url: `${settings.value['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
 				formData,
+				url: `${settings.value['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
 				schema: whisperApiResponseSchema,
 			});
 			if (!postResult.ok) {
@@ -61,7 +63,7 @@ export function createTranscriptionServiceFasterWhisperServer({
 					},
 				});
 			}
-			return Ok(whisperApiResponse.text);
+			return Ok(whisperApiResponse.text.trim());
 		},
 	};
 }
