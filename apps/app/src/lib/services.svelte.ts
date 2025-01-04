@@ -17,7 +17,7 @@ import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService
 import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
 import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroq } from './services/transcription/TranscriptionService.groq';
-import { createTranscriptionServiceWhisper } from './services/transcription/TranscriptionService.whisper';
+import { createTranscriptionServiceWhisper } from './services/transcription/TranscriptionService.openai';
 
 // Services that are not determined by the user's settings, but by the platform.
 
