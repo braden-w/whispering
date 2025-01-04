@@ -51,8 +51,11 @@ export function createTranscriptionServiceWhisper({
 			const formData = new FormData();
 			formData.append(
 				'file',
-				audioBlob,
-				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
+				new File(
+					[audioBlob],
+					`recording.${getExtensionFromAudioBlob(audioBlob)}`,
+					{ type: audioBlob.type },
+				),
 			);
 			formData.append('model', 'whisper-1');
 			if (options.outputLanguage !== 'auto') {

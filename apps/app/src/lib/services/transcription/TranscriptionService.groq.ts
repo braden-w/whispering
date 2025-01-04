@@ -48,13 +48,15 @@ export function createTranscriptionServiceGroq({
 					description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
 				});
 			}
-			const formDataFile = new File(
-				[audioBlob],
-				`recording.${getExtensionFromAudioBlob(audioBlob)}`,
-				{ type: audioBlob.type },
-			);
 			const formData = new FormData();
-			formData.append('file', formDataFile);
+			formData.append(
+				'file',
+				new File(
+					[audioBlob],
+					`recording.${getExtensionFromAudioBlob(audioBlob)}`,
+					{ type: audioBlob.type },
+				),
+			);
 			formData.append('model', 'whisper-large-v3');
 			if (options.outputLanguage !== 'auto')
 				formData.append('language', options.outputLanguage);
