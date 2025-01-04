@@ -16,10 +16,12 @@
 	let {
 		transformation: initialTransformation,
 	}: { transformation: Transformation } = $props();
-	let transformation = $state(structuredClone(initialTransformation));
+	let transformation = $state(
+		structuredClone($state.snapshot(initialTransformation)),
+	);
 
 	$effect(() => {
-		transformation = structuredClone(initialTransformation);
+		transformation = structuredClone($state.snapshot(initialTransformation));
 	});
 
 	const updateTransformationWithToastMutation =
