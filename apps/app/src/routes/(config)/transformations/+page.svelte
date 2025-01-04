@@ -19,10 +19,16 @@
 		createTable,
 		renderComponent,
 	} from '@tanstack/svelte-table';
-	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
+	import type {
+		ColumnDef,
+		ColumnFilter,
+		PaginationState,
+		Updater,
+	} from '@tanstack/table-core';
 	import {
 		getCoreRowModel,
 		getFilteredRowModel,
+		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
 	import { ChevronDownIcon, PlusIcon } from 'lucide-svelte';
@@ -138,6 +144,7 @@
 		defaultValue: {},
 		schema: z.record(z.string(), z.boolean()),
 	});
+	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
 	function createUpdater<T>(state: { value: T }) {
 		return (updater: Updater<T>) => {
@@ -167,10 +174,18 @@
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setFilters,
 		onColumnVisibilityChange: setVisibility,
 		onRowSelectionChange: setRowSelection,
+		onPaginationChange: (updater) => {
+			if (typeof updater === 'function') {
+				pagination = updater(pagination);
+			} else {
+				pagination = updater;
+			}
+		},
 		state: {
 			get sorting() {
 				return sorting.value;
@@ -183,6 +198,9 @@
 			},
 			get rowSelection() {
 				return rowSelection.value;
+			},
+			get pagination() {
+				return pagination;
 			},
 		},
 	});
@@ -232,7 +250,7 @@
 				/>
 				<Button variant="outline" type="submit">Search</Button>
 			</form>
-			<div class="flex w-full items-center justify-between gap-2">
+			<div class="flex w-full items-center justify-end gap-2">
 				{#if selectedTransformationRows.length > 0}
 					<WhisperingButton
 						tooltipContent="Delete selected transformations"
@@ -254,16 +272,6 @@
 						<TrashIcon class="h-4 w-4" />
 					</WhisperingButton>
 				{/if}
-
-				<div
-					class={cn(
-						'text-muted-foreground text-sm sm:block',
-						selectedTransformationRows.length > 0 && 'hidden',
-					)}
-				>
-					{selectedTransformationRows.length} of
-					{table.getFilteredRowModel().rows.length} row(s) selected.
-				</div>
 
 				<div class="ml-auto flex items-center gap-2">
 					<Dialog.Root bind:open={isDialogOpen}>
@@ -344,37 +352,64 @@
 			</div>
 		</div>
 
-		<Table.Root>
-			<Table.Header>
-				{#each table.getHeaderGroups() as headerGroup}
-					<Table.Row>
-						{#each headerGroup.headers as header}
-							<Table.Head colspan={header.colSpan}>
-								{#if !header.isPlaceholder}
+		<div class="rounded-md border">
+			<Table.Root>
+				<Table.Header>
+					{#each table.getHeaderGroups() as headerGroup}
+						<Table.Row>
+							{#each headerGroup.headers as header}
+								<Table.Head colspan={header.colSpan}>
+									{#if !header.isPlaceholder}
+										<FlexRender
+											content={header.column.columnDef.header}
+											context={header.getContext()}
+										/>
+									{/if}
+								</Table.Head>
+							{/each}
+						</Table.Row>
+					{/each}
+				</Table.Header>
+				<Table.Body>
+					{#each table.getRowModel().rows as row (row.id)}
+						<Table.Row>
+							{#each row.getVisibleCells() as cell}
+								<Table.Cell>
 									<FlexRender
-										content={header.column.columnDef.header}
-										context={header.getContext()}
+										content={cell.column.columnDef.cell}
+										context={cell.getContext()}
 									/>
-								{/if}
-							</Table.Head>
-						{/each}
-					</Table.Row>
-				{/each}
-			</Table.Header>
-			<Table.Body>
-				{#each table.getRowModel().rows as row (row.id)}
-					<Table.Row>
-						{#each row.getVisibleCells() as cell}
-							<Table.Cell>
-								<FlexRender
-									content={cell.column.columnDef.cell}
-									context={cell.getContext()}
-								/>
-							</Table.Cell>
-						{/each}
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
+								</Table.Cell>
+							{/each}
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</div>
+
+		<div class="flex items-center justify-between">
+			<div class="text-muted-foreground text-sm">
+				{selectedTransformationRows.length} of {table.getFilteredRowModel().rows
+					.length} row(s) selected.
+			</div>
+			<div class="flex items-center space-x-2">
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.previousPage()}
+					disabled={!table.getCanPreviousPage()}
+				>
+					Previous
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.nextPage()}
+					disabled={!table.getCanNextPage()}
+				>
+					Next
+				</Button>
+			</div>
+		</div>
 	</div>
 </main>
