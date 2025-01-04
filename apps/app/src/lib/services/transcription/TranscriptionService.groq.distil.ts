@@ -7,14 +7,19 @@ import {
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
 
-export function createTranscriptionServiceGroq({
+/**
+ * Fastest and most cost-effective model, but English-only.
+ * Recommended for English transcription where speed and cost are priorities.
+ * Cost: $0.02/hour, 250x real-time processing, 13% WER
+ */
+export function createTranscriptionServiceGroqDistil({
 	HttpService,
 }: {
 	HttpService: HttpService;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
-		modelName: 'whisper-large-v3',
+		modelName: 'distil-whisper-large-v3-en',
 		postConfig: {
 			url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 			headers: {
