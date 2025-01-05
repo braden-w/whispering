@@ -175,38 +175,46 @@
 
 									{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
 										<LabeledSelect
-											id="prompt_transform.inference.OpenAI.model"
+											id="prompt_transform.inference.provider.OpenAI.model"
 											label="Model"
 											items={OPENAI_INFERENCE_MODEL_OPTIONS}
-											selected={step['prompt_transform.inference.OpenAI.model']}
+											selected={step[
+												'prompt_transform.inference.provider.OpenAI.model'
+											]}
 											placeholder="Select a model"
 											onSelectedChange={(value) => {
-												step['prompt_transform.inference.OpenAI.model'] = value;
+												step[
+													'prompt_transform.inference.provider.OpenAI.model'
+												] = value;
 											}}
 										/>
 									{:else if step['prompt_transform.inference.provider'] === 'Groq'}
 										<LabeledSelect
-											id="prompt_transform.inference.Groq.model"
+											id="prompt_transform.inference.provider.Groq.model"
 											label="Model"
 											items={GROQ_INFERENCE_MODEL_OPTIONS}
-											selected={step['prompt_transform.inference.Groq.model']}
+											selected={step[
+												'prompt_transform.inference.provider.Groq.model'
+											]}
 											placeholder="Select a model"
 											onSelectedChange={(value) => {
-												step['prompt_transform.inference.Groq.model'] = value;
+												step['prompt_transform.inference.provider.Groq.model'] =
+													value;
 											}}
 										/>
 									{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
 										<LabeledSelect
-											id="prompt_transform.inference.Anthropic.model"
+											id="prompt_transform.inference.provider.Anthropic.model"
 											label="Model"
 											items={ANTHROPIC_INFERENCE_MODEL_OPTIONS}
 											selected={step[
-												'prompt_transform.inference.Anthropic.model'
+												'prompt_transform.inference.provider.Anthropic.model'
 											]}
 											placeholder="Select a model"
 											onSelectedChange={(value) => {
-												step['prompt_transform.inference.Anthropic.model'] =
-													value;
+												step[
+													'prompt_transform.inference.provider.Anthropic.model'
+												] = value;
 											}}
 										/>
 									{/if}
@@ -215,13 +223,13 @@
 										id="prompt_transform.systemPromptTemplate"
 										label="System Prompt Template"
 										bind:value={step['prompt_transform.systemPromptTemplate']}
-										placeholder="Enter system prompt template"
+										placeholder="Enter system prompt template. Use &lbrace;&lbrace;input&rbrace;&rbrace; to reference the input text."
 									/>
 									<LabeledTextarea
 										id="prompt_transform.userPromptTemplate"
 										label="User Prompt Template"
 										bind:value={step['prompt_transform.userPromptTemplate']}
-										placeholder="Enter user prompt template"
+										placeholder="Enter user prompt template. Use &lbrace;&lbrace;input&rbrace;&rbrace; to reference the input text."
 									/>
 								</div>
 							{/if}
