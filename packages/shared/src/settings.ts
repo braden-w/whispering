@@ -33,13 +33,14 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'transcription.prompt': '',
 		'transcription.temperature': '0',
 
-		'transcription.openAi.apiKey': '',
-
-		'transcription.groq.apiKey': '',
-
 		'transcription.fasterWhisperServer.serverUrl': 'http://localhost:8000',
 		'transcription.fasterWhisperServer.serverModel':
 			'Systran/faster-whisper-medium.en',
+
+
+		'apiKeys.openai': '',
+		'apiKeys.anthropic': '',
+		'apiKeys.groq': '',
 
 		'shortcuts.currentLocalShortcut': 'space',
 		'shortcuts.currentGlobalShortcut':
@@ -77,15 +78,13 @@ export const settingsSchema = z.object({
 	'transcription.temperature': z.string(),
 
 	// Service-specific settings
-	'transcription.openAi.apiKey': z.string(),
-	'transcription.groq.apiKey': z.string(),
 	'transcription.groq.model': z.enum(GROQ_MODELS),
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
 
-	'inference.openAi.apiKey': z.string(),
-	'inference.anthropic.apiKey': z.string(),
-	'inference.groq.apiKey': z.string(),
+	'apiKeys.openai': z.string(),
+	'apiKeys.anthropic': z.string(),
+	'apiKeys.groq': z.string(),
 
 	'shortcuts.currentLocalShortcut': z.string(),
 	'shortcuts.currentGlobalShortcut': z.string(),

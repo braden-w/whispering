@@ -18,11 +18,11 @@ export function createTranscriptionServiceOpenAi({
 		postConfig: {
 			url: 'https://api.openai.com/v1/audio/transcriptions',
 			headers: {
-				Authorization: `Bearer ${settings.value['transcription.openAi.apiKey']}`,
+				Authorization: `Bearer ${settings.value['apiKeys.openai']}`,
 			},
 		},
 		preValidate: async () => {
-			if (!settings.value['transcription.openAi.apiKey']) {
+			if (!settings.value['apiKeys.openai']) {
 				return TranscriptionServiceErr({
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
@@ -34,7 +34,7 @@ export function createTranscriptionServiceOpenAi({
 				});
 			}
 
-			if (!settings.value['transcription.openAi.apiKey'].startsWith('sk-')) {
+			if (!settings.value['apiKeys.openai'].startsWith('sk-')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',

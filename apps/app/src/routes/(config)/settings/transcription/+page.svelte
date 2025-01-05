@@ -1,4 +1,6 @@
 <script lang="ts">
+	import OpenAiApiKeyInput from '../-components/OpenAiApiKeyInput.svelte';
+	import GroqApiKeyInput from '../-components/GroqApiKeyInput.svelte';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -47,40 +49,7 @@
 	/>
 
 	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
-		<LabeledInput
-			id="openai-api-key"
-			label="OpenAI API Key"
-			type="password"
-			placeholder="Your OpenAI API Key"
-			value={settings.value['transcription.openAi.apiKey']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.openAi.apiKey': value,
-				};
-			}}
-		>
-			{#snippet description()}
-				You can find your API key in your <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/api-keys"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					account settings
-				</Button>. Make sure <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/settings/organization/billing/overview"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					billing
-				</Button>
-				is enabled.
-			{/snippet}
-		</LabeledInput>
+		<OpenAiApiKeyInput />
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
 		<LabeledSelect
 			id="groq-model"
@@ -106,31 +75,7 @@
 				</Button>.
 			{/snippet}
 		</LabeledSelect>
-		<LabeledInput
-			id="groq-api-key"
-			label="Groq API Key"
-			type="password"
-			placeholder="Your Groq API Key"
-			value={settings.value['transcription.groq.apiKey']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.groq.apiKey': value,
-				};
-			}}
-		>
-			{#snippet description()}
-				You can find your Groq API key in your <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://console.groq.com/keys"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Groq console
-				</Button>.
-			{/snippet}
-		</LabeledInput>
+		<GroqApiKeyInput />
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>

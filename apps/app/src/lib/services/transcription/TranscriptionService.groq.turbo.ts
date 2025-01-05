@@ -23,11 +23,11 @@ export function createTranscriptionServiceGroqTurbo({
 		postConfig: {
 			url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 			headers: {
-				Authorization: `Bearer ${settings.value['transcription.groq.apiKey']}`,
+				Authorization: `Bearer ${settings.value['apiKeys.groq']}`,
 			},
 		},
 		preValidate: async () => {
-			if (!settings.value['transcription.groq.apiKey']) {
+			if (!settings.value['apiKeys.groq']) {
 				return TranscriptionServiceErr({
 					title: 'Groq API Key not provided.',
 					description: 'Please enter your Groq API key in the settings',
@@ -39,7 +39,7 @@ export function createTranscriptionServiceGroqTurbo({
 				});
 			}
 
-			if (!settings.value['transcription.groq.apiKey'].startsWith('gsk_')) {
+			if (!settings.value['apiKeys.groq'].startsWith('gsk_')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid Groq API Key',
 					description: 'The Groq API Key must start with "gsk_"',
