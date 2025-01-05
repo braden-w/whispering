@@ -1,7 +1,13 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { DownloadService } from '$lib/services.svelte';
 import { Ok, tryAsync } from '@epicenterhq/result';
-import type { ANTHROPIC_INFERENCE_MODELS, GROQ_INFERENCE_MODELS, INFERENCE_PROVIDERS, OPENAI_INFERENCE_MODELS, Settings } from '@repo/shared';
+import type {
+	ANTHROPIC_INFERENCE_MODELS,
+	GROQ_INFERENCE_MODELS,
+	INFERENCE_PROVIDERS,
+	OPENAI_INFERENCE_MODELS,
+	Settings,
+} from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { toast } from '../../utils/toast';
 import type { DbService } from './DbService';
@@ -47,9 +53,10 @@ export type RecordingsDbSchemaV4 = {
 			type: (typeof TRANSFORMATION_STEP_TYPES)[number];
 
 			'prompt_transform.inference.provider': (typeof INFERENCE_PROVIDERS)[number];
-			'prompt_transform.inference.OpenAI.model': (typeof OPENAI_INFERENCE_MODELS)[number];
-			'prompt_transform.inference.Groq.model': (typeof GROQ_INFERENCE_MODELS)[number];
-			'prompt_transform.inference.Anthropic.model': (typeof ANTHROPIC_INFERENCE_MODELS)[number];
+			'prompt_transform.inference.provider.OpenAI.model': (typeof OPENAI_INFERENCE_MODELS)[number];
+			'prompt_transform.inference.provider.Groq.model': (typeof GROQ_INFERENCE_MODELS)[number];
+			'prompt_transform.inference.provider.Anthropic.model': (typeof ANTHROPIC_INFERENCE_MODELS)[number];
+
 			'prompt_transform.systemPromptTemplate': string;
 			'prompt_transform.userPromptTemplate': string;
 
