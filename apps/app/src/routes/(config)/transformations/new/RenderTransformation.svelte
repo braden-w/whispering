@@ -21,6 +21,9 @@
 		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
 	} from '@repo/shared';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
+	import AnthropicApiKeyInput from '../../settings/-components/AnthropicApiKeyInput.svelte';
+	import GroqApiKeyInput from '../../settings/-components/GroqApiKeyInput.svelte';
+	import OpenAiApiKeyInput from '../../settings/-components/OpenAiApiKeyInput.svelte';
 
 	let {
 		transformation,
@@ -287,6 +290,8 @@
 													] = value;
 												}}
 											/>
+
+											<OpenAiApiKeyInput />
 										{:else if step['prompt_transform.inference.provider'] === 'Groq'}
 											<LabeledSelect
 												id="prompt_transform.inference.provider.Groq.model"
@@ -302,6 +307,8 @@
 													] = value;
 												}}
 											/>
+
+											<GroqApiKeyInput />
 										{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
 											<LabeledSelect
 												id="prompt_transform.inference.provider.Anthropic.model"
@@ -317,6 +324,8 @@
 													] = value;
 												}}
 											/>
+
+											<AnthropicApiKeyInput />
 										{/if}
 
 										<LabeledTextarea
