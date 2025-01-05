@@ -12,7 +12,7 @@
 	} from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
-	import RenderTransformation from './new/RenderTransformation.svelte';
+	import RenderTransformation from './-components/RenderTransformation.svelte';
 
 	let {
 		transformation: initialTransformation,

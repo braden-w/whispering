@@ -4,7 +4,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { createCreateTransformationWithToast } from '$lib/mutations/transformations';
 	import { generateDefaultTransformation } from '$lib/services/db';
-	import RenderTransformation from './RenderTransformation.svelte';
+	import RenderTransformation from '../-components/RenderTransformation.svelte';
 
 	let transformation = $state(generateDefaultTransformation());
 	const createTransformationWithToastMutation =
