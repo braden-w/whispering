@@ -108,7 +108,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	 * Handler for when the value from storage is successfully updated.
 	 * @default `() => {}`
 	 */
-	onUpdateSuccess?: () => void;
+	onUpdateSuccess?: (newValue: z.infer<TSchema>) => void;
 	/**
 	 * Handler for when the value from storage fails to update.
 	 * @default `() => {}`
@@ -125,7 +125,7 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 	const setValueInLocalStorage = (newValue: z.infer<TSchema>) => {
 		try {
 			localStorage.setItem(key, JSON.stringify(newValue));
-			onUpdateSuccess?.();
+			onUpdateSuccess?.(newValue);
 		} catch (error) {
 			onUpdateError?.(error);
 		} finally {
