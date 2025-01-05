@@ -8,7 +8,7 @@ import {
 	TRANSCRIPTION_SERVICES,
 } from './constants.js';
 
-export const getDefaultSettings = (platform: 'app' | 'extension') =>
+export const getDefaultSettings = () =>
 	({
 		'sound.playOnStartSuccess': true,
 		'sound.playOnStopSuccess': true,
@@ -37,14 +37,12 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'transcription.fasterWhisperServer.serverModel':
 			'Systran/faster-whisper-medium.en',
 
-
 		'apiKeys.openai': '',
 		'apiKeys.anthropic': '',
 		'apiKeys.groq': '',
 
 		'shortcuts.currentLocalShortcut': 'space',
-		'shortcuts.currentGlobalShortcut':
-			platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		'shortcuts.currentGlobalShortcut': 'CommandOrControl+Shift+;',
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({

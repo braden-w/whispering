@@ -13,7 +13,7 @@ import { recorder } from './recorder.svelte';
 export const settings = createPersistedState({
 	key: 'whispering-settings',
 	schema: settingsSchema,
-	defaultValue: getDefaultSettings('app'),
+	defaultValue: getDefaultSettings(),
 	onUpdateSuccess: () => {
 		toast.success({ title: 'Settings updated!', description: '' });
 	},
