@@ -83,6 +83,10 @@ export const settingsSchema = z.object({
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
 
+	'inference.openAi.apiKey': z.string(),
+	'inference.anthropic.apiKey': z.string(),
+	'inference.groq.apiKey': z.string(),
+
 	'shortcuts.currentLocalShortcut': z.string(),
 	'shortcuts.currentGlobalShortcut': z.string(),
 });
