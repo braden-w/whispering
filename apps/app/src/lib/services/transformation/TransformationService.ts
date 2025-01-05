@@ -64,7 +64,7 @@ async function handlePromptTransform(
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${settings.value['inference.openAi.apiKey']}`,
+						Authorization: `Bearer ${settings.value['apiKeys.openai']}`,
 					},
 					body: JSON.stringify({
 						model,
@@ -87,7 +87,7 @@ async function handlePromptTransform(
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							Authorization: `Bearer ${settings.value['inference.groq.apiKey']}`,
+							Authorization: `Bearer ${settings.value['apiKeys.groq']}`,
 						},
 						body: JSON.stringify({
 							model,
@@ -110,7 +110,7 @@ async function handlePromptTransform(
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${settings.value['inference.anthropic.apiKey']}`,
+						Authorization: `Bearer ${settings.value['apiKeys.anthropic']}`,
 					},
 					body: JSON.stringify({
 						model,
