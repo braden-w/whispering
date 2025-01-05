@@ -58,6 +58,7 @@ function createRecorder() {
 				subtitle: '',
 				createdAt: now,
 				updatedAt: now,
+				timestamp: now,
 				transcribedText: '',
 				blob,
 				transcriptionStatus: 'UNPROCESSED',
