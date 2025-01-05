@@ -208,12 +208,14 @@ export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
 	label: model,
 }));
 
-export const INFERENCE_SERVICES = ['OpenAI', 'Groq', 'Anthropic'] as const;
+export const INFERENCE_PROVIDERS = ['OpenAI', 'Groq', 'Anthropic'] as const;
 
-export const INFERENCE_SERVICE_OPTIONS = INFERENCE_SERVICES.map((service) => ({
-	value: service,
-	label: service,
-}));
+export const INFERENCE_PROVIDER_OPTIONS = INFERENCE_PROVIDERS.map(
+	(provider) => ({
+		value: provider,
+		label: provider,
+	}),
+);
 
 // https://platform.openai.com/docs/models
 export const OPENAI_INFERENCE_MODELS = [

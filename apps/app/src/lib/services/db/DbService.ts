@@ -39,7 +39,10 @@ export function generateDefaultTransformationStep(): TransformationStep {
 	return {
 		id: nanoid(),
 		type: 'prompt_transform',
-		'prompt_transform.model': 'gpt-4o',
+		'prompt_transform.inference.provider': 'OpenAI',
+		'prompt_transform.inference.OpenAI.model': 'gpt-4o',
+		'prompt_transform.inference.Groq.model': 'llama-3.3-70b-versatile',
+		'prompt_transform.inference.Anthropic.model': 'claude-3-5-sonnet-latest',
 		'prompt_transform.systemPromptTemplate': '',
 		'prompt_transform.userPromptTemplate': '',
 		'find_replace.findText': '',

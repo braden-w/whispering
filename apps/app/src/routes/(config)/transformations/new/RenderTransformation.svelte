@@ -13,6 +13,12 @@
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
 	import { CopyIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+	import {
+		INFERENCE_PROVIDER_OPTIONS,
+		OPENAI_INFERENCE_MODEL_OPTIONS,
+		GROQ_INFERENCE_MODEL_OPTIONS,
+		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
+	} from '@repo/shared';
 
 	let {
 		transformation,
@@ -157,18 +163,54 @@
 							{:else if step.type === 'prompt_transform'}
 								<div class="space-y-4">
 									<LabeledSelect
-										id="prompt_transform.model"
-										label="Model"
-										items={[
-											{ value: 'gpt-4o', label: 'GPT-4o' },
-											{ value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-										]}
-										selected={step['prompt_transform.model']}
-										placeholder="Select a model"
+										id="prompt_transform.inference.provider"
+										label="Provider"
+										items={INFERENCE_PROVIDER_OPTIONS}
+										selected={step['prompt_transform.inference.provider']}
+										placeholder="Select a provider"
 										onSelectedChange={(value) => {
-											step['prompt_transform.model'] = value;
+											step['prompt_transform.inference.provider'] = value;
 										}}
 									/>
+
+									{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
+										<LabeledSelect
+											id="prompt_transform.inference.OpenAI.model"
+											label="Model"
+											items={OPENAI_INFERENCE_MODEL_OPTIONS}
+											selected={step['prompt_transform.inference.OpenAI.model']}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step['prompt_transform.inference.OpenAI.model'] = value;
+											}}
+										/>
+									{:else if step['prompt_transform.inference.provider'] === 'Groq'}
+										<LabeledSelect
+											id="prompt_transform.inference.Groq.model"
+											label="Model"
+											items={GROQ_INFERENCE_MODEL_OPTIONS}
+											selected={step['prompt_transform.inference.Groq.model']}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step['prompt_transform.inference.Groq.model'] = value;
+											}}
+										/>
+									{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
+										<LabeledSelect
+											id="prompt_transform.inference.Anthropic.model"
+											label="Model"
+											items={ANTHROPIC_INFERENCE_MODEL_OPTIONS}
+											selected={step[
+												'prompt_transform.inference.Anthropic.model'
+											]}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step['prompt_transform.inference.Anthropic.model'] =
+													value;
+											}}
+										/>
+									{/if}
+
 									<LabeledTextarea
 										id="prompt_transform.systemPromptTemplate"
 										label="System Prompt Template"
