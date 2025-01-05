@@ -124,6 +124,13 @@ export const TRANSCRIPTION_SERVICES = [
 	'faster-whisper-server',
 ] as const;
 
+export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
+	(service) => ({
+		value: service,
+		label: service,
+	}),
+);
+
 const SUPPORTED_LANGUAGES_TO_LABEL = {
 	auto: 'Auto',
 	af: 'Afrikaans',
@@ -190,13 +197,6 @@ export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
 		({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
 );
 
-export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
-	(service) => ({
-		value: service,
-		label: service,
-	}),
-);
-
 export const GROQ_MODELS = [
 	'whisper-large-v3',
 	'whisper-large-v3-turbo',
@@ -207,6 +207,51 @@ export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
 	value: model,
 	label: model,
 }));
+
+export const INFERENCE_SERVICES = ['OpenAI', 'Groq', 'Anthropic'] as const;
+
+export const INFERENCE_SERVICE_OPTIONS = INFERENCE_SERVICES.map((service) => ({
+	value: service,
+	label: service,
+}));
+
+// https://platform.openai.com/docs/models
+export const OPENAI_INFERENCE_MODELS = [
+	'gpt-4o',
+	'gpt-4o-mini',
+	'gpt-3.5-turbo',
+] as const;
+
+export const OPENAI_INFERENCE_MODEL_OPTIONS = OPENAI_INFERENCE_MODELS.map(
+	(model) => ({
+		value: model,
+		label: model,
+	}),
+);
+
+// https://console.groq.com/docs/models
+export const GROQ_INFERENCE_MODELS = ['llama-3.3-70b-versatile'] as const;
+
+export const GROQ_INFERENCE_MODEL_OPTIONS = GROQ_INFERENCE_MODELS.map(
+	(model) => ({
+		value: model,
+		label: model,
+	}),
+);
+
+// https://docs.anthropic.com/claude/docs/models-overview
+export const ANTHROPIC_INFERENCE_MODELS = [
+	'claude-3-5-sonnet-latest',
+	'claude-3-5-haiku-latest',
+	'claude-3-opus-latest',
+] as const;
+
+export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
+	(model) => ({
+		value: model,
+		label: model,
+	}),
+);
 
 export type WhisperingSoundNames =
 	| 'start'
