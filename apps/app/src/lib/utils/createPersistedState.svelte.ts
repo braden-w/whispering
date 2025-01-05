@@ -156,7 +156,6 @@ export function createPersistedState<TSchema extends z.ZodTypeAny>({
 			error: valueFromStorageResult.error,
 		});
 
-		setValueInLocalStorage(resolvedValue);
 		return resolvedValue;
 	};
 
