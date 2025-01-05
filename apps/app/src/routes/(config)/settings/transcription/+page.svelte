@@ -1,6 +1,6 @@
 <script lang="ts">
-	import OpenAiApiKeyInput from '../-components/OpenAiApiKeyInput.svelte';
-	import GroqApiKeyInput from '../-components/GroqApiKeyInput.svelte';
+	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
+	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';

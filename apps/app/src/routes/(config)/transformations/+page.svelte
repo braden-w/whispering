@@ -40,7 +40,7 @@
 		createDeleteTransformationWithToast,
 	} from '$lib/mutations/transformations';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import RenderTransformation from './new/RenderTransformation.svelte';
+	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import { nanoid } from 'nanoid/non-secure';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 

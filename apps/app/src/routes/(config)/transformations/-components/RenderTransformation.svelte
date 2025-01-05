@@ -22,9 +22,9 @@
 		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
 	} from '@repo/shared';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
-	import AnthropicApiKeyInput from '../../settings/-components/AnthropicApiKeyInput.svelte';
-	import GroqApiKeyInput from '../../settings/-components/GroqApiKeyInput.svelte';
-	import OpenAiApiKeyInput from '../../settings/-components/OpenAiApiKeyInput.svelte';
+	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
+	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
+	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
 
 	let {
 		transformation,
