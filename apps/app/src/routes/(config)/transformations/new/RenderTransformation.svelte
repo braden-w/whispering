@@ -119,55 +119,6 @@
 </script>
 
 <div class="space-y-4">
-	<div class="grid grid-cols-2 gap-4">
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Input</Card.Title>
-				<Card.Description>Enter the text you want to transform</Card.Description
-				>
-			</Card.Header>
-			<Card.Content>
-				<LabeledTextarea
-					id="input"
-					bind:value={input}
-					placeholder="Enter text to transform..."
-					rows={5}
-				/>
-			</Card.Content>
-		</Card.Root>
-
-		<Card.Root>
-			<Card.Header>
-				<Card.Title>Output</Card.Title>
-				<Card.Description>Transformed text will appear here</Card.Description>
-			</Card.Header>
-			<Card.Content>
-				<LabeledTextarea
-					id="output"
-					value={output}
-					placeholder="Transformed text will appear here..."
-					rows={5}
-					readonly
-				/>
-			</Card.Content>
-		</Card.Root>
-	</div>
-
-	<Button
-		onclick={runTransformation}
-		disabled={isRunning || !input.trim() || transformation.steps.length === 0}
-		class="w-full"
-	>
-		{#if isRunning}
-			<span class="loading loading-spinner loading-sm mr-2"></span>
-		{:else}
-			<PlayIcon class="mr-2 h-4 w-4" />
-		{/if}
-		Run Transformation
-	</Button>
-
-	<Separator class="my-4" />
-
 	<LabeledInput
 		id="title"
 		label="Title"
@@ -353,5 +304,63 @@
 	<Button onclick={addStep} variant="outline" class="w-full mt-2">
 		<PlusIcon class="mr-2 h-4 w-4" />
 		Add Step
+	</Button>
+
+	<Separator class="my-4" />
+
+	<div>
+		<Card.Title class="text-lg mb-2">Test Transformation</Card.Title>
+		<Card.Description class="mb-4">
+			Try out your transformation with sample input
+		</Card.Description>
+	</div>
+
+	<div class="grid grid-cols-2 gap-4">
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Input</Card.Title>
+				<Card.Description>Enter the text you want to transform</Card.Description
+				>
+			</Card.Header>
+			<Card.Content>
+				<LabeledTextarea
+					id="input"
+					label="Input Text"
+					bind:value={input}
+					placeholder="Enter text to transform..."
+					rows={5}
+				/>
+			</Card.Content>
+		</Card.Root>
+
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Output</Card.Title>
+				<Card.Description>Transformed text will appear here</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<LabeledTextarea
+					id="output"
+					label="Output Text"
+					value={output}
+					placeholder="Transformed text will appear here..."
+					rows={5}
+					readonly
+				/>
+			</Card.Content>
+		</Card.Root>
+	</div>
+
+	<Button
+		onclick={runTransformation}
+		disabled={isRunning || !input.trim() || transformation.steps.length === 0}
+		class="w-full"
+	>
+		{#if isRunning}
+			<span class="loading loading-spinner loading-sm mr-2"></span>
+		{:else}
+			<PlayIcon class="mr-2 h-4 w-4" />
+		{/if}
+		Run Transformation
 	</Button>
 </div>
