@@ -24,6 +24,7 @@
 			subtitle: '',
 			createdAt: '',
 			updatedAt: '',
+			timestamp: '',
 			blob: new Blob(),
 			transcribedText: '',
 			transcriptionStatus: 'UNPROCESSED',
