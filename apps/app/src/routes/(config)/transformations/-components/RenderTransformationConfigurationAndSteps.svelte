@@ -166,8 +166,8 @@
 						{#if step.type === 'prompt_transform'}
 							<Card.Description>
 								{index === 0
-									? `'\{\{input\}\}' is the user input`
-									: `'\{\{input\}\}' is the output from the previous step`}
+									? `'{{input}}' is the user input`
+									: `'{{input}}' is the output from the previous step`}
 							</Card.Description>
 						{/if}
 					</Card.Header>
