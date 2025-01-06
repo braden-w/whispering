@@ -278,10 +278,9 @@
 								>
 									{#snippet description()}
 										{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
-											<p class="text-destructive text-sm">
+											<p class="text-amber-500 text-sm font-semibold">
 												Please include {'{{input}}'} in your template to inject the
-												input text! Otherwise the input text will not be included
-												in the transformation.
+												input text into the prompt!
 											</p>
 										{/if}
 									{/snippet}
