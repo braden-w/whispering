@@ -29,11 +29,14 @@ export type TransformationStep = Transformation['steps'][number];
 
 export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
 
-const TRANSFORMATION_STEP_TYPES = ['prompt_transform', 'find_replace'] as const;
-export const TRANSFORMATION_STEP_TYPE_OPTIONS = [
-	{ value: 'prompt_transform', label: 'Prompt Transform' },
-	{ value: 'find_replace', label: 'Find Replace' },
-] satisfies { value: TransformationStep['type']; label: string }[];
+export const TRANSFORMATION_STEP_TYPES = [
+	'prompt_transform',
+	'find_replace',
+] as const;
+export const TRANSFORMATION_STEP_TYPES_TO_LABELS = {
+	prompt_transform: 'Prompt Transform',
+	find_replace: 'Find Replace',
+} as const satisfies Record<(typeof TRANSFORMATION_STEP_TYPES)[number], string>;
 
 export type RecordingsDbSchemaV4 = {
 	recordings: RecordingsDbSchemaV3['recordings'] & {

@@ -50,7 +50,7 @@
 		<Select.Trigger class="w-full">
 			{selectedLabel ?? placeholder}
 		</Select.Trigger>
-		<Select.Content class="max-h-96 overflow-auto">
+		<Select.Content>
 			{#each items as item}
 				<Select.Item value={item.value} label={item.label}>
 					{item.label}
