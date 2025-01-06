@@ -112,7 +112,7 @@
 							return 'Find Replace';
 					}
 				})()}
-				<Card.Root class="border border-border/50">
+				<Card.Root>
 					<Card.Header class="space-y-3">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2">
