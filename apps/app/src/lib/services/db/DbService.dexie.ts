@@ -347,7 +347,7 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
-		async createRecording(recording: InsertRecording) {
+		async createRecording(recording) {
 			const now = new Date().toISOString();
 			const recordingWithTimestamps = {
 				...recording,
