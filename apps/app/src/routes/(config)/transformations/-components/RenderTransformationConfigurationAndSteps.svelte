@@ -8,6 +8,7 @@
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import * as Alert from '$lib/components/ui/alert';
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
@@ -91,21 +92,36 @@
 			placeholder="Enter a description"
 		/>
 
+		{#if transformation.steps.length === 0}
+			<Alert.Root variant="destructive">
+				<Alert.Title>No steps added</Alert.Title>
+				<Alert.Description>
+					Please add at least one step to your transformation before saving.
+				</Alert.Description>
+			</Alert.Root>
+		{/if}
+
 		<Accordion.Root
 			type="single"
 			class="w-full space-y-2"
 			bind:value={currentlyOpenStepId}
 		>
 			{#each transformation.steps as step, index}
+				{@const stepName = (() => {
+					switch (step.type) {
+						case 'prompt_transform':
+							return 'Prompt Transform';
+						case 'find_replace':
+							return 'Find Replace';
+					}
+				})()}
 				<Card.Root class="border border-border/50">
 					<Card.Content class="p-0">
 						<Accordion.Item class="border-0" value={step.id}>
 							<div class="flex items-center justify-between px-4 py-2">
 								<Accordion.Trigger class="flex-1 hover:no-underline">
 									<span class="text-sm font-medium">
-										Step {index + 1}: {step.type === 'prompt_transform'
-											? 'Prompt Transform'
-											: 'Find Replace'}
+										Step {index + 1}: {stepName}
 									</span>
 								</Accordion.Trigger>
 								<div class="flex gap-1">
@@ -272,7 +288,11 @@
 			{/each}
 		</Accordion.Root>
 
-		<Button onclick={addStep} variant="outline" class="w-full mt-2">
+		<Button
+			onclick={addStep}
+			variant={transformation.steps.length === 0 ? 'default' : 'outline'}
+			class="w-full mt-2"
+		>
 			<PlusIcon class="mr-2 h-4 w-4" />
 			Add Step
 		</Button>
