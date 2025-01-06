@@ -1,12 +1,10 @@
-import { recordingsKeys } from '$lib/queries/recordings';
 import {
-	DbService,
 	DownloadService,
 	userConfiguredServices,
 } from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
-import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+import { createMutation } from '@tanstack/svelte-query';
 
 export const createUpdateRecordingWithToast = () =>
 	createMutation(() => ({

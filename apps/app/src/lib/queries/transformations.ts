@@ -1,4 +1,4 @@
-import { DbService } from '$lib/services/index.js';
+import { userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/utils/toast';
 import { createQuery } from '@tanstack/svelte-query';
 
@@ -11,7 +11,7 @@ export const createTransformationsQuery = () =>
 	createQuery(() => ({
 		queryKey: transformationsKeys.all,
 		queryFn: async () => {
-			const result = await DbService.getAllTransformations();
+			const result = await userConfiguredServices.db.getAllTransformations();
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to fetch transformations!',

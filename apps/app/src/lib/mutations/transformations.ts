@@ -1,15 +1,18 @@
-import { transformationsKeys } from '$lib/queries/transformations';
-import { DbService } from '$lib/services/index.js';
 import type { Transformation } from '$lib/services/db';
+import { userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/utils/toast';
 import { createMutation } from '@tanstack/svelte-query';
 
 export const createCreateTransformationWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async (
-			...params: Parameters<typeof DbService.createTransformation>
+			...params: Parameters<
+				typeof userConfiguredServices.db.createTransformation
+			>
 		) => {
-			const result = await DbService.createTransformation(...params);
+			const result = await userConfiguredServices.db.createTransformation(
+				...params,
+			);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to create transformation!',
@@ -29,9 +32,13 @@ export const createCreateTransformationWithToast = () =>
 export const createUpdateTransformationWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async (
-			...params: Parameters<typeof DbService.updateTransformation>
+			...params: Parameters<
+				typeof userConfiguredServices.db.updateTransformation
+			>
 		) => {
-			const result = await DbService.updateTransformation(...params);
+			const result = await userConfiguredServices.db.updateTransformation(
+				...params,
+			);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to update transformation!',
@@ -51,7 +58,8 @@ export const createUpdateTransformationWithToast = () =>
 export const createDeleteTransformationWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async (transformation: Transformation) => {
-			const result = await DbService.deleteTransformation(transformation);
+			const result =
+				await userConfiguredServices.db.deleteTransformation(transformation);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete transformation!',
@@ -71,7 +79,8 @@ export const createDeleteTransformationWithToast = () =>
 export const createDeleteTransformationsWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async (transformations: Transformation[]) => {
-			const result = await DbService.deleteTransformations(transformations);
+			const result =
+				await userConfiguredServices.db.deleteTransformations(transformations);
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to delete transformations!',

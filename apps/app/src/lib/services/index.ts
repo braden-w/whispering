@@ -49,7 +49,7 @@ const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-export const DbService = createDbDexieService();
+const DbService = createDbDexieService();
 
 const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
