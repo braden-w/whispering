@@ -1,4 +1,3 @@
-import { settings } from '$lib/stores/settings.svelte.js';
 import { Ok } from '@epicenterhq/result';
 import type { HttpService } from '../http/HttpService';
 import {
@@ -6,17 +5,20 @@ import {
 	type TranscriptionService,
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
+import type { Settings } from '@repo/shared';
 
 export function createTranscriptionServiceFasterWhisperServer({
 	HttpService,
+	settings,
 }: {
 	HttpService: HttpService;
+	settings: Settings;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
-		modelName: settings.value['transcription.fasterWhisperServer.serverModel'],
+		modelName: settings['transcription.fasterWhisperServer.serverModel'],
 		postConfig: {
-			url: `${settings.value['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
+			url: `${settings['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
 		},
 		preValidate: async () => Ok(undefined),
 		errorConfig: {

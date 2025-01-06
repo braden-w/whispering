@@ -1,4 +1,4 @@
-import { settings } from '$lib/stores/settings.svelte';
+import type { Settings } from '@repo/shared';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
@@ -12,6 +12,7 @@ import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
 import { createHttpServiceWeb } from './services/http/HttpService.web';
 import { createNotificationServiceDesktop } from './services/notifications/NotificationService.desktop';
 import { createNotificationServiceWeb } from './services/notifications/NotificationService.web';
+import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
 import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
@@ -20,6 +21,7 @@ import { createTranscriptionServiceGroqDistil } from './services/transcription/T
 import { createTranscriptionServiceGroqLarge } from './services/transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './services/transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
+import { settings } from './stores/settings.svelte';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -44,35 +46,53 @@ export const DbService = createDbDexieService();
 /**
  * Services that are determined by the user's settings.
  */
-export const userConfiguredServices = createServices();
-
-function createServices() {
+export const userConfiguredServices = () => {
 	const HttpService = window.__TAURI_INTERNALS__
 		? createHttpServiceDesktop()
 		: createHttpServiceWeb();
 
-	const TranscriptionService = $derived.by(() => {
+	const TranscriptionService = (() => {
 		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
-				return createTranscriptionServiceOpenAi({ HttpService });
+				return createTranscriptionServiceOpenAi({
+					HttpService,
+					settings: settings.value,
+				});
 			case 'Groq': {
 				switch (settings.value['transcription.groq.model']) {
 					case 'whisper-large-v3':
-						return createTranscriptionServiceGroqLarge({ HttpService });
+						return createTranscriptionServiceGroqLarge({
+							HttpService,
+							settings: settings.value,
+						});
 					case 'whisper-large-v3-turbo':
-						return createTranscriptionServiceGroqTurbo({ HttpService });
+						return createTranscriptionServiceGroqTurbo({
+							HttpService,
+							settings: settings.value,
+						});
 					case 'distil-whisper-large-v3-en':
-						return createTranscriptionServiceGroqDistil({ HttpService });
+						return createTranscriptionServiceGroqDistil({
+							HttpService,
+							settings: settings.value,
+						});
 					default:
-						return createTranscriptionServiceGroqLarge({ HttpService });
+						return createTranscriptionServiceGroqLarge({
+							HttpService,
+							settings: settings.value,
+						});
 				}
 			}
 			case 'faster-whisper-server':
-				return createTranscriptionServiceFasterWhisperServer({ HttpService });
+				return createTranscriptionServiceFasterWhisperServer({
+					HttpService,
+					settings: settings.value,
+				});
 		}
-	});
+	})();
 
-	const RecorderService = createRecorderServiceWeb();
+	const RecorderService = window.__TAURI_INTERNALS__
+		? createRecorderServiceTauri()
+		: createRecorderServiceWeb();
 
 	const PlaySoundService = window.__TAURI_INTERNALS__
 		? createPlaySoundServiceDesktop()
@@ -104,4 +124,4 @@ function createServices() {
 			},
 		},
 	};
-}
+};

@@ -1,13 +1,14 @@
-import { settings } from '$lib/stores/settings.svelte';
 import { Ok, type Result } from '@epicenterhq/result';
 import type { Transformation, TransformationStep } from '../db';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
+import type { Settings } from '@repo/shared';
 
 type TransformationError = WhisperingResult<string>;
 
 export async function runTransformationOnInput(
 	input: string,
 	transformation: Transformation,
+	settings: Settings,
 ): Promise<TransformationError> {
 	try {
 		let currentInput = input;
@@ -15,8 +16,8 @@ export async function runTransformationOnInput(
 		for (const step of transformation.steps) {
 			const result =
 				step.type === 'find_replace'
-					? await handleFindReplace(currentInput, step)
-					: await handlePromptTransform(currentInput, step);
+					? await handleFindReplace(currentInput, step, settings)
+					: await handlePromptTransform(currentInput, step, settings);
 
 			if (!result.ok) return result;
 			currentInput = result.data;
@@ -35,6 +36,7 @@ export async function runTransformationOnInput(
 async function handlePromptTransform(
 	input: string,
 	step: TransformationStep,
+	settings: Settings,
 ): Promise<TransformationError> {
 	if (step.type !== 'prompt_transform') {
 		return WhisperingErr({
@@ -64,7 +66,7 @@ async function handlePromptTransform(
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${settings.value['apiKeys.openai']}`,
+						Authorization: `Bearer ${settings['apiKeys.openai']}`,
 					},
 					body: JSON.stringify({
 						model,
@@ -87,7 +89,7 @@ async function handlePromptTransform(
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							Authorization: `Bearer ${settings.value['apiKeys.groq']}`,
+							Authorization: `Bearer ${settings['apiKeys.groq']}`,
 						},
 						body: JSON.stringify({
 							model,
@@ -110,7 +112,7 @@ async function handlePromptTransform(
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${settings.value['apiKeys.anthropic']}`,
+						Authorization: `Bearer ${settings['apiKeys.anthropic']}`,
 					},
 					body: JSON.stringify({
 						model,
@@ -159,6 +161,7 @@ async function handlePromptTransform(
 async function handleFindReplace(
 	input: string,
 	step: TransformationStep,
+	settings: Settings,
 ): Promise<TransformationError> {
 	try {
 		if (step.type !== 'find_replace') {

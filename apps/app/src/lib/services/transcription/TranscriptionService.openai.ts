@@ -1,4 +1,3 @@
-import { settings } from '$lib/stores/settings.svelte.js';
 import { Ok } from '@epicenterhq/result';
 import type { HttpService } from '../http/HttpService';
 import {
@@ -6,11 +5,14 @@ import {
 	type TranscriptionService,
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
+import type { Settings } from '@repo/shared';
 
 export function createTranscriptionServiceOpenAi({
 	HttpService,
+	settings,
 }: {
 	HttpService: HttpService;
+	settings: Settings;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
@@ -18,11 +20,11 @@ export function createTranscriptionServiceOpenAi({
 		postConfig: {
 			url: 'https://api.openai.com/v1/audio/transcriptions',
 			headers: {
-				Authorization: `Bearer ${settings.value['apiKeys.openai']}`,
+				Authorization: `Bearer ${settings['apiKeys.openai']}`,
 			},
 		},
 		preValidate: async () => {
-			if (!settings.value['apiKeys.openai']) {
+			if (!settings['apiKeys.openai']) {
 				return TranscriptionServiceErr({
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
@@ -34,7 +36,7 @@ export function createTranscriptionServiceOpenAi({
 				});
 			}
 
-			if (!settings.value['apiKeys.openai'].startsWith('sk-')) {
+			if (!settings['apiKeys.openai'].startsWith('sk-')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',
