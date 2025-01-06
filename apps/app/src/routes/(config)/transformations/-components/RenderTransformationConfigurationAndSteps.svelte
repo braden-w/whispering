@@ -11,14 +11,22 @@
 	import * as Alert from '$lib/components/ui/alert';
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
-	import { TRANSFORMATION_STEP_TYPE_OPTIONS } from '$lib/services/db/DbService.dexie';
+	import {
+		TRANSFORMATION_STEP_TYPES,
+		TRANSFORMATION_STEP_TYPES_TO_LABELS,
+	} from '$lib/services/db/DbService.dexie';
 	import {
 		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
 		GROQ_INFERENCE_MODEL_OPTIONS,
 		INFERENCE_PROVIDER_OPTIONS,
 		OPENAI_INFERENCE_MODEL_OPTIONS,
 	} from '@repo/shared';
-	import { CopyIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+	import {
+		CopyIcon,
+		PlusIcon,
+		TrashIcon,
+		ChevronDownIcon,
+	} from 'lucide-svelte';
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
@@ -101,11 +109,7 @@
 			</Alert.Root>
 		{/if}
 
-		<Accordion.Root
-			type="single"
-			class="w-full space-y-2"
-			bind:value={currentlyOpenStepId}
-		>
+		<div class="space-y-4">
 			{#each transformation.steps as step, index}
 				{@const stepName = (() => {
 					switch (step.type) {
@@ -116,61 +120,76 @@
 					}
 				})()}
 				<Card.Root class="border border-border/50">
-					<Card.Content class="p-0">
-						<Accordion.Item class="border-0" value={step.id}>
-							<div class="flex items-center justify-between px-4 py-2">
-								<Accordion.Trigger class="flex-1 hover:no-underline">
-									<span class="text-sm font-medium">
-										Step {index + 1}: {stepName}
-									</span>
-								</Accordion.Trigger>
-								<div class="flex gap-1">
-									<WhisperingButton
-										tooltipContent="Duplicate step"
-										variant="ghost"
-										size="icon"
-										class="h-8 w-8"
-										onclick={() => duplicateStep(index)}
-									>
-										<CopyIcon class="h-4 w-4" />
-									</WhisperingButton>
-									<WhisperingButton
-										tooltipContent="Delete step"
-										variant="ghost"
-										size="icon"
-										class="h-8 w-8"
-										onclick={() => removeStep(index)}
-									>
-										<TrashIcon class="h-4 w-4" />
-									</WhisperingButton>
-								</div>
+					<Card.Header>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2">
+								<Card.Title class="text-xl">
+									Step {index + 1}:
+								</Card.Title>
+								<LabeledSelect
+									id="step-type"
+									label="Type"
+									selected={step.type}
+									items={TRANSFORMATION_STEP_TYPES.map(
+										(type) =>
+											({
+												value: type,
+												label: TRANSFORMATION_STEP_TYPES_TO_LABELS[type],
+											}) as const,
+									)}
+									onSelectedChange={(value) => {
+										step.type = value;
+									}}
+									hideLabel
+									class="h-8"
+									placeholder="Select a step type"
+								/>
 							</div>
-							<Accordion.Content>
-								<div class="space-y-4 p-4 pt-2">
-									<LabeledSelect
-										id="step-type"
-										label="Step Type"
-										selected={step.type}
-										items={TRANSFORMATION_STEP_TYPE_OPTIONS}
-										onSelectedChange={(value) => {
-											step.type = value;
-										}}
-										placeholder="Select a step type"
+							<div class="flex gap-1 items-center">
+								<WhisperingButton
+									tooltipContent="Duplicate step"
+									variant="ghost"
+									size="icon"
+									class="h-8 w-8"
+									onclick={() => duplicateStep(index)}
+								>
+									<CopyIcon class="h-4 w-4" />
+								</WhisperingButton>
+								<WhisperingButton
+									tooltipContent="Delete step"
+									variant="ghost"
+									size="icon"
+									class="h-8 w-8"
+									onclick={() => removeStep(index)}
+								>
+									<TrashIcon class="h-4 w-4" />
+								</WhisperingButton>
+							</div>
+						</div>
+					</Card.Header>
+					<Card.Content>
+						{#if step.type === 'find_replace'}
+							<div class="space-y-4">
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<LabeledInput
+										id="find_replace.findText"
+										label="Find Text"
+										bind:value={step['find_replace.findText']}
+										placeholder="Enter text to find"
 									/>
-									{#if step.type === 'find_replace'}
-										<div class="space-y-4">
-											<LabeledInput
-												id="find_replace.findText"
-												label="Find Text"
-												bind:value={step['find_replace.findText']}
-												placeholder="Enter text to find"
-											/>
-											<LabeledInput
-												id="find_replace.replaceText"
-												label="Replace Text"
-												bind:value={step['find_replace.replaceText']}
-												placeholder="Enter replacement text"
-											/>
+									<LabeledInput
+										id="find_replace.replaceText"
+										label="Replace Text"
+										bind:value={step['find_replace.replaceText']}
+										placeholder="Enter replacement text"
+									/>
+								</div>
+								<Accordion.Root type="single" class="w-full">
+									<Accordion.Item class="border-b-0" value="advanced">
+										<Accordion.Trigger class="text-sm">
+											Advanced Options
+										</Accordion.Trigger>
+										<Accordion.Content>
 											<LabeledSwitch
 												id="find_replace.useRegex"
 												label="Use Regex"
@@ -179,114 +198,115 @@
 													step['find_replace.useRegex'] = v;
 												}}
 											/>
-										</div>
-									{:else if step.type === 'prompt_transform'}
-										<div class="space-y-4">
-											<LabeledSelect
-												id="prompt_transform.inference.provider"
-												label="Provider"
-												items={INFERENCE_PROVIDER_OPTIONS}
-												selected={step['prompt_transform.inference.provider']}
-												placeholder="Select a provider"
-												onSelectedChange={(value) => {
-													step['prompt_transform.inference.provider'] = value;
-												}}
-											/>
+										</Accordion.Content>
+									</Accordion.Item>
+								</Accordion.Root>
+							</div>
+						{:else if step.type === 'prompt_transform'}
+							<div class="space-y-4">
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<LabeledSelect
+										id="prompt_transform.inference.provider"
+										label="Provider"
+										items={INFERENCE_PROVIDER_OPTIONS}
+										selected={step['prompt_transform.inference.provider']}
+										placeholder="Select a provider"
+										onSelectedChange={(value) => {
+											step['prompt_transform.inference.provider'] = value;
+										}}
+									/>
 
-											{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
-												<LabeledSelect
-													id="prompt_transform.inference.provider.OpenAI.model"
-													label="Model"
-													items={OPENAI_INFERENCE_MODEL_OPTIONS}
-													selected={step[
-														'prompt_transform.inference.provider.OpenAI.model'
-													]}
-													placeholder="Select a model"
-													onSelectedChange={(value) => {
-														step[
-															'prompt_transform.inference.provider.OpenAI.model'
-														] = value;
-													}}
-												/>
-
-												<OpenAiApiKeyInput />
-											{:else if step['prompt_transform.inference.provider'] === 'Groq'}
-												<LabeledSelect
-													id="prompt_transform.inference.provider.Groq.model"
-													label="Model"
-													items={GROQ_INFERENCE_MODEL_OPTIONS}
-													selected={step[
-														'prompt_transform.inference.provider.Groq.model'
-													]}
-													placeholder="Select a model"
-													onSelectedChange={(value) => {
-														step[
-															'prompt_transform.inference.provider.Groq.model'
-														] = value;
-													}}
-												/>
-
-												<GroqApiKeyInput />
-											{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
-												<LabeledSelect
-													id="prompt_transform.inference.provider.Anthropic.model"
-													label="Model"
-													items={ANTHROPIC_INFERENCE_MODEL_OPTIONS}
-													selected={step[
-														'prompt_transform.inference.provider.Anthropic.model'
-													]}
-													placeholder="Select a model"
-													onSelectedChange={(value) => {
-														step[
-															'prompt_transform.inference.provider.Anthropic.model'
-														] = value;
-													}}
-												/>
-
-												<AnthropicApiKeyInput />
-											{/if}
-
-											<LabeledTextarea
-												id="prompt_transform.systemPromptTemplate"
-												label="System Prompt Template"
-												bind:value={step[
-													'prompt_transform.systemPromptTemplate'
-												]}
-												placeholder="Enter system prompt template. Use {'{{input}}'} to reference the input text."
-											>
-												{#snippet description()}
-													{#if step['prompt_transform.systemPromptTemplate'] && !step['prompt_transform.systemPromptTemplate'].includes('{{input}}')}
-														<p class="text-destructive text-sm">
-															Please include {'{{input}}'} in your template to reference
-															the input text
-														</p>
-													{/if}
-												{/snippet}
-											</LabeledTextarea>
-											<LabeledTextarea
-												id="prompt_transform.userPromptTemplate"
-												label="User Prompt Template"
-												bind:value={step['prompt_transform.userPromptTemplate']}
-												placeholder="Enter user prompt template. Use {'{{input}}'} to reference the input text."
-											>
-												{#snippet description()}
-													{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
-														<p class="text-destructive text-sm">
-															Please include {'{{input}}'} in your template to reference
-															the input text
-														</p>
-													{/if}
-												{/snippet}
-											</LabeledTextarea>
-										</div>
+									{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
+										<LabeledSelect
+											id="prompt_transform.inference.provider.OpenAI.model"
+											label="Model"
+											items={OPENAI_INFERENCE_MODEL_OPTIONS}
+											selected={step[
+												'prompt_transform.inference.provider.OpenAI.model'
+											]}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step[
+													'prompt_transform.inference.provider.OpenAI.model'
+												] = value;
+											}}
+										/>
+									{:else if step['prompt_transform.inference.provider'] === 'Groq'}
+										<LabeledSelect
+											id="prompt_transform.inference.provider.Groq.model"
+											label="Model"
+											items={GROQ_INFERENCE_MODEL_OPTIONS}
+											selected={step[
+												'prompt_transform.inference.provider.Groq.model'
+											]}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step['prompt_transform.inference.provider.Groq.model'] =
+													value;
+											}}
+										/>
+									{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
+										<LabeledSelect
+											id="prompt_transform.inference.provider.Anthropic.model"
+											label="Model"
+											items={ANTHROPIC_INFERENCE_MODEL_OPTIONS}
+											selected={step[
+												'prompt_transform.inference.provider.Anthropic.model'
+											]}
+											placeholder="Select a model"
+											onSelectedChange={(value) => {
+												step[
+													'prompt_transform.inference.provider.Anthropic.model'
+												] = value;
+											}}
+										/>
 									{/if}
 								</div>
-							</Accordion.Content>
-						</Accordion.Item>
+
+								{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
+									<OpenAiApiKeyInput />
+								{:else if step['prompt_transform.inference.provider'] === 'Groq'}
+									<GroqApiKeyInput />
+								{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
+									<AnthropicApiKeyInput />
+								{/if}
+
+								<LabeledTextarea
+									id="prompt_transform.systemPromptTemplate"
+									label="System Prompt Template"
+									bind:value={step['prompt_transform.systemPromptTemplate']}
+									placeholder="Enter system prompt template. Use {'{{input}}'} to reference the input text."
+								>
+									{#snippet description()}
+										{#if step['prompt_transform.systemPromptTemplate'] && !step['prompt_transform.systemPromptTemplate'].includes('{{input}}')}
+											<p class="text-destructive text-sm">
+												Please include {'{{input}}'} in your template to reference
+												the input text
+											</p>
+										{/if}
+									{/snippet}
+								</LabeledTextarea>
+								<LabeledTextarea
+									id="prompt_transform.userPromptTemplate"
+									label="User Prompt Template"
+									bind:value={step['prompt_transform.userPromptTemplate']}
+									placeholder="Enter user prompt template. Use {'{{input}}'} to reference the input text."
+								>
+									{#snippet description()}
+										{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
+											<p class="text-destructive text-sm">
+												Please include {'{{input}}'} in your template to reference
+												the input text
+											</p>
+										{/if}
+									{/snippet}
+								</LabeledTextarea>
+							</div>
+						{/if}
 					</Card.Content>
 				</Card.Root>
 			{/each}
-		</Accordion.Root>
+		</div>
 
 		<Button
 			onclick={addStep}

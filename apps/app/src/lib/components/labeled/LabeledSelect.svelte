@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends string ">
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -10,7 +11,9 @@
 		selected,
 		onSelectedChange,
 		placeholder = 'Select an option',
+		class: className,
 		disabled = false,
+		hideLabel = false,
 		description,
 	}: {
 		id: string;
@@ -23,7 +26,9 @@
 		selected: T;
 		onSelectedChange: (selected: T) => void;
 		placeholder?: string;
+		class?: string;
 		disabled?: boolean;
+		hideLabel?: boolean;
 		description?: string | Snippet;
 	} = $props();
 
@@ -33,7 +38,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-	<Label class="text-sm" for={id}>
+	<Label class={cn('text-sm', hideLabel && 'sr-only')} for={id}>
 		{label}
 	</Label>
 	<Select.Root
@@ -47,7 +52,7 @@
 		}}
 		{disabled}
 	>
-		<Select.Trigger class="w-full">
+		<Select.Trigger class={cn('w-full', className)}>
 			{selectedLabel ?? placeholder}
 		</Select.Trigger>
 		<Select.Content>
