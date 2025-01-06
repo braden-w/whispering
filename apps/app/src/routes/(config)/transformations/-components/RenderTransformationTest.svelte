@@ -6,33 +6,32 @@
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
 	import { toast } from '$lib/utils/toast';
+	import { createMutation } from '@tanstack/svelte-query';
 	import { PlayIcon } from 'lucide-svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();
 
 	let input = $state('');
 	let output = $state('');
-	let isRunning = $state(false);
 
-	async function runTransformation() {
-		if (!input.trim()) {
-			toast.error({
-				title: 'No input provided',
-				description: 'Please enter some text to transform',
-			});
-			return;
-		}
+	const runTransformation = createMutation(() => ({
+		mutationFn: async () => {
+			if (!input.trim()) {
+				toast.error({
+					title: 'No input provided',
+					description: 'Please enter some text to transform',
+				});
+				throw new Error('No input provided');
+			}
 
-		if (transformation.steps.length === 0) {
-			toast.error({
-				title: 'No steps configured',
-				description: 'Please add at least one transformation step',
-			});
-			return;
-		}
+			if (transformation.steps.length === 0) {
+				toast.error({
+					title: 'No steps configured',
+					description: 'Please add at least one transformation step',
+				});
+				throw new Error('No steps configured');
+			}
 
-		isRunning = true;
-		try {
 			const result = await runTransformationOnInput(input, transformation);
 			if (!result.ok) {
 				toast.error({
@@ -40,23 +39,18 @@
 					description: result.error.description,
 					action: result.error.action,
 				});
-				return;
+				throw result.error;
 			}
-			output = result.data;
+			return result.data;
+		},
+		onSuccess: (data) => {
+			output = data;
 			toast.success({
 				title: 'Transformation complete',
 				description: 'The text has been successfully transformed',
 			});
-		} catch (error) {
-			toast.error({
-				title: 'Transformation failed',
-				description: 'An unexpected error occurred',
-				action: { type: 'more-details', error },
-			});
-		} finally {
-			isRunning = false;
-		}
-	}
+		},
+	}));
 </script>
 
 <Card.Root>
@@ -105,11 +99,13 @@
 		</div>
 
 		<Button
-			onclick={runTransformation}
-			disabled={isRunning || !input.trim() || transformation.steps.length === 0}
+			onclick={() => runTransformation.mutate()}
+			disabled={runTransformation.isPending ||
+				!input.trim() ||
+				transformation.steps.length === 0}
 			class="w-full"
 		>
-			{#if isRunning}
+			{#if runTransformation.isPending}
 				<span class="loading loading-spinner loading-sm mr-2"></span>
 			{:else}
 				<PlayIcon class="mr-2 h-4 w-4" />
