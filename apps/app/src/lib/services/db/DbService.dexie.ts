@@ -26,7 +26,6 @@ export type InsertTransformation = Omit<
 >;
 
 export type TransformationStep = Transformation['steps'][number];
-
 export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
 
 export const TRANSFORMATION_STEP_TYPES = [
