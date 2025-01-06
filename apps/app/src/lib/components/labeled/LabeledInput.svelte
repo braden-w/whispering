@@ -35,12 +35,10 @@
 		{...restProps}
 	/>
 	{#if description}
-		<div class="text-muted-foreground text-sm">
-			{#if typeof description === 'string'}
-				{description}
-			{:else}
-				{@render description()}
-			{/if}
-		</div>
+		{#if typeof description === 'string'}
+			<p class="text-muted-foreground text-sm">{description}</p>
+		{:else}
+			{@render description()}
+		{/if}
 	{/if}
 </div>

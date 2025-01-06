@@ -223,10 +223,10 @@
 											>
 												{#snippet description()}
 													{#if step['prompt_transform.systemPromptTemplate'] && !step['prompt_transform.systemPromptTemplate'].includes('{{input}}')}
-														<span class="text-destructive text-sm">
+														<p class="text-destructive text-sm">
 															Please include {'{{input}}'} in your template to reference
 															the input text
-														</span>
+														</p>
 													{/if}
 												{/snippet}
 											</LabeledTextarea>
@@ -238,10 +238,10 @@
 											>
 												{#snippet description()}
 													{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
-														<span class="text-destructive text-sm">
+														<p class="text-destructive text-sm">
 															Please include {'{{input}}'} in your template to reference
 															the input text
-														</span>
+														</p>
 													{/if}
 												{/snippet}
 											</LabeledTextarea>

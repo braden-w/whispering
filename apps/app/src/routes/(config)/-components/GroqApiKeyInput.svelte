@@ -15,14 +15,16 @@
 	}}
 >
 	{#snippet description()}
-		You can find your Groq API key in your <Button
-			variant="link"
-			class="px-0.3 py-0.2 h-fit"
-			href="https://console.groq.com/keys"
-			target="_blank"
-			rel="noopener noreferrer"
-		>
-			Groq console
-		</Button>.
+		<p class="text-muted-foreground text-sm">
+			You can find your Groq API key in your <Button
+				variant="link"
+				class="px-0.3 py-0.2 h-fit"
+				href="https://console.groq.com/keys"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Groq console
+			</Button>.
+		</p>
 	{/snippet}
 </LabeledInput>
