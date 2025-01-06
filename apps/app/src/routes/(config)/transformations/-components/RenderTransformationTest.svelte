@@ -2,6 +2,7 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import { userConfiguredServices } from '$lib/services.svelte';
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
@@ -33,7 +34,7 @@
 				throw new Error('No steps configured');
 			}
 
-			const result = await runTransformationOnInput(input, transformation);
+			const result = await userConfiguredServices.transformations.runTransformationOnInput(input, transformation);
 			if (!result.ok) {
 				toast.error({
 					title: result.error.title,

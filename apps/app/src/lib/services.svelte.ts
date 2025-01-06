@@ -8,6 +8,7 @@ import { createClipboardServiceWeb } from './services/clipboard/ClipboardService
 import {
 	createDbDexieService,
 	type Recording,
+	type Transformation,
 } from './services/db/DbService.dexie';
 import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './services/download/DownloadService.web';
@@ -26,6 +27,7 @@ import { createTranscriptionServiceGroqTurbo } from './services/transcription/Tr
 import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
 import { settings } from './stores/settings.svelte';
 import { queryClient } from '../routes/+layout.svelte';
+import { runTransformationOnInput } from './services/transformation/TransformationService';
 import { recordingsKeys } from './queries/recordings';
 
 // Services that are not determined by the user's settings, but by the platform.
@@ -64,6 +66,14 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
+		transformations: {
+			runTransformationOnInput: async (
+				input: string,
+				transformation: Transformation,
+			) => {
+				return runTransformationOnInput(input, transformation, HttpService);
+			},
+		},
 		db: {
 			createRecording: async (recording: Recording) => {
 				const result = await DbService.createRecording(recording);
