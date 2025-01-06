@@ -43,85 +43,88 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 
 export const DbService = createDbDexieService();
 
-const HttpService = window.__TAURI_INTERNALS__
-	? createHttpServiceDesktop()
-	: createHttpServiceWeb();
-
-const RecorderService = window.__TAURI_INTERNALS__
-	? createRecorderServiceTauri()
-	: createRecorderServiceWeb();
-
-const PlaySoundService = window.__TAURI_INTERNALS__
-	? createPlaySoundServiceDesktop()
-	: createPlaySoundServiceWeb();
 /**
  * Services that are determined by the user's settings.
  */
-export const userConfiguredServices = {
-	get transcription() {
-		switch (settings.value['transcription.selectedTranscriptionService']) {
-			case 'OpenAI':
-				return createTranscriptionServiceOpenAi({
-					HttpService,
-					settings: settings.value,
-				});
-			case 'Groq': {
-				switch (settings.value['transcription.groq.model']) {
-					case 'whisper-large-v3':
-						return createTranscriptionServiceGroqLarge({
-							HttpService,
-							settings: settings.value,
-						});
-					case 'whisper-large-v3-turbo':
-						return createTranscriptionServiceGroqTurbo({
-							HttpService,
-							settings: settings.value,
-						});
-					case 'distil-whisper-large-v3-en':
-						return createTranscriptionServiceGroqDistil({
-							HttpService,
-							settings: settings.value,
-						});
-					default:
-						return createTranscriptionServiceGroqLarge({
-							HttpService,
-							settings: settings.value,
-						});
+export const userConfiguredServices = (() => {
+	const HttpService = window.__TAURI_INTERNALS__
+		? createHttpServiceDesktop()
+		: createHttpServiceWeb();
+
+	const RecorderService = window.__TAURI_INTERNALS__
+		? createRecorderServiceTauri()
+		: createRecorderServiceWeb();
+
+	const PlaySoundService = window.__TAURI_INTERNALS__
+		? createPlaySoundServiceDesktop()
+		: createPlaySoundServiceWeb();
+
+	return {
+		get transcription() {
+			switch (settings.value['transcription.selectedTranscriptionService']) {
+				case 'OpenAI':
+					return createTranscriptionServiceOpenAi({
+						HttpService,
+						settings: settings.value,
+					});
+				case 'Groq': {
+					switch (settings.value['transcription.groq.model']) {
+						case 'whisper-large-v3':
+							return createTranscriptionServiceGroqLarge({
+								HttpService,
+								settings: settings.value,
+							});
+						case 'whisper-large-v3-turbo':
+							return createTranscriptionServiceGroqTurbo({
+								HttpService,
+								settings: settings.value,
+							});
+						case 'distil-whisper-large-v3-en':
+							return createTranscriptionServiceGroqDistil({
+								HttpService,
+								settings: settings.value,
+							});
+						default:
+							return createTranscriptionServiceGroqLarge({
+								HttpService,
+								settings: settings.value,
+							});
+					}
 				}
-			}
-			case 'faster-whisper-server':
-				return createTranscriptionServiceFasterWhisperServer({
-					HttpService,
-					settings: settings.value,
-				});
-			default:
-				return createTranscriptionServiceOpenAi({
-					HttpService,
-					settings: settings.value,
-				});
-		}
-	},
-	recorder: RecorderService,
-	sound: {
-		playStartSoundIfEnabled: () => {
-			if (settings.value['sound.playOnStartSuccess']) {
-				void PlaySoundService.playSound('start');
+				case 'faster-whisper-server':
+					return createTranscriptionServiceFasterWhisperServer({
+						HttpService,
+						settings: settings.value,
+					});
+				default:
+					return createTranscriptionServiceOpenAi({
+						HttpService,
+						settings: settings.value,
+					});
 			}
 		},
-		playStopSoundIfEnabled: () => {
-			if (settings.value['sound.playOnStopSuccess']) {
-				void PlaySoundService.playSound('stop');
-			}
+		recorder: RecorderService,
+		sound: {
+			playStartSoundIfEnabled: () => {
+				if (settings.value['sound.playOnStartSuccess']) {
+					void PlaySoundService.playSound('start');
+				}
+			},
+			playStopSoundIfEnabled: () => {
+				if (settings.value['sound.playOnStopSuccess']) {
+					void PlaySoundService.playSound('stop');
+				}
+			},
+			playCancelSoundIfEnabled: () => {
+				if (settings.value['sound.playOnCancelSuccess']) {
+					void PlaySoundService.playSound('cancel');
+				}
+			},
+			playTranscriptionCompleteSoundIfEnabled: () => {
+				if (settings.value['sound.playOnTranscriptionSuccess']) {
+					void PlaySoundService.playSound('transcription-complete');
+				}
+			},
 		},
-		playCancelSoundIfEnabled: () => {
-			if (settings.value['sound.playOnCancelSuccess']) {
-				void PlaySoundService.playSound('cancel');
-			}
-		},
-		playTranscriptionCompleteSoundIfEnabled: () => {
-			if (settings.value['sound.playOnTranscriptionSuccess']) {
-				void PlaySoundService.playSound('transcription-complete');
-			}
-		},
-	},
-};
+	};
+})();
