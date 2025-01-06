@@ -14,7 +14,7 @@
 		onChange: (transformation: Transformation) => void;
 	} = $props();
 
-	let activeTab = $state('steps');
+	let activeTab = $state('configure');
 </script>
 
 <div class="space-y-4">
@@ -23,8 +23,7 @@
 		class="w-full"
 		onValueChange={(v) => (activeTab = v)}
 	>
-		<Tabs.List class="grid w-full grid-cols-3">
-			<Tabs.Trigger value="steps">Steps</Tabs.Trigger>
+		<Tabs.List class="grid w-full grid-cols-2">
 			<Tabs.Trigger value="configure">Configure</Tabs.Trigger>
 			<Tabs.Trigger value="test">Test</Tabs.Trigger>
 		</Tabs.List>
@@ -54,9 +53,6 @@
 						/>
 					</Card.Content>
 				</Card.Root>
-			</Tabs.Content>
-
-			<Tabs.Content value="steps">
 				<RenderTransformationSteps {transformation} {onChange} />
 			</Tabs.Content>
 
