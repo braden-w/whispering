@@ -46,10 +46,6 @@
 			steps: [...transformation.steps, generateDefaultTransformationStep()],
 		};
 		onChange(updatedTransformation);
-
-		if (updatedTransformation.steps.length > 0) {
-			const lastStep = updatedTransformation.steps.at(-1);
-		}
 	}
 
 	function removeStep(index: number) {
