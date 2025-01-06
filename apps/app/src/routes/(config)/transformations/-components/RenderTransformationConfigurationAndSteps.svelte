@@ -104,14 +104,6 @@
 
 		<div class="space-y-4">
 			{#each transformation.steps as step, index}
-				{@const stepName = (() => {
-					switch (step.type) {
-						case 'prompt_transform':
-							return 'Prompt Transform';
-						case 'find_replace':
-							return 'Find Replace';
-					}
-				})()}
 				<Card.Root>
 					<Card.Header class="space-y-3">
 						<div class="flex items-center justify-between">
