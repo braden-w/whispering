@@ -5,12 +5,12 @@ import { HttpServiceErr } from './HttpService';
 
 export function createHttpServiceDesktop(): HttpService {
 	return {
-		async post({ formData, url, schema, headers }) {
+		async post({ body, url, schema, headers }) {
 			const responseResult = await tryAsync({
 				try: () =>
 					fetch(url, {
 						method: 'POST',
-						body: formData,
+						body,
 						headers: headers,
 					}),
 				mapErr: (error) => HttpServiceErr({ code: 'NetworkError', error }),

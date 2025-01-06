@@ -61,8 +61,8 @@ export function createWhisperService({
 				formData.append('temperature', options.temperature);
 
 			const postResult = await HttpService.post({
-				formData,
 				url: postConfig.url,
+				body: formData,
 				headers: postConfig.headers,
 				schema: whisperApiResponseSchema,
 			});
