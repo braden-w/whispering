@@ -268,22 +268,13 @@
 									id="prompt_transform.systemPromptTemplate"
 									label="System Prompt Template"
 									bind:value={step['prompt_transform.systemPromptTemplate']}
-									placeholder="Enter system prompt template. Use {'{{input}}'} to reference the input text."
-								>
-									{#snippet description()}
-										{#if step['prompt_transform.systemPromptTemplate'] && !step['prompt_transform.systemPromptTemplate'].includes('{{input}}')}
-											<p class="text-destructive text-sm">
-												Please include {'{{input}}'} in your template to reference
-												the input text
-											</p>
-										{/if}
-									{/snippet}
-								</LabeledTextarea>
+									placeholder="Example: You are an expert proofreader. Please take in the following text and correct any grammatical errors"
+								/>
 								<LabeledTextarea
 									id="prompt_transform.userPromptTemplate"
 									label="User Prompt Template"
 									bind:value={step['prompt_transform.userPromptTemplate']}
-									placeholder="Enter user prompt template. Use {'{{input}}'} to reference the input text."
+									placeholder="Example: Please analyze this text and improve its clarity: {'{{input}}'}"
 								>
 									{#snippet description()}
 										{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
