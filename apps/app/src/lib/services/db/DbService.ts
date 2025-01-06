@@ -87,4 +87,7 @@ export type DbService = {
 	deleteTransformation: (
 		transformation: Transformation,
 	) => Promise<DbServiceResult<void>>;
+	deleteTransformations: (
+		transformations: Transformation[],
+	) => Promise<DbServiceResult<void>>;
 };

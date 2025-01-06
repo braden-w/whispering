@@ -29,6 +29,7 @@ import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionS
 import { runTransformationOnInput } from './transformation/TransformationService';
 import { settings } from '../stores/settings.svelte';
 import { createClipboardFns } from './clipboard';
+import { transformationsKeys } from '$lib/queries/transformations';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -80,7 +81,8 @@ export const userConfiguredServices = (() => {
 			},
 		},
 		db: {
-			createRecording: async (recording: Recording) => {
+			...DbService,
+			createRecording: async (recording) => {
 				const result = await DbService.createRecording(recording);
 				if (!result.ok) return result;
 
@@ -91,7 +93,7 @@ export const userConfiguredServices = (() => {
 
 				return result;
 			},
-			updateRecording: async (recording: Recording) => {
+			updateRecording: async (recording) => {
 				const result = await DbService.updateRecording(recording);
 				if (!result.ok) return result;
 
@@ -104,7 +106,7 @@ export const userConfiguredServices = (() => {
 
 				return result;
 			},
-			deleteRecording: async (recording: Recording) => {
+			deleteRecording: async (recording) => {
 				const result = await DbService.deleteRecording(recording);
 				if (!result.ok) return result;
 
@@ -115,7 +117,7 @@ export const userConfiguredServices = (() => {
 
 				return result;
 			},
-			deleteRecordings: async (recordings: Recording[]) => {
+			deleteRecordings: async (recordings) => {
 				const result = await DbService.deleteRecordings(recordings);
 				if (!result.ok) return result;
 
@@ -127,7 +129,62 @@ export const userConfiguredServices = (() => {
 
 				return result;
 			},
-		},
+			createTransformation: async (transformation) => {
+				const result = await DbService.createTransformation(transformation);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Transformation[]>(
+					transformationsKeys.all,
+					(oldData) => {
+						if (!oldData) return [result.data];
+						return [...oldData, result.data];
+					},
+				);
+				return result;
+			},
+			updateTransformation: async (transformation) => {
+				const result = await DbService.updateTransformation(transformation);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Transformation[]>(
+					transformationsKeys.all,
+					(oldData) => {
+						if (!oldData) return [result.data];
+						return oldData.map((item) =>
+							item.id === transformation.id ? transformation : item,
+						);
+					},
+				);
+				return result;
+			},
+			deleteTransformation: async (transformation) => {
+				const result = await DbService.deleteTransformation(transformation);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Transformation[]>(
+					transformationsKeys.all,
+					(oldData) => {
+						if (!oldData) return [];
+						return oldData.filter((item) => item.id !== transformation.id);
+					},
+				);
+				return result;
+			},
+			deleteTransformations: async (transformations) => {
+				const result = await DbService.deleteTransformations(transformations);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Transformation[]>(
+					transformationsKeys.all,
+					(oldData) => {
+						if (!oldData) return [];
+						const deletedIds = new Set(transformations.map((t) => t.id));
+						return oldData.filter((item) => !deletedIds.has(item.id));
+					},
+				);
+				return result;
+			},
+		} satisfies typeof DbService,
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':

@@ -2,12 +2,10 @@ import { transformationsKeys } from '$lib/queries/transformations';
 import { DbService } from '$lib/services/index.js';
 import type { Transformation } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
-import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+import { createMutation } from '@tanstack/svelte-query';
 
-export const createCreateTransformationWithToast = () => {
-	const queryClient = useQueryClient();
-
-	return createMutation(() => ({
+export const createCreateTransformationWithToast = () =>
+	createMutation(() => ({
 		mutationFn: async (
 			...params: Parameters<typeof DbService.createTransformation>
 		) => {
@@ -26,22 +24,10 @@ export const createCreateTransformationWithToast = () => {
 			});
 			return result.data;
 		},
-		onSuccess: (newTransformation) => {
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [newTransformation];
-					return [...oldData, newTransformation];
-				},
-			);
-		},
 	}));
-};
 
-export const createUpdateTransformationWithToast = () => {
-	const queryClient = useQueryClient();
-
-	return createMutation(() => ({
+export const createUpdateTransformationWithToast = () =>
+	createMutation(() => ({
 		mutationFn: async (
 			...params: Parameters<typeof DbService.updateTransformation>
 		) => {
@@ -60,24 +46,10 @@ export const createUpdateTransformationWithToast = () => {
 			});
 			return result.data;
 		},
-		onSuccess: (updatedTransformation) => {
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [updatedTransformation];
-					return oldData.map((item) =>
-						item.id === updatedTransformation.id ? updatedTransformation : item,
-					);
-				},
-			);
-		},
 	}));
-};
 
-export const createDeleteTransformationWithToast = () => {
-	const queryClient = useQueryClient();
-
-	return createMutation(() => ({
+export const createDeleteTransformationWithToast = () =>
+	createMutation(() => ({
 		mutationFn: async (transformation: Transformation) => {
 			const result = await DbService.deleteTransformation(transformation);
 			if (!result.ok) {
@@ -94,14 +66,24 @@ export const createDeleteTransformationWithToast = () => {
 			});
 			return transformation;
 		},
-		onSuccess: (deletedTransformation) => {
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [];
-					return oldData.filter((item) => item.id !== deletedTransformation.id);
-				},
-			);
+	}));
+
+export const createDeleteTransformationsWithToast = () =>
+	createMutation(() => ({
+		mutationFn: async (transformations: Transformation[]) => {
+			const result = await DbService.deleteTransformations(transformations);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to delete transformations!',
+					description: 'Your transformations could not be deleted.',
+					action: { type: 'more-details', error: result.error },
+				});
+				throw result.error;
+			}
+			toast.success({
+				title: 'Deleted transformations!',
+				description: 'Your transformations have been deleted successfully.',
+			});
+			return transformations;
 		},
 	}));
-};

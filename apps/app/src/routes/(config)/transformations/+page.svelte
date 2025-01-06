@@ -37,6 +37,7 @@
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import {
 		createCreateTransformationWithToast,
+		createDeleteTransformationsWithToast,
 		createDeleteTransformationWithToast,
 	} from '$lib/mutations/transformations';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -165,6 +166,8 @@
 	const transformationsQuery = createTransformationsQuery();
 	const deleteTransformationWithToastMutation =
 		createDeleteTransformationWithToast();
+	const deleteTransformationsWithToastMutation =
+		createDeleteTransformationsWithToast();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -263,9 +266,9 @@
 								subtitle:
 									'Are you sure you want to delete these transformations?',
 								onConfirm: () => {
-									selectedTransformationRows.forEach(({ original }) => {
-										deleteTransformationWithToastMutation.mutate(original);
-									});
+									deleteTransformationsWithToastMutation.mutate(
+										selectedTransformationRows.map(({ original }) => original),
+									);
 								},
 							});
 						}}

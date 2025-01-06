@@ -531,5 +531,18 @@ export function createDbDexieService(): DbService {
 			if (!deleteTransformationResult.ok) return deleteTransformationResult;
 			return Ok(undefined);
 		},
+
+		async deleteTransformations(transformations) {
+			const ids = transformations.map((t) => t.id);
+			return tryAsync({
+				try: () => db.transformations.bulkDelete(ids),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error deleting transformations from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
 	};
 }
