@@ -1,5 +1,5 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { DownloadService } from '$lib/services.svelte';
+import { DownloadService } from '$lib/services/index.js';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type {
 	ANTHROPIC_INFERENCE_MODELS,

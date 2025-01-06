@@ -1,4 +1,4 @@
-import { DbService } from '$lib/services.svelte';
+import { DbService } from '$lib/services/index.js';
 import { toast } from '$lib/utils/toast';
 import { createQuery } from '@tanstack/svelte-query';
 

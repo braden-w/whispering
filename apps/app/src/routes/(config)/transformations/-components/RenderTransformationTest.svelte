@@ -2,7 +2,7 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { userConfiguredServices } from '$lib/services.svelte';
+	import { userConfiguredServices } from '$lib/services/index.js';
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';

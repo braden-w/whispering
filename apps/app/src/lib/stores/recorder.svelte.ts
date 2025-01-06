@@ -2,7 +2,7 @@ import {
 	ClipboardService,
 	SetTrayIconService,
 	userConfiguredServices,
-} from '$lib/services.svelte';
+} from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';

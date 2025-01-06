@@ -1,33 +1,33 @@
-import { queryClient } from '../routes/+layout.svelte';
-import { recordingsKeys } from './queries/recordings';
+import { queryClient } from '../../routes/+layout.svelte';
+import { recordingsKeys } from '../queries/recordings';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
-} from './services/SetTrayIconService';
-import { createClipboardServiceDesktop } from './services/clipboard/ClipboardService.desktop';
-import { createClipboardServiceWeb } from './services/clipboard/ClipboardService.web';
+} from './SetTrayIconService';
+import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
+import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
 import {
 	type Recording,
 	type Transformation,
 	createDbDexieService,
-} from './services/db/DbService.dexie';
-import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
-import { createDownloadServiceWeb } from './services/download/DownloadService.web';
-import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
-import { createHttpServiceWeb } from './services/http/HttpService.web';
-import { createNotificationServiceDesktop } from './services/notifications/NotificationService.desktop';
-import { createNotificationServiceWeb } from './services/notifications/NotificationService.web';
-import { createRecorderServiceTauri } from './services/recorder/RecorderService.tauri';
-import { createRecorderServiceWeb } from './services/recorder/RecorderService.web';
-import { createPlaySoundServiceDesktop } from './services/sound/PlaySoundService.desktop';
-import { createPlaySoundServiceWeb } from './services/sound/PlaySoundService.web';
-import { createTranscriptionServiceFasterWhisperServer } from './services/transcription/TranscriptionService.fasterWhisperServer';
-import { createTranscriptionServiceGroqDistil } from './services/transcription/TranscriptionService.groq.distil';
-import { createTranscriptionServiceGroqLarge } from './services/transcription/TranscriptionService.groq.large';
-import { createTranscriptionServiceGroqTurbo } from './services/transcription/TranscriptionService.groq.turbo';
-import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
-import { runTransformationOnInput } from './services/transformation/TransformationService';
-import { settings } from './stores/settings.svelte';
+} from './db/DbService.dexie';
+import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
+import { createDownloadServiceWeb } from './download/DownloadService.web';
+import { createHttpServiceDesktop } from './http/HttpService.desktop';
+import { createHttpServiceWeb } from './http/HttpService.web';
+import { createNotificationServiceDesktop } from './notifications/NotificationService.desktop';
+import { createNotificationServiceWeb } from './notifications/NotificationService.web';
+import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
+import { createRecorderServiceWeb } from './recorder/RecorderService.web';
+import { createPlaySoundServiceDesktop } from './sound/PlaySoundService.desktop';
+import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
+import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
+import { createTranscriptionServiceGroqDistil } from './transcription/TranscriptionService.groq.distil';
+import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
+import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
+import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
+import { runTransformationOnInput } from './transformation/TransformationService';
+import { settings } from '../stores/settings.svelte';
 
 // Services that are not determined by the user's settings, but by the platform.
 

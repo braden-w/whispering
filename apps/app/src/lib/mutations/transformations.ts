@@ -1,5 +1,5 @@
 import { transformationsKeys } from '$lib/queries/transformations';
-import { DbService } from '$lib/services.svelte';
+import { DbService } from '$lib/services/index.js';
 import type { Transformation } from '$lib/services/db';
 import { toast } from '$lib/utils/toast';
 import { createMutation, useQueryClient } from '@tanstack/svelte-query';
