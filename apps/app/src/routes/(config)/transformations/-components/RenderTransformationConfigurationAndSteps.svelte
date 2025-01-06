@@ -97,7 +97,7 @@
 			<Alert.Root variant="warning">
 				<Alert.Title>No steps added</Alert.Title>
 				<Alert.Description>
-					Please add at least one step to your transformation before saving.
+					Please add at least one step to your transformation for it to work.
 				</Alert.Description>
 			</Alert.Root>
 		{/if}
