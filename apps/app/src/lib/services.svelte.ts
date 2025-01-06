@@ -43,21 +43,20 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 
 export const DbService = createDbDexieService();
 
+const HttpService = window.__TAURI_INTERNALS__
+	? createHttpServiceDesktop()
+	: createHttpServiceWeb();
+
+const PlaySoundService = window.__TAURI_INTERNALS__
+	? createPlaySoundServiceDesktop()
+	: createPlaySoundServiceWeb();
+
 /**
  * Services that are determined by the user's settings.
  */
 export const userConfiguredServices = (() => {
-	const HttpService = window.__TAURI_INTERNALS__
-		? createHttpServiceDesktop()
-		: createHttpServiceWeb();
-
-	const RecorderService = window.__TAURI_INTERNALS__
-		? createRecorderServiceTauri()
-		: createRecorderServiceWeb();
-
-	const PlaySoundService = window.__TAURI_INTERNALS__
-		? createPlaySoundServiceDesktop()
-		: createPlaySoundServiceWeb();
+	const RecorderServiceTauri = createRecorderServiceTauri();
+	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
 		get transcription() {
@@ -103,7 +102,12 @@ export const userConfiguredServices = (() => {
 					});
 			}
 		},
-		recorder: RecorderService,
+		get recorder() {
+			if (settings.value['recorder.selectedRecorderService'] === 'Tauri') {
+				return RecorderServiceTauri;
+			}
+			return RecorderServiceWeb;
+		},
 		sound: {
 			playStartSoundIfEnabled: () => {
 				if (settings.value['sound.playOnStartSuccess']) {
