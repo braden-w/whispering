@@ -163,6 +163,13 @@
 								</WhisperingButton>
 							</div>
 						</div>
+						{#if step.type === 'prompt_transform'}
+							<Card.Description>
+								{index === 0
+									? `'\{\{input\}\}' is the user input`
+									: `'\{\{input\}\}' is the output from the previous step`}
+							</Card.Description>
+						{/if}
 					</Card.Header>
 					<Card.Content>
 						{#if step.type === 'find_replace'}
