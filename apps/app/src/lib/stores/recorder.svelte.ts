@@ -21,7 +21,8 @@ function createRecorder() {
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		const _setTrayIconResult = await SetTrayIconService.setTrayIcon(newValue);
+		const _setTrayIconResult =
+			await userConfiguredServices.tray.setTrayIcon(newValue);
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =

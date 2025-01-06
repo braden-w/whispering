@@ -43,7 +43,7 @@ export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
 	: createClipboardServiceWeb();
 
-export const SetTrayIconService = window.__TAURI_INTERNALS__
+const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
@@ -65,6 +65,7 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
+		tray: SetTrayIconService,
 		transformations: {
 			runTransformationOnInput: async ({
 				input,
