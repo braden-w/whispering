@@ -1,4 +1,5 @@
-import type { Settings } from '@repo/shared';
+import { queryClient } from '../routes/+layout.svelte';
+import { recordingsKeys } from './queries/recordings';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
@@ -6,9 +7,9 @@ import {
 import { createClipboardServiceDesktop } from './services/clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './services/clipboard/ClipboardService.web';
 import {
-	createDbDexieService,
 	type Recording,
 	type Transformation,
+	createDbDexieService,
 } from './services/db/DbService.dexie';
 import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './services/download/DownloadService.web';
@@ -25,10 +26,8 @@ import { createTranscriptionServiceGroqDistil } from './services/transcription/T
 import { createTranscriptionServiceGroqLarge } from './services/transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './services/transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
-import { settings } from './stores/settings.svelte';
-import { queryClient } from '../routes/+layout.svelte';
 import { runTransformationOnInput } from './services/transformation/TransformationService';
-import { recordingsKeys } from './queries/recordings';
+import { settings } from './stores/settings.svelte';
 
 // Services that are not determined by the user's settings, but by the platform.
 
