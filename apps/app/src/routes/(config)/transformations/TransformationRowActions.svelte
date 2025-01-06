@@ -1,19 +1,9 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { TrashIcon } from '$lib/components/icons';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
-	import { clipboard } from '$lib/utils/clipboard';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import {
-		DownloadIcon,
-		Loader2Icon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
-	} from 'lucide-svelte';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();

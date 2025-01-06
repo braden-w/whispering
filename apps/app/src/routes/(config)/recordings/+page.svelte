@@ -13,7 +13,7 @@
 	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
-	import { clipboard } from '$lib/utils/clipboard';
+	import { userConfiguredServices } from '$lib/services/index.js';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
 		FlexRender,
@@ -388,10 +388,12 @@
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
 									onclick={async () => {
-										await clipboard.copyTextToClipboardWithToast({
-											label: 'transcribed text (joined)',
-											text: joinedTranscriptionsText,
-										});
+										await userConfiguredServices.clipboard.copyTextToClipboardWithToast(
+											{
+												label: 'transcribed text (joined)',
+												text: joinedTranscriptionsText,
+											},
+										);
 										isDialogOpen = false;
 									}}
 									type="submit"

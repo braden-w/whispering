@@ -1,6 +1,5 @@
 import { userConfiguredServices } from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
-import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
@@ -111,7 +110,7 @@ function createTranscriber() {
 					type: 'button',
 					label: 'Go to recordings',
 					onClick: () =>
-						clipboard.copyTextToClipboardWithToast({
+						userConfiguredServices.clipboard.copyTextToClipboardWithToast({
 							label: 'transcribed text',
 							text: transcribedText,
 						}),

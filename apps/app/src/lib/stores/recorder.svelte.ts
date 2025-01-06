@@ -1,12 +1,10 @@
+import type { Recording } from '$lib/services/db';
 import {
 	ClipboardService,
-	SetTrayIconService,
 	userConfiguredServices,
 } from '$lib/services/index.js';
-import type { Recording } from '$lib/services/db';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';
-import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
@@ -121,10 +119,9 @@ function createRecorder() {
 									type: 'button',
 									label: 'Copy to clipboard',
 									onClick: () =>
-										clipboard.copyTextToClipboardWithToast({
-											label: 'transcribed text',
-											text: transcribedText,
-										}),
+										userConfiguredServices.clipboard.copyTextToClipboardWithToast(
+											{ label: 'transcribed text', text: transcribedText },
+										),
 								},
 							});
 							return;

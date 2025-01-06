@@ -11,7 +11,7 @@
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { clipboard } from '$lib/utils/clipboard';
+	import { userConfiguredServices } from '$lib/services/index.js';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
@@ -105,7 +105,7 @@
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
-					clipboard.copyTextToClipboardWithToast({
+					userConfiguredServices.clipboard.copyTextToClipboardWithToast({
 						label: 'transcribed text',
 						text: latestTranscribingOrDoneRecording.transcribedText,
 					})}

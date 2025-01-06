@@ -28,6 +28,7 @@ import { createTranscriptionServiceGroqTurbo } from './transcription/Transcripti
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { runTransformationOnInput } from './transformation/TransformationService';
 import { settings } from '../stores/settings.svelte';
+import { clipboard } from './clipboard';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -65,6 +66,7 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
+		clipboard,
 		tray: SetTrayIconService,
 		transformations: {
 			runTransformationOnInput: async ({

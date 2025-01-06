@@ -8,7 +8,7 @@
 	} from '$lib/mutations/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
-	import { clipboard } from '$lib/utils/clipboard';
+	import { userConfiguredServices } from '$lib/services/index.js';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import {
 		DownloadIcon,
@@ -46,7 +46,7 @@
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
 		onclick={() =>
-			clipboard.copyTextToClipboardWithToast({
+			userConfiguredServices.clipboard.copyTextToClipboardWithToast({
 				label: 'transcribed text',
 				text: recording.transcribedText,
 			})}
