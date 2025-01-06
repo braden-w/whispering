@@ -7,7 +7,7 @@
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
 	import { toast } from '$lib/utils/toast';
 	import { createMutation } from '@tanstack/svelte-query';
-	import { PlayIcon } from 'lucide-svelte';
+	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();
 
@@ -106,11 +106,13 @@
 			class="w-full"
 		>
 			{#if runTransformation.isPending}
-				<span class="loading loading-spinner loading-sm mr-2"></span>
+				<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 			{:else}
 				<PlayIcon class="mr-2 h-4 w-4" />
 			{/if}
-			Run Transformation
+			{runTransformation.isPending
+				? 'Running Transformation...'
+				: 'Run Transformation'}
 		</Button>
 	</Card.Content>
 </Card.Root>
