@@ -21,6 +21,7 @@
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 
 	let {
 		transformation,
@@ -94,22 +95,24 @@
 									</span>
 								</Accordion.Trigger>
 								<div class="flex gap-1">
-									<Button
+									<WhisperingButton
+										tooltipContent="Duplicate step"
 										variant="ghost"
 										size="icon"
 										class="h-8 w-8"
 										onclick={() => duplicateStep(index)}
 									>
 										<CopyIcon class="h-4 w-4" />
-									</Button>
-									<Button
+									</WhisperingButton>
+									<WhisperingButton
+										tooltipContent="Delete step"
 										variant="ghost"
 										size="icon"
 										class="h-8 w-8"
 										onclick={() => removeStep(index)}
 									>
 										<TrashIcon class="h-4 w-4" />
-									</Button>
+									</WhisperingButton>
 								</div>
 							</div>
 							<Accordion.Content>
