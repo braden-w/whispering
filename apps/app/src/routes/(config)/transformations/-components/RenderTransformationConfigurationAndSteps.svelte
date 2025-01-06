@@ -185,7 +185,7 @@
 									/>
 								</div>
 								<Accordion.Root type="single" class="w-full">
-									<Accordion.Item class="border-b-0" value="advanced">
+									<Accordion.Item class="border-none" value="advanced">
 										<Accordion.Trigger class="text-sm">
 											Advanced Options
 										</Accordion.Trigger>
@@ -197,6 +197,7 @@
 												onCheckedChange={(v) => {
 													step['find_replace.useRegex'] = v;
 												}}
+												description="Enable regular expressions for more advanced text matching patterns"
 											/>
 										</Accordion.Content>
 									</Accordion.Item>
@@ -263,14 +264,6 @@
 									{/if}
 								</div>
 
-								{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
-									<OpenAiApiKeyInput />
-								{:else if step['prompt_transform.inference.provider'] === 'Groq'}
-									<GroqApiKeyInput />
-								{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
-									<AnthropicApiKeyInput />
-								{/if}
-
 								<LabeledTextarea
 									id="prompt_transform.systemPromptTemplate"
 									label="System Prompt Template"
@@ -301,6 +294,22 @@
 										{/if}
 									{/snippet}
 								</LabeledTextarea>
+								<Accordion.Root type="single" class="w-full">
+									<Accordion.Item class="border-none" value="advanced">
+										<Accordion.Trigger class="text-sm">
+											Advanced Options
+										</Accordion.Trigger>
+										<Accordion.Content>
+											{#if step['prompt_transform.inference.provider'] === 'OpenAI'}
+												<OpenAiApiKeyInput />
+											{:else if step['prompt_transform.inference.provider'] === 'Groq'}
+												<GroqApiKeyInput />
+											{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
+												<AnthropicApiKeyInput />
+											{/if}
+										</Accordion.Content>
+									</Accordion.Item>
+								</Accordion.Root>
 							</div>
 						{/if}
 					</Card.Content>

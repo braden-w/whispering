@@ -8,11 +8,13 @@
 		label,
 		checked = $bindable(),
 		onCheckedChange,
+		description,
 	}: {
 		id: string;
 		label: string | Snippet;
 		checked: boolean;
 		onCheckedChange?: (value: boolean) => void;
+		description?: string;
 	} = $props();
 </script>
 
@@ -25,4 +27,7 @@
 			{@render label()}
 		{/if}
 	</Label>
+	{#if description}
+		<p class="text-sm text-muted-foreground">{description}</p>
+	{/if}
 </div>
