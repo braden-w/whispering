@@ -40,8 +40,6 @@
 		onChange: (transformation: Transformation) => void;
 	} = $props();
 
-	let currentlyOpenStepId = $state<string | undefined>();
-
 	function addStep() {
 		const updatedTransformation = {
 			...transformation,
