@@ -1,13 +1,13 @@
-import { queryClient } from '../../routes/+layout.svelte';
-import { recordingsKeys } from '../queries/recordings';
+import { settings } from '../stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
 } from './SetTrayIconService';
+import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
+import { createDbFns } from './db';
 import {
-	type Recording,
 	type Transformation,
 	createDbDexieService,
 } from './db/DbService.dexie';
@@ -27,9 +27,6 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { runTransformationOnInput } from './transformation/TransformationService';
-import { settings } from '../stores/settings.svelte';
-import { createClipboardFns } from './clipboard';
-import { transformationsKeys } from '$lib/queries/transformations';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -80,111 +77,7 @@ export const userConfiguredServices = (() => {
 				return runTransformationOnInput(input, transformation, HttpService);
 			},
 		},
-		db: {
-			...DbService,
-			createRecording: async (recording) => {
-				const result = await DbService.createRecording(recording);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-					if (!oldData) return [result.data];
-					return [...oldData, result.data];
-				});
-
-				return result;
-			},
-			updateRecording: async (recording) => {
-				const result = await DbService.updateRecording(recording);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-					if (!oldData) return [result.data];
-					return oldData.map((item) =>
-						item.id === recording.id ? recording : item,
-					);
-				});
-
-				return result;
-			},
-			deleteRecording: async (recording) => {
-				const result = await DbService.deleteRecording(recording);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-					if (!oldData) return [];
-					return oldData.filter((item) => item.id !== recording.id);
-				});
-
-				return result;
-			},
-			deleteRecordings: async (recordings) => {
-				const result = await DbService.deleteRecordings(recordings);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-					if (!oldData) return [];
-					const deletedIds = new Set(recordings.map((r) => r.id));
-					return oldData.filter((item) => !deletedIds.has(item.id));
-				});
-
-				return result;
-			},
-			createTransformation: async (transformation) => {
-				const result = await DbService.createTransformation(transformation);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Transformation[]>(
-					transformationsKeys.all,
-					(oldData) => {
-						if (!oldData) return [result.data];
-						return [...oldData, result.data];
-					},
-				);
-				return result;
-			},
-			updateTransformation: async (transformation) => {
-				const result = await DbService.updateTransformation(transformation);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Transformation[]>(
-					transformationsKeys.all,
-					(oldData) => {
-						if (!oldData) return [result.data];
-						return oldData.map((item) =>
-							item.id === transformation.id ? transformation : item,
-						);
-					},
-				);
-				return result;
-			},
-			deleteTransformation: async (transformation) => {
-				const result = await DbService.deleteTransformation(transformation);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Transformation[]>(
-					transformationsKeys.all,
-					(oldData) => {
-						if (!oldData) return [];
-						return oldData.filter((item) => item.id !== transformation.id);
-					},
-				);
-				return result;
-			},
-			deleteTransformations: async (transformations) => {
-				const result = await DbService.deleteTransformations(transformations);
-				if (!result.ok) return result;
-
-				queryClient.setQueryData<Transformation[]>(
-					transformationsKeys.all,
-					(oldData) => {
-						if (!oldData) return [];
-						const deletedIds = new Set(transformations.map((t) => t.id));
-						return oldData.filter((item) => !deletedIds.has(item.id));
-					},
-				);
-				return result;
-			},
-		} satisfies typeof DbService,
+		db: createDbFns(DbService),
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':
