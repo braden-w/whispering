@@ -5,6 +5,7 @@
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import { runTransformationOnInput } from '$lib/services/transformation/TransformationService';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/utils/toast';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
@@ -60,42 +61,24 @@
 			>Try out your transformation with sample input</Card.Description
 		>
 	</Card.Header>
-	<Card.Content class="space-y-4">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<Card.Root>
-				<Card.Header>
-					<Card.Title>Input</Card.Title>
-					<Card.Description
-						>Enter the text you want to transform</Card.Description
-					>
-				</Card.Header>
-				<Card.Content>
-					<LabeledTextarea
-						id="input"
-						label="Input Text"
-						bind:value={input}
-						placeholder="Enter text to transform..."
-						rows={5}
-					/>
-				</Card.Content>
-			</Card.Root>
+	<Card.Content class="space-y-6">
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<LabeledTextarea
+				id="input"
+				label="Input Text"
+				bind:value={input}
+				placeholder="Enter text to transform..."
+				rows={5}
+			/>
 
-			<Card.Root>
-				<Card.Header>
-					<Card.Title>Output</Card.Title>
-					<Card.Description>Transformed text will appear here</Card.Description>
-				</Card.Header>
-				<Card.Content>
-					<LabeledTextarea
-						id="output"
-						label="Output Text"
-						value={output}
-						placeholder="Transformed text will appear here..."
-						rows={5}
-						readonly
-					/>
-				</Card.Content>
-			</Card.Root>
+			<LabeledTextarea
+				id="output"
+				label="Output Text"
+				value={output}
+				placeholder="Transformed text will appear here..."
+				rows={5}
+				readonly
+			/>
 		</div>
 
 		<Button
