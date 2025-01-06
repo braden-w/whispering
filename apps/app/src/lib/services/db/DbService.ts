@@ -41,7 +41,7 @@ export function generateDefaultTransformationStep(): TransformationStep {
 	return {
 		id: nanoid(),
 		type: 'prompt_transform',
-		'prompt_transform.inference.provider': 'OpenAI',
+		'prompt_transform.inference.provider': 'Groq',
 		'prompt_transform.inference.provider.OpenAI.model': 'gpt-4o',
 		'prompt_transform.inference.provider.Groq.model': 'llama-3.3-70b-versatile',
 		'prompt_transform.inference.provider.Anthropic.model':
