@@ -1,8 +1,5 @@
 import type { Recording } from '$lib/services/db';
-import {
-	ClipboardService,
-	userConfiguredServices,
-} from '$lib/services/index.js';
+import { userConfiguredServices } from '$lib/services/index.js';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';
 import { toast } from '$lib/utils/toast';
@@ -106,7 +103,9 @@ function createRecorder() {
 							description: 'Copying the transcription to your clipboard...',
 						});
 						const copyResult =
-							await ClipboardService.setClipboardText(transcribedText);
+							await userConfiguredServices.clipboard.setClipboardText(
+								transcribedText,
+							);
 						if (!copyResult.ok) {
 							toast.warning(copyResult.error);
 							toast.success({
@@ -148,7 +147,9 @@ function createRecorder() {
 						description: 'Pasting the transcription to your cursor...',
 					});
 					const pasteResult =
-						await ClipboardService.writeTextToCursor(transcribedText);
+						await userConfiguredServices.clipboard.writeTextToCursor(
+							transcribedText,
+						);
 					if (!pasteResult.ok) {
 						toast.warning(pasteResult.error);
 						toast.success({

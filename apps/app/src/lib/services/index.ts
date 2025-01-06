@@ -28,7 +28,7 @@ import { createTranscriptionServiceGroqTurbo } from './transcription/Transcripti
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { runTransformationOnInput } from './transformation/TransformationService';
 import { settings } from '../stores/settings.svelte';
-import { clipboard } from './clipboard';
+import { createClipboardFns } from './clipboard';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -40,7 +40,7 @@ export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
 	: createNotificationServiceWeb();
 
-export const ClipboardService = window.__TAURI_INTERNALS__
+const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
 	: createClipboardServiceWeb();
 
@@ -66,7 +66,7 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
-		clipboard,
+		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
 		transformations: {
 			runTransformationOnInput: async ({

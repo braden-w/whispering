@@ -1,7 +1,8 @@
-import { ClipboardService } from '$lib/services/index.js';
 import { toast } from '$lib/utils/toast';
+import type { ClipboardService } from './ClipboardService';
 
-export const clipboard = {
+export const createClipboardFns = (ClipboardService: ClipboardService) => ({
+	...ClipboardService,
 	copyTextToClipboardWithToast: async ({
 		label,
 		text,
@@ -41,4 +42,4 @@ export const clipboard = {
 			descriptionClass: 'line-clamp-2',
 		});
 	},
-};
+});
