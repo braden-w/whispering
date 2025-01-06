@@ -18,8 +18,12 @@
 
 	const recordingsQuery = createRecordingsQuery();
 
-	const latestRecording = $derived<Recording>(
-		recordingsQuery.data?.find((r) => r.transcriptionStatus === 'DONE') ?? {
+	const latestTranscribingOrDoneRecording = $derived<Recording>(
+		recordingsQuery.data?.find(
+			(r) =>
+				r.transcriptionStatus === 'TRANSCRIBING' ||
+				r.transcriptionStatus === 'DONE',
+		) ?? {
 			id: '',
 			title: '',
 			subtitle: '',
@@ -39,8 +43,8 @@
 	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
-		if (!latestRecording.blob) return undefined;
-		return blobUrlManager.createUrl(latestRecording.blob);
+		if (!latestTranscribingOrDoneRecording.blob) return undefined;
+		return blobUrlManager.createUrl(latestTranscribingOrDoneRecording.blob);
 	});
 
 	onDestroy(() => {
@@ -89,28 +93,29 @@
 				class="w-full"
 				placeholder="Transcribed text will appear here..."
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
+					recordingId: latestTranscribingOrDoneRecording.id,
 					propertyName: 'transcribedText',
 				})}"
 				readonly
-				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
+				value={latestTranscribingOrDoneRecording.transcriptionStatus ===
+				'TRANSCRIBING'
 					? '...'
-					: latestRecording.transcribedText}
+					: latestTranscribingOrDoneRecording.transcribedText}
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
 					clipboard.copyTextToClipboardWithToast({
 						label: 'transcribed text',
-						text: latestRecording.transcribedText,
+						text: latestTranscribingOrDoneRecording.transcribedText,
 					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
+					recordingId: latestTranscribingOrDoneRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
 			>
-				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+				{#if latestTranscribingOrDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
 					<Loader2Icon class="h-6 w-6 animate-spin" />
 				{:else}
 					<ClipboardIcon class="h-6 w-6" />
@@ -121,7 +126,7 @@
 		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestRecording.id,
+					recordingId: latestTranscribingOrDoneRecording.id,
 					propertyName: 'blob',
 				})}"
 				src={blobUrl}
