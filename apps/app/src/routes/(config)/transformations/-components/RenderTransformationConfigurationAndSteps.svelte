@@ -71,12 +71,26 @@
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title>Transformation Steps</Card.Title>
-		<Card.Description
-			>Configure the steps of your transformation</Card.Description
-		>
+		<Card.Title>Configuration</Card.Title>
+		<Card.Description>
+			Configure the title, description, and steps for your transformation
+		</Card.Description>
 	</Card.Header>
 	<Card.Content class="space-y-4">
+		<LabeledInput
+			id="title"
+			label="Title"
+			bind:value={transformation.title}
+			placeholder="Enter a title"
+		/>
+
+		<LabeledInput
+			id="description"
+			label="Description"
+			bind:value={transformation.description}
+			placeholder="Enter a description"
+		/>
+
 		<Accordion.Root
 			type="single"
 			class="w-full space-y-2"

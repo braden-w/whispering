@@ -3,7 +3,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import type { Transformation } from '$lib/services/db';
-	import RenderTransformationSteps from './RenderTransformationSteps.svelte';
+	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationTest from './RenderTransformationTest.svelte';
 
 	let {
@@ -30,30 +30,10 @@
 
 		<div class="mt-4">
 			<Tabs.Content value="configure">
-				<Card.Root>
-					<Card.Header>
-						<Card.Title>Basic Configuration</Card.Title>
-						<Card.Description
-							>Configure the basic settings for your transformation</Card.Description
-						>
-					</Card.Header>
-					<Card.Content class="space-y-4">
-						<LabeledInput
-							id="title"
-							label="Title"
-							bind:value={transformation.title}
-							placeholder="Enter a title"
-						/>
-
-						<LabeledInput
-							id="description"
-							label="Description"
-							bind:value={transformation.description}
-							placeholder="Enter a description"
-						/>
-					</Card.Content>
-				</Card.Root>
-				<RenderTransformationSteps {transformation} {onChange} />
+				<RenderTransformationConfigurationAndSteps
+					{transformation}
+					{onChange}
+				/>
 			</Tabs.Content>
 
 			<Tabs.Content value="test">
