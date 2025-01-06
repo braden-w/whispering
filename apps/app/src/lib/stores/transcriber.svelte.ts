@@ -1,4 +1,4 @@
-import { DbService, userConfiguredServices } from '$lib/services.svelte';
+import { userConfiguredServices } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
@@ -41,9 +41,10 @@ function createTranscriber() {
 				...recording,
 				transcriptionStatus: 'TRANSCRIBING',
 			} as const satisfies Recording;
-			const setStatusTranscribingResult = await DbService.updateRecording(
-				recordingWithTranscribingStatus,
-			);
+			const setStatusTranscribingResult =
+				await userConfiguredServices.db.updateRecording(
+					recordingWithTranscribingStatus,
+				);
 
 			if (!setStatusTranscribingResult.ok) {
 				toast.warning({
@@ -58,13 +59,6 @@ function createTranscriber() {
 				});
 			}
 
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [recordingWithTranscribingStatus];
-				return oldData.map((item) =>
-					item.id === recording.id ? recordingWithTranscribingStatus : item,
-				);
-			});
-
 			transcribingRecordingIds.add(recording.id);
 			const transcriptionResult =
 				await userConfiguredServices.transcription.transcribe(recording.blob, {
@@ -78,13 +72,7 @@ function createTranscriber() {
 					...recording,
 					transcriptionStatus: 'FAILED',
 				} as const satisfies Recording;
-				await DbService.updateRecording(failedRecording);
-				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-					if (!oldData) return [failedRecording];
-					return oldData.map((item) =>
-						item.id === recording.id ? failedRecording : item,
-					);
-				});
+				await userConfiguredServices.db.updateRecording(failedRecording);
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
@@ -98,7 +86,7 @@ function createTranscriber() {
 				transcriptionStatus: 'DONE',
 			} as const satisfies Recording;
 			const saveRecordingToDatabaseResult =
-				await DbService.updateRecording(updatedRecording);
+				await userConfiguredServices.db.updateRecording(updatedRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: toastId,
@@ -112,13 +100,6 @@ function createTranscriber() {
 				});
 				return saveRecordingToDatabaseResult;
 			}
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [updatedRecording];
-				return oldData.map((item) =>
-					item.id === recording.id ? updatedRecording : item,
-				);
-			});
 
 			void userConfiguredServices.sound.playTranscriptionCompleteSoundIfEnabled();
 			toast.success({

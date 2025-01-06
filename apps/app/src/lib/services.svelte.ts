@@ -5,7 +5,10 @@ import {
 } from './services/SetTrayIconService';
 import { createClipboardServiceDesktop } from './services/clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './services/clipboard/ClipboardService.web';
-import { createDbDexieService } from './services/db/DbService.dexie';
+import {
+	createDbDexieService,
+	type Recording,
+} from './services/db/DbService.dexie';
 import { createDownloadServiceDesktop } from './services/download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './services/download/DownloadService.web';
 import { createHttpServiceDesktop } from './services/http/HttpService.desktop';
@@ -22,6 +25,8 @@ import { createTranscriptionServiceGroqLarge } from './services/transcription/Tr
 import { createTranscriptionServiceGroqTurbo } from './services/transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './services/transcription/TranscriptionService.openai';
 import { settings } from './stores/settings.svelte';
+import { queryClient } from '../routes/+layout.svelte';
+import { recordingsKeys } from './queries/recordings';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -59,6 +64,32 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
+		db: {
+			createRecording: async (recording: Recording) => {
+				const result = await DbService.createRecording(recording);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+					if (!oldData) return [result.data];
+					return [...oldData, result.data];
+				});
+
+				return result;
+			},
+			updateRecording: async (recording: Recording) => {
+				const result = await DbService.updateRecording(recording);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+					if (!oldData) return [result.data];
+					return oldData.map((item) =>
+						item.id === recording.id ? recording : item,
+					);
+				});
+
+				return result;
+			},
+		},
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':

@@ -1,12 +1,11 @@
 import {
 	ClipboardService,
-	DbService,
 	SetTrayIconService,
 	userConfiguredServices,
 } from '$lib/services.svelte';
 import type { Recording } from '$lib/services/db';
-import { transcriber } from '$lib/stores/transcriber.svelte';
 import { settings } from '$lib/stores/settings.svelte';
+import { transcriber } from '$lib/stores/transcriber.svelte';
 import { clipboard } from '$lib/utils/clipboard';
 import { toast } from '$lib/utils/toast';
 import {
@@ -14,13 +13,10 @@ import {
 	type WhisperingRecordingState,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { useQueryClient } from '@tanstack/svelte-query';
-import { recordingsKeys } from '$lib/queries/recordings';
 
 export const recorder = createRecorder();
 
 function createRecorder() {
-	const queryClient = useQueryClient();
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
@@ -68,7 +64,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await DbService.createRecording(newRecording);
+				await userConfiguredServices.db.createRecording(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,
@@ -81,11 +77,6 @@ function createRecorder() {
 				});
 				return;
 			}
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [saveRecordingToDatabaseResult.data];
-				return [...oldData, saveRecordingToDatabaseResult.data];
-			});
 
 			toast.loading({
 				id: stopRecordingToastId,
