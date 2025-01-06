@@ -2,6 +2,8 @@ import { Err, type Ok } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type {
+	InsertRecording,
+	InsertTransformation,
 	Recording,
 	Transformation,
 	TransformationStep,
@@ -42,7 +44,8 @@ export function generateDefaultTransformationStep(): TransformationStep {
 		'prompt_transform.inference.provider': 'OpenAI',
 		'prompt_transform.inference.provider.OpenAI.model': 'gpt-4o',
 		'prompt_transform.inference.provider.Groq.model': 'llama-3.3-70b-versatile',
-		'prompt_transform.inference.provider.Anthropic.model': 'claude-3-5-sonnet-latest',
+		'prompt_transform.inference.provider.Anthropic.model':
+			'claude-3-5-sonnet-latest',
 
 		'prompt_transform.systemPromptTemplate': '',
 		'prompt_transform.userPromptTemplate': '',
@@ -55,8 +58,12 @@ export function generateDefaultTransformationStep(): TransformationStep {
 
 export type DbService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
-	createRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
-	updateRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
+	createRecording: (
+		recording: InsertRecording,
+	) => Promise<DbServiceResult<Recording>>;
+	updateRecording: (
+		recording: Recording,
+	) => Promise<DbServiceResult<Recording>>;
 	deleteRecording: (recording: Recording) => Promise<DbServiceResult<void>>;
 	deleteRecordings: (recordings: Recording[]) => Promise<DbServiceResult<void>>;
 	/**
@@ -72,7 +79,7 @@ export type DbService = {
 
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
 	createTransformation: (
-		transformation: Transformation,
+		transformation: InsertTransformation,
 	) => Promise<DbServiceResult<Transformation>>;
 	updateTransformation: (
 		transformation: Transformation,

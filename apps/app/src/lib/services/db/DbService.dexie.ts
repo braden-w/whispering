@@ -20,6 +20,10 @@ export type Recording = RecordingsDbSchemaV4['recordings'];
 export type InsertRecording = Omit<Recording, 'createdAt' | 'updatedAt'>;
 
 export type Transformation = RecordingsDbSchemaV4['transformations'];
+export type InsertTransformation = Omit<
+	Transformation,
+	'createdAt' | 'updatedAt'
+>;
 
 export type TransformationStep = Transformation['steps'][number];
 
@@ -362,7 +366,7 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!createRecordingResult.ok) return createRecordingResult;
-			return Ok(undefined);
+			return Ok(recordingWithTimestamps);
 		},
 
 		async updateRecording(recording: Recording) {
@@ -383,7 +387,7 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!updateRecordingResult.ok) return updateRecordingResult;
-			return Ok(undefined);
+			return Ok(recordingWithTimestamp);
 		},
 
 		async deleteRecording(recording: Recording) {
@@ -498,7 +502,7 @@ export function createDbDexieService(): DbService {
 			const transformationWithTimestamp = {
 				...transformation,
 				updatedAt: now,
-			};
+			} satisfies Transformation;
 			const updateTransformationResult = await tryAsync({
 				try: () => db.transformations.put(transformationWithTimestamp),
 				mapErr: (error) =>

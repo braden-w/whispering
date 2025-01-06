@@ -177,12 +177,14 @@ function createRecorder() {
 						title: '⏳ Closing session...',
 						description: 'Wrapping up your recording session...',
 					});
-					const closeSessionResult = await userConfiguredServices(
-						settings.value,
-					).recorder.closeRecordingSession(undefined, {
-						sendStatus: (options) =>
-							toast.loading({ id: stopRecordingToastId, ...options }),
-					});
+					const closeSessionResult =
+						await userConfiguredServices.recorder.closeRecordingSession(
+							undefined,
+							{
+								sendStatus: (options) =>
+									toast.loading({ id: stopRecordingToastId, ...options }),
+							},
+						);
 					if (!closeSessionResult.ok) {
 						toast.warning({
 							id: stopRecordingToastId,
