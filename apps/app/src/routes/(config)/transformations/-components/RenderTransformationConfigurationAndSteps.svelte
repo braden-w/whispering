@@ -49,7 +49,6 @@
 
 		if (updatedTransformation.steps.length > 0) {
 			const lastStep = updatedTransformation.steps.at(-1);
-			currentlyOpenStepId = lastStep?.id;
 		}
 	}
 
