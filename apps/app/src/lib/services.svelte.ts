@@ -43,15 +43,22 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 
 export const DbService = createDbDexieService();
 
+const HttpService = window.__TAURI_INTERNALS__
+	? createHttpServiceDesktop()
+	: createHttpServiceWeb();
+
+const RecorderService = window.__TAURI_INTERNALS__
+	? createRecorderServiceTauri()
+	: createRecorderServiceWeb();
+
+const PlaySoundService = window.__TAURI_INTERNALS__
+	? createPlaySoundServiceDesktop()
+	: createPlaySoundServiceWeb();
 /**
  * Services that are determined by the user's settings.
  */
-export const userConfiguredServices = (() => {
-	const HttpService = window.__TAURI_INTERNALS__
-		? createHttpServiceDesktop()
-		: createHttpServiceWeb();
-
-	const TranscriptionService = (() => {
+export const userConfiguredServices = {
+	get transcription() {
 		switch (settings.value['transcription.selectedTranscriptionService']) {
 			case 'OpenAI':
 				return createTranscriptionServiceOpenAi({
@@ -87,41 +94,34 @@ export const userConfiguredServices = (() => {
 					HttpService,
 					settings: settings.value,
 				});
+			default:
+				return createTranscriptionServiceOpenAi({
+					HttpService,
+					settings: settings.value,
+				});
 		}
-	})();
-
-	const RecorderService = window.__TAURI_INTERNALS__
-		? createRecorderServiceTauri()
-		: createRecorderServiceWeb();
-
-	const PlaySoundService = window.__TAURI_INTERNALS__
-		? createPlaySoundServiceDesktop()
-		: createPlaySoundServiceWeb();
-
-	return {
-		transcription: TranscriptionService,
-		recorder: RecorderService,
-		sound: {
-			playStartSoundIfEnabled: () => {
-				if (settings.value['sound.playOnStartSuccess']) {
-					void PlaySoundService.playSound('start');
-				}
-			},
-			playStopSoundIfEnabled: () => {
-				if (settings.value['sound.playOnStopSuccess']) {
-					void PlaySoundService.playSound('stop');
-				}
-			},
-			playCancelSoundIfEnabled: () => {
-				if (settings.value['sound.playOnCancelSuccess']) {
-					void PlaySoundService.playSound('cancel');
-				}
-			},
-			playTranscriptionCompleteSoundIfEnabled: () => {
-				if (settings.value['sound.playOnTranscriptionSuccess']) {
-					void PlaySoundService.playSound('transcription-complete');
-				}
-			},
+	},
+	recorder: RecorderService,
+	sound: {
+		playStartSoundIfEnabled: () => {
+			if (settings.value['sound.playOnStartSuccess']) {
+				void PlaySoundService.playSound('start');
+			}
 		},
-	};
-})();
+		playStopSoundIfEnabled: () => {
+			if (settings.value['sound.playOnStopSuccess']) {
+				void PlaySoundService.playSound('stop');
+			}
+		},
+		playCancelSoundIfEnabled: () => {
+			if (settings.value['sound.playOnCancelSuccess']) {
+				void PlaySoundService.playSound('cancel');
+			}
+		},
+		playTranscriptionCompleteSoundIfEnabled: () => {
+			if (settings.value['sound.playOnTranscriptionSuccess']) {
+				void PlaySoundService.playSound('transcription-complete');
+			}
+		},
+	},
+};
