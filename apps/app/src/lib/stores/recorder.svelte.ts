@@ -14,10 +14,13 @@ import {
 	type WhisperingRecordingState,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { useQueryClient } from '@tanstack/svelte-query';
+import { recordingsKeys } from '$lib/queries/recordings';
 
 export const recorder = createRecorder();
 
 function createRecorder() {
+	const queryClient = useQueryClient();
 	let recorderState = $state<WhisperingRecordingState>('IDLE');
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
@@ -78,6 +81,11 @@ function createRecorder() {
 				});
 				return;
 			}
+
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [saveRecordingToDatabaseResult.data];
+				return [...oldData, saveRecordingToDatabaseResult.data];
+			});
 
 			toast.loading({
 				id: stopRecordingToastId,

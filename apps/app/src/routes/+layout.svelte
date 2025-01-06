@@ -1,11 +1,24 @@
+<script module lang="ts">
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	export const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser,
+			},
+		},
+	});
+</script>
+
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto, onNavigate } from '$app/navigation';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
+	import { DbService } from '$lib/services.svelte';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { toast } from '$lib/utils/toast';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
@@ -14,18 +27,6 @@
 	import '../app.css';
 	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
 	import { closeToTrayIfEnabled } from './+layout/closeToTray';
-	import { DbService } from '$lib/services.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { browser } from '$app/environment';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				enabled: browser,
-			},
-		},
-	});
 
 	let { children } = $props();
 
