@@ -219,14 +219,32 @@
 												bind:value={step[
 													'prompt_transform.systemPromptTemplate'
 												]}
-												placeholder="Enter system prompt template. Use &lbrace;&lbrace;input&rbrace;&rbrace; to reference the input text."
-											/>
+												placeholder="Enter system prompt template. Use {'{{input}}'} to reference the input text."
+											>
+												{#snippet description()}
+													{#if step['prompt_transform.systemPromptTemplate'] && !step['prompt_transform.systemPromptTemplate'].includes('{{input}}')}
+														<span class="text-destructive text-sm">
+															Please include {'{{input}}'} in your template to reference
+															the input text
+														</span>
+													{/if}
+												{/snippet}
+											</LabeledTextarea>
 											<LabeledTextarea
 												id="prompt_transform.userPromptTemplate"
 												label="User Prompt Template"
 												bind:value={step['prompt_transform.userPromptTemplate']}
-												placeholder="Enter user prompt template. Use &lbrace;&lbrace;input&rbrace;&rbrace; to reference the input text."
-											/>
+												placeholder="Enter user prompt template. Use {'{{input}}'} to reference the input text."
+											>
+												{#snippet description()}
+													{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
+														<span class="text-destructive text-sm">
+															Please include {'{{input}}'} in your template to reference
+															the input text
+														</span>
+													{/if}
+												{/snippet}
+											</LabeledTextarea>
 										</div>
 									{/if}
 								</div>
