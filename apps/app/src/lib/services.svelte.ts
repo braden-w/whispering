@@ -89,6 +89,29 @@ export const userConfiguredServices = (() => {
 
 				return result;
 			},
+			deleteRecording: async (recording: Recording) => {
+				const result = await DbService.deleteRecording(recording);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+					if (!oldData) return [];
+					return oldData.filter((item) => item.id !== recording.id);
+				});
+
+				return result;
+			},
+			deleteRecordings: async (recordings: Recording[]) => {
+				const result = await DbService.deleteRecordings(recordings);
+				if (!result.ok) return result;
+
+				queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+					if (!oldData) return [];
+					const deletedIds = new Set(recordings.map((r) => r.id));
+					return oldData.filter((item) => !deletedIds.has(item.id));
+				});
+
+				return result;
+			},
 		},
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
