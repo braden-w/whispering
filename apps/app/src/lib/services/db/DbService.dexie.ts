@@ -333,7 +333,7 @@ export function createDbDexieService(): DbService {
 	return {
 		async getAllRecordings() {
 			return tryAsync({
-				try: () => db.recordings.toArray(),
+				try: () => db.recordings.orderBy('timestamp').reverse().toArray(),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting all recordings from Dexie',
