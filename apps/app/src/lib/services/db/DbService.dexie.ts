@@ -124,8 +124,9 @@ type RecordingsDbSchemaV1 = {
 		 * 1. Begins in an 'UNPROCESSED' state
 		 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
 		 * 3. Finally is marked as 'DONE' when the transcription is complete.
+		 * 4. If the transcription fails, it is marked as 'FAILED'
 		 */
-		transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE';
+		transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE' | 'FAILED';
 	};
 };
 

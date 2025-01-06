@@ -63,6 +63,10 @@ function createTranscriber() {
 				);
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
+				void DbService.updateRecording({
+					...recording,
+					transcriptionStatus: 'FAILED',
+				});
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
