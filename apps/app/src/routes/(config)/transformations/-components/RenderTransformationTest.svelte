@@ -34,7 +34,11 @@
 				throw new Error('No steps configured');
 			}
 
-			const result = await userConfiguredServices.transformations.runTransformationOnInput(input, transformation);
+			const result =
+				await userConfiguredServices.transformations.runTransformationOnInput({
+					input,
+					transformation,
+				});
 			if (!result.ok) {
 				toast.error({
 					title: result.error.title,

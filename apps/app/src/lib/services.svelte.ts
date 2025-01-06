@@ -66,10 +66,13 @@ export const userConfiguredServices = (() => {
 
 	return {
 		transformations: {
-			runTransformationOnInput: async (
-				input: string,
-				transformation: Transformation,
-			) => {
+			runTransformationOnInput: async ({
+				input,
+				transformation,
+			}: {
+				input: string;
+				transformation: Transformation;
+			}) => {
 				return runTransformationOnInput(input, transformation, HttpService);
 			},
 		},
