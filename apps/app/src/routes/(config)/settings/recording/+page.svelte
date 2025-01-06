@@ -9,7 +9,7 @@
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =
-			await userConfiguredServices().recorder.enumerateRecordingDevices();
+			await userConfiguredServices.recorder.enumerateRecordingDevices();
 		if (!enumerateRecordingDevicesResult.ok) {
 			toast.warning(enumerateRecordingDevicesResult.error);
 			return [];

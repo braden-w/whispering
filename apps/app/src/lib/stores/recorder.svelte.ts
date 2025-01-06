@@ -34,7 +34,7 @@ function createRecorder() {
 				description: 'Finalizing your audio capture...',
 			});
 
-			const stopResult = await userConfiguredServices().recorder.stopRecording(
+			const stopResult = await userConfiguredServices.recorder.stopRecording(
 				undefined,
 				{
 					sendStatus: (options) =>
@@ -48,7 +48,7 @@ function createRecorder() {
 			}
 			await setRecorderState('SESSION');
 			console.info('Recording stopped');
-			void userConfiguredServices().sound.playStopSoundIfEnabled();
+			void userConfiguredServices.sound.playStopSoundIfEnabled();
 
 			const blob = stopResult.data;
 			const now = new Date().toISOString();
@@ -207,7 +207,7 @@ function createRecorder() {
 		});
 		if (recorderState === 'IDLE') {
 			const initResult =
-				await userConfiguredServices().recorder.initRecordingSession(
+				await userConfiguredServices.recorder.initRecordingSession(
 					{
 						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
 						bitsPerSecond:
@@ -225,7 +225,7 @@ function createRecorder() {
 			await setRecorderState('SESSION');
 		}
 		const startRecordingResult =
-			await userConfiguredServices().recorder.startRecording(nanoid(), {
+			await userConfiguredServices.recorder.startRecording(nanoid(), {
 				sendStatus: (options) =>
 					toast.loading({ id: startRecordingToastId, ...options }),
 			});
@@ -240,7 +240,7 @@ function createRecorder() {
 			description: 'Speak now and stop recording when done',
 		});
 		console.info('Recording started');
-		void userConfiguredServices().sound.playStartSoundIfEnabled();
+		void userConfiguredServices.sound.playStartSoundIfEnabled();
 	};
 
 	return {
@@ -256,12 +256,9 @@ function createRecorder() {
 				description: 'Wrapping things up, just a moment...',
 			});
 			const closeResult =
-				await userConfiguredServices().recorder.closeRecordingSession(
-					undefined,
-					{
-						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-					},
-				);
+				await userConfiguredServices.recorder.closeRecordingSession(undefined, {
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				});
 			if (!closeResult.ok) {
 				toast.error({ id: toastId, ...closeResult.error });
 				return;
@@ -276,9 +273,9 @@ function createRecorder() {
 
 		toggleRecordingWithToast: () => {
 			if (recorderState === 'SESSION+RECORDING') {
-				void stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
+				stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 			} else {
-				void startRecordingWithToast();
+				startRecordingWithToast();
 			}
 		},
 
@@ -290,7 +287,7 @@ function createRecorder() {
 				description: 'Discarding the current recording...',
 			});
 			const cancelResult =
-				await userConfiguredServices().recorder.cancelRecording(undefined, {
+				await userConfiguredServices.recorder.cancelRecording(undefined, {
 					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 				});
 			if (!cancelResult.ok) {
@@ -313,7 +310,7 @@ function createRecorder() {
 					description: 'Wrapping up your recording session...',
 				});
 				const closeSessionResult =
-					await userConfiguredServices().recorder.closeRecordingSession(
+					await userConfiguredServices.recorder.closeRecordingSession(
 						undefined,
 						{
 							sendStatus: (options) =>
@@ -337,7 +334,7 @@ function createRecorder() {
 				});
 				await setRecorderState('IDLE');
 			}
-			void userConfiguredServices().sound.playCancelSoundIfEnabled();
+			void userConfiguredServices.sound.playCancelSoundIfEnabled();
 			console.info('Recording cancelled');
 		},
 	};

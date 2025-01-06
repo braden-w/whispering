@@ -46,7 +46,7 @@ export const DbService = createDbDexieService();
 /**
  * Services that are determined by the user's settings.
  */
-export const userConfiguredServices = () => {
+export const userConfiguredServices = (() => {
 	const HttpService = window.__TAURI_INTERNALS__
 		? createHttpServiceDesktop()
 		: createHttpServiceWeb();
@@ -124,4 +124,4 @@ export const userConfiguredServices = () => {
 			},
 		},
 	};
-};
+})();

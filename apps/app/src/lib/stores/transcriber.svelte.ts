@@ -53,14 +53,11 @@ function createTranscriber() {
 			}
 			transcribingRecordingIds.add(recording.id);
 			const transcriptionResult =
-				await userConfiguredServices().transcription.transcribe(
-					recording.blob,
-					{
-						outputLanguage: settings.value['transcription.outputLanguage'],
-						prompt: settings.value['transcription.prompt'],
-						temperature: settings.value['transcription.temperature'],
-					},
-				);
+				await userConfiguredServices.transcription.transcribe(recording.blob, {
+					outputLanguage: settings.value['transcription.outputLanguage'],
+					prompt: settings.value['transcription.prompt'],
+					temperature: settings.value['transcription.temperature'],
+				});
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
 				void DbService.updateRecording({
@@ -95,7 +92,7 @@ function createTranscriber() {
 				return saveRecordingToDatabaseResult;
 			}
 
-			void userConfiguredServices().sound.playTranscriptionCompleteSoundIfEnabled();
+			void userConfiguredServices.sound.playTranscriptionCompleteSoundIfEnabled();
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
