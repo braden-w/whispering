@@ -21,7 +21,7 @@
 
 	let { recording }: { recording: Recording } = $props();
 
-	const downloadRecordingWithToast = createDownloadRecordingWithToast();
+	const downloadRecordingWithToastMutation = createDownloadRecordingWithToast();
 	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
 </script>
 
@@ -62,11 +62,11 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() => downloadRecordingWithToast.mutate(recording)}
+		onclick={() => downloadRecordingWithToastMutation.mutate(recording)}
 		variant="ghost"
 		size="icon"
 	>
-		{#if downloadRecordingWithToast.isPending}
+		{#if downloadRecordingWithToastMutation.isPending}
 			<Loader2Icon class="h-4 w-4 animate-spin" />
 		{:else}
 			<DownloadIcon class="h-4 w-4" />
