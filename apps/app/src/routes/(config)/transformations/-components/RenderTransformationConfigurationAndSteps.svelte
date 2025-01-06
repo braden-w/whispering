@@ -94,7 +94,7 @@
 		/>
 
 		{#if transformation.steps.length === 0}
-			<Alert.Root variant="destructive">
+			<Alert.Root variant="warning">
 				<Alert.Title>No steps added</Alert.Title>
 				<Alert.Description>
 					Please add at least one step to your transformation before saving.
