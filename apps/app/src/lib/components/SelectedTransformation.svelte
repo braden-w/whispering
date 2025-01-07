@@ -87,6 +87,12 @@
 									transformation.id && 'text-transparent',
 							)}
 						/>
+						<span
+							class="bg-muted-foreground p-0.5 font-mono text-xs rounded-md max-w-16 truncate"
+						>
+							{transformation.id}
+						</span>
+
 						{transformation.title}
 					</Command.Item>
 				{/each}
