@@ -6,6 +6,7 @@
 	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
+	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 	import {
 		CheckIcon,
 		ChevronsUpDownIcon,
@@ -48,6 +49,9 @@
 				aria-expanded={open}
 				class="w-full justify-between"
 				{...props}
+				style="view-transition-name: {createTransformationViewTransitionName({
+					transformationId: displayTransformation?.id ?? null,
+				})}"
 			>
 				{displayTransformation?.title ?? 'No post-processing selected'}
 				<ChevronsUpDownIcon class="opacity-50" />

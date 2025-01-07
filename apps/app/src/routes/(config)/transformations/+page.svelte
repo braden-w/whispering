@@ -47,6 +47,7 @@
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -209,7 +210,13 @@
 		direction="horizontal"
 		class="rounded-lg border gap-6 p-6"
 	>
-		<Resizable.Pane defaultSize={50} class="flex flex-col gap-4">
+		<Resizable.Pane
+			defaultSize={50}
+			class="flex flex-col gap-4"
+			style="view-transition-name: {createTransformationViewTransitionName({
+				transformationId: null,
+			})}"
+		>
 			<div class="flex items-center justify-between gap-2 w-full">
 				<Input
 					placeholder="Filter transformations..."
@@ -352,6 +359,9 @@
 									onclick={() => {
 										selectedEditTransformation = row.original;
 									}}
+									style="view-transition-name: {createTransformationViewTransitionName(
+										{ transformationId: row.id },
+									)}"
 								>
 									{#each row.getVisibleCells() as cell}
 										<Table.Cell>
