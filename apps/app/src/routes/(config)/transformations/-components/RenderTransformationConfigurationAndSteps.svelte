@@ -115,7 +115,7 @@
 		{/if}
 
 		<div class="space-y-4">
-			{#each transformation.steps as step, index}
+			{#each transformation.steps as step, index (step.id)}
 				<Card.Root>
 					<Card.Header class="space-y-3">
 						<div class="flex items-center justify-between">
