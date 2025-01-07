@@ -7,11 +7,11 @@
 	let {
 		transformation,
 		class: className,
-		icon = false,
+		size = 'default',
 	}: {
 		transformation: Transformation;
 		class?: string;
-		icon?: boolean;
+		size?: 'default' | 'icon';
 	} = $props();
 
 	const isTransformationActive = $derived(
@@ -29,7 +29,7 @@
 <WhisperingButton
 	tooltipContent={displayText}
 	variant="ghost"
-	size={icon ? 'icon' : 'default'}
+	{size}
 	class={className}
 	onclick={() => {
 		if (isTransformationActive) {
@@ -45,7 +45,7 @@
 		}
 	}}
 >
-	{#if !icon}
+	{#if size === 'default'}
 		{displayText}
 	{/if}
 	{#if isTransformationActive}
