@@ -87,16 +87,9 @@
 							)}
 						/>
 						{#if transformation.title === ''}
-							<span class="p-1 bg-muted rounded font-mono text-xs">
+							<span class="text-muted-foreground text-xs">
 								{transformation.id}
 							</span>
-						{:else if transformation.description}
-							<div class="flex flex-col gap-1">
-								{transformation.title}
-								<span class="text-muted-foreground text-sm">
-									{transformation.description}
-								</span>
-							</div>
 						{:else}
 							{transformation.title}
 						{/if}
