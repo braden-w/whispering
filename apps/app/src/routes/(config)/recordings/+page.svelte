@@ -276,13 +276,6 @@
 			);
 		return transcriptions.join(delimiter);
 	});
-
-	const filterQuery = $derived.by(() => {
-		const initialFilterValue = table
-			.getColumn('transcribedText')
-			?.getFilterValue();
-		return typeof initialFilterValue === 'string' ? initialFilterValue : '';
-	});
 </script>
 
 <svelte:head>
@@ -302,16 +295,11 @@
 				placeholder="Filter transcripts..."
 				type="text"
 				class="w-full md:max-w-sm"
-				value={filterQuery}
+				value={table.getColumn('transcribedText')?.getFilterValue() as string}
 				oninput={(e) =>
 					table
 						.getColumn('transcribedText')
 						?.setFilterValue(e.currentTarget.value)}
-				onchange={(e) => {
-					table
-						.getColumn('transcribedText')
-						?.setFilterValue(e.currentTarget.value);
-				}}
 			/>
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
