@@ -55,7 +55,7 @@
 		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content class="w-80 max-w-xl p-0">
-		<Command.Root>
+		<Command.Root loop>
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
