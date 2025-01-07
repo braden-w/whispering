@@ -10,19 +10,25 @@
 	import { cn } from '$lib/utils';
 	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
 	import type { Transformation } from '$lib/services/db';
+	import { tick } from 'svelte';
 
-	let selectedTransformationId = $state<Transformation['id'] | null>(null);
 	let open = $state(false);
-	let searchQuery = $state('');
+	let selectedTransformationId = $state<Transformation['id'] | null>(null);
+	let triggerRef = $state<HTMLButtonElement | null>(null);
+
 	const transformationsQuery = createTransformationsQuery();
 
-	const filteredTransformations = $derived(
-		transformationsQuery.data?.filter(
-			(t) =>
-				t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				t.description?.toLowerCase().includes(searchQuery.toLowerCase()),
-		),
+	const displayTransformationTitle = $derived(
+		transformationsQuery.data?.find((t) => t.id === selectedTransformationId)
+			?.title,
 	);
+
+	function closeAndFocusTrigger() {
+		open = false;
+		tick().then(() => {
+			triggerRef?.focus();
+		});
+	}
 </script>
 
 <Popover bind:open>
@@ -35,47 +41,40 @@
 				class="w-full justify-between"
 				{...props}
 			>
-				{selectedTransformationId ?? 'No post-processing selected'}
+				{displayTransformationTitle ?? 'No post-processing selected'}
 				<ChevronsUpDownIcon class="opacity-50" />
 			</Button>
 		{/snippet}
 	</PopoverTrigger>
 	<PopoverContent class="w-80 max-w-xl p-0">
 		<Command.Root>
-			<Command.Input
-				placeholder="Search transformations..."
-				bind:value={searchQuery}
-			/>
+			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
-				{#if filteredTransformations}
-					{#each filteredTransformations as transformation (transformation.id)}
-						<Command.Item
-							value={transformation.title}
-							onSelect={() => {
-								selectedTransformationId = transformation.id;
-								open = false;
-							}}
-						>
-							<CheckIcon
-								class={cn(
-									'mr-2 size-4',
-									selectedTransformationId === transformation.id
-										? 'opacity-100'
-										: 'opacity-0',
-								)}
-							/>
-							<div class="flex flex-col gap-1">
-								{transformation.title}
-								{#if transformation.description}
-									<span class="text-muted-foreground text-sm">
-										{transformation.description}
-									</span>
-								{/if}
-							</div>
-						</Command.Item>
-					{/each}
-				{/if}
+				{#each transformationsQuery.data ?? [] as transformation (transformation.id)}
+					<Command.Item
+						value={transformation.title}
+						onSelect={() => {
+							selectedTransformationId = transformation.id;
+							closeAndFocusTrigger();
+						}}
+					>
+						<CheckIcon
+							class={cn(
+								selectedTransformationId !== transformation.id &&
+									'text-transparent',
+							)}
+						/>
+						<div class="flex flex-col gap-1">
+							{transformation.title}
+							{#if transformation.description}
+								<span class="text-muted-foreground text-sm">
+									{transformation.description}
+								</span>
+							{/if}
+						</div>
+					</Command.Item>
+				{/each}
 			</Command.Group>
 		</Command.Root>
 	</PopoverContent>
