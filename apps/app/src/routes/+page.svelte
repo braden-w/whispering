@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import TransformationSelect from '$lib/components/TransformationSelect.svelte';
+	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -135,7 +135,7 @@
 			></audio>
 		{/if}
 
-		<TransformationSelect />
+		<SelectedTransformation />
 	</div>
 
 	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />
