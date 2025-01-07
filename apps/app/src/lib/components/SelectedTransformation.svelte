@@ -12,9 +12,7 @@
 	import type { Transformation } from '$lib/services/db';
 	import { tick } from 'svelte';
 
-	let open = $state(false);
 	let selectedTransformationId = $state<Transformation['id'] | null>(null);
-	let triggerRef = $state<HTMLButtonElement | null>(null);
 
 	const transformationsQuery = createTransformationsQuery();
 
@@ -23,6 +21,8 @@
 			?.title,
 	);
 
+	let open = $state(false);
+	let triggerRef = $state<HTMLButtonElement | null>(null);
 	function closeAndFocusTrigger() {
 		open = false;
 		tick().then(() => {
@@ -32,7 +32,7 @@
 </script>
 
 <Popover bind:open>
-	<PopoverTrigger>
+	<PopoverTrigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
 			<Button
 				variant="outline"
