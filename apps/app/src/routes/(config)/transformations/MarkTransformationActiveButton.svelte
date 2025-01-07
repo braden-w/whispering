@@ -7,20 +7,29 @@
 	let {
 		transformation,
 		class: className,
-	}: { transformation: Transformation; class?: string } = $props();
+		icon = false,
+	}: {
+		transformation: Transformation;
+		class?: string;
+		icon?: boolean;
+	} = $props();
 
 	const isTransformationActive = $derived(
 		settings.value['transformations.selectedTransformationId'] ===
 			transformation.id,
 	);
+
+	const displayText = $derived(
+		isTransformationActive
+			? 'Transformation is active'
+			: 'Mark transformation as active',
+	);
 </script>
 
 <WhisperingButton
-	tooltipContent={isTransformationActive
-		? 'Transformation is active'
-		: 'Mark transformation as active'}
+	tooltipContent={displayText}
 	variant="ghost"
-	size="icon"
+	size={icon ? 'icon' : 'default'}
 	class={className}
 	onclick={() => {
 		if (isTransformationActive) {
@@ -36,6 +45,9 @@
 		}
 	}}
 >
+	{#if !icon}
+		{displayText}
+	{/if}
 	{#if isTransformationActive}
 		<CheckCircleIcon class="h-4 w-4 text-green-500" />
 	{:else}

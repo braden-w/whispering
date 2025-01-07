@@ -14,7 +14,7 @@
 </script>
 
 <div class="flex items-center">
-	<MarkTransformationActiveButton {transformation} />
+	<MarkTransformationActiveButton icon {transformation} />
 	<EditTransformationDialog {transformation}></EditTransformationDialog>
 
 	<WhisperingButton
