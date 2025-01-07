@@ -109,11 +109,6 @@
 			.refine((data): data is ColumnFilter => data.value !== undefined)
 			.array(),
 	});
-	let columnVisibility = createPersistedState({
-		key: 'whispering-transformations-data-table-column-visibility',
-		defaultValue: {},
-		schema: z.record(z.string(), z.boolean()),
-	});
 	let rowSelection = createPersistedState({
 		key: 'whispering-transformations-data-table-row-selection',
 		defaultValue: {},
@@ -133,7 +128,6 @@
 
 	const setSorting = createUpdater(sorting);
 	const setFilters = createUpdater(columnFilters);
-	const setVisibility = createUpdater(columnVisibility);
 	const setRowSelection = createUpdater(rowSelection);
 
 	const transformationsQuery = createTransformationsQuery();
@@ -154,7 +148,6 @@
 		getPaginationRowModel: getPaginationRowModel(),
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setFilters,
-		onColumnVisibilityChange: setVisibility,
 		onRowSelectionChange: setRowSelection,
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
@@ -169,9 +162,6 @@
 			},
 			get columnFilters() {
 				return columnFilters.value;
-			},
-			get columnVisibility() {
-				return columnVisibility.value;
 			},
 			get rowSelection() {
 				return rowSelection.value;
