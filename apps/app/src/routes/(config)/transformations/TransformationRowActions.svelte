@@ -4,9 +4,9 @@
 	import { TrashIcon } from '$lib/components/icons';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
-	import { CheckIcon } from 'lucide-svelte';
-	import EditTransformationDialog from './EditTransformationDialog.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import { CheckCircleIcon, CircleIcon } from 'lucide-svelte';
+	import EditTransformationDialog from './EditTransformationDialog.svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();
 
@@ -25,9 +25,20 @@
 			? 'Transformation is active'
 			: 'Mark transformation as active'}
 		variant="ghost"
+		size="icon"
 		disabled={isTransformationActive}
+		onclick={() => {
+			settings.value = {
+				...settings.value,
+				'transformations.selectedTransformationId': transformation.id,
+			};
+		}}
 	>
-		<CheckIcon class="h-4 w-4" />
+		{#if isTransformationActive}
+			<CheckCircleIcon class="h-4 w-4" />
+		{:else}
+			<CircleIcon class="h-4 w-4" />
+		{/if}
 	</WhisperingButton>
 	<EditTransformationDialog {transformation}></EditTransformationDialog>
 
