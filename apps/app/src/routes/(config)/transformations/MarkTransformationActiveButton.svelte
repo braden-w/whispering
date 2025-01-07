@@ -4,7 +4,10 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { CheckCircleIcon, CircleIcon } from 'lucide-svelte';
 
-	let { transformation }: { transformation: Transformation } = $props();
+	let {
+		transformation,
+		class: className,
+	}: { transformation: Transformation; class?: string } = $props();
 
 	const isTransformationActive = $derived(
 		settings.value['transformations.selectedTransformationId'] ===
@@ -18,6 +21,7 @@
 		: 'Mark transformation as active'}
 	variant="ghost"
 	size="icon"
+	class={className}
 	onclick={() => {
 		settings.value = {
 			...settings.value,

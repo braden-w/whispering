@@ -11,6 +11,7 @@
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
+	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
 	let {
 		transformation: initialTransformation,
@@ -89,6 +90,7 @@
 				{/if}
 				Delete
 			</Button>
+			<MarkTransformationActiveButton {transformation} />
 			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
 				Cancel
 			</Button>
