@@ -436,15 +436,13 @@
 		<Resizable.Handle />
 		<Resizable.Pane defaultSize={50}>
 			{#if selectedTransformation}
-				<div class="rounded-md border p-6">
-					<RenderTransformation
-						transformation={selectedTransformation}
-						onChange={(newTransformation) => {
-							// TODO: Add update mutation
-							console.log('Update transformation:', newTransformation);
-						}}
-					/>
-				</div>
+				<RenderTransformation
+					transformation={selectedTransformation}
+					onChange={(newTransformation) => {
+						// TODO: Add update mutation
+						console.log('Update transformation:', newTransformation);
+					}}
+				/>
 			{:else}
 				<div
 					class="flex h-[50vh] items-center justify-center rounded-md border"
