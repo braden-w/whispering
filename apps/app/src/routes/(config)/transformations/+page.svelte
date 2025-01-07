@@ -187,12 +187,7 @@
 	const updateTransformationWithToastMutation =
 		createUpdateTransformationWithToast();
 
-	const selectedTransformation = $derived(
-		transformationsQuery.data?.find(
-			(t) =>
-				t.id === settings.value['transformations.selectedTransformationId'],
-		),
-	);
+	let selectedEditTransformation = $state<Transformation | null>(null);
 </script>
 
 <svelte:head>
@@ -349,17 +344,10 @@
 							{#each table.getRowModel().rows as row (row.id)}
 								<Table.Row
 									class={cn('cursor-pointer', {
-										'bg-muted/75':
-											row.id ===
-											settings.value[
-												'transformations.selectedTransformationId'
-											],
+										'bg-muted/75': row.id === selectedEditTransformation?.id,
 									})}
 									onclick={() => {
-										settings.value = {
-											...settings.value,
-											'transformations.selectedTransformationId': row.id,
-										};
+										selectedEditTransformation = row.original;
 									}}
 								>
 									{#each row.getVisibleCells() as cell}
@@ -415,9 +403,9 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:block" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			{#if selectedTransformation}
+			{#if selectedEditTransformation}
 				<RenderTransformation
-					transformation={selectedTransformation}
+					transformation={selectedEditTransformation}
 					onChange={(newTransformation) => {
 						updateTransformationWithToastMutation.mutate(
 							$state.snapshot(newTransformation),
