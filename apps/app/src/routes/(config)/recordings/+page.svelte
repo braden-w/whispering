@@ -23,6 +23,7 @@
 	import type {
 		ColumnDef,
 		ColumnFilter,
+		ColumnFiltersState,
 		PaginationState,
 		Updater,
 	} from '@tanstack/table-core';
@@ -163,14 +164,7 @@
 		defaultValue: [{ id: 'createdAt', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
-	let columnFilters = createPersistedState({
-		key: 'whispering-recordings-data-table-column-filters',
-		defaultValue: [],
-		schema: z
-			.object({ id: z.string(), value: z.unknown() })
-			.refine((data): data is ColumnFilter => data.value !== undefined)
-			.array(),
-	});
+	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = createPersistedState({
 		key: 'whispering-recordings-data-table-column-visibility',
 		defaultValue: {
@@ -200,7 +194,6 @@
 	}
 
 	const setSorting = createUpdater(sorting);
-	const setFilters = createUpdater(columnFilters);
 	const setVisibility = createUpdater(columnVisibility);
 	const setRowSelection = createUpdater(rowSelection);
 
@@ -219,7 +212,13 @@
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		onSortingChange: setSorting,
-		onColumnFiltersChange: setFilters,
+		onColumnFiltersChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnFilters = updater(columnFilters);
+			} else {
+				columnFilters = updater;
+			}
+		},
 		onColumnVisibilityChange: setVisibility,
 		onRowSelectionChange: setRowSelection,
 		onPaginationChange: (updater) => {
