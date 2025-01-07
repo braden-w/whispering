@@ -28,7 +28,7 @@ export const HttpServiceErr = (
 export type HttpService = {
 	post: <TSchema extends z.ZodTypeAny>(config: {
 		url: string;
-		formData: FormData;
+		body: BodyInit | FormData;
 		schema: TSchema;
 		headers?: Record<string, string>;
 	}) => Promise<HttpServiceResult<z.infer<TSchema>>>;
