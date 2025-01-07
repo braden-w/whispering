@@ -44,8 +44,34 @@
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import { nanoid } from 'nanoid/non-secure';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import { settings } from '$lib/stores/settings.svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
+		{
+			id: 'selected',
+			meta: {
+				headerText: 'Selected',
+			},
+			header: (headerContext) =>
+				renderComponent(DataTableHeader, headerContext),
+			cell: ({ row }) => {
+				const isSelected =
+					row.id === settings.value['transformations.selectedTransformationId'];
+				return renderComponent(Button, {
+					variant: isSelected ? 'ghost' : 'default',
+					onclick: () => {
+						settings.value = {
+							...settings.value,
+							'transformations.selectedTransformationId': isSelected
+								? null
+								: row.original.id,
+						};
+					},
+					value: isSelected ? 'Selected' : 'Select',
+				});
+			},
+			enableSorting: false,
+		},
 		{
 			id: 'select',
 			header: ({ table }) =>
