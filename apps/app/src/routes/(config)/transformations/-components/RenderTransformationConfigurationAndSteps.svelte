@@ -115,7 +115,7 @@
 		{/if}
 
 		<div class="space-y-4">
-			{#each transformation.steps as step, index (step.id)}
+			{#each transformation.steps as step, index (index)}
 				<Card.Root>
 					<Card.Header class="space-y-3">
 						<div class="flex items-center justify-between">
@@ -178,13 +178,40 @@
 									<LabeledInput
 										id="find_replace.findText"
 										label="Find Text"
-										bind:value={step['find_replace.findText']}
+										value={step['find_replace.findText']}
+										oninput={(e) => {
+											onChange({
+												...transformation,
+												steps: transformation.steps.map((s, i) =>
+													i === index
+														? {
+																...s,
+																'find_replace.findText': e.currentTarget.value,
+															}
+														: s,
+												),
+											});
+										}}
 										placeholder="Enter text to find"
 									/>
 									<LabeledInput
 										id="find_replace.replaceText"
 										label="Replace Text"
-										bind:value={step['find_replace.replaceText']}
+										value={step['find_replace.replaceText']}
+										oninput={(e) => {
+											onChange({
+												...transformation,
+												steps: transformation.steps.map((s, i) =>
+													i === index
+														? {
+																...s,
+																'find_replace.replaceText':
+																	e.currentTarget.value,
+															}
+														: s,
+												),
+											});
+										}}
 										placeholder="Enter replacement text"
 									/>
 								</div>
@@ -271,13 +298,41 @@
 								<LabeledTextarea
 									id="prompt_transform.systemPromptTemplate"
 									label="System Prompt Template"
-									bind:value={step['prompt_transform.systemPromptTemplate']}
+									value={step['prompt_transform.systemPromptTemplate']}
+									oninput={(e) => {
+										onChange({
+											...transformation,
+											steps: transformation.steps.map((s, i) =>
+												i === index
+													? {
+															...s,
+															'prompt_transform.systemPromptTemplate':
+																e.currentTarget.value,
+														}
+													: s,
+											),
+										});
+									}}
 									placeholder="Example: You are an expert proofreader. Please take in the following text and correct any grammatical errors"
 								/>
 								<LabeledTextarea
 									id="prompt_transform.userPromptTemplate"
 									label="User Prompt Template"
-									bind:value={step['prompt_transform.userPromptTemplate']}
+									value={step['prompt_transform.userPromptTemplate']}
+									oninput={(e) => {
+										onChange({
+											...transformation,
+											steps: transformation.steps.map((s, i) =>
+												i === index
+													? {
+															...s,
+															'prompt_transform.userPromptTemplate':
+																e.currentTarget.value,
+														}
+													: s,
+											),
+										});
+									}}
 									placeholder="Example: Please analyze this text and improve its clarity: {'{{input}}'}"
 								>
 									{#snippet description()}
