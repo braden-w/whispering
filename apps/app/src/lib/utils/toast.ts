@@ -1,7 +1,7 @@
 import { dev } from '$app/environment';
 import { goto } from '$app/navigation';
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { NotificationService } from '$lib/services.svelte';
+import { NotificationService } from '$lib/services/index.js';
 import { extension } from '@repo/extension';
 import type { ToastAndNotifyOptions } from '@repo/shared';
 import { toast as sonnerToast } from 'svelte-sonner';
