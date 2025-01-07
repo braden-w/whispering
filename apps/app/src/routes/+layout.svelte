@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { browser } from '$app/environment';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { QueryClient } from '@tanstack/svelte-query';
 	export const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
@@ -20,6 +20,7 @@
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
