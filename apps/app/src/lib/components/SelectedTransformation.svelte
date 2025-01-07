@@ -51,8 +51,10 @@
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
-							settings.value['transformations.selectedTransformationId'] =
-								transformation.id;
+							settings.value = {
+								...settings.value,
+								'transformations.selectedTransformationId': transformation.id,
+							};
 							closeAndFocusTrigger();
 						}}
 					>
