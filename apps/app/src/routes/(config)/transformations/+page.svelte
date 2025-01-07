@@ -13,6 +13,7 @@
 		createCreateTransformationWithToast,
 		createDeleteTransformationWithToast,
 		createDeleteTransformationsWithToast,
+		createUpdateTransformationWithToast,
 	} from '$lib/mutations/transformations';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import {
@@ -182,6 +183,9 @@
 	let isDialogOpen = $state(false);
 	const createTransformationWithToastMutation =
 		createCreateTransformationWithToast();
+
+	const updateTransformationWithToastMutation =
+		createUpdateTransformationWithToast();
 
 	const selectedTransformation = $derived(
 		transformationsQuery.data?.find(
@@ -409,14 +413,15 @@
 				</div>
 			</div>
 		</Resizable.Pane>
-		<Resizable.Handle />
-		<Resizable.Pane defaultSize={50}>
+		<Resizable.Handle class="hidden md:block" />
+		<Resizable.Pane defaultSize={50} class="hidden md:block">
 			{#if selectedTransformation}
 				<RenderTransformation
 					transformation={selectedTransformation}
 					onChange={(newTransformation) => {
-						// TODO: Add update mutation
-						console.log('Update transformation:', newTransformation);
+						updateTransformationWithToastMutation.mutate(
+							$state.snapshot(newTransformation),
+						);
 					}}
 				/>
 			{:else}
