@@ -6,20 +6,19 @@
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
-	let {
-		selectedEditTransformation: initialTransformation,
-		setSelectedTransformation,
-	} = $props<{
+	let { selectedEditTransformation, setSelectedTransformation } = $props<{
 		selectedEditTransformation: Transformation | null;
 		setSelectedTransformation: (transformation: Transformation) => void;
 	}>();
 
 	let transformation = $state<Transformation | null>(
-		structuredClone($state.snapshot(initialTransformation)),
+		structuredClone($state.snapshot(selectedEditTransformation)),
 	);
 
 	$effect(() => {
-		transformation = structuredClone($state.snapshot(initialTransformation));
+		transformation = structuredClone(
+			$state.snapshot(selectedEditTransformation),
+		);
 	});
 
 	const updateTransformationWithToastMutation =
