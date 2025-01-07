@@ -291,12 +291,14 @@
 	<p class="text-muted-foreground">
 		Your latest recordings and transcriptions, stored locally in IndexedDB.
 	</p>
-	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
+	<div class="flex flex-col gap-4 rounded-md border p-6">
+		<div
+			class="flex flex-col md:flex-row md:items-center items-start justify-between gap-2"
+		>
 			<Input
 				placeholder="Filter transcripts..."
 				type="text"
-				class="max-w-md"
+				class="w-full md:max-w-sm"
 				value={filterQuery}
 				oninput={(e) =>
 					table
@@ -308,7 +310,7 @@
 						?.setFilterValue(e.currentTarget.value);
 				}}
 			/>
-			<div class="flex w-full items-center justify-end gap-2">
+			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
 						tooltipContent="Transcribe selected recordings"
