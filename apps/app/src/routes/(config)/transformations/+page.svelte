@@ -414,21 +414,23 @@
 					}}
 				>
 					{#snippet closeButtons()}
-						<div class="absolute right-4 top-4">
-							<MarkTransformationActiveButton
-								transformation={selectedEditTransformation}
-							/>
-							<WhisperingButton
-								tooltipContent="Close"
-								variant="outline"
-								size="icon"
-								onclick={() => {
-									selectedEditTransformation = null;
-								}}
-							>
-								<XIcon class="size-4" />
-							</WhisperingButton>
-						</div>
+						{#if selectedEditTransformation}
+							<div class="absolute right-4 top-4">
+								<MarkTransformationActiveButton
+									transformation={selectedEditTransformation}
+								/>
+								<WhisperingButton
+									tooltipContent="Close"
+									variant="outline"
+									size="icon"
+									onclick={() => {
+										selectedEditTransformation = null;
+									}}
+								>
+									<XIcon class="size-4" />
+								</WhisperingButton>
+							</div>
+						{/if}
 					{/snippet}
 				</RenderTransformation>
 			{:else}
