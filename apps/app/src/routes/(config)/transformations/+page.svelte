@@ -2,10 +2,9 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
-	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
@@ -39,7 +38,7 @@
 		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { ChevronDownIcon, PlusIcon } from 'lucide-svelte';
+	import { PlusIcon } from 'lucide-svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import DataTableHeader from './DataTableHeader.svelte';
@@ -136,6 +135,13 @@
 				columnFilters = updater;
 			}
 		},
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				rowSelection.value = updater(rowSelection.value);
+			} else {
+				rowSelection.value = updater;
+			}
+		},
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
 				pagination = updater(pagination);
@@ -193,7 +199,7 @@
 		class="rounded-lg border gap-6 p-6"
 	>
 		<Resizable.Pane defaultSize={50} class="flex flex-col gap-4">
-			<div class="flex items-center justify-between gap-2">
+			<div class="flex items-center justify-between gap-2 w-full">
 				<Input
 					placeholder="Filter transformations..."
 					type="text"
