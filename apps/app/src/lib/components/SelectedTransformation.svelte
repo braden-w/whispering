@@ -17,14 +17,10 @@
 
 	const transformationsQuery = createTransformationsQuery();
 
-	const transformationsWithNonemptyTitle = $derived(
-		transformationsQuery.data
-			? transformationsQuery.data.filter((t) => t.title.trim() !== '')
-			: [],
-	);
+	const transformations = $derived(transformationsQuery.data ?? []);
 
 	const displayTransformation = $derived(
-		transformationsWithNonemptyTitle.find(
+		transformations.find(
 			(t) =>
 				t.id === settings.value['transformations.selectedTransformationId'],
 		),
@@ -63,7 +59,7 @@
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
-				{#each transformationsWithNonemptyTitle as transformation (transformation.id)}
+				{#each transformations as transformation (transformation.id)}
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
