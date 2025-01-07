@@ -12,6 +12,7 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 
 	let { recording: initialRecording }: { recording: Recording } = $props();
 	let recording = $state(structuredClone($state.snapshot(initialRecording)));
@@ -50,7 +51,22 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="overflow-y-auto max-h-[90vh]">
+	<Dialog.Content
+		class="overflow-y-auto max-h-[90vh]"
+		onInteractOutside={(e) => {
+			e.preventDefault();
+			if (isDialogOpen) {
+				confirmationDialog.open({
+					title: 'Unsaved changes',
+					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
+					confirmText: 'Leave',
+					onConfirm: () => {
+						isDialogOpen = false;
+					},
+				});
+			}
+		}}
+	>
 		<Dialog.Header>
 			<Dialog.Title>Edit recording</Dialog.Title>
 			<Dialog.Description>
