@@ -79,21 +79,30 @@
 							}
 							closeAndFocusTrigger();
 						}}
-						class="line-clamp-1 flex items-center"
+						class="flex items-center gap-1 py-3"
 					>
 						<CheckIcon
 							class={cn(
+								'h-4 w-4 flex-shrink-0',
 								settings.value['transformations.selectedTransformationId'] !==
 									transformation.id && 'text-transparent',
 							)}
 						/>
-						<span
-							class="bg-muted-foreground p-0.5 font-mono text-xs rounded-md max-w-16 truncate"
-						>
-							{transformation.id}
-						</span>
-
-						{transformation.title}
+						<div class="flex flex-col min-w-0">
+							<div class="flex items-center gap-2">
+								<span
+									class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
+								>
+									{transformation.id}
+								</span>
+								<span class="font-medium truncate">{transformation.title}</span>
+							</div>
+							{#if transformation.description}
+								<span class="text-sm text-muted-foreground line-clamp-2">
+									{transformation.description}
+								</span>
+							{/if}
+						</div>
 					</Command.Item>
 				{/each}
 				<Command.Item
