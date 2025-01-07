@@ -18,7 +18,7 @@
 
 	const transformationsWithNonemptyTitle = $derived(
 		transformationsQuery.data
-			? transformationsQuery.data.filter((t) => t.title !== '')
+			? transformationsQuery.data.filter((t) => t.title.trim() !== '')
 			: [],
 	);
 
@@ -90,6 +90,7 @@
 									transformation.id && 'text-transparent',
 							)}
 						/>
+						{transformation.title}
 					</Command.Item>
 				{/each}
 				<Command.Item
