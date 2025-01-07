@@ -37,6 +37,8 @@ export const getDefaultSettings = () =>
 		'transcription.fasterWhisperServer.serverModel':
 			'Systran/faster-whisper-medium.en',
 
+		'transformations.selectedTransformationId': null,
+
 		'apiKeys.openai': '',
 		'apiKeys.anthropic': '',
 		'apiKeys.groq': '',
@@ -79,6 +81,8 @@ export const settingsSchema = z.object({
 	'transcription.groq.model': z.enum(GROQ_MODELS),
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
+
+	'transformations.selectedTransformationId': z.string().nullable(),
 
 	'apiKeys.openai': z.string(),
 	'apiKeys.anthropic': z.string(),

@@ -1,4 +1,4 @@
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { parseJson } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import type { z } from 'zod';
