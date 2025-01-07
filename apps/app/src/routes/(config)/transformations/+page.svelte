@@ -201,8 +201,11 @@
 		Your text transformations, stored locally in IndexedDB.
 	</p>
 
-	<Resizable.PaneGroup direction="horizontal" class="rounded-lg border">
-		<Resizable.Pane defaultSize={50}>
+	<Resizable.PaneGroup
+		direction="horizontal"
+		class="rounded-lg border gap-6 p-6"
+	>
+		<Resizable.Pane defaultSize={50} class="flex flex-col gap-4">
 			<div class="flex flex-col items-center justify-between gap-2">
 				<Input
 					placeholder="Filter transformations..."
