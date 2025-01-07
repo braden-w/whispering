@@ -239,6 +239,15 @@
 		table.getFilteredSelectedRowModel().rows,
 	);
 
+	const filterQuery = {
+		get value() {
+			return table.getColumn('select')?.getFilterValue() as string;
+		},
+		set value(value) {
+			table.getColumn('select')?.setFilterValue(value);
+		},
+	};
+
 	let template = $state('{{createdAt}} {{transcribedText}}');
 	let delimiter = $state('\n\n');
 
@@ -278,9 +287,8 @@
 				placeholder="Filter transcripts..."
 				type="text"
 				class="w-full md:max-w-sm"
-				value={table.getColumn('select')?.getFilterValue() as string}
-				oninput={(e) =>
-					table.getColumn('select')?.setFilterValue(e.currentTarget.value)}
+				value={filterQuery.value}
+				oninput={(e) => (filterQuery.value = e.currentTarget.value)}
 			/>
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
@@ -471,7 +479,7 @@
 					{:else}
 						<Table.Row>
 							<Table.Cell colspan={columns.length} class="h-24 text-center">
-								{#if filterQuery}
+								{#if filterQuery.value}
 									No recordings found.
 								{:else}
 									No recordings yet. Start recording to add one.
