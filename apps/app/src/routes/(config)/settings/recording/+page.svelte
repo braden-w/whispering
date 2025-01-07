@@ -3,7 +3,7 @@
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { toast } from '$lib/utils/toast';
+	import { toast } from '$lib/services/toast';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 	import { LabeledSelect } from '$lib/components/labeled/index.js';
 

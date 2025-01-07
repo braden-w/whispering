@@ -2,7 +2,7 @@ import type { Recording } from '$lib/services/db';
 import { userConfiguredServices } from '$lib/services/index.js';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	type WhisperingRecordingState,

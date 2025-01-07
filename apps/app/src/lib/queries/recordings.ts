@@ -1,5 +1,5 @@
 import { userConfiguredServices } from '$lib/services/index.js';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 
 import { createQuery } from '@tanstack/svelte-query';
 

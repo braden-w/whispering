@@ -1,6 +1,6 @@
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { tryAsync, trySync } from '@epicenterhq/result';
 import {
 	WhisperingErr,

@@ -1,6 +1,6 @@
 import type { Transformation } from '$lib/services/db';
 import { userConfiguredServices } from '$lib/services/index.js';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
 
 export const createCreateTransformationWithToast = () =>

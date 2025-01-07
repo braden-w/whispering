@@ -1,4 +1,4 @@
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { settings } from '../stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,

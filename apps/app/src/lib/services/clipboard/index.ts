@@ -1,4 +1,4 @@
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import type { ClipboardService } from './ClipboardService';
 
 export const createClipboardFns = (ClipboardService: ClipboardService) => ({

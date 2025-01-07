@@ -1,6 +1,6 @@
 import { userConfiguredServices } from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
