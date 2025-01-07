@@ -348,7 +348,7 @@
 						{:else if table.getRowModel().rows?.length}
 							{#each table.getRowModel().rows as row (row.id)}
 								<Table.Row
-									class={cn('cursor-pointer hover:bg-muted/50', {
+									class={cn('cursor-pointer', {
 										'bg-muted/75':
 											row.id ===
 											settings.value[
