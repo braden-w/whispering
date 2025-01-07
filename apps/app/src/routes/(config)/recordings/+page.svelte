@@ -184,20 +184,6 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	function createUpdater<T>(state: { value: T }) {
-		return (updater: Updater<T>) => {
-			if (updater instanceof Function) {
-				state.value = updater(state.value);
-			} else {
-				state.value = updater;
-			}
-		};
-	}
-
-	const setSorting = createUpdater(sorting);
-	const setVisibility = createUpdater(columnVisibility);
-	const setRowSelection = createUpdater(rowSelection);
-
 	const recordingsQuery = createRecordingsQuery();
 
 	const deleteRecordingsWithToastMutation = createDeleteRecordingsWithToast();
@@ -212,7 +198,13 @@
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		onSortingChange: setSorting,
+		onSortingChange: (updater) => {
+			if (typeof updater === 'function') {
+				sorting.value = updater(sorting.value);
+			} else {
+				sorting.value = updater;
+			}
+		},
 		onColumnFiltersChange: (updater) => {
 			if (typeof updater === 'function') {
 				columnFilters = updater(columnFilters);
@@ -220,8 +212,20 @@
 				columnFilters = updater;
 			}
 		},
-		onColumnVisibilityChange: setVisibility,
-		onRowSelectionChange: setRowSelection,
+		onColumnVisibilityChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnVisibility.value = updater(columnVisibility.value);
+			} else {
+				columnVisibility.value = updater;
+			}
+		},
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				rowSelection.value = updater(rowSelection.value);
+			} else {
+				rowSelection.value = updater;
+			}
+		},
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
 				pagination = updater(pagination);
