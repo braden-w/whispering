@@ -49,7 +49,18 @@
 					transformationId: displayTransformation?.id ?? null,
 				})}"
 			>
-				{displayTransformation?.title ?? 'No post-processing selected'}
+				{#if displayTransformation}
+					<div class="flex items-center gap-2">
+						<span
+							class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
+						>
+							{displayTransformation.id}
+						</span>
+						{displayTransformation.title}
+					</div>
+				{:else}
+					No post-processing selected
+				{/if}
 				<ChevronsUpDownIcon class="opacity-50" />
 			</Button>
 		{/snippet}
