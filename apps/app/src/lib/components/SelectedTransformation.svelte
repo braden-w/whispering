@@ -78,6 +78,7 @@
 							};
 							closeAndFocusTrigger();
 						}}
+						class="line-clamp-1 flex items-center"
 					>
 						<CheckIcon
 							class={cn(
@@ -85,14 +86,20 @@
 									transformation.id && 'text-transparent',
 							)}
 						/>
-						<div class="flex flex-col gap-1">
-							{transformation.title}
-							{#if transformation.description}
+						{#if transformation.title === ''}
+							<span class="p-1 bg-muted rounded font-mono text-xs">
+								{transformation.id}
+							</span>
+						{:else if transformation.description}
+							<div class="flex flex-col gap-1">
+								{transformation.title}
 								<span class="text-muted-foreground text-sm">
 									{transformation.description}
 								</span>
-							{/if}
-						</div>
+							</div>
+						{:else}
+							{transformation.title}
+						{/if}
 					</Command.Item>
 				{/each}
 				<Command.Item
