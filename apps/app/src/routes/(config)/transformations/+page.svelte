@@ -407,7 +407,7 @@
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
 			<EditTransformationSidePanel
-				selectedEditTransformation={selectedEditTransformation}
+				{selectedEditTransformation}
 				setSelectedTransformation={(transformation) => {
 					selectedEditTransformation = transformation;
 				}}
