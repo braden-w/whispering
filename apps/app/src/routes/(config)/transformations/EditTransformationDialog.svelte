@@ -1,11 +1,9 @@
 <script lang="ts">
+	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import {
 		createDeleteTransformationWithToast,
 		createUpdateTransformationWithToast,
@@ -46,7 +44,22 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="overflow-y-auto max-h-[90vh] max-w-3xl">
+	<Dialog.Content
+		class="overflow-y-auto max-h-[90vh] max-w-3xl"
+		onInteractOutside={(e) => {
+			e.preventDefault();
+			if (isDialogOpen) {
+				confirmationDialog.open({
+					title: 'Unsaved changes',
+					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
+					confirmText: 'Leave',
+					onConfirm: () => {
+						isDialogOpen = false;
+					},
+				});
+			}
+		}}
+	>
 		<Dialog.Header>
 			<Dialog.Title>Edit transformation</Dialog.Title>
 			<Dialog.Description>
@@ -81,11 +94,14 @@
 			</Button>
 			<Button
 				onclick={() => {
-					updateTransformationWithToastMutation.mutate($state.snapshot(transformation), {
-						onSettled: () => {
-							isDialogOpen = false;
+					updateTransformationWithToastMutation.mutate(
+						$state.snapshot(transformation),
+						{
+							onSettled: () => {
+								isDialogOpen = false;
+							},
 						},
-					});
+					);
 				}}
 				disabled={updateTransformationWithToastMutation.isPending}
 			>
