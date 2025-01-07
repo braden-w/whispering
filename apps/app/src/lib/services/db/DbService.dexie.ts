@@ -9,7 +9,7 @@ import type {
 	Settings,
 } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
-import { toast } from '../../utils/toast';
+import { toast } from '$lib/services/toast';
 import type { DbService } from './DbService';
 import { DbServiceErr } from './DbService';
 
