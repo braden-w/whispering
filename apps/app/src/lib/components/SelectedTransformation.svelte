@@ -16,10 +16,14 @@
 
 	const transformationsQuery = createTransformationsQuery();
 
-	const transformations = $derived(transformationsQuery.data ?? []);
+	const transformationsWithNonemptyTitle = $derived(
+		transformationsQuery.data
+			? transformationsQuery.data.filter((t) => t.title !== '')
+			: [],
+	);
 
 	const displayTransformation = $derived(
-		transformations.find(
+		transformationsWithNonemptyTitle.find(
 			(t) =>
 				t.id === settings.value['transformations.selectedTransformationId'],
 		),
@@ -68,7 +72,7 @@
 					<CircleIcon class="h-4 w-4" />
 					None
 				</Command.Item>
-				{#each transformations as transformation (transformation.id)}
+				{#each transformationsWithNonemptyTitle as transformation (transformation.id)}
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
@@ -86,13 +90,6 @@
 									transformation.id && 'text-transparent',
 							)}
 						/>
-						{#if transformation.title === ''}
-							<span class="text-muted-foreground text-xs">
-								{transformation.id}
-							</span>
-						{:else}
-							{transformation.title}
-						{/if}
 					</Command.Item>
 				{/each}
 				<Command.Item
