@@ -1,18 +1,26 @@
 <script lang="ts">
-	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Resizable from '$lib/components/ui/resizable/index.js';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import {
+		createCreateTransformationWithToast,
+		createDeleteTransformationWithToast,
+		createDeleteTransformationsWithToast,
+	} from '$lib/mutations/transformations';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import {
-		generateDefaultTransformation,
 		type Transformation,
+		generateDefaultTransformation,
 	} from '$lib/services/db';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -24,7 +32,6 @@
 		ColumnDef,
 		ColumnFiltersState,
 		PaginationState,
-		Updater,
 	} from '@tanstack/table-core';
 	import {
 		getCoreRowModel,
@@ -34,18 +41,9 @@
 	} from '@tanstack/table-core';
 	import { ChevronDownIcon, PlusIcon } from 'lucide-svelte';
 	import { z } from 'zod';
+	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
-	import {
-		createCreateTransformationWithToast,
-		createDeleteTransformationsWithToast,
-		createDeleteTransformationWithToast,
-	} from '$lib/mutations/transformations';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import RenderTransformation from './-components/RenderTransformation.svelte';
-	import { nanoid } from 'nanoid/non-secure';
-	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import { settings } from '$lib/stores/settings.svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
