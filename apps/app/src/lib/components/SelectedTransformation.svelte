@@ -12,10 +12,17 @@
 	import type { Transformation } from '$lib/services/db';
 
 	let selectedTransformationId = $state<Transformation['id'] | null>(null);
-
 	let open = $state(false);
 	let searchQuery = $state('');
 	const transformationsQuery = createTransformationsQuery();
+
+	const filteredTransformations = $derived(
+		transformationsQuery.data?.filter(
+			(t) =>
+				t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				t.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+		),
+	);
 </script>
 
 <Popover bind:open>
@@ -29,11 +36,11 @@
 				{...props}
 			>
 				{selectedTransformationId ?? 'No post-processing selected'}
-				<ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+				<ChevronsUpDownIcon class="opacity-50" />
 			</Button>
 		{/snippet}
 	</PopoverTrigger>
-	<PopoverContent class="w-full p-0">
+	<PopoverContent class="w-80 max-w-xl p-0">
 		<Command.Root>
 			<Command.Input
 				placeholder="Search transformations..."
@@ -41,30 +48,25 @@
 			/>
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
-				{#if transformationsQuery.data}
-					{#each transformationsQuery.data.filter((t) => t.title
-								.toLowerCase()
-								.includes(searchQuery.toLowerCase()) || t.description
-								.toLowerCase()
-								.includes(searchQuery.toLowerCase())) as transformation (transformation.id)}
+				{#if filteredTransformations}
+					{#each filteredTransformations as transformation (transformation.id)}
 						<Command.Item
 							value={transformation.title}
 							onSelect={() => {
 								selectedTransformationId = transformation.id;
 								open = false;
 							}}
-							class="cursor-pointer"
 						>
 							<CheckIcon
 								class={cn(
-									'mr-2 h-4 w-4',
+									'mr-2 size-4',
 									selectedTransformationId === transformation.id
 										? 'opacity-100'
 										: 'opacity-0',
 								)}
 							/>
 							<div class="flex flex-col gap-1">
-								<span>{transformation.title}</span>
+								{transformation.title}
 								{#if transformation.description}
 									<span class="text-muted-foreground text-sm">
 										{transformation.description}
