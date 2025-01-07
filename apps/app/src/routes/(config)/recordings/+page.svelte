@@ -47,6 +47,7 @@
 	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import { Card } from '$lib/components/ui/card';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -291,7 +292,7 @@
 	<p class="text-muted-foreground">
 		Your latest recordings and transcriptions, stored locally in IndexedDB.
 	</p>
-	<div class="flex flex-col gap-4 rounded-md border p-6">
+	<Card class="flex flex-col gap-4 p-6">
 		<div
 			class="flex flex-col md:flex-row md:items-center items-start justify-between gap-2"
 		>
@@ -535,5 +536,5 @@
 				</Button>
 			</div>
 		</div>
-	</div>
+	</Card>
 </main>
