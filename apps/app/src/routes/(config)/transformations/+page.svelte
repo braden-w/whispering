@@ -265,6 +265,7 @@
 								title: 'Delete transformations',
 								subtitle:
 									'Are you sure you want to delete these transformations?',
+								confirmText: 'Delete',
 								onConfirm: () => {
 									deleteTransformationsWithToastMutation.mutate(
 										selectedTransformationRows.map(({ original }) => original),

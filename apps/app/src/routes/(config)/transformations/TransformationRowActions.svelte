@@ -21,6 +21,7 @@
 			confirmationDialog.open({
 				title: 'Delete transformation',
 				subtitle: 'Are you sure you want to delete this transformation?',
+				confirmText: 'Delete',
 				onConfirm: () =>
 					deleteTransformationWithToastMutation.mutate(transformation),
 			});

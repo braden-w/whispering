@@ -79,6 +79,7 @@
 			confirmationDialog.open({
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
+				confirmText: 'Delete',
 				onConfirm: () => deleteRecordingWithToastMutation.mutate(recording),
 			});
 		}}
