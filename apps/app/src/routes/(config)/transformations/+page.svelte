@@ -169,6 +169,15 @@
 		table.getFilteredSelectedRowModel().rows,
 	);
 
+	const filterQuery = {
+		get value() {
+			return table.getColumn('select')?.getFilterValue() as string;
+		},
+		set value(value) {
+			table.getColumn('select')?.setFilterValue(value);
+		},
+	};
+
 	let transformation = $state(generateDefaultTransformation());
 	let isDialogOpen = $state(false);
 	const createTransformationWithToastMutation =
@@ -204,9 +213,8 @@
 					placeholder="Filter transformations..."
 					type="text"
 					class="w-full"
-					value={table.getColumn('title')?.getFilterValue() as string}
-					oninput={(e) =>
-						table.getColumn('title')?.setFilterValue(e.currentTarget.value)}
+					value={filterQuery.value}
+					oninput={(e) => (filterQuery.value = e.currentTarget.value)}
 				/>
 				<div class="flex w-full items-center justify-between gap-2">
 					{#if selectedTransformationRows.length > 0}
@@ -363,7 +371,7 @@
 						{:else}
 							<Table.Row>
 								<Table.Cell colspan={columns.length} class="h-24 text-center">
-									{#if filterQuery}
+									{#if filterQuery.value}
 										No transformations found.
 									{:else}
 										No transformations yet. Click "Create Transformation" to add
