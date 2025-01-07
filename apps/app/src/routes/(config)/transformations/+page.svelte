@@ -172,14 +172,6 @@
 		},
 	});
 
-	function getInitialFilterValue() {
-		const filterValue = table.getColumn('title')?.getFilterValue();
-		if (typeof filterValue === 'string') {
-			return filterValue;
-		}
-		return '';
-	}
-	let filterQuery = $state(getInitialFilterValue());
 	const selectedTransformationRows = $derived(
 		table.getFilteredSelectedRowModel().rows,
 	);
@@ -211,23 +203,16 @@
 
 	<Resizable.PaneGroup direction="horizontal" class="rounded-lg border">
 		<Resizable.Pane defaultSize={50}>
-			<div class="flex flex-col gap-2">
-				<form
-					class="flex w-full gap-2"
-					onsubmit={(e) => {
-						e.preventDefault();
-						table.getColumn('title')?.setFilterValue(filterQuery);
-					}}
-				>
-					<Input
-						placeholder="Filter transformations..."
-						type="text"
-						bind:value={filterQuery}
-					/>
-					<Button variant="outline" type="submit">Search</Button>
-				</form>
-
-				<div class="flex items-center justify-between">
+			<div class="flex flex-col items-center justify-between gap-2">
+				<Input
+					placeholder="Filter transformations..."
+					type="text"
+					class="w-full"
+					value={table.getColumn('title')?.getFilterValue() as string}
+					oninput={(e) =>
+						table.getColumn('title')?.setFilterValue(e.currentTarget.value)}
+				/>
+				<div class="flex w-full items-center justify-between gap-2">
 					{#if selectedTransformationRows.length > 0}
 						<WhisperingButton
 							tooltipContent="Delete selected transformations"
@@ -318,6 +303,31 @@
 								</Dialog.Footer>
 							</Dialog.Content>
 						</Dialog.Root>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger
+								class={cn(
+									buttonVariants({ variant: 'outline' }),
+									'ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180',
+								)}
+							>
+								Columns <ChevronDownIcon
+									class="ml-2 h-4 w-4 transition-transform duration-200"
+								/>
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Content>
+								{#each table
+									.getAllColumns()
+									.filter((c) => c.getCanHide()) as column (column.id)}
+									<DropdownMenu.CheckboxItem
+										checked={column.getIsVisible()}
+										onCheckedChange={(value) =>
+											column.toggleVisibility(!!value)}
+									>
+										{column.columnDef.meta?.headerText}
+									</DropdownMenu.CheckboxItem>
+								{/each}
+							</DropdownMenu.Content>
+						</DropdownMenu.Root>
 					</div>
 				</div>
 			</div>
