@@ -11,41 +11,36 @@ export const createTransformationFns = ({
 }: {
 	HttpService: HttpService;
 }) => ({
-	runTransformationOnInput: async (
-		input: string,
-		transformation: Transformation,
-	) => {
-		return runTransformationOnInput(input, transformation, HttpService);
+	runTransformationOnInput: async ({
+		input,
+		transformation,
+	}: {
+		input: string;
+		transformation: Transformation;
+	}): Promise<TransformationResult> => {
+		try {
+			let currentInput = input;
+
+			for (const step of transformation.steps) {
+				const result = await handleStep({
+					input: currentInput,
+					step,
+					HttpService,
+				});
+				if (!result.ok) return result;
+				currentInput = result.data;
+			}
+
+			return Ok(currentInput);
+		} catch (error) {
+			return WhisperingErr({
+				title: 'Transformation failed',
+				description: 'An error occurred during the transformation process',
+				action: { type: 'more-details', error },
+			});
+		}
 	},
 });
-
-async function runTransformationOnInput(
-	input: string,
-	transformation: Transformation,
-	HttpService: HttpService,
-): Promise<TransformationResult> {
-	try {
-		let currentInput = input;
-
-		for (const step of transformation.steps) {
-			const result = await handleStep({
-				input: currentInput,
-				step,
-				HttpService,
-			});
-			if (!result.ok) return result;
-			currentInput = result.data;
-		}
-
-		return Ok(currentInput);
-	} catch (error) {
-		return WhisperingErr({
-			title: 'Transformation failed',
-			description: 'An error occurred during the transformation process',
-			action: { type: 'more-details', error },
-		});
-	}
-}
 
 async function handleStep({
 	input,
