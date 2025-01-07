@@ -59,27 +59,24 @@
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
-				<Command.Item
-					value="None"
-					onSelect={() => {
-						settings.value = {
-							...settings.value,
-							'transformations.selectedTransformationId': null,
-						};
-						closeAndFocusTrigger();
-					}}
-				>
-					<CircleIcon class="h-4 w-4" />
-					None
-				</Command.Item>
 				{#each transformationsWithNonemptyTitle as transformation (transformation.id)}
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
-							settings.value = {
-								...settings.value,
-								'transformations.selectedTransformationId': transformation.id,
-							};
+							if (
+								settings.value['transformations.selectedTransformationId'] ===
+								transformation.id
+							) {
+								settings.value = {
+									...settings.value,
+									'transformations.selectedTransformationId': null,
+								};
+							} else {
+								settings.value = {
+									...settings.value,
+									'transformations.selectedTransformationId': transformation.id,
+								};
+							}
 							closeAndFocusTrigger();
 						}}
 						class="line-clamp-1 flex items-center"
