@@ -37,7 +37,7 @@
 	}
 </script>
 
-{#snippet renderTransformation(transformation: Transformation)}
+{#snippet renderTransformationIdTitle(transformation: Transformation)}
 	<div class="flex items-center gap-2">
 		<span
 			class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
@@ -64,7 +64,7 @@
 				})}"
 			>
 				{#if displayTransformation}
-					{@render renderTransformation(displayTransformation)}
+					{@render renderTransformationIdTitle(displayTransformation)}
 				{:else}
 					No post-processing selected
 				{/if}
@@ -107,7 +107,7 @@
 							)}
 						/>
 						<div class="flex flex-col min-w-0">
-							{@render renderTransformation(transformation)}
+							{@render renderTransformationIdTitle(transformation)}
 							{#if transformation.description}
 								<span class="text-sm text-muted-foreground line-clamp-2">
 									{transformation.description}
