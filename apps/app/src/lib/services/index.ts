@@ -28,7 +28,10 @@ import { createTranscriptionServiceGroqDistil } from './transcription/Transcript
 import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
-import { runTransformationOnInput } from './transformation/TransformationService';
+import {
+	createTransformationFns,
+	runTransformationOnInput,
+} from './transformation/TransformationService';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -96,17 +99,7 @@ export const userConfiguredServices = (() => {
 		},
 		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
-		transformations: {
-			runTransformationOnInput: async ({
-				input,
-				transformation,
-			}: {
-				input: string;
-				transformation: Transformation;
-			}) => {
-				return runTransformationOnInput(input, transformation, HttpService);
-			},
-		},
+		transformations: createTransformationFns({ HttpService }),
 		db: createDbFns(DbService),
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {

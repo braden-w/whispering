@@ -6,7 +6,20 @@ import { z } from 'zod';
 import type { HttpService } from '../http/HttpService';
 type TransformationResult = WhisperingResult<string>;
 
-export async function runTransformationOnInput(
+export const createTransformationFns = ({
+	HttpService,
+}: {
+	HttpService: HttpService;
+}) => ({
+	runTransformationOnInput: async (
+		input: string,
+		transformation: Transformation,
+	) => {
+		return runTransformationOnInput(input, transformation, HttpService);
+	},
+});
+
+async function runTransformationOnInput(
 	input: string,
 	transformation: Transformation,
 	HttpService: HttpService,
