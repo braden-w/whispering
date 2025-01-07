@@ -78,9 +78,7 @@
 		},
 		{
 			accessorKey: 'id',
-			meta: {
-				headerText: 'ID',
-			},
+			meta: { headerText: 'ID' },
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
 			enableSorting: false,
@@ -88,57 +86,37 @@
 		},
 		{
 			accessorKey: 'title',
-			meta: {
-				headerText: 'Title',
-			},
+			meta: { headerText: 'Title' },
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'subtitle',
-			meta: {
-				headerText: 'Subtitle',
-			},
+			meta: { headerText: 'Subtitle' },
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'createdAt',
-			meta: {
-				headerText: 'Created At',
-			},
+			meta: { headerText: 'Created At' },
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			accessorKey: 'updatedAt',
-			meta: {
-				headerText: 'Updated At',
-			},
+			meta: { headerText: 'Updated At' },
 			header: (headerContext) =>
 				renderComponent(DataTableHeader, headerContext),
 		},
 		{
 			id: 'transcribedText',
-			filterFn: (row, _columnId, filterValue) => {
-				const { transcribedText } = row.getValue<{
-					id: string;
-					transcribedText: string;
-				}>('transcribedText');
-				return transcribedText.includes(filterValue);
-			},
-			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
-			meta: {
-				headerText: 'Transcribed Text',
-			},
+			accessorKey: 'transcribedText',
+			meta: { headerText: 'Transcribed Text' },
 			header: 'Transcribed Text',
-			cell: ({ getValue }) => {
-				const { id, transcribedText } = getValue<{
-					id: string;
-					transcribedText: string;
-				}>();
+			cell: ({ getValue, row }) => {
+				const transcribedText = getValue<string>();
 				return renderComponent(TranscribedText, {
-					recordingId: id,
+					recordingId: row.id,
 					transcribedText,
 				});
 			},
@@ -146,9 +124,7 @@
 		{
 			id: 'audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
-			meta: {
-				headerText: 'Audio',
-			},
+			meta: { headerText: 'Audio' },
 			header: 'Audio',
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<Pick<Recording, 'id' | 'blob'>>();
@@ -158,9 +134,7 @@
 		{
 			id: 'actions',
 			accessorFn: (recording) => recording,
-			meta: {
-				headerText: 'Actions',
-			},
+			meta: { headerText: 'Actions' },
 			header: 'Actions',
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
