@@ -402,7 +402,7 @@
 				</div>
 			</div>
 		</Resizable.Pane>
-		<Resizable.Handle class="hidden md:flex" withHandle />
+		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
 			{#if selectedEditTransformation}
 				<RenderTransformation
