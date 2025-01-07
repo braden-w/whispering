@@ -1,8 +1,5 @@
-import {
-	DownloadService,
-	userConfiguredServices,
-} from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
+import { userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/utils/toast';
 import { createMutation } from '@tanstack/svelte-query';
 
@@ -64,34 +61,5 @@ export const createDeleteRecordingsWithToast = () =>
 				description: 'Your recordings have been deleted successfully.',
 			});
 			return recordings;
-		},
-	}));
-
-export const createDownloadRecordingWithToast = () =>
-	createMutation(() => ({
-		mutationFn: async (recording: Recording) => {
-			if (!recording.blob) {
-				toast.error({
-					title: '⚠️ Recording blob not found',
-					description: "Your recording doesn't have a blob to download.",
-				});
-				return;
-			}
-			const result = await DownloadService.downloadBlob({
-				name: `whispering_recording_${recording.id}`,
-				blob: recording.blob,
-			});
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to download recording!',
-					description: 'Your recording could not be downloaded.',
-					action: { type: 'more-details', error: result.error },
-				});
-				return;
-			}
-			toast.success({
-				title: 'Recording downloading!',
-				description: 'Your recording is being downloaded.',
-			});
 		},
 	}));

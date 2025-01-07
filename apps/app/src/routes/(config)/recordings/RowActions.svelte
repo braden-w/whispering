@@ -2,14 +2,12 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
-	import {
-		createDeleteRecordingWithToast,
-		createDownloadRecordingWithToast,
-	} from '$lib/mutations/recordings';
+	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { userConfiguredServices } from '$lib/services/index.js';
+	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { createMutation } from '@tanstack/svelte-query';
 	import {
 		DownloadIcon,
 		Loader2Icon,
@@ -21,7 +19,9 @@
 
 	let { recording }: { recording: Recording } = $props();
 
-	const downloadRecordingWithToastMutation = createDownloadRecordingWithToast();
+	const downloadRecordingWithToastMutation = createMutation(() => ({
+		mutationFn: userConfiguredServices.download.downloadRecordingWithToast,
+	}));
 	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
 </script>
 
