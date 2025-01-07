@@ -39,11 +39,12 @@
 		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { PlusIcon } from 'lucide-svelte';
+	import { PlusIcon, XIcon } from 'lucide-svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
+	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -411,7 +412,25 @@
 							$state.snapshot(newTransformation),
 						);
 					}}
-				/>
+				>
+					{#snippet closeButtons()}
+						<div class="absolute right-4 top-4">
+							<MarkTransformationActiveButton
+								transformation={selectedEditTransformation}
+							/>
+							<WhisperingButton
+								tooltipContent="Close"
+								variant="outline"
+								size="icon"
+								onclick={() => {
+									selectedEditTransformation = null;
+								}}
+							>
+								<XIcon class="size-4" />
+							</WhisperingButton>
+						</div>
+					{/snippet}
+				</RenderTransformation>
 			{:else}
 				<div
 					class="flex h-[50vh] items-center justify-center rounded-md border"
