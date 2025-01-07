@@ -3,6 +3,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import type { Snippet } from 'svelte';
+	import { cn } from '$lib/utils';
 
 	let {
 		id,
@@ -11,6 +12,7 @@
 		type = 'text',
 		placeholder = '',
 		disabled = false,
+		hideLabel = false,
 		description,
 		...restProps
 	}: HTMLInputAttributes & {
@@ -19,12 +21,15 @@
 		type?: 'text' | 'password' | 'number';
 		placeholder?: string;
 		disabled?: boolean;
+		hideLabel?: boolean;
 		description?: string | Snippet;
 	} = $props();
 </script>
 
 <div class="flex flex-col gap-2">
-	<Label class="text-sm" for={id}>{label}</Label>
+	<Label class={cn('text-sm', hideLabel && 'sr-only')} for={id}>
+		{label}
+	</Label>
 	<Input
 		{id}
 		bind:value

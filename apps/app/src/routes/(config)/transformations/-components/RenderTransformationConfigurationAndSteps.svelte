@@ -31,6 +31,7 @@
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { Separator } from '$lib/components/ui/separator';
 
 	let {
 		transformation,
@@ -71,7 +72,7 @@
 	}
 </script>
 
-<Card.Root>
+<Card.Root class="space-y-6">
 	<Card.Header>
 		<Card.Title>Configuration</Card.Title>
 		<Card.Description>
@@ -89,10 +90,10 @@
 					title: e.currentTarget.value,
 				});
 			}}
-			placeholder="Enter a title"
+			placeholder="Enter a descriptive title for this transformation"
+			description="A clear, concise name that describes what this transformation does"
 		/>
-
-		<LabeledInput
+		<LabeledTextarea
 			id="description"
 			label="Description"
 			value={transformation.description}
@@ -102,9 +103,12 @@
 					description: e.currentTarget.value,
 				});
 			}}
-			placeholder="Enter a description"
+			placeholder="Explain how this transformation works and when to use it"
+			description="Provide details about the transformation's purpose and expected outcomes"
 		/>
 
+		<Separator />
+		<h3 class="font-medium mb-4">Transformation Steps</h3>
 		{#if transformation.steps.length === 0}
 			<Alert.Root variant="warning">
 				<Alert.Title>No steps added</Alert.Title>
