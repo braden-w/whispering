@@ -1,10 +1,6 @@
 <script lang="ts">
 	import * as Command from '$lib/components/ui/command';
-	import {
-		Popover,
-		PopoverContent,
-		PopoverTrigger,
-	} from '$lib/components/ui/popover';
+	import * as Popover from '$lib/components/ui/popover';
 	import { Button } from '$lib/components/ui/button';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import { cn } from '$lib/utils';
@@ -31,8 +27,8 @@
 	}
 </script>
 
-<Popover bind:open>
-	<PopoverTrigger bind:ref={triggerRef}>
+<Popover.Root bind:open>
+	<Popover.Trigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
 			<Button
 				variant="outline"
@@ -45,8 +41,8 @@
 				<ChevronsUpDownIcon class="opacity-50" />
 			</Button>
 		{/snippet}
-	</PopoverTrigger>
-	<PopoverContent class="w-80 max-w-xl p-0">
+	</Popover.Trigger>
+	<Popover.Content class="w-80 max-w-xl p-0">
 		<Command.Root>
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
@@ -77,5 +73,5 @@
 				{/each}
 			</Command.Group>
 		</Command.Root>
-	</PopoverContent>
-</Popover>
+	</Popover.Content>
+</Popover.Root>
