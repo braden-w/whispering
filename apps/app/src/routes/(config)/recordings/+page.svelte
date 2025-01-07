@@ -65,7 +65,7 @@
 				}),
 			enableSorting: false,
 			enableHiding: false,
-			filterFn: (row, columnId, filterValue) => {
+			filterFn: (row, _columnId, filterValue) => {
 				const title = String(row.getValue('title'));
 				const subtitle = String(row.getValue('subtitle'));
 				const transcribedText = String(row.getValue('transcribedText'));
