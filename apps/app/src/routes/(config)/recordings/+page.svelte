@@ -22,7 +22,6 @@
 	} from '@tanstack/svelte-table';
 	import type {
 		ColumnDef,
-		ColumnFilter,
 		ColumnFiltersState,
 		PaginationState,
 		Updater,
@@ -66,6 +65,16 @@
 				}),
 			enableSorting: false,
 			enableHiding: false,
+			filterFn: (row, columnId, filterValue) => {
+				const title = String(row.getValue('title'));
+				const subtitle = String(row.getValue('subtitle'));
+				const transcribedText = String(row.getValue('transcribedText'));
+				return (
+					title.toLowerCase().includes(filterValue.toLowerCase()) ||
+					subtitle.toLowerCase().includes(filterValue.toLowerCase()) ||
+					transcribedText.toLowerCase().includes(filterValue.toLowerCase())
+				);
+			},
 		},
 		{
 			accessorKey: 'id',
@@ -295,11 +304,9 @@
 				placeholder="Filter transcripts..."
 				type="text"
 				class="w-full md:max-w-sm"
-				value={table.getColumn('transcribedText')?.getFilterValue() as string}
+				value={table.getColumn('select')?.getFilterValue() as string}
 				oninput={(e) =>
-					table
-						.getColumn('transcribedText')
-						?.setFilterValue(e.currentTarget.value)}
+					table.getColumn('select')?.setFilterValue(e.currentTarget.value)}
 			/>
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
