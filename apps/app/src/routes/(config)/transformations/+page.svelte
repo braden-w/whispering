@@ -293,31 +293,6 @@
 								</Dialog.Footer>
 							</Dialog.Content>
 						</Dialog.Root>
-						<DropdownMenu.Root>
-							<DropdownMenu.Trigger
-								class={cn(
-									buttonVariants({ variant: 'outline' }),
-									'ml-auto items-center transition-all [&[data-state=open]>svg]:rotate-180',
-								)}
-							>
-								Columns <ChevronDownIcon
-									class="ml-2 h-4 w-4 transition-transform duration-200"
-								/>
-							</DropdownMenu.Trigger>
-							<DropdownMenu.Content>
-								{#each table
-									.getAllColumns()
-									.filter((c) => c.getCanHide()) as column (column.id)}
-									<DropdownMenu.CheckboxItem
-										checked={column.getIsVisible()}
-										onCheckedChange={(value) =>
-											column.toggleVisibility(!!value)}
-									>
-										{column.columnDef.meta?.headerText}
-									</DropdownMenu.CheckboxItem>
-								{/each}
-							</DropdownMenu.Content>
-						</DropdownMenu.Root>
 					</div>
 				</div>
 			</div>
