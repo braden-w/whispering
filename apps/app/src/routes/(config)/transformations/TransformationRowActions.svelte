@@ -35,7 +35,7 @@
 		}}
 	>
 		{#if isTransformationActive}
-			<CheckCircleIcon class="h-4 w-4" />
+			<CheckCircleIcon class="h-4 w-4 text-green-500" />
 		{:else}
 			<CircleIcon class="h-4 w-4" />
 		{/if}
