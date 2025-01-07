@@ -1,20 +1,20 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
-	import { Button } from '$lib/components/ui/button';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
-	import type { Transformation } from '$lib/services/db';
 	import { tick } from 'svelte';
-
-	let selectedTransformationId = $state<Transformation['id'] | null>(null);
 
 	const transformationsQuery = createTransformationsQuery();
 
 	const displayTransformationTitle = $derived(
-		transformationsQuery.data?.find((t) => t.id === selectedTransformationId)
-			?.title,
+		transformationsQuery.data?.find(
+			(t) =>
+				t.id === settings.value['transformations.selectedTransformationId'],
+		)?.title,
 	);
 
 	let open = $state(false);
@@ -51,14 +51,15 @@
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
-							selectedTransformationId = transformation.id;
+							settings.value['transformations.selectedTransformationId'] =
+								transformation.id;
 							closeAndFocusTrigger();
 						}}
 					>
 						<CheckIcon
 							class={cn(
-								selectedTransformationId !== transformation.id &&
-									'text-transparent',
+								settings.value['transformations.selectedTransformationId'] !==
+									transformation.id && 'text-transparent',
 							)}
 						/>
 						<div class="flex flex-col gap-1">
