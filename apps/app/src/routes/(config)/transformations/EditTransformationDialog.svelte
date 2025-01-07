@@ -15,7 +15,8 @@
 
 	let {
 		transformation: initialTransformation,
-	}: { transformation: Transformation } = $props();
+		class: className,
+	}: { transformation: Transformation; class?: string } = $props();
 	let transformation = $state(
 		structuredClone($state.snapshot(initialTransformation)),
 	);
@@ -39,6 +40,7 @@
 				tooltipContent="Edit transformation"
 				variant="ghost"
 				size="icon"
+				class={className}
 				{...props}
 			>
 				<EditIcon class="h-4 w-4" />

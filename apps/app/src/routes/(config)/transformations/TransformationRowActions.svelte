@@ -15,7 +15,7 @@
 
 <div class="flex items-center">
 	<MarkTransformationActiveButton size="icon" {transformation} />
-	<EditTransformationDialog {transformation}></EditTransformationDialog>
+	<EditTransformationDialog {transformation} class="md:hidden" />
 
 	<WhisperingButton
 		tooltipContent="Delete transformation"
