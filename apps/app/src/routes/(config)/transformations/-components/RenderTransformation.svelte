@@ -9,9 +9,11 @@
 	let {
 		transformation,
 		onChange,
+		closeButtons,
 	}: {
 		transformation: Transformation;
 		onChange: (transformation: Transformation) => void;
+		closeButtons?: Snippet[];
 	} = $props();
 
 	let activeTab = $state('configure');
@@ -20,7 +22,7 @@
 <div class="space-y-4">
 	<Tabs.Root
 		value={activeTab}
-		class="w-full"
+		class="w-full flex flex-col gap-2"
 		onValueChange={(v) => (activeTab = v)}
 	>
 		<Tabs.List class="grid w-full grid-cols-2">
@@ -28,17 +30,12 @@
 			<Tabs.Trigger value="test">Test</Tabs.Trigger>
 		</Tabs.List>
 
-		<div class="mt-4">
-			<Tabs.Content value="configure">
-				<RenderTransformationConfigurationAndSteps
-					{transformation}
-					{onChange}
-				/>
-			</Tabs.Content>
+		<Tabs.Content value="configure">
+			<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
+		</Tabs.Content>
 
-			<Tabs.Content value="test">
-				<RenderTransformationTest {transformation} />
-			</Tabs.Content>
-		</div>
+		<Tabs.Content value="test">
+			<RenderTransformationTest {transformation} />
+		</Tabs.Content>
 	</Tabs.Root>
 </div>
