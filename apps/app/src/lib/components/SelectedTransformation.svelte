@@ -61,7 +61,7 @@
 			<Command.Group>
 				{#each transformations as transformation (transformation.id)}
 					<Command.Item
-						value={transformation.title}
+						value="${transformation.id} - ${transformation.title} - ${transformation.description}"
 						onSelect={() => {
 							if (
 								settings.value['transformations.selectedTransformationId'] ===
