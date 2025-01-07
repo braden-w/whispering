@@ -22,7 +22,7 @@
 	} from '@tanstack/svelte-table';
 	import type {
 		ColumnDef,
-		ColumnFilter,
+		ColumnFiltersState,
 		PaginationState,
 		Updater,
 	} from '@tanstack/table-core';
@@ -46,7 +46,6 @@
 	import { nanoid } from 'nanoid/non-secure';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
-	import * as Separator from '$lib/components/ui/separator';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -101,34 +100,13 @@
 		defaultValue: [{ id: 'title', desc: false }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
-	let columnFilters = createPersistedState({
-		key: 'whispering-transformations-data-table-column-filters',
-		defaultValue: [],
-		schema: z
-			.object({ id: z.string(), value: z.unknown() })
-			.refine((data): data is ColumnFilter => data.value !== undefined)
-			.array(),
-	});
+	let columnFilters = $state<ColumnFiltersState>([]);
 	let rowSelection = createPersistedState({
 		key: 'whispering-transformations-data-table-row-selection',
 		defaultValue: {},
 		schema: z.record(z.string(), z.boolean()),
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
-
-	function createUpdater<T>(state: { value: T }) {
-		return (updater: Updater<T>) => {
-			if (updater instanceof Function) {
-				state.value = updater(state.value);
-			} else {
-				state.value = updater;
-			}
-		};
-	}
-
-	const setSorting = createUpdater(sorting);
-	const setFilters = createUpdater(columnFilters);
-	const setRowSelection = createUpdater(rowSelection);
 
 	const transformationsQuery = createTransformationsQuery();
 	const deleteTransformationWithToastMutation =
@@ -146,9 +124,20 @@
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setFilters,
-		onRowSelectionChange: setRowSelection,
+		onSortingChange: (updater) => {
+			if (typeof updater === 'function') {
+				sorting.value = updater(sorting.value);
+			} else {
+				sorting.value = updater;
+			}
+		},
+		onColumnFiltersChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnFilters = updater(columnFilters);
+			} else {
+				columnFilters = updater;
+			}
+		},
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
 				pagination = updater(pagination);
@@ -161,7 +150,7 @@
 				return sorting.value;
 			},
 			get columnFilters() {
-				return columnFilters.value;
+				return columnFilters;
 			},
 			get rowSelection() {
 				return rowSelection.value;
