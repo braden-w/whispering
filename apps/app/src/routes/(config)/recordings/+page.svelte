@@ -297,9 +297,7 @@
 		Your latest recordings and transcriptions, stored locally in IndexedDB.
 	</p>
 	<Card class="flex flex-col gap-4 p-6">
-		<div
-			class="flex flex-col md:flex-row md:items-center items-start justify-between gap-2"
-		>
+		<div class="flex flex-col md:flex-row items-center justify-between gap-2">
 			<Input
 				placeholder="Filter transcripts..."
 				type="text"
