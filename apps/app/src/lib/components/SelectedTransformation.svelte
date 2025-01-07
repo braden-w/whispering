@@ -10,11 +10,11 @@
 
 	const transformationsQuery = createTransformationsQuery();
 
-	const displayTransformationTitle = $derived(
+	const displayTransformation = $derived(
 		transformationsQuery.data?.find(
 			(t) =>
 				t.id === settings.value['transformations.selectedTransformationId'],
-		)?.title,
+		),
 	);
 
 	let open = $state(false);
@@ -37,7 +37,7 @@
 				class="w-full justify-between"
 				{...props}
 			>
-				{displayTransformationTitle ?? 'No post-processing selected'}
+				{displayTransformation?.title ?? 'No post-processing selected'}
 				<ChevronsUpDownIcon class="opacity-50" />
 			</Button>
 		{/snippet}
