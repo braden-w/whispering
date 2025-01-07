@@ -82,14 +82,26 @@
 		<LabeledInput
 			id="title"
 			label="Title"
-			bind:value={transformation.title}
+			value={transformation.title}
+			oninput={(e) => {
+				onChange({
+					...transformation,
+					title: e.currentTarget.value,
+				});
+			}}
 			placeholder="Enter a title"
 		/>
 
 		<LabeledInput
 			id="description"
 			label="Description"
-			bind:value={transformation.description}
+			value={transformation.description}
+			oninput={(e) => {
+				onChange({
+					...transformation,
+					description: e.currentTarget.value,
+				});
+			}}
 			placeholder="Enter a description"
 		/>
 
