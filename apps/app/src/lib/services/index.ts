@@ -28,10 +28,7 @@ import { createTranscriptionServiceGroqDistil } from './transcription/Transcript
 import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
-import {
-	createTransformationFns,
-	runTransformationOnInput,
-} from './transformation/TransformationService';
+import { createTransformationFns } from './transformation/TransformationService';
 
 // Services that are not determined by the user's settings, but by the platform.
 
