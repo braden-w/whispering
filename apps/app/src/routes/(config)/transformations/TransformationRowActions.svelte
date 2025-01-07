@@ -26,7 +26,6 @@
 			: 'Mark transformation as active'}
 		variant="ghost"
 		size="icon"
-		disabled={isTransformationActive}
 		onclick={() => {
 			settings.value = {
 				...settings.value,
