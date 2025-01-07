@@ -1,11 +1,17 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
-	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
+	import {
+		CheckIcon,
+		ChevronsUpDownIcon,
+		CircleIcon,
+		SettingsIcon,
+	} from 'lucide-svelte';
 	import { tick } from 'svelte';
 
 	const transformationsQuery = createTransformationsQuery();
@@ -47,6 +53,19 @@
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group>
+				<Command.Item
+					value="None"
+					onSelect={() => {
+						settings.value = {
+							...settings.value,
+							'transformations.selectedTransformationId': null,
+						};
+						closeAndFocusTrigger();
+					}}
+				>
+					<CircleIcon class="h-4 w-4" />
+					None
+				</Command.Item>
 				{#each transformationsQuery.data ?? [] as transformation (transformation.id)}
 					<Command.Item
 						value={transformation.title}
@@ -74,6 +93,13 @@
 						</div>
 					</Command.Item>
 				{/each}
+				<Command.Item
+					value="Manage transformations"
+					onSelect={() => goto('/transformations')}
+				>
+					<SettingsIcon class="h-4 w-4" />
+					Manage transformations
+				</Command.Item>
 			</Command.Group>
 		</Command.Root>
 	</Popover.Content>
