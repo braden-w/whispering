@@ -206,10 +206,7 @@
 		Your text transformations, stored locally in IndexedDB.
 	</p>
 
-	<Resizable.PaneGroup
-		direction="horizontal"
-		class="rounded-lg border gap-6 p-6"
-	>
+	<Resizable.PaneGroup direction="horizontal" class="gap-6 py-6">
 		<Resizable.Pane
 			defaultSize={50}
 			class="flex flex-col gap-4"
