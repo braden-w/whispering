@@ -233,7 +233,7 @@
 				return sorting.value;
 			},
 			get columnFilters() {
-				return columnFilters.value;
+				return columnFilters;
 			},
 			get columnVisibility() {
 				return columnVisibility.value;
@@ -247,14 +247,6 @@
 		},
 	});
 
-	function getInitialFilterValue() {
-		const filterValue = table.getColumn('transcribedText')?.getFilterValue();
-		if (typeof filterValue === 'string') {
-			return filterValue;
-		}
-		return '';
-	}
-	let filterQuery = $state(getInitialFilterValue());
 	const selectedRecordingRows = $derived(
 		table.getFilteredSelectedRowModel().rows,
 	);
@@ -279,6 +271,13 @@
 			);
 		return transcriptions.join(delimiter);
 	});
+
+	const filterQuery = $derived.by(() => {
+		const initialFilterValue = table
+			.getColumn('transcribedText')
+			?.getFilterValue();
+		return typeof initialFilterValue === 'string' ? initialFilterValue : '';
+	});
 </script>
 
 <svelte:head>
@@ -294,20 +293,21 @@
 	</p>
 	<div class="space-y-4 rounded-md border p-6">
 		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
-			<form
-				class="flex w-full max-w-sm gap-2"
-				onsubmit={(e) => {
-					e.preventDefault();
-					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
+			<Input
+				placeholder="Filter transcripts..."
+				type="text"
+				class="max-w-md"
+				value={filterQuery}
+				oninput={(e) =>
+					table
+						.getColumn('transcribedText')
+						?.setFilterValue(e.currentTarget.value)}
+				onchange={(e) => {
+					table
+						.getColumn('transcribedText')
+						?.setFilterValue(e.currentTarget.value);
 				}}
-			>
-				<Input
-					placeholder="Filter transcripts..."
-					type="text"
-					bind:value={filterQuery}
-				/>
-				<Button variant="outline" type="submit">Search</Button>
-			</form>
+			/>
 			<div class="flex w-full items-center justify-end gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
