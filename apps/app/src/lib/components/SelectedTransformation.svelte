@@ -4,6 +4,7 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
 	import { createTransformationsQuery } from '$lib/queries/transformations';
+	import { Transformation } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
@@ -36,6 +37,19 @@
 	}
 </script>
 
+{#snippet renderTransformation(transformation: Transformation)}
+	<div class="flex items-center gap-2">
+		<span
+			class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
+		>
+			{transformation.id}
+		</span>
+		<span class="font-medium truncate">
+			{transformation.title}
+		</span>
+	</div>
+{/snippet}
+
 <Popover.Root bind:open>
 	<Popover.Trigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
@@ -50,14 +64,7 @@
 				})}"
 			>
 				{#if displayTransformation}
-					<div class="flex items-center gap-2">
-						<span
-							class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
-						>
-							{displayTransformation.id}
-						</span>
-						{displayTransformation.title}
-					</div>
+					{@render renderTransformation(displayTransformation)}
 				{:else}
 					No post-processing selected
 				{/if}
@@ -100,14 +107,7 @@
 							)}
 						/>
 						<div class="flex flex-col min-w-0">
-							<div class="flex items-center gap-2">
-								<span
-									class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
-								>
-									{transformation.id}
-								</span>
-								<span class="font-medium truncate">{transformation.title}</span>
-							</div>
+							{@render renderTransformation(transformation)}
 							{#if transformation.description}
 								<span class="text-sm text-muted-foreground line-clamp-2">
 									{transformation.description}
