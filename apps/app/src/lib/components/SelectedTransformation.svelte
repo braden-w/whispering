@@ -16,8 +16,10 @@
 
 	const transformationsQuery = createTransformationsQuery();
 
+	const transformations = $derived(transformationsQuery.data ?? []);
+
 	const displayTransformation = $derived(
-		transformationsQuery.data?.find(
+		transformations.find(
 			(t) =>
 				t.id === settings.value['transformations.selectedTransformationId'],
 		),
@@ -66,7 +68,7 @@
 					<CircleIcon class="h-4 w-4" />
 					None
 				</Command.Item>
-				{#each transformationsQuery.data ?? [] as transformation (transformation.id)}
+				{#each transformations as transformation (transformation.id)}
 					<Command.Item
 						value={transformation.title}
 						onSelect={() => {
