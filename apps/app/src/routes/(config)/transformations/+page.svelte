@@ -4,12 +4,14 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
+	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import {
 		createCreateTransformationWithToast,
@@ -42,13 +44,11 @@
 		getSortedRowModel,
 	} from '@tanstack/table-core';
 	import { PlusIcon } from 'lucide-svelte';
+	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
-	import SortableDataTableHeader from './SortableDataTableHeader.svelte';
-	import TransformationRowActions from './TransformationRowActions.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { Badge } from '$lib/components/ui/badge';
-	import { createRawSnippet } from 'svelte';
+	import TransformationRowActions from './TransformationRowActions.svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -92,7 +92,7 @@
 		{
 			accessorKey: 'title',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Title',
 				}),
@@ -100,7 +100,7 @@
 		{
 			accessorKey: 'description',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Description',
 				}),

@@ -39,7 +39,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import { z } from 'zod';
-	import SortableDataTableHeader from '../transformations/SortableSortableDataTableHeader.svelte';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -80,7 +80,7 @@
 			id: 'ID',
 			accessorKey: 'id',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, { column, headerText: 'ID' }),
+				renderComponent(SortableTableHeader, { column, headerText: 'ID' }),
 			enableSorting: false,
 			enableHiding: false,
 		},
@@ -88,7 +88,7 @@
 			id: 'Title',
 			accessorKey: 'title',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Title',
 				}),
@@ -97,7 +97,7 @@
 			id: 'Subtitle',
 			accessorKey: 'subtitle',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Subtitle',
 				}),
@@ -106,7 +106,7 @@
 			id: 'Created At',
 			accessorKey: 'createdAt',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Created At',
 				}),
@@ -115,7 +115,7 @@
 			id: 'Updated At',
 			accessorKey: 'updatedAt',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Updated At',
 				}),
@@ -124,7 +124,7 @@
 			id: 'Transcribed Text',
 			accessorKey: 'transcribedText',
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Transcribed Text',
 				}),
@@ -140,7 +140,7 @@
 			id: 'Audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Audio',
 				}),
@@ -153,7 +153,7 @@
 			id: 'Actions',
 			accessorFn: (recording) => recording,
 			header: ({ column }) =>
-				renderComponent(SortableDataTableHeader, {
+				renderComponent(SortableTableHeader, {
 					column,
 					headerText: 'Actions',
 				}),
