@@ -47,6 +47,8 @@
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import { Badge } from '$lib/components/ui/badge';
+	import { createRawSnippet } from 'svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -75,6 +77,17 @@
 				}),
 			enableSorting: false,
 			enableHiding: false,
+		},
+		{
+			accessorKey: 'id',
+			cell: ({ getValue }) =>
+				renderComponent(Badge, {
+					variant: 'id',
+					children: createRawSnippet((name) => ({
+						render: () => getValue<string>(),
+					})),
+				}),
+			header: 'ID',
 		},
 		{
 			accessorKey: 'title',
