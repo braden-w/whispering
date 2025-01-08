@@ -114,7 +114,10 @@
 			header: 'Actions',
 			cell: ({ getValue }) => {
 				const transformation = getValue<Transformation>();
-				return renderComponent(TransformationRowActions, { transformation });
+				return renderComponent(TransformationRowActions, {
+					transformation,
+					class: 'hidden group-hover:flex',
+				});
 			},
 		},
 	];
@@ -372,7 +375,7 @@
 						{:else if table.getRowModel().rows?.length}
 							{#each table.getRowModel().rows as row (row.id)}
 								<Table.Row
-									class={cn('cursor-pointer', {
+									class={cn('cursor-pointer group', {
 										'bg-muted/75': row.id === selectedEditTransformation?.id,
 									})}
 									onclick={() => {

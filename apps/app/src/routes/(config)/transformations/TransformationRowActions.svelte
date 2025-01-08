@@ -4,15 +4,19 @@
 	import { TrashIcon } from '$lib/components/icons';
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
+	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
 
-	let { transformation }: { transformation: Transformation } = $props();
+	let {
+		transformation,
+		class: className,
+	}: { transformation: Transformation; class?: string } = $props();
 
 	const deleteTransformationWithToastMutation =
 		createDeleteTransformationWithToast();
 </script>
 
-<div class="flex items-center">
+<div class={cn('flex items-center', className)}>
 	<EditTransformationDialog {transformation} class="md:hidden" />
 
 	<WhisperingButton
