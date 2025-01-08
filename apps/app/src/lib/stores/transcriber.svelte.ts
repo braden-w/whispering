@@ -1,11 +1,10 @@
-import { userConfiguredServices } from '$lib/services/index.js';
 import type { Recording } from '$lib/services/db';
+import { userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
-import { queryClient } from '$lib/queryClient';
 
 export const transcriber = createTranscriber();
 
