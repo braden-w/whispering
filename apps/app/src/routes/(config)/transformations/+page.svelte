@@ -22,9 +22,9 @@
 		type Transformation,
 		generateDefaultTransformation,
 	} from '$lib/services/db';
-	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 	import {
 		FlexRender,
 		createTable,
@@ -41,13 +41,11 @@
 		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { PlusIcon, XIcon } from 'lucide-svelte';
+	import { PlusIcon } from 'lucide-svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
-	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
