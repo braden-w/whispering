@@ -5,8 +5,7 @@ import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
-import { recordingsKeys } from '$lib/queries/recordings';
-import { queryClient } from '../../routes/+layout.svelte';
+import { queryClient } from '$lib/queryClient';
 
 export const transcriber = createTranscriber();
 

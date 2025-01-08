@@ -28,7 +28,7 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
-import { queryClient } from '../../routes/+layout.svelte';
+import { queryClient } from '$lib/queryClient';
 
 // Services that are not determined by the user's settings, but by the platform.
 
