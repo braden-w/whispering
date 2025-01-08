@@ -17,9 +17,8 @@ import type {
 import { DbServiceErr } from './DbService';
 
 const DB_NAME = 'RecordingDB';
-const DB_VERSION = 4;
 
-export type RecordingsDbSchemaV4 = {
+type RecordingsDbSchemaV4 = {
 	recordings: Recording;
 	transformations: Transformation;
 	transformationRuns: TransformationRun;
