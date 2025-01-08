@@ -21,8 +21,8 @@
 
 	const displayText = $derived(
 		isTransformationActive
-			? 'Transformation is active'
-			: 'Mark transformation as active',
+			? 'Transformation is selected'
+			: 'Mark transformation as selected',
 	);
 </script>
 
