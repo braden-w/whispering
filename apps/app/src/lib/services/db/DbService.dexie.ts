@@ -13,6 +13,9 @@ import { toast } from '$lib/services/toast';
 import type { DbService } from './DbService';
 import { DbServiceErr } from './DbService';
 import { nanoid } from 'nanoid/non-secure';
+import type { QueryClient } from '@tanstack/svelte-query';
+import { recordingsKeys } from '$lib/queries/recordings';
+import { transformationsKeys } from '$lib/queries/transformations';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 4;
@@ -349,7 +352,9 @@ class RecordingsDatabase extends Dexie {
 	}
 }
 
-export function createDbDexieService(): DbService {
+export function createDbDexieService({
+	queryClient,
+}: { queryClient: QueryClient }): DbService {
 	const db = new RecordingsDatabase();
 
 	return {
@@ -384,6 +389,11 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!createRecordingResult.ok) return createRecordingResult;
+
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [recordingWithTimestamps];
+				return [...oldData, recordingWithTimestamps];
+			});
 			return Ok(recordingWithTimestamps);
 		},
 
@@ -405,6 +415,13 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!updateRecordingResult.ok) return updateRecordingResult;
+
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [recordingWithTimestamp];
+				return oldData.map((item) =>
+					item.id === recording.id ? recordingWithTimestamp : item,
+				);
+			});
 			return Ok(recordingWithTimestamp);
 		},
 
@@ -421,12 +438,17 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
+
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [];
+				return oldData.filter((item) => item.id !== recording.id);
+			});
 			return Ok(undefined);
 		},
 
 		async deleteRecordings(recordingsToDelete: Recording[]) {
 			const ids = recordingsToDelete.map((r) => r.id);
-			return tryAsync({
+			const deleteRecordingsResult = await tryAsync({
 				try: () => db.recordings.bulkDelete(ids),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -435,6 +457,15 @@ export function createDbDexieService(): DbService {
 						error,
 					}),
 			});
+			if (!deleteRecordingsResult.ok) return deleteRecordingsResult;
+
+			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+				if (!oldData) return [];
+				const deletedIds = new Set(recordingsToDelete.map((r) => r.id));
+				return oldData.filter((item) => !deletedIds.has(item.id));
+			});
+
+			return Ok(undefined);
 		},
 
 		async cleanupExpiredRecordings({
@@ -512,6 +543,14 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!createTransformationResult.ok) return createTransformationResult;
+
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [transformationWithTimestamps];
+					return [...oldData, transformationWithTimestamps];
+				},
+			);
 			return Ok(transformationWithTimestamps);
 		},
 
@@ -531,6 +570,16 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!updateTransformationResult.ok) return updateTransformationResult;
+
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [transformationWithTimestamp];
+					return oldData.map((item) =>
+						item.id === transformation.id ? transformationWithTimestamp : item,
+					);
+				},
+			);
 			return Ok(transformationWithTimestamp);
 		},
 
@@ -545,12 +594,20 @@ export function createDbDexieService(): DbService {
 					}),
 			});
 			if (!deleteTransformationResult.ok) return deleteTransformationResult;
+
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [];
+					return oldData.filter((item) => item.id !== transformation.id);
+				},
+			);
 			return Ok(undefined);
 		},
 
 		async deleteTransformations(transformations) {
 			const ids = transformations.map((t) => t.id);
-			return tryAsync({
+			const deleteTransformationsResult = await tryAsync({
 				try: () => db.transformations.bulkDelete(ids),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -559,6 +616,17 @@ export function createDbDexieService(): DbService {
 						error,
 					}),
 			});
+			if (!deleteTransformationsResult.ok) return deleteTransformationsResult;
+
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [];
+					const deletedIds = new Set(transformations.map((t) => t.id));
+					return oldData.filter((item) => !deletedIds.has(item.id));
+				},
+			);
+			return Ok(undefined);
 		},
 
 		async createTransformationRun(transformationRun) {

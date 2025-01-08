@@ -7,7 +7,6 @@ import {
 import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import { createDbFns } from './db';
 import {
 	type Recording,
 	type Transformation,
@@ -29,6 +28,7 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
+import { queryClient } from '../../routes/+layout.svelte';
 
 // Services that are not determined by the user's settings, but by the platform.
 
@@ -48,7 +48,7 @@ const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-const DbService = createDbDexieService();
+const DbService = createDbDexieService({ queryClient });
 
 const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
@@ -96,8 +96,8 @@ export const userConfiguredServices = (() => {
 		},
 		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
-		transformations: createTransformationFns({ HttpService }),
-		db: createDbFns(DbService),
+		transformations: createTransformationFns({ HttpService, DbService }),
+		db: DbService,
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':
