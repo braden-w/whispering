@@ -5,7 +5,6 @@
 	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
 	import type { Transformation } from '$lib/services/db';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
-	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();
 
@@ -14,7 +13,6 @@
 </script>
 
 <div class="flex items-center">
-	<MarkTransformationActiveButton size="icon" {transformation} />
 	<EditTransformationDialog {transformation} class="md:hidden" />
 
 	<WhisperingButton

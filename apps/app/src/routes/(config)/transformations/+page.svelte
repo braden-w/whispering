@@ -46,6 +46,7 @@
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import DataTableHeader from './DataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
+	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
@@ -61,6 +62,16 @@
 					checked: row.getIsSelected(),
 					onCheckedChange: (value) => row.toggleSelected(!!value),
 					'aria-label': 'Select row',
+				}),
+			enableSorting: false,
+			enableHiding: false,
+		},
+		{
+			id: 'mark-selected',
+			cell: ({ row }) =>
+				renderComponent(MarkTransformationActiveButton, {
+					transformation: row.original,
+					size: 'icon',
 				}),
 			enableSorting: false,
 			enableHiding: false,
