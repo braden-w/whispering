@@ -1,130 +1,28 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { DownloadService } from '$lib/services/index.js';
-import { Ok, tryAsync } from '@epicenterhq/result';
-import type {
-	ANTHROPIC_INFERENCE_MODELS,
-	GROQ_INFERENCE_MODELS,
-	INFERENCE_PROVIDERS,
-	OPENAI_INFERENCE_MODELS,
-	Settings,
-} from '@repo/shared';
-import Dexie, { type Transaction } from 'dexie';
-import { toast } from '$lib/services/toast';
-import type { DbService } from './DbService';
-import { DbServiceErr } from './DbService';
-import { nanoid } from 'nanoid/non-secure';
-import type { QueryClient } from '@tanstack/svelte-query';
 import { recordingsKeys } from '$lib/queries/recordings';
 import { transformationsKeys } from '$lib/queries/transformations';
+import { DownloadService } from '$lib/services/index.js';
+import { toast } from '$lib/services/toast';
+import { Ok, tryAsync } from '@epicenterhq/result';
+import type { Settings } from '@repo/shared';
+import type { QueryClient } from '@tanstack/svelte-query';
+import Dexie, { type Transaction } from 'dexie';
+import { nanoid } from 'nanoid/non-secure';
+import type {
+	DbService,
+	Recording,
+	Transformation,
+	TransformationRun,
+} from './DbService';
+import { DbServiceErr } from './DbService';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 4;
 
-export type Recording = RecordingsDbSchemaV4['recordings'];
-export type InsertRecording = Omit<Recording, 'createdAt' | 'updatedAt'>;
-
-export type Transformation = RecordingsDbSchemaV4['transformations'];
-export type InsertTransformation = Omit<
-	Transformation,
-	'createdAt' | 'updatedAt'
->;
-
-export type TransformationStep = Transformation['steps'][number];
-export type InsertTransformationStep = Omit<
-	TransformationStep,
-	'createdAt' | 'updatedAt'
->;
-
-export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
-export type InsertTransformationRun = Pick<
-	TransformationRun,
-	'input' | 'transformationId' | 'recordingId'
->;
-
-export type TransformationStepRun = TransformationRun['stepRuns'][number];
-export type InsertTransformationStepRun = Omit<
-	TransformationStepRun,
-	'createdAt' | 'updatedAt'
->;
-
-export const TRANSFORMATION_STEP_TYPES = [
-	'prompt_transform',
-	'find_replace',
-] as const;
-export const TRANSFORMATION_STEP_TYPES_TO_LABELS = {
-	prompt_transform: 'Prompt Transform',
-	find_replace: 'Find Replace',
-} as const satisfies Record<(typeof TRANSFORMATION_STEP_TYPES)[number], string>;
-
 export type RecordingsDbSchemaV4 = {
-	recordings: RecordingsDbSchemaV3['recordings'] & {
-		createdAt: string;
-		updatedAt: string;
-	};
-	transformations: {
-		id: string;
-		title: string;
-		description: string;
-		createdAt: string;
-		updatedAt: string;
-		/**
-		 * It can be one of several types of text transformations:
-		 * - find_replace: Replace text patterns with new text
-		 * - prompt_transform: Use AI to transform text based on prompts
-		 */
-		steps: {
-			id: string;
-			// For now, steps don't need titles or descriptions. They can be computed from the type as "Find and Replace" or "Prompt Transform"
-			type: (typeof TRANSFORMATION_STEP_TYPES)[number];
-
-			'prompt_transform.inference.provider': (typeof INFERENCE_PROVIDERS)[number];
-			'prompt_transform.inference.provider.OpenAI.model': (typeof OPENAI_INFERENCE_MODELS)[number];
-			'prompt_transform.inference.provider.Groq.model': (typeof GROQ_INFERENCE_MODELS)[number];
-			'prompt_transform.inference.provider.Anthropic.model': (typeof ANTHROPIC_INFERENCE_MODELS)[number];
-
-			'prompt_transform.systemPromptTemplate': string;
-			'prompt_transform.userPromptTemplate': string;
-
-			'find_replace.findText': string;
-			'find_replace.replaceText': string;
-			'find_replace.useRegex': boolean;
-		}[];
-	};
-
-	/**
-	 * Represents an execution of a transformation, which can be run on either
-	 * a recording's transcribed text or arbitrary input text.
-	 */
-	transformationRuns: {
-		id: string;
-		transformationId: string;
-		/**
-		 * Recording id if the transformation is invoked on a recording.
-		 * Null if the transformation is invoked on arbitrary text input.
-		 */
-		recordingId: string | null;
-		status: 'pending' | 'running' | 'completed' | 'failed';
-		startedAt: string;
-		completedAt: string | null;
-		/**
-		 * Because the recording's transcribedText can change after invoking,
-		 * we store a snapshot of the transcribedText at the time of invoking.
-		 */
-		input: string;
-		output: string | null;
-		error: string | null;
-
-		stepRuns: {
-			id: string;
-			stepId: string;
-			status: 'pending' | 'running' | 'completed' | 'failed';
-			startedAt: string;
-			completedAt: string | null;
-			input: string;
-			output: string | null;
-			error: string | null;
-		}[];
-	};
+	recordings: Recording;
+	transformations: Transformation;
+	transformationRuns: TransformationRun;
 };
 
 type RecordingsDbSchemaV3 = {

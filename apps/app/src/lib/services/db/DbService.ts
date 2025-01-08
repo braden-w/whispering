@@ -1,17 +1,12 @@
 import { Err, type Ok } from '@epicenterhq/result';
-import type { Settings } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
 import type {
-	InsertRecording,
-	InsertTransformation,
-	InsertTransformationRun,
-	InsertTransformationStepRun,
-	Recording,
-	Transformation,
-	TransformationRun,
-	TransformationStepRun,
-	TransformationStep,
-} from './DbService.dexie';
+	ANTHROPIC_INFERENCE_MODELS,
+	GROQ_INFERENCE_MODELS,
+	INFERENCE_PROVIDERS,
+	OPENAI_INFERENCE_MODELS,
+	Settings,
+} from '@repo/shared';
+import { nanoid } from 'nanoid/non-secure';
 
 type DbErrorProperties = {
 	_tag: 'DbServiceError';
@@ -112,3 +107,119 @@ export type DbService = {
 		) => Promise<DbServiceResult<TransformationRun>>;
 	};
 };
+
+export const TRANSFORMATION_STEP_TYPES = [
+	'prompt_transform',
+	'find_replace',
+] as const;
+
+export const TRANSFORMATION_STEP_TYPES_TO_LABELS = {
+	prompt_transform: 'Prompt Transform',
+	find_replace: 'Find Replace',
+} as const satisfies Record<(typeof TRANSFORMATION_STEP_TYPES)[number], string>;
+
+export type Recording = {
+	id: string;
+	title: string;
+	subtitle: string;
+	timestamp: string;
+	createdAt: string;
+	updatedAt: string;
+	transcribedText: string;
+	blob: Blob | undefined;
+	/**
+	 * A recording
+	 * 1. Begins in an 'UNPROCESSED' state
+	 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
+	 * 3. Finally is marked as 'DONE' when the transcription is complete.
+	 * 4. If the transcription fails, it is marked as 'FAILED'
+	 */
+	transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE' | 'FAILED';
+};
+
+export type InsertRecording = Omit<Recording, 'createdAt' | 'updatedAt'>;
+
+export type Transformation = {
+	id: string;
+	title: string;
+	description: string;
+	createdAt: string;
+	updatedAt: string;
+	/**
+	 * It can be one of several types of text transformations:
+	 * - find_replace: Replace text patterns with new text
+	 * - prompt_transform: Use AI to transform text based on prompts
+	 */
+	steps: {
+		id: string;
+		// For now, steps don't need titles or descriptions. They can be computed from the type as "Find and Replace" or "Prompt Transform"
+		type: (typeof TRANSFORMATION_STEP_TYPES)[number];
+
+		'prompt_transform.inference.provider': (typeof INFERENCE_PROVIDERS)[number];
+		'prompt_transform.inference.provider.OpenAI.model': (typeof OPENAI_INFERENCE_MODELS)[number];
+		'prompt_transform.inference.provider.Groq.model': (typeof GROQ_INFERENCE_MODELS)[number];
+		'prompt_transform.inference.provider.Anthropic.model': (typeof ANTHROPIC_INFERENCE_MODELS)[number];
+
+		'prompt_transform.systemPromptTemplate': string;
+		'prompt_transform.userPromptTemplate': string;
+
+		'find_replace.findText': string;
+		'find_replace.replaceText': string;
+		'find_replace.useRegex': boolean;
+	}[];
+};
+export type InsertTransformation = Omit<
+	Transformation,
+	'createdAt' | 'updatedAt'
+>;
+
+export type TransformationStep = Transformation['steps'][number];
+export type InsertTransformationStep = Omit<
+	TransformationStep,
+	'createdAt' | 'updatedAt'
+>;
+
+/**
+ * Represents an execution of a transformation, which can be run on either
+ * a recording's transcribed text or arbitrary input text.
+ */
+export type TransformationRun = {
+	id: string;
+	transformationId: string;
+	/**
+	 * Recording id if the transformation is invoked on a recording.
+	 * Null if the transformation is invoked on arbitrary text input.
+	 */
+	recordingId: string | null;
+	status: 'pending' | 'running' | 'completed' | 'failed';
+	startedAt: string;
+	completedAt: string | null;
+	/**
+	 * Because the recording's transcribedText can change after invoking,
+	 * we store a snapshot of the transcribedText at the time of invoking.
+	 */
+	input: string;
+	output: string | null;
+	error: string | null;
+
+	stepRuns: {
+		id: string;
+		stepId: string;
+		status: 'pending' | 'running' | 'completed' | 'failed';
+		startedAt: string;
+		completedAt: string | null;
+		input: string;
+		output: string | null;
+		error: string | null;
+	}[];
+};
+export type InsertTransformationRun = Pick<
+	TransformationRun,
+	'input' | 'transformationId' | 'recordingId'
+>;
+
+export type TransformationStepRun = TransformationRun['stepRuns'][number];
+export type InsertTransformationStepRun = Omit<
+	TransformationStepRun,
+	'createdAt' | 'updatedAt'
+>;
