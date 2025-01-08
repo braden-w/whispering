@@ -44,7 +44,7 @@
 	import { PlusIcon } from 'lucide-svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
-	import DataTableHeader from './DataTableHeader.svelte';
+	import SortableDataTableHeader from './SortableDataTableHeader.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import { Badge } from '$lib/components/ui/badge';
@@ -92,12 +92,18 @@
 		{
 			accessorKey: 'title',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Title' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Title',
+				}),
 		},
 		{
 			accessorKey: 'description',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Description' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Description',
+				}),
 		},
 		{
 			id: 'actions',

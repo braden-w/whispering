@@ -39,7 +39,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import { z } from 'zod';
-	import DataTableHeader from '../transformations/DataTableHeader.svelte';
+	import SortableDataTableHeader from '../transformations/SortableSortableDataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -80,7 +80,7 @@
 			id: 'ID',
 			accessorKey: 'id',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'ID' }),
+				renderComponent(SortableDataTableHeader, { column, headerText: 'ID' }),
 			enableSorting: false,
 			enableHiding: false,
 		},
@@ -88,31 +88,43 @@
 			id: 'Title',
 			accessorKey: 'title',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Title' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Title',
+				}),
 		},
 		{
 			id: 'Subtitle',
 			accessorKey: 'subtitle',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Subtitle' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Subtitle',
+				}),
 		},
 		{
 			id: 'Created At',
 			accessorKey: 'createdAt',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Created At' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Created At',
+				}),
 		},
 		{
 			id: 'Updated At',
 			accessorKey: 'updatedAt',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Updated At' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Updated At',
+				}),
 		},
 		{
 			id: 'Transcribed Text',
 			accessorKey: 'transcribedText',
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, {
+				renderComponent(SortableDataTableHeader, {
 					column,
 					headerText: 'Transcribed Text',
 				}),
@@ -128,7 +140,10 @@
 			id: 'Audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Audio' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Audio',
+				}),
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<Pick<Recording, 'id' | 'blob'>>();
 				return renderComponent(RenderAudioUrl, { id, blob });
@@ -138,7 +153,10 @@
 			id: 'Actions',
 			accessorFn: (recording) => recording,
 			header: ({ column }) =>
-				renderComponent(DataTableHeader, { column, headerText: 'Actions' }),
+				renderComponent(SortableDataTableHeader, {
+					column,
+					headerText: 'Actions',
+				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
 				return renderComponent(RowActions, { recording });
