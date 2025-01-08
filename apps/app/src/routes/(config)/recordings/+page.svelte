@@ -47,6 +47,8 @@
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import { Card } from '$lib/components/ui/card';
+	import { Badge } from '$lib/components/ui/badge';
+	import { createRawSnippet } from 'svelte';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -81,8 +83,15 @@
 			accessorKey: 'id',
 			header: ({ column }) =>
 				renderComponent(SortableTableHeader, { column, headerText: 'ID' }),
-			enableSorting: false,
-			enableHiding: false,
+			cell: ({ getValue }) => {
+				const id = getValue<string>();
+				return renderComponent(Badge, {
+					variant: 'id',
+					children: createRawSnippet(() => ({
+						render: () => id,
+					})),
+				});
+			},
 		},
 		{
 			id: 'Title',
