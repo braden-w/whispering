@@ -37,7 +37,7 @@
 	>
 		{#snippet closeButtons()}
 			{#if transformation}
-				<div class="absolute right-4 top-4">
+				<div class="flex items-center absolute right-4 top-4 gap-1">
 					<MarkTransformationActiveButton {transformation} />
 					<WhisperingButton
 						tooltipContent="Close"
