@@ -4,7 +4,7 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
-	import { queryClient } from '$lib/queryClient';
+	import { queryClient } from '$lib/services';
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';

@@ -28,7 +28,16 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
-import { queryClient } from '$lib/queryClient';
+import { browser } from '$app/environment';
+import { QueryClient } from '@tanstack/svelte-query';
+
+export const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			enabled: browser,
+		},
+	},
+});
 
 // Services that are not determined by the user's settings, but by the platform.
 
