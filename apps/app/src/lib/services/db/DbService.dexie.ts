@@ -12,6 +12,7 @@ import Dexie, { type Transaction } from 'dexie';
 import { toast } from '$lib/services/toast';
 import type { DbService } from './DbService';
 import { DbServiceErr } from './DbService';
+import { nanoid } from 'nanoid/non-secure';
 
 const DB_NAME = 'RecordingDB';
 const DB_VERSION = 4;
@@ -26,7 +27,22 @@ export type InsertTransformation = Omit<
 >;
 
 export type TransformationStep = Transformation['steps'][number];
+export type InsertTransformationStep = Omit<
+	TransformationStep,
+	'createdAt' | 'updatedAt'
+>;
+
 export type TransformationRun = RecordingsDbSchemaV4['transformationRuns'];
+export type InsertTransformationRun = Pick<
+	TransformationRun,
+	'input' | 'transformationId' | 'recordingId'
+>;
+
+export type TransformationStepRun = TransformationRun['stepRuns'][number];
+export type InsertTransformationStepRun = Omit<
+	TransformationStepRun,
+	'createdAt' | 'updatedAt'
+>;
 
 export const TRANSFORMATION_STEP_TYPES = [
 	'prompt_transform',
@@ -543,6 +559,32 @@ export function createDbDexieService(): DbService {
 						error,
 					}),
 			});
+		},
+
+		async createTransformationRun(transformationRun) {
+			const now = new Date().toISOString();
+			const transformationRunWithTimestamps = {
+				...transformationRun,
+				id: nanoid(),
+				startedAt: now,
+				completedAt: null,
+				status: 'pending',
+				output: null,
+				error: null,
+				stepRuns: [],
+			} satisfies TransformationRun;
+			const createTransformationRunResult = await tryAsync({
+				try: () => db.transformationRuns.add(transformationRunWithTimestamps),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error adding transformation run to Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!createTransformationRunResult.ok)
+				return createTransformationRunResult;
+			return Ok(transformationRunWithTimestamps);
 		},
 	};
 }

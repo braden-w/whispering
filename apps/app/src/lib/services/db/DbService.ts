@@ -4,8 +4,12 @@ import { nanoid } from 'nanoid/non-secure';
 import type {
 	InsertRecording,
 	InsertTransformation,
+	InsertTransformationRun,
+	InsertTransformationStepRun,
 	Recording,
 	Transformation,
+	TransformationRun,
+	TransformationStepRun,
 	TransformationStep,
 } from './DbService.dexie';
 
@@ -90,4 +94,21 @@ export type DbService = {
 	deleteTransformations: (
 		transformations: Transformation[],
 	) => Promise<DbServiceResult<void>>;
+
+	transformationRuns: {
+		create: (
+			transformationRun: InsertTransformationRun,
+		) => Promise<DbServiceResult<TransformationRun>>;
+		set: (
+			transformationRun: TransformationRun,
+		) => Promise<DbServiceResult<TransformationRun>>;
+		setStatus: (
+			transformationRun: TransformationRun,
+			status: TransformationRun['status'],
+		) => Promise<DbServiceResult<TransformationRun>>;
+		addTransformationStepRun: (
+			transformationRun: TransformationRun,
+			stepRun: InsertTransformationStepRun,
+		) => Promise<DbServiceResult<TransformationRun>>;
+	};
 };
