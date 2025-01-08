@@ -1,11 +1,10 @@
-<script lang="ts">
+<script lang="ts" generics="TColumn extends Column<any, any>">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import type { Transformation } from '$lib/services/db';
-	import type { HeaderContext } from '@tanstack/table-core';
+	import type { Column } from '@tanstack/svelte-table';
 	import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-svelte';
 
-	let { column }: HeaderContext<Transformation, unknown> = $props();
-	const headerText = $derived(column.columnDef.meta?.headerText);
+	let { column, headerText }: { column: TColumn; headerText: string } =
+		$props();
 </script>
 
 <Button

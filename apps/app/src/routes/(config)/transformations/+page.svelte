@@ -91,26 +91,17 @@
 		},
 		{
 			accessorKey: 'title',
-			meta: {
-				headerText: 'Title',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Title' }),
 		},
 		{
 			accessorKey: 'description',
-			meta: {
-				headerText: 'Description',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Description' }),
 		},
 		{
 			id: 'actions',
 			accessorFn: (transformation) => transformation,
-			meta: {
-				headerText: 'Actions',
-			},
 			header: 'Actions',
 			cell: ({ getValue }) => {
 				const transformation = getValue<Transformation>();

@@ -39,7 +39,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import { z } from 'zod';
-	import DataTableHeader from './DataTableHeader.svelte';
+	import DataTableHeader from '../transformations/DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -77,42 +77,45 @@
 			},
 		},
 		{
+			id: 'ID',
 			accessorKey: 'id',
-			meta: { headerText: 'ID' },
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'ID' }),
 			enableSorting: false,
 			enableHiding: false,
 		},
 		{
+			id: 'Title',
 			accessorKey: 'title',
-			meta: { headerText: 'Title' },
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Title' }),
 		},
 		{
+			id: 'Subtitle',
 			accessorKey: 'subtitle',
-			meta: { headerText: 'Subtitle' },
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Subtitle' }),
 		},
 		{
+			id: 'Created At',
 			accessorKey: 'createdAt',
-			meta: { headerText: 'Created At' },
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Created At' }),
 		},
 		{
+			id: 'Updated At',
 			accessorKey: 'updatedAt',
-			meta: { headerText: 'Updated At' },
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Updated At' }),
 		},
 		{
-			id: 'transcribedText',
+			id: 'Transcribed Text',
 			accessorKey: 'transcribedText',
-			meta: { headerText: 'Transcribed Text' },
-			header: 'Transcribed Text',
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, {
+					column,
+					headerText: 'Transcribed Text',
+				}),
 			cell: ({ getValue, row }) => {
 				const transcribedText = getValue<string>();
 				return renderComponent(TranscribedText, {
@@ -122,20 +125,20 @@
 			},
 		},
 		{
-			id: 'audio',
+			id: 'Audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
-			meta: { headerText: 'Audio' },
-			header: 'Audio',
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Audio' }),
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<Pick<Recording, 'id' | 'blob'>>();
 				return renderComponent(RenderAudioUrl, { id, blob });
 			},
 		},
 		{
-			id: 'actions',
+			id: 'Actions',
 			accessorFn: (recording) => recording,
-			meta: { headerText: 'Actions' },
-			header: 'Actions',
+			header: ({ column }) =>
+				renderComponent(DataTableHeader, { column, headerText: 'Actions' }),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
 				return renderComponent(RowActions, { recording });
@@ -425,7 +428,7 @@
 								checked={column.getIsVisible()}
 								onCheckedChange={(value) => column.toggleVisibility(!!value)}
 							>
-								{column.columnDef.meta?.headerText}
+								{column.columnDef.id}
 							</DropdownMenu.CheckboxItem>
 						{/each}
 					</DropdownMenu.Content>
