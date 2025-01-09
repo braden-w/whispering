@@ -190,7 +190,6 @@
 		},
 	};
 
-	let isDialogOpen = $state(false);
 	let selectedTransformationId = $state<string | null>(null);
 	const setSelectedTransformationId = (id: string | null) => {
 		selectedTransformationId = id;
