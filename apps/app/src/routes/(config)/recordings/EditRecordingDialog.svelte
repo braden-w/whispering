@@ -11,7 +11,7 @@
 		deleteRecordingWithToast,
 		updateRecordingWithToast,
 	} from '$lib/mutations/recordings';
-	import { Recording } from '$lib/services/db';
+	import type { Recording } from '$lib/services/db';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
