@@ -31,7 +31,6 @@
 	import { XIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { z } from 'zod';
 
 	let { selectedTransformationId, onClose } = $props<{
 		selectedTransformationId: string;
