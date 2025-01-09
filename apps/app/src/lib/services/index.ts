@@ -42,6 +42,18 @@ type MutationResultFunction<
 	TVariables = unknown,
 > = (variables: TVariables) => MaybePromise<Result<TData, TError>>;
 
+type CreateResultMutationOptions<
+	TData = unknown,
+	TError = unknown,
+	TVariables = unknown,
+	TContext = unknown,
+> = Omit<
+	CreateMutationOptions<TData, TError, TVariables, TContext>,
+	'mutationFn'
+> & {
+	mutationFn: MutationResultFunction<TData, TError, TVariables>;
+};
+
 export const createResultMutation = <
 	TData = unknown,
 	TError = unknown,
@@ -49,12 +61,7 @@ export const createResultMutation = <
 	TContext = unknown,
 >(
 	options: FunctionedParams<
-		Omit<
-			CreateMutationOptions<TData, TError, TVariables, TContext>,
-			'mutationFn'
-		> & {
-			mutationFn: MutationResultFunction<TData, TError, TVariables>;
-		}
+		CreateResultMutationOptions<TData, TError, TVariables, TContext>
 	>,
 ) => {
 	const { mutationFn, ...optionValues } = options();
@@ -79,10 +86,7 @@ export const wrapWithMutation = <
 		mutate: fn,
 		createMutation: <TContext = unknown>(
 			options: FunctionedParams<
-				Exclude<
-					CreateMutationOptions<TData, TError, TVariables, TContext>,
-					'mutationFn'
-				>
+				CreateResultMutationOptions<TData, TError, TVariables, TContext>
 			>,
 		) => createResultMutation<TData, TError, TVariables, TContext>(options),
 	};
