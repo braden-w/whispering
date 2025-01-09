@@ -1,11 +1,14 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
+import type { MaybePromise } from '@repo/shared';
 import {
 	type CreateMutationOptions,
-	type CreateMutationResult,
+	type CreateQueryOptions,
 	type FunctionedParams,
+	type QueryKey,
 	QueryClient,
 	createMutation,
+	createQuery,
 } from '@tanstack/svelte-query';
 import { settings } from '../stores/settings.svelte';
 import {
@@ -15,6 +18,7 @@ import {
 import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
+import type { Recording } from './db';
 import { createDbDexieService } from './db/DbService.dexie';
 import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './download/DownloadService.web';
@@ -33,8 +37,43 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
-import type { Recording } from './db';
-import type { MaybePromise } from '@repo/shared';
+
+type QueryResultFunction<TData, TError> = () => MaybePromise<
+	Result<TData, TError>
+>;
+
+type CreateResultQueryOptions<
+	TQueryFnData,
+	TError,
+	TData,
+	TQueryKey extends QueryKey,
+> = Omit<
+	CreateQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+	'queryFn'
+> & {
+	queryFn: QueryResultFunction<TQueryFnData, TError>;
+};
+
+export const createResultQuery = <
+	TQueryFnData,
+	TError,
+	TData,
+	TQueryKey extends QueryKey,
+>(
+	options: FunctionedParams<
+		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+	>,
+) => {
+	const { queryFn, ...optionValues } = options();
+	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => ({
+		...optionValues,
+		queryFn: async () => {
+			const result = await queryFn();
+			if (!result.ok) throw result.error;
+			return result.data;
+		},
+	}));
+};
 
 type MutationResultFunction<
 	TData = unknown,
@@ -75,66 +114,6 @@ export const createResultMutation = <
 	}));
 };
 
-export const wrapWithMutation = <
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
->(
-	fn: MutationResultFunction<TData, TError, TVariables>,
-) => {
-	return {
-		mutate: fn,
-		createMutation: <TContext = unknown>(
-			options?: FunctionedParams<
-				Omit<
-					CreateMutationOptions<TData, TError, TVariables, TContext>,
-					'mutationFn'
-				>
-			>,
-		) => {
-			const optionValues = options();
-			return createResultMutation<TData, TError, TVariables, TContext>(() => ({
-				...optionValues,
-				mutationFn: fn,
-			}));
-		},
-	};
-};
-
-type WrappedServiceWithMutation<
-	Service extends Record<string, MutationResultFunction>,
-> = {
-	[K in keyof Service]: Service[K] extends MutationResultFunction<
-		infer TData,
-		infer TError,
-		infer TVariables
-	>
-		? {
-				mutate: Service[K];
-				createMutation: <TContext = unknown>(
-					options?: FunctionedParams<
-						Exclude<
-							CreateMutationOptions<TData, TError, TVariables, TContext>,
-							'mutationFn'
-						>
-					>,
-				) => CreateMutationResult<TData, TError, TVariables>;
-			}
-		: never;
-};
-
-export const wrapServiceWithMutation = <
-	Service extends Record<string, MutationResultFunction<any, any, any>>,
->(
-	service: Service,
-) =>
-	Object.fromEntries(
-		Object.entries(service).map(([key, serviceFn]) => [
-			key,
-			wrapWithMutation(serviceFn),
-		]),
-	) as WrappedServiceWithMutation<Service>;
-
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
@@ -143,13 +122,9 @@ export const queryClient = new QueryClient({
 	},
 });
 
-// Services that are not determined by the user's settings, but by the platform.
-
-export const DownloadService = wrapServiceWithMutation(
-	window.__TAURI_INTERNALS__
-		? createDownloadServiceDesktop()
-		: createDownloadServiceWeb(),
-);
+export const DownloadService = window.__TAURI_INTERNALS__
+	? createDownloadServiceDesktop()
+	: createDownloadServiceWeb();
 
 export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
