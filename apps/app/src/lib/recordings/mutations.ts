@@ -61,10 +61,7 @@ export const deleteRecordingWithToast = createResultMutation(() => ({
 			if (!oldData) return [];
 			return oldData.filter((item) => item.id !== recording.id);
 		});
-		queryClient.setQueryData<Recording>(
-			recordingsKeys.byId(recording.id),
-			undefined,
-		);
+		queryClient.removeQueries({ queryKey: recordingsKeys.byId(recording.id) });
 
 		toast.success({
 			title: 'Deleted recording!',
@@ -95,10 +92,9 @@ export const deleteRecordingsWithToast = createResultMutation(() => ({
 			return oldData.filter((item) => !deletedIds.has(item.id));
 		});
 		for (const recording of recordings) {
-			queryClient.setQueryData<Recording>(
-				recordingsKeys.byId(recording.id),
-				undefined,
-			);
+			queryClient.removeQueries({
+				queryKey: recordingsKeys.byId(recording.id),
+			});
 		}
 
 		toast.success({

@@ -101,10 +101,9 @@ export const createDeleteTransformationWithToast = () =>
 					return oldData.filter((item) => item.id !== transformation.id);
 				},
 			);
-			queryClient.setQueryData<Transformation>(
-				transformationsKeys.byId(transformation.id),
-				undefined,
-			);
+			queryClient.removeQueries({
+				queryKey: transformationsKeys.byId(transformation.id),
+			});
 
 			toast.success({
 				title: 'Deleted transformation!',
@@ -137,10 +136,9 @@ export const createDeleteTransformationsWithToast = () =>
 				},
 			);
 			for (const transformation of transformations) {
-				queryClient.setQueryData<Transformation>(
-					transformationsKeys.byId(transformation.id),
-					undefined,
-				);
+				queryClient.removeQueries({
+					queryKey: transformationsKeys.byId(transformation.id),
+				});
 			}
 
 			toast.success({
