@@ -109,7 +109,7 @@
 			cell: ({ getValue }) => {
 				const transformation = getValue<Transformation>();
 				return renderComponent(TransformationRowActions, {
-					transformation,
+					transformationId: transformation.id,
 					class: 'hidden group-hover:flex',
 				});
 			},
