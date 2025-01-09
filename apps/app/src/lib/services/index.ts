@@ -85,10 +85,19 @@ export const wrapWithMutation = <
 	return {
 		mutate: fn,
 		createMutation: <TContext = unknown>(
-			options: FunctionedParams<
-				CreateResultMutationOptions<TData, TError, TVariables, TContext>
+			options?: FunctionedParams<
+				Omit<
+					CreateMutationOptions<TData, TError, TVariables, TContext>,
+					'mutationFn'
+				>
 			>,
-		) => createResultMutation<TData, TError, TVariables, TContext>(options),
+		) => {
+			const optionValues = options();
+			return createResultMutation<TData, TError, TVariables, TContext>(() => ({
+				...optionValues,
+				mutationFn: fn,
+			}));
+		},
 	};
 };
 
@@ -103,7 +112,7 @@ type WrappedServiceWithMutation<
 		? {
 				mutate: Service[K];
 				createMutation: <TContext = unknown>(
-					options: FunctionedParams<
+					options?: FunctionedParams<
 						Exclude<
 							CreateMutationOptions<TData, TError, TVariables, TContext>,
 							'mutationFn'
@@ -114,7 +123,7 @@ type WrappedServiceWithMutation<
 		: never;
 };
 
-const wrapServiceWithMutation = <
+export const wrapServiceWithMutation = <
 	Service extends Record<string, MutationResultFunction<any, any, any>>,
 >(
 	service: Service,

@@ -60,7 +60,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await userConfiguredServices.db.createRecording(newRecording);
+				await db.createRecording.mutate(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,
@@ -118,7 +118,7 @@ function createRecorder() {
 									type: 'button',
 									label: 'Copy to clipboard',
 									onClick: () =>
-										userConfiguredServices.clipboard.copyTextToClipboardWithToast(
+										userConfiguredServices.clipboard.copyTextToClipboardWithToast.mutate(
 											{ label: 'transcribed text', text: transcribedText },
 										),
 								},
