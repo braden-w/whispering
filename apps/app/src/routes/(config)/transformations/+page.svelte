@@ -36,6 +36,7 @@
 	import { z } from 'zod';
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
 	import EditTransformationSidePanel from './EditTransformationSidePanel.svelte';
+	import { sidebar } from './EditTransformationSidePanel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
@@ -189,15 +190,6 @@
 			table.getColumn('select')?.setFilterValue(value);
 		},
 	};
-
-	let selectedTransformationId = createPersistedState({
-		key: 'whispering-transformations-selected-transformation-id',
-		defaultValue: null,
-		schema: z.string().nullable(),
-	});
-	const setSelectedTransformationId = (id: string | null) => {
-		selectedTransformationId.value = id;
-	};
 </script>
 
 <svelte:head>
@@ -292,11 +284,13 @@
 							{/each}
 						{:else if table.getRowModel().rows?.length}
 							{#each table.getRowModel().rows as row (row.id)}
+								{@const isSelected =
+									row.id === sidebar.selectedTransformationId}
 								<Table.Row
 									class={cn('cursor-pointer group', {
-										'bg-muted/75': row.id === selectedTransformationId.value,
+										'bg-muted/75': isSelected,
 									})}
-									onclick={() => setSelectedTransformationId(row.id)}
+									onclick={() => sidebar.openTransformationById(row.id)}
 									style="view-transition-name: {createTransformationViewTransitionName(
 										{ transformationId: row.id },
 									)}"
@@ -354,10 +348,10 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			{#if selectedTransformationId.value}
+			{#if sidebar.selectedTransformationId}
 				<EditTransformationSidePanel
-					selectedTransformationId={selectedTransformationId.value}
-					onClose={() => setSelectedTransformationId(null)}
+					selectedTransformationId={sidebar.selectedTransformationId}
+					onClose={() => sidebar.close()}
 				/>
 			{:else}
 				<div
