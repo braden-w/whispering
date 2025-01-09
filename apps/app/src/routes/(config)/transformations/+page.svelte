@@ -190,9 +190,13 @@
 		},
 	};
 
-	let selectedTransformationId = $state<string | null>(null);
+	let selectedTransformationId = createPersistedState({
+		key: 'whispering-transformations-selected-transformation-id',
+		defaultValue: null,
+		schema: z.string().nullable(),
+	});
 	const setSelectedTransformationId = (id: string | null) => {
-		selectedTransformationId = id;
+		selectedTransformationId.value = id;
 	};
 </script>
 
@@ -290,11 +294,9 @@
 							{#each table.getRowModel().rows as row (row.id)}
 								<Table.Row
 									class={cn('cursor-pointer group', {
-										'bg-muted/75': row.id === selectedTransformationId,
+										'bg-muted/75': row.id === selectedTransformationId.value,
 									})}
-									onclick={() => {
-										setSelectedTransformationId(row.id);
-									}}
+									onclick={() => setSelectedTransformationId(row.id)}
 									style="view-transition-name: {createTransformationViewTransitionName(
 										{ transformationId: row.id },
 									)}"
@@ -352,10 +354,10 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			{#if selectedTransformationId}
+			{#if selectedTransformationId.value}
 				<EditTransformationSidePanel
-					{selectedTransformationId}
-					{setSelectedTransformationId}
+					selectedTransformationId={selectedTransformationId.value}
+					onClose={() => setSelectedTransformationId(null)}
 				/>
 			{:else}
 				<div

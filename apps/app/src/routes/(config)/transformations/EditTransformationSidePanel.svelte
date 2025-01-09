@@ -1,15 +1,14 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { type Transformation } from '$lib/services/db';
 	import { updateTransformationWithToast } from '$lib/transformations/mutations';
+	import { createTransformationQuery } from '$lib/transformations/queries';
 	import { XIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { createTransformationQuery } from '$lib/transformations/queries';
 
-	let { selectedTransformationId, setSelectedTransformationId } = $props<{
+	let { selectedTransformationId, onClose } = $props<{
 		selectedTransformationId: string;
-		setSelectedTransformationId: (transformationId: string | null) => void;
+		onClose: () => void;
 	}>();
 
 	let transformationQuery = createTransformationQuery(selectedTransformationId);
@@ -31,7 +30,7 @@
 						tooltipContent="Close"
 						variant="outline"
 						size="icon"
-						onclick={() => setSelectedTransformationId(null)}
+						onclick={() => onClose()}
 					>
 						<XIcon class="size-4" />
 					</WhisperingButton>
