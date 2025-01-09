@@ -1,67 +1,81 @@
-import type { DbServiceErr, Recording } from '$lib/services/db';
-import { userConfiguredServices } from '$lib/services/index.js';
+import type { Recording } from '$lib/services/db';
+import {
+	createResultMutation,
+	userConfiguredServices,
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
-import { createMutation } from '@tanstack/svelte-query';
+import { Ok } from '@epicenterhq/result';
+import { WhisperingErr } from '@repo/shared';
 
-export const updateRecordingWithToast = createMutation(() => ({
+export const updateRecordingWithToast = createResultMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await userConfiguredServices.db.updateRecording(recording);
 		if (!result.ok) {
-			toast.error({
+			return WhisperingErr({
 				title: 'Failed to update recording!',
 				description: 'Your recording could not be updated.',
 				action: { type: 'more-details', error: result.error },
 			});
-			throw result.error;
 		}
+		return Ok(recording);
+	},
+	onSuccess: () => {
 		toast.success({
 			title: 'Updated recording!',
 			description: 'Your recording has been updated successfully.',
 		});
-		return recording;
+	},
+	onError: (error) => {
+		toast.error({
+			title: 'Failed to update recording!',
+			description: 'Your recording could not be updated.',
+			action: { type: 'more-details', error },
+		});
 	},
 }));
 
-export const deleteRecordingWithToast = createMutation<
-	Recording,
-	DbServiceErr,
-	Recording
->(() => ({
-	mutationFn: async (recording) => {
+export const deleteRecordingWithToast = createResultMutation(() => ({
+	mutationFn: async (recording: Recording) => {
 		const result = await userConfiguredServices.db.deleteRecording(recording);
 		if (!result.ok) {
-			toast.error({
+			return WhisperingErr({
 				title: 'Failed to delete recording!',
 				description: 'Your recording could not be deleted.',
 				action: { type: 'more-details', error: result.error },
 			});
-			throw result.error;
 		}
+		return Ok(recording);
+	},
+	onSuccess: () => {
 		toast.success({
 			title: 'Deleted recording!',
 			description: 'Your recording has been deleted successfully.',
 		});
-		return recording;
 	},
-	onError: (error, variables, context) => {},
+	onError: (error) => {
+		toast.error(error);
+	},
 }));
 
-export const deleteRecordingsWithToast = createMutation(() => ({
+export const deleteRecordingsWithToast = createResultMutation(() => ({
 	mutationFn: async (recordings: Recording[]) => {
 		const result = await userConfiguredServices.db.deleteRecordings(recordings);
-		await userConfiguredServices.db.deleteRecordings(recordings);
 		if (!result.ok) {
-			toast.error({
+			return WhisperingErr({
 				title: 'Failed to delete recordings!',
 				description: 'Your recordings could not be deleted.',
 				action: { type: 'more-details', error: result.error },
 			});
-			throw result.error;
 		}
+		return Ok(recordings);
+	},
+	onSuccess: () => {
 		toast.success({
 			title: 'Deleted recordings!',
 			description: 'Your recordings have been deleted successfully.',
 		});
-		return recordings;
+	},
+	onError: (error) => {
+		toast.error(error);
 	},
 }));

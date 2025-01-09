@@ -8,13 +8,9 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
-	import {
-		CheckIcon,
-		ChevronsUpDownIcon,
-		CircleIcon,
-		SettingsIcon,
-	} from 'lucide-svelte';
+	import { CheckIcon, ChevronsUpDownIcon, SettingsIcon } from 'lucide-svelte';
 	import { tick } from 'svelte';
+	import { Badge } from './ui/badge';
 
 	const transformationsQuery = createTransformationsQuery();
 
@@ -39,11 +35,9 @@
 
 {#snippet renderTransformationIdTitle(transformation: Transformation)}
 	<div class="flex items-center gap-2">
-		<span
-			class="bg-muted px-1.5 py-0.5 rounded-md text-xs font-mono text-muted-foreground flex-shrink-0 max-w-16 truncate"
-		>
+		<Badge variant="id" class="flex-shrink-0 max-w-16 truncate">
 			{transformation.id}
-		</span>
+		</Badge>
 		<span class="font-medium truncate">
 			{transformation.title}
 		</span>

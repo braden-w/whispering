@@ -7,6 +7,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
@@ -15,6 +16,8 @@
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
+
+	const recordingsQuery = createRecordingsQuery();
 
 	const latestTranscribingOrDoneRecording = $derived<Recording>(
 		recordingsQuery.data?.find(
@@ -103,7 +106,7 @@
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
-					copyTextToClipboardWithToast({
+					copyTextToClipboardWithToast.mutate({
 						label: 'transcribed text',
 						text: latestTranscribingOrDoneRecording.transcribedText,
 					})}

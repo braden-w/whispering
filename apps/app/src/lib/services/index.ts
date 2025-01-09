@@ -15,7 +15,6 @@ import {
 	createSetTrayIconDesktopService,
 	createSetTrayIconWebService,
 } from './SetTrayIconService';
-import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
 import { createDbDexieService } from './db/DbService.dexie';
@@ -52,7 +51,7 @@ type CreateResultQueryOptions<
 	queryFn: QueryResultFunction<TQueryFnData, TError>;
 };
 
-export const createResultQuery = <
+export function createResultQuery<
 	TQueryFnData,
 	TError,
 	TData,
@@ -61,7 +60,7 @@ export const createResultQuery = <
 	options: FunctionedParams<
 		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
 	>,
-) => {
+) {
 	const { queryFn, ...optionValues } = options();
 	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => ({
 		...optionValues,
@@ -71,7 +70,7 @@ export const createResultQuery = <
 			return result.data;
 		},
 	}));
-};
+}
 
 type MutationResultFunction<
 	TData = unknown,
@@ -91,7 +90,7 @@ type CreateResultMutationOptions<
 	mutationFn: MutationResultFunction<TData, TError, TVariables>;
 };
 
-export const createResultMutation = <
+export function createResultMutation<
 	TData = unknown,
 	TError = unknown,
 	TVariables = unknown,
@@ -100,7 +99,7 @@ export const createResultMutation = <
 	options: FunctionedParams<
 		CreateResultMutationOptions<TData, TError, TVariables, TContext>
 	>,
-) => {
+) {
 	const { mutationFn, ...optionValues } = options();
 	return createMutation<TData, TError, TVariables, TContext>(() => ({
 		...optionValues,
@@ -110,7 +109,7 @@ export const createResultMutation = <
 			return result.data;
 		},
 	}));
-};
+}
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
@@ -154,7 +153,6 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
-		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
 		transformations: createTransformationFns({ HttpService, DbService }),
 		db: DbService,
