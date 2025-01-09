@@ -4,6 +4,7 @@ import type { MaybePromise } from '@repo/shared';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
+	type DefaultError,
 	type FunctionedParams,
 	QueryClient,
 	type QueryKey,
@@ -52,10 +53,10 @@ type CreateResultQueryOptions<
 };
 
 export function createResultQuery<
-	TQueryFnData,
-	TError,
-	TData,
-	TQueryKey extends QueryKey,
+	TQueryFnData = unknown,
+	TError = DefaultError,
+	TData = TQueryFnData,
+	TQueryKey extends QueryKey = QueryKey,
 >(
 	options: FunctionedParams<
 		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
@@ -92,8 +93,8 @@ type CreateResultMutationOptions<
 
 export function createResultMutation<
 	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
+	TError = DefaultError,
+	TVariables = void,
 	TContext = unknown,
 >(
 	options: FunctionedParams<
