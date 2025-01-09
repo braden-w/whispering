@@ -8,6 +8,7 @@ import {
 	type WhisperingRecordingState,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 
 export const recorder = createRecorder();
 
@@ -118,7 +119,7 @@ function createRecorder() {
 									type: 'button',
 									label: 'Copy to clipboard',
 									onClick: () =>
-										userConfiguredServices.clipboard.copyTextToClipboardWithToast.mutate(
+										copyTextToClipboardWithToast.mutate(
 											{ label: 'transcribed text', text: transcribedText },
 										),
 								},

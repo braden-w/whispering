@@ -10,7 +10,6 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { userConfiguredServices } from '$lib/services/index.js';
@@ -49,6 +48,7 @@
 	import { Card } from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import { createRawSnippet } from 'svelte';
+	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -197,9 +197,11 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const recordingsQuery = createRecordingsQuery();
+	const recordingsQuery =
+		userConfiguredServices.db.getAllRecordingsWithToast.createMutation();
 
-	const deleteRecordingsWithToastMutation = createDeleteRecordingsWithToast();
+	const deleteRecordingsWithToastMutation =
+		userConfiguredServices.db.deleteRecordingsWithToast.createMutation();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -399,12 +401,10 @@
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
 									onclick={async () => {
-										await userConfiguredServices.clipboard.copyTextToClipboardWithToast(
-											{
-												label: 'transcribed text (joined)',
-												text: joinedTranscriptionsText,
-											},
-										);
+										await copyTextToClipboardWithToast({
+											label: 'transcribed text (joined)',
+											text: joinedTranscriptionsText,
+										});
 										isDialogOpen = false;
 									}}
 									type="submit"

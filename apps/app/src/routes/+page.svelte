@@ -6,17 +6,15 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { createRecordingsQuery } from '$lib/queries/recordings';
+	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 	import type { Recording } from '$lib/services/db';
+	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { userConfiguredServices } from '$lib/services/index.js';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
-
-	const recordingsQuery = createRecordingsQuery();
 
 	const latestTranscribingOrDoneRecording = $derived<Recording>(
 		recordingsQuery.data?.find(
@@ -105,7 +103,7 @@
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
-					userConfiguredServices.clipboard.copyTextToClipboardWithToast({
+					copyTextToClipboardWithToast({
 						label: 'transcribed text',
 						text: latestTranscribingOrDoneRecording.transcribedText,
 					})}

@@ -1,12 +1,12 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
-import { WhisperingErr, type MaybePromise } from '@repo/shared';
+import type { MaybePromise } from '@repo/shared';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
 	type FunctionedParams,
-	type QueryKey,
 	QueryClient,
+	type QueryKey,
 	createMutation,
 	createQuery,
 } from '@tanstack/svelte-query';
@@ -18,7 +18,6 @@ import {
 import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import type { Recording } from './db';
 import { createDbDexieService } from './db/DbService.dexie';
 import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './download/DownloadService.web';
@@ -30,7 +29,6 @@ import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
 import { createPlaySoundServiceDesktop } from './sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
-import { toast } from './toast';
 import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroqDistil } from './transcription/TranscriptionService.groq.distil';
 import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
@@ -130,7 +128,7 @@ export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
 	: createNotificationServiceWeb();
 
-const ClipboardService = window.__TAURI_INTERNALS__
+export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
 	: createClipboardServiceWeb();
 
@@ -156,39 +154,6 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
-		download: {
-			downloadRecordingWithToast: createResultMutation(() => ({
-				mutationFn: async (recording: Recording) => {
-					if (!recording.blob) {
-						return WhisperingErr({
-							title: '⚠️ Recording blob not found',
-							description: "Your recording doesn't have a blob to download.",
-						});
-					}
-					const result = await DownloadService.downloadBlob({
-						name: `whispering_recording_${recording.id}`,
-						blob: recording.blob,
-					});
-					if (!result.ok) {
-						return WhisperingErr({
-							title: 'Failed to download recording!',
-							description: 'Your recording could not be downloaded.',
-							action: { type: 'more-details', error: result.error },
-						});
-					}
-					return result;
-				},
-				onSuccess: () => {
-					toast.success({
-						title: 'Recording downloading!',
-						description: 'Your recording is being downloaded.',
-					});
-				},
-				onError: (error) => {
-					toast.error(error);
-				},
-			})),
-		},
 		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
 		transformations: createTransformationFns({ HttpService, DbService }),

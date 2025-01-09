@@ -1,3 +1,4 @@
+import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 import type { Recording } from '$lib/services/db';
 import { userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
@@ -108,7 +109,7 @@ function createTranscriber() {
 					type: 'button',
 					label: 'Go to recordings',
 					onClick: () =>
-						userConfiguredServices.clipboard.copyTextToClipboardWithToast({
+						copyTextToClipboardWithToast({
 							label: 'transcribed text',
 							text: transcribedText,
 						}),

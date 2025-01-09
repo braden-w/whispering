@@ -2,9 +2,13 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
-	import { createDeleteRecordingWithToast } from '$lib/mutations/recordings';
+	import { deleteRecordingWithToast } from '$lib/mutations/recordings';
 	import type { Recording } from '$lib/services/db';
-	import { userConfiguredServices } from '$lib/services/index.js';
+	import {
+		createResultMutation,
+		DownloadService,
+		userConfiguredServices,
+	} from '$lib/services/index.js';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { createMutation } from '@tanstack/svelte-query';
@@ -16,13 +20,43 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
+	import { WhisperingErr } from '@repo/shared';
+	import { toast } from '$lib/services/toast';
+	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 
 	let { recording }: { recording: Recording } = $props();
 
-	const downloadRecordingWithToastMutation = createMutation(() => ({
-		mutationFn: userConfiguredServices.download.downloadRecordingWithToast,
+	const downloadRecordingWithToast = createResultMutation(() => ({
+		mutationFn: async (recording: Recording) => {
+			if (!recording.blob) {
+				return WhisperingErr({
+					title: '⚠️ Recording blob not found',
+					description: "Your recording doesn't have a blob to download.",
+				});
+			}
+			const result = await DownloadService.downloadBlob({
+				name: `whispering_recording_${recording.id}`,
+				blob: recording.blob,
+			});
+			if (!result.ok) {
+				return WhisperingErr({
+					title: 'Failed to download recording!',
+					description: 'Your recording could not be downloaded.',
+					action: { type: 'more-details', error: result.error },
+				});
+			}
+			return result;
+		},
+		onSuccess: () => {
+			toast.success({
+				title: 'Recording downloading!',
+				description: 'Your recording is being downloaded.',
+			});
+		},
+		onError: (error) => {
+			toast.error(error);
+		},
 	}));
-	const deleteRecordingWithToastMutation = createDeleteRecordingWithToast();
 </script>
 
 <div class="flex items-center">
@@ -41,12 +75,12 @@
 		{/if}
 	</WhisperingButton>
 
-	<EditRecordingDialog {recording}></EditRecordingDialog>
+	<EditRecordingDialog recordingId={recording.id}></EditRecordingDialog>
 
 	<WhisperingButton
 		tooltipContent="Copy transcribed text"
 		onclick={() =>
-			userConfiguredServices.clipboard.copyTextToClipboardWithToast({
+			copyTextToClipboardWithToast.mutate({
 				label: 'transcribed text',
 				text: recording.transcribedText,
 			})}
@@ -62,11 +96,11 @@
 
 	<WhisperingButton
 		tooltipContent="Download recording"
-		onclick={() => downloadRecordingWithToastMutation.mutate(recording)}
+		onclick={() => downloadRecordingWithToast.mutate(recording)}
 		variant="ghost"
 		size="icon"
 	>
-		{#if downloadRecordingWithToastMutation.isPending}
+		{#if downloadRecordingWithToast.isPending}
 			<Loader2Icon class="h-4 w-4 animate-spin" />
 		{:else}
 			<DownloadIcon class="h-4 w-4" />
@@ -80,7 +114,7 @@
 				title: 'Delete recording',
 				subtitle: 'Are you sure you want to delete this recording?',
 				confirmText: 'Delete',
-				onConfirm: () => deleteRecordingWithToastMutation.mutate(recording),
+				onConfirm: () => deleteRecordingWithToast.mutate(recording),
 			});
 		}}
 		variant="ghost"
