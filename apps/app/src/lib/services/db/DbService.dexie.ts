@@ -1,11 +1,8 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { recordingsKeys } from '$lib/queries/recordings';
-import { transformationsKeys } from '$lib/queries/transformations';
 import { DownloadService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
-import type { QueryClient } from '@tanstack/svelte-query';
 import Dexie, { type Transaction } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import type {
@@ -249,9 +246,7 @@ class RecordingsDatabase extends Dexie {
 	}
 }
 
-export function createDbDexieService({
-	queryClient,
-}: { queryClient: QueryClient }): DbService {
+export function createDbDexieService(): DbService {
 	const db = new RecordingsDatabase();
 
 	return {
@@ -301,11 +296,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!createRecordingResult.ok) return createRecordingResult;
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [recordingWithTimestamps];
-				return [...oldData, recordingWithTimestamps];
-			});
 			return Ok(recordingWithTimestamps);
 		},
 
@@ -327,13 +317,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!updateRecordingResult.ok) return updateRecordingResult;
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [recordingWithTimestamp];
-				return oldData.map((item) =>
-					item.id === recording.id ? recordingWithTimestamp : item,
-				);
-			});
 			return Ok(recordingWithTimestamp);
 		},
 
@@ -350,11 +333,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!deleteRecordingByIdResult.ok) return deleteRecordingByIdResult;
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [];
-				return oldData.filter((item) => item.id !== recording.id);
-			});
 			return Ok(undefined);
 		},
 
@@ -370,13 +348,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!deleteRecordingsResult.ok) return deleteRecordingsResult;
-
-			queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
-				if (!oldData) return [];
-				const deletedIds = new Set(recordingsToDelete.map((r) => r.id));
-				return oldData.filter((item) => !deletedIds.has(item.id));
-			});
-
 			return Ok(undefined);
 		},
 
@@ -455,14 +426,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!createTransformationResult.ok) return createTransformationResult;
-
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [transformationWithTimestamps];
-					return [...oldData, transformationWithTimestamps];
-				},
-			);
 			return Ok(transformationWithTimestamps);
 		},
 
@@ -482,16 +445,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!updateTransformationResult.ok) return updateTransformationResult;
-
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [transformationWithTimestamp];
-					return oldData.map((item) =>
-						item.id === transformation.id ? transformationWithTimestamp : item,
-					);
-				},
-			);
 			return Ok(transformationWithTimestamp);
 		},
 
@@ -506,14 +459,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!deleteTransformationResult.ok) return deleteTransformationResult;
-
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [];
-					return oldData.filter((item) => item.id !== transformation.id);
-				},
-			);
 			return Ok(undefined);
 		},
 
@@ -529,15 +474,6 @@ export function createDbDexieService({
 					}),
 			});
 			if (!deleteTransformationsResult.ok) return deleteTransformationsResult;
-
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [];
-					const deletedIds = new Set(transformations.map((t) => t.id));
-					return oldData.filter((item) => !deletedIds.has(item.id));
-				},
-			);
 			return Ok(undefined);
 		},
 

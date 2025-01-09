@@ -1,7 +1,9 @@
+import { queryClient } from '$lib/services';
 import type { Transformation } from '$lib/services/db';
-import { userConfiguredServices } from '$lib/services/index.js';
+import { DbService, userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
+import { transformationsKeys } from './queries';
 
 export const createCreateTransformationWithToast = () =>
 	createMutation(() => ({
@@ -17,11 +19,20 @@ export const createCreateTransformationWithToast = () =>
 				});
 				throw result.error;
 			}
+			return result.data;
+		},
+		onSuccess: (transformation) => {
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [transformation];
+					return [...oldData, transformation];
+				},
+			);
 			toast.success({
 				title: 'Created transformation!',
 				description: 'Your transformation has been created successfully.',
 			});
-			return result.data;
 		},
 	}));
 
@@ -39,11 +50,22 @@ export const createUpdateTransformationWithToast = () =>
 				});
 				throw result.error;
 			}
+			return result.data;
+		},
+		onSuccess: (transformation) => {
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [transformation];
+					return oldData.map((item) =>
+						item.id === transformation.id ? transformation : item,
+					);
+				},
+			);
 			toast.success({
 				title: 'Updated transformation!',
 				description: 'Your transformation has been updated successfully.',
 			});
-			return result.data;
 		},
 	}));
 
@@ -59,11 +81,20 @@ export const createDeleteTransformationWithToast = () =>
 				});
 				throw result.error;
 			}
+			return transformation;
+		},
+		onSuccess: (transformation) => {
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [];
+					return oldData.filter((item) => item.id !== transformation.id);
+				},
+			);
 			toast.success({
 				title: 'Deleted transformation!',
 				description: 'Your transformation has been deleted successfully.',
 			});
-			return transformation;
 		},
 	}));
 
@@ -79,10 +110,20 @@ export const createDeleteTransformationsWithToast = () =>
 				});
 				throw result.error;
 			}
+			return transformations;
+		},
+		onSuccess: (transformations) => {
+			queryClient.setQueryData<Transformation[]>(
+				transformationsKeys.all,
+				(oldData) => {
+					if (!oldData) return [];
+					const deletedIds = new Set(transformations.map((t) => t.id));
+					return oldData.filter((item) => !deletedIds.has(item.id));
+				},
+			);
 			toast.success({
 				title: 'Deleted transformations!',
 				description: 'Your transformations have been deleted successfully.',
 			});
-			return transformations;
 		},
 	}));
