@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
-import type { MaybePromise } from '@repo/shared';
+import { WhisperingErr, type MaybePromise } from '@repo/shared';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
@@ -157,32 +157,37 @@ export const userConfiguredServices = (() => {
 
 	return {
 		download: {
-			downloadRecordingWithToast: async (recording: Recording) => {
-				if (!recording.blob) {
-					toast.error({
-						title: '⚠️ Recording blob not found',
-						description: "Your recording doesn't have a blob to download.",
+			downloadRecordingWithToast: createResultMutation(() => ({
+				mutationFn: async (recording: Recording) => {
+					if (!recording.blob) {
+						return WhisperingErr({
+							title: '⚠️ Recording blob not found',
+							description: "Your recording doesn't have a blob to download.",
+						});
+					}
+					const result = await DownloadService.downloadBlob({
+						name: `whispering_recording_${recording.id}`,
+						blob: recording.blob,
 					});
-					return;
-				}
-				const result = await DownloadService.downloadBlob({
-					name: `whispering_recording_${recording.id}`,
-					blob: recording.blob,
-				});
-				if (!result.ok) {
-					toast.error({
-						title: 'Failed to download recording!',
-						description: 'Your recording could not be downloaded.',
-						action: { type: 'more-details', error: result.error },
+					if (!result.ok) {
+						return WhisperingErr({
+							title: 'Failed to download recording!',
+							description: 'Your recording could not be downloaded.',
+							action: { type: 'more-details', error: result.error },
+						});
+					}
+					return result;
+				},
+				onSuccess: () => {
+					toast.success({
+						title: 'Recording downloading!',
+						description: 'Your recording is being downloaded.',
 					});
-					return;
-				}
-				toast.success({
-					title: 'Recording downloading!',
-					description: 'Your recording is being downloaded.',
-				});
-				return result;
-			},
+				},
+				onError: (error) => {
+					toast.error(error);
+				},
+			})),
 		},
 		clipboard: createClipboardFns(ClipboardService),
 		tray: SetTrayIconService,
