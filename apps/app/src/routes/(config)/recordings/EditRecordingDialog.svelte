@@ -11,16 +11,12 @@
 		deleteRecordingWithToast,
 		updateRecordingWithToast,
 	} from '$lib/mutations/recordings';
-	import { createRecordingQuery } from '$lib/queries/recordings';
+	import { Recording } from '$lib/services/db';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
-	let { recordingId }: { recordingId: string } = $props();
-
-	const recordingQuery = createRecordingQuery(recordingId);
-
-	const recording = $derived(recordingQuery.data);
+	let { recording }: { recording: Recording } = $props();
 
 	let isDialogOpen = $state(false);
 
@@ -36,117 +32,112 @@
 	});
 </script>
 
-{#if recording}
-	<Dialog.Root bind:open={isDialogOpen}>
-		<Dialog.Trigger>
-			{#snippet child({ props })}
-				<WhisperingButton
-					tooltipContent="Edit recording"
-					variant="ghost"
-					size="icon"
-					{...props}
-				>
-					<EditIcon class="h-4 w-4" />
-				</WhisperingButton>
-			{/snippet}
-		</Dialog.Trigger>
-		<Dialog.Content
-			class="overflow-y-auto max-h-[90vh]"
-			onInteractOutside={(e) => {
-				e.preventDefault();
-				if (isDialogOpen) {
-					confirmationDialog.open({
-						title: 'Unsaved changes',
-						subtitle:
-							'You have unsaved changes. Are you sure you want to leave?',
-						confirmText: 'Leave',
-						onConfirm: () => {
+<Dialog.Root bind:open={isDialogOpen}>
+	<Dialog.Trigger>
+		{#snippet child({ props })}
+			<WhisperingButton
+				tooltipContent="Edit recording"
+				variant="ghost"
+				size="icon"
+				{...props}
+			>
+				<EditIcon class="h-4 w-4" />
+			</WhisperingButton>
+		{/snippet}
+	</Dialog.Trigger>
+	<Dialog.Content
+		class="overflow-y-auto max-h-[90vh]"
+		onInteractOutside={(e) => {
+			e.preventDefault();
+			if (isDialogOpen) {
+				confirmationDialog.open({
+					title: 'Unsaved changes',
+					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
+					confirmText: 'Leave',
+					onConfirm: () => {
+						isDialogOpen = false;
+					},
+				});
+			}
+		}}
+	>
+		<Dialog.Header>
+			<Dialog.Title>Edit recording</Dialog.Title>
+			<Dialog.Description>
+				Make changes to your recording here. Click save when you're done.
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="space-y-4 py-4">
+			<div class="grid grid-cols-4 items-center gap-4">
+				<Label for="title" class="text-right">Title</Label>
+				<Input id="title" bind:value={recording.title} class="col-span-3" />
+			</div>
+			<div class="grid grid-cols-4 items-center gap-4">
+				<Label for="subtitle" class="text-right">Subtitle</Label>
+				<Input
+					id="subtitle"
+					bind:value={recording.subtitle}
+					class="col-span-3"
+				/>
+			</div>
+			<div class="grid grid-cols-4 items-center gap-4">
+				<Label for="timestamp" class="text-right">Created At</Label>
+				<Input
+					id="timestamp"
+					bind:value={recording.timestamp}
+					class="col-span-3"
+				/>
+			</div>
+			<div class="grid grid-cols-4 items-center gap-4">
+				<Label for="transcribedText" class="text-right">Transcribed Text</Label>
+				<Textarea
+					id="transcribedText"
+					bind:value={recording.transcribedText}
+					class="col-span-3"
+				/>
+			</div>
+			{#if blobUrl}
+				<div class="grid grid-cols-4 items-center gap-4">
+					<Label for="blob" class="text-right">Audio</Label>
+					<audio src={blobUrl} controls class="col-span-3 h-8 w-full"></audio>
+				</div>
+			{/if}
+		</div>
+		<Dialog.Footer>
+			<Button
+				class="mr-auto"
+				onclick={() =>
+					deleteRecordingWithToast.mutate(recording, {
+						onSettled: () => {
+							isDialogOpen = false;
+						},
+					})}
+				variant="destructive"
+				disabled={deleteRecordingWithToast.isPending}
+			>
+				{#if deleteRecordingWithToast.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				Delete
+			</Button>
+			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
+				Cancel
+			</Button>
+			<Button
+				onclick={() => {
+					updateRecordingWithToast.mutate(recording, {
+						onSettled: () => {
 							isDialogOpen = false;
 						},
 					});
-				}
-			}}
-		>
-			<Dialog.Header>
-				<Dialog.Title>Edit recording</Dialog.Title>
-				<Dialog.Description>
-					Make changes to your recording here. Click save when you're done.
-				</Dialog.Description>
-			</Dialog.Header>
-			<div class="space-y-4 py-4">
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="title" class="text-right">Title</Label>
-					<Input id="title" bind:value={recording.title} class="col-span-3" />
-				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="subtitle" class="text-right">Subtitle</Label>
-					<Input
-						id="subtitle"
-						bind:value={recording.subtitle}
-						class="col-span-3"
-					/>
-				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="timestamp" class="text-right">Created At</Label>
-					<Input
-						id="timestamp"
-						bind:value={recording.timestamp}
-						class="col-span-3"
-					/>
-				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="transcribedText" class="text-right"
-						>Transcribed Text</Label
-					>
-					<Textarea
-						id="transcribedText"
-						bind:value={recording.transcribedText}
-						class="col-span-3"
-					/>
-				</div>
-				{#if blobUrl}
-					<div class="grid grid-cols-4 items-center gap-4">
-						<Label for="blob" class="text-right">Audio</Label>
-						<audio src={blobUrl} controls class="col-span-3 h-8 w-full"></audio>
-					</div>
+				}}
+				disabled={updateRecordingWithToast.isPending}
+			>
+				{#if updateRecordingWithToast.isPending}
+					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
-			</div>
-			<Dialog.Footer>
-				<Button
-					class="mr-auto"
-					onclick={() =>
-						deleteRecordingWithToast.mutate(recording, {
-							onSettled: () => {
-								isDialogOpen = false;
-							},
-						})}
-					variant="destructive"
-					disabled={deleteRecordingWithToast.isPending}
-				>
-					{#if deleteRecordingWithToast.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Delete
-				</Button>
-				<Button variant="outline" onclick={() => (isDialogOpen = false)}>
-					Cancel
-				</Button>
-				<Button
-					onclick={() => {
-						updateRecordingWithToast.mutate(recording, {
-							onSettled: () => {
-								isDialogOpen = false;
-							},
-						});
-					}}
-					disabled={updateRecordingWithToast.isPending}
-				>
-					{#if updateRecordingWithToast.isPending}
-						<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Save
-				</Button>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
-{/if}
+				Save
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

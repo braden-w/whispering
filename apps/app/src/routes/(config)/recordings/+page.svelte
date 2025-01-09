@@ -29,7 +29,7 @@
 	import type {
 		ColumnDef,
 		ColumnFiltersState,
-		PaginationState
+		PaginationState,
 	} from '@tanstack/table-core';
 	import {
 		getCoreRowModel,
@@ -167,7 +167,7 @@
 				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
-				return renderComponent(RowActions, { recording });
+				return renderComponent(RowActions, { recordingId: recording.id });
 			},
 		},
 	];

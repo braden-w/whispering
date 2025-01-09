@@ -23,8 +23,14 @@
 	import { WhisperingErr } from '@repo/shared';
 	import { toast } from '$lib/services/toast';
 	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
+	import { createRecordingQuery } from '$lib/queries/recordings';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
-	let { recording }: { recording: Recording } = $props();
+	let { recordingId }: { recordingId: string } = $props();
+
+	const recordingQuery = createRecordingQuery(recordingId);
+
+	const recording = $derived(recordingQuery.data);
 
 	const downloadRecordingWithToast = createResultMutation(() => ({
 		mutationFn: async (recording: Recording) => {
@@ -59,67 +65,78 @@
 	}));
 </script>
 
-<div class="flex items-center">
-	<WhisperingButton
-		tooltipContent="Transcribe recording"
-		onclick={() => transcriber.transcribeAndUpdateRecordingWithToast(recording)}
-		variant="ghost"
-		size="icon"
-	>
-		{#if recording.transcriptionStatus === 'UNPROCESSED'}
-			<StartTranscriptionIcon class="h-4 w-4" />
-		{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
-			<LoadingTranscriptionIcon class="h-4 w-4" />
-		{:else}
-			<RetryTranscriptionIcon class="h-4 w-4" />
-		{/if}
-	</WhisperingButton>
+{#if !recording}
+	<div class="flex items-center gap-1">
+		<Skeleton class="h-8 w-8" />
+		<Skeleton class="h-8 w-8" />
+		<Skeleton class="h-8 w-8" />
+		<Skeleton class="h-8 w-8" />
+		<Skeleton class="h-8 w-8" />
+	</div>
+{:else}
+	<div class="flex items-center">
+		<WhisperingButton
+			tooltipContent="Transcribe recording"
+			onclick={() =>
+				transcriber.transcribeAndUpdateRecordingWithToast(recording)}
+			variant="ghost"
+			size="icon"
+		>
+			{#if recording.transcriptionStatus === 'UNPROCESSED'}
+				<StartTranscriptionIcon class="h-4 w-4" />
+			{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
+				<LoadingTranscriptionIcon class="h-4 w-4" />
+			{:else}
+				<RetryTranscriptionIcon class="h-4 w-4" />
+			{/if}
+		</WhisperingButton>
 
-	<EditRecordingDialog recordingId={recording.id}></EditRecordingDialog>
+		<EditRecordingDialog {recording}></EditRecordingDialog>
 
-	<WhisperingButton
-		tooltipContent="Copy transcribed text"
-		onclick={() =>
-			copyTextToClipboardWithToast.mutate({
-				label: 'transcribed text',
-				text: recording.transcribedText,
-			})}
-		variant="ghost"
-		size="icon"
-		style="view-transition-name: {createRecordingViewTransitionName({
-			recordingId: recording.id,
-			propertyName: 'transcribedText',
-		})}-copy-button"
-	>
-		<ClipboardIcon class="h-4 w-4" />
-	</WhisperingButton>
+		<WhisperingButton
+			tooltipContent="Copy transcribed text"
+			onclick={() =>
+				copyTextToClipboardWithToast.mutate({
+					label: 'transcribed text',
+					text: recording.transcribedText,
+				})}
+			variant="ghost"
+			size="icon"
+			style="view-transition-name: {createRecordingViewTransitionName({
+				recordingId: recording.id,
+				propertyName: 'transcribedText',
+			})}-copy-button"
+		>
+			<ClipboardIcon class="h-4 w-4" />
+		</WhisperingButton>
 
-	<WhisperingButton
-		tooltipContent="Download recording"
-		onclick={() => downloadRecordingWithToast.mutate(recording)}
-		variant="ghost"
-		size="icon"
-	>
-		{#if downloadRecordingWithToast.isPending}
-			<Loader2Icon class="h-4 w-4 animate-spin" />
-		{:else}
-			<DownloadIcon class="h-4 w-4" />
-		{/if}
-	</WhisperingButton>
+		<WhisperingButton
+			tooltipContent="Download recording"
+			onclick={() => downloadRecordingWithToast.mutate(recording)}
+			variant="ghost"
+			size="icon"
+		>
+			{#if downloadRecordingWithToast.isPending}
+				<Loader2Icon class="h-4 w-4 animate-spin" />
+			{:else}
+				<DownloadIcon class="h-4 w-4" />
+			{/if}
+		</WhisperingButton>
 
-	<WhisperingButton
-		tooltipContent="Delete recording"
-		onclick={() => {
-			confirmationDialog.open({
-				title: 'Delete recording',
-				subtitle: 'Are you sure you want to delete this recording?',
-				confirmText: 'Delete',
-				onConfirm: () => deleteRecordingWithToast.mutate(recording),
-			});
-		}}
-		variant="ghost"
-		size="icon"
-	>
-		<TrashIcon class="h-4 w-4" />
-	</WhisperingButton>
-</div>
+		<WhisperingButton
+			tooltipContent="Delete recording"
+			onclick={() => {
+				confirmationDialog.open({
+					title: 'Delete recording',
+					subtitle: 'Are you sure you want to delete this recording?',
+					confirmText: 'Delete',
+					onConfirm: () => deleteRecordingWithToast.mutate(recording),
+				});
+			}}
+			variant="ghost"
+			size="icon"
+		>
+			<TrashIcon class="h-4 w-4" />
+		</WhisperingButton>
+	</div>
+{/if}
