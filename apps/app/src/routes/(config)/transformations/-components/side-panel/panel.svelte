@@ -2,7 +2,9 @@
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { z } from 'zod';
 
-	const createSidebar = () => {
+	export const sidebar = createSidebar();
+
+	function createSidebar() {
 		let selectedTransformationId = createPersistedState({
 			key: 'whispering-transformations-selected-transformation-id',
 			defaultValue: null,
@@ -19,9 +21,7 @@
 				selectedTransformationId.value = null;
 			},
 		};
-	};
-
-	export const sidebar = createSidebar();
+	}
 </script>
 
 <script lang="ts">
