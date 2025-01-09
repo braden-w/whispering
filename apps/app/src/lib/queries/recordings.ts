@@ -1,4 +1,4 @@
-import { userConfiguredServices } from '$lib/services/index.js';
+import { DbService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 
 import { createQuery } from '@tanstack/svelte-query';
@@ -12,7 +12,7 @@ export const createRecordingsQuery = () =>
 	createQuery(() => ({
 		queryKey: recordingsKeys.all,
 		queryFn: async () => {
-			const result = await userConfiguredServices.db.getAllRecordings();
+			const result = await DbService.getAllRecordings();
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to fetch recordings!',

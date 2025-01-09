@@ -135,7 +135,7 @@ const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-const DbService = createDbDexieService({ queryClient });
+export const DbService = createDbDexieService({ queryClient });
 
 const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
@@ -155,7 +155,6 @@ export const userConfiguredServices = (() => {
 	return {
 		tray: SetTrayIconService,
 		transformations: createTransformationFns({ HttpService, DbService }),
-		db: DbService,
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':
