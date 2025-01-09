@@ -65,16 +65,14 @@
 	}));
 </script>
 
-{#if !recording}
-	<div class="flex items-center gap-1">
+<div class="flex items-center gap-1">
+	{#if !recording}
 		<Skeleton class="h-8 w-8" />
 		<Skeleton class="h-8 w-8" />
 		<Skeleton class="h-8 w-8" />
 		<Skeleton class="h-8 w-8" />
 		<Skeleton class="h-8 w-8" />
-	</div>
-{:else}
-	<div class="flex items-center">
+	{:else}
 		<WhisperingButton
 			tooltipContent="Transcribe recording"
 			onclick={() =>
@@ -138,5 +136,5 @@
 		>
 			<TrashIcon class="h-4 w-4" />
 		</WhisperingButton>
-	</div>
-{/if}
+	{/if}
+</div>

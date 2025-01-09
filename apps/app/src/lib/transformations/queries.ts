@@ -24,3 +24,20 @@ export const createTransformationsQuery = () =>
 			return result.data;
 		},
 	}));
+
+export const createTransformationQuery = (id: string) =>
+	createQuery(() => ({
+		queryKey: transformationsKeys.byId(id),
+		queryFn: async () => {
+			const result = await DbService.getTransformationById(id);
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to fetch transformation!',
+					description: 'Your transformation could not be fetched.',
+					action: { type: 'more-details', error: result.error },
+				});
+				throw result.error;
+			}
+			return result.data;
+		},
+	}));
