@@ -33,12 +33,14 @@ import { createTranscriptionServiceGroqLarge } from './transcription/Transcripti
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
+import type { Recording } from './db';
+import type { MaybePromise } from '@repo/shared';
 
 type MutationResultFunction<
 	TData = unknown,
 	TError = unknown,
 	TVariables = unknown,
-> = (variables: TVariables) => Promise<Result<TData, TError>>;
+> = (variables: TVariables) => MaybePromise<Result<TData, TError>>;
 
 export type WrapServiceWithMutation<
 	Service extends Record<string, MutationResultFunction>,
