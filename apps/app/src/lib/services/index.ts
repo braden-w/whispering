@@ -42,7 +42,53 @@ type MutationResultFunction<
 	TVariables = unknown,
 > = (variables: TVariables) => MaybePromise<Result<TData, TError>>;
 
-export type WrapServiceWithMutation<
+export const createResultMutation = <
+	TData = unknown,
+	TError = unknown,
+	TVariables = unknown,
+	TContext = unknown,
+>(
+	options: FunctionedParams<
+		Omit<
+			CreateMutationOptions<TData, TError, TVariables, TContext>,
+			'mutationFn'
+		> & {
+			mutationFn: MutationResultFunction<TData, TError, TVariables>;
+		}
+	>,
+) => {
+	const { mutationFn, ...optionValues } = options();
+	return createMutation<TData, TError, TVariables, TContext>(() => ({
+		...optionValues,
+		mutationFn: async (args) => {
+			const result = await mutationFn(args);
+			if (!result.ok) throw result.error;
+			return result.data;
+		},
+	}));
+};
+
+export const wrapWithMutation = <
+	TData = unknown,
+	TError = unknown,
+	TVariables = unknown,
+>(
+	fn: MutationResultFunction<TData, TError, TVariables>,
+) => {
+	return {
+		mutate: fn,
+		createMutation: <TContext = unknown>(
+			options: FunctionedParams<
+				Exclude<
+					CreateMutationOptions<TData, TError, TVariables, TContext>,
+					'mutationFn'
+				>
+			>,
+		) => createResultMutation<TData, TError, TVariables, TContext>(options),
+	};
+};
+
+type WrappedServiceWithMutation<
 	Service extends Record<string, MutationResultFunction>,
 > = {
 	[K in keyof Service]: Service[K] extends MutationResultFunction<
@@ -64,37 +110,6 @@ export type WrapServiceWithMutation<
 		: never;
 };
 
-const wrapWithMutation = <
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
->(
-	fn: MutationResultFunction<TData, TError, TVariables>,
-) => {
-	return {
-		mutate: fn,
-		createMutation: <TContext = unknown>(
-			options: FunctionedParams<
-				Exclude<
-					CreateMutationOptions<TData, TError, TVariables, TContext>,
-					'mutationFn'
-				>
-			>,
-		) =>
-			createMutation<TData, TError, TVariables, TContext>(() => {
-				const optionValues = options();
-				return {
-					...optionValues,
-					mutationFn: async (args) => {
-						const result = await fn(args);
-						if (!result.ok) throw result.error;
-						return result.data;
-					},
-				};
-			}),
-	};
-};
-
 const wrapServiceWithMutation = <
 	Service extends Record<string, MutationResultFunction<any, any, any>>,
 >(
@@ -105,7 +120,7 @@ const wrapServiceWithMutation = <
 			key,
 			wrapWithMutation(serviceFn),
 		]),
-	) as WrapServiceWithMutation<Service>;
+	) as WrappedServiceWithMutation<Service>;
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
