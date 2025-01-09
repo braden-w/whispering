@@ -1,12 +1,9 @@
 <script lang="ts">
-	import { LabeledInput } from '$lib/components/labeled/index.js';
-	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import type { Transformation } from '$lib/services/db';
 	import type { Snippet } from 'svelte';
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationTest from './RenderTransformationTest.svelte';
-	import { XIcon } from 'lucide-svelte';
 	let {
 		transformation,
 		onChange,

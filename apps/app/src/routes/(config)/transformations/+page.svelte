@@ -5,20 +5,13 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import {
-		type Transformation,
-		generateDefaultTransformation,
-	} from '$lib/services/db';
-	import {
-		createTransformationWithToast,
-		deleteTransformationsWithToast,
-	} from '$lib/transformations/mutations';
+	import { type Transformation } from '$lib/services/db';
+	import { deleteTransformationsWithToast } from '$lib/transformations/mutations';
 	import { createTransformationsQuery } from '$lib/transformations/queries';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -39,10 +32,9 @@
 		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
-	import { PlusIcon } from 'lucide-svelte';
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
-	import RenderTransformation from './-components/RenderTransformation.svelte';
+	import CreateTransformationButton from './CreateTransformationButton.svelte';
 	import EditTransformationSidePanel from './EditTransformationSidePanel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
@@ -198,10 +190,11 @@
 		},
 	};
 
-	let transformation = $state(generateDefaultTransformation());
 	let isDialogOpen = $state(false);
-
-	let selectedEditTransformation = $state<Transformation | null>(null);
+	let selectedTransformationId = $state<string | null>(null);
+	const setSelectedTransformationId = (id: string | null) => {
+		selectedTransformationId = id;
+	};
 </script>
 
 <svelte:head>
@@ -259,70 +252,7 @@
 					{/if}
 
 					<div class="flex items-center gap-2">
-						<Dialog.Root bind:open={isDialogOpen}>
-							<Dialog.Trigger>
-								{#snippet child({ props })}
-									<Button {...props}>
-										<PlusIcon class="h-4 w-4 mr-2" />
-										Create Transformation
-									</Button>
-								{/snippet}
-							</Dialog.Trigger>
-
-							<Dialog.Content
-								class="overflow-y-auto max-h-[90vh] max-w-3xl"
-								onInteractOutside={(e) => {
-									e.preventDefault();
-									if (isDialogOpen) {
-										confirmationDialog.open({
-											title: 'Unsaved changes',
-											subtitle:
-												'You have unsaved changes. Are you sure you want to leave?',
-											confirmText: 'Leave',
-											onConfirm: () => {
-												isDialogOpen = false;
-											},
-										});
-									}
-								}}
-							>
-								<Dialog.Header>
-									<Dialog.Title>Create Transformation</Dialog.Title>
-									<Dialog.Description>
-										Create a new transformation to transform text.
-									</Dialog.Description>
-								</Dialog.Header>
-								<RenderTransformation
-									{transformation}
-									onChange={(newTransformation) => {
-										transformation = newTransformation;
-									}}
-								/>
-								<Dialog.Footer>
-									<Button
-										variant="outline"
-										onclick={() => (isDialogOpen = false)}
-									>
-										Cancel
-									</Button>
-									<Button
-										type="submit"
-										onclick={() =>
-											createTransformationWithToast.mutate(
-												$state.snapshot(transformation),
-												{
-													onSuccess: () => {
-														isDialogOpen = false;
-														transformation = generateDefaultTransformation();
-													},
-												},
-											)}
-									>
-										Create
-									</Button>
-								</Dialog.Footer>
-							</Dialog.Content>
-						</Dialog.Root>
+						<CreateTransformationButton />
 					</div>
 				</div>
 			</div>
@@ -361,10 +291,10 @@
 							{#each table.getRowModel().rows as row (row.id)}
 								<Table.Row
 									class={cn('cursor-pointer group', {
-										'bg-muted/75': row.id === selectedEditTransformation?.id,
+										'bg-muted/75': row.id === selectedTransformationId,
 									})}
 									onclick={() => {
-										selectedEditTransformation = row.original;
+										setSelectedTransformationId(row.id);
 									}}
 									style="view-transition-name: {createTransformationViewTransitionName(
 										{ transformationId: row.id },
@@ -423,12 +353,23 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			<EditTransformationSidePanel
-				{selectedEditTransformation}
-				setSelectedTransformation={(transformation) => {
-					selectedEditTransformation = transformation;
-				}}
-			/>
+			{#if selectedTransformationId}
+				<EditTransformationSidePanel
+					{selectedTransformationId}
+					{setSelectedTransformationId}
+				/>
+			{:else}
+				<div
+					class="flex h-[50vh] items-center justify-center rounded-md border"
+				>
+					<div class="text-center">
+						<h3 class="text-lg font-medium">No transformation selected</h3>
+						<p class="text-muted-foreground mt-2">
+							Select a transformation from the list to edit it
+						</p>
+					</div>
+				</div>
+			{/if}
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>

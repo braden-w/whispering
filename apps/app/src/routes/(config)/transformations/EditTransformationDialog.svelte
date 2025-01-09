@@ -14,16 +14,9 @@
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
 	let {
-		transformation: initialTransformation,
+		transformation,
 		class: className,
 	}: { transformation: Transformation; class?: string } = $props();
-	let transformation = $state(
-		structuredClone($state.snapshot(initialTransformation)),
-	);
-
-	$effect(() => {
-		transformation = structuredClone($state.snapshot(initialTransformation));
-	});
 
 	let isDialogOpen = $state(false);
 </script>

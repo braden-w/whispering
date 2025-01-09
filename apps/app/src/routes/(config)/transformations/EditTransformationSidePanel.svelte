@@ -5,28 +5,21 @@
 	import { XIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import { createTransformationQuery } from '$lib/transformations/queries';
 
-	let { selectedEditTransformation, setSelectedTransformation } = $props<{
-		selectedEditTransformation: Transformation | null;
-		setSelectedTransformation: (transformation: Transformation) => void;
+	let { selectedTransformationId, setSelectedTransformationId } = $props<{
+		selectedTransformationId: string;
+		setSelectedTransformationId: (transformationId: string | null) => void;
 	}>();
 
-	let transformation = $state<Transformation | null>(
-		structuredClone($state.snapshot(selectedEditTransformation)),
-	);
-
-	$effect(() => {
-		transformation = structuredClone(
-			$state.snapshot(selectedEditTransformation),
-		);
-	});
+	let transformationQuery = createTransformationQuery(selectedTransformationId);
+	let transformation = $derived(transformationQuery.data);
 </script>
 
 {#if transformation}
 	<RenderTransformation
 		{transformation}
 		onChange={(newTransformation) => {
-			transformation = newTransformation;
 			updateTransformationWithToast.mutate($state.snapshot(newTransformation));
 		}}
 	>
@@ -38,7 +31,7 @@
 						tooltipContent="Close"
 						variant="outline"
 						size="icon"
-						onclick={() => setSelectedTransformation(null)}
+						onclick={() => setSelectedTransformationId(null)}
 					>
 						<XIcon class="size-4" />
 					</WhisperingButton>
@@ -46,13 +39,4 @@
 			{/if}
 		{/snippet}
 	</RenderTransformation>
-{:else}
-	<div class="flex h-[50vh] items-center justify-center rounded-md border">
-		<div class="text-center">
-			<h3 class="text-lg font-medium">No transformation selected</h3>
-			<p class="text-muted-foreground mt-2">
-				Select a transformation from the list to edit it
-			</p>
-		</div>
-	</div>
 {/if}

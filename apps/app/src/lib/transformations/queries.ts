@@ -1,4 +1,5 @@
-import { DbService } from '$lib/services/index.js';
+import type { Transformation } from '$lib/services/db';
+import { DbService, queryClient } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { createQuery } from '@tanstack/svelte-query';
 
@@ -40,4 +41,10 @@ export const createTransformationQuery = (id: string) =>
 			}
 			return result.data;
 		},
+		initialData: () =>
+			queryClient
+				.getQueryData<Transformation[]>(transformationsKeys.all)
+				?.find((t) => t.id === id),
+		initialDataUpdatedAt: () =>
+			queryClient.getQueryState(transformationsKeys.byId(id))?.dataUpdatedAt,
 	}));
