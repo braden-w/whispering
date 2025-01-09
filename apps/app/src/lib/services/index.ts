@@ -52,7 +52,14 @@ export type WrapServiceWithMutation<
 	>
 		? {
 				mutate: Service[K];
-				createMutation: () => CreateMutationResult<TData, TError, TVariables>;
+				createMutation: <TContext = unknown>(
+					options: FunctionedParams<
+						Exclude<
+							CreateMutationOptions<TData, TError, TVariables, TContext>,
+							'mutationFn'
+						>
+					>,
+				) => CreateMutationResult<TData, TError, TVariables>;
 			}
 		: never;
 };
