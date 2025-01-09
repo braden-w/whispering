@@ -57,6 +57,7 @@ export function generateDefaultTransformationStep(): TransformationStep {
 
 export type DbService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
+	getRecordingById: (id: string) => Promise<DbServiceResult<Recording | null>>;
 	createRecording: (
 		recording: InsertRecording,
 	) => Promise<DbServiceResult<Recording>>;

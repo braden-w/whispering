@@ -267,6 +267,21 @@ export function createDbDexieService({
 			});
 		},
 
+		async getRecordingById(id: string) {
+			return tryAsync({
+				try: async () => {
+					const maybeRecording = (await db.recordings.get(id)) ?? null;
+					return maybeRecording;
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting recording by id from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
 		async createRecording(recording) {
 			const now = new Date().toISOString();
 			const recordingWithTimestamps = {
