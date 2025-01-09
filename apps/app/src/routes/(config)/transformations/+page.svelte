@@ -1,6 +1,4 @@
 <script lang="ts">
-	import EditTransformationSidePanel from './EditTransformationSidePanel.svelte';
-
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
@@ -11,19 +9,17 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
+	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import {
-		createCreateTransformationWithToast,
-		createDeleteTransformationWithToast,
-		createDeleteTransformationsWithToast,
-		createUpdateTransformationWithToast,
-	} from '$lib/mutations/transformations';
-	import { createTransformationsQuery } from '$lib/queries/transformations';
 	import {
 		type Transformation,
 		generateDefaultTransformation,
 	} from '$lib/services/db';
+	import {
+		createTransformationWithToast,
+		deleteTransformationsWithToast,
+	} from '$lib/transformations/mutations';
+	import { createTransformationsQuery } from '$lib/transformations/queries';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
@@ -47,6 +43,7 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
+	import EditTransformationSidePanel from './EditTransformationSidePanel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
@@ -133,10 +130,6 @@
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
 	const transformationsQuery = createTransformationsQuery();
-	const deleteTransformationWithToastMutation =
-		createDeleteTransformationWithToast();
-	const deleteTransformationsWithToastMutation =
-		createDeleteTransformationsWithToast();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -207,11 +200,6 @@
 
 	let transformation = $state(generateDefaultTransformation());
 	let isDialogOpen = $state(false);
-	const createTransformationWithToastMutation =
-		createCreateTransformationWithToast();
-
-	const updateTransformationWithToastMutation =
-		createUpdateTransformationWithToast();
 
 	let selectedEditTransformation = $state<Transformation | null>(null);
 </script>
@@ -257,7 +245,7 @@
 										'Are you sure you want to delete these transformations?',
 									confirmText: 'Delete',
 									onConfirm: () => {
-										deleteTransformationsWithToastMutation.mutate(
+										deleteTransformationsWithToast.mutate(
 											selectedTransformationRows.map(
 												({ original }) => original,
 											),
@@ -320,7 +308,7 @@
 									<Button
 										type="submit"
 										onclick={() =>
-											createTransformationWithToastMutation.mutate(
+											createTransformationWithToast.mutate(
 												$state.snapshot(transformation),
 												{
 													onSuccess: () => {

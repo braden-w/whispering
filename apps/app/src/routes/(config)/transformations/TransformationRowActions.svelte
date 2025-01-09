@@ -2,7 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
-	import { createDeleteTransformationWithToast } from '$lib/transformations/mutations';
+	import { deleteTransformationWithToast } from '$lib/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
@@ -11,9 +11,6 @@
 		transformation,
 		class: className,
 	}: { transformation: Transformation; class?: string } = $props();
-
-	const deleteTransformationWithToastMutation =
-		createDeleteTransformationWithToast();
 </script>
 
 <div class={cn('flex items-center', className)}>
@@ -26,8 +23,7 @@
 				title: 'Delete transformation',
 				subtitle: 'Are you sure you want to delete this transformation?',
 				confirmText: 'Delete',
-				onConfirm: () =>
-					deleteTransformationWithToastMutation.mutate(transformation),
+				onConfirm: () => deleteTransformationWithToast.mutate(transformation),
 			});
 		}}
 		variant="ghost"

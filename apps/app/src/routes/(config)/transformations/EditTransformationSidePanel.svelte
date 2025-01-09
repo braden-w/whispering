@@ -1,7 +1,7 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { createUpdateTransformationWithToast } from '$lib/transformations/mutations';
 	import { type Transformation } from '$lib/services/db';
+	import { updateTransformationWithToast } from '$lib/transformations/mutations';
 	import { XIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
@@ -20,9 +20,6 @@
 			$state.snapshot(selectedEditTransformation),
 		);
 	});
-
-	const updateTransformationWithToastMutation =
-		createUpdateTransformationWithToast();
 </script>
 
 {#if transformation}
@@ -30,9 +27,7 @@
 		{transformation}
 		onChange={(newTransformation) => {
 			transformation = newTransformation;
-			updateTransformationWithToastMutation.mutate(
-				$state.snapshot(newTransformation),
-			);
+			updateTransformationWithToast.mutate($state.snapshot(newTransformation));
 		}}
 	>
 		{#snippet closeButtons()}

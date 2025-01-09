@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { copyTextToClipboardWithToast } from '$lib/clipboard/mutations';
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
@@ -6,10 +7,8 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { copyTextToClipboardWithToast } from '$lib/clipboard/mutations';
 	import { createRecordingsQuery } from '$lib/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';

@@ -2,13 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { createCreateTransformationWithToast } from '$lib/transformations/mutations';
 	import { generateDefaultTransformation } from '$lib/services/db';
+	import { createTransformationWithToast } from '$lib/transformations/mutations';
 	import RenderTransformation from '../-components/RenderTransformation.svelte';
 
 	let transformation = $state(generateDefaultTransformation());
-	const createTransformationWithToastMutation =
-		createCreateTransformationWithToast();
 </script>
 
 <Card.Root class="w-full max-w-4xl">
@@ -28,7 +26,7 @@
 		<Card.Footer class="flex justify-end gap-2">
 			<Button
 				onclick={() =>
-					createTransformationWithToastMutation.mutate(
+					createTransformationWithToast.mutate(
 						$state.snapshot(transformation),
 						{ onSuccess: () => goto('/transformations') },
 					)}

@@ -4,11 +4,11 @@
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import {
-		createDeleteTransformationWithToast,
-		createUpdateTransformationWithToast,
-	} from '$lib/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
+	import {
+		deleteTransformationWithToast,
+		updateTransformationWithToast,
+	} from '$lib/transformations/mutations';
 	import { Loader2Icon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
@@ -24,11 +24,6 @@
 	$effect(() => {
 		transformation = structuredClone($state.snapshot(initialTransformation));
 	});
-
-	const updateTransformationWithToastMutation =
-		createUpdateTransformationWithToast();
-	const deleteTransformationWithToastMutation =
-		createDeleteTransformationWithToast();
 
 	let isDialogOpen = $state(false);
 </script>
@@ -79,15 +74,15 @@
 			<Button
 				class="mr-auto"
 				onclick={() =>
-					deleteTransformationWithToastMutation.mutate(transformation, {
+					deleteTransformationWithToast.mutate(transformation, {
 						onSettled: () => {
 							isDialogOpen = false;
 						},
 					})}
 				variant="destructive"
-				disabled={deleteTransformationWithToastMutation.isPending}
+				disabled={deleteTransformationWithToast.isPending}
 			>
-				{#if deleteTransformationWithToastMutation.isPending}
+				{#if deleteTransformationWithToast.isPending}
 					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
 				Delete
@@ -98,7 +93,7 @@
 			</Button>
 			<Button
 				onclick={() => {
-					updateTransformationWithToastMutation.mutate(
+					updateTransformationWithToast.mutate(
 						$state.snapshot(transformation),
 						{
 							onSettled: () => {
@@ -107,9 +102,9 @@
 						},
 					);
 				}}
-				disabled={updateTransformationWithToastMutation.isPending}
+				disabled={updateTransformationWithToast.isPending}
 			>
-				{#if updateTransformationWithToastMutation.isPending}
+				{#if updateTransformationWithToast.isPending}
 					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
 				Save
