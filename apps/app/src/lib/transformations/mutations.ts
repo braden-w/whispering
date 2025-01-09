@@ -29,6 +29,11 @@ export const createCreateTransformationWithToast = () =>
 					return [...oldData, transformation];
 				},
 			);
+			queryClient.setQueryData<Transformation>(
+				transformationsKeys.byId(transformation.id),
+				transformation,
+			);
+
 			toast.success({
 				title: 'Created transformation!',
 				description: 'Your transformation has been created successfully.',
@@ -62,6 +67,11 @@ export const createUpdateTransformationWithToast = () =>
 					);
 				},
 			);
+			queryClient.setQueryData<Transformation>(
+				transformationsKeys.byId(transformation.id),
+				transformation,
+			);
+
 			toast.success({
 				title: 'Updated transformation!',
 				description: 'Your transformation has been updated successfully.',
@@ -91,6 +101,11 @@ export const createDeleteTransformationWithToast = () =>
 					return oldData.filter((item) => item.id !== transformation.id);
 				},
 			);
+			queryClient.setQueryData<Transformation>(
+				transformationsKeys.byId(transformation.id),
+				undefined,
+			);
+
 			toast.success({
 				title: 'Deleted transformation!',
 				description: 'Your transformation has been deleted successfully.',
@@ -121,6 +136,13 @@ export const createDeleteTransformationsWithToast = () =>
 					return oldData.filter((item) => !deletedIds.has(item.id));
 				},
 			);
+			for (const transformation of transformations) {
+				queryClient.setQueryData<Transformation>(
+					transformationsKeys.byId(transformation.id),
+					undefined,
+				);
+			}
+
 			toast.success({
 				title: 'Deleted transformations!',
 				description: 'Your transformations have been deleted successfully.',

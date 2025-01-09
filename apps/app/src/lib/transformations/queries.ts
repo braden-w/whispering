@@ -1,10 +1,11 @@
-import { userConfiguredServices } from '$lib/services/index.js';
+import { DbService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { createQuery } from '@tanstack/svelte-query';
 
 // Define the query key as a constant array
 export const transformationsKeys = {
 	all: ['transformations'] as const,
+	byId: (id: string) => ['transformations', id] as const,
 };
 
 export const createTransformationsQuery = () =>

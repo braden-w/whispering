@@ -25,6 +25,11 @@ export const updateRecordingWithToast = createResultMutation(() => ({
 				item.id === recording.id ? recording : item,
 			);
 		});
+		queryClient.setQueryData<Recording>(
+			recordingsKeys.byId(recording.id),
+			recording,
+		);
+
 		toast.success({
 			title: 'Updated recording!',
 			description: 'Your recording has been updated successfully.',
@@ -56,6 +61,11 @@ export const deleteRecordingWithToast = createResultMutation(() => ({
 			if (!oldData) return [];
 			return oldData.filter((item) => item.id !== recording.id);
 		});
+		queryClient.setQueryData<Recording>(
+			recordingsKeys.byId(recording.id),
+			undefined,
+		);
+
 		toast.success({
 			title: 'Deleted recording!',
 			description: 'Your recording has been deleted successfully.',
@@ -84,6 +94,13 @@ export const deleteRecordingsWithToast = createResultMutation(() => ({
 			const deletedIds = new Set(recordings.map((r) => r.id));
 			return oldData.filter((item) => !deletedIds.has(item.id));
 		});
+		for (const recording of recordings) {
+			queryClient.setQueryData<Recording>(
+				recordingsKeys.byId(recording.id),
+				undefined,
+			);
+		}
+
 		toast.success({
 			title: 'Deleted recordings!',
 			description: 'Your recordings have been deleted successfully.',
