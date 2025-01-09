@@ -139,7 +139,7 @@ class RecordingsDatabase extends Dexie {
 							const blob = new Blob([dumpString], {
 								type: 'application/json',
 							});
-							DownloadService.downloadBlob({
+							DownloadService.downloadBlob.mutate({
 								name: 'recording-db-dump.json',
 								blob,
 							});

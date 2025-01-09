@@ -1,4 +1,12 @@
-import { toast } from './toast';
+import { browser } from '$app/environment';
+import type { Result } from '@epicenterhq/result';
+import {
+	type CreateMutationOptions,
+	type CreateMutationResult,
+	type FunctionedParams,
+	QueryClient,
+	createMutation,
+} from '@tanstack/svelte-query';
 import { settings } from '../stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,
@@ -7,11 +15,7 @@ import {
 import { createClipboardFns } from './clipboard';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import {
-	type Recording,
-	type Transformation,
-	createDbDexieService,
-} from './db/DbService.dexie';
+import { createDbDexieService } from './db/DbService.dexie';
 import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './download/DownloadService.web';
 import { createHttpServiceDesktop } from './http/HttpService.desktop';
@@ -22,14 +26,77 @@ import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
 import { createPlaySoundServiceDesktop } from './sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
+import { toast } from './toast';
 import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createTranscriptionServiceGroqDistil } from './transcription/TranscriptionService.groq.distil';
 import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
 import { createTransformationFns } from './transformation/TransformationService';
-import { browser } from '$app/environment';
-import { QueryClient } from '@tanstack/svelte-query';
+
+type MutationResultFunction<
+	TData = unknown,
+	TError = unknown,
+	TVariables = unknown,
+> = (variables: TVariables) => Promise<Result<TData, TError>>;
+
+export type WrapServiceWithMutation<
+	Service extends Record<string, MutationResultFunction>,
+> = {
+	[K in keyof Service]: Service[K] extends MutationResultFunction<
+		infer TData,
+		infer TError,
+		infer TVariables
+	>
+		? {
+				mutate: Service[K];
+				createMutation: () => CreateMutationResult<TData, TError, TVariables>;
+			}
+		: never;
+};
+
+const wrapWithMutation = <
+	TData = unknown,
+	TError = unknown,
+	TVariables = unknown,
+>(
+	fn: MutationResultFunction<TData, TError, TVariables>,
+) => {
+	return {
+		mutate: fn,
+		createMutation: <TContext = unknown>(
+			options: FunctionedParams<
+				Exclude<
+					CreateMutationOptions<TData, TError, TVariables, TContext>,
+					'mutationFn'
+				>
+			>,
+		) =>
+			createMutation<TData, TError, TVariables, TContext>(() => {
+				const optionValues = options();
+				return {
+					...optionValues,
+					mutationFn: async (args) => {
+						const result = await fn(args);
+						if (!result.ok) throw result.error;
+						return result.data;
+					},
+				};
+			}),
+	};
+};
+
+const wrapServiceWithMutation = <
+	Service extends Record<string, MutationResultFunction<any, any, any>>,
+>(
+	service: Service,
+) =>
+	Object.fromEntries(
+		Object.entries(service).map(([key, serviceFn]) => [
+			key,
+			wrapWithMutation(serviceFn),
+		]),
+	) as WrapServiceWithMutation<Service>;
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
@@ -41,9 +108,11 @@ export const queryClient = new QueryClient({
 
 // Services that are not determined by the user's settings, but by the platform.
 
-export const DownloadService = window.__TAURI_INTERNALS__
-	? createDownloadServiceDesktop()
-	: createDownloadServiceWeb();
+export const DownloadService = wrapServiceWithMutation(
+	window.__TAURI_INTERNALS__
+		? createDownloadServiceDesktop()
+		: createDownloadServiceWeb(),
+);
 
 export const NotificationService = window.__TAURI_INTERNALS__
 	? createNotificationServiceDesktop()
