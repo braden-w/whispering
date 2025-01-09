@@ -2,17 +2,24 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { Card } from '$lib/components/ui/card';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
+	import { deleteRecordingsWithToast } from '$lib/mutations/recordings';
+	import { createRecordingsQuery } from '$lib/queries/recordings';
 	import type { Recording } from '$lib/services/db';
+	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
-	import { userConfiguredServices } from '$lib/services/index.js';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
 		FlexRender,
@@ -22,8 +29,7 @@
 	import type {
 		ColumnDef,
 		ColumnFiltersState,
-		PaginationState,
-		Updater,
+		PaginationState
 	} from '@tanstack/table-core';
 	import {
 		getCoreRowModel,
@@ -37,18 +43,11 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
+	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
-	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import { createDeleteRecordingsWithToast } from '$lib/mutations/recordings';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
-	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import { Card } from '$lib/components/ui/card';
-	import { Badge } from '$lib/components/ui/badge';
-	import { createRawSnippet } from 'svelte';
-	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -197,11 +196,7 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const recordingsQuery =
-		userConfiguredServices.db.getAllRecordingsWithToast.createMutation();
-
-	const deleteRecordingsWithToastMutation =
-		userConfiguredServices.db.deleteRecordingsWithToast.createMutation();
+	const recordingsQuery = createRecordingsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -400,12 +395,18 @@
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
-									onclick={async () => {
-										await copyTextToClipboardWithToast({
-											label: 'transcribed text (joined)',
-											text: joinedTranscriptionsText,
-										});
-										isDialogOpen = false;
+									onclick={() => {
+										copyTextToClipboardWithToast.mutate(
+											{
+												label: 'transcribed text (joined)',
+												text: joinedTranscriptionsText,
+											},
+											{
+												onSuccess: () => {
+													isDialogOpen = false;
+												},
+											},
+										);
 									}}
 									type="submit"
 								>
@@ -425,7 +426,7 @@
 								subtitle: 'Are you sure you want to delete these recordings?',
 								confirmText: 'Delete',
 								onConfirm: () => {
-									deleteRecordingsWithToastMutation.mutate(
+									deleteRecordingsWithToast.mutate(
 										selectedRecordingRows.map(({ original }) => original),
 									);
 								},
