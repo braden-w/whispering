@@ -7,7 +7,7 @@
 	import {
 		createDeleteTransformationWithToast,
 		createUpdateTransformationWithToast,
-	} from '$lib/mutations/transformations';
+	} from '$lib/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';

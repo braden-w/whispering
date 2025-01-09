@@ -2,7 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
-	import { createDeleteTransformationWithToast } from '$lib/mutations/transformations';
+	import { createDeleteTransformationWithToast } from '$lib/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';

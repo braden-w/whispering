@@ -6,8 +6,8 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
-	import { createRecordingsQuery } from '$lib/queries/recordings';
+	import { copyTextToClipboardWithToast } from '$lib/clipboard/mutations';
+	import { createRecordingsQuery } from '$lib/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { recorder } from '$lib/stores/recorder.svelte';
@@ -115,6 +115,8 @@
 					recordingId: latestTranscribingOrDoneRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
+				disabled={latestTranscribingOrDoneRecording.transcriptionStatus ===
+					'TRANSCRIBING'}
 			>
 				{#if latestTranscribingOrDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
 					<Loader2Icon class="h-6 w-6 animate-spin" />

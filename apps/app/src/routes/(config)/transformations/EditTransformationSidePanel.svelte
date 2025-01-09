@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { createUpdateTransformationWithToast } from '$lib/mutations/transformations';
+	import { createUpdateTransformationWithToast } from '$lib/transformations/mutations';
 	import { type Transformation } from '$lib/services/db';
 	import { XIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';

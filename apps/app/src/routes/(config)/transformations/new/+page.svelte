@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { createCreateTransformationWithToast } from '$lib/mutations/transformations';
+	import { createCreateTransformationWithToast } from '$lib/transformations/mutations';
 	import { generateDefaultTransformation } from '$lib/services/db';
 	import RenderTransformation from '../-components/RenderTransformation.svelte';
 

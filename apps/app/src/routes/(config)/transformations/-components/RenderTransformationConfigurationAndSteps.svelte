@@ -14,7 +14,7 @@
 	import {
 		TRANSFORMATION_STEP_TYPES,
 		TRANSFORMATION_STEP_TYPES_TO_LABELS,
-	} from '$lib/services/db/DbService.dexie';
+	} from '$lib/services/db/DbService';
 	import {
 		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
 		GROQ_INFERENCE_MODEL_OPTIONS,

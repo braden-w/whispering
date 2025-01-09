@@ -2,7 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
-	import { deleteRecordingWithToast } from '$lib/mutations/recordings';
+	import { deleteRecordingWithToast } from '$lib/recordings/mutations';
 	import type { Recording } from '$lib/services/db';
 	import {
 		createResultMutation,
@@ -22,8 +22,8 @@
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import { WhisperingErr } from '@repo/shared';
 	import { toast } from '$lib/services/toast';
-	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
-	import { createRecordingQuery } from '$lib/queries/recordings';
+	import { copyTextToClipboardWithToast } from '$lib/clipboard/mutations';
+	import { createRecordingQuery } from '$lib/recordings/queries';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	let { recordingId }: { recordingId: string } = $props();

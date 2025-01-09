@@ -11,7 +11,7 @@ export const createTransformationsQuery = () =>
 	createQuery(() => ({
 		queryKey: transformationsKeys.all,
 		queryFn: async () => {
-			const result = await userConfiguredServices.db.getAllTransformations();
+			const result = await DbService.getAllTransformations();
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to fetch transformations!',
