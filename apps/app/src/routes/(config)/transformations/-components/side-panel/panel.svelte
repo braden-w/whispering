@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import { createPersistedState } from '$lib/utils/createPersistedState';
+	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { z } from 'zod';
 
 	const createSidebar = () => {
@@ -29,8 +29,8 @@
 	import { updateTransformationWithToast } from '$lib/transformations/mutations';
 	import { createTransformationQuery } from '$lib/transformations/queries';
 	import { XIcon } from 'lucide-svelte';
-	import RenderTransformation from './-components/RenderTransformation.svelte';
-	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import RenderTransformation from '../RenderTransformation.svelte';
+	import MarkTransformationActiveButton from '../../MarkTransformationActiveButton.svelte';
 
 	let { selectedTransformationId, onClose } = $props<{
 		selectedTransformationId: string;

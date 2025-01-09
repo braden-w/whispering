@@ -35,8 +35,8 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
-	import EditTransformationSidePanel from './EditTransformationSidePanel.svelte';
-	import { sidebar } from './EditTransformationSidePanel.svelte';
+	import EditTransformationSidePanel from './-components/side-panel/panel.svelte';
+	import { sidebar } from './-components/side-panel/panel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
