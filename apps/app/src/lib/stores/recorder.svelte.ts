@@ -6,6 +6,7 @@ import {
 import { createRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import {
+	playSoundIfEnabled,
 	SetTrayIconService,
 	userConfiguredServices,
 } from '$lib/services/index.js';
@@ -51,7 +52,7 @@ function createRecorder() {
 			}
 			await setRecorderState('SESSION');
 			console.info('Recording stopped');
-			void userConfiguredServices.sound.playStopSoundIfEnabled();
+			void playSoundIfEnabled('stop');
 
 			const blob = stopResult.data;
 			const now = new Date().toISOString();
@@ -245,7 +246,7 @@ function createRecorder() {
 			description: 'Speak now and stop recording when done',
 		});
 		console.info('Recording started');
-		void userConfiguredServices.sound.playStartSoundIfEnabled();
+		void playSoundIfEnabled('start');
 	};
 
 	return {
@@ -339,7 +340,7 @@ function createRecorder() {
 				});
 				await setRecorderState('IDLE');
 			}
-			void userConfiguredServices.sound.playCancelSoundIfEnabled();
+			void playSoundIfEnabled('cancel');
 			console.info('Recording cancelled');
 		},
 	};

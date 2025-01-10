@@ -1,6 +1,10 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
-import type { MaybePromise } from '@repo/shared';
+import {
+	whisperingSoundNames,
+	type MaybePromise,
+	type WhisperingSoundNames,
+} from '@repo/shared';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
@@ -209,28 +213,11 @@ export const userConfiguredServices = (() => {
 			}
 			return RecorderServiceWeb;
 		},
-
-		sound: {
-			playStartSoundIfEnabled: () => {
-				if (settings.value['sound.playOnStartSuccess']) {
-					void PlaySoundService.playSound('start');
-				}
-			},
-			playStopSoundIfEnabled: () => {
-				if (settings.value['sound.playOnStopSuccess']) {
-					void PlaySoundService.playSound('stop');
-				}
-			},
-			playCancelSoundIfEnabled: () => {
-				if (settings.value['sound.playOnCancelSuccess']) {
-					void PlaySoundService.playSound('cancel');
-				}
-			},
-			playTranscriptionCompleteSoundIfEnabled: () => {
-				if (settings.value['sound.playOnTranscriptionSuccess']) {
-					void PlaySoundService.playSound('transcriptionComplete');
-				}
-			},
-		},
 	};
 })();
+
+export const playSoundIfEnabled = (soundName: WhisperingSoundNames) => {
+	if (settings.value[`sound.playOn.${soundName}`]) {
+		void PlaySoundService.playSound(soundName);
+	}
+};
