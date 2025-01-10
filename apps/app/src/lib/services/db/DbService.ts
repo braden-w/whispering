@@ -94,22 +94,20 @@ export type DbService = {
 		transformations: Transformation[],
 	) => Promise<DbServiceResult<void>>;
 
-	transformationRuns: {
-		create: (
-			transformationRun: InsertTransformationRun,
-		) => Promise<DbServiceResult<TransformationRun>>;
-		set: (
-			transformationRun: TransformationRun,
-		) => Promise<DbServiceResult<TransformationRun>>;
-		setStatus: (
-			transformationRun: TransformationRun,
-			status: TransformationRun['status'],
-		) => Promise<DbServiceResult<TransformationRun>>;
-		addTransformationStepRun: (
-			transformationRun: TransformationRun,
-			stepRun: InsertTransformationStepRun,
-		) => Promise<DbServiceResult<TransformationRun>>;
-	};
+	createTransformationRun: (
+		transformationRun: Pick<
+			TransformationRun,
+			'input' | 'transformationId' | 'recordingId'
+		>,
+	) => Promise<DbServiceResult<TransformationRun>>;
+	updateTransformationRun: (
+		transformationRun: TransformationRun,
+	) => Promise<DbServiceResult<TransformationRun>>;
+
+	setTransformationRunStatus: (opts: {
+		transformationRunId: string;
+		status: TransformationRun['status'];
+	}) => Promise<DbServiceResult<void>>;
 };
 
 export const TRANSFORMATION_STEP_TYPES = [
@@ -195,7 +193,7 @@ export type TransformationRun = {
 	 * Null if the transformation is invoked on arbitrary text input.
 	 */
 	recordingId: string | null;
-	status: 'pending' | 'running' | 'completed' | 'failed';
+	status: 'idle' | 'running' | 'completed' | 'failed';
 	startedAt: string;
 	completedAt: string | null;
 	/**
@@ -209,7 +207,7 @@ export type TransformationRun = {
 	stepRuns: {
 		id: string;
 		stepId: string;
-		status: 'pending' | 'running' | 'completed' | 'failed';
+		status: 'idle' | 'running' | 'completed' | 'failed';
 		startedAt: string;
 		completedAt: string | null;
 		input: string;
@@ -217,10 +215,6 @@ export type TransformationRun = {
 		error: string | null;
 	}[];
 };
-export type InsertTransformationRun = Pick<
-	TransformationRun,
-	'input' | 'transformationId' | 'recordingId'
->;
 
 export type TransformationStepRun = TransformationRun['stepRuns'][number];
 export type InsertTransformationStepRun = Omit<

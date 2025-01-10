@@ -217,7 +217,7 @@ class RecordingsDatabase extends Dexie {
 				}
 			});
 
-		// V4: Add transformations, pipelines, and pipeline runs tables
+		// V4: Add transformations, transformation runs, and recording
 		// Also migrate recordings timestamp to createdAt and updatedAt
 		this.version(4)
 			.stores({
@@ -243,6 +243,28 @@ class RecordingsDatabase extends Dexie {
 					await handleUpgradeError({ tx, version: 4, error });
 				}
 			});
+
+		// V5: Change the "subtitle" field to "description"
+		// this.version(5)
+		// 	.stores({
+		// 		recordings: '&id, timestamp, createdAt, updatedAt',
+		// 		transformations: '&id, createdAt, updatedAt',
+		// 		transformationRuns: '&id, recordingId, startedAt',
+		// 	})
+		// 	.upgrade(async (tx) => {
+		// 		const oldRecordings = await tx
+		// 			.table<RecordingsDbSchemaV4['recordings']>('recordings')
+		// 			.toArray();
+
+		// 		const newRecordings = oldRecordings.map(
+		// 			({ subtitle, ...recording }) => ({
+		// 				...recording,
+		// 				description: subtitle,
+		// 			}),
+		// 		);
+
+		// 		await tx.table('recordings').bulkAdd(newRecordings);
+		// 	});
 	}
 }
 
@@ -500,7 +522,7 @@ export function createDbDexieService(): DbService {
 				id: nanoid(),
 				startedAt: now,
 				completedAt: null,
-				status: 'pending',
+				status: 'idle',
 				output: null,
 				error: null,
 				stepRuns: [],
