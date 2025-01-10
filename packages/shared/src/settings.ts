@@ -1,4 +1,4 @@
-import { z, ZodBoolean } from 'zod';
+import { z, type ZodBoolean } from 'zod';
 import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
@@ -11,10 +11,10 @@ import {
 
 export const getDefaultSettings = () =>
 	({
-		'sound.playOnStartSuccess': true,
-		'sound.playOnStopSuccess': true,
-		'sound.playOnCancelSuccess': true,
-		'sound.playOnTranscriptionSuccess': true,
+		'sound.playOnStart': true,
+		'sound.playOnStop': true,
+		'sound.playOnCancel': true,
+		'sound.playOnTranscriptionComplete': true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
 		'recording.isFasterRerecordEnabled': false,
@@ -50,12 +50,12 @@ export const getDefaultSettings = () =>
 
 export const settingsSchema = z.object({
 	...({
-		'sound.playOnStartSuccess': z.boolean(),
-		'sound.playOnStopSuccess': z.boolean(),
-		'sound.playOnCancelSuccess': z.boolean(),
-		'sound.playOnTranscriptionCompleteSuccess': z.boolean(),
+		'sound.playOnStart': z.boolean(),
+		'sound.playOnStop': z.boolean(),
+		'sound.playOnCancel': z.boolean(),
+		'sound.playOnTranscriptionComplete': z.boolean(),
 	} satisfies {
-		[K in WhisperingSoundNames as `sound.playOn${Capitalize<K>}Success`]: ZodBoolean;
+		[K in WhisperingSoundNames as `sound.playOn${Capitalize<K>}`]: ZodBoolean;
 	}),
 
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
