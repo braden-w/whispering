@@ -32,9 +32,8 @@
 	import MarkTransformationActiveButton from '../MarkTransformationActiveButton.svelte';
 	import RenderTransformation from './RenderTransformation.svelte';
 
-	let { selectedTransformationId } = $props<{
-		selectedTransformationId: string;
-	}>();
+	let { selectedTransformationId }: { selectedTransformationId: string } =
+		$props();
 
 	const transformationQuery = createTransformationQuery(
 		selectedTransformationId,
