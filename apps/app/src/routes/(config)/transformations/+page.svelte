@@ -351,7 +351,6 @@
 			{#if sidebar.selectedTransformationId}
 				<EditTransformationSidePanel
 					selectedTransformationId={sidebar.selectedTransformationId}
-					onClose={() => sidebar.close()}
 				/>
 			{:else}
 				<div
