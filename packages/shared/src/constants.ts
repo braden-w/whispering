@@ -259,4 +259,4 @@ export type WhisperingSoundNames =
 	| 'start'
 	| 'stop'
 	| 'cancel'
-	| 'transcription-complete';
+	| 'transcriptionComplete';

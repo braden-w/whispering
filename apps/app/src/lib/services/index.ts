@@ -228,7 +228,7 @@ export const userConfiguredServices = (() => {
 			},
 			playTranscriptionCompleteSoundIfEnabled: () => {
 				if (settings.value['sound.playOnTranscriptionSuccess']) {
-					void PlaySoundService.playSound('transcription-complete');
+					void PlaySoundService.playSound('transcriptionComplete');
 				}
 			},
 		},

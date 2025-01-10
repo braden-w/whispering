@@ -26,7 +26,7 @@ export function createPlaySoundServiceWeb(): PlaySoundService {
 					case 'cancel':
 						await cancelSound.play();
 						break;
-					case 'transcription-complete':
+					case 'transcriptionComplete':
 						await transcriptionCompleteSound.play();
 						break;
 				}
