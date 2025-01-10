@@ -528,7 +528,7 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 				id: nanoid(),
 				startedAt: now,
 				completedAt: null,
-				status: 'idle',
+				status: 'running',
 				output: null,
 				error: null,
 				stepRuns: [],
@@ -547,25 +547,6 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(transformationRunWithTimestamps);
 		},
 
-		async setTransformationRunStatus({ transformationRunId, status }) {
-			const updateTransformationRunResult = await tryAsync({
-				try: () =>
-					db.transformationRuns
-						.where('id')
-						.equals(transformationRunId)
-						.modify({ status }),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error updating transformation run status in Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-			if (!updateTransformationRunResult.ok)
-				return updateTransformationRunResult;
-			return Ok(undefined);
-		},
-
 		async addTransformationStepRunToTransformationRun({
 			transformationRunId,
 			stepRun: { input, stepId },
@@ -577,7 +558,7 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 				input,
 				startedAt: now,
 				completedAt: null,
-				status: 'idle',
+				status: 'running',
 				output: null,
 				error: null,
 			} satisfies TransformationStepRun;

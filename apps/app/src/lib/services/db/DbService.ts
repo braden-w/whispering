@@ -102,10 +102,6 @@ export type DbTransformationsService = {
 			'input' | 'transformationId' | 'maybeRecordingId'
 		>,
 	) => Promise<DbServiceResult<TransformationRun>>;
-	setTransformationRunStatus: (opts: {
-		transformationRunId: string;
-		status: TransformationRun['status'];
-	}) => Promise<DbServiceResult<void>>;
 	addTransformationStepRunToTransformationRun: (opts: {
 		transformationRunId: string;
 		stepRun: Pick<TransformationStepRun, 'input' | 'stepId'>;
