@@ -8,7 +8,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { type Transformation } from '$lib/services/db';
 	import { deleteTransformationsWithToast } from '$lib/query/transformations/mutations';
@@ -220,36 +220,30 @@
 					value={filterQuery.value}
 					oninput={(e) => (filterQuery.value = e.currentTarget.value)}
 				/>
-				<div class="flex w-full items-center justify-between gap-2">
-					{#if selectedTransformationRows.length > 0}
-						<WhisperingButton
-							tooltipContent="Delete selected transformations"
-							variant="outline"
-							size="icon"
-							onclick={() => {
-								confirmationDialog.open({
-									title: 'Delete transformations',
-									subtitle:
-										'Are you sure you want to delete these transformations?',
-									confirmText: 'Delete',
-									onConfirm: () => {
-										deleteTransformationsWithToast.mutate(
-											selectedTransformationRows.map(
-												({ original }) => original,
-											),
-										);
-									},
-								});
-							}}
-						>
-							<TrashIcon class="h-4 w-4" />
-						</WhisperingButton>
-					{/if}
+				{#if selectedTransformationRows.length > 0}
+					<WhisperingButton
+						tooltipContent="Delete selected transformations"
+						variant="outline"
+						size="icon"
+						onclick={() => {
+							confirmationDialog.open({
+								title: 'Delete transformations',
+								subtitle:
+									'Are you sure you want to delete these transformations?',
+								confirmText: 'Delete',
+								onConfirm: () => {
+									deleteTransformationsWithToast.mutate(
+										selectedTransformationRows.map(({ original }) => original),
+									);
+								},
+							});
+						}}
+					>
+						<TrashIcon class="h-4 w-4" />
+					</WhisperingButton>
+				{/if}
 
-					<div class="flex items-center gap-2">
-						<CreateTransformationButton />
-					</div>
-				</div>
+				<CreateTransformationButton />
 			</div>
 
 			<div class="rounded-md border">
