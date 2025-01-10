@@ -28,7 +28,7 @@
 
 	let { recordingId }: { recordingId: string } = $props();
 
-	const recordingQuery = createRecordingQuery(recordingId);
+	const recordingQuery = createRecordingQuery(() => recordingId);
 
 	const recording = $derived(recordingQuery.data);
 

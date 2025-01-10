@@ -1,6 +1,7 @@
 import type { Recording } from '$lib/services/db';
 import { DbService, queryClient } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
+import type { Accessor } from '$lib/transformations/queries';
 
 import { createQuery } from '@tanstack/svelte-query';
 
@@ -27,11 +28,11 @@ export const createRecordingsQuery = () =>
 		},
 	}));
 
-export const createRecordingQuery = (id: string) =>
+export const createRecordingQuery = (id: Accessor<string>) =>
 	createQuery(() => ({
-		queryKey: recordingsKeys.byId(id),
+		queryKey: recordingsKeys.byId(id()),
 		queryFn: async () => {
-			const result = await DbService.getRecordingById(id);
+			const result = await DbService.getRecordingById(id());
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to fetch recording!',
@@ -45,7 +46,7 @@ export const createRecordingQuery = (id: string) =>
 		initialData: () =>
 			queryClient
 				.getQueryData<Recording[]>(recordingsKeys.all)
-				?.find((r) => r.id === id),
+				?.find((r) => r.id === id()),
 		initialDataUpdatedAt: () =>
 			queryClient.getQueryState(recordingsKeys.all)?.dataUpdatedAt,
 	}));
