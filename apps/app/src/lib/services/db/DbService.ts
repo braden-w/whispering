@@ -99,7 +99,7 @@ export type DbTransformationsService = {
 	createTransformationRun: (
 		transformationRun: Pick<
 			TransformationRun,
-			'input' | 'transformationId' | 'recordingId'
+			'input' | 'transformationId' | 'maybeRecordingId'
 		>,
 	) => Promise<DbServiceResult<TransformationRun>>;
 	setTransformationRunStatus: (opts: {
@@ -110,6 +110,16 @@ export type DbTransformationsService = {
 		transformationRunId: string;
 		stepRun: Pick<TransformationStepRun, 'input' | 'stepId'>;
 	}) => Promise<DbServiceResult<TransformationStepRun>>;
+	markTransformationStepRunAsFailed: (opts: {
+		transformationRunId: string;
+		stepRunId: string;
+		error: string;
+	}) => Promise<DbServiceResult<void>>;
+	markTransformationStepRunAsCompleted: (opts: {
+		transformationRunId: string;
+		stepRunId: string;
+		output: string;
+	}) => Promise<DbServiceResult<void>>;
 };
 
 export const TRANSFORMATION_STEP_TYPES = [
@@ -186,6 +196,12 @@ export type InsertTransformationStep = Omit<
 /**
  * Represents an execution of a transformation, which can be run on either
  * a recording's transcribed text or arbitrary input text.
+ *
+ * Status transitions:
+ * 1. 'idle' - Initial state when created
+ * 2. 'running' - When transformation execution begins
+ * 3. 'completed' - When all steps have completed successfully
+ * 4. 'failed' - If any step fails or an error occurs
  */
 export type TransformationRun = {
 	id: string;
@@ -194,7 +210,7 @@ export type TransformationRun = {
 	 * Recording id if the transformation is invoked on a recording.
 	 * Null if the transformation is invoked on arbitrary text input.
 	 */
-	recordingId: string | null;
+	maybeRecordingId: string | null;
 	status: 'idle' | 'running' | 'completed' | 'failed';
 	startedAt: string;
 	completedAt: string | null;
@@ -209,6 +225,13 @@ export type TransformationRun = {
 	stepRuns: {
 		id: string;
 		stepId: string;
+		/**
+		 * Status transitions:
+		 * 1. 'idle' - Initial state when step is created
+		 * 2. 'running' - When step execution begins
+		 * 3. 'completed' - When step completes successfully
+		 * 4. 'failed' - If step execution fails
+		 */
 		status: 'idle' | 'running' | 'completed' | 'failed';
 		startedAt: string;
 		completedAt: string | null;

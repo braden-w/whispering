@@ -582,16 +582,14 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 				error: null,
 			} satisfies TransformationStepRun;
 
-			return tryAsync({
-				try: async () => {
-					await db.transformationRuns
+			const result = await tryAsync({
+				try: () =>
+					db.transformationRuns
 						.where('id')
 						.equals(transformationRunId)
 						.modify((transformationRun) => {
 							transformationRun.stepRuns.push(stepRunWithTimestamps);
-						});
-					return stepRunWithTimestamps;
-				},
+						}),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding step run to transformation run in Dexie',
@@ -599,6 +597,70 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 						error,
 					}),
 			});
+			if (!result.ok) return result;
+			return Ok(stepRunWithTimestamps);
+		},
+
+		async markTransformationStepRunAsFailed({
+			transformationRunId,
+			stepRunId,
+			error,
+		}) {
+			const updateTransformationStepRunResult = await tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('id')
+						.equals(transformationRunId)
+						.modify((transformationRun) => {
+							const stepRun = transformationRun.stepRuns.find(
+								(sr) => sr.id === stepRunId,
+							);
+							if (!stepRun) return;
+							stepRun.status = 'failed';
+							stepRun.completedAt = new Date().toISOString();
+							stepRun.error = error;
+						}),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation step run status in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!updateTransformationStepRunResult.ok)
+				return updateTransformationStepRunResult;
+			return Ok(undefined);
+		},
+
+		async markTransformationStepRunAsCompleted({
+			transformationRunId,
+			stepRunId,
+			output,
+		}) {
+			const updateTransformationStepRunResult = await tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('id')
+						.equals(transformationRunId)
+						.modify((transformationRun) => {
+							const stepRun = transformationRun.stepRuns.find(
+								(sr) => sr.id === stepRunId,
+							);
+							if (!stepRun) return;
+							stepRun.status = 'completed';
+							stepRun.completedAt = new Date().toISOString();
+							stepRun.output = output;
+						}),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation step run status in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!updateTransformationStepRunResult.ok)
+				return updateTransformationStepRunResult;
+			return Ok(undefined);
 		},
 	};
 }
