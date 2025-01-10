@@ -55,7 +55,7 @@ export function generateDefaultTransformationStep(): TransformationStep {
 	};
 }
 
-export type DbService = {
+export type DbRecordingsService = {
 	getAllRecordings: () => Promise<DbServiceResult<Recording[]>>;
 	getRecordingById: (id: string) => Promise<DbServiceResult<Recording | null>>;
 	createRecording: (
@@ -76,7 +76,9 @@ export type DbService = {
 	cleanupExpiredRecordings: (
 		settings: Settings,
 	) => Promise<DbServiceResult<void>>;
+};
 
+export type DbTransformationsService = {
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
 	getTransformationById: (
 		id: string,

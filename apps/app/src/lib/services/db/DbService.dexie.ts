@@ -6,7 +6,8 @@ import type { Settings } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import type {
-	DbService,
+	DbRecordingsService,
+	DbTransformationsService,
 	Recording,
 	Transformation,
 	TransformationRun,
@@ -268,9 +269,9 @@ class RecordingsDatabase extends Dexie {
 	}
 }
 
-export function createDbDexieService(): DbService {
-	const db = new RecordingsDatabase();
+const db = new RecordingsDatabase();
 
+export function createDbRecordingsServiceDexie(): DbRecordingsService {
 	return {
 		async getAllRecordings() {
 			return tryAsync({
@@ -418,7 +419,11 @@ export function createDbDexieService(): DbService {
 				}
 			}
 		},
+	};
+}
 
+export function createDbTransformationsServiceDexie(): DbTransformationsService {
+	return {
 		async getAllTransformations() {
 			return tryAsync({
 				try: () => db.transformations.toArray(),
@@ -539,6 +544,40 @@ export function createDbDexieService(): DbService {
 			if (!createTransformationRunResult.ok)
 				return createTransformationRunResult;
 			return Ok(transformationRunWithTimestamps);
+		},
+
+		async updateTransformationRun(transformationRun) {
+			const updateTransformationRunResult = await tryAsync({
+				try: () => db.transformationRuns.put(transformationRun),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation run in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!updateTransformationRunResult.ok)
+				return updateTransformationRunResult;
+			return Ok(transformationRun);
+		},
+
+		async setTransformationRunStatus({ transformationRunId, status }) {
+			const updateTransformationRunResult = await tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('id')
+						.equals(transformationRunId)
+						.modify({ status }),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation run status in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!updateTransformationRunResult.ok)
+				return updateTransformationRunResult;
+			return Ok(undefined);
 		},
 	};
 }

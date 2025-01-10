@@ -1,6 +1,6 @@
 import type { Transformation } from '$lib/services/db';
 import {
-	DbService,
+	DbTransformationsService,
 	createResultQuery,
 	queryClient,
 } from '$lib/services/index.js';
@@ -16,7 +16,7 @@ export const createTransformationsQuery = () =>
 	createResultQuery(() => ({
 		queryKey: transformationsKeys.all,
 		queryFn: async () => {
-			const result = await DbService.getAllTransformations();
+			const result = await DbTransformationsService.getAllTransformations();
 			return result;
 		},
 	}));
@@ -25,7 +25,7 @@ export const createTransformationQuery = (id: Accessor<string>) =>
 	createResultQuery(() => ({
 		queryKey: transformationsKeys.byId(id()),
 		queryFn: async () => {
-			const result = await DbService.getTransformationById(id());
+			const result = await DbTransformationsService.getTransformationById(id());
 			return result;
 		},
 		initialData: () =>

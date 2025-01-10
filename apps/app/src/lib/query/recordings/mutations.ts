@@ -1,6 +1,6 @@
 import { queryClient } from '$lib/services';
 import type { Recording } from '$lib/services/db';
-import { DbService } from '$lib/services/index.js';
+import { DbRecordingsService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
@@ -9,7 +9,7 @@ import { recordingsKeys } from './queries';
 
 export const createRecording = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
-		const result = await DbService.updateRecording(recording);
+		const result = await DbRecordingsService.updateRecording(recording);
 		if (!result.ok) {
 			return WhisperingErr({
 				title: 'Failed to update recording!',
@@ -33,7 +33,7 @@ export const createRecording = createMutation(() => ({
 
 export const updateRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
-		const result = await DbService.updateRecording(recording);
+		const result = await DbRecordingsService.updateRecording(recording);
 		if (!result.ok) {
 			const e = WhisperingErr({
 				title: 'Failed to update recording!',
@@ -66,7 +66,7 @@ export const updateRecordingWithToast = createMutation(() => ({
 
 export const deleteRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
-		const result = await DbService.deleteRecording(recording);
+		const result = await DbRecordingsService.deleteRecording(recording);
 		if (!result.ok) {
 			const e = WhisperingErr({
 				title: 'Failed to delete recording!',
@@ -93,7 +93,7 @@ export const deleteRecordingWithToast = createMutation(() => ({
 
 export const deleteRecordingsWithToast = createMutation(() => ({
 	mutationFn: async (recordings: Recording[]) => {
-		const result = await DbService.deleteRecordings(recordings);
+		const result = await DbRecordingsService.deleteRecordings(recordings);
 		if (!result.ok) {
 			const e = WhisperingErr({
 				title: 'Failed to delete recordings!',

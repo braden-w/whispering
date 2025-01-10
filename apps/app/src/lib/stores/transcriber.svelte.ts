@@ -1,7 +1,7 @@
 import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 import type { Recording } from '$lib/services/db';
 import {
-	DbService,
+	DbRecordingsService,
 	playSoundIfEnabled,
 	userConfiguredServices,
 } from '$lib/services/index.js';
@@ -43,9 +43,10 @@ function createTranscriber() {
 				...recording,
 				transcriptionStatus: 'TRANSCRIBING',
 			} as const satisfies Recording;
-			const setStatusTranscribingResult = await DbService.updateRecording(
-				recordingWithTranscribingStatus,
-			);
+			const setStatusTranscribingResult =
+				await DbRecordingsService.updateRecording(
+					recordingWithTranscribingStatus,
+				);
 
 			if (!setStatusTranscribingResult.ok) {
 				toast.warning({
@@ -73,7 +74,7 @@ function createTranscriber() {
 					...recording,
 					transcriptionStatus: 'FAILED',
 				} as const satisfies Recording;
-				await DbService.updateRecording(failedRecording);
+				await DbRecordingsService.updateRecording(failedRecording);
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
@@ -87,7 +88,7 @@ function createTranscriber() {
 				transcriptionStatus: 'DONE',
 			} as const satisfies Recording;
 			const saveRecordingToDatabaseResult =
-				await DbService.updateRecording(updatedRecording);
+				await DbRecordingsService.updateRecording(updatedRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: toastId,
