@@ -1,11 +1,36 @@
+<script module lang="ts">
+	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { z } from 'zod';
+
+	export const sidebar = createSidebar();
+
+	function createSidebar() {
+		let selectedTransformationId = createPersistedState({
+			key: 'whispering-transformations-selected-transformation-id',
+			defaultValue: null,
+			schema: z.string().nullable(),
+		});
+		return {
+			get selectedTransformationId() {
+				return selectedTransformationId.value;
+			},
+			openTransformationById: (id: string) => {
+				selectedTransformationId.value = id;
+			},
+			close: () => {
+				selectedTransformationId.value = null;
+			},
+		};
+	}
+</script>
+
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { updateTransformation } from '$lib/transformations/mutations';
 	import { createTransformationQuery } from '$lib/transformations/queries';
 	import { XIcon } from 'lucide-svelte';
-	import MarkTransformationActiveButton from '../../MarkTransformationActiveButton.svelte';
-	import RenderTransformation from '../RenderTransformation.svelte';
-	import { sidebar } from './panel.svelte';
+	import MarkTransformationActiveButton from '../MarkTransformationActiveButton.svelte';
+	import RenderTransformation from './RenderTransformation.svelte';
 
 	let { selectedTransformationId } = $props<{
 		selectedTransformationId: string;

@@ -35,8 +35,8 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
-	import EditTransformationSidePanel from './-components/side-panel/panel.svelte';
-	import { sidebar } from './-components/side-panel/panel.svelte';
+	import EditTransformationSidePanel from './-components/EditTransformationSidePanel.svelte';
+	import { sidebar } from './-components/EditTransformationSidePanel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
@@ -348,9 +348,22 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			<EditTransformationSidePanel
-				selectedTransformationId={sidebar.selectedTransformationId}
-			/>
+			{#if sidebar.selectedTransformationId}
+				<EditTransformationSidePanel
+					selectedTransformationId={sidebar.selectedTransformationId}
+				/>
+			{:else}
+				<div
+					class="flex h-[50vh] items-center justify-center rounded-md border"
+				>
+					<div class="text-center">
+						<h3 class="text-lg font-medium">No transformation selected</h3>
+						<p class="text-muted-foreground mt-2">
+							Select a transformation from the list to edit it
+						</p>
+					</div>
+				</div>
+			{/if}
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>
