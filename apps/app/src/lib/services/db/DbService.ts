@@ -194,10 +194,9 @@ export type InsertTransformationStep = Omit<
  * a recording's transcribed text or arbitrary input text.
  *
  * Status transitions:
- * 1. 'idle' - Initial state when created
- * 2. 'running' - When transformation execution begins
- * 3. 'completed' - When all steps have completed successfully
- * 4. 'failed' - If any step fails or an error occurs
+ * 1. 'running' - Initial state when created and transformation is immediately invoked
+ * 2. 'completed' - When all steps have completed successfully
+ * 3. 'failed' - If any step fails or an error occurs
  */
 export type TransformationRun = {
 	id: string;
@@ -207,7 +206,7 @@ export type TransformationRun = {
 	 * Null if the transformation is invoked on arbitrary text input.
 	 */
 	maybeRecordingId: string | null;
-	status: 'idle' | 'running' | 'completed' | 'failed';
+	status: 'running' | 'completed' | 'failed';
 	startedAt: string;
 	completedAt: string | null;
 	/**
@@ -223,12 +222,11 @@ export type TransformationRun = {
 		stepId: string;
 		/**
 		 * Status transitions:
-		 * 1. 'idle' - Initial state when step is created
-		 * 2. 'running' - When step execution begins
-		 * 3. 'completed' - When step completes successfully
-		 * 4. 'failed' - If step execution fails
+		 * 1. 'running' - Initial state when created and step is immediately invoked
+		 * 2. 'completed' - When step completes successfully
+		 * 3. 'failed' - If step execution fails
 		 */
-		status: 'idle' | 'running' | 'completed' | 'failed';
+		status: 'running' | 'completed' | 'failed';
 		startedAt: string;
 		completedAt: string | null;
 		input: string;
