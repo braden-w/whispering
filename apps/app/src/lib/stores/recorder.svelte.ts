@@ -1,14 +1,15 @@
+import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+import { createRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import { userConfiguredServices } from '$lib/services/index.js';
+import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';
-import { toast } from '$lib/services/toast';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	type WhisperingRecordingState,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 
 export const recorder = createRecorder();
 
@@ -61,7 +62,7 @@ function createRecorder() {
 			};
 
 			const saveRecordingToDatabaseResult =
-				await db.createRecording.mutate(newRecording);
+				await createRecording.mutateAsync(newRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,

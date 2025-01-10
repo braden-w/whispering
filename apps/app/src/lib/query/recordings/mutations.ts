@@ -5,8 +5,9 @@ import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { recordingsKeys } from './queries';
 import { queryClient } from '$lib/services';
+import { createMutation } from '@tanstack/svelte-query';
 
-export const createRecording = createResultMutation(() => ({
+export const createRecording = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbService.updateRecording(recording);
 		if (!result.ok) {
@@ -16,9 +17,6 @@ export const createRecording = createResultMutation(() => ({
 				action: { type: 'more-details', error: result.error },
 			});
 		}
-		return Ok(recording);
-	},
-	onSuccess: (recording) => {
 		queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
 			if (!oldData) return [recording];
 			return [...oldData, recording];
@@ -27,6 +25,7 @@ export const createRecording = createResultMutation(() => ({
 			recordingsKeys.byId(recording.id),
 			recording,
 		);
+		return Ok(recording);
 	},
 }));
 
