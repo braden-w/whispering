@@ -5,6 +5,8 @@ import {
 	queryClient,
 } from '$lib/services/index.js';
 
+export type Accessor<T> = () => T;
+
 // Define the query key as a constant array
 export const transformationsKeys = {
 	all: ['transformations'] as const,
@@ -20,17 +22,17 @@ export const createTransformationsQuery = () =>
 		},
 	}));
 
-export const createTransformationQuery = (id: string) =>
+export const createTransformationQuery = (id: Accessor<string>) =>
 	createResultQuery(() => ({
-		queryKey: transformationsKeys.byId(id),
+		queryKey: transformationsKeys.byId(id()),
 		queryFn: async () => {
-			const result = await DbService.getTransformationById(id);
+			const result = await DbService.getTransformationById(id());
 			return result;
 		},
 		initialData: () =>
 			queryClient
 				.getQueryData<Transformation[]>(transformationsKeys.all)
-				?.find((t) => t.id === id),
+				?.find((t) => t.id === id()),
 		initialDataUpdatedAt: () =>
-			queryClient.getQueryState(transformationsKeys.byId(id))?.dataUpdatedAt,
+			queryClient.getQueryState(transformationsKeys.byId(id()))?.dataUpdatedAt,
 	}));

@@ -13,7 +13,9 @@
 		class: className,
 	}: { transformationId: string; class?: string } = $props();
 
-	const transformationsQuery = createTransformationQuery(transformationId);
+	const transformationsQuery = createTransformationQuery(
+		() => transformationId,
+	);
 	const transformation = $derived(transformationsQuery.data);
 </script>
 

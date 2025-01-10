@@ -36,7 +36,7 @@
 		$props();
 
 	const transformationQuery = createTransformationQuery(
-		selectedTransformationId,
+		() => selectedTransformationId,
 	);
 
 	const transformation = $derived(transformationQuery.data);
