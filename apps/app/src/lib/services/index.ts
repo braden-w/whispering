@@ -1,10 +1,6 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
-import {
-	whisperingSoundNames,
-	type MaybePromise,
-	type WhisperingSoundNames,
-} from '@repo/shared';
+import type { MaybePromise, WhisperingSoundNames } from '@repo/shared';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
