@@ -11,10 +11,10 @@ import {
 
 export const getDefaultSettings = () =>
 	({
-		'sound.playOnStart': true,
-		'sound.playOnStop': true,
-		'sound.playOnCancel': true,
-		'sound.playOnTranscriptionComplete': true,
+		'sound.playOn.start': true,
+		'sound.playOn.stop': true,
+		'sound.playOn.cancel': true,
+		'sound.playOn.transcriptionComplete': true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
 		'recording.isFasterRerecordEnabled': false,
@@ -50,12 +50,12 @@ export const getDefaultSettings = () =>
 
 export const settingsSchema = z.object({
 	...({
-		'sound.playOnStart': z.boolean(),
-		'sound.playOnStop': z.boolean(),
-		'sound.playOnCancel': z.boolean(),
-		'sound.playOnTranscriptionComplete': z.boolean(),
+		'sound.playOn.start': z.boolean(),
+		'sound.playOn.stop': z.boolean(),
+		'sound.playOn.cancel': z.boolean(),
+		'sound.playOn.transcriptionComplete': z.boolean(),
 	} satisfies {
-		[K in WhisperingSoundNames as `sound.playOn${Capitalize<K>}`]: ZodBoolean;
+		[K in WhisperingSoundNames as `sound.playOn.${K}`]: ZodBoolean;
 	}),
 
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
