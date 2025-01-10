@@ -56,48 +56,46 @@
 	}));
 </script>
 
-<Card.Root>
-	<Card.Header>
-		<Card.Title>Test Transformation</Card.Title>
-		<Card.Description
-			>Try out your transformation with sample input</Card.Description
-		>
-	</Card.Header>
-	<Card.Content class="space-y-6">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-			<LabeledTextarea
-				id="input"
-				label="Input Text"
-				bind:value={input}
-				placeholder="Enter text to transform..."
-				rows={5}
-			/>
+<Card.Header>
+	<Card.Title>Test Transformation</Card.Title>
+	<Card.Description
+		>Try out your transformation with sample input</Card.Description
+	>
+</Card.Header>
+<Card.Content class="space-y-6">
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		<LabeledTextarea
+			id="input"
+			label="Input Text"
+			bind:value={input}
+			placeholder="Enter text to transform..."
+			rows={5}
+		/>
 
-			<LabeledTextarea
-				id="output"
-				label="Output Text"
-				value={output}
-				placeholder="Transformed text will appear here..."
-				rows={5}
-				readonly
-			/>
-		</div>
+		<LabeledTextarea
+			id="output"
+			label="Output Text"
+			value={output}
+			placeholder="Transformed text will appear here..."
+			rows={5}
+			readonly
+		/>
+	</div>
 
-		<Button
-			onclick={() => runTransformation.mutate()}
-			disabled={runTransformation.isPending ||
-				!input.trim() ||
-				transformation.steps.length === 0}
-			class="w-full"
-		>
-			{#if runTransformation.isPending}
-				<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-			{:else}
-				<PlayIcon class="mr-2 h-4 w-4" />
-			{/if}
-			{runTransformation.isPending
-				? 'Running Transformation...'
-				: 'Run Transformation'}
-		</Button>
-	</Card.Content>
-</Card.Root>
+	<Button
+		onclick={() => runTransformation.mutate()}
+		disabled={runTransformation.isPending ||
+			!input.trim() ||
+			transformation.steps.length === 0}
+		class="w-full"
+	>
+		{#if runTransformation.isPending}
+			<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+		{:else}
+			<PlayIcon class="mr-2 h-4 w-4" />
+		{/if}
+		{runTransformation.isPending
+			? 'Running Transformation...'
+			: 'Run Transformation'}
+	</Button>
+</Card.Content>
