@@ -121,7 +121,7 @@ export type DbTransformationsService = {
 		output: string;
 	}) => Promise<DbServiceResult<TransformationRun>>;
 	markTransformationRunAsCompleted: (opts: {
-		transformationRunId: string;
+		transformationRun: TransformationRun;
 		output: string;
 	}) => Promise<DbServiceResult<TransformationRun>>;
 };
