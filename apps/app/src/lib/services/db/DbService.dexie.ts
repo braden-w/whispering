@@ -582,7 +582,7 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(stepRunWithTimestamps);
 		},
 
-		async markTransformationStepRunAsFailed({
+		async markTransformationRunAsFailed({
 			transformationRunId,
 			stepRunId,
 			error,
@@ -597,9 +597,13 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 								(sr) => sr.id === stepRunId,
 							);
 							if (!stepRun) return;
+							const now = new Date().toISOString();
 							stepRun.status = 'failed';
-							stepRun.completedAt = new Date().toISOString();
+							stepRun.completedAt = now;
 							stepRun.error = error;
+							transformationRun.status = 'failed';
+							transformationRun.completedAt = now;
+							transformationRun.error = error;
 						}),
 				mapErr: (error) =>
 					DbServiceErr({
@@ -613,7 +617,7 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(undefined);
 		},
 
-		async markTransformationStepRunAsCompleted({
+		async markTransformationRunAsCompleted({
 			transformationRunId,
 			stepRunId,
 			output,
@@ -628,9 +632,13 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 								(sr) => sr.id === stepRunId,
 							);
 							if (!stepRun) return;
+							const now = new Date().toISOString();
 							stepRun.status = 'completed';
-							stepRun.completedAt = new Date().toISOString();
+							stepRun.completedAt = now;
 							stepRun.output = output;
+							transformationRun.status = 'completed';
+							transformationRun.completedAt = now;
+							transformationRun.output = output;
 						}),
 				mapErr: (error) =>
 					DbServiceErr({
