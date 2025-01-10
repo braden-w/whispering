@@ -13,7 +13,7 @@
 	let input = $state('');
 	let output = $state('');
 
-	const runTransformation = createMutation(() => ({
+	const runTransformationTest = createMutation(() => ({
 		mutationFn: async () => {
 			if (!input.trim()) {
 				toast.error({
@@ -97,18 +97,18 @@
 	</div>
 
 	<Button
-		onclick={() => runTransformation.mutate()}
-		disabled={runTransformation.isPending ||
+		onclick={() => runTransformationTest.mutate()}
+		disabled={runTransformationTest.isPending ||
 			!input.trim() ||
 			transformation.steps.length === 0}
 		class="w-full"
 	>
-		{#if runTransformation.isPending}
+		{#if runTransformationTest.isPending}
 			<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
 			<PlayIcon class="mr-2 h-4 w-4" />
 		{/if}
-		{runTransformation.isPending
+		{runTransformationTest.isPending
 			? 'Running Transformation...'
 			: 'Run Transformation'}
 	</Button>
