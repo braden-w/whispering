@@ -62,15 +62,18 @@ export function createResultQuery<
 		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
 	>,
 ) {
-	const { queryFn, ...optionValues } = options();
-	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => ({
-		...optionValues,
-		queryFn: async () => {
-			const result = await queryFn();
-			if (!result.ok) throw result.error;
-			return result.data;
-		},
-	}));
+	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => {
+		const { queryFn, ...optionValues } = options();
+		return {
+			...optionValues,
+
+			queryFn: async () => {
+				const result = await queryFn();
+				if (!result.ok) throw result.error;
+				return result.data;
+			},
+		};
+	});
 }
 
 type MutationResultFunction<
@@ -101,15 +104,17 @@ export function createResultMutation<
 		CreateResultMutationOptions<TData, TError, TVariables, TContext>
 	>,
 ) {
-	const { mutationFn, ...optionValues } = options();
-	return createMutation<TData, TError, TVariables, TContext>(() => ({
-		...optionValues,
-		mutationFn: async (args) => {
-			const result = await mutationFn(args);
-			if (!result.ok) throw result.error;
-			return result.data;
-		},
-	}));
+	return createMutation<TData, TError, TVariables, TContext>(() => {
+		const { mutationFn, ...optionValues } = options();
+		return {
+			...optionValues,
+			mutationFn: async (args) => {
+				const result = await mutationFn(args);
+				if (!result.ok) throw result.error;
+				return result.data;
+			},
+		};
+	});
 }
 
 export const queryClient = new QueryClient({
@@ -136,7 +141,7 @@ const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-export const DbService = createDbDexieService({ queryClient });
+export const DbService = createDbDexieService();
 
 const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
