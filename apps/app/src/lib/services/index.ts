@@ -213,22 +213,22 @@ export const userConfiguredServices = (() => {
 		sound: {
 			playStartSoundIfEnabled: () => {
 				if (settings.value['sound.playOnStartSuccess']) {
-					void PlaySoundService.playSound('start');
+					void PlaySoundService.playStartSound();
 				}
 			},
 			playStopSoundIfEnabled: () => {
 				if (settings.value['sound.playOnStopSuccess']) {
-					void PlaySoundService.playSound('stop');
+					void PlaySoundService.playStopSound();
 				}
 			},
 			playCancelSoundIfEnabled: () => {
 				if (settings.value['sound.playOnCancelSuccess']) {
-					void PlaySoundService.playSound('cancel');
+					void PlaySoundService.playCancelSound();
 				}
 			},
 			playTranscriptionCompleteSoundIfEnabled: () => {
 				if (settings.value['sound.playOnTranscriptionSuccess']) {
-					void PlaySoundService.playSound('transcriptionComplete');
+					void PlaySoundService.playTranscriptionCompleteSound();
 				}
 			},
 		},
