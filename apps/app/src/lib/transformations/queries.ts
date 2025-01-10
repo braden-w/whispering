@@ -1,16 +1,9 @@
 import type { Transformation } from '$lib/services/db';
 import {
-	createResultQuery,
 	DbService,
+	createResultQuery,
 	queryClient,
-	type CreateResultQueryOptions,
 } from '$lib/services/index.js';
-import { toast } from '$lib/services/toast';
-import type {
-	DefaultError,
-	FunctionedParams,
-	QueryKey,
-} from '@tanstack/svelte-query';
 
 // Define the query key as a constant array
 export const transformationsKeys = {
@@ -27,12 +20,8 @@ export const createTransformationsQuery = () =>
 		},
 	}));
 
-export const createTransformationQuery = (
-	id: string,
-	options: () => { enabled: boolean },
-) => {
-	return createResultQuery(() => ({
-		...options(),
+export const createTransformationQuery = (id: string) =>
+	createResultQuery(() => ({
 		queryKey: transformationsKeys.byId(id),
 		queryFn: async () => {
 			const result = await DbService.getTransformationById(id);
@@ -45,4 +34,3 @@ export const createTransformationQuery = (
 		initialDataUpdatedAt: () =>
 			queryClient.getQueryState(transformationsKeys.byId(id))?.dataUpdatedAt,
 	}));
-};
