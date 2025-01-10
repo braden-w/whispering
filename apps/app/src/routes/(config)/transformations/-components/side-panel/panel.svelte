@@ -32,9 +32,8 @@
 	import RenderTransformation from '../RenderTransformation.svelte';
 	import MarkTransformationActiveButton from '../../MarkTransformationActiveButton.svelte';
 
-	let { selectedTransformationId, onClose } = $props<{
+	let { selectedTransformationId } = $props<{
 		selectedTransformationId: string;
-		onClose: () => void;
 	}>();
 
 	let transformationQuery = createTransformationQuery(selectedTransformationId);
@@ -56,7 +55,7 @@
 						tooltipContent="Close"
 						variant="outline"
 						size="icon"
-						onclick={() => onClose()}
+						onclick={() => sidebar.close()}
 					>
 						<XIcon class="size-4" />
 					</WhisperingButton>
