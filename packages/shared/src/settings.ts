@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, ZodBoolean } from 'zod';
 import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
@@ -6,6 +6,7 @@ import {
 	GROQ_MODELS,
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
+	type WhisperingSoundNames,
 } from './constants.js';
 
 export const getDefaultSettings = () =>
@@ -48,10 +49,15 @@ export const getDefaultSettings = () =>
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({
-	'sound.playOnStartSuccess': z.boolean(),
-	'sound.playOnStopSuccess': z.boolean(),
-	'sound.playOnCancelSuccess': z.boolean(),
-	'sound.playOnTranscriptionSuccess': z.boolean(),
+	...({
+		'sound.playOnStartSuccess': z.boolean(),
+		'sound.playOnStopSuccess': z.boolean(),
+		'sound.playOnCancelSuccess': z.boolean(),
+		'sound.playOnTranscriptionCompleteSuccess': z.boolean(),
+	} satisfies {
+		[K in WhisperingSoundNames as `sound.playOn${Capitalize<K>}Success`]: ZodBoolean;
+	}),
+
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
 	'transcription.clipboard.pasteOnSuccess': z.boolean(),
 	'recording.isFasterRerecordEnabled': z.boolean(),
