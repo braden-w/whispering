@@ -20,7 +20,7 @@
 					title: 'No input provided',
 					description: 'Please enter some text to transform',
 				});
-				throw new Error('No input provided');
+				return;
 			}
 
 			if (transformation.steps.length === 0) {
@@ -28,26 +28,40 @@
 					title: 'No steps configured',
 					description: 'Please add at least one transformation step',
 				});
-				throw new Error('No steps configured');
+				return;
 			}
 
-			const result =
-				await userConfiguredServices.transformations.runTransformationOnInput({
+			const maybeTransformationResult =
+				await userConfiguredServices.transformations.runTransformation({
+					maybeRecordingId: null,
 					input,
 					transformation,
 				});
-			if (!result.ok) {
+			if (!maybeTransformationResult.ok) {
 				toast.error({
-					title: result.error.title,
-					description: result.error.description,
-					action: result.error.action,
+					title: 'Unexpected database error while running transformation',
+					description:
+						'The transformation ran as expected but there was an unexpected database error',
+					action: {
+						type: 'more-details',
+						error: maybeTransformationResult.error,
+					},
 				});
-				throw result.error;
+				return;
 			}
-			return result.data;
-		},
-		onSuccess: (data) => {
-			output = data;
+			const transformationResult = maybeTransformationResult.data;
+
+			if (transformationResult.error) {
+				toast.error({
+					title: 'Transformation failed',
+					description: transformationResult.error,
+				});
+				return;
+			}
+			if (transformationResult.output) {
+				output = transformationResult.output;
+			}
+
 			toast.success({
 				title: 'Transformation complete',
 				description: 'The text has been successfully transformed',
@@ -58,9 +72,9 @@
 
 <Card.Header>
 	<Card.Title>Test Transformation</Card.Title>
-	<Card.Description
-		>Try out your transformation with sample input</Card.Description
-	>
+	<Card.Description>
+		Try out your transformation with sample input
+	</Card.Description>
 </Card.Header>
 <Card.Content class="space-y-6">
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
