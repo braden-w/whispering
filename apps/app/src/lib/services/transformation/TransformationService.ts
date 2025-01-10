@@ -1,14 +1,24 @@
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import type { Transformation, TransformationStep } from '../db';
+import { nanoid } from 'nanoid';
 import { z } from 'zod';
+import type {
+	DbTransformationsService,
+	Transformation,
+	TransformationRun,
+	TransformationStep,
+	TransformationStepRun,
+} from '../db';
 import type { HttpService } from '../http/HttpService';
-type TransformationResult = WhisperingResult<string>;
+
+type StepResult = WhisperingResult<string>;
 
 export const createTransformationFns = ({
+	DbTransformationsService,
 	HttpService,
 }: {
+	DbTransformationsService: DbTransformationsService;
 	HttpService: HttpService;
 }) => ({
 	runTransformationOnInput: async ({
@@ -17,22 +27,99 @@ export const createTransformationFns = ({
 	}: {
 		input: string;
 		transformation: Transformation;
-	}): Promise<TransformationResult> => {
-		try {
-			let currentInput = input;
+	}): Promise<WhisperingResult<TransformationRun>> => {
+		const createTransformationRunResult =
+			await DbTransformationsService.createTransformationRun({
+				transformationId: transformation.id,
+				recordingId: null,
+				input,
+			});
 
+		if (!createTransformationRunResult.ok)
+			return WhisperingErr(createTransformationRunResult.error);
+
+		const transformationRun = createTransformationRunResult.data;
+
+		try {
+			await DbTransformationsService.setTransformationRunStatus({
+				transformationRunId: transformationRun.id,
+				status: 'running',
+			});
+
+			let currentInput = input;
 			for (const step of transformation.steps) {
+				const now = new Date().toISOString();
+				const newStepRun = {
+					id: nanoid(),
+					stepId: step.id,
+					status: 'idle',
+					startedAt: now,
+					completedAt: null,
+					input: currentInput,
+					output: null,
+					error: null,
+				} satisfies TransformationStepRun;
+
+				const addTransformationStepRunToTransformationRunResult =
+					await DbTransformationsService.transformationRuns.set({
+						...transformationRun,
+						stepRuns: [...transformationRun.stepRuns, newStepRun],
+					});
+
+				if (!addTransformationStepRunToTransformationRunResult.ok)
+					return WhisperingErr(
+						addTransformationStepRunToTransformationRunResult.error,
+					);
+
+				const transformationRunWithStepRun =
+					addTransformationStepRunToTransformationRunResult.data;
+
+				await DbTransformationsService.transformationRuns.setStatus(
+					transformationRunWithStepRun,
+					'running',
+				);
+
 				const result = await handleStep({
 					input: currentInput,
 					step,
 					HttpService,
 				});
-				if (!result.ok) return result;
+
+				if (!result.ok) {
+					await DbTransformationsService.transformationRuns.set({
+						...transformationRunWithStepRun,
+						stepRuns: [
+							...transformationRunWithStepRun.stepRuns,
+							{
+								...newStepRun,
+								status: 'failed',
+								completedAt: new Date().toISOString(),
+								error: result.error.title,
+							},
+						],
+					});
+
+					transformationRun.status = 'failed';
+					transformationRun.completedAt = new Date().toISOString();
+					transformationRun.error = result.error.title;
+					return Ok(transformationRun);
+				}
+
 				currentInput = result.data;
+				newStepRun.status = 'completed';
+				newStepRun.completedAt = new Date().toISOString();
+				newStepRun.output = currentInput;
 			}
 
-			return Ok(currentInput);
+			transformationRun.status = 'completed';
+			transformationRun.completedAt = new Date().toISOString();
+			transformationRun.output = currentInput;
+			return Ok(transformationRun);
 		} catch (error) {
+			transformationRun.status = 'failed';
+			transformationRun.completedAt = new Date().toISOString();
+			transformationRun.error =
+				'An error occurred during the transformation process';
 			return WhisperingErr({
 				title: 'Transformation failed',
 				description: 'An error occurred during the transformation process',
@@ -50,7 +137,7 @@ async function handleStep({
 	input: string;
 	step: TransformationStep;
 	HttpService: HttpService;
-}): Promise<TransformationResult> {
+}): Promise<StepResult> {
 	switch (step.type) {
 		case 'find_replace': {
 			const findText = step['find_replace.findText'];
