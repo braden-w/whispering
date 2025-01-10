@@ -2,15 +2,16 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { deleteRecordingWithToast } from '$lib/query/recordings/mutations';
+	import { createRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import {
-		createResultMutation,
-		DownloadService,
-		userConfiguredServices,
-	} from '$lib/services/index.js';
+	import { DownloadService } from '$lib/services/index.js';
+	import { toast } from '$lib/services/toast';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { WhisperingErr } from '@repo/shared';
 	import { createMutation } from '@tanstack/svelte-query';
 	import {
 		DownloadIcon,
@@ -20,11 +21,6 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
-	import { WhisperingErr } from '@repo/shared';
-	import { toast } from '$lib/services/toast';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { createRecordingQuery } from '$lib/query/recordings/queries';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	let { recordingId }: { recordingId: string } = $props();
 
@@ -32,35 +28,35 @@
 
 	const recording = $derived(recordingQuery.data);
 
-	const downloadRecordingWithToast = createResultMutation(() => ({
+	const downloadRecordingWithToast = createMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			if (!recording.blob) {
-				return WhisperingErr({
+				const e = WhisperingErr({
 					title: '⚠️ Recording blob not found',
 					description: "Your recording doesn't have a blob to download.",
 				});
+				toast.error(e.error);
+				return e;
 			}
 			const result = await DownloadService.downloadBlob({
 				name: `whispering_recording_${recording.id}`,
 				blob: recording.blob,
 			});
 			if (!result.ok) {
-				return WhisperingErr({
+				const e = WhisperingErr({
 					title: 'Failed to download recording!',
 					description: 'Your recording could not be downloaded.',
 					action: { type: 'more-details', error: result.error },
 				});
+				toast.error(e.error);
+				return e;
 			}
-			return result;
-		},
-		onSuccess: () => {
+
 			toast.success({
 				title: 'Recording downloading!',
 				description: 'Your recording is being downloaded.',
 			});
-		},
-		onError: (error) => {
-			toast.error(error);
+			return result;
 		},
 	}));
 </script>
