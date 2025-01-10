@@ -1,6 +1,10 @@
 import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 import type { Recording } from '$lib/services/db';
-import { DbService, userConfiguredServices } from '$lib/services/index.js';
+import {
+	DbService,
+	playSoundIfEnabled,
+	userConfiguredServices,
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
@@ -98,7 +102,7 @@ function createTranscriber() {
 				return saveRecordingToDatabaseResult;
 			}
 
-			void userConfiguredServices.sound.playTranscriptionCompleteSoundIfEnabled();
+			void playSoundIfEnabled('transcriptionComplete');
 			toast.success({
 				id: toastId,
 				title: '📋 Recording transcribed!',
