@@ -21,17 +21,19 @@ export const createTransformationFns = ({
 	DbTransformationsService: DbTransformationsService;
 	HttpService: HttpService;
 }) => ({
-	runTransformationOnInput: async ({
+	runTransformation: async ({
+		maybeRecordingId,
 		input,
 		transformation,
 	}: {
+		maybeRecordingId: string | null;
 		input: string;
 		transformation: Transformation;
 	}): Promise<WhisperingResult<TransformationRun>> => {
 		const createTransformationRunResult =
 			await DbTransformationsService.createTransformationRun({
 				transformationId: transformation.id,
-				recordingId: null,
+				maybeRecordingId,
 				input,
 			});
 
@@ -40,92 +42,49 @@ export const createTransformationFns = ({
 
 		const transformationRun = createTransformationRunResult.data;
 
-		try {
-			await DbTransformationsService.setTransformationRunStatus({
-				transformationRunId: transformationRun.id,
-				status: 'running',
-			});
-
-			let currentInput = input;
-			for (const step of transformation.steps) {
-				const now = new Date().toISOString();
-				const newStepRun = {
-					id: nanoid(),
-					stepId: step.id,
-					status: 'idle',
-					startedAt: now,
-					completedAt: null,
-					input: currentInput,
-					output: null,
-					error: null,
-				} satisfies TransformationStepRun;
-
-				const addTransformationStepRunToTransformationRunResult =
-					await DbTransformationsService.transformationRuns.set({
-						...transformationRun,
-						stepRuns: [...transformationRun.stepRuns, newStepRun],
-					});
-
-				if (!addTransformationStepRunToTransformationRunResult.ok)
-					return WhisperingErr(
-						addTransformationStepRunToTransformationRunResult.error,
-					);
-
-				const transformationRunWithStepRun =
-					addTransformationStepRunToTransformationRunResult.data;
-
-				await DbTransformationsService.transformationRuns.setStatus(
-					transformationRunWithStepRun,
-					'running',
+		let currentInput = input;
+		for (const step of transformation.steps) {
+			const addTransformationStepRunToTransformationRunResult =
+				await DbTransformationsService.addTransformationStepRunToTransformationRun(
+					{
+						transformationRunId: transformationRun.id,
+						stepRun: { stepId: step.id, input: currentInput },
+					},
 				);
 
-				const result = await handleStep({
-					input: currentInput,
-					step,
-					HttpService,
+			if (!addTransformationStepRunToTransformationRunResult.ok)
+				return WhisperingErr(
+					addTransformationStepRunToTransformationRunResult.error,
+				);
+
+			const transformationRunWithStepRun =
+				addTransformationStepRunToTransformationRunResult.data;
+
+			const handleStepResult = await handleStep({
+				input: currentInput,
+				step,
+				HttpService,
+			});
+
+			if (!handleStepResult.ok) {
+				await DbTransformationsService.markTransformationRunAsFailed({
+					transformationRunId: transformationRun.id,
+					stepRunId: transformationRunWithStepRun.id,
+					error: handleStepResult.error.title,
 				});
-
-				if (!result.ok) {
-					await DbTransformationsService.transformationRuns.set({
-						...transformationRunWithStepRun,
-						stepRuns: [
-							...transformationRunWithStepRun.stepRuns,
-							{
-								...newStepRun,
-								status: 'failed',
-								completedAt: new Date().toISOString(),
-								error: result.error.title,
-							},
-						],
-					});
-
-					transformationRun.status = 'failed';
-					transformationRun.completedAt = new Date().toISOString();
-					transformationRun.error = result.error.title;
-					return Ok(transformationRun);
-				}
-
-				currentInput = result.data;
-				newStepRun.status = 'completed';
-				newStepRun.completedAt = new Date().toISOString();
-				newStepRun.output = currentInput;
+				return WhisperingErr(handleStepResult.error);
 			}
 
-			transformationRun.status = 'completed';
-			transformationRun.completedAt = new Date().toISOString();
-			transformationRun.output = currentInput;
-			return Ok(transformationRun);
-		} catch (error) {
-			transformationRun.status = 'failed';
-			transformationRun.completedAt = new Date().toISOString();
-			transformationRun.error =
-				'An error occurred during the transformation process';
-			return WhisperingErr({
-				title: 'Transformation failed',
-				description: 'An error occurred during the transformation process',
-				action: { type: 'more-details', error },
+			await DbTransformationsService.markTransformationRunAsCompleted({
+				transformationRunId: transformationRun.id,
+				stepRunId: transformationRunWithStepRun.id,
+				output: handleStepResult.data,
 			});
+
+			currentInput = handleStepResult.data;
 		}
+
+		return Ok(transformationRun);
 	},
 });
 
