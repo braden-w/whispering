@@ -1,6 +1,6 @@
-import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
+import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 import type { Recording } from '$lib/services/db';
-import { userConfiguredServices } from '$lib/services/index.js';
+import { DbService, userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
@@ -39,10 +39,9 @@ function createTranscriber() {
 				...recording,
 				transcriptionStatus: 'TRANSCRIBING',
 			} as const satisfies Recording;
-			const setStatusTranscribingResult =
-				await userConfiguredServices.db.updateRecording(
-					recordingWithTranscribingStatus,
-				);
+			const setStatusTranscribingResult = await DbService.updateRecording(
+				recordingWithTranscribingStatus,
+			);
 
 			if (!setStatusTranscribingResult.ok) {
 				toast.warning({
@@ -70,7 +69,7 @@ function createTranscriber() {
 					...recording,
 					transcriptionStatus: 'FAILED',
 				} as const satisfies Recording;
-				await userConfiguredServices.db.updateRecording(failedRecording);
+				await DbService.updateRecording(failedRecording);
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
@@ -84,7 +83,7 @@ function createTranscriber() {
 				transcriptionStatus: 'DONE',
 			} as const satisfies Recording;
 			const saveRecordingToDatabaseResult =
-				await userConfiguredServices.db.updateRecording(updatedRecording);
+				await DbService.updateRecording(updatedRecording);
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: toastId,
@@ -107,9 +106,9 @@ function createTranscriber() {
 				descriptionClass: 'line-clamp-2',
 				action: {
 					type: 'button',
-					label: 'Go to recordings',
+					label: 'Copy to clipboard',
 					onClick: () =>
-						copyTextToClipboardWithToast({
+						copyTextToClipboardWithToast.mutate({
 							label: 'transcribed text',
 							text: transcribedText,
 						}),

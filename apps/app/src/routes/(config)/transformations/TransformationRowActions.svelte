@@ -3,8 +3,8 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { deleteTransformationWithToast } from '$lib/transformations/mutations';
-	import { createTransformationQuery } from '$lib/transformations/queries';
+	import { deleteTransformationWithToast } from '$lib/query/transformations/mutations';
+	import { createTransformationQuery } from '$lib/query/transformations/queries';
 	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
 

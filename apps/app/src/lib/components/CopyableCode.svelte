@@ -1,6 +1,6 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { copyTextToClipboardWithToast } from '$lib/mutations/clipboard';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
 	const { codeText }: { codeText: string } = $props();

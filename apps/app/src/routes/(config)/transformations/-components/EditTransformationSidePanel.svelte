@@ -26,8 +26,8 @@
 
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { updateTransformation } from '$lib/transformations/mutations';
-	import { createTransformationQuery } from '$lib/transformations/queries';
+	import { updateTransformation } from '$lib/query/transformations/mutations';
+	import { createTransformationQuery } from '$lib/query/transformations/queries';
 	import { XIcon } from 'lucide-svelte';
 	import MarkTransformationActiveButton from '../MarkTransformationActiveButton.svelte';
 	import RenderTransformation from './RenderTransformation.svelte';

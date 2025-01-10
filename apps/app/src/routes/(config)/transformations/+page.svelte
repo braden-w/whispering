@@ -11,8 +11,8 @@
 	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { type Transformation } from '$lib/services/db';
-	import { deleteTransformationsWithToast } from '$lib/transformations/mutations';
-	import { createTransformationsQuery } from '$lib/transformations/queries';
+	import { deleteTransformationsWithToast } from '$lib/query/transformations/mutations';
+	import { createTransformationsQuery } from '$lib/query/transformations/queries';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';

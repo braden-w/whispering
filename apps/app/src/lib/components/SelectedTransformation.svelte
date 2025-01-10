@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
-	import { createTransformationsQuery } from '$lib/queries/transformations';
+	import { createTransformationsQuery } from '$lib/query/transformations/queries';
 	import type { Transformation } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';

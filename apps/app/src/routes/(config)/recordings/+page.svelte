@@ -14,9 +14,9 @@
 	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { copyTextToClipboardWithToast } from '$lib/clipboard/mutations';
-	import { deleteRecordingsWithToast } from '$lib/recordings/mutations';
-	import { createRecordingsQuery } from '$lib/recordings/queries';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { deleteRecordingsWithToast } from '$lib/query/recordings/mutations';
+	import { createRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';

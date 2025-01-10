@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { generateDefaultTransformation } from '$lib/services/db';
-	import { createTransformationWithToast } from '$lib/transformations/mutations';
+	import { createTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { PlusIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 
