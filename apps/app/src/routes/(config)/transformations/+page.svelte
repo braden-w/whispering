@@ -348,22 +348,9 @@
 		</Resizable.Pane>
 		<Resizable.Handle class="hidden md:flex" />
 		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			{#if sidebar.selectedTransformationId}
-				<EditTransformationSidePanel
-					selectedTransformationId={sidebar.selectedTransformationId}
-				/>
-			{:else}
-				<div
-					class="flex h-[50vh] items-center justify-center rounded-md border"
-				>
-					<div class="text-center">
-						<h3 class="text-lg font-medium">No transformation selected</h3>
-						<p class="text-muted-foreground mt-2">
-							Select a transformation from the list to edit it
-						</p>
-					</div>
-				</div>
-			{/if}
+			<EditTransformationSidePanel
+				selectedTransformationId={sidebar.selectedTransformationId}
+			/>
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>

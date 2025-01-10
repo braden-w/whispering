@@ -1,7 +1,16 @@
 import type { Transformation } from '$lib/services/db';
-import { DbService, queryClient } from '$lib/services/index.js';
+import {
+	createResultQuery,
+	DbService,
+	queryClient,
+	type CreateResultQueryOptions,
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
-import { createQuery } from '@tanstack/svelte-query';
+import type {
+	DefaultError,
+	FunctionedParams,
+	QueryKey,
+} from '@tanstack/svelte-query';
 
 // Define the query key as a constant array
 export const transformationsKeys = {
@@ -10,36 +19,24 @@ export const transformationsKeys = {
 };
 
 export const createTransformationsQuery = () =>
-	createQuery(() => ({
+	createResultQuery(() => ({
 		queryKey: transformationsKeys.all,
 		queryFn: async () => {
 			const result = await DbService.getAllTransformations();
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to fetch transformations!',
-					description: 'Your transformations could not be fetched.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
+			return result;
 		},
 	}));
 
-export const createTransformationQuery = (id: string) =>
-	createQuery(() => ({
+export const createTransformationQuery = (
+	id: string,
+	options: () => { enabled: boolean },
+) => {
+	return createResultQuery(() => ({
+		...options(),
 		queryKey: transformationsKeys.byId(id),
 		queryFn: async () => {
 			const result = await DbService.getTransformationById(id);
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to fetch transformation!',
-					description: 'Your transformation could not be fetched.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
+			return result;
 		},
 		initialData: () =>
 			queryClient
@@ -48,3 +45,4 @@ export const createTransformationQuery = (id: string) =>
 		initialDataUpdatedAt: () =>
 			queryClient.getQueryState(transformationsKeys.byId(id))?.dataUpdatedAt,
 	}));
+};

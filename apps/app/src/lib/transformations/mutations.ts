@@ -1,4 +1,4 @@
-import { queryClient } from '$lib/services';
+import { createResultMutation, queryClient } from '$lib/services';
 import type { Transformation } from '$lib/services/db';
 import { DbService, userConfiguredServices } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
@@ -37,6 +37,26 @@ export const createTransformationWithToast = createMutation(() => ({
 			title: 'Created transformation!',
 			description: 'Your transformation has been created successfully.',
 		});
+	},
+}));
+
+export const updateTransformation = createResultMutation(() => ({
+	mutationFn: (transformation: Transformation) =>
+		DbService.updateTransformation(transformation),
+	onSuccess: (transformation) => {
+		queryClient.setQueryData<Transformation[]>(
+			transformationsKeys.all,
+			(oldData) => {
+				if (!oldData) return [transformation];
+				return oldData.map((item) =>
+					item.id === transformation.id ? transformation : item,
+				);
+			},
+		);
+		queryClient.setQueryData<Transformation>(
+			transformationsKeys.byId(transformation.id),
+			transformation,
+		);
 	},
 }));
 
