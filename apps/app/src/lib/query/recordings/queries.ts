@@ -1,8 +1,8 @@
 import type { Recording } from '$lib/services/db';
 import { DbService, queryClient } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
-import type { Accessor } from '$lib/transformations/queries';
 import { createQuery } from '@tanstack/svelte-query';
+import type { Accessor } from '../types';
 
 // Define the query key as a constant array
 export const recordingsKeys = {

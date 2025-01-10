@@ -4,8 +4,7 @@ import {
 	createResultQuery,
 	queryClient,
 } from '$lib/services/index.js';
-
-export type Accessor<T> = () => T;
+import type { Accessor } from '../types';
 
 // Define the query key as a constant array
 export const transformationsKeys = {
