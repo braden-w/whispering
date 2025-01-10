@@ -1,4 +1,8 @@
-import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+import {
+	copyTextToClipboard,
+	copyTextToClipboardWithToast,
+	writeTextToCursor,
+} from '$lib/query/clipboard/mutations';
 import { createRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import { userConfiguredServices } from '$lib/services/index.js';
@@ -105,9 +109,7 @@ function createRecorder() {
 							description: 'Copying the transcription to your clipboard...',
 						});
 						const copyResult =
-							await userConfiguredServices.clipboard.setClipboardText(
-								transcribedText,
-							);
+							await copyTextToClipboard.mutateAsync(transcribedText);
 						if (!copyResult.ok) {
 							toast.warning(copyResult.error);
 							toast.success({
@@ -150,9 +152,7 @@ function createRecorder() {
 						description: 'Pasting the transcription to your cursor...',
 					});
 					const pasteResult =
-						await userConfiguredServices.clipboard.writeTextToCursor(
-							transcribedText,
-						);
+						await writeTextToCursor.mutateAsync(transcribedText);
 					if (!pasteResult.ok) {
 						toast.warning(pasteResult.error);
 						toast.success({
