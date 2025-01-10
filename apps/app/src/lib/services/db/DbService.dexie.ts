@@ -409,6 +409,22 @@ export function createDbDexieService(): DbService {
 			});
 		},
 
+		async getTransformationById(id: string) {
+			return tryAsync({
+				try: async () => {
+					const maybeTransformation =
+						(await db.transformations.get(id)) ?? null;
+					return maybeTransformation;
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting transformation by id from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
 		async createTransformation(transformation) {
 			const now = new Date().toISOString();
 			const transformationWithTimestamps = {

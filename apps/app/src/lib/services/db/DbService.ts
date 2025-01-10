@@ -78,6 +78,9 @@ export type DbService = {
 	) => Promise<DbServiceResult<void>>;
 
 	getAllTransformations: () => Promise<DbServiceResult<Transformation[]>>;
+	getTransformationById: (
+		id: string,
+	) => Promise<DbServiceResult<Transformation | null>>;
 	createTransformation: (
 		transformation: InsertTransformation,
 	) => Promise<DbServiceResult<Transformation>>;
