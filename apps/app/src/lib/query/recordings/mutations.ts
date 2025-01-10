@@ -1,11 +1,11 @@
+import { queryClient } from '$lib/services';
 import type { Recording } from '$lib/services/db';
-import { DbService, createResultMutation } from '$lib/services/index.js';
+import { DbService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
-import { WhisperingErr, type WhisperingErrProperties } from '@repo/shared';
-import { recordingsKeys } from './queries';
-import { queryClient } from '$lib/services';
+import { WhisperingErr } from '@repo/shared';
 import { createMutation } from '@tanstack/svelte-query';
+import { recordingsKeys } from './queries';
 
 export const createRecording = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
@@ -31,7 +31,7 @@ export const createRecording = createMutation(() => ({
 	},
 }));
 
-export const updateRecordingWithToast = createResultMutation(() => ({
+export const updateRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbService.updateRecording(recording);
 		if (!result.ok) {
@@ -64,7 +64,7 @@ export const updateRecordingWithToast = createResultMutation(() => ({
 	},
 }));
 
-export const deleteRecordingWithToast = createResultMutation(() => ({
+export const deleteRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbService.deleteRecording(recording);
 		if (!result.ok) {
@@ -91,7 +91,7 @@ export const deleteRecordingWithToast = createResultMutation(() => ({
 	},
 }));
 
-export const deleteRecordingsWithToast = createResultMutation(() => ({
+export const deleteRecordingsWithToast = createMutation(() => ({
 	mutationFn: async (recordings: Recording[]) => {
 		const result = await DbService.deleteRecordings(recordings);
 		if (!result.ok) {

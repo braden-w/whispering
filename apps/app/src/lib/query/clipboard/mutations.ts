@@ -1,4 +1,4 @@
-import { ClipboardService, createResultMutation } from '$lib/services';
+import { ClipboardService } from '$lib/services';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
 
@@ -9,7 +9,7 @@ export const copyTextToClipboard = createMutation(() => ({
 	},
 }));
 
-export const copyTextToClipboardWithToast = createResultMutation(() => ({
+export const copyTextToClipboardWithToast = createMutation(() => ({
 	mutationFn: async ({
 		label,
 		text,
@@ -35,8 +35,8 @@ export const copyTextToClipboardWithToast = createResultMutation(() => ({
 	},
 }));
 
-export const writeTextToCursor = createResultMutation(() => ({
-	mutationFn: async ({ text }: { text: string }) => {
+export const writeTextToCursor = createMutation(() => ({
+	mutationFn: async (text: string) => {
 		const result = await ClipboardService.writeTextToCursor(text);
 		return result;
 	},

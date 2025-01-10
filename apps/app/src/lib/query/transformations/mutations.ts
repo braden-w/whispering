@@ -1,6 +1,6 @@
-import { createResultMutation, queryClient } from '$lib/services';
+import { queryClient } from '$lib/services';
 import type { Transformation } from '$lib/services/db';
-import { DbService, userConfiguredServices } from '$lib/services/index.js';
+import { DbService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationsKeys } from './queries';
@@ -40,10 +40,11 @@ export const createTransformationWithToast = createMutation(() => ({
 	},
 }));
 
-export const updateTransformation = createResultMutation(() => ({
-	mutationFn: (transformation: Transformation) =>
-		DbService.updateTransformation(transformation),
-	onSuccess: (transformation) => {
+export const updateTransformation = createMutation(() => ({
+	mutationFn: async (transformation: Transformation) => {
+		const result = await DbService.updateTransformation(transformation);
+		if (!result.ok) return result;
+
 		queryClient.setQueryData<Transformation[]>(
 			transformationsKeys.all,
 			(oldData) => {
@@ -57,6 +58,8 @@ export const updateTransformation = createResultMutation(() => ({
 			transformationsKeys.byId(transformation.id),
 			transformation,
 		);
+
+		return result;
 	},
 }));
 
