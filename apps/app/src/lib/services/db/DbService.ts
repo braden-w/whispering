@@ -99,7 +99,6 @@ export type DbTransformationsService = {
 	getTransformationRunById: (
 		id: string,
 	) => Promise<DbServiceResult<TransformationRun | null>>;
-
 	createTransformationRun: (
 		transformationRun: Pick<
 			TransformationRun,
@@ -107,23 +106,24 @@ export type DbTransformationsService = {
 		>,
 	) => Promise<DbServiceResult<TransformationRun>>;
 	addTransformationStepRunToTransformationRun: (opts: {
-		transformationRunId: string;
-		stepRun: Pick<TransformationStepRun, 'input' | 'stepId'>;
+		transformationRun: TransformationRun;
+		stepId: string;
+		input: string;
 	}) => Promise<DbServiceResult<TransformationStepRun>>;
-	markTransformationRunAsFailed: (opts: {
-		transformationRunId: string;
+	markTransformationRunAndRunStepAsFailed: (opts: {
+		transformationRun: TransformationRun;
 		stepRunId: string;
 		error: string;
-	}) => Promise<DbServiceResult<void>>;
+	}) => Promise<DbServiceResult<TransformationRun>>;
 	markTransformationRunStepAsCompleted: (opts: {
-		transformationRunId: string;
+		transformationRun: TransformationRun;
 		stepRunId: string;
 		output: string;
-	}) => Promise<DbServiceResult<void>>;
+	}) => Promise<DbServiceResult<TransformationRun>>;
 	markTransformationRunAsCompleted: (opts: {
 		transformationRunId: string;
 		output: string;
-	}) => Promise<DbServiceResult<void>>;
+	}) => Promise<DbServiceResult<TransformationRun>>;
 };
 
 export const TRANSFORMATION_STEP_TYPES = [

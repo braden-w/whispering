@@ -562,11 +562,12 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 		},
 
 		async addTransformationStepRunToTransformationRun({
-			transformationRunId,
-			stepRun: { input, stepId },
+			transformationRun,
+			input,
+			stepId,
 		}) {
 			const now = new Date().toISOString();
-			const stepRunWithTimestamps = {
+			const transformationStepRun = {
 				id: nanoid(),
 				stepId,
 				input,
@@ -577,14 +578,18 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 				error: null,
 			} satisfies TransformationStepRun;
 
+			const addStepRunToTransformationRun = (
+				transformationRun: TransformationRun,
+			) => {
+				transformationRun.stepRuns.push(transformationStepRun);
+			};
+
 			const result = await tryAsync({
 				try: () =>
 					db.transformationRuns
 						.where('id')
-						.equals(transformationRunId)
-						.modify((transformationRun) => {
-							transformationRun.stepRuns.push(stepRunWithTimestamps);
-						}),
+						.equals(transformationRun.id)
+						.modify(addStepRunToTransformationRun),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding step run to transformation run in Dexie',
@@ -593,32 +598,36 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 					}),
 			});
 			if (!result.ok) return result;
-			return Ok(stepRunWithTimestamps);
+			addStepRunToTransformationRun(transformationRun);
+			return Ok(transformationStepRun);
 		},
 
-		async markTransformationRunAsFailed({
-			transformationRunId,
+		async markTransformationRunAndRunStepAsFailed({
+			transformationRun,
 			stepRunId,
 			error,
 		}) {
+			const markTransformationRunAndRunStepAsFailed = (
+				transformationRun: TransformationRun,
+			) => {
+				const stepRun = transformationRun.stepRuns.find(
+					(sr) => sr.id === stepRunId,
+				);
+				if (!stepRun) return;
+				const now = new Date().toISOString();
+				stepRun.status = 'failed';
+				stepRun.completedAt = now;
+				stepRun.error = error;
+				transformationRun.status = 'failed';
+				transformationRun.completedAt = now;
+				transformationRun.error = error;
+			};
 			const updateTransformationStepRunResult = await tryAsync({
 				try: () =>
 					db.transformationRuns
 						.where('id')
-						.equals(transformationRunId)
-						.modify((transformationRun) => {
-							const stepRun = transformationRun.stepRuns.find(
-								(sr) => sr.id === stepRunId,
-							);
-							if (!stepRun) return;
-							const now = new Date().toISOString();
-							stepRun.status = 'failed';
-							stepRun.completedAt = now;
-							stepRun.error = error;
-							transformationRun.status = 'failed';
-							transformationRun.completedAt = now;
-							transformationRun.error = error;
-						}),
+						.equals(transformationRun.id)
+						.modify(markTransformationRunAndRunStepAsFailed),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
@@ -629,29 +638,34 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			if (!updateTransformationStepRunResult.ok)
 				return updateTransformationStepRunResult;
 
-			return Ok(undefined);
+			markTransformationRunAndRunStepAsFailed(transformationRun);
+			return Ok(transformationRun);
 		},
 
 		async markTransformationRunStepAsCompleted({
-			transformationRunId,
+			transformationRun,
 			stepRunId,
 			output,
 		}) {
+			const markTransformationRunStepAsCompleted = (
+				transformationRun: TransformationRun,
+			) => {
+				const stepRun = transformationRun.stepRuns.find(
+					(sr) => sr.id === stepRunId,
+				);
+				if (!stepRun) return;
+				const now = new Date().toISOString();
+				stepRun.status = 'completed';
+				stepRun.completedAt = now;
+				stepRun.output = output;
+			};
+
 			const updateTransformationStepRunResult = await tryAsync({
 				try: () =>
 					db.transformationRuns
 						.where('id')
-						.equals(transformationRunId)
-						.modify((transformationRun) => {
-							const stepRun = transformationRun.stepRuns.find(
-								(sr) => sr.id === stepRunId,
-							);
-							if (!stepRun) return;
-							const now = new Date().toISOString();
-							stepRun.status = 'completed';
-							stepRun.completedAt = now;
-							stepRun.output = output;
-						}),
+						.equals(transformationRun.id)
+						.modify(markTransformationRunStepAsCompleted),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
@@ -662,21 +676,25 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			if (!updateTransformationStepRunResult.ok)
 				return updateTransformationStepRunResult;
 
-			return Ok(undefined);
+			markTransformationRunStepAsCompleted(transformationRun);
+			return Ok(transformationRun);
 		},
 
-		async markTransformationRunAsCompleted({ transformationRunId, output }) {
+		async markTransformationRunAsCompleted({ transformationRun, output }) {
+			const markTransformationRunAsCompleted = (
+				transformationRun: TransformationRun,
+			) => {
+				const now = new Date().toISOString();
+				transformationRun.status = 'completed';
+				transformationRun.completedAt = now;
+				transformationRun.output = output;
+			};
 			const updateTransformationStepRunResult = await tryAsync({
 				try: () =>
 					db.transformationRuns
 						.where('id')
-						.equals(transformationRunId)
-						.modify((transformationRun) => {
-							const now = new Date().toISOString();
-							transformationRun.status = 'completed';
-							transformationRun.completedAt = now;
-							transformationRun.output = output;
-						}),
+						.equals(transformationRun.id)
+						.modify(markTransformationRunAsCompleted),
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
@@ -687,7 +705,8 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			if (!updateTransformationStepRunResult.ok)
 				return updateTransformationStepRunResult;
 
-			return Ok(undefined);
+			markTransformationRunAsCompleted(transformationRun);
+			return Ok(transformationRun);
 		},
 	};
 }
