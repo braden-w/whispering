@@ -12,21 +12,20 @@ const transcriptionCompleteSound = new Audio(transcriptionCompleteSoundSrc);
 
 export function createPlaySoundServiceDesktop(): PlaySoundService {
 	return {
-		playSound: async (soundName) => {
-			switch (soundName) {
-				case 'start':
-					await startSound.play();
-					break;
-				case 'stop':
-					await stopSound.play();
-					break;
-				case 'cancel':
-					await cancelSound.play();
-					break;
-				case 'transcriptionComplete':
-					await transcriptionCompleteSound.play();
-					break;
-			}
+		playStartSound: async () => {
+			await startSound.play();
+			return Ok(undefined);
+		},
+		playStopSound: async () => {
+			await stopSound.play();
+			return Ok(undefined);
+		},
+		playTranscriptionCompleteSound: async () => {
+			await transcriptionCompleteSound.play();
+			return Ok(undefined);
+		},
+		playCancelSound: async () => {
+			await cancelSound.play();
 			return Ok(undefined);
 		},
 	};
