@@ -1,14 +1,12 @@
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import type {
 	DbTransformationsService,
 	Transformation,
 	TransformationRun,
 	TransformationStep,
-	TransformationStepRun,
 } from '../db';
 import type { HttpService } from '../http/HttpService';
 
@@ -44,7 +42,7 @@ export const createTransformationFns = ({
 
 		let currentInput = input;
 		for (const step of transformation.steps) {
-			const addTransformationStepRunToTransformationRunResult =
+			const newTransformationStepRunResult =
 				await DbTransformationsService.addTransformationStepRunToTransformationRun(
 					{
 						transformationRunId: transformationRun.id,
@@ -52,13 +50,19 @@ export const createTransformationFns = ({
 					},
 				);
 
-			if (!addTransformationStepRunToTransformationRunResult.ok)
-				return WhisperingErr(
-					addTransformationStepRunToTransformationRunResult.error,
-				);
+			if (!newTransformationStepRunResult.ok) {
+				return WhisperingErr({
+					title: 'Unexpected database error',
+					description:
+						'Unable to finish running transformation due to an unexpected database error',
+					action: {
+						type: 'more-details',
+						error: newTransformationStepRunResult.error,
+					},
+				});
+			}
 
-			const transformationRunWithStepRun =
-				addTransformationStepRunToTransformationRunResult.data;
+			const newTransformationStepRun = newTransformationStepRunResult.data;
 
 			const handleStepResult = await handleStep({
 				input: currentInput,
@@ -67,24 +71,90 @@ export const createTransformationFns = ({
 			});
 
 			if (!handleStepResult.ok) {
-				await DbTransformationsService.markTransformationRunAsFailed({
-					transformationRunId: transformationRun.id,
-					stepRunId: transformationRunWithStepRun.id,
-					error: handleStepResult.error.title,
-				});
-				return WhisperingErr(handleStepResult.error);
+				const dbResult =
+					await DbTransformationsService.markTransformationRunAsFailed({
+						transformationRunId: transformationRun.id,
+						stepRunId: newTransformationStepRun.id,
+						error: handleStepResult.error.title,
+					});
+				if (!dbResult.ok) {
+					return WhisperingErr({
+						title: 'Unexpected database error',
+						description:
+							'Unable to finish running transformation due to an unexpected database error',
+						action: { type: 'more-details', error: handleStepResult.error },
+					});
+				}
+
+				const newTransformationRunResult =
+					await DbTransformationsService.getTransformationRunById(
+						transformationRun.id,
+					);
+
+				if (!newTransformationRunResult.ok) {
+					return WhisperingErr({
+						title: 'Unexpected database error',
+						description:
+							'Error finding transformationRun after marking it as failed',
+						action: {
+							type: 'more-details',
+							error: newTransformationRunResult.error,
+						},
+					});
+				}
+				const newTransformationRun = newTransformationRunResult.data;
+				if (!newTransformationRun)
+					return WhisperingErr({
+						title: 'Unexpected database error',
+						description:
+							'Unable to find transformationRun after marking it as failed',
+					});
+				return Ok(newTransformationRun);
 			}
 
-			await DbTransformationsService.markTransformationRunAsCompleted({
-				transformationRunId: transformationRun.id,
-				stepRunId: transformationRunWithStepRun.id,
-				output: handleStepResult.data,
-			});
+			const dbResult =
+				await DbTransformationsService.markTransformationRunStepAsCompleted({
+					transformationRunId: transformationRun.id,
+					stepRunId: newTransformationStepRun.id,
+					output: handleStepResult.data,
+				});
+
+			if (!dbResult.ok) {
+				return WhisperingErr({
+					title: 'Unexpected database error',
+					description:
+						'Unable to finish running transformation due to an unexpected database error',
+					action: { type: 'more-details', error: dbResult.error },
+				});
+			}
 
 			currentInput = handleStepResult.data;
 		}
 
-		return Ok(transformationRun);
+		const newTransformationRunResult =
+			await DbTransformationsService.getTransformationRunById(
+				transformationRun.id,
+			);
+
+		if (!newTransformationRunResult.ok) {
+			return WhisperingErr({
+				title: 'Unexpected database error',
+				description:
+					'Error finding transformationRun after marking it as succeeded',
+				action: {
+					type: 'more-details',
+					error: newTransformationRunResult.error,
+				},
+			});
+		}
+		const newTransformationRun = newTransformationRunResult.data;
+		if (!newTransformationRun)
+			return WhisperingErr({
+				title: 'Unexpected database error',
+				description:
+					'Unable to find transformationRun after marking it as succeeded',
+			});
+		return Ok(newTransformationRun);
 	},
 });
 

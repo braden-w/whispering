@@ -2,7 +2,7 @@ import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
 import { DownloadService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok, tryAsync } from '@epicenterhq/result';
-import type { Settings } from '@repo/shared';
+import { WhisperingErr, type Settings } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import type {
@@ -521,6 +521,20 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(undefined);
 		},
 
+		async getTransformationRunById(id) {
+			const result = await tryAsync({
+				try: () => db.transformationRuns.where('id').equals(id).first(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting transformation run by id from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!result.ok) return result;
+			return Ok(result.data ?? null);
+		},
+
 		async createTransformationRun(transformationRun) {
 			const now = new Date().toISOString();
 			const transformationRunWithTimestamps = {
@@ -614,10 +628,11 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			});
 			if (!updateTransformationStepRunResult.ok)
 				return updateTransformationStepRunResult;
+
 			return Ok(undefined);
 		},
 
-		async markTransformationRunAsCompleted({
+		async markTransformationRunStepAsCompleted({
 			transformationRunId,
 			stepRunId,
 			output,
@@ -636,6 +651,28 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 							stepRun.status = 'completed';
 							stepRun.completedAt = now;
 							stepRun.output = output;
+						}),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error updating transformation step run status in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+			if (!updateTransformationStepRunResult.ok)
+				return updateTransformationStepRunResult;
+
+			return Ok(undefined);
+		},
+
+		async markTransformationRunAsCompleted({ transformationRunId, output }) {
+			const updateTransformationStepRunResult = await tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('id')
+						.equals(transformationRunId)
+						.modify((transformationRun) => {
+							const now = new Date().toISOString();
 							transformationRun.status = 'completed';
 							transformationRun.completedAt = now;
 							transformationRun.output = output;
@@ -649,6 +686,7 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			});
 			if (!updateTransformationStepRunResult.ok)
 				return updateTransformationStepRunResult;
+
 			return Ok(undefined);
 		},
 	};
