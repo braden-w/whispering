@@ -5,7 +5,10 @@ import {
 } from '$lib/query/clipboard/mutations';
 import { createRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
-import { userConfiguredServices } from '$lib/services/index.js';
+import {
+	SetTrayIconService,
+	userConfiguredServices,
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { transcriber } from '$lib/stores/transcriber.svelte';
@@ -22,8 +25,7 @@ function createRecorder() {
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
-		const _setTrayIconResult =
-			await userConfiguredServices.tray.setTrayIcon(newValue);
+		const _setTrayIconResult = await SetTrayIconService.setTrayIcon(newValue);
 	};
 
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =

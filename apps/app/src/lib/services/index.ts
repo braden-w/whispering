@@ -137,7 +137,7 @@ export const ClipboardService = window.__TAURI_INTERNALS__
 	? createClipboardServiceDesktop()
 	: createClipboardServiceWeb();
 
-const SetTrayIconService = window.__TAURI_INTERNALS__
+export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
@@ -159,7 +159,6 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
-		tray: SetTrayIconService,
 		transformations: createTransformationFns({ HttpService, DbService }),
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
@@ -210,6 +209,7 @@ export const userConfiguredServices = (() => {
 			}
 			return RecorderServiceWeb;
 		},
+
 		sound: {
 			playStartSoundIfEnabled: () => {
 				if (settings.value['sound.playOnStartSuccess']) {
