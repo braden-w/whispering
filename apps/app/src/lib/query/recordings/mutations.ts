@@ -6,6 +6,30 @@ import { WhisperingErr } from '@repo/shared';
 import { recordingsKeys } from './queries';
 import { queryClient } from '$lib/services';
 
+export const createRecording = createResultMutation(() => ({
+	mutationFn: async (recording: Recording) => {
+		const result = await DbService.updateRecording(recording);
+		if (!result.ok) {
+			return WhisperingErr({
+				title: 'Failed to update recording!',
+				description: 'Your recording could not be updated.',
+				action: { type: 'more-details', error: result.error },
+			});
+		}
+		return Ok(recording);
+	},
+	onSuccess: (recording) => {
+		queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+			if (!oldData) return [recording];
+			return [...oldData, recording];
+		});
+		queryClient.setQueryData<Recording>(
+			recordingsKeys.byId(recording.id),
+			recording,
+		);
+	},
+}));
+
 export const updateRecordingWithToast = createResultMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbService.updateRecording(recording);
