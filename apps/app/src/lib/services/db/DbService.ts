@@ -102,14 +102,14 @@ export type DbTransformationsService = {
 			'input' | 'transformationId' | 'recordingId'
 		>,
 	) => Promise<DbServiceResult<TransformationRun>>;
-	updateTransformationRun: (
-		transformationRun: TransformationRun,
-	) => Promise<DbServiceResult<TransformationRun>>;
-
 	setTransformationRunStatus: (opts: {
 		transformationRunId: string;
 		status: TransformationRun['status'];
 	}) => Promise<DbServiceResult<void>>;
+	addTransformationStepRunToTransformationRun: (opts: {
+		transformationRunId: string;
+		stepRun: Pick<TransformationStepRun, 'input' | 'stepId'>;
+	}) => Promise<DbServiceResult<TransformationStepRun>>;
 };
 
 export const TRANSFORMATION_STEP_TYPES = [
@@ -219,7 +219,3 @@ export type TransformationRun = {
 };
 
 export type TransformationStepRun = TransformationRun['stepRuns'][number];
-export type InsertTransformationStepRun = Omit<
-	TransformationStepRun,
-	'createdAt' | 'updatedAt'
->;

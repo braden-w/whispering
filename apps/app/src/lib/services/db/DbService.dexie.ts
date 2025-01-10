@@ -11,6 +11,7 @@ import type {
 	Recording,
 	Transformation,
 	TransformationRun,
+	TransformationStepRun,
 } from './DbService';
 import { DbServiceErr } from './DbService';
 
@@ -546,21 +547,6 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(transformationRunWithTimestamps);
 		},
 
-		async updateTransformationRun(transformationRun) {
-			const updateTransformationRunResult = await tryAsync({
-				try: () => db.transformationRuns.put(transformationRun),
-				mapErr: (error) =>
-					DbServiceErr({
-						title: 'Error updating transformation run in Dexie',
-						description: 'Please try again',
-						error,
-					}),
-			});
-			if (!updateTransformationRunResult.ok)
-				return updateTransformationRunResult;
-			return Ok(transformationRun);
-		},
-
 		async setTransformationRunStatus({ transformationRunId, status }) {
 			const updateTransformationRunResult = await tryAsync({
 				try: () =>
@@ -578,6 +564,41 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			if (!updateTransformationRunResult.ok)
 				return updateTransformationRunResult;
 			return Ok(undefined);
+		},
+
+		async addTransformationStepRunToTransformationRun({
+			transformationRunId,
+			stepRun: { input, stepId },
+		}) {
+			const now = new Date().toISOString();
+			const stepRunWithTimestamps = {
+				id: nanoid(),
+				stepId,
+				input,
+				startedAt: now,
+				completedAt: null,
+				status: 'idle',
+				output: null,
+				error: null,
+			} satisfies TransformationStepRun;
+
+			return tryAsync({
+				try: async () => {
+					await db.transformationRuns
+						.where('id')
+						.equals(transformationRunId)
+						.modify((transformationRun) => {
+							transformationRun.stepRuns.push(stepRunWithTimestamps);
+						});
+					return stepRunWithTimestamps;
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error adding step run to transformation run in Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
 		},
 	};
 }
