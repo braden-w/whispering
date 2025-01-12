@@ -8,8 +8,8 @@ import type {
 	Transformation,
 	TransformationRun,
 	TransformationStep,
-} from '../db';
-import type { HttpService } from '../http/HttpService';
+} from './db';
+import type { HttpService } from './http/HttpService';
 
 type StepResult = WhisperingResult<string>;
 
