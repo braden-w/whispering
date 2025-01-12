@@ -15,10 +15,8 @@
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane class="h-full flex flex-col">
-		<div class="flex-1 overflow-y-auto">
-			<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
-		</div>
+	<Resizable.Pane>
+		<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
 	<Resizable.Pane>

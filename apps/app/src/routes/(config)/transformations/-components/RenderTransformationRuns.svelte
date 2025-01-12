@@ -30,18 +30,18 @@
 	);
 </script>
 
-<div class="space-y-4 overflow-y-auto h-full">
-	{#if transformationsQuery.isLoading}
-		<div class="text-muted-foreground text-sm">Loading runs...</div>
-	{:else if transformationsQuery.error}
-		<div class="text-destructive text-sm">
-			{transformationsQuery.error.description}
-		</div>
-	{:else if transformationsQuery.data}
-		{@const runs = transformationsQuery.data}
-		{#if runs.length === 0}
-			<div class="text-muted-foreground text-sm">No runs yet</div>
-		{:else}
+{#if transformationsQuery.isLoading}
+	<div class="text-muted-foreground text-sm">Loading runs...</div>
+{:else if transformationsQuery.error}
+	<div class="text-destructive text-sm">
+		{transformationsQuery.error.description}
+	</div>
+{:else if transformationsQuery.data}
+	{@const runs = transformationsQuery.data}
+	{#if runs.length === 0}
+		<div class="text-muted-foreground text-sm">No runs yet</div>
+	{:else}
+		<div class="space-y-4 overflow-y-auto h-full">
 			{#each runs as run}
 				<Card.Root>
 					<Card.Header class="p-4">
@@ -135,6 +135,6 @@
 					{/if}
 				</Card.Root>
 			{/each}
-		{/if}
+		</div>
 	{/if}
-</div>
+{/if}
