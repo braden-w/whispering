@@ -44,32 +44,30 @@
 		<div class="flex flex-col gap-4 p-4 overflow-y-auto h-full">
 			{#each runs as run}
 				<Card.Root>
-					<Card.Header class="p-4">
-						<div class="flex items-center gap-6">
-							<Button
-								variant="ghost"
-								size="icon"
-								class="h-8 w-8 shrink-0"
-								onclick={() => toggleRunExpanded(run.id)}
-							>
-								{#if expandedRunIds.has(run.id)}
-									<ChevronDown class="h-4 w-4" />
-								{:else}
-									<ChevronRight class="h-4 w-4" />
-								{/if}
-							</Button>
-							<div
-								class="grid grid-cols-[100px_150px_150px] items-center gap-6"
-							>
-								<Badge variant={`status.${run.status}`} class="w-fit">
-									{run.status}
-								</Badge>
-								<div class="text-sm text-muted-foreground whitespace-nowrap">
-									{formatDate(run.startedAt)}
-								</div>
-								<div class="text-sm text-muted-foreground whitespace-nowrap">
-									{run.completedAt ? formatDate(run.completedAt) : '-'}
-								</div>
+					<Card.Header class="p-4 flex flex-row items-center gap-6">
+						<Button
+							variant="ghost"
+							size="icon"
+							class="h-8 w-8 shrink-0"
+							onclick={() => toggleRunExpanded(run.id)}
+						>
+							{#if expandedRunIds.has(run.id)}
+								<ChevronDown class="h-4 w-4" />
+							{:else}
+								<ChevronRight class="h-4 w-4" />
+							{/if}
+						</Button>
+						<div
+							class="grid grid-cols-[100px_150px_150px] items-center align-middle gap-6"
+						>
+							<Badge variant={`status.${run.status}`} class="w-fit">
+								{run.status}
+							</Badge>
+							<div class="text-sm text-muted-foreground whitespace-nowrap">
+								{formatDate(run.startedAt)}
+							</div>
+							<div class="text-sm text-muted-foreground whitespace-nowrap">
+								{run.completedAt ? formatDate(run.completedAt) : '-'}
 							</div>
 						</div>
 					</Card.Header>
