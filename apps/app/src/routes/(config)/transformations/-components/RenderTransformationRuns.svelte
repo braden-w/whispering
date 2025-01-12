@@ -41,98 +41,109 @@
 	{#if runs.length === 0}
 		<div class="text-muted-foreground text-sm">No runs yet</div>
 	{:else}
-		<div class="flex flex-col gap-4 p-4 overflow-y-auto h-full">
-			{#each runs as run}
-				<Card.Root>
-					<Card.Header class="p-4 flex flex-row items-center gap-6">
-						<Button
-							variant="ghost"
-							size="icon"
-							class="h-8 w-8 shrink-0"
-							onclick={() => toggleRunExpanded(run.id)}
-						>
-							{#if expandedRunIds.has(run.id)}
-								<ChevronDown class="h-4 w-4" />
-							{:else}
-								<ChevronRight class="h-4 w-4" />
-							{/if}
-						</Button>
-						<div
-							class="grid grid-cols-[100px_150px_150px] items-center align-middle gap-6"
-						>
-							<Badge variant={`status.${run.status}`} class="w-fit">
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Expand</Table.Head>
+					<Table.Head>Status</Table.Head>
+					<Table.Head>Started</Table.Head>
+					<Table.Head>Completed</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each runs as run}
+					<Table.Row>
+						<Table.Cell>
+							<Button
+								variant="ghost"
+								size="icon"
+								class="h-8 w-8 shrink-0"
+								onclick={() => toggleRunExpanded(run.id)}
+							>
+								{#if expandedRunIds.has(run.id)}
+									<ChevronDown class="h-4 w-4" />
+								{:else}
+									<ChevronRight class="h-4 w-4" />
+								{/if}
+							</Button>
+						</Table.Cell>
+						<Table.Cell>
+							<Badge variant={`status.${run.status}`}>
 								{run.status}
 							</Badge>
-							<div class="text-sm text-muted-foreground whitespace-nowrap">
-								{formatDate(run.startedAt)}
-							</div>
-							<div class="text-sm text-muted-foreground whitespace-nowrap">
-								{run.completedAt ? formatDate(run.completedAt) : '-'}
-							</div>
-						</div>
-					</Card.Header>
-					{#if expandedRunIds.has(run.id)}
-						<Card.Content class="p-4">
-							<div class="space-y-4">
-								<div>
-									<h4 class="text-sm font-medium mb-2">Input</h4>
-									<pre
-										class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.input}</pre>
-								</div>
-								{#if run.output}
+						</Table.Cell>
+						<Table.Cell>
+							{formatDate(run.startedAt)}
+						</Table.Cell>
+						<Table.Cell>
+							{run.completedAt ? formatDate(run.completedAt) : '-'}
+						</Table.Cell>
+					</Table.Row>
+
+					<Table.Row>
+						{#if expandedRunIds.has(run.id)}
+							<Card.Content class="p-4">
+								<div class="space-y-4">
 									<div>
-										<h4 class="text-sm font-medium mb-2">Output</h4>
+										<h4 class="text-sm font-medium mb-2">Input</h4>
 										<pre
-											class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.output}</pre>
+											class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.input}</pre>
 									</div>
-								{/if}
-								{#if run.error}
-									<div>
-										<h4 class="text-sm font-medium mb-2 text-destructive">
-											Error
-										</h4>
-										<pre
-											class="text-sm bg-destructive/10 text-destructive p-2 rounded-md overflow-x-auto">{run.error}</pre>
-									</div>
-								{/if}
-								{#if run.stepRuns.length > 0}
-									<div>
-										<h4 class="text-sm font-medium mb-2">Steps</h4>
-										<Table.Root>
-											<Table.Header>
-												<Table.Row>
-													<Table.Head>Status</Table.Head>
-													<Table.Head>Started</Table.Head>
-													<Table.Head>Completed</Table.Head>
-												</Table.Row>
-											</Table.Header>
-											<Table.Body>
-												{#each run.stepRuns as stepRun}
+									{#if run.output}
+										<div>
+											<h4 class="text-sm font-medium mb-2">Output</h4>
+											<pre
+												class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.output}</pre>
+										</div>
+									{/if}
+									{#if run.error}
+										<div>
+											<h4 class="text-sm font-medium mb-2 text-destructive">
+												Error
+											</h4>
+											<pre
+												class="text-sm bg-destructive/10 text-destructive p-2 rounded-md overflow-x-auto">{run.error}</pre>
+										</div>
+									{/if}
+									{#if run.stepRuns.length > 0}
+										<div>
+											<h4 class="text-sm font-medium mb-2">Steps</h4>
+											<Table.Root>
+												<Table.Header>
 													<Table.Row>
-														<Table.Cell>
-															<Badge variant={`status.${stepRun.status}`}>
-																{stepRun.status}
-															</Badge>
-														</Table.Cell>
-														<Table.Cell>
-															{formatDate(stepRun.startedAt)}
-														</Table.Cell>
-														<Table.Cell>
-															{stepRun.completedAt
-																? formatDate(stepRun.completedAt)
-																: '-'}
-														</Table.Cell>
+														<Table.Head>Status</Table.Head>
+														<Table.Head>Started</Table.Head>
+														<Table.Head>Completed</Table.Head>
 													</Table.Row>
-												{/each}
-											</Table.Body>
-										</Table.Root>
-									</div>
-								{/if}
-							</div>
-						</Card.Content>
-					{/if}
-				</Card.Root>
-			{/each}
-		</div>
+												</Table.Header>
+												<Table.Body>
+													{#each run.stepRuns as stepRun}
+														<Table.Row>
+															<Table.Cell>
+																<Badge variant={`status.${stepRun.status}`}>
+																	{stepRun.status}
+																</Badge>
+															</Table.Cell>
+															<Table.Cell>
+																{formatDate(stepRun.startedAt)}
+															</Table.Cell>
+															<Table.Cell>
+																{stepRun.completedAt
+																	? formatDate(stepRun.completedAt)
+																	: '-'}
+															</Table.Cell>
+														</Table.Row>
+													{/each}
+												</Table.Body>
+											</Table.Root>
+										</div>
+									{/if}
+								</div>
+							</Card.Content>
+						{/if}
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
 	{/if}
 {/if}
