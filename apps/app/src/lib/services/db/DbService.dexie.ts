@@ -535,6 +535,24 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			return Ok(result.data ?? null);
 		},
 
+		async getTransformationRunsByTransformationId(transformationId) {
+			return tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('transformationId')
+						.equals(transformationId)
+						.reverse() // Most recent first
+						.toArray(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title:
+							'Error getting transformation runs by transformation id from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
 		async createTransformationRun(transformationRun) {
 			const now = new Date().toISOString();
 			const transformationRunWithTimestamps = {

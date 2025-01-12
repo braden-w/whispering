@@ -3,6 +3,8 @@
 	import type { Transformation } from '$lib/services/db';
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationTest from './RenderTransformationTest.svelte';
+	import RenderTransformationRuns from './RenderTransformationRuns.svelte';
+
 	let {
 		transformation,
 		onChange,
@@ -27,9 +29,7 @@
 			<Resizable.Handle withHandle />
 			<Resizable.Pane class="min-h-[200px]">
 				<div class="h-full w-full p-4 bg-card rounded-lg">
-					<div class="text-muted-foreground text-sm">
-						Results will appear here
-					</div>
+					<RenderTransformationRuns transformationId={transformation.id} />
 				</div>
 			</Resizable.Pane>
 		</Resizable.PaneGroup>
