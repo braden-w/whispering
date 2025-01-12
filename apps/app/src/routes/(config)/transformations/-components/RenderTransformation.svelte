@@ -1,34 +1,35 @@
 <script lang="ts">
-	import * as Tabs from '$lib/components/ui/tabs';
+	import * as Resizable from '$lib/components/ui/resizable';
 	import type { Transformation } from '$lib/services/db';
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationTest from './RenderTransformationTest.svelte';
 	let {
-		activeTab = 'configure',
 		transformation,
 		onChange,
 	}: {
-		activeTab: 'configure' | 'test';
 		transformation: Transformation;
 		onChange: (transformation: Transformation) => void;
 	} = $props();
 </script>
 
-<Tabs.Root
-	value={activeTab}
-	class="w-full flex flex-col gap-2"
-	onValueChange={(v) => (activeTab = v)}
->
-	<Tabs.List class="grid w-full grid-cols-2">
-		<Tabs.Trigger value="configure">Configure</Tabs.Trigger>
-		<Tabs.Trigger value="test">Test</Tabs.Trigger>
-	</Tabs.List>
-
-	<Tabs.Content value="configure">
+<Resizable.PaneGroup direction="horizontal">
+	<Resizable.Pane class="min-w-96">
 		<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
-	</Tabs.Content>
-
-	<Tabs.Content value="test">
-		<RenderTransformationTest {transformation} />
-	</Tabs.Content>
-</Tabs.Root>
+	</Resizable.Pane>
+	<Resizable.Handle withHandle />
+	<Resizable.Pane>
+		<Resizable.PaneGroup direction="vertical">
+			<Resizable.Pane class="min-h-[200px]">
+				<RenderTransformationTest {transformation} />
+			</Resizable.Pane>
+			<Resizable.Handle withHandle />
+			<Resizable.Pane class="min-h-[200px]">
+				<div class="h-full w-full p-4 bg-card rounded-lg">
+					<div class="text-muted-foreground text-sm">
+						Results will appear here
+					</div>
+				</div>
+			</Resizable.Pane>
+		</Resizable.PaneGroup>
+	</Resizable.Pane>
+</Resizable.PaneGroup>

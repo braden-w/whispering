@@ -54,7 +54,7 @@
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content
-		class="overflow-y-auto max-h-[90vh] max-w-3xl"
+		class="overflow-y-auto max-h-[80vh] max-w-7xl"
 		onInteractOutside={(e) => {
 			e.preventDefault();
 			if (isDialogOpen) {
