@@ -5,7 +5,6 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Table from '$lib/components/ui/table';
 	import { createTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
-	import type { TransformationRun } from '$lib/services/db';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 
@@ -18,17 +17,6 @@
 			expandedRunIds.delete(runId);
 		} else {
 			expandedRunIds.add(runId);
-		}
-	}
-
-	function getStatusColor(status: TransformationRun['status']) {
-		switch (status) {
-			case 'running':
-				return 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20';
-			case 'completed':
-				return 'bg-green-500/10 text-green-500 hover:bg-green-500/20';
-			case 'failed':
-				return 'bg-red-500/10 text-red-500 hover:bg-red-500/20';
 		}
 	}
 
@@ -71,7 +59,7 @@
 												<ChevronRight class="h-4 w-4" />
 											{/if}
 										</Button>
-										<Badge class={getStatusColor(run.status)}>
+										<Badge variant={`status.${run.status}`}>
 											{run.status}
 										</Badge>
 										<div class="text-sm text-muted-foreground">
@@ -124,7 +112,7 @@
 														{#each run.stepRuns as stepRun}
 															<Table.Row>
 																<Table.Cell>
-																	<Badge class={getStatusColor(stepRun.status)}>
+																	<Badge variant={`status.${stepRun.status}`}>
 																		{stepRun.status}
 																	</Badge>
 																</Table.Cell>
