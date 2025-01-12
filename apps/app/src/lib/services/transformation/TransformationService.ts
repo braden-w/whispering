@@ -13,7 +13,7 @@ import type { HttpService } from '../http/HttpService';
 
 type StepResult = WhisperingResult<string>;
 
-export const createTransformationFns = ({
+export const createRunTransformationService = ({
 	DbTransformationsService,
 	HttpService,
 }: {

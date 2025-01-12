@@ -2,8 +2,8 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { userConfiguredServices } from '$lib/services/index.js';
 	import type { Transformation } from '$lib/services/db';
+	import { RunTransformationService } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
@@ -32,7 +32,7 @@
 			}
 
 			const maybeTransformationResult =
-				await userConfiguredServices.transformations.runTransformation({
+				await RunTransformationService.runTransformation({
 					maybeRecordingId: null,
 					input,
 					transformation,

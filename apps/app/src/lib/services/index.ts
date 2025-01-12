@@ -18,7 +18,10 @@ import {
 } from './SetTrayIconService';
 import { createClipboardServiceDesktop } from './clipboard/ClipboardService.desktop';
 import { createClipboardServiceWeb } from './clipboard/ClipboardService.web';
-import { createDbDexieService } from './db/DbService.dexie';
+import {
+	createDbRecordingsServiceDexie,
+	createDbTransformationsServiceDexie,
+} from './db/DbService.dexie';
 import { createDownloadServiceDesktop } from './download/DownloadService.desktop';
 import { createDownloadServiceWeb } from './download/DownloadService.web';
 import { createHttpServiceDesktop } from './http/HttpService.desktop';
@@ -34,7 +37,7 @@ import { createTranscriptionServiceGroqDistil } from './transcription/Transcript
 import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
 import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
 import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
-import { createTransformationFns } from './transformation/TransformationService';
+import { createRunTransformationService } from './transformation/TransformationService';
 
 type QueryResultFunction<TData, TError> = () => MaybePromise<
 	Result<TData, TError>
@@ -141,7 +144,8 @@ export const SetTrayIconService = window.__TAURI_INTERNALS__
 	? createSetTrayIconDesktopService()
 	: createSetTrayIconWebService();
 
-export const DbService = createDbDexieService();
+export const DbRecordingsService = createDbRecordingsServiceDexie();
+export const DbTransformationsService = createDbTransformationsServiceDexie();
 
 const HttpService = window.__TAURI_INTERNALS__
 	? createHttpServiceDesktop()
@@ -151,6 +155,11 @@ const PlaySoundService = window.__TAURI_INTERNALS__
 	? createPlaySoundServiceDesktop()
 	: createPlaySoundServiceWeb();
 
+export const RunTransformationService = createRunTransformationService({
+	HttpService,
+	DbTransformationsService,
+});
+
 /**
  * Services that are determined by the user's settings.
  */
@@ -159,7 +168,6 @@ export const userConfiguredServices = (() => {
 	const RecorderServiceWeb = createRecorderServiceWeb();
 
 	return {
-		transformations: createTransformationFns({ HttpService, DbService }),
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
 				case 'OpenAI':
