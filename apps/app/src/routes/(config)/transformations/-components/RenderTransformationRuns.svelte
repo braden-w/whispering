@@ -80,9 +80,9 @@
 						</Table.Cell>
 					</Table.Row>
 
-					<Table.Row>
-						{#if expandedRunIds.has(run.id)}
-							<Card.Content class="p-4">
+					{#if expandedRunIds.has(run.id)}
+						<Table.Row>
+							<Table.Cell colspan={4}>
 								<div class="space-y-4">
 									<div>
 										<h4 class="text-sm font-medium mb-2">Input</h4>
@@ -139,9 +139,9 @@
 										</div>
 									{/if}
 								</div>
-							</Card.Content>
-						{/if}
-					</Table.Row>
+							</Table.Cell>
+						</Table.Row>
+					{/if}
 				{/each}
 			</Table.Body>
 		</Table.Root>
