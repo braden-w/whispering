@@ -13,8 +13,10 @@
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane class="min-w-96">
-		<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
+	<Resizable.Pane class="min-w-96 h-full flex flex-col">
+		<div class="flex-1 overflow-y-auto">
+			<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
+		</div>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
 	<Resizable.Pane>
