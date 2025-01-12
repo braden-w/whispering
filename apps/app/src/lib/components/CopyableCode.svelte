@@ -1,9 +1,34 @@
+<script lang="ts" module>
+	import { type VariantProps, tv } from 'tailwind-variants';
+
+	export const copyableCodeVariants = tv({
+		base: 'relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold',
+		variants: {
+			variant: {
+				default: 'bg-muted',
+				error: 'bg-destructive/10 text-destructive',
+			},
+		},
+		defaultVariants: {
+			variant: 'default',
+		},
+	});
+
+	export type CopyableCodeVariant = VariantProps<
+		typeof copyableCodeVariants
+	>['variant'];
+</script>
+
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { cn } from '$lib/utils';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 
-	const { codeText }: { codeText: string } = $props();
+	const {
+		codeText,
+		variant,
+	}: { codeText: string; variant?: CopyableCodeVariant } = $props();
 	let hasCopied = $state(false);
 
 	$effect(() => {
@@ -15,9 +40,8 @@
 	});
 </script>
 
-<pre
-	class="bg-muted relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold">
-  <WhisperingButton
+<pre class={copyableCodeVariants({ variant })}>
+	<WhisperingButton
 		tooltipContent="Copy to clipboard"
 		size="icon"
 		variant="ghost"

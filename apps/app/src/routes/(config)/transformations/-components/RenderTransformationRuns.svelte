@@ -9,6 +9,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { format } from 'date-fns';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
+	import { Label } from '$lib/components/ui/label';
 
 	let { transformationId }: { transformationId: string } = $props();
 
@@ -86,23 +87,20 @@
 							<Table.Cell colspan={4}>
 								<div class="space-y-4">
 									<div>
-										<h4 class="text-sm font-medium mb-2">Input</h4>
+										<Label class="text-sm font-medium">Input</Label>
 										<CopyableCode codeText={run.input} />
 									</div>
 									{#if run.output}
 										<div>
-											<h4 class="text-sm font-medium mb-2">Output</h4>
+											<Label class="text-sm font-medium">Output</Label>
 											<CopyableCode codeText={run.output} />
 										</div>
 									{/if}
 									{#if run.error}
-										<div>
-											<h4 class="text-sm font-medium mb-2 text-destructive">
-												Error
-											</h4>
-											<pre
-												class="text-sm bg-destructive/10 text-destructive p-2 rounded-md overflow-x-auto">{run.error}</pre>
-										</div>
+										<Label class="text-sm font-medium text-destructive">
+											Error
+										</Label>
+										<CopyableCode codeText={run.error} variant="error" />
 									{/if}
 									{#if run.stepRuns.length > 0}
 										<div>
