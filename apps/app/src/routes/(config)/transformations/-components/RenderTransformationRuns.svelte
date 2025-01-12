@@ -49,7 +49,7 @@
 							<Button
 								variant="ghost"
 								size="icon"
-								class="h-6 w-6 shrink-0"
+								class="h-8 w-8 shrink-0"
 								onclick={() => toggleRunExpanded(run.id)}
 							>
 								{#if expandedRunIds.has(run.id)}
