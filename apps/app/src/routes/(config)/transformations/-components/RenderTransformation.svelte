@@ -4,14 +4,14 @@
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationTest from './RenderTransformationTest.svelte';
 	let {
+		activeTab = 'configure',
 		transformation,
 		onChange,
 	}: {
+		activeTab: 'configure' | 'test';
 		transformation: Transformation;
 		onChange: (transformation: Transformation) => void;
 	} = $props();
-
-	let activeTab = $state('configure');
 </script>
 
 <Tabs.Root

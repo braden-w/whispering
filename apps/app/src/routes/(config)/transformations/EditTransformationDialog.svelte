@@ -4,12 +4,12 @@
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import type { Transformation } from '$lib/services/db';
 	import {
 		deleteTransformationWithToast,
 		updateTransformationWithToast,
 	} from '$lib/query/transformations/mutations';
-	import { Loader2Icon } from 'lucide-svelte';
+	import type { Transformation } from '$lib/services/db';
+	import { HistoryIcon, Loader2Icon, PlayIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
@@ -33,6 +33,24 @@
 			>
 				<EditIcon class="h-4 w-4" />
 			</WhisperingButton>
+			<WhisperingButton
+				tooltipContent="Test transformation"
+				variant="ghost"
+				size="icon"
+				class={className}
+				{...props}
+			>
+				<PlayIcon class="h-4 w-4" />
+			</WhisperingButton>
+			<WhisperingButton
+				tooltipContent="Transformation Run History"
+				variant="ghost"
+				size="icon"
+				class={className}
+				{...props}
+			>
+				<HistoryIcon class="h-4 w-4" />
+			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content
@@ -51,12 +69,6 @@
 			}
 		}}
 	>
-		<Dialog.Header>
-			<Dialog.Title>Edit transformation</Dialog.Title>
-			<Dialog.Description>
-				Make changes to your transformation here. Click save when you're done.
-			</Dialog.Description>
-		</Dialog.Header>
 		<RenderTransformation
 			{transformation}
 			onChange={(newTransformation) => {
