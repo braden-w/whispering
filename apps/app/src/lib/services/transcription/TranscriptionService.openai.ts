@@ -1,18 +1,17 @@
 import { Ok } from '@epicenterhq/result';
 import type { HttpService } from '../http/HttpService';
 import {
-	TranscriptionServiceErr,
 	type TranscriptionService,
+	TranscriptionServiceErr,
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
-import type { Settings } from '@repo/shared';
 
-export function createTranscriptionServiceOpenAi({
+export function createOpenaiTranscriptionService({
 	HttpService,
-	settings,
+	apiKey,
 }: {
 	HttpService: HttpService;
-	settings: Settings;
+	apiKey: string;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
@@ -20,11 +19,11 @@ export function createTranscriptionServiceOpenAi({
 		postConfig: {
 			url: 'https://api.openai.com/v1/audio/transcriptions',
 			headers: {
-				Authorization: `Bearer ${settings['apiKeys.openai']}`,
+				Authorization: `Bearer ${apiKey}`,
 			},
 		},
 		preValidate: async () => {
-			if (!settings['apiKeys.openai']) {
+			if (!apiKey) {
 				return TranscriptionServiceErr({
 					title: 'OpenAI API Key not provided.',
 					description: 'Please enter your OpenAI API key in the settings',
@@ -36,7 +35,7 @@ export function createTranscriptionServiceOpenAi({
 				});
 			}
 
-			if (!settings['apiKeys.openai'].startsWith('sk-')) {
+			if (!apiKey.startsWith('sk-')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid OpenAI API Key',
 					description: 'The OpenAI API Key must start with "sk-"',

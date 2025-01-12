@@ -127,7 +127,7 @@ export function HttpServiceErrIntoTranscriptionServiceErr({
 				title: '❓ Unexpected Error',
 				description:
 					'An unexpected error occurred during transcription. Please try again or contact support if the issue persists.',
-				action: { type: 'more-details', error: error.error },
+				action: { type: 'more-details' },
 			});
 	}
 }

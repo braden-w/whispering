@@ -5,31 +5,47 @@ import {
 	type TranscriptionService,
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
-import type { Settings } from '@repo/shared';
 
-/**
- * Fastest and most cost-effective model, but English-only.
- * Recommended for English transcription where speed and cost are priorities.
- * Cost: $0.02/hour, 250x real-time processing, 13% WER
- */
-export function createTranscriptionServiceGroqDistil({
+type ModelName =
+	/**
+	 * Best accuracy (10.3% WER) and full multilingual support, including translation.
+	 * Recommended for error-sensitive applications requiring multilingual support.
+	 * Cost: $0.111/hour
+	 */
+	| 'whisper-large-v3'
+	/**
+	 * Fast multilingual model with good accuracy (12% WER).
+	 * Best price-to-performance ratio for multilingual applications.
+	 * Cost: $0.04/hour, 216x real-time processing
+	 */
+	| 'whisper-large-v3-turbo'
+	/**
+	 * Fastest and most cost-effective model, but English-only.
+	 * Recommended for English transcription where speed and cost are priorities.
+	 * Cost: $0.02/hour, 250x real-time processing, 13% WER
+	 */
+	| 'distil-whisper-large-v3-en';
+
+export function createGroqTranscriptionService({
 	HttpService,
-	settings,
+	apiKey,
+	modelName,
 }: {
 	HttpService: HttpService;
-	settings: Settings;
+	apiKey: string;
+	modelName: ModelName;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
-		modelName: 'distil-whisper-large-v3-en',
+		modelName,
 		postConfig: {
 			url: 'https://api.groq.com/openai/v1/audio/transcriptions',
 			headers: {
-				Authorization: `Bearer ${settings['apiKeys.groq']}`,
+				Authorization: `Bearer ${apiKey}`,
 			},
 		},
 		preValidate: async () => {
-			if (!settings['apiKeys.groq']) {
+			if (!apiKey) {
 				return TranscriptionServiceErr({
 					title: 'Groq API Key not provided.',
 					description: 'Please enter your Groq API key in the settings',
@@ -41,7 +57,7 @@ export function createTranscriptionServiceGroqDistil({
 				});
 			}
 
-			if (!settings['apiKeys.groq'].startsWith('gsk_')) {
+			if (!apiKey.startsWith('gsk_')) {
 				return TranscriptionServiceErr({
 					title: 'Invalid Groq API Key',
 					description: 'The Groq API Key must start with "gsk_"',

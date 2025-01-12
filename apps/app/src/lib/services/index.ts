@@ -30,14 +30,12 @@ import { createNotificationServiceDesktop } from './notifications/NotificationSe
 import { createNotificationServiceWeb } from './notifications/NotificationService.web';
 import { createRecorderServiceTauri } from './recorder/RecorderService.tauri';
 import { createRecorderServiceWeb } from './recorder/RecorderService.web';
+import { createRunTransformationService } from './runTransformation';
 import { createPlaySoundServiceDesktop } from './sound/PlaySoundService.desktop';
 import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
-import { createTranscriptionServiceFasterWhisperServer } from './transcription/TranscriptionService.fasterWhisperServer';
-import { createTranscriptionServiceGroqDistil } from './transcription/TranscriptionService.groq.distil';
-import { createTranscriptionServiceGroqLarge } from './transcription/TranscriptionService.groq.large';
-import { createTranscriptionServiceGroqTurbo } from './transcription/TranscriptionService.groq.turbo';
-import { createTranscriptionServiceOpenAi } from './transcription/TranscriptionService.openai';
-import { createRunTransformationService } from './transformation/TransformationService';
+import { createFasterWhisperServerTranscriptionService } from './transcription/TranscriptionService.fasterWhisperServer';
+import { createGroqTranscriptionService } from './transcription/TranscriptionService.groq';
+import { createOpenaiTranscriptionService } from './transcription/TranscriptionService.openai';
 
 type QueryResultFunction<TData, TError> = () => MaybePromise<
 	Result<TData, TError>
@@ -170,45 +168,34 @@ export const userConfiguredServices = (() => {
 	return {
 		get transcription() {
 			switch (settings.value['transcription.selectedTranscriptionService']) {
-				case 'OpenAI':
-					return createTranscriptionServiceOpenAi({
+				case 'OpenAI': {
+					return createOpenaiTranscriptionService({
 						HttpService,
-						settings: settings.value,
+						apiKey: settings.value['apiKeys.openai'],
 					});
-				case 'Groq': {
-					switch (settings.value['transcription.groq.model']) {
-						case 'whisper-large-v3':
-							return createTranscriptionServiceGroqLarge({
-								HttpService,
-								settings: settings.value,
-							});
-						case 'whisper-large-v3-turbo':
-							return createTranscriptionServiceGroqTurbo({
-								HttpService,
-								settings: settings.value,
-							});
-						case 'distil-whisper-large-v3-en':
-							return createTranscriptionServiceGroqDistil({
-								HttpService,
-								settings: settings.value,
-							});
-						default:
-							return createTranscriptionServiceGroqLarge({
-								HttpService,
-								settings: settings.value,
-							});
-					}
 				}
-				case 'faster-whisper-server':
-					return createTranscriptionServiceFasterWhisperServer({
+				case 'Groq': {
+					return createGroqTranscriptionService({
 						HttpService,
-						settings: settings.value,
+						apiKey: settings.value['apiKeys.groq'],
+						modelName: settings.value['transcription.groq.model'],
 					});
-				default:
-					return createTranscriptionServiceOpenAi({
+				}
+				case 'faster-whisper-server': {
+					return createFasterWhisperServerTranscriptionService({
 						HttpService,
-						settings: settings.value,
+						serverModel:
+							settings.value['transcription.fasterWhisperServer.serverModel'],
+						serverUrl:
+							settings.value['transcription.fasterWhisperServer.serverUrl'],
 					});
+				}
+				default: {
+					return createOpenaiTranscriptionService({
+						HttpService,
+						apiKey: settings.value['apiKeys.openai'],
+					});
+				}
 			}
 		},
 		get recorder() {

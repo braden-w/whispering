@@ -1,24 +1,23 @@
 import { Ok } from '@epicenterhq/result';
-import type { HttpService } from '../http/HttpService';
-import {
-	TranscriptionServiceErr,
-	type TranscriptionService,
-} from './TranscriptionService';
-import { createWhisperService } from './createWhisperService';
 import type { Settings } from '@repo/shared';
+import type { HttpService } from '../http/HttpService';
+import type { TranscriptionService } from './TranscriptionService';
+import { createWhisperService } from './createWhisperService';
 
-export function createTranscriptionServiceFasterWhisperServer({
+export function createFasterWhisperServerTranscriptionService({
 	HttpService,
-	settings,
+	serverModel,
+	serverUrl,
 }: {
 	HttpService: HttpService;
-	settings: Settings;
+	serverModel: string;
+	serverUrl: string;
 }): TranscriptionService {
 	return createWhisperService({
 		HttpService,
-		modelName: settings['transcription.fasterWhisperServer.serverModel'],
+		modelName: serverModel,
 		postConfig: {
-			url: `${settings['transcription.fasterWhisperServer.serverUrl']}/v1/audio/transcriptions`,
+			url: `${serverUrl}/v1/audio/transcriptions`,
 		},
 		preValidate: async () => Ok(undefined),
 		errorConfig: {
