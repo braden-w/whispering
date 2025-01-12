@@ -204,7 +204,40 @@
 		Your text transformations, stored locally in IndexedDB.
 	</p>
 
-	<Resizable.PaneGroup direction="horizontal" class="gap-6 py-6">
+	<div class="flex items-center justify-between gap-2 w-full">
+		<Input
+			placeholder="Filter transformations..."
+			type="text"
+			class="w-full"
+			value={filterQuery.value}
+			oninput={(e) => (filterQuery.value = e.currentTarget.value)}
+		/>
+		{#if selectedTransformationRows.length > 0}
+			<WhisperingButton
+				tooltipContent="Delete selected transformations"
+				variant="outline"
+				size="icon"
+				onclick={() => {
+					confirmationDialog.open({
+						title: 'Delete transformations',
+						subtitle: 'Are you sure you want to delete these transformations?',
+						confirmText: 'Delete',
+						onConfirm: () => {
+							deleteTransformationsWithToast.mutate(
+								selectedTransformationRows.map(({ original }) => original),
+							);
+						},
+					});
+				}}
+			>
+				<TrashIcon class="h-4 w-4" />
+			</WhisperingButton>
+		{/if}
+
+		<CreateTransformationButton />
+	</div>
+
+	<Resizable.PaneGroup direction="horizontal" class="gap-6">
 		<Resizable.Pane
 			defaultSize={50}
 			class="flex flex-col gap-4"
@@ -212,40 +245,6 @@
 				transformationId: null,
 			})}"
 		>
-			<div class="flex items-center justify-between gap-2 w-full">
-				<Input
-					placeholder="Filter transformations..."
-					type="text"
-					class="w-full"
-					value={filterQuery.value}
-					oninput={(e) => (filterQuery.value = e.currentTarget.value)}
-				/>
-				{#if selectedTransformationRows.length > 0}
-					<WhisperingButton
-						tooltipContent="Delete selected transformations"
-						variant="outline"
-						size="icon"
-						onclick={() => {
-							confirmationDialog.open({
-								title: 'Delete transformations',
-								subtitle:
-									'Are you sure you want to delete these transformations?',
-								confirmText: 'Delete',
-								onConfirm: () => {
-									deleteTransformationsWithToast.mutate(
-										selectedTransformationRows.map(({ original }) => original),
-									);
-								},
-							});
-						}}
-					>
-						<TrashIcon class="h-4 w-4" />
-					</WhisperingButton>
-				{/if}
-
-				<CreateTransformationButton />
-			</div>
-
 			<div class="rounded-md border">
 				<Table.Root>
 					<Table.Header>
