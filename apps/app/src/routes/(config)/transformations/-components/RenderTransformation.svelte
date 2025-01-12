@@ -24,7 +24,7 @@
 		<Tabs.Trigger value="test">Test</Tabs.Trigger>
 	</Tabs.List>
 
-	<Tabs.Content value="configure" class="relative">
+	<Tabs.Content value="configure">
 		<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
 	</Tabs.Content>
 
