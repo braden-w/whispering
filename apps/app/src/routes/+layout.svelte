@@ -4,7 +4,7 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
-	import { DbService, queryClient } from '$lib/services';
+	import { DbRecordingsService, queryClient } from '$lib/services';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
@@ -24,7 +24,7 @@
 
 	$effect(() => {
 		recorder.recorderState;
-		void DbService.cleanupExpiredRecordings(settings.value);
+		void DbRecordingsService.cleanupExpiredRecordings(settings.value);
 	});
 
 	onNavigate((navigation) => {
