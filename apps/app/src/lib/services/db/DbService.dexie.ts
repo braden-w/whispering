@@ -225,7 +225,7 @@ class RecordingsDatabase extends Dexie {
 			.stores({
 				recordings: '&id, timestamp, createdAt, updatedAt',
 				transformations: '&id, createdAt, updatedAt',
-				transformationRuns: '&id, recordingId, startedAt',
+				transformationRuns: '&id, transformationId, recordingId, startedAt',
 			})
 			.upgrade(async (tx) => {
 				try {
