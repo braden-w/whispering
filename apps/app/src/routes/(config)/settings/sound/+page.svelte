@@ -24,11 +24,11 @@
 		<LabeledSwitch
 			id="play-sound-start"
 			label="Play sound when recording starts"
-			checked={settings.value['sound.playOnStartSuccess']}
+			checked={settings.value['sound.playOn.start']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					'sound.playOnStartSuccess': v,
+					'sound.playOn.start': v,
 				};
 			}}
 		/>
@@ -36,11 +36,11 @@
 		<LabeledSwitch
 			id="play-sound-stop"
 			label="Play sound when recording stops"
-			checked={settings.value['sound.playOnStopSuccess']}
+			checked={settings.value['sound.playOn.stop']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					'sound.playOnStopSuccess': v,
+					'sound.playOn.stop': v,
 				};
 			}}
 		/>
@@ -48,11 +48,11 @@
 		<LabeledSwitch
 			id="play-sound-cancel"
 			label="Play sound when recording cancels"
-			checked={settings.value['sound.playOnCancelSuccess']}
+			checked={settings.value['sound.playOn.cancel']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					'sound.playOnCancelSuccess': v,
+					'sound.playOn.cancel': v,
 				};
 			}}
 		/>
@@ -60,11 +60,11 @@
 		<LabeledSwitch
 			id="play-sound-transcription"
 			label="Play sound after transcription"
-			checked={settings.value['sound.playOnTranscriptionSuccess']}
+			checked={settings.value['sound.playOn.transcriptionComplete']}
 			onCheckedChange={(v) => {
 				settings.value = {
 					...settings.value,
-					'sound.playOnTranscriptionSuccess': v,
+					'sound.playOn.transcriptionComplete': v,
 				};
 			}}
 		/>

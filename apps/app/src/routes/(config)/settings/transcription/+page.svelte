@@ -16,7 +16,6 @@
 	import {
 		LabeledInput,
 		LabeledSelect,
-		LabeledSwitch,
 		LabeledTextarea,
 	} from '$lib/components/labeled/index.js';
 </script>
@@ -115,18 +114,14 @@
 					</Tabs.List>
 
 					<Tabs.Content value="cpu-mode">
-						<p class="text-muted-foreground pb-4">
-							For computers without CUDA support:
-						</p>
 						<CopyableCode
+							label="For computers without CUDA support:"
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
 						/>
 					</Tabs.Content>
 					<Tabs.Content value="gpu-mode">
-						<p class="text-muted-foreground pb-4">
-							For computers with CUDA support:
-						</p>
 						<CopyableCode
+							label="For computers with CUDA support:"
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
 						/>
 					</Tabs.Content>
