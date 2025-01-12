@@ -30,7 +30,7 @@
 	);
 </script>
 
-<div class="space-y-4">
+<div class="space-y-4 overflow-y-auto h-full">
 	{#if transformationsQuery.isLoading}
 		<div class="text-muted-foreground text-sm">Loading runs...</div>
 	{:else if transformationsQuery.error}
@@ -45,31 +45,31 @@
 			{#each runs as run}
 				<Card.Root>
 					<Card.Header class="p-4">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-2">
-								<Button
-									variant="ghost"
-									size="icon"
-									class="h-6 w-6"
-									onclick={() => toggleRunExpanded(run.id)}
-								>
-									{#if expandedRunIds.has(run.id)}
-										<ChevronDown class="h-4 w-4" />
-									{:else}
-										<ChevronRight class="h-4 w-4" />
-									{/if}
-								</Button>
-								<Badge variant={`status.${run.status}`}>
+						<div class="flex items-center gap-6">
+							<Button
+								variant="ghost"
+								size="icon"
+								class="h-6 w-6 shrink-0"
+								onclick={() => toggleRunExpanded(run.id)}
+							>
+								{#if expandedRunIds.has(run.id)}
+									<ChevronDown class="h-4 w-4" />
+								{:else}
+									<ChevronRight class="h-4 w-4" />
+								{/if}
+							</Button>
+							<div
+								class="grid grid-cols-[100px_150px_150px] items-center gap-6"
+							>
+								<Badge variant={`status.${run.status}`} class="w-fit">
 									{run.status}
 								</Badge>
-								<div class="text-sm text-muted-foreground">
-									Started: {formatDate(run.startedAt)}
+								<div class="text-sm text-muted-foreground whitespace-nowrap">
+									{formatDate(run.startedAt)}
 								</div>
-								{#if run.completedAt}
-									<div class="text-sm text-muted-foreground">
-										Completed: {formatDate(run.completedAt)}
-									</div>
-								{/if}
+								<div class="text-sm text-muted-foreground whitespace-nowrap">
+									{run.completedAt ? formatDate(run.completedAt) : '-'}
+								</div>
 							</div>
 						</div>
 					</Card.Header>
