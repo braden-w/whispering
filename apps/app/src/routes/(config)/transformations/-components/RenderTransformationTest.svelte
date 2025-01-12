@@ -33,7 +33,7 @@
 
 			const maybeTransformationResult =
 				await RunTransformationService.runTransformation({
-					maybeRecordingId: null,
+					recordingId: null,
 					input,
 					transformation,
 				});

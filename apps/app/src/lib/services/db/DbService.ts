@@ -105,7 +105,7 @@ export type DbTransformationsService = {
 	createTransformationRun: (
 		transformationRun: Pick<
 			TransformationRun,
-			'input' | 'transformationId' | 'maybeRecordingId'
+			'input' | 'transformationId' | 'recordingId'
 		>,
 	) => Promise<DbServiceResult<TransformationRun>>;
 	addTransformationStepRunToTransformationRun: (opts: {
@@ -216,7 +216,7 @@ export type TransformationRun = {
 	 * Recording id if the transformation is invoked on a recording.
 	 * Null if the transformation is invoked on arbitrary text input.
 	 */
-	maybeRecordingId: string | null;
+	recordingId: string | null;
 	status: 'running' | 'completed' | 'failed';
 	startedAt: string;
 	completedAt: string | null;

@@ -1,5 +1,4 @@
 import { Ok } from '@epicenterhq/result';
-import type { Settings } from '@repo/shared';
 import type { HttpService } from '../http/HttpService';
 import type { TranscriptionService } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
