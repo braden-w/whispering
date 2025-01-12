@@ -8,6 +8,7 @@
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { format } from 'date-fns';
+	import CopyableCode from '$lib/components/CopyableCode.svelte';
 
 	let { transformationId }: { transformationId: string } = $props();
 
@@ -86,14 +87,12 @@
 								<div class="space-y-4">
 									<div>
 										<h4 class="text-sm font-medium mb-2">Input</h4>
-										<pre
-											class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.input}</pre>
+										<CopyableCode codeText={run.input} />
 									</div>
 									{#if run.output}
 										<div>
 											<h4 class="text-sm font-medium mb-2">Output</h4>
-											<pre
-												class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.output}</pre>
+											<CopyableCode codeText={run.output} />
 										</div>
 									{/if}
 									{#if run.error}
