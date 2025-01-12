@@ -15,7 +15,7 @@
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane class="min-w-96 h-full flex flex-col">
+	<Resizable.Pane class="h-full flex flex-col">
 		<div class="flex-1 overflow-y-auto">
 			<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
 		</div>
@@ -23,14 +23,12 @@
 	<Resizable.Handle withHandle />
 	<Resizable.Pane>
 		<Resizable.PaneGroup direction="vertical">
-			<Resizable.Pane class="min-h-[200px]">
+			<Resizable.Pane>
 				<RenderTransformationTest {transformation} />
 			</Resizable.Pane>
 			<Resizable.Handle withHandle />
-			<Resizable.Pane class="min-h-[200px]">
-				<div class="h-full w-full p-4 bg-card rounded-lg">
-					<RenderTransformationRuns transformationId={transformation.id} />
-				</div>
+			<Resizable.Pane>
+				<RenderTransformationRuns transformationId={transformation.id} />
 			</Resizable.Pane>
 		</Resizable.PaneGroup>
 	</Resizable.Pane>
