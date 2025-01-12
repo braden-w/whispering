@@ -11,7 +11,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import SortableTableHeader from '$lib/components/ui/table/SortableDataTableHeader.svelte';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
