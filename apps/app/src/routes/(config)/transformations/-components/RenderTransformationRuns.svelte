@@ -37,12 +37,13 @@
 			{transformationsQuery.error.description}
 		</div>
 	{:else if transformationsQuery.data}
-		{#if transformationsQuery.data?.length === 0}
+		{@const runs = transformationsQuery.data}
+		{#if runs.length === 0}
 			<div class="text-muted-foreground text-sm">No runs yet</div>
 		{:else}
-			<ScrollArea class="h-[400px]">
+			<ScrollArea>
 				<div class="space-y-4">
-					{#each transformationsQuery.data as run}
+					{#each runs as run}
 						<Card.Root>
 							<Card.Header class="p-4">
 								<div class="flex items-center justify-between">
