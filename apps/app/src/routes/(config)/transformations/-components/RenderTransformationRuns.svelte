@@ -41,7 +41,7 @@
 	{#if runs.length === 0}
 		<div class="text-muted-foreground text-sm">No runs yet</div>
 	{:else}
-		<div class="space-y-4 overflow-y-auto h-full">
+		<div class="flex flex-col gap-4 p-4 overflow-y-auto h-full">
 			{#each runs as run}
 				<Card.Root>
 					<Card.Header class="p-4">

@@ -13,6 +13,10 @@
 				destructive:
 					'bg-destructive text-destructive-foreground hover:bg-destructive/80 border-transparent',
 				outline: 'text-foreground',
+				'status.running': 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20',
+				'status.completed':
+					'bg-green-500/10 text-green-500 hover:bg-green-500/20',
+				'status.failed': 'bg-red-500/10 text-red-500 hover:bg-red-500/20',
 			},
 		},
 		defaultVariants: {
