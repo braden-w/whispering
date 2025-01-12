@@ -23,7 +23,10 @@
 		variant="ghost"
 		class="absolute right-4 top-4 h-4 w-4"
 		onclick={() =>
-			copyTextToClipboardWithToast.mutate({ label: 'code', text: codeText })}>
+			copyTextToClipboardWithToast.mutate(
+				{ label: 'code', text: codeText },
+				{ onSuccess: () => (hasCopied = true) },
+			)}>
 			<span class="sr-only">Copy</span>
     {#if hasCopied}
 			<CheckIcon />
