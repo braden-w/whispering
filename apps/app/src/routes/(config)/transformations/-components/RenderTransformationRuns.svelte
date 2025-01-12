@@ -41,103 +41,99 @@
 		{#if runs.length === 0}
 			<div class="text-muted-foreground text-sm">No runs yet</div>
 		{:else}
-			<ScrollArea>
-				<div class="space-y-4">
-					{#each runs as run}
-						<Card.Root>
-							<Card.Header class="p-4">
-								<div class="flex items-center justify-between">
-									<div class="flex items-center gap-2">
-										<Button
-											variant="ghost"
-											size="icon"
-											class="h-6 w-6"
-											onclick={() => toggleRunExpanded(run.id)}
-										>
-											{#if expandedRunIds.has(run.id)}
-												<ChevronDown class="h-4 w-4" />
-											{:else}
-												<ChevronRight class="h-4 w-4" />
-											{/if}
-										</Button>
-										<Badge variant={`status.${run.status}`}>
-											{run.status}
-										</Badge>
-										<div class="text-sm text-muted-foreground">
-											Started: {formatDate(run.startedAt)}
-										</div>
-										{#if run.completedAt}
-											<div class="text-sm text-muted-foreground">
-												Completed: {formatDate(run.completedAt)}
-											</div>
-										{/if}
-									</div>
+			{#each runs as run}
+				<Card.Root>
+					<Card.Header class="p-4">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2">
+								<Button
+									variant="ghost"
+									size="icon"
+									class="h-6 w-6"
+									onclick={() => toggleRunExpanded(run.id)}
+								>
+									{#if expandedRunIds.has(run.id)}
+										<ChevronDown class="h-4 w-4" />
+									{:else}
+										<ChevronRight class="h-4 w-4" />
+									{/if}
+								</Button>
+								<Badge variant={`status.${run.status}`}>
+									{run.status}
+								</Badge>
+								<div class="text-sm text-muted-foreground">
+									Started: {formatDate(run.startedAt)}
 								</div>
-							</Card.Header>
-							{#if expandedRunIds.has(run.id)}
-								<Card.Content class="p-4">
-									<div class="space-y-4">
-										<div>
-											<h4 class="text-sm font-medium mb-2">Input</h4>
-											<pre
-												class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.input}</pre>
-										</div>
-										{#if run.output}
-											<div>
-												<h4 class="text-sm font-medium mb-2">Output</h4>
-												<pre
-													class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.output}</pre>
-											</div>
-										{/if}
-										{#if run.error}
-											<div>
-												<h4 class="text-sm font-medium mb-2 text-destructive">
-													Error
-												</h4>
-												<pre
-													class="text-sm bg-destructive/10 text-destructive p-2 rounded-md overflow-x-auto">{run.error}</pre>
-											</div>
-										{/if}
-										{#if run.stepRuns.length > 0}
-											<div>
-												<h4 class="text-sm font-medium mb-2">Steps</h4>
-												<Table.Root>
-													<Table.Header>
-														<Table.Row>
-															<Table.Head>Status</Table.Head>
-															<Table.Head>Started</Table.Head>
-															<Table.Head>Completed</Table.Head>
-														</Table.Row>
-													</Table.Header>
-													<Table.Body>
-														{#each run.stepRuns as stepRun}
-															<Table.Row>
-																<Table.Cell>
-																	<Badge variant={`status.${stepRun.status}`}>
-																		{stepRun.status}
-																	</Badge>
-																</Table.Cell>
-																<Table.Cell>
-																	{formatDate(stepRun.startedAt)}
-																</Table.Cell>
-																<Table.Cell>
-																	{stepRun.completedAt
-																		? formatDate(stepRun.completedAt)
-																		: '-'}
-																</Table.Cell>
-															</Table.Row>
-														{/each}
-													</Table.Body>
-												</Table.Root>
-											</div>
-										{/if}
+								{#if run.completedAt}
+									<div class="text-sm text-muted-foreground">
+										Completed: {formatDate(run.completedAt)}
 									</div>
-								</Card.Content>
-							{/if}
-						</Card.Root>
-					{/each}
-				</div>
-			</ScrollArea>
+								{/if}
+							</div>
+						</div>
+					</Card.Header>
+					{#if expandedRunIds.has(run.id)}
+						<Card.Content class="p-4">
+							<div class="space-y-4">
+								<div>
+									<h4 class="text-sm font-medium mb-2">Input</h4>
+									<pre
+										class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.input}</pre>
+								</div>
+								{#if run.output}
+									<div>
+										<h4 class="text-sm font-medium mb-2">Output</h4>
+										<pre
+											class="text-sm bg-muted p-2 rounded-md overflow-x-auto">{run.output}</pre>
+									</div>
+								{/if}
+								{#if run.error}
+									<div>
+										<h4 class="text-sm font-medium mb-2 text-destructive">
+											Error
+										</h4>
+										<pre
+											class="text-sm bg-destructive/10 text-destructive p-2 rounded-md overflow-x-auto">{run.error}</pre>
+									</div>
+								{/if}
+								{#if run.stepRuns.length > 0}
+									<div>
+										<h4 class="text-sm font-medium mb-2">Steps</h4>
+										<Table.Root>
+											<Table.Header>
+												<Table.Row>
+													<Table.Head>Status</Table.Head>
+													<Table.Head>Started</Table.Head>
+													<Table.Head>Completed</Table.Head>
+												</Table.Row>
+											</Table.Header>
+											<Table.Body>
+												{#each run.stepRuns as stepRun}
+													<Table.Row>
+														<Table.Cell>
+															<Badge variant={`status.${stepRun.status}`}>
+																{stepRun.status}
+															</Badge>
+														</Table.Cell>
+														<Table.Cell>
+															{formatDate(stepRun.startedAt)}
+														</Table.Cell>
+														<Table.Cell>
+															{stepRun.completedAt
+																? formatDate(stepRun.completedAt)
+																: '-'}
+														</Table.Cell>
+													</Table.Row>
+												{/each}
+											</Table.Body>
+										</Table.Root>
+									</div>
+								{/if}
+							</div>
+						</Card.Content>
+					{/if}
+				</Card.Root>
+			{/each}
 		{/if}
 	{/if}
 </div>
