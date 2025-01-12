@@ -103,7 +103,6 @@
 				const transformation = getValue<Transformation>();
 				return renderComponent(TransformationRowActions, {
 					transformationId: transformation.id,
-					class: 'hidden group-hover:flex',
 				});
 			},
 		},
@@ -237,126 +236,96 @@
 		<CreateTransformationButton />
 	</div>
 
-	<Resizable.PaneGroup direction="horizontal" class="gap-6">
-		<Resizable.Pane
-			defaultSize={50}
-			class="flex flex-col gap-4"
-			style="view-transition-name: {createTransformationViewTransitionName({
-				transformationId: null,
-			})}"
-		>
-			<div class="rounded-md border">
-				<Table.Root>
-					<Table.Header>
-						{#each table.getHeaderGroups() as headerGroup}
-							<Table.Row>
-								{#each headerGroup.headers as header}
-									<Table.Head colspan={header.colSpan}>
-										{#if !header.isPlaceholder}
-											<FlexRender
-												content={header.column.columnDef.header}
-												context={header.getContext()}
-											/>
-										{/if}
-									</Table.Head>
-								{/each}
-							</Table.Row>
+	<div class="rounded-md border">
+		<Table.Root>
+			<Table.Header>
+				{#each table.getHeaderGroups() as headerGroup}
+					<Table.Row>
+						{#each headerGroup.headers as header}
+							<Table.Head colspan={header.colSpan}>
+								{#if !header.isPlaceholder}
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
+								{/if}
+							</Table.Head>
 						{/each}
-					</Table.Header>
-					<Table.Body>
-						{#if transformationsQuery.isPending}
-							{#each { length: 5 }}
-								<Table.Row>
-									<Table.Cell>
-										<Skeleton class="h-4 w-4" />
-									</Table.Cell>
-									<Table.Cell colspan={columns.length - 1}>
-										<Skeleton class="h-4 w-full" />
-									</Table.Cell>
-								</Table.Row>
-							{/each}
-						{:else if table.getRowModel().rows?.length}
-							{#each table.getRowModel().rows as row (row.id)}
-								{@const isSelected =
-									row.id === sidebar.selectedTransformationId}
-								<Table.Row
-									class={cn('cursor-pointer group', {
-										'bg-muted/75': isSelected,
-									})}
-									onclick={() => sidebar.openTransformationById(row.id)}
-									style="view-transition-name: {createTransformationViewTransitionName(
-										{ transformationId: row.id },
-									)}"
-								>
-									{#each row.getVisibleCells() as cell}
-										<Table.Cell>
-											<FlexRender
-												content={cell.column.columnDef.cell}
-												context={cell.getContext()}
-											/>
-										</Table.Cell>
-									{/each}
-								</Table.Row>
-							{/each}
-						{:else}
-							<Table.Row>
-								<Table.Cell colspan={columns.length} class="h-24 text-center">
-									{#if filterQuery.value}
-										No transformations found.
-									{:else}
-										No transformations yet. Click "Create Transformation" to add
-										one.
-									{/if}
+					</Table.Row>
+				{/each}
+			</Table.Header>
+			<Table.Body>
+				{#if transformationsQuery.isPending}
+					{#each { length: 5 }}
+						<Table.Row>
+							<Table.Cell>
+								<Skeleton class="h-4 w-4" />
+							</Table.Cell>
+							<Table.Cell colspan={columns.length - 1}>
+								<Skeleton class="h-4 w-full" />
+							</Table.Cell>
+						</Table.Row>
+					{/each}
+				{:else if table.getRowModel().rows?.length}
+					{#each table.getRowModel().rows as row (row.id)}
+						{@const isSelected = row.id === sidebar.selectedTransformationId}
+						<Table.Row
+							class={cn('cursor-pointer group', {
+								'bg-muted/75': isSelected,
+							})}
+							onclick={() => sidebar.openTransformationById(row.id)}
+							style="view-transition-name: {createTransformationViewTransitionName(
+								{ transformationId: row.id },
+							)}"
+						>
+							{#each row.getVisibleCells() as cell}
+								<Table.Cell>
+									<FlexRender
+										content={cell.column.columnDef.cell}
+										context={cell.getContext()}
+									/>
 								</Table.Cell>
-							</Table.Row>
-						{/if}
-					</Table.Body>
-				</Table.Root>
-			</div>
+							{/each}
+						</Table.Row>
+					{/each}
+				{:else}
+					<Table.Row>
+						<Table.Cell colspan={columns.length} class="h-24 text-center">
+							{#if filterQuery.value}
+								No transformations found.
+							{:else}
+								No transformations yet. Click "Create Transformation" to add
+								one.
+							{/if}
+						</Table.Cell>
+					</Table.Row>
+				{/if}
+			</Table.Body>
+		</Table.Root>
+	</div>
 
-			<div class="flex items-center justify-between">
-				<div class="text-muted-foreground text-sm">
-					{selectedTransformationRows.length} of {table.getFilteredRowModel()
-						.rows.length} row(s) selected.
-				</div>
-				<div class="flex items-center space-x-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onclick={() => table.previousPage()}
-						disabled={!table.getCanPreviousPage()}
-					>
-						Previous
-					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						onclick={() => table.nextPage()}
-						disabled={!table.getCanNextPage()}
-					>
-						Next
-					</Button>
-				</div>
-			</div>
-		</Resizable.Pane>
-		<Resizable.Handle class="hidden md:flex" />
-		<Resizable.Pane defaultSize={50} class="hidden md:block">
-			{#if sidebar.selectedTransformationId}
-				<EditTransformationSidePanel
-					selectedTransformationId={sidebar.selectedTransformationId}
-				/>
-			{:else}
-				<div
-					class="flex h-[50vh] items-center justify-center rounded-md border"
-				>
-					<div class="text-center">
-						<h3 class="text-lg font-medium">No transformation selected</h3>
-						<p class="text-muted-foreground mt-2">
-							Select a transformation from the list to edit it
-						</p>
-					</div>
-				</div>
-			{/if}
-		</Resizable.Pane>
-	</Resizable.PaneGroup>
+	<div class="flex items-center justify-between">
+		<div class="text-muted-foreground text-sm">
+			{selectedTransformationRows.length} of {table.getFilteredRowModel().rows
+				.length} row(s) selected.
+		</div>
+		<div class="flex items-center space-x-2">
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.previousPage()}
+				disabled={!table.getCanPreviousPage()}
+			>
+				Previous
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.nextPage()}
+				disabled={!table.getCanNextPage()}
+			>
+				Next
+			</Button>
+		</div>
+	</div>
 </main>

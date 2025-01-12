@@ -8,10 +8,7 @@
 	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
 
-	let {
-		transformationId,
-		class: className,
-	}: { transformationId: string; class?: string } = $props();
+	let { transformationId }: { transformationId: string } = $props();
 
 	const transformationsQuery = createTransformationQuery(
 		() => transformationId,
@@ -19,12 +16,12 @@
 	const transformation = $derived(transformationsQuery.data);
 </script>
 
-<div class={cn('flex items-center gap-1', className)}>
+<div class="flex items-center gap-1">
 	{#if !transformation}
 		<Skeleton class="h-8 w-8 md:hidden" />
 		<Skeleton class="h-8 w-8" />
 	{:else}
-		<EditTransformationDialog {transformation} class="md:hidden" />
+		<EditTransformationDialog {transformation} />
 
 		<WhisperingButton
 			tooltipContent="Delete transformation"
