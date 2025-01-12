@@ -7,6 +7,7 @@
 	import { createTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { format } from 'date-fns';
 
 	let { transformationId }: { transformationId: string } = $props();
 
@@ -21,7 +22,7 @@
 	}
 
 	function formatDate(dateStr: string) {
-		return new Date(dateStr).toLocaleString();
+		return format(new Date(dateStr), 'MMM d, yyyy h:mm a');
 	}
 
 	const transformationsQuery = createTransformationRunsByIdQuery(
