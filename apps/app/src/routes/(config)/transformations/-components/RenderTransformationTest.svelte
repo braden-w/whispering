@@ -2,8 +2,8 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import { runTransformation } from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
-	import { RunTransformationService } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
@@ -31,12 +31,11 @@
 				return;
 			}
 
-			const maybeTransformationResult =
-				await RunTransformationService.runTransformation({
-					recordingId: null,
-					input,
-					transformation,
-				});
+			const maybeTransformationResult = await runTransformation.mutateAsync({
+				recordingId: null,
+				input,
+				transformation,
+			});
 			if (!maybeTransformationResult.ok) {
 				toast.error({
 					title: 'Unexpected database error while running transformation',

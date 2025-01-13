@@ -1,9 +1,14 @@
-import { DbTransformationsService, queryClient } from '$lib/services';
-import type { Transformation } from '$lib/services/db';
+import {
+	DbTransformationsService,
+	queryClient,
+	RunTransformationService,
+} from '$lib/services';
+import type { Transformation, TransformationRun } from '$lib/services/db';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationsKeys } from './queries';
 import { settings } from '$lib/stores/settings.svelte';
+import { transformationRunKeys } from '../transformationRuns/queries';
 
 export const createTransformationWithToast = createMutation(() => ({
 	mutationFn: async (
@@ -193,5 +198,23 @@ export const deleteTransformationsWithToast = createMutation(() => ({
 			title: 'Deleted transformations!',
 			description: 'Your transformations have been deleted successfully.',
 		});
+	},
+}));
+
+export const runTransformation = createMutation(() => ({
+	mutationFn: async (
+		...params: Parameters<typeof RunTransformationService.runTransformation>
+	) => {
+		const result = await RunTransformationService.runTransformation(...params);
+		if (!result.ok) return result;
+		const newTransformationRun = result.data;
+		queryClient.setQueryData<TransformationRun[]>(
+			transformationRunKeys.byId(newTransformationRun.transformationId),
+			(oldData) => {
+				if (!oldData) return [newTransformationRun];
+				return [newTransformationRun, ...oldData];
+			},
+		);
+		return result;
 	},
 }));
