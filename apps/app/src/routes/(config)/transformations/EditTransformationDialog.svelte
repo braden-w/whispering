@@ -25,30 +25,13 @@
 	<Dialog.Trigger>
 		{#snippet child({ props })}
 			<WhisperingButton
-				tooltipContent="Edit transformation"
-				variant="ghost"
-				size="icon"
-				class={className}
 				{...props}
+				tooltipContent="Edit transformation, test transformation, and view run history"
+				variant="ghost"
+				class={className}
 			>
 				<EditIcon class="h-4 w-4" />
-			</WhisperingButton>
-			<WhisperingButton
-				tooltipContent="Test transformation"
-				variant="ghost"
-				size="icon"
-				class={className}
-				{...props}
-			>
 				<PlayIcon class="h-4 w-4" />
-			</WhisperingButton>
-			<WhisperingButton
-				tooltipContent="Transformation Run History"
-				variant="ghost"
-				size="icon"
-				class={className}
-				{...props}
-			>
 				<HistoryIcon class="h-4 w-4" />
 			</WhisperingButton>
 		{/snippet}
