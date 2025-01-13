@@ -85,57 +85,50 @@
 					{#if expandedRunIds.has(run.id)}
 						<Table.Row>
 							<Table.Cell colspan={4}>
-								<div class="space-y-4">
+								<CopyableCode codeText={run.input} label="Input" />
+								{#if run.output}
+									<CopyableCode codeText={run.output} label="Output" />
+								{/if}
+								{#if run.error}
+									<CopyableCode
+										codeText={run.error}
+										label="Error"
+										variant="error"
+									/>
+								{/if}
+								{#if run.stepRuns.length > 0}
 									<div>
-										<Label class="text-sm font-medium">Input</Label>
-										<CopyableCode codeText={run.input} />
-									</div>
-									{#if run.output}
-										<div>
-											<Label class="text-sm font-medium">Output</Label>
-											<CopyableCode codeText={run.output} />
-										</div>
-									{/if}
-									{#if run.error}
-										<Label class="text-sm font-medium text-destructive">
-											Error
-										</Label>
-										<CopyableCode codeText={run.error} variant="error" />
-									{/if}
-									{#if run.stepRuns.length > 0}
-										<div>
-											<h4 class="text-sm font-medium mb-2">Steps</h4>
-											<Table.Root>
-												<Table.Header>
+										<h4 class="text-sm font-medium mb-2">Steps</h4>
+										<Table.Root>
+											<Table.Header>
+												<Table.Row>
+													<Table.Head>Status</Table.Head>
+													<Table.Head>Started</Table.Head>
+													<Table.Head>Completed</Table.Head>
+												</Table.Row>
+											</Table.Header>
+											<Table.Body>
+												{#each run.stepRuns as stepRun}
 													<Table.Row>
-														<Table.Head>Status</Table.Head>
-														<Table.Head>Started</Table.Head>
-														<Table.Head>Completed</Table.Head>
+														<Table.Cell>
+															<Badge variant={`status.${stepRun.status}`}>
+																{stepRun.status}
+															</Badge>
+														</Table.Cell>
+														<Table.Cell>
+															{formatDate(stepRun.startedAt)}
+														</Table.Cell>
+														<Table.Cell>
+															{stepRun.completedAt
+																? formatDate(stepRun.completedAt)
+																: '-'}
+														</Table.Cell>
 													</Table.Row>
-												</Table.Header>
-												<Table.Body>
-													{#each run.stepRuns as stepRun}
-														<Table.Row>
-															<Table.Cell>
-																<Badge variant={`status.${stepRun.status}`}>
-																	{stepRun.status}
-																</Badge>
-															</Table.Cell>
-															<Table.Cell>
-																{formatDate(stepRun.startedAt)}
-															</Table.Cell>
-															<Table.Cell>
-																{stepRun.completedAt
-																	? formatDate(stepRun.completedAt)
-																	: '-'}
-															</Table.Cell>
-														</Table.Row>
-													{/each}
-												</Table.Body>
-											</Table.Root>
-										</div>
-									{/if}
-								</div>
+												{/each}
+											</Table.Body>
+										</Table.Root>
+									</div>
+								{/if}
 							</Table.Cell>
 						</Table.Row>
 					{/if}
