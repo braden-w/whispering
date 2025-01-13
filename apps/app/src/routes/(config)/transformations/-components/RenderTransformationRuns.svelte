@@ -84,12 +84,11 @@
 
 					{#if expandedRunIds.has(run.id)}
 						<Table.Row>
-							<Table.Cell colspan={4}>
+							<Table.Cell class="space-y-4" colspan={4}>
 								<CopyableCode codeText={run.input} label="Input" />
 								{#if run.output}
 									<CopyableCode codeText={run.output} label="Output" />
-								{/if}
-								{#if run.error}
+								{:else if run.error}
 									<CopyableCode
 										codeText={run.error}
 										label="Error"
@@ -97,8 +96,8 @@
 									/>
 								{/if}
 								{#if run.stepRuns.length > 0}
-									<div>
-										<h4 class="text-sm font-medium mb-2">Steps</h4>
+									<div class="flex flex-col gap-2">
+										<Label class="text-sm font-medium">Steps</Label>
 										<Table.Root>
 											<Table.Header>
 												<Table.Row>
