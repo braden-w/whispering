@@ -35,7 +35,19 @@
 {:else if transformationsQuery.data}
 	{@const runs = transformationsQuery.data}
 	{#if runs.length === 0}
-		<div class="text-muted-foreground text-sm">No runs yet</div>
+		<div class="flex h-[300px] items-center justify-center">
+			<div class="flex flex-col items-center gap-4 text-center">
+				<div class="rounded-full bg-muted p-4">
+					<ChevronRight class="h-6 w-6 text-muted-foreground" />
+				</div>
+				<div class="space-y-1">
+					<h3 class="text-xl font-semibold">No Runs Yet</h3>
+					<p class="text-muted-foreground">
+						When you run a transformation, the results will appear here.
+					</p>
+				</div>
+			</div>
+		</div>
 	{:else}
 		<Table.Root>
 			<Table.Header>
