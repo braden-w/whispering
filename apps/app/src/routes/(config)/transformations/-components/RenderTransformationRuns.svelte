@@ -98,34 +98,36 @@
 								{#if run.stepRuns.length > 0}
 									<div class="flex flex-col gap-2">
 										<Label class="text-sm font-medium">Steps</Label>
-										<Table.Root>
-											<Table.Header>
-												<Table.Row>
-													<Table.Head>Status</Table.Head>
-													<Table.Head>Started</Table.Head>
-													<Table.Head>Completed</Table.Head>
-												</Table.Row>
-											</Table.Header>
-											<Table.Body>
-												{#each run.stepRuns as stepRun}
+										<Card.Root>
+											<Table.Root>
+												<Table.Header>
 													<Table.Row>
-														<Table.Cell>
-															<Badge variant={`status.${stepRun.status}`}>
-																{stepRun.status}
-															</Badge>
-														</Table.Cell>
-														<Table.Cell>
-															{formatDate(stepRun.startedAt)}
-														</Table.Cell>
-														<Table.Cell>
-															{stepRun.completedAt
-																? formatDate(stepRun.completedAt)
-																: '-'}
-														</Table.Cell>
+														<Table.Head>Status</Table.Head>
+														<Table.Head>Started</Table.Head>
+														<Table.Head>Completed</Table.Head>
 													</Table.Row>
-												{/each}
-											</Table.Body>
-										</Table.Root>
+												</Table.Header>
+												<Table.Body>
+													{#each run.stepRuns as stepRun}
+														<Table.Row>
+															<Table.Cell>
+																<Badge variant={`status.${stepRun.status}`}>
+																	{stepRun.status}
+																</Badge>
+															</Table.Cell>
+															<Table.Cell>
+																{formatDate(stepRun.startedAt)}
+															</Table.Cell>
+															<Table.Cell>
+																{stepRun.completedAt
+																	? formatDate(stepRun.completedAt)
+																	: '-'}
+															</Table.Cell>
+														</Table.Row>
+													{/each}
+												</Table.Body>
+											</Table.Root>
+										</Card.Root>
 									</div>
 								{/if}
 							</Table.Cell>
