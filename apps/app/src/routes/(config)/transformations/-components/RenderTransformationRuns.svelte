@@ -6,21 +6,16 @@
 	import * as Table from '$lib/components/ui/table';
 	import { createTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
-	import { SvelteSet } from 'svelte/reactivity';
 	import { format } from 'date-fns';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
 	import { Label } from '$lib/components/ui/label';
 
 	let { transformationId }: { transformationId: string } = $props();
 
-	let expandedRunIds = new SvelteSet<string>();
+	let expandedRunId = $state<string | null>(null);
 
 	function toggleRunExpanded(runId: string) {
-		if (expandedRunIds.has(runId)) {
-			expandedRunIds.delete(runId);
-		} else {
-			expandedRunIds.add(runId);
-		}
+		expandedRunId = expandedRunId === runId ? null : runId;
 	}
 
 	function formatDate(dateStr: string) {
@@ -62,7 +57,7 @@
 								class="h-8 w-8 shrink-0"
 								onclick={() => toggleRunExpanded(run.id)}
 							>
-								{#if expandedRunIds.has(run.id)}
+								{#if expandedRunId === run.id}
 									<ChevronDown class="h-4 w-4" />
 								{:else}
 									<ChevronRight class="h-4 w-4" />
@@ -82,7 +77,7 @@
 						</Table.Cell>
 					</Table.Row>
 
-					{#if expandedRunIds.has(run.id)}
+					{#if expandedRunId === run.id}
 						<Table.Row>
 							<Table.Cell class="space-y-4" colspan={4}>
 								<CopyableCode codeText={run.input} label="Input" />
