@@ -3,6 +3,7 @@ import type { Transformation } from '$lib/services/db';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationsKeys } from './queries';
+import { settings } from '$lib/stores/settings.svelte';
 
 export const createTransformationWithToast = createMutation(() => ({
 	mutationFn: async (
@@ -118,17 +119,27 @@ export const deleteTransformationWithToast = createMutation(() => ({
 		}
 		return transformation;
 	},
-	onSuccess: (transformation) => {
+	onSuccess: (deletedTransformation) => {
 		queryClient.setQueryData<Transformation[]>(
 			transformationsKeys.all,
 			(oldData) => {
 				if (!oldData) return [];
-				return oldData.filter((item) => item.id !== transformation.id);
+				return oldData.filter((item) => item.id !== deletedTransformation.id);
 			},
 		);
 		queryClient.removeQueries({
-			queryKey: transformationsKeys.byId(transformation.id),
+			queryKey: transformationsKeys.byId(deletedTransformation.id),
 		});
+
+		if (
+			deletedTransformation.id ===
+			settings.value['transformations.selectedTransformationId']
+		) {
+			settings.value = {
+				...settings.value,
+				'transformations.selectedTransformationId': null,
+			};
+		}
 
 		toast.success({
 			title: 'Deleted transformation!',
@@ -151,19 +162,31 @@ export const deleteTransformationsWithToast = createMutation(() => ({
 		}
 		return transformations;
 	},
-	onSuccess: (transformations) => {
+	onSuccess: (deletedTransformations) => {
 		queryClient.setQueryData<Transformation[]>(
 			transformationsKeys.all,
 			(oldData) => {
 				if (!oldData) return [];
-				const deletedIds = new Set(transformations.map((t) => t.id));
+				const deletedIds = new Set(deletedTransformations.map((t) => t.id));
 				return oldData.filter((item) => !deletedIds.has(item.id));
 			},
 		);
-		for (const transformation of transformations) {
+		for (const transformation of deletedTransformations) {
 			queryClient.removeQueries({
 				queryKey: transformationsKeys.byId(transformation.id),
 			});
+		}
+
+		if (
+			deletedTransformations.some(
+				(t) =>
+					t.id === settings.value['transformations.selectedTransformationId'],
+			)
+		) {
+			settings.value = {
+				...settings.value,
+				'transformations.selectedTransformationId': null,
+			};
 		}
 
 		toast.success({
