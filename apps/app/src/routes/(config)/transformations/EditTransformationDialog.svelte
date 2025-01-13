@@ -19,6 +19,18 @@
 	}: { transformation: Transformation; class?: string } = $props();
 
 	let isDialogOpen = $state(false);
+
+	function askForCloseConfirmation() {
+		if (!isDialogOpen) return;
+		confirmationDialog.open({
+			title: 'Unsaved changes',
+			subtitle: 'You have unsaved changes. Are you sure you want to leave?',
+			confirmText: 'Leave',
+			onConfirm: () => {
+				isDialogOpen = false;
+			},
+		});
+	}
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -40,29 +52,11 @@
 		class="max-h-[80vh] max-w-7xl h-[80vh]"
 		onEscapeKeydown={(e) => {
 			e.preventDefault();
-			if (isDialogOpen) {
-				confirmationDialog.open({
-					title: 'Unsaved changes',
-					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
-					confirmText: 'Leave',
-					onConfirm: () => {
-						isDialogOpen = false;
-					},
-				});
-			}
+			askForCloseConfirmation();
 		}}
 		onInteractOutside={(e) => {
 			e.preventDefault();
-			if (isDialogOpen) {
-				confirmationDialog.open({
-					title: 'Unsaved changes',
-					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
-					confirmText: 'Leave',
-					onConfirm: () => {
-						isDialogOpen = false;
-					},
-				});
-			}
+			askForCloseConfirmation();
 		}}
 	>
 		<RenderTransformation
