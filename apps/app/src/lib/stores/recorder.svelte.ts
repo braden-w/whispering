@@ -105,6 +105,90 @@ function createRecorder() {
 
 					const { transcribedText } = transcribeAndUpdateWithToastResult.data;
 
+					let finalText = transcribedText;
+
+					const selectedTransformationId =
+						settings.value['transformations.selectedTransformationId'];
+					if (selectedTransformationId) {
+						toast.loading({
+							id: stopRecordingToastId,
+							title: '🔄 Running transformation...',
+							description:
+								'Applying your selected transformation to the transcribed text...',
+						});
+
+						// Get the transformation
+						const getTransformationResult =
+							await DbTransformationsService.getTransformationById(
+								selectedTransformationId,
+							);
+						if (!getTransformationResult.ok) {
+							toast.warning({
+								id: stopRecordingToastId,
+								title: '⚠️ Transformation not found',
+								description:
+									'Could not find the selected transformation. Proceeding with original transcription.',
+								action: {
+									type: 'more-details',
+									error: getTransformationResult.error,
+								},
+							});
+						} else {
+							const transformation = getTransformationResult.data;
+							if (!transformation) {
+								toast.warning({
+									id: stopRecordingToastId,
+									title: '⚠️ Transformation not found',
+									description:
+										'Could not find the selected transformation. Proceeding with original transcription.',
+								});
+							} else {
+								// Run the transformation
+								const transformationResult =
+									await RunTransformationService.runTransformation({
+										recordingId: newRecording.id,
+										input: transcribedText,
+										transformation,
+									});
+
+								if (!transformationResult.ok) {
+									toast.warning({
+										id: stopRecordingToastId,
+										title: '⚠️ Transformation failed',
+										description:
+											'Failed to apply the transformation. Using original transcription.',
+										action: {
+											type: 'more-details',
+											error: transformationResult.error,
+										},
+									});
+								} else {
+									const transformationRun = transformationResult.data;
+									if (transformationRun.error) {
+										toast.warning({
+											id: stopRecordingToastId,
+											title: '⚠️ Transformation error',
+											description: transformationRun.error,
+										});
+									} else if (transformationRun.output) {
+										finalText = transformationRun.output;
+										toast.success({
+											id: stopRecordingToastId,
+											title: '✨ Transformation Complete!',
+											description: finalText,
+											descriptionClass: 'line-clamp-2',
+											action: {
+												type: 'link',
+												label: 'Go to recordings',
+												goto: WHISPERING_RECORDINGS_PATHNAME,
+											},
+										});
+									}
+								}
+							}
+						}
+					}
+
 					if (settings.value['transcription.clipboard.copyOnSuccess']) {
 						toast.loading({
 							id: stopRecordingToastId,
