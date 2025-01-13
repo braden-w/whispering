@@ -105,6 +105,9 @@
 														<Table.Head>Status</Table.Head>
 														<Table.Head>Started</Table.Head>
 														<Table.Head>Completed</Table.Head>
+														<Table.Head>Input</Table.Head>
+														<Table.Head>Output</Table.Head>
+														<Table.Head>Error</Table.Head>
 													</Table.Row>
 												</Table.Header>
 												<Table.Body>
@@ -122,6 +125,15 @@
 																{stepRun.completedAt
 																	? formatDate(stepRun.completedAt)
 																	: '-'}
+															</Table.Cell>
+															<Table.Cell>
+																{stepRun.input}
+															</Table.Cell>
+															<Table.Cell>
+																{stepRun.output}
+															</Table.Cell>
+															<Table.Cell>
+																{stepRun.error}
 															</Table.Cell>
 														</Table.Row>
 													{/each}
