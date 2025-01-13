@@ -113,7 +113,6 @@
 														<Table.Head>Completed</Table.Head>
 														<Table.Head>Input</Table.Head>
 														<Table.Head>Output</Table.Head>
-														<Table.Head>Error</Table.Head>
 													</Table.Row>
 												</Table.Header>
 												<Table.Body>
@@ -136,10 +135,20 @@
 																{stepRun.input}
 															</Table.Cell>
 															<Table.Cell>
-																{stepRun.output}
-															</Table.Cell>
-															<Table.Cell>
-																{stepRun.error}
+																{#if stepRun.output}
+																	<CopyableCode
+																		codeText={stepRun.output}
+																		hideLabel
+																		label="Output"
+																	/>
+																{:else if stepRun.error}
+																	<CopyableCode
+																		codeText={stepRun.error}
+																		hideLabel
+																		label="Error"
+																		variant="error"
+																	/>
+																{/if}
 															</Table.Cell>
 														</Table.Row>
 													{/each}

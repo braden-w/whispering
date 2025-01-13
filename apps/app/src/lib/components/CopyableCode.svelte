@@ -24,13 +24,19 @@
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 	import { Label } from './ui/label';
+	import { cn } from '$lib/utils';
 
 	const {
 		label,
+		hideLabel,
 		codeText,
 		variant,
-	}: { label: string; codeText: string; variant?: CopyableCodeVariant } =
-		$props();
+	}: {
+		label: string;
+		hideLabel?: boolean;
+		codeText: string;
+		variant?: CopyableCodeVariant;
+	} = $props();
 	let hasCopied = $state(false);
 
 	$effect(() => {
@@ -43,7 +49,9 @@
 </script>
 
 <div class="flex flex-col gap-2">
-	<Label class="text-sm">{label}</Label>
+	<Label class={cn('text-sm', hideLabel && 'sr-only')}>
+		{label}
+	</Label>
 	<pre class={copyableCodeVariants({ variant })}>
 	<WhisperingButton
 			tooltipContent="Copy to clipboard"
