@@ -1,14 +1,13 @@
 <script lang="ts">
+	import CopyableCode from '$lib/components/CopyableCode.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
 	import { createTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
-	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { format } from 'date-fns';
-	import CopyableCode from '$lib/components/CopyableCode.svelte';
-	import { Label } from '$lib/components/ui/label';
+	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
 	let { transformationId }: { transformationId: string } = $props();
 
