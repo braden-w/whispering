@@ -38,6 +38,19 @@
 	</Dialog.Trigger>
 	<Dialog.Content
 		class="max-h-[80vh] max-w-7xl h-[80vh]"
+		onEscapeKeydown={(e) => {
+			e.preventDefault();
+			if (isDialogOpen) {
+				confirmationDialog.open({
+					title: 'Unsaved changes',
+					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
+					confirmText: 'Leave',
+					onConfirm: () => {
+						isDialogOpen = false;
+					},
+				});
+			}
+		}}
 		onInteractOutside={(e) => {
 			e.preventDefault();
 			if (isDialogOpen) {
