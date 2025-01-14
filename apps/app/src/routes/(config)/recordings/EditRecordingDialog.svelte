@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -46,22 +45,7 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content
-		class="overflow-y-auto max-h-[90vh]"
-		onInteractOutside={(e) => {
-			e.preventDefault();
-			if (isDialogOpen) {
-				confirmationDialog.open({
-					title: 'Unsaved changes',
-					subtitle: 'You have unsaved changes. Are you sure you want to leave?',
-					confirmText: 'Leave',
-					onConfirm: () => {
-						isDialogOpen = false;
-					},
-				});
-			}
-		}}
-	>
+	<Dialog.Content class="overflow-y-auto max-h-[90vh]">
 		<Dialog.Header>
 			<Dialog.Title>Edit recording</Dialog.Title>
 			<Dialog.Description>Changes are saved automatically.</Dialog.Description>
