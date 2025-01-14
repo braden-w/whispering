@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
-	import { createTransformationsQuery } from '$lib/query/transformations/queries';
+	import { useTransformationsQuery } from '$lib/query/transformations/queries';
 	import type { Transformation } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
@@ -12,7 +12,7 @@
 	import { tick } from 'svelte';
 	import { Badge } from './ui/badge';
 
-	const transformationsQuery = createTransformationsQuery();
+	const transformationsQuery = useTransformationsQuery();
 
 	const transformations = $derived(transformationsQuery.data ?? []);
 

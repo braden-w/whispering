@@ -26,13 +26,13 @@
 
 <script lang="ts">
 	import { updateTransformation } from '$lib/query/transformations/mutations';
-	import { createTransformationQuery } from '$lib/query/transformations/queries';
+	import { useTransformationQuery } from '$lib/query/transformations/queries';
 	import RenderTransformation from './RenderTransformation.svelte';
 
 	let { selectedTransformationId }: { selectedTransformationId: string } =
 		$props();
 
-	const transformationQuery = createTransformationQuery(
+	const transformationQuery = useTransformationQuery(
 		() => selectedTransformationId,
 	);
 

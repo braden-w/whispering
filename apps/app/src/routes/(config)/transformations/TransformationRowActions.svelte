@@ -4,15 +4,13 @@
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { deleteTransformationWithToast } from '$lib/query/transformations/mutations';
-	import { createTransformationQuery } from '$lib/query/transformations/queries';
+	import { useTransformationQuery } from '$lib/query/transformations/queries';
 	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
 
 	let { transformationId }: { transformationId: string } = $props();
 
-	const transformationsQuery = createTransformationQuery(
-		() => transformationId,
-	);
+	const transformationsQuery = useTransformationQuery(() => transformationId);
 	const transformation = $derived(transformationsQuery.data);
 </script>
 

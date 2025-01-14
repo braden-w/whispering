@@ -10,7 +10,7 @@ export const transformationRunKeys = {
 	byId: (id: string) => ['transformationRuns', id] as const,
 };
 
-export const createTransformationRunsByIdQuery = (id: Accessor<string>) =>
+export const useTransformationRunsByIdQuery = (id: Accessor<string>) =>
 	createResultQuery(() => ({
 		queryKey: transformationRunKeys.byId(id()),
 		queryFn: async () => {

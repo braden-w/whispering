@@ -10,7 +10,7 @@ export const recordingsKeys = {
 	byId: (id: string) => [...recordingsKeys.all, id] as const,
 };
 
-export const createRecordingsQuery = () =>
+export const useRecordingsQuery = () =>
 	createQuery(() => ({
 		queryKey: recordingsKeys.all,
 		queryFn: async () => {
@@ -27,7 +27,7 @@ export const createRecordingsQuery = () =>
 		},
 	}));
 
-export const createRecordingQuery = (id: Accessor<string>) =>
+export const useRecordingQuery = (id: Accessor<string>) =>
 	createQuery(() => ({
 		queryKey: recordingsKeys.byId(id()),
 		queryFn: async () => {

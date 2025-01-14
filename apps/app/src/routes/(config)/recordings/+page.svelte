@@ -16,7 +16,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { deleteRecordingsWithToast } from '$lib/query/recordings/mutations';
-	import { createRecordingsQuery } from '$lib/query/recordings/queries';
+	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
@@ -196,7 +196,7 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const recordingsQuery = createRecordingsQuery();
+	const recordingsQuery = useRecordingsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,

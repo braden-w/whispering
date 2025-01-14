@@ -8,7 +8,7 @@
 		deleteRecordingWithToast,
 		updateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
-	import { createRecordingQuery } from '$lib/query/recordings/queries';
+	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { DownloadService } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
@@ -27,7 +27,7 @@
 
 	let { recordingId }: { recordingId: string } = $props();
 
-	const recordingQuery = createRecordingQuery(() => recordingId);
+	const recordingQuery = useRecordingQuery(() => recordingId);
 
 	const recording = $derived(recordingQuery.data);
 

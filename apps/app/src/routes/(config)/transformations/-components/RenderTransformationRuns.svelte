@@ -5,7 +5,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
-	import { createTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
+	import { useTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
 	import { format } from 'date-fns';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
@@ -21,7 +21,7 @@
 		return format(new Date(dateStr), 'MMM d, yyyy h:mm a');
 	}
 
-	const transformationsQuery = createTransformationRunsByIdQuery(
+	const transformationsQuery = useTransformationRunsByIdQuery(
 		() => transformationId,
 	);
 </script>

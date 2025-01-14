@@ -7,7 +7,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { createRecordingsQuery } from '$lib/query/recordings/queries';
+	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -16,7 +16,7 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
-	const recordingsQuery = createRecordingsQuery();
+	const recordingsQuery = useRecordingsQuery();
 
 	const latestTranscribingOrDoneRecording = $derived<Recording>(
 		recordingsQuery.data?.find(

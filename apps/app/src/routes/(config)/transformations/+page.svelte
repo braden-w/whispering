@@ -12,7 +12,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { type Transformation } from '$lib/services/db';
 	import { deleteTransformationsWithToast } from '$lib/query/transformations/mutations';
-	import { createTransformationsQuery } from '$lib/query/transformations/queries';
+	import { useTransformationsQuery } from '$lib/query/transformations/queries';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
@@ -121,7 +121,7 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const transformationsQuery = createTransformationsQuery();
+	const transformationsQuery = useTransformationsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,

@@ -12,7 +12,7 @@ export const transformationsKeys = {
 	byId: (id: string) => ['transformations', id] as const,
 };
 
-export const createTransformationsQuery = () =>
+export const useTransformationsQuery = () =>
 	createResultQuery(() => ({
 		queryKey: transformationsKeys.all,
 		queryFn: async () => {
@@ -21,7 +21,7 @@ export const createTransformationsQuery = () =>
 		},
 	}));
 
-export const createTransformationQuery = (id: Accessor<string>) =>
+export const useTransformationQuery = (id: Accessor<string>) =>
 	createResultQuery(() => ({
 		queryKey: transformationsKeys.byId(id()),
 		queryFn: async () => {
