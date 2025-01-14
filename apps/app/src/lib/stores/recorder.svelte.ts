@@ -78,8 +78,9 @@ function createRecorder() {
 			if (!saveRecordingToDatabaseResult.ok) {
 				toast.error({
 					id: stopRecordingToastId,
-					title: '❌ Failed to save recording to database',
-					description: 'Recording completed but unable to save to database',
+					title: '❌ Database Save Failed',
+					description:
+						'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
 					action: {
 						type: 'more-details',
 						error: saveRecordingToDatabaseResult.error,
@@ -406,8 +407,9 @@ async function maybeCopyMaybePaste({
 	if (!copyResult.ok) {
 		toast.warning({
 			id: toastId,
-			title: 'Unable to copy to clipboard',
-			description: 'Please copy manually below.',
+			title: '⚠️ Clipboard Access Failed',
+			description:
+				'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
 			action: { type: 'more-details', error: copyResult.error },
 		});
 		toast.success({
@@ -449,8 +451,9 @@ async function maybeCopyMaybePaste({
 	if (!pasteResult.ok) {
 		toast.warning({
 			id: toastId,
-			title: 'Unable to paste to cursor',
-			description: 'Please paste manually.',
+			title: '⚠️ Paste Operation Failed',
+			description:
+				'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
 			action: { type: 'more-details', error: pasteResult.error },
 		});
 		toast.success({
@@ -459,7 +462,7 @@ async function maybeCopyMaybePaste({
 			descriptionClass: 'line-clamp-2',
 			action: {
 				type: 'button',
-				label: 'Copy to clipboard',
+				label: 'Copy again',
 				onClick: () =>
 					copyTextToClipboardWithToast.mutate({
 						label: 'transcribed text',
