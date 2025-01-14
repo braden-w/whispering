@@ -9,13 +9,7 @@
 		updateTransformationWithToast,
 	} from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
-	import {
-		Loader2Icon,
-		PlayIcon,
-		HistoryIcon,
-		TrashIcon,
-		XIcon,
-	} from 'lucide-svelte';
+	import { HistoryIcon, Loader2Icon, PlayIcon, TrashIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
@@ -25,22 +19,16 @@
 	}: { transformation: Transformation; class?: string } = $props();
 
 	let isDialogOpen = $state(false);
-	let saveTimeout: ReturnType<typeof setTimeout>;
 
-	function debouncedSave(newTransformation: Transformation) {
+	let saveTimeout: NodeJS.Timeout;
+	function debouncedSetTransformation(newTransformation: Transformation) {
 		clearTimeout(saveTimeout);
 		saveTimeout = setTimeout(() => {
-			updateTransformationWithToast.mutate(newTransformation);
+			updateTransformationWithToast.mutate($state.snapshot(newTransformation));
 		}, 500);
 	}
-
-	$effect.root(() => {
-		return () => clearTimeout(saveTimeout);
-	});
-
 	$effect(() => {
-		if (!transformation) return;
-		debouncedSave(transformation);
+		return () => clearTimeout(saveTimeout);
 	});
 </script>
 
@@ -67,7 +55,7 @@
 		<RenderTransformation
 			{transformation}
 			onChange={(newTransformation) => {
-				transformation = newTransformation;
+				debouncedSetTransformation(newTransformation);
 			}}
 		/>
 
