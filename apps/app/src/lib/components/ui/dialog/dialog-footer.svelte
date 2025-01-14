@@ -14,7 +14,7 @@
 <div
 	bind:this={ref}
 	class={cn(
-		'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+		'flex flex-col-reverse sm:flex-row sm:justify-between gap-2',
 		className,
 	)}
 	{...restProps}

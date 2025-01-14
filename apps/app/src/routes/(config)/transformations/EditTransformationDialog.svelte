@@ -62,7 +62,6 @@
 
 		<Dialog.Footer>
 			<Button
-				class="mr-auto"
 				onclick={() => {
 					confirmationDialog.open({
 						title: 'Delete transformation',
@@ -90,10 +89,12 @@
 				{/if}
 				Delete
 			</Button>
-			<MarkTransformationActiveButton {transformation} />
-			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
-				Close
-			</Button>
+			<div class="flex items-center gap-2">
+				<MarkTransformationActiveButton {transformation} />
+				<Button variant="outline" onclick={() => (isDialogOpen = false)}>
+					Close
+				</Button>
+			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

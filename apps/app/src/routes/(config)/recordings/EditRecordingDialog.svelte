@@ -104,7 +104,6 @@
 		</div>
 		<Dialog.Footer>
 			<Button
-				class="mr-auto"
 				onclick={() =>
 					deleteRecordingWithToast.mutate(recording, {
 						onSettled: () => {
