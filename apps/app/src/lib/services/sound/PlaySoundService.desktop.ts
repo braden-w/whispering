@@ -4,6 +4,7 @@ import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import transcriptionCompleteSoundSrc from './assets/zapsplat_multimedia_ui_notification_classic_bell_synth_success_107505.mp3';
+import transformationCompleteSoundSrc from './assets/zapsplat_multimedia_notification_alert_ping_bright_chime_001_93276.mp3';
 import type { WhisperingSoundNames } from '@repo/shared';
 
 const sounds = {
@@ -11,6 +12,7 @@ const sounds = {
 	stop: new Audio(stopSoundSrc),
 	cancel: new Audio(cancelSoundSrc),
 	transcriptionComplete: new Audio(transcriptionCompleteSoundSrc),
+	transformationComplete: new Audio(transformationCompleteSoundSrc),
 } satisfies Record<WhisperingSoundNames, HTMLAudioElement>;
 
 export function createPlaySoundServiceDesktop(): PlaySoundService {

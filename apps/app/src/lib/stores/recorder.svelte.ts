@@ -145,6 +145,8 @@ function createRecorder() {
 					}
 
 					const finalText = processResult.data;
+
+					void playSoundIfEnabled('transformationComplete');
 					maybeCopyMaybePaste({
 						transcribedText: finalText,
 						toastId: stopRecordingToastId,

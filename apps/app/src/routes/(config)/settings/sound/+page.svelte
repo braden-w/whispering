@@ -68,5 +68,17 @@
 				};
 			}}
 		/>
+
+		<LabeledSwitch
+			id="play-sound-transformation"
+			label="Play sound after transformation"
+			checked={settings.value['sound.playOn.transformationComplete']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.transformationComplete': v,
+				};
+			}}
+		/>
 	</div>
 </div>
