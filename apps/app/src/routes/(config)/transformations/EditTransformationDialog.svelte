@@ -12,6 +12,7 @@
 	import { HistoryIcon, Loader2Icon, PlayIcon, TrashIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 
 	let {
 		transformation,
@@ -25,7 +26,7 @@
 		clearTimeout(saveTimeout);
 		saveTimeout = setTimeout(() => {
 			updateTransformationWithToast.mutate($state.snapshot(newTransformation));
-		}, 500);
+		}, DEBOUNCE_TIME_MS);
 	}
 	$effect(() => {
 		return () => clearTimeout(saveTimeout);
@@ -48,7 +49,7 @@
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content class="max-h-[80vh] max-w-7xl h-[80vh]">
-		<Dialog.Header>
+		<Dialog.Header class="border-b">
 			<Dialog.Title>Transformation Settings</Dialog.Title>
 		</Dialog.Header>
 

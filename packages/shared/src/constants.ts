@@ -11,6 +11,8 @@ export const WHISPERING_RECORDINGS_PATHNAME = '/recordings' as const;
 
 export const WHISPERING_SETTINGS_PATHNAME = '/settings' as const;
 
+export const DEBOUNCE_TIME_MS = 500;
+
 export const BITRATE_VALUES_KBPS = [
 	'64',
 	'96',

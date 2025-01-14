@@ -4,14 +4,17 @@
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { deleteRecordingWithToast } from '$lib/query/recordings/mutations';
+	import {
+		deleteRecordingWithToast,
+		updateRecordingWithToast,
+	} from '$lib/query/recordings/mutations';
 	import { createRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { DownloadService } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { WhisperingErr } from '@repo/shared';
+	import { DEBOUNCE_TIME_MS, WhisperingErr } from '@repo/shared';
 	import { createMutation } from '@tanstack/svelte-query';
 	import {
 		DownloadIcon,
@@ -27,6 +30,17 @@
 	const recordingQuery = createRecordingQuery(() => recordingId);
 
 	const recording = $derived(recordingQuery.data);
+
+	let saveTimeout: NodeJS.Timeout;
+	function debouncedSetRecording(newRecording: Recording) {
+		clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(() => {
+			updateRecordingWithToast.mutate($state.snapshot(newRecording));
+		}, DEBOUNCE_TIME_MS);
+	}
+	$effect(() => {
+		return () => clearTimeout(saveTimeout);
+	});
 
 	const downloadRecordingWithToast = createMutation(() => ({
 		mutationFn: async (recording: Recording) => {
@@ -85,7 +99,12 @@
 			{/if}
 		</WhisperingButton>
 
-		<EditRecordingDialog {recording}></EditRecordingDialog>
+		<EditRecordingDialog
+			{recording}
+			onChange={(newRecording) => {
+				debouncedSetRecording(newRecording);
+			}}
+		/>
 
 		<WhisperingButton
 			tooltipContent="Copy transcribed text"
