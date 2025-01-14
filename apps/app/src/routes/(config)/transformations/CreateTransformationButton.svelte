@@ -6,6 +6,7 @@
 	import { createTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { PlusIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
+	import { Separator } from '$lib/components/ui/separator';
 
 	let isDialogOpen = $state(false);
 	let transformation = $state(generateDefaultTransformation());
@@ -47,8 +48,9 @@
 			}
 		}}
 	>
-		<Dialog.Header class="border-b">
+		<Dialog.Header>
 			<Dialog.Title>Create Transformation</Dialog.Title>
+			<Separator />
 		</Dialog.Header>
 
 		<RenderTransformation

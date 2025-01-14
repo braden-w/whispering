@@ -13,6 +13,7 @@
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
+	import { Separator } from '$lib/components/ui/separator';
 
 	let {
 		transformation,
@@ -49,8 +50,9 @@
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content class="max-h-[80vh] max-w-7xl h-[80vh]">
-		<Dialog.Header class="border-b">
+		<Dialog.Header>
 			<Dialog.Title>Transformation Settings</Dialog.Title>
+			<Separator />
 		</Dialog.Header>
 
 		<RenderTransformation
