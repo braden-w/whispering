@@ -9,7 +9,13 @@
 		updateTransformationWithToast,
 	} from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
-	import { HistoryIcon, Loader2Icon, PlayIcon } from 'lucide-svelte';
+	import {
+		Loader2Icon,
+		PlayIcon,
+		HistoryIcon,
+		TrashIcon,
+		XIcon,
+	} from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
@@ -19,18 +25,23 @@
 	}: { transformation: Transformation; class?: string } = $props();
 
 	let isDialogOpen = $state(false);
+	let saveTimeout: ReturnType<typeof setTimeout>;
 
-	function askForCloseConfirmation() {
-		if (!isDialogOpen) return;
-		confirmationDialog.open({
-			title: 'Unsaved changes',
-			subtitle: 'You have unsaved changes. Are you sure you want to leave?',
-			confirmText: 'Leave',
-			onConfirm: () => {
-				isDialogOpen = false;
-			},
-		});
+	function debouncedSave(newTransformation: Transformation) {
+		clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(() => {
+			updateTransformationWithToast.mutate(newTransformation);
+		}, 500);
 	}
+
+	$effect.root(() => {
+		return () => clearTimeout(saveTimeout);
+	});
+
+	$effect(() => {
+		if (!transformation) return;
+		debouncedSave(transformation);
+	});
 </script>
 
 <Dialog.Root bind:open={isDialogOpen}>
@@ -48,61 +59,51 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content
-		class="max-h-[80vh] max-w-7xl h-[80vh]"
-		onEscapeKeydown={(e) => {
-			e.preventDefault();
-			askForCloseConfirmation();
-		}}
-		onInteractOutside={(e) => {
-			e.preventDefault();
-			askForCloseConfirmation();
-		}}
-	>
+	<Dialog.Content class="max-h-[80vh] max-w-7xl h-[80vh]">
+		<Dialog.Header>
+			<Dialog.Title>Transformation Settings</Dialog.Title>
+		</Dialog.Header>
+
 		<RenderTransformation
 			{transformation}
 			onChange={(newTransformation) => {
 				transformation = newTransformation;
 			}}
 		/>
+
 		<Dialog.Footer>
 			<Button
 				class="mr-auto"
-				onclick={() =>
-					deleteTransformationWithToast.mutate(transformation, {
-						onSettled: () => {
-							isDialogOpen = false;
+				onclick={() => {
+					confirmationDialog.open({
+						title: 'Delete transformation',
+						subtitle: 'Are you sure? This action cannot be undone.',
+						confirmText: 'Delete',
+						onConfirm: () => {
+							deleteTransformationWithToast.mutate(
+								$state.snapshot(transformation),
+								{
+									onSettled: () => {
+										isDialogOpen = false;
+									},
+								},
+							);
 						},
-					})}
+					});
+				}}
 				variant="destructive"
 				disabled={deleteTransformationWithToast.isPending}
 			>
 				{#if deleteTransformationWithToast.isPending}
 					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
+				{:else}
+					<TrashIcon class="h-4 w-4 mr-1" />
 				{/if}
 				Delete
 			</Button>
 			<MarkTransformationActiveButton {transformation} />
 			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
-				Cancel
-			</Button>
-			<Button
-				onclick={() => {
-					updateTransformationWithToast.mutate(
-						$state.snapshot(transformation),
-						{
-							onSettled: () => {
-								isDialogOpen = false;
-							},
-						},
-					);
-				}}
-				disabled={updateTransformationWithToast.isPending}
-			>
-				{#if updateTransformationWithToast.isPending}
-					<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
-				{/if}
-				Save
+				Close
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
