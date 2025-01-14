@@ -65,7 +65,7 @@ export const createRunTransformationService = ({
 						{
 							transformationRun,
 							stepRunId: newTransformationStepRun.id,
-							error: handleStepResult.error.title,
+							error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
 						},
 					);
 				if (!dbResult.ok) return dbResult;

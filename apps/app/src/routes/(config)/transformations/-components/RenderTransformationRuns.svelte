@@ -30,7 +30,7 @@
 	<div class="text-muted-foreground text-sm">Loading runs...</div>
 {:else if transformationsQuery.error}
 	<div class="text-destructive text-sm">
-		{transformationsQuery.error.description}
+		{transformationsQuery.error.title}: {transformationsQuery.error.description}
 	</div>
 {:else if transformationsQuery.data}
 	{@const runs = transformationsQuery.data}
