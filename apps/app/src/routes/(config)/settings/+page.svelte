@@ -49,6 +49,7 @@
 				'transcription.clipboard.pasteOnSuccess': v,
 			};
 		}}
+		disabled={!settings.value['transcription.clipboard.copyOnSuccess']}
 	/>
 
 	<LabeledSwitch
