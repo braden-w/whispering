@@ -22,7 +22,7 @@
 	</Dialog.Trigger>
 
 	<Dialog.Content
-		class="overflow-y-auto max-h-[90vh] max-w-3xl"
+		class="max-h-[80vh] max-w-7xl h-[80vh]"
 		onInteractOutside={(e) => {
 			e.preventDefault();
 			if (isDialogOpen) {
@@ -37,18 +37,17 @@
 			}
 		}}
 	>
-		<Dialog.Header>
+		<Dialog.Header class="border-b">
 			<Dialog.Title>Create Transformation</Dialog.Title>
-			<Dialog.Description>
-				Create a new transformation to transform text.
-			</Dialog.Description>
 		</Dialog.Header>
+
 		<RenderTransformation
 			{transformation}
 			onChange={(newTransformation) => {
 				transformation = newTransformation;
 			}}
 		/>
+
 		<Dialog.Footer>
 			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
 				Cancel
