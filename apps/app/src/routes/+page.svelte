@@ -7,7 +7,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { useRecordingsQuery } from '$lib/query/recordings/queries';
+	import { useLatestDoneRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -16,14 +16,10 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
-	const recordingsQuery = useRecordingsQuery();
+	const latestDoneRecordingQuery = useLatestDoneRecording();
 
-	const latestTranscribingOrDoneRecording = $derived<Recording>(
-		recordingsQuery.data?.find(
-			(r) =>
-				r.transcriptionStatus === 'TRANSCRIBING' ||
-				r.transcriptionStatus === 'DONE',
-		) ?? {
+	const latestDoneRecording = $derived<Recording>(
+		latestDoneRecordingQuery.data ?? {
 			id: '',
 			title: '',
 			subtitle: '',
@@ -43,8 +39,8 @@
 	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
-		if (!latestTranscribingOrDoneRecording.blob) return undefined;
-		return blobUrlManager.createUrl(latestTranscribingOrDoneRecording.blob);
+		if (!latestDoneRecording.blob) return undefined;
+		return blobUrlManager.createUrl(latestDoneRecording.blob);
 	});
 
 	onDestroy(() => {
@@ -93,31 +89,29 @@
 				class="w-full"
 				placeholder="Transcribed text will appear here..."
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestTranscribingOrDoneRecording.id,
+					recordingId: latestDoneRecording.id,
 					propertyName: 'transcribedText',
 				})}"
 				readonly
-				value={latestTranscribingOrDoneRecording.transcriptionStatus ===
-				'TRANSCRIBING'
+				value={latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'
 					? '...'
-					: latestTranscribingOrDoneRecording.transcribedText}
+					: latestDoneRecording.transcribedText}
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
 					copyTextToClipboardWithToast.mutate({
 						label: 'transcribed text',
-						text: latestTranscribingOrDoneRecording.transcribedText,
+						text: latestDoneRecording.transcribedText,
 					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestTranscribingOrDoneRecording.id,
+					recordingId: latestDoneRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
-				disabled={latestTranscribingOrDoneRecording.transcriptionStatus ===
-					'TRANSCRIBING'}
+				disabled={latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
 			>
-				{#if latestTranscribingOrDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
+				{#if latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
 					<Loader2Icon class="h-6 w-6 animate-spin" />
 				{:else}
 					<ClipboardIcon class="h-6 w-6" />
@@ -128,7 +122,7 @@
 		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestTranscribingOrDoneRecording.id,
+					recordingId: latestDoneRecording.id,
 					propertyName: 'blob',
 				})}"
 				src={blobUrl}

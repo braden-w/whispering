@@ -8,6 +8,7 @@ import type { Accessor } from '../types';
 // Define the query key as a constant array
 export const recordingsKeys = {
 	all: ['recordings'] as const,
+	latest: ['recordings', 'latest'] as const,
 	byId: (id: string) => [...recordingsKeys.all, id] as const,
 };
 
@@ -20,6 +21,23 @@ export const useRecordingsQuery = () =>
 				toast.error({
 					title: 'Failed to fetch recordings!',
 					description: 'Your recordings could not be fetched.',
+					action: { type: 'more-details', error: result.error },
+				});
+				throw result.error;
+			}
+			return result.data;
+		},
+	}));
+
+export const useLatestDoneRecording = () =>
+	createQuery(() => ({
+		queryKey: recordingsKeys.latest,
+		queryFn: async () => {
+			const result = await DbRecordingsService.getLatestDoneRecording();
+			if (!result.ok) {
+				toast.error({
+					title: 'Failed to fetch latest recording!',
+					description: 'Your latest recording could not be fetched.',
 					action: { type: 'more-details', error: result.error },
 				});
 				throw result.error;

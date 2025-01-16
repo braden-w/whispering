@@ -290,6 +290,25 @@ export function createDbRecordingsServiceDexie() {
 			});
 		},
 
+		async getLatestDoneRecording() {
+			return tryAsync({
+				try: async () => {
+					const latestDoneRecording = await db.recordings
+						.where('transcriptionStatus')
+						.equals('DONE')
+						.reverse()
+						.first();
+					return latestDoneRecording ?? null;
+				},
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting latest recording from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
 		async getRecordingById(id: string) {
 			return tryAsync({
 				try: async () => {
