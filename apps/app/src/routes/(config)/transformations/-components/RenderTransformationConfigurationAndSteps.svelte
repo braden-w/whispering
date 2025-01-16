@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		LabeledInput,
 		LabeledSelect,
@@ -7,9 +7,10 @@
 		LabeledTextarea,
 	} from '$lib/components/labeled/index.js';
 	import * as Accordion from '$lib/components/ui/accordion';
+	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import * as Alert from '$lib/components/ui/alert';
+	import { Separator } from '$lib/components/ui/separator';
 	import type { Transformation } from '$lib/services/db';
 	import { generateDefaultTransformationStep } from '$lib/services/db';
 	import {
@@ -22,24 +23,20 @@
 		INFERENCE_PROVIDER_OPTIONS,
 		OPENAI_INFERENCE_MODEL_OPTIONS,
 	} from '@repo/shared';
-	import {
-		CopyIcon,
-		PlusIcon,
-		TrashIcon,
-		ChevronDownIcon,
-	} from 'lucide-svelte';
+	import { CopyIcon, PlusIcon, TrashIcon } from 'lucide-svelte';
+	import { slide } from 'svelte/transition';
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { Separator } from '$lib/components/ui/separator';
 
 	let {
 		transformation,
-		onChange,
+		setTransformation,
+		setTransformationDebounced,
 	}: {
 		transformation: Transformation;
-		onChange: (transformation: Transformation) => void;
+		setTransformation: (transformation: Transformation) => void;
+		setTransformationDebounced: (transformation: Transformation) => void;
 	} = $props();
 
 	function addStep() {
@@ -47,7 +44,7 @@
 			...transformation,
 			steps: [...transformation.steps, generateDefaultTransformationStep()],
 		};
-		onChange(updatedTransformation);
+		setTransformation(updatedTransformation);
 	}
 
 	function removeStep(index: number) {
@@ -55,7 +52,7 @@
 			...transformation,
 			steps: transformation.steps.filter((_, i) => i !== index),
 		};
-		onChange(updatedTransformation);
+		setTransformation(updatedTransformation);
 	}
 
 	function duplicateStep(index: number) {
@@ -69,7 +66,7 @@
 				...transformation.steps.slice(index + 1),
 			],
 		};
-		onChange(updatedTransformation);
+		setTransformation(updatedTransformation);
 	}
 </script>
 
@@ -87,7 +84,7 @@
 				label="Title"
 				value={transformation.title}
 				oninput={(e) => {
-					onChange({
+					setTransformationDebounced({
 						...transformation,
 						title: e.currentTarget.value,
 					});
@@ -100,7 +97,7 @@
 				label="Description"
 				value={transformation.description}
 				oninput={(e) => {
-					onChange({
+					setTransformationDebounced({
 						...transformation,
 						description: e.currentTarget.value,
 					});
@@ -147,7 +144,7 @@
 												}) as const,
 										)}
 										onSelectedChange={(value) => {
-											onChange({
+											setTransformation({
 												...transformation,
 												steps: transformation.steps.map((s, i) =>
 													i === index ? { ...s, type: value } : s,
@@ -197,7 +194,7 @@
 											label="Find Text"
 											value={step['find_replace.findText']}
 											oninput={(e) => {
-												onChange({
+												setTransformationDebounced({
 													...transformation,
 													steps: transformation.steps.map((s, i) =>
 														i === index
@@ -217,7 +214,7 @@
 											label="Replace Text"
 											value={step['find_replace.replaceText']}
 											oninput={(e) => {
-												onChange({
+												setTransformationDebounced({
 													...transformation,
 													steps: transformation.steps.map((s, i) =>
 														i === index
@@ -244,7 +241,17 @@
 													label="Use Regex"
 													checked={step['find_replace.useRegex']}
 													onCheckedChange={(v) => {
-														step['find_replace.useRegex'] = v;
+														setTransformation({
+															...transformation,
+															steps: transformation.steps.map((s, i) =>
+																i === index
+																	? {
+																			...s,
+																			'find_replace.useRegex': v,
+																		}
+																	: s,
+															),
+														});
 													}}
 													description="Enable regular expressions for more advanced text matching patterns"
 												/>
@@ -262,7 +269,17 @@
 											selected={step['prompt_transform.inference.provider']}
 											placeholder="Select a provider"
 											onSelectedChange={(value) => {
-												step['prompt_transform.inference.provider'] = value;
+												setTransformation({
+													...transformation,
+													steps: transformation.steps.map((s, i) =>
+														i === index
+															? {
+																	...s,
+																	'prompt_transform.inference.provider': value,
+																}
+															: s,
+													),
+												});
 											}}
 										/>
 
@@ -276,9 +293,18 @@
 												]}
 												placeholder="Select a model"
 												onSelectedChange={(value) => {
-													step[
-														'prompt_transform.inference.provider.OpenAI.model'
-													] = value;
+													setTransformation({
+														...transformation,
+														steps: transformation.steps.map((s, i) =>
+															i === index
+																? {
+																		...s,
+																		'prompt_transform.inference.provider.OpenAI.model':
+																			value,
+																	}
+																: s,
+														),
+													});
 												}}
 											/>
 										{:else if step['prompt_transform.inference.provider'] === 'Groq'}
@@ -291,9 +317,18 @@
 												]}
 												placeholder="Select a model"
 												onSelectedChange={(value) => {
-													step[
-														'prompt_transform.inference.provider.Groq.model'
-													] = value;
+													setTransformation({
+														...transformation,
+														steps: transformation.steps.map((s, i) =>
+															i === index
+																? {
+																		...s,
+																		'prompt_transform.inference.provider.Groq.model':
+																			value,
+																	}
+																: s,
+														),
+													});
 												}}
 											/>
 										{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
@@ -306,9 +341,18 @@
 												]}
 												placeholder="Select a model"
 												onSelectedChange={(value) => {
-													step[
-														'prompt_transform.inference.provider.Anthropic.model'
-													] = value;
+													setTransformation({
+														...transformation,
+														steps: transformation.steps.map((s, i) =>
+															i === index
+																? {
+																		...s,
+																		'prompt_transform.inference.provider.Anthropic.model':
+																			value,
+																	}
+																: s,
+														),
+													});
 												}}
 											/>
 										{/if}
@@ -319,7 +363,7 @@
 										label="System Prompt Template"
 										value={step['prompt_transform.systemPromptTemplate']}
 										oninput={(e) => {
-											onChange({
+											setTransformationDebounced({
 												...transformation,
 												steps: transformation.steps.map((s, i) =>
 													i === index
@@ -339,7 +383,7 @@
 										label="User Prompt Template"
 										value={step['prompt_transform.userPromptTemplate']}
 										oninput={(e) => {
-											onChange({
+											setTransformationDebounced({
 												...transformation,
 												steps: transformation.steps.map((s, i) =>
 													i === index

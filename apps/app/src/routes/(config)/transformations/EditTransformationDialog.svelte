@@ -57,7 +57,12 @@
 
 		<RenderTransformation
 			{transformation}
-			onChange={(newTransformation) => {
+			setTransformation={(newTransformation) => {
+				updateTransformationWithToast.mutate(
+					$state.snapshot(newTransformation),
+				);
+			}}
+			setTransformationDebounced={(newTransformation) => {
 				debouncedSetTransformation(newTransformation);
 			}}
 		/>

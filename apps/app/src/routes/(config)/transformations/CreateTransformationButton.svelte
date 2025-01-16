@@ -55,7 +55,10 @@
 
 		<RenderTransformation
 			{transformation}
-			onChange={(newTransformation) => {
+			setTransformation={(newTransformation) => {
+				transformation = newTransformation;
+			}}
+			setTransformationDebounced={(newTransformation) => {
 				transformation = newTransformation;
 			}}
 		/>

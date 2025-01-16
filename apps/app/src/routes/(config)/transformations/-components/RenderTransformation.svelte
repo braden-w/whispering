@@ -7,16 +7,22 @@
 
 	let {
 		transformation,
-		onChange,
+		setTransformation,
+		setTransformationDebounced,
 	}: {
 		transformation: Transformation;
-		onChange: (transformation: Transformation) => void;
+		setTransformation: (transformation: Transformation) => void;
+		setTransformationDebounced: (transformation: Transformation) => void;
 	} = $props();
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
 	<Resizable.Pane>
-		<RenderTransformationConfigurationAndSteps {transformation} {onChange} />
+		<RenderTransformationConfigurationAndSteps
+			{transformation}
+			{setTransformation}
+			{setTransformationDebounced}
+		/>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
 	<Resizable.Pane>
