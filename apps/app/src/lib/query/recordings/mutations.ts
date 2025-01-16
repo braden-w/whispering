@@ -1,10 +1,10 @@
-import { queryClient } from '$lib/services';
+import { queryClient } from '$lib/query';
+import { createMutation } from '$lib/query/createMutation.svelte';
 import type { Recording } from '$lib/services/db';
 import { DbRecordingsService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
-import { createMutation } from '@tanstack/svelte-query';
 import { recordingsKeys } from './queries';
 
 export const createRecording = createMutation(() => ({

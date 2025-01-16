@@ -5,7 +5,7 @@
 	import { runTransformation } from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { toast } from '$lib/services/toast';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { createMutation } from '$lib/query/createMutation.svelte';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
 
 	let { transformation }: { transformation: Transformation } = $props();

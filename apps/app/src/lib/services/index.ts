@@ -118,14 +118,6 @@ export function createResultMutation<
 	});
 }
 
-export const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			enabled: browser,
-		},
-	},
-});
-
 export const DownloadService = window.__TAURI_INTERNALS__
 	? createDownloadServiceDesktop()
 	: createDownloadServiceWeb();

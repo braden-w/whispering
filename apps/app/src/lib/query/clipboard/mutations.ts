@@ -1,6 +1,6 @@
+import { createMutation } from '$lib/query/createMutation.svelte';
 import { ClipboardService } from '$lib/services';
 import { toast } from '$lib/services/toast';
-import { createMutation } from '@tanstack/svelte-query';
 
 export const copyTextToClipboard = createMutation(() => ({
 	mutationFn: async (text: string) => {

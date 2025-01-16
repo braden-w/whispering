@@ -1,21 +1,12 @@
-import { browser } from '$app/environment';
+import { queryClient } from '$lib/query';
 import type { DefaultError } from '@tanstack/query-core';
-import { MutationObserver, QueryClient } from '@tanstack/query-core';
+import { MutationObserver } from '@tanstack/query-core';
 import type {
-	CreateMutateFunction,
 	CreateMutationOptions,
 	CreateMutationResult,
 } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
 import type { Accessor } from './types';
-
-export const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			enabled: browser,
-		},
-	},
-});
 
 export function createMutation<
 	TData = unknown,

@@ -1,5 +1,6 @@
 import type { Recording } from '$lib/services/db';
-import { DbRecordingsService, queryClient } from '$lib/services/index.js';
+import { DbRecordingsService } from '$lib/services/index.js';
+import { queryClient } from '$lib/query';
 import { toast } from '$lib/services/toast';
 import { createQuery } from '@tanstack/svelte-query';
 import type { Accessor } from '../types';

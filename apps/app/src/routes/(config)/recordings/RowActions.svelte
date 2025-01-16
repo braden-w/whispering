@@ -15,7 +15,7 @@
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { DEBOUNCE_TIME_MS, WhisperingErr } from '@repo/shared';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { createMutation } from '$lib/query/createMutation.svelte';
 	import {
 		DownloadIcon,
 		Loader2Icon,
