@@ -86,7 +86,13 @@
 		<Skeleton class="h-8 w-8" />
 	{:else}
 		<WhisperingButton
-			tooltipContent="Transcribe recording"
+			tooltipContent={recording.transcriptionStatus === 'UNPROCESSED'
+				? 'Start transcribing this recording'
+				: recording.transcriptionStatus === 'TRANSCRIBING'
+					? 'Currently transcribing...'
+					: recording.transcriptionStatus === 'DONE'
+						? 'Retry transcription'
+						: 'Transcription failed - click to try again'}
 			onclick={() =>
 				transcriber.transcribeAndUpdateRecordingWithToast(recording)}
 			variant="ghost"
