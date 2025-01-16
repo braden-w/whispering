@@ -99,24 +99,36 @@ class RecordingsDatabase extends Dexie {
 				content: dumpString,
 				buttons: [
 					{
-						label: 'Delete Database',
+						label: 'Download Database Dump',
+						onClick: () => {
+							const blob = new Blob([dumpString], {
+								type: 'application/json',
+							});
+							downloadIndexedDbBlobWithToast.mutate({
+								name: 'recording-db-dump.json',
+								blob,
+							});
+						},
+					},
+					{
+						label: 'Delete Database and Reload',
+						variant: 'destructive',
 						onClick: async () => {
 							try {
-								// Delete all tables
-								await Promise.all(
-									DUMP_TABLE_NAMES.map((name) => tx.table(name).clear()),
-								);
 								// Delete the database
 								await this.delete();
-								// Reset the version
-								await Dexie.delete(DB_NAME);
 								toast.success({
 									title: 'Database Deleted',
 									description:
 										'The database has been successfully deleted. Please refresh the page.',
+									action: {
+										type: 'button',
+										label: 'Refresh',
+										onClick: () => {
+											window.location.reload();
+										},
+									},
 								});
-								// Force reload to reinitialize the database
-								window.location.reload();
 							} catch (err) {
 								const error =
 									err instanceof Error ? err : new Error(String(err));
@@ -130,18 +142,6 @@ class RecordingsDatabase extends Dexie {
 									},
 								});
 							}
-						},
-					},
-					{
-						label: 'Download Database Dump',
-						onClick: () => {
-							const blob = new Blob([dumpString], {
-								type: 'application/json',
-							});
-							downloadIndexedDbBlobWithToast.mutate({
-								name: 'recording-db-dump.json',
-								blob,
-							});
 						},
 					},
 				],

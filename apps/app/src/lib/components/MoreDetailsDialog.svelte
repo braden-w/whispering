@@ -8,6 +8,7 @@
 			{
 				label: string;
 				onClick: () => void;
+				variant?: 'default' | 'destructive';
 			}[]
 		>([]);
 
@@ -43,6 +44,7 @@
 				buttons?: {
 					label: string;
 					onClick: () => void;
+					variant?: 'default' | 'destructive';
 				}[];
 			}) => {
 				title = payload.title;
@@ -72,6 +74,7 @@
 			<Dialog.Footer>
 				{#each moreDetailsDialog.buttons as button}
 					<Button
+						variant={button.variant}
 						onclick={() => {
 							button.onClick();
 							moreDetailsDialog.isOpen = false;
