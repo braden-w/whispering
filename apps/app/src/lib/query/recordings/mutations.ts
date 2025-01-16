@@ -26,6 +26,9 @@ export const createRecording = createMutation(() => ({
 			recordingsKeys.byId(recording.id),
 			recording,
 		);
+		queryClient.invalidateQueries({
+			queryKey: recordingsKeys.latest,
+		});
 
 		return Ok(recording);
 	},
@@ -48,6 +51,9 @@ export const updateRecording = createMutation(() => ({
 			recordingsKeys.byId(recording.id),
 			recording,
 		);
+		queryClient.invalidateQueries({
+			queryKey: recordingsKeys.latest,
+		});
 
 		return Ok(recording);
 	},
@@ -76,6 +82,9 @@ export const updateRecordingWithToast = createMutation(() => ({
 			recordingsKeys.byId(recording.id),
 			recording,
 		);
+		queryClient.invalidateQueries({
+			queryKey: recordingsKeys.latest,
+		});
 
 		toast.success({
 			title: 'Updated recording!',
@@ -103,6 +112,9 @@ export const deleteRecordingWithToast = createMutation(() => ({
 			return oldData.filter((item) => item.id !== recording.id);
 		});
 		queryClient.removeQueries({ queryKey: recordingsKeys.byId(recording.id) });
+		queryClient.invalidateQueries({
+			queryKey: recordingsKeys.latest,
+		});
 
 		toast.success({
 			title: 'Deleted recording!',
@@ -136,6 +148,9 @@ export const deleteRecordingsWithToast = createMutation(() => ({
 				queryKey: recordingsKeys.byId(recording.id),
 			});
 		}
+		queryClient.invalidateQueries({
+			queryKey: recordingsKeys.latest,
+		});
 
 		toast.success({
 			title: 'Deleted recordings!',
