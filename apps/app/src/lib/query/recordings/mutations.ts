@@ -9,7 +9,7 @@ import { recordingsKeys } from './queries';
 
 export const createRecording = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
-		const result = await DbRecordingsService.updateRecording(recording);
+		const result = await DbRecordingsService.createRecording(recording);
 		if (!result.ok) {
 			return WhisperingErr({
 				title: 'Failed to update recording!',
