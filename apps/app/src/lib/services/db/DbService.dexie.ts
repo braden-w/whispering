@@ -59,95 +59,103 @@ class RecordingsDatabase extends Dexie {
 	constructor() {
 		super(DB_NAME);
 
-		const handleUpgradeError = async ({
+		const wrapUpgradeWithErrorHandling = async ({
 			tx,
 			version,
-			error,
-		}: { tx: Transaction; version: number; error: unknown }) => {
-			const DUMP_TABLE_NAMES = [
-				'recordings',
-				'recordingMetadata',
-				'recordingBlobs',
-			] as const;
+			upgrade,
+		}: {
+			tx: Transaction;
+			version: number;
+			upgrade: (tx: Transaction) => Promise<void>;
+		}) => {
+			try {
+				await upgrade(tx);
+			} catch (error) {
+				const DUMP_TABLE_NAMES = [
+					'recordings',
+					'recordingMetadata',
+					'recordingBlobs',
+				] as const;
 
-			const dumpTable = async (tableName: string) => {
-				try {
-					const contents = await tx.table(tableName).toArray();
-					return contents;
-				} catch (error) {
-					return [];
-				}
-			};
+				const dumpTable = async (tableName: string) => {
+					try {
+						const contents = await tx.table(tableName).toArray();
+						return contents;
+					} catch (error) {
+						return [];
+					}
+				};
 
-			const dumps = await Promise.all(
-				DUMP_TABLE_NAMES.map((name) => dumpTable(name)),
-			);
+				const dumps = await Promise.all(
+					DUMP_TABLE_NAMES.map((name) => dumpTable(name)),
+				);
 
-			const dumpState = {
-				version,
-				tables: Object.fromEntries(
-					DUMP_TABLE_NAMES.map((name, i) => [name, dumps[i]]),
-				),
-			};
+				const dumpState = {
+					version,
+					tables: Object.fromEntries(
+						DUMP_TABLE_NAMES.map((name, i) => [name, dumps[i]]),
+					),
+				};
 
-			const dumpString = JSON.stringify(dumpState, null, 2);
+				const dumpString = JSON.stringify(dumpState, null, 2);
 
-			moreDetailsDialog.open({
-				title: `Failed to upgrade IndexedDb Database to version ${version}`,
-				description:
-					'Please download the database dump and delete the database to start fresh.',
-				content: dumpString,
-				buttons: [
-					{
-						label: 'Download Database Dump',
-						onClick: () => {
-							const blob = new Blob([dumpString], {
-								type: 'application/json',
-							});
-							downloadIndexedDbBlobWithToast.mutate({
-								name: 'recording-db-dump.json',
-								blob,
-							});
+				moreDetailsDialog.open({
+					title: `Failed to upgrade IndexedDb Database to version ${version}`,
+					description:
+						'Please download the database dump and delete the database to start fresh.',
+					content: dumpString,
+					buttons: [
+						{
+							label: 'Download Database Dump',
+							onClick: () => {
+								const blob = new Blob([dumpString], {
+									type: 'application/json',
+								});
+								downloadIndexedDbBlobWithToast.mutate({
+									name: 'recording-db-dump.json',
+									blob,
+								});
+							},
 						},
-					},
-					{
-						label: 'Delete Database and Reload',
-						variant: 'destructive',
-						onClick: async () => {
-							try {
-								// Delete the database
-								await this.delete();
-								toast.success({
-									title: 'Database Deleted',
-									description:
-										'The database has been successfully deleted. Please refresh the page.',
-									action: {
-										type: 'button',
-										label: 'Refresh',
-										onClick: () => {
-											window.location.reload();
+						{
+							label: 'Delete Database and Reload',
+							variant: 'destructive',
+							onClick: async () => {
+								try {
+									// Delete the database
+									await this.delete();
+									toast.success({
+										title: 'Database Deleted',
+										description:
+											'The database has been successfully deleted. Please refresh the page.',
+										action: {
+											type: 'button',
+											label: 'Refresh',
+											onClick: () => {
+												window.location.reload();
+											},
 										},
-									},
-								});
-							} catch (err) {
-								const error =
-									err instanceof Error ? err : new Error(String(err));
-								toast.error({
-									title: 'Failed to Delete Database',
-									description:
-										'There was an error deleting the database. Please try again.',
-									action: {
-										type: 'more-details',
-										error,
-									},
-								});
-							}
+									});
+								} catch (err) {
+									const error =
+										err instanceof Error ? err : new Error(String(err));
+									toast.error({
+										title: 'Failed to Delete Database',
+										description:
+											'There was an error deleting the database. Please try again.',
+										action: {
+											type: 'more-details',
+											error,
+										},
+									});
+								}
+							},
 						},
-					},
-				],
-			});
+					],
+				});
 
-			throw error; // Re-throw to trigger rollback
+				throw error; // Re-throw to trigger rollback
+			}
 		};
 
 		// V1: Single recordings table
@@ -161,29 +169,31 @@ class RecordingsDatabase extends Dexie {
 				recordingBlobs: '&id',
 			})
 			.upgrade(async (tx) => {
-				try {
-					// Migrate data from recordings to split tables
-					const oldRecordings = await tx
-						.table<RecordingsDbSchemaV1['recordings']>('recordings')
-						.toArray();
+				await wrapUpgradeWithErrorHandling({
+					tx,
+					version: 0.2,
+					upgrade: async (tx) => {
+						// Migrate data from recordings to split tables
+						const oldRecordings = await tx
+							.table<RecordingsDbSchemaV1['recordings']>('recordings')
+							.toArray();
 
-					// Create entries in both new tables
-					const metadata = oldRecordings.map(
-						({ blob, ...recording }) => recording,
-					);
-					const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
+						// Create entries in both new tables
+						const metadata = oldRecordings.map(
+							({ blob, ...recording }) => recording,
+						);
+						const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
 
-					await tx
-						.table<RecordingsDbSchemaV2['recordingMetadata']>(
-							'recordingMetadata',
-						)
-						.bulkAdd(metadata);
-					await tx
-						.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
-						.bulkAdd(blobs);
-				} catch (error) {
-					await handleUpgradeError({ tx, version: 0.2, error });
-				}
+						await tx
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
+							.bulkAdd(metadata);
+						await tx
+							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
+							.bulkAdd(blobs);
+					},
+				});
 			});
 
 		// V3: Back to single recordings table
@@ -194,29 +204,31 @@ class RecordingsDatabase extends Dexie {
 				recordingBlobs: null,
 			})
 			.upgrade(async (tx) => {
-				try {
-					// Get data from both tables
-					const metadata = await tx
-						.table<RecordingsDbSchemaV2['recordingMetadata']>(
-							'recordingMetadata',
-						)
-						.toArray();
-					const blobs = await tx
-						.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
-						.toArray();
+				await wrapUpgradeWithErrorHandling({
+					tx,
+					version: 0.3,
+					upgrade: async (tx) => {
+						// Get data from both tables
+						const metadata = await tx
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
+							.toArray();
+						const blobs = await tx
+							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
+							.toArray();
 
-					// Combine and migrate the data
-					const mergedRecordings = metadata.map((record) => {
-						const blob = blobs.find((b) => b.id === record.id)?.blob;
-						return { ...record, blob };
-					});
+						// Combine and migrate the data
+						const mergedRecordings = metadata.map((record) => {
+							const blob = blobs.find((b) => b.id === record.id)?.blob;
+							return { ...record, blob };
+						});
 
-					await tx
-						.table<RecordingsDbSchemaV3['recordings']>('recordings')
-						.bulkAdd(mergedRecordings);
-				} catch (error) {
-					await handleUpgradeError({ tx, version: 0.3, error });
-				}
+						await tx
+							.table<RecordingsDbSchemaV3['recordings']>('recordings')
+							.bulkAdd(mergedRecordings);
+					},
+				});
 			});
 
 		// V4: Add transformations, transformation runs, and recording
@@ -228,22 +240,24 @@ class RecordingsDatabase extends Dexie {
 				transformationRuns: '&id, transformationId, recordingId, startedAt',
 			})
 			.upgrade(async (tx) => {
-				try {
-					const oldRecordings = await tx
-						.table<RecordingsDbSchemaV3['recordings']>('recordings')
-						.toArray();
+				await wrapUpgradeWithErrorHandling({
+					tx,
+					version: 0.4,
+					upgrade: async (tx) => {
+						const oldRecordings = await tx
+							.table<RecordingsDbSchemaV3['recordings']>('recordings')
+							.toArray();
 
-					const newRecordings = oldRecordings.map((record) => ({
-						...record,
-						createdAt: record.timestamp,
-						updatedAt: record.timestamp,
-					}));
+						const newRecordings = oldRecordings.map((record) => ({
+							...record,
+							createdAt: record.timestamp,
+							updatedAt: record.timestamp,
+						}));
 
-					await tx.table('recordings').clear();
-					await tx.table('recordings').bulkAdd(newRecordings);
-				} catch (error) {
-					await handleUpgradeError({ tx, version: 0.4, error });
-				}
+						await tx.table('recordings').clear();
+						await tx.table('recordings').bulkAdd(newRecordings);
+					},
+				});
 			});
 
 		// V5: Change the "subtitle" field to "description"
