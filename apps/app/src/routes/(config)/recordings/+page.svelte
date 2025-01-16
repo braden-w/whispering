@@ -111,6 +111,15 @@
 				}),
 		},
 		{
+			id: 'Timestamp',
+			accessorKey: 'timestamp',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Timestamp',
+				}),
+		},
+		{
 			id: 'Created At',
 			accessorKey: 'createdAt',
 			header: ({ column }) =>
