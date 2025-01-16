@@ -157,7 +157,7 @@ class RecordingsDatabase extends Dexie {
 		this.version(0.2)
 			.stores({
 				recordings: null,
-				recordingMetadata: '&id, timestamp',
+				recordingMetadata: '&id',
 				recordingBlobs: '&id',
 			})
 			.upgrade(async (tx) => {
