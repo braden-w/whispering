@@ -1,7 +1,7 @@
 import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+import { updateRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import {
-	DbRecordingsService,
 	playSoundIfEnabled,
 	userConfiguredServices,
 } from '$lib/services/index.js';
@@ -9,9 +9,8 @@ import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { settings } from './settings.svelte';
 import { SvelteSet } from 'svelte/reactivity';
-import { updateRecording } from '$lib/query/recordings/mutations';
+import { settings } from './settings.svelte';
 
 export const transcriber = createTranscriber();
 
