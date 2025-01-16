@@ -4,18 +4,16 @@
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { createMutation } from '$lib/query/createMutation.svelte';
+	import { downloadRecordingWithToast } from '$lib/query/download/mutations';
 	import {
 		deleteRecordingWithToast,
 		updateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { DownloadService } from '$lib/services/index.js';
-	import { toast } from '$lib/services/toast';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import { DEBOUNCE_TIME_MS, WhisperingErr } from '@repo/shared';
+	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
@@ -42,38 +40,6 @@
 	$effect(() => {
 		return () => clearTimeout(saveTimeout);
 	});
-
-	const downloadRecordingWithToast = createMutation(() => ({
-		mutationFn: async (recording: Recording) => {
-			if (!recording.blob) {
-				const e = WhisperingErr({
-					title: '⚠️ Recording blob not found',
-					description: "Your recording doesn't have a blob to download.",
-				});
-				toast.error(e.error);
-				return e;
-			}
-			const result = await DownloadService.downloadBlob({
-				name: `whispering_recording_${recording.id}`,
-				blob: recording.blob,
-			});
-			if (!result.ok) {
-				const e = WhisperingErr({
-					title: 'Failed to download recording!',
-					description: 'Your recording could not be downloaded.',
-					action: { type: 'more-details', error: result.error },
-				});
-				toast.error(e.error);
-				return e;
-			}
-
-			toast.success({
-				title: 'Recording downloading!',
-				description: 'Your recording is being downloaded.',
-			});
-			return result;
-		},
-	}));
 </script>
 
 <div class="flex items-center gap-1">

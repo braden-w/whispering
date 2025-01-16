@@ -14,6 +14,10 @@ import type {
 	TransformationStepRun,
 } from './DbService';
 import { DbServiceErr } from './DbService';
+import {
+	downloadIndexedDbBlobWithToast,
+	downloadRecordingWithToast,
+} from '$lib/query/download/mutations';
 
 const DB_NAME = 'RecordingDB';
 
@@ -138,7 +142,7 @@ class RecordingsDatabase extends Dexie {
 							const blob = new Blob([dumpString], {
 								type: 'application/json',
 							});
-							DownloadService.downloadBlob.mutate({
+							downloadIndexedDbBlobWithToast.mutate({
 								name: 'recording-db-dump.json',
 								blob,
 							});
