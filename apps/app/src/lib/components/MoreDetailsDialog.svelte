@@ -68,17 +68,19 @@
 		</Dialog.Header>
 		<pre
 			class="bg-muted relative whitespace-pre-wrap break-words rounded p-4 pr-12 font-mono text-sm">{moreDetailsDialog.content}</pre>
+		{#if moreDetailsDialog.buttons.length !== 0}
+			<Dialog.Footer>
+				{#each moreDetailsDialog.buttons as button}
+					<Button
+						onclick={() => {
+							button.onClick();
+							moreDetailsDialog.isOpen = false;
+						}}
+					>
+						{button.label}
+					</Button>
+				{/each}
+			</Dialog.Footer>
+		{/if}
 	</Dialog.Content>
-	{#if moreDetailsDialog.buttons.length !== 0}
-		<Dialog.Footer>
-			{#each moreDetailsDialog.buttons as button}
-				<Button onclick={() => {
-					button.onClick();
-					moreDetailsDialog.isOpen = false;
-				}}>
-					{button.label}
-				</Button>
-			{/each}
-		</Dialog.Footer>
-	{/if}
 </Dialog.Root>
