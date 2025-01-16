@@ -1,8 +1,8 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { DownloadService } from '$lib/services/index.js';
+import { downloadIndexedDbBlobWithToast } from '$lib/query/download/mutations';
 import { toast } from '$lib/services/toast';
 import { Ok, tryAsync } from '@epicenterhq/result';
-import { WhisperingErr, type Settings } from '@repo/shared';
+import type { Settings } from '@repo/shared';
 import Dexie, { type Transaction } from 'dexie';
 import { nanoid } from 'nanoid/non-secure';
 import type {
@@ -14,10 +14,6 @@ import type {
 	TransformationStepRun,
 } from './DbService';
 import { DbServiceErr } from './DbService';
-import {
-	downloadIndexedDbBlobWithToast,
-	downloadRecordingWithToast,
-} from '$lib/query/download/mutations';
 
 const DB_NAME = 'RecordingDB';
 
