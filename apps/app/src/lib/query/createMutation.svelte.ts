@@ -1,16 +1,13 @@
+import { browser } from '$app/environment';
 import type { DefaultError } from '@tanstack/query-core';
-import {
-	MutationObserver,
-	notifyManager,
-	QueryClient,
-} from '@tanstack/query-core';
+import { MutationObserver, QueryClient } from '@tanstack/query-core';
 import type {
 	CreateMutateFunction,
 	CreateMutationOptions,
 	CreateMutationResult,
 } from '@tanstack/svelte-query';
+import { createSubscriber } from 'svelte/reactivity';
 import type { Accessor } from './types';
-import { browser } from '$app/environment';
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
@@ -27,13 +24,21 @@ export function createMutation<
 	TContext = unknown,
 >(
 	options: Accessor<CreateMutationOptions<TData, TError, TVariables, TContext>>,
-) {
-	const observer = $derived(
-		new MutationObserver<TData, TError, TVariables, TContext>(
-			queryClient,
-			options(),
-		),
+): CreateMutationResult<TData, TError, TVariables, TContext> {
+	const observer = new MutationObserver<TData, TError, TVariables, TContext>(
+		queryClient,
+		options(),
 	);
+
+	// Create subscriber to handle reactivity
+	const subscribe = createSubscriber((update) => {
+		// Update options and setup subscription when first subscriber is added
+		observer.setOptions(options());
+		const unsubscribe = observer.subscribe(() => {
+			update(); // Trigger re-runs of effects that depend on the result
+		});
+		return unsubscribe; // Cleanup when no more subscribers
+	});
 
 	const mutate: CreateMutateFunction<TData, TError, TVariables, TContext> = (
 		variables,
@@ -42,37 +47,25 @@ export function createMutation<
 		observer.mutate(variables, mutateOptions).catch(noop);
 	};
 
-	$effect.root(() => {
-		$effect.pre(() => {
-			observer.setOptions(options());
-		});
-	});
+	return new Proxy(
+		{},
+		{
+			get: (_, anyProperty) => {
+				// Trigger subscription when accessing any property
+				subscribe();
+				const currentResult = observer.getCurrentResult();
 
-	const result = $state(observer.getCurrentResult());
+				const result = {
+					...currentResult,
+					mutate,
+					mutateAsync: currentResult.mutate,
+				};
 
-	$effect.root(() => {
-		$effect(() => {
-			const unsubscribe = observer.subscribe((val) => {
-				notifyManager.batchCalls(() => {
-					Object.assign(result, val);
-				})();
-			});
-
-			return unsubscribe;
-		});
-	});
-
-	return new Proxy(result, {
-		get: (_, prop) => {
-			const r = {
-				...result,
-				mutate,
-				mutateAsync: result.mutate,
-			};
-			if (prop === 'value') return r;
-			return r[prop];
+				if (anyProperty === 'value') return currentResult;
+				return result[anyProperty as keyof typeof result];
+			},
 		},
-	}) satisfies CreateMutationResult<TData, TError, TVariables, TContext>;
+	) as CreateMutationResult<TData, TError, TVariables, TContext>;
 }
 
 function noop() {}
