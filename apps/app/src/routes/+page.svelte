@@ -7,7 +7,7 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { useLatestDoneRecording } from '$lib/query/recordings/queries';
+	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -16,10 +16,10 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
-	const latestDoneRecordingQuery = useLatestDoneRecording();
+	const latestRecordingQuery = useLatestRecording();
 
-	const latestDoneRecording = $derived<Recording>(
-		latestDoneRecordingQuery.data ?? {
+	const latestRecording = $derived<Recording>(
+		latestRecordingQuery.data ?? {
 			id: '',
 			title: '',
 			subtitle: '',
@@ -39,8 +39,8 @@
 	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
-		if (!latestDoneRecording.blob) return undefined;
-		return blobUrlManager.createUrl(latestDoneRecording.blob);
+		if (!latestRecording.blob) return undefined;
+		return blobUrlManager.createUrl(latestRecording.blob);
 	});
 
 	onDestroy(() => {
@@ -89,29 +89,29 @@
 				class="w-full"
 				placeholder="Transcribed text will appear here..."
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestDoneRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}"
 				readonly
-				value={latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'
+				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
 					? '...'
-					: latestDoneRecording.transcribedText}
+					: latestRecording.transcribedText}
 			/>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
 					copyTextToClipboardWithToast.mutate({
 						label: 'transcribed text',
-						text: latestDoneRecording.transcribedText,
+						text: latestRecording.transcribedText,
 					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestDoneRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
-				disabled={latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
+				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 			>
-				{#if latestDoneRecording.transcriptionStatus === 'TRANSCRIBING'}
+				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 					<Loader2Icon class="h-6 w-6 animate-spin" />
 				{:else}
 					<ClipboardIcon class="h-6 w-6" />
@@ -122,7 +122,7 @@
 		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
-					recordingId: latestDoneRecording.id,
+					recordingId: latestRecording.id,
 					propertyName: 'blob',
 				})}"
 				src={blobUrl}

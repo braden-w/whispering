@@ -290,15 +290,14 @@ export function createDbRecordingsServiceDexie() {
 			});
 		},
 
-		async getLatestDoneRecording() {
+		async getLatestRecording() {
 			return tryAsync({
 				try: async () => {
-					const latestDoneRecording = await db.recordings
-						.where('transcriptionStatus')
-						.equals('DONE')
+					const latestRecording = await db.recordings
+						.orderBy('timestamp')
 						.reverse()
 						.first();
-					return latestDoneRecording ?? null;
+					return latestRecording ?? null;
 				},
 				mapErr: (error) =>
 					DbServiceErr({

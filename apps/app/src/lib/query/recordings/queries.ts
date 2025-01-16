@@ -29,11 +29,11 @@ export const useRecordingsQuery = () =>
 		},
 	}));
 
-export const useLatestDoneRecording = () =>
+export const useLatestRecording = () =>
 	createQuery(() => ({
 		queryKey: recordingsKeys.latest,
 		queryFn: async () => {
-			const result = await DbRecordingsService.getLatestDoneRecording();
+			const result = await DbRecordingsService.getLatestRecording();
 			if (!result.ok) {
 				toast.error({
 					title: 'Failed to fetch latest recording!',
