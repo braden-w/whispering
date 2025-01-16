@@ -183,7 +183,7 @@
 
 	let sorting = createPersistedState({
 		key: 'whispering-recordings-data-table-sorting',
-		defaultValue: [{ id: 'createdAt', desc: true }],
+		defaultValue: [{ id: 'timestamp', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
 	let columnFilters = $state<ColumnFiltersState>([]);
@@ -284,7 +284,7 @@
 		},
 	};
 
-	let template = $state('{{createdAt}} {{transcribedText}}');
+	let template = $state('{{timestamp}} {{transcribedText}}');
 	let delimiter = $state('\n\n');
 
 	let isDialogOpen = $state(false);
