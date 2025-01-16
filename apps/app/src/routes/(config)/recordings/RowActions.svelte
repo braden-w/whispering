@@ -19,7 +19,6 @@
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
-		HistoryIcon,
 		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
@@ -105,9 +104,7 @@
 			{:else if recording.transcriptionStatus === 'DONE'}
 				<RetryTranscriptionIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'FAILED'}
-				<AlertCircleIcon
-					class="h-4 w-4 text-destructive hover:text-destructive/80 transition-colors"
-				/>
+				<AlertCircleIcon class="h-4 w-4 text-red-500" />
 			{/if}
 		</WhisperingButton>
 
