@@ -151,10 +151,10 @@ class RecordingsDatabase extends Dexie {
 		};
 
 		// V1: Single recordings table
-		this.version(1).stores({ recordings: '&id, timestamp' });
+		this.version(0.1).stores({ recordings: '&id, timestamp' });
 
 		// V2: Split into metadata and blobs
-		this.version(2)
+		this.version(0.2)
 			.stores({
 				recordings: null,
 				recordingMetadata: '&id, timestamp',
@@ -182,12 +182,12 @@ class RecordingsDatabase extends Dexie {
 						.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
 						.bulkAdd(blobs);
 				} catch (error) {
-					await handleUpgradeError({ tx, version: 2, error });
+					await handleUpgradeError({ tx, version: 0.2, error });
 				}
 			});
 
 		// V3: Back to single recordings table
-		this.version(3)
+		this.version(0.3)
 			.stores({
 				recordings: '&id, timestamp',
 				recordingMetadata: null,
@@ -215,13 +215,13 @@ class RecordingsDatabase extends Dexie {
 						.table<RecordingsDbSchemaV3['recordings']>('recordings')
 						.bulkAdd(mergedRecordings);
 				} catch (error) {
-					await handleUpgradeError({ tx, version: 3, error });
+					await handleUpgradeError({ tx, version: 0.3, error });
 				}
 			});
 
 		// V4: Add transformations, transformation runs, and recording
 		// Also migrate recordings timestamp to createdAt and updatedAt
-		this.version(4)
+		this.version(0.4)
 			.stores({
 				recordings: '&id, timestamp, createdAt, updatedAt',
 				transformations: '&id, createdAt, updatedAt',
@@ -242,7 +242,7 @@ class RecordingsDatabase extends Dexie {
 					await tx.table('recordings').clear();
 					await tx.table('recordings').bulkAdd(newRecordings);
 				} catch (error) {
-					await handleUpgradeError({ tx, version: 4, error });
+					await handleUpgradeError({ tx, version: 0.4, error });
 				}
 			});
 
