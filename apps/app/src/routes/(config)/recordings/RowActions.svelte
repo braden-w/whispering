@@ -4,6 +4,7 @@
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { createMutation } from '$lib/query/createMutation.svelte';
 	import {
 		deleteRecordingWithToast,
 		updateRecordingWithToast,
@@ -15,9 +16,10 @@
 	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { DEBOUNCE_TIME_MS, WhisperingErr } from '@repo/shared';
-	import { createMutation } from '$lib/query/createMutation.svelte';
 	import {
+		AlertCircleIcon,
 		DownloadIcon,
+		HistoryIcon,
 		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
@@ -94,8 +96,12 @@
 				<StartTranscriptionIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
 				<LoadingTranscriptionIcon class="h-4 w-4" />
-			{:else}
+			{:else if recording.transcriptionStatus === 'DONE'}
 				<RetryTranscriptionIcon class="h-4 w-4" />
+			{:else if recording.transcriptionStatus === 'FAILED'}
+				<AlertCircleIcon
+					class="h-4 w-4 text-destructive hover:text-destructive/80 transition-colors"
+				/>
 			{/if}
 		</WhisperingButton>
 
