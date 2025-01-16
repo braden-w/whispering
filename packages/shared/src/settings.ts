@@ -1,18 +1,21 @@
-import { z } from 'zod';
+import { z, type ZodBoolean } from 'zod';
 import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
 	DEFAULT_BITRATE_KBPS,
+	GROQ_MODELS,
 	SUPPORTED_LANGUAGES,
 	TRANSCRIPTION_SERVICES,
+	type WhisperingSoundNames,
 } from './constants.js';
 
-export const getDefaultSettings = (platform: 'app' | 'extension') =>
+export const getDefaultSettings = () =>
 	({
-		'sound.playOnStartSuccess': true,
-		'sound.playOnStopSuccess': true,
-		'sound.playOnCancelSuccess': true,
-		'sound.playOnTranscriptionSuccess': true,
+		'sound.playOn.start': true,
+		'sound.playOn.stop': true,
+		'sound.playOn.cancel': true,
+		'sound.playOn.transcriptionComplete': true,
+		'sound.playOn.transformationComplete': true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
 		'recording.isFasterRerecordEnabled': false,
@@ -27,28 +30,36 @@ export const getDefaultSettings = (platform: 'app' | 'extension') =>
 		'recording.bitrateKbps': DEFAULT_BITRATE_KBPS,
 
 		'transcription.selectedTranscriptionService': 'OpenAI',
+		'transcription.groq.model': 'whisper-large-v3',
 		'transcription.outputLanguage': 'auto',
 		'transcription.prompt': '',
 		'transcription.temperature': '0',
-
-		'transcription.openAi.apiKey': '',
-
-		'transcription.groq.apiKey': '',
 
 		'transcription.fasterWhisperServer.serverUrl': 'http://localhost:8000',
 		'transcription.fasterWhisperServer.serverModel':
 			'Systran/faster-whisper-medium.en',
 
+		'transformations.selectedTransformationId': null,
+
+		'apiKeys.openai': '',
+		'apiKeys.anthropic': '',
+		'apiKeys.groq': '',
+
 		'shortcuts.currentLocalShortcut': 'space',
-		'shortcuts.currentGlobalShortcut':
-			platform === 'app' ? 'CommandOrControl+Shift+;' : '',
+		'shortcuts.currentGlobalShortcut': 'CommandOrControl+Shift+;',
 	}) satisfies Settings;
 
 export const settingsSchema = z.object({
-	'sound.playOnStartSuccess': z.boolean(),
-	'sound.playOnStopSuccess': z.boolean(),
-	'sound.playOnCancelSuccess': z.boolean(),
-	'sound.playOnTranscriptionSuccess': z.boolean(),
+	...({
+		'sound.playOn.start': z.boolean(),
+		'sound.playOn.stop': z.boolean(),
+		'sound.playOn.cancel': z.boolean(),
+		'sound.playOn.transcriptionComplete': z.boolean(),
+		'sound.playOn.transformationComplete': z.boolean(),
+	} satisfies {
+		[K in WhisperingSoundNames as `sound.playOn.${K}`]: ZodBoolean;
+	}),
+
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
 	'transcription.clipboard.pasteOnSuccess': z.boolean(),
 	'recording.isFasterRerecordEnabled': z.boolean(),
@@ -75,10 +86,15 @@ export const settingsSchema = z.object({
 	'transcription.temperature': z.string(),
 
 	// Service-specific settings
-	'transcription.openAi.apiKey': z.string(),
-	'transcription.groq.apiKey': z.string(),
+	'transcription.groq.model': z.enum(GROQ_MODELS),
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
+
+	'transformations.selectedTransformationId': z.string().nullable(),
+
+	'apiKeys.openai': z.string(),
+	'apiKeys.anthropic': z.string(),
+	'apiKeys.groq': z.string(),
 
 	'shortcuts.currentLocalShortcut': z.string(),
 	'shortcuts.currentGlobalShortcut': z.string(),

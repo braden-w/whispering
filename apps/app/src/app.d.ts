@@ -17,9 +17,3 @@ declare global {
 		goto: (url: string) => Promise<void>;
 	}
 }
-
-declare module '@tanstack/svelte-table' {
-	interface ColumnMeta<TData extends RowData, TValue> {
-		headerText: string;
-	}
-}

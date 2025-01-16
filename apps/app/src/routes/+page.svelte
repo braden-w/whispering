@@ -1,24 +1,30 @@
 <script lang="ts">
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
+	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
+	import { useLatestRecording } from '$lib/query/recordings/queries';
+	import type { Recording } from '$lib/services/db';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { clipboard } from '$lib/utils/clipboard';
+	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
+	const latestRecordingQuery = useLatestRecording();
+
 	const latestRecording = $derived<Recording>(
-		recordings.value.at(-1) ?? {
+		latestRecordingQuery.data ?? {
 			id: '',
 			title: '',
 			subtitle: '',
+			createdAt: '',
+			updatedAt: '',
 			timestamp: '',
 			blob: new Blob(),
 			transcribedText: '',
@@ -94,7 +100,7 @@
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
-					clipboard.copyTextToClipboardWithToast({
+					copyTextToClipboardWithToast.mutate({
 						label: 'transcribed text',
 						text: latestRecording.transcribedText,
 					})}
@@ -103,6 +109,7 @@
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
+				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 			>
 				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 					<Loader2Icon class="h-6 w-6 animate-spin" />
@@ -111,6 +118,7 @@
 				{/if}
 			</WhisperingButton>
 		</div>
+
 		{#if blobUrl}
 			<audio
 				style="view-transition-name: {createRecordingViewTransitionName({
@@ -122,6 +130,8 @@
 				class="h-8 w-full"
 			></audio>
 		{/if}
+
+		<SelectedTransformation />
 	</div>
 
 	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />

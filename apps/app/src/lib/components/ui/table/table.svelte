@@ -11,7 +11,7 @@
 	}: WithElementRef<HTMLTableAttributes> = $props();
 </script>
 
-<div class="relative w-full overflow-auto">
+<div class="relative h-full w-full overflow-auto">
 	<table
 		bind:this={ref}
 		class={cn('w-full caption-bottom text-sm', className)}

@@ -1,6 +1,6 @@
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { toast } from '$lib/utils/toast';
+import { toast } from '$lib/services/toast';
 import { tryAsync, trySync } from '@epicenterhq/result';
 import {
 	WhisperingErr,
@@ -13,7 +13,7 @@ import { recorder } from './recorder.svelte';
 export const settings = createPersistedState({
 	key: 'whispering-settings',
 	schema: settingsSchema,
-	defaultValue: getDefaultSettings('app'),
+	defaultValue: getDefaultSettings(),
 	onUpdateSuccess: () => {
 		toast.success({ title: 'Settings updated!', description: '' });
 	},

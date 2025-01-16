@@ -1,4 +1,6 @@
 <script lang="ts">
+	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
+	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -6,13 +8,16 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
 	import {
+		GROQ_MODELS_OPTIONS,
 		SUPPORTED_LANGUAGES_OPTIONS,
 		TRANSCRIPTION_SERVICE_OPTIONS,
 		WHISPERING_URL,
 	} from '@repo/shared';
-	import SettingsLabelInput from '../SettingsLabelInput.svelte';
-	import SettingsLabelSelect from '../SettingsLabelSelect.svelte';
-	import SettingsLabelTextarea from '../SettingsLabelTextarea.svelte';
+	import {
+		LabeledInput,
+		LabeledSelect,
+		LabeledTextarea,
+	} from '$lib/components/labeled/index.js';
 </script>
 
 <svelte:head>
@@ -28,85 +33,48 @@
 	</div>
 	<Separator />
 
-	<div class="grid gap-2">
-		<SettingsLabelSelect
-			id="selected-transcription-service"
-			label="Transcription Service"
-			items={TRANSCRIPTION_SERVICE_OPTIONS}
-			selected={settings.value['transcription.selectedTranscriptionService']}
+	<LabeledSelect
+		id="selected-transcription-service"
+		label="Transcription Service"
+		items={TRANSCRIPTION_SERVICE_OPTIONS}
+		selected={settings.value['transcription.selectedTranscriptionService']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'transcription.selectedTranscriptionService': selected,
+			};
+		}}
+		placeholder="Select a transcription service"
+	/>
+
+	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
+		<OpenAiApiKeyInput />
+	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
+		<LabeledSelect
+			id="groq-model"
+			label="Groq Model"
+			items={GROQ_MODELS_OPTIONS}
+			selected={settings.value['transcription.groq.model']}
 			onSelectedChange={(selected) => {
-				if (!selected) return;
 				settings.value = {
 					...settings.value,
-					'transcription.selectedTranscriptionService': selected,
+					'transcription.groq.model': selected,
 				};
 			}}
-			placeholder="Select a transcription service"
-		/>
-	</div>
-	{#if settings.value['transcription.selectedTranscriptionService'] === 'OpenAI'}
-		<div class="grid gap-2">
-			<SettingsLabelInput
-				id="openai-api-key"
-				label="OpenAI API Key"
-				type="password"
-				placeholder="Your OpenAI API Key"
-				value={settings.value['transcription.openAi.apiKey']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.openAi.apiKey': value,
-					};
-				}}
-			/>
-			<div class="text-muted-foreground text-sm">
-				You can find your API key in your <Button
+		>
+			{#snippet description()}
+				You can find more details about the models in the <Button
 					variant="link"
 					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/api-keys"
+					href="https://console.groq.com/docs/speech-text"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					account settings
-				</Button>. Make sure <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://platform.openai.com/settings/organization/billing/overview"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					billing
-				</Button>
-				is enabled.
-			</div>
-		</div>
-	{:else if settings.value['transcription.selectedTranscriptionService'] === 'Groq'}
-		<div class="grid gap-2">
-			<SettingsLabelInput
-				id="groq-api-key"
-				label="Groq API Key"
-				type="password"
-				placeholder="Your Groq API Key"
-				value={settings.value['transcription.groq.apiKey']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.groq.apiKey': value,
-					};
-				}}
-			/>
-			<div class="text-muted-foreground text-sm">
-				You can find your Groq API key in your <Button
-					variant="link"
-					class="px-0.3 py-0.2 h-fit"
-					href="https://console.groq.com/keys"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Groq console
+					Groq docs
 				</Button>.
-			</div>
-		</div>
+			{/snippet}
+		</LabeledSelect>
+		<GroqApiKeyInput />
 	{:else if settings.value['transcription.selectedTranscriptionService'] === 'faster-whisper-server'}
 		<Card.Root class="w-full">
 			<Card.Header>
@@ -146,18 +114,14 @@
 					</Tabs.List>
 
 					<Tabs.Content value="cpu-mode">
-						<p class="text-muted-foreground pb-4">
-							For computers without CUDA support:
-						</p>
 						<CopyableCode
+							label="For computers without CUDA support:"
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
 						/>
 					</Tabs.Content>
 					<Tabs.Content value="gpu-mode">
-						<p class="text-muted-foreground pb-4">
-							For computers with CUDA support:
-						</p>
 						<CopyableCode
+							label="For computers with CUDA support:"
 							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
 						/>
 					</Tabs.Content>
@@ -165,88 +129,76 @@
 			</Card.Content>
 		</Card.Root>
 
-		<div class="grid gap-2">
-			<SettingsLabelInput
-				id="faster-whisper-server-url"
-				label="faster-whisper-server URL"
-				placeholder="Your faster-whisper-server URL"
-				value={settings.value['transcription.fasterWhisperServer.serverUrl']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.fasterWhisperServer.serverUrl': value,
-					};
-				}}
-			/>
-		</div>
-		<div class="grid gap-2">
-			<SettingsLabelInput
-				id="faster-whisper-server-model"
-				label="faster-whisper-server Model"
-				placeholder="Your faster-whisper-server Model"
-				value={settings.value['transcription.fasterWhisperServer.serverModel']}
-				oninput={({ currentTarget: { value } }) => {
-					settings.value = {
-						...settings.value,
-						'transcription.fasterWhisperServer.serverModel': value,
-					};
-				}}
-			/>
-		</div>
+		<LabeledInput
+			id="faster-whisper-server-url"
+			label="faster-whisper-server URL"
+			placeholder="Your faster-whisper-server URL"
+			value={settings.value['transcription.fasterWhisperServer.serverUrl']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.fasterWhisperServer.serverUrl': value,
+				};
+			}}
+		/>
+
+		<LabeledInput
+			id="faster-whisper-server-model"
+			label="faster-whisper-server Model"
+			placeholder="Your faster-whisper-server Model"
+			value={settings.value['transcription.fasterWhisperServer.serverModel']}
+			oninput={({ currentTarget: { value } }) => {
+				settings.value = {
+					...settings.value,
+					'transcription.fasterWhisperServer.serverModel': value,
+				};
+			}}
+		/>
 	{/if}
-	<div class="grid gap-2">
-		<SettingsLabelSelect
-			id="output-language"
-			label="Output Language"
-			items={SUPPORTED_LANGUAGES_OPTIONS}
-			selected={settings.value['transcription.outputLanguage']}
-			onSelectedChange={(selected) => {
-				if (!selected) return;
-				settings.value = {
-					...settings.value,
-					'transcription.outputLanguage': selected,
-				};
-			}}
-			placeholder="Select a language"
-		/>
-	</div>
 
-	<div class="grid gap-2">
-		<SettingsLabelInput
-			id="temperature"
-			label="Temperature"
-			type="number"
-			min="0"
-			max="1"
-			step="0.1"
-			placeholder="0"
-			value={settings.value['transcription.temperature']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.temperature': value,
-				};
-			}}
-		/>
-		<div class="text-muted-foreground text-sm">
-			Controls randomness in the model's output. 0 is focused and deterministic,
-			1 is more creative.
-		</div>
-	</div>
+	<LabeledSelect
+		id="output-language"
+		label="Output Language"
+		items={SUPPORTED_LANGUAGES_OPTIONS}
+		selected={settings.value['transcription.outputLanguage']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'transcription.outputLanguage': selected,
+			};
+		}}
+		placeholder="Select a language"
+	/>
 
-	<div class="grid gap-2">
-		<SettingsLabelTextarea
-			id="transcription-prompt"
-			label="System Prompt"
-			placeholder="Optional system prompt to guide the transcription"
-			value={settings.value['transcription.prompt']}
-			oninput={({ currentTarget: { value } }) => {
-				settings.value = {
-					...settings.value,
-					'transcription.prompt': value,
-				};
-			}}
-			description="Custom instructions to guide the transcription process. Leave empty for default behavior."
-		/>
-	</div>
+	<LabeledInput
+		id="temperature"
+		label="Temperature"
+		type="number"
+		min="0"
+		max="1"
+		step="0.1"
+		placeholder="0"
+		value={settings.value['transcription.temperature']}
+		oninput={({ currentTarget: { value } }) => {
+			settings.value = {
+				...settings.value,
+				'transcription.temperature': value,
+			};
+		}}
+		description="Controls randomness in the model's output. 0 is focused and deterministic, 1 is more creative."
+	/>
+
+	<LabeledTextarea
+		id="transcription-prompt"
+		label="System Prompt"
+		placeholder="Optional system prompt to guide the transcription"
+		value={settings.value['transcription.prompt']}
+		oninput={({ currentTarget: { value } }) => {
+			settings.value = {
+				...settings.value,
+				'transcription.prompt': value,
+			};
+		}}
+		description="Custom instructions to guide the transcription process. Leave empty for default behavior."
+	/>
 </div>

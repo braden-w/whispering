@@ -5,6 +5,7 @@
 	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
 	import {
 		ListIcon,
+		FilterIcon,
 		Minimize2Icon,
 		MoonIcon,
 		SlidersVerticalIcon,
@@ -26,6 +27,14 @@
 		size="icon"
 	>
 		<ListIcon class="h-4 w-4" aria-hidden="true" />
+	</WhisperingButton>
+	<WhisperingButton
+		tooltipContent="Transformations"
+		href="/transformations"
+		variant="ghost"
+		size="icon"
+	>
+		<FilterIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
 		tooltipContent="Settings"

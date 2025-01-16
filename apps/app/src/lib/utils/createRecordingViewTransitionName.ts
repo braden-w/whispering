@@ -1,4 +1,4 @@
-import type { Recording } from '$lib/stores/recordings.svelte';
+import type { Recording } from '$lib/services/db';
 
 export function createRecordingViewTransitionName({
 	recordingId,

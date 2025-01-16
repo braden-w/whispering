@@ -4,9 +4,12 @@
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
+	import { DbRecordingsService } from '$lib/services';
+	import { queryClient } from '$lib/query';
 	import { recorder } from '$lib/stores/recorder.svelte';
-	import { toast } from '$lib/utils/toast';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { ModeWatcher, mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import type { ToasterProps } from 'svelte-sonner';
@@ -14,9 +17,6 @@
 	import '../app.css';
 	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
 	import { closeToTrayIfEnabled } from './+layout/closeToTray';
-	import { RecordingsService } from '$lib/services.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { recordings } from '$lib/stores/recordings.svelte';
 
 	let { children } = $props();
 
@@ -25,8 +25,7 @@
 
 	$effect(() => {
 		recorder.recorderState;
-		recordings.value;
-		void RecordingsService.cleanupExpiredRecordings(settings.value);
+		void DbRecordingsService.cleanupExpiredRecordings(settings.value);
 	});
 
 	onNavigate((navigation) => {
@@ -61,34 +60,36 @@
 	<title>Whispering</title>
 </svelte:head>
 
-<button
-	class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
-	onclick={recorder.toggleRecordingWithToast}
->
-	<span
-		style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
-		class="text-[48px] leading-none"
+<QueryClientProvider client={queryClient}>
+	<button
+		class="xxs:hidden hover:bg-accent hover:text-accent-foreground h-screen w-screen transform duration-300 ease-in-out"
+		onclick={recorder.toggleRecordingWithToast}
 	>
-		{#if recorder.recorderState === 'SESSION+RECORDING'}
-			🔲
-		{:else}
-			🎙️
-		{/if}
-	</span>
-</button>
+		<span
+			style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));"
+			class="text-[48px] leading-none"
+		>
+			{#if recorder.recorderState === 'SESSION+RECORDING'}
+				🔲
+			{:else}
+				🎙️
+			{/if}
+		</span>
+	</button>
 
-<div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
-	{@render children()}
-</div>
+	<div class="xxs:flex hidden min-h-screen flex-col items-center gap-2">
+		{@render children()}
+	</div>
 
-<Toaster
-	offset={16}
-	class="xs:block hidden"
-	theme={$mode}
-	{...TOASTER_SETTINGS}
-/>
-<ModeWatcher />
-<FasterRerecordExplainedDialog />
-<ConfirmationDialog />
-<MoreDetailsDialog />
-<NotificationLog />
+	<Toaster
+		offset={16}
+		class="xs:block hidden"
+		theme={$mode}
+		{...TOASTER_SETTINGS}
+	/>
+	<ModeWatcher />
+	<FasterRerecordExplainedDialog />
+	<ConfirmationDialog />
+	<MoreDetailsDialog />
+	<NotificationLog />
+</QueryClientProvider>

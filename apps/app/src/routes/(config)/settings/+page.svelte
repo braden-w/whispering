@@ -2,15 +2,15 @@
 	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import { macOSAppNapExplainedDialog } from '$lib/components/MacOSAppNapExplainedDialog.svelte';
 	import MacOSAppNapExplainedDialog from '$lib/components/MacOSAppNapExplainedDialog.svelte';
+	import {
+		LabeledSelect,
+		LabeledSwitch,
+	} from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { ALWAYS_ON_TOP_OPTIONS } from '@repo/shared';
-	import SettingsLabelSelect from './SettingsLabelSelect.svelte';
 	import { type } from '@tauri-apps/plugin-os';
-	import * as Card from '$lib/components/ui/card';
 </script>
 
 <svelte:head>
@@ -27,53 +27,42 @@
 
 	<Separator />
 
-	<div class="flex items-center gap-2">
-		<Switch
-			id="copy-to-clipboard"
-			aria-labelledby="copy-to-clipboard"
-			checked={settings.value['transcription.clipboard.copyOnSuccess']}
-			onCheckedChange={(v) => {
-				settings.value = {
-					...settings.value,
-					'transcription.clipboard.copyOnSuccess': v,
-				};
-			}}
-		/>
-		<Label for="copy-to-clipboard">
-			Copy text to clipboard on successful transcription
-		</Label>
-	</div>
+	<LabeledSwitch
+		id="copy-to-clipboard"
+		label="Copy text to clipboard on successful transcription"
+		checked={settings.value['transcription.clipboard.copyOnSuccess']}
+		onCheckedChange={(v) => {
+			settings.value = {
+				...settings.value,
+				'transcription.clipboard.copyOnSuccess': v,
+			};
+		}}
+	/>
 
-	<div class="flex items-center gap-2">
-		<Switch
-			id="paste-from-clipboard"
-			aria-labelledby="paste-from-clipboard"
-			checked={settings.value['transcription.clipboard.pasteOnSuccess']}
-			onCheckedChange={(v) => {
-				settings.value = {
-					...settings.value,
-					'transcription.clipboard.pasteOnSuccess': v,
-				};
-			}}
-		/>
-		<Label for="paste-from-clipboard">
-			Paste contents from clipboard after successful transcription
-		</Label>
-	</div>
+	<LabeledSwitch
+		id="paste-from-clipboard"
+		label="Paste contents from clipboard after successful transcription"
+		checked={settings.value['transcription.clipboard.pasteOnSuccess']}
+		onCheckedChange={(v) => {
+			settings.value = {
+				...settings.value,
+				'transcription.clipboard.pasteOnSuccess': v,
+			};
+		}}
+		disabled={!settings.value['transcription.clipboard.copyOnSuccess']}
+	/>
 
-	<div class="flex items-center gap-2">
-		<Switch
-			id="faster-rerecord"
-			aria-labelledby="faster-rerecord"
-			checked={settings.value['recording.isFasterRerecordEnabled']}
-			onCheckedChange={(v) => {
-				settings.value = {
-					...settings.value,
-					'recording.isFasterRerecordEnabled': v,
-				};
-			}}
-		/>
-		<Label for="faster-rerecord">
+	<LabeledSwitch
+		id="faster-rerecord"
+		checked={settings.value['recording.isFasterRerecordEnabled']}
+		onCheckedChange={(v) => {
+			settings.value = {
+				...settings.value,
+				'recording.isFasterRerecordEnabled': v,
+			};
+		}}
+	>
+		{#snippet label()}
 			Enable faster rerecord. <Button
 				variant="link"
 				size="inline"
@@ -81,21 +70,19 @@
 			>
 				(What's that?)
 			</Button>
-		</Label>
-	</div>
+		{/snippet}
+	</LabeledSwitch>
 
 	{#if window.__TAURI_INTERNALS__}
-		<div class="flex items-center gap-2">
-			<Switch
-				id="close-to-tray"
-				aria-labelledby="close-to-tray"
-				checked={settings.value['system.closeToTray']}
-				onCheckedChange={(v) => {
-					settings.value = { ...settings.value, 'system.closeToTray': v };
-				}}
-			/>
-			<Label for="close-to-tray">
-				Close to tray instead of quitting
+		<LabeledSwitch
+			id="close-to-tray"
+			checked={settings.value['system.closeToTray']}
+			onCheckedChange={(v) => {
+				settings.value = { ...settings.value, 'system.closeToTray': v };
+			}}
+		>
+			{#snippet label()}
+				Close to tray instead of quitting.
 				{#if window.__TAURI_INTERNALS__ && type() === 'macos'}
 					<Button
 						variant="link"
@@ -105,74 +92,65 @@
 						(Not recommended for macOS)
 					</Button>
 				{/if}
-			</Label>
-		</div>
+			{/snippet}
+		</LabeledSwitch>
 	{/if}
 
 	<Separator />
 
-	<div class="grid gap-2">
-		<SettingsLabelSelect
-			id="recording-retention-strategy"
-			label="Auto Delete Recordings"
-			items={[
-				{ value: 'keep-forever', label: 'Keep All Recordings' },
-				{ value: 'limit-count', label: 'Keep Limited Number' },
-			]}
-			selected={settings.value['database.recordingRetentionStrategy']}
-			onSelectedChange={(selected) => {
-				if (!selected) return;
-				settings.value = {
-					...settings.value,
-					'database.recordingRetentionStrategy': selected,
-				};
-			}}
-			placeholder="Select retention strategy"
-		/>
-	</div>
+	<LabeledSelect
+		id="recording-retention-strategy"
+		label="Auto Delete Recordings"
+		items={[
+			{ value: 'keep-forever', label: 'Keep All Recordings' },
+			{ value: 'limit-count', label: 'Keep Limited Number' },
+		]}
+		selected={settings.value['database.recordingRetentionStrategy']}
+		onSelectedChange={(selected) => {
+			settings.value = {
+				...settings.value,
+				'database.recordingRetentionStrategy': selected,
+			};
+		}}
+		placeholder="Select retention strategy"
+	/>
 
 	{#if settings.value['database.recordingRetentionStrategy'] === 'limit-count'}
-		<div class="grid gap-2">
-			<SettingsLabelSelect
-				id="max-recording-count"
-				label="Maximum Recordings"
-				items={[
-					{ value: '5', label: '5 Recordings' },
-					{ value: '10', label: '10 Recordings' },
-					{ value: '25', label: '25 Recordings' },
-					{ value: '50', label: '50 Recordings' },
-					{ value: '100', label: '100 Recordings' },
-				]}
-				selected={settings.value['database.maxRecordingCount']}
-				onSelectedChange={(selected) => {
-					if (!selected) return;
-					settings.value = {
-						...settings.value,
-						'database.maxRecordingCount': selected,
-					};
-				}}
-				placeholder="Select maximum recordings"
-			/>
-		</div>
+		<LabeledSelect
+			id="max-recording-count"
+			label="Maximum Recordings"
+			items={[
+				{ value: '5', label: '5 Recordings' },
+				{ value: '10', label: '10 Recordings' },
+				{ value: '25', label: '25 Recordings' },
+				{ value: '50', label: '50 Recordings' },
+				{ value: '100', label: '100 Recordings' },
+			]}
+			selected={settings.value['database.maxRecordingCount']}
+			onSelectedChange={(selected) => {
+				settings.value = {
+					...settings.value,
+					'database.maxRecordingCount': selected,
+				};
+			}}
+			placeholder="Select maximum recordings"
+		/>
 	{/if}
 
 	{#if window.__TAURI_INTERNALS__}
-		<div class="grid gap-2">
-			<SettingsLabelSelect
-				id="always-on-top"
-				label="Always On Top"
-				items={ALWAYS_ON_TOP_OPTIONS}
-				selected={settings.value['system.alwaysOnTop']}
-				onSelectedChange={async (selected) => {
-					if (!selected) return;
-					settings.value = {
-						...settings.value,
-						'system.alwaysOnTop': selected,
-					};
-				}}
-				placeholder="Select a language"
-			/>
-		</div>
+		<LabeledSelect
+			id="always-on-top"
+			label="Always On Top"
+			items={ALWAYS_ON_TOP_OPTIONS}
+			selected={settings.value['system.alwaysOnTop']}
+			onSelectedChange={async (selected) => {
+				settings.value = {
+					...settings.value,
+					'system.alwaysOnTop': selected,
+				};
+			}}
+			placeholder="Select a language"
+		/>
 	{/if}
 </div>
 

@@ -2,27 +2,39 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { Card } from '$lib/components/ui/card';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { type Recording, recordings } from '$lib/stores/recordings.svelte';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { deleteRecordingsWithToast } from '$lib/query/recordings/mutations';
+	import { useRecordingsQuery } from '$lib/query/recordings/queries';
+	import type { Recording } from '$lib/services/db';
+	import { transcriber } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
-	import { clipboard } from '$lib/utils/clipboard';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
 		FlexRender,
 		createTable,
 		renderComponent,
 	} from '@tanstack/svelte-table';
-	import type { ColumnDef, ColumnFilter, Updater } from '@tanstack/table-core';
+	import type {
+		ColumnDef,
+		ColumnFiltersState,
+		PaginationState,
+	} from '@tanstack/table-core';
 	import {
 		getCoreRowModel,
 		getFilteredRowModel,
+		getPaginationRowModel,
 		getSortedRowModel,
 	} from '@tanstack/table-core';
 	import {
@@ -31,8 +43,8 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
+	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
-	import DataTableHeader from './DataTableHeader.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
@@ -54,155 +66,198 @@
 				}),
 			enableSorting: false,
 			enableHiding: false,
-		},
-		{
-			accessorKey: 'id',
-			meta: {
-				headerText: 'ID',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
-			enableSorting: false,
-			enableHiding: false,
-		},
-		{
-			accessorKey: 'title',
-			meta: {
-				headerText: 'Title',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
-		},
-		{
-			accessorKey: 'subtitle',
-			meta: {
-				headerText: 'Subtitle',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
-		},
-		{
-			accessorKey: 'timestamp',
-			meta: {
-				headerText: 'Timestamp',
-			},
-			header: (headerContext) =>
-				renderComponent(DataTableHeader, headerContext),
-		},
-		{
-			id: 'transcribedText',
 			filterFn: (row, _columnId, filterValue) => {
-				const { transcribedText } = row.getValue<{
-					id: string;
-					transcribedText: string;
-				}>('transcribedText');
-				return transcribedText.includes(filterValue);
+				const title = String(row.getValue('title'));
+				const subtitle = String(row.getValue('subtitle'));
+				const transcribedText = String(row.getValue('transcribedText'));
+				return (
+					title.toLowerCase().includes(filterValue.toLowerCase()) ||
+					subtitle.toLowerCase().includes(filterValue.toLowerCase()) ||
+					transcribedText.toLowerCase().includes(filterValue.toLowerCase())
+				);
 			},
-			accessorFn: ({ id, transcribedText }) => ({ id, transcribedText }),
-			meta: {
-				headerText: 'Transcribed Text',
-			},
-			header: 'Transcribed Text',
+		},
+		{
+			id: 'ID',
+			accessorKey: 'id',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, { column, headerText: 'ID' }),
 			cell: ({ getValue }) => {
-				const { id, transcribedText } = getValue<{
-					id: string;
-					transcribedText: string;
-				}>();
+				const id = getValue<string>();
+				return renderComponent(Badge, {
+					variant: 'id',
+					children: createRawSnippet(() => ({
+						render: () => id,
+					})),
+				});
+			},
+		},
+		{
+			id: 'Title',
+			accessorKey: 'title',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Title',
+				}),
+		},
+		{
+			id: 'Subtitle',
+			accessorKey: 'subtitle',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Subtitle',
+				}),
+		},
+		{
+			id: 'Timestamp',
+			accessorKey: 'timestamp',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Timestamp',
+				}),
+		},
+		{
+			id: 'Created At',
+			accessorKey: 'createdAt',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Created At',
+				}),
+		},
+		{
+			id: 'Updated At',
+			accessorKey: 'updatedAt',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Updated At',
+				}),
+		},
+		{
+			id: 'Transcribed Text',
+			accessorKey: 'transcribedText',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Transcribed Text',
+				}),
+			cell: ({ getValue, row }) => {
+				const transcribedText = getValue<string>();
 				return renderComponent(TranscribedText, {
-					recordingId: id,
+					recordingId: row.id,
 					transcribedText,
 				});
 			},
 		},
 		{
-			id: 'audio',
+			id: 'Audio',
 			accessorFn: ({ id, blob }) => ({ id, blob }),
-			meta: {
-				headerText: 'Audio',
-			},
-			header: 'Audio',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Audio',
+				}),
 			cell: ({ getValue }) => {
 				const { id, blob } = getValue<Pick<Recording, 'id' | 'blob'>>();
 				return renderComponent(RenderAudioUrl, { id, blob });
 			},
 		},
 		{
-			id: 'actions',
+			id: 'Actions',
 			accessorFn: (recording) => recording,
-			meta: {
-				headerText: 'Actions',
-			},
-			header: 'Actions',
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Actions',
+				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
-				return renderComponent(RowActions, { recording });
+				return renderComponent(RowActions, { recordingId: recording.id });
 			},
 		},
 	];
 
 	let sorting = createPersistedState({
-		key: 'whispering-data-table-sorting',
-		defaultValue: [{ id: 'timestamp', desc: true }],
+		key: 'whispering-recordings-data-table-sorting',
+		defaultValue: [{ id: 'createdAt', desc: true }],
 		schema: z.array(z.object({ desc: z.boolean(), id: z.string() })),
 	});
-	let columnFilters = createPersistedState({
-		key: 'whispering-data-table-column-filters',
-		defaultValue: [],
-		schema: z
-			.object({ id: z.string(), value: z.unknown() })
-			.refine((data): data is ColumnFilter => data.value !== undefined)
-			.array(),
-	});
+	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = createPersistedState({
-		key: 'whispering-data-table-column-visibility',
+		key: 'whispering-recordings-data-table-column-visibility',
 		defaultValue: {
 			id: false,
 			title: false,
 			subtitle: false,
-			timestamp: false,
+			createdAt: false,
+			updatedAt: false,
 		},
 		schema: z.record(z.string(), z.boolean()),
 	});
 	let rowSelection = createPersistedState({
-		key: 'whispering-data-table-row-selection',
+		key: 'whispering-recordings-data-table-row-selection',
 		defaultValue: {},
 		schema: z.record(z.string(), z.boolean()),
 	});
+	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	function createUpdater<T>(state: { value: T }) {
-		return (updater: Updater<T>) => {
-			if (updater instanceof Function) {
-				state.value = updater(state.value);
-			} else {
-				state.value = updater;
-			}
-		};
-	}
-
-	const setSorting = createUpdater(sorting);
-	const setFilters = createUpdater(columnFilters);
-	const setVisibility = createUpdater(columnVisibility);
-	const setRowSelection = createUpdater(rowSelection);
+	const recordingsQuery = useRecordingsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
 		get data() {
-			return recordings.value;
+			return recordingsQuery.data ?? [];
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setFilters,
-		onColumnVisibilityChange: setVisibility,
-		onRowSelectionChange: setRowSelection,
+		getPaginationRowModel: getPaginationRowModel(),
+		onSortingChange: (updater) => {
+			if (typeof updater === 'function') {
+				sorting.value = updater(sorting.value);
+			} else {
+				sorting.value = updater;
+			}
+		},
+		onColumnFiltersChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnFilters = updater(columnFilters);
+			} else {
+				columnFilters = updater;
+			}
+		},
+		onColumnVisibilityChange: (updater) => {
+			if (typeof updater === 'function') {
+				columnVisibility.value = updater(columnVisibility.value);
+			} else {
+				columnVisibility.value = updater;
+			}
+		},
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				rowSelection.value = updater(rowSelection.value);
+			} else {
+				rowSelection.value = updater;
+			}
+		},
+		onPaginationChange: (updater) => {
+			if (typeof updater === 'function') {
+				pagination = updater(pagination);
+			} else {
+				pagination = updater;
+			}
+		},
 		state: {
 			get sorting() {
 				return sorting.value;
 			},
 			get columnFilters() {
-				return columnFilters.value;
+				return columnFilters;
 			},
 			get columnVisibility() {
 				return columnVisibility.value;
@@ -210,22 +265,26 @@
 			get rowSelection() {
 				return rowSelection.value;
 			},
+			get pagination() {
+				return pagination;
+			},
 		},
 	});
 
-	function getInitialFilterValue() {
-		const filterValue = table.getColumn('transcribedText')?.getFilterValue();
-		if (typeof filterValue === 'string') {
-			return filterValue;
-		}
-		return '';
-	}
-	let filterQuery = $state(getInitialFilterValue());
 	const selectedRecordingRows = $derived(
 		table.getFilteredSelectedRowModel().rows,
 	);
 
-	let template = $state('{{timestamp}} {{transcribedText}}');
+	const filterQuery = {
+		get value() {
+			return table.getColumn('select')?.getFilterValue() as string;
+		},
+		set value(value) {
+			table.getColumn('select')?.setFilterValue(value);
+		},
+	};
+
+	let template = $state('{{createdAt}} {{transcribedText}}');
 	let delimiter = $state('\n\n');
 
 	let isDialogOpen = $state(false);
@@ -236,20 +295,11 @@
 			.filter((recording) => recording.transcribedText !== '')
 			.map((recording) =>
 				template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-					switch (key) {
-						case 'id':
-							return recording.id;
-						case 'title':
-							return recording.title;
-						case 'subtitle':
-							return recording.subtitle;
-						case 'timestamp':
-							return recording.timestamp;
-						case 'transcribedText':
-							return recording.transcribedText;
-						default:
-							return '';
+					if (key in recording) {
+						const value = recording[key as keyof Recording];
+						return typeof value === 'string' ? value : '';
 					}
+					return '';
 				}),
 			);
 		return transcriptions.join(delimiter);
@@ -267,22 +317,15 @@
 	<p class="text-muted-foreground">
 		Your latest recordings and transcriptions, stored locally in IndexedDB.
 	</p>
-	<div class="space-y-4 rounded-md border p-6">
-		<div class="flex flex-col items-center gap-2 overflow-auto sm:flex-row">
-			<form
-				class="flex w-full max-w-sm gap-2"
-				onsubmit={(e) => {
-					e.preventDefault();
-					table.getColumn('transcribedText')?.setFilterValue(filterQuery);
-				}}
-			>
-				<Input
-					placeholder="Filter transcripts..."
-					type="text"
-					bind:value={filterQuery}
-				/>
-				<Button variant="outline" type="submit">Search</Button>
-			</form>
+	<Card class="flex flex-col gap-4 p-6">
+		<div class="flex flex-col md:flex-row items-center justify-between gap-2">
+			<Input
+				placeholder="Filter transcripts..."
+				type="text"
+				class="w-full md:max-w-sm"
+				value={filterQuery.value}
+				oninput={(e) => (filterQuery.value = e.currentTarget.value)}
+			/>
 			<div class="flex w-full items-center justify-between gap-2">
 				{#if selectedRecordingRows.length > 0}
 					<WhisperingButton
@@ -292,19 +335,19 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									recordings.transcribeAndUpdateRecordingWithToast(
+									transcriber.transcribeAndUpdateRecordingWithToast(
 										recording.original,
 									),
 								),
 							)}
 					>
 						{#if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsQuery.data?.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'TRANSCRIBING';
 						})}
 							<LoadingTranscriptionIcon class="h-4 w-4" />
 						{:else if selectedRecordingRows.some(({ id }) => {
-							const currentRow = recordings.value.find((r) => r.id === id);
+							const currentRow = recordingsQuery.data?.find((r) => r.id === id);
 							return currentRow?.transcriptionStatus === 'DONE';
 						})}
 							<RetryTranscriptionIcon class="h-4 w-4" />
@@ -326,7 +369,7 @@
 								<ClipboardIcon class="h-4 w-4" />
 							</WhisperingButton>
 						</Dialog.Trigger>
-						<Dialog.Content class="sm:max-w-[425px]">
+						<Dialog.Content>
 							<Dialog.Header>
 								<Dialog.Title>Copy Transcripts</Dialog.Title>
 								<Dialog.Description>
@@ -361,12 +404,18 @@
 							<Dialog.Footer>
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
-									onclick={async () => {
-										await clipboard.copyTextToClipboardWithToast({
-											label: 'transcribed text (joined)',
-											text: joinedTranscriptionsText,
-										});
-										isDialogOpen = false;
+									onclick={() => {
+										copyTextToClipboardWithToast.mutate(
+											{
+												label: 'transcribed text (joined)',
+												text: joinedTranscriptionsText,
+											},
+											{
+												onSuccess: () => {
+													isDialogOpen = false;
+												},
+											},
+										);
 									}}
 									type="submit"
 								>
@@ -384,26 +433,18 @@
 							confirmationDialog.open({
 								title: 'Delete recordings',
 								subtitle: 'Are you sure you want to delete these recordings?',
-								onConfirm: () =>
-									recordings.deleteRecordingsWithToast(
+								confirmText: 'Delete',
+								onConfirm: () => {
+									deleteRecordingsWithToast.mutate(
 										selectedRecordingRows.map(({ original }) => original),
-									),
+									);
+								},
 							});
 						}}
 					>
 						<TrashIcon class="h-4 w-4" />
 					</WhisperingButton>
 				{/if}
-
-				<div
-					class={cn(
-						'text-muted-foreground text-sm sm:block',
-						selectedRecordingRows.length > 0 && 'hidden',
-					)}
-				>
-					{selectedRecordingRows.length} of
-					{table.getFilteredRowModel().rows.length} row(s) selected.
-				</div>
 
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger
@@ -424,7 +465,7 @@
 								checked={column.getIsVisible()}
 								onCheckedChange={(value) => column.toggleVisibility(!!value)}
 							>
-								{column.columnDef.meta?.headerText}
+								{column.columnDef.id}
 							</DropdownMenu.CheckboxItem>
 						{/each}
 					</DropdownMenu.Content>
@@ -432,37 +473,87 @@
 			</div>
 		</div>
 
-		<Table.Root>
-			<Table.Header>
-				{#each table.getHeaderGroups() as headerGroup}
-					<Table.Row>
-						{#each headerGroup.headers as header}
-							<Table.Head colspan={header.colSpan}>
-								{#if !header.isPlaceholder}
-									<FlexRender
-										content={header.column.columnDef.header}
-										context={header.getContext()}
-									/>
+		<div class="rounded-md border">
+			<Table.Root>
+				<Table.Header>
+					{#each table.getHeaderGroups() as headerGroup}
+						<Table.Row>
+							{#each headerGroup.headers as header}
+								<Table.Head colspan={header.colSpan}>
+									{#if !header.isPlaceholder}
+										<FlexRender
+											content={header.column.columnDef.header}
+											context={header.getContext()}
+										/>
+									{/if}
+								</Table.Head>
+							{/each}
+						</Table.Row>
+					{/each}
+				</Table.Header>
+				<Table.Body>
+					{#if recordingsQuery.isPending}
+						{#each { length: 5 }}
+							<Table.Row>
+								<Table.Cell>
+									<Skeleton class="h-4 w-4" />
+								</Table.Cell>
+								<Table.Cell colspan={columns.length - 1}>
+									<Skeleton class="h-4 w-full" />
+								</Table.Cell>
+							</Table.Row>
+						{/each}
+					{:else if table.getRowModel().rows?.length}
+						{#each table.getRowModel().rows as row (row.id)}
+							<Table.Row>
+								{#each row.getVisibleCells() as cell}
+									<Table.Cell>
+										<FlexRender
+											content={cell.column.columnDef.cell}
+											context={cell.getContext()}
+										/>
+									</Table.Cell>
+								{/each}
+							</Table.Row>
+						{/each}
+					{:else}
+						<Table.Row>
+							<Table.Cell colspan={columns.length} class="h-24 text-center">
+								{#if filterQuery.value}
+									No recordings found.
+								{:else}
+									No recordings yet. Start recording to add one.
 								{/if}
-							</Table.Head>
-						{/each}
-					</Table.Row>
-				{/each}
-			</Table.Header>
-			<Table.Body>
-				{#each table.getRowModel().rows as row (row.id)}
-					<Table.Row>
-						{#each row.getVisibleCells() as cell}
-							<Table.Cell>
-								<FlexRender
-									content={cell.column.columnDef.cell}
-									context={cell.getContext()}
-								/>
 							</Table.Cell>
-						{/each}
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	</div>
+						</Table.Row>
+					{/if}
+				</Table.Body>
+			</Table.Root>
+		</div>
+
+		<div class="flex items-center justify-between">
+			<div class="text-muted-foreground text-sm">
+				{selectedRecordingRows.length} of {table.getFilteredRowModel().rows
+					.length} row(s) selected.
+			</div>
+			<div class="flex items-center space-x-2">
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.previousPage()}
+					disabled={!table.getCanPreviousPage()}
+				>
+					Previous
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.nextPage()}
+					disabled={!table.getCanNextPage()}
+				>
+					Next
+				</Button>
+			</div>
+		</div>
+	</Card>
 </main>

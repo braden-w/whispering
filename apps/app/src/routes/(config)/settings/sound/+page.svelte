@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { LabeledSwitch } from '$lib/components/labeled';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
@@ -20,66 +21,64 @@
 	<Separator />
 
 	<div class="space-y-4">
-		<div class="flex items-center gap-2">
-			<Switch
-				id="play-sound-start"
-				aria-labelledby="play-sound-start"
-				checked={settings.value['sound.playOnStartSuccess']}
-				onCheckedChange={(v) => {
-					settings.value = {
-						...settings.value,
-						'sound.playOnStartSuccess': v,
-					};
-				}}
-			/>
-			<Label for="play-sound-start">Play sound when recording starts</Label>
-		</div>
+		<LabeledSwitch
+			id="play-sound-start"
+			label="Play sound when recording starts"
+			checked={settings.value['sound.playOn.start']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.start': v,
+				};
+			}}
+		/>
 
-		<div class="flex items-center gap-2">
-			<Switch
-				id="play-sound-stop"
-				aria-labelledby="play-sound-stop"
-				checked={settings.value['sound.playOnStopSuccess']}
-				onCheckedChange={(v) => {
-					settings.value = {
-						...settings.value,
-						'sound.playOnStopSuccess': v,
-					};
-				}}
-			/>
-			<Label for="play-sound-stop">Play sound when recording stops</Label>
-		</div>
+		<LabeledSwitch
+			id="play-sound-stop"
+			label="Play sound when recording stops"
+			checked={settings.value['sound.playOn.stop']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.stop': v,
+				};
+			}}
+		/>
 
-		<div class="flex items-center gap-2">
-			<Switch
-				id="play-sound-cancel"
-				aria-labelledby="play-sound-cancel"
-				checked={settings.value['sound.playOnCancelSuccess']}
-				onCheckedChange={(v) => {
-					settings.value = {
-						...settings.value,
-						'sound.playOnCancelSuccess': v,
-					};
-				}}
-			/>
-			<Label for="play-sound-cancel">Play sound when recording cancels</Label>
-		</div>
+		<LabeledSwitch
+			id="play-sound-cancel"
+			label="Play sound when recording cancels"
+			checked={settings.value['sound.playOn.cancel']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.cancel': v,
+				};
+			}}
+		/>
 
-		<div class="flex items-center gap-2">
-			<Switch
-				id="play-sound-transcription"
-				aria-labelledby="play-sound-transcription"
-				checked={settings.value['sound.playOnTranscriptionSuccess']}
-				onCheckedChange={(v) => {
-					settings.value = {
-						...settings.value,
-						'sound.playOnTranscriptionSuccess': v,
-					};
-				}}
-			/>
-			<Label for="play-sound-transcription">
-				Play sound after transcription
-			</Label>
-		</div>
+		<LabeledSwitch
+			id="play-sound-transcription"
+			label="Play sound after transcription"
+			checked={settings.value['sound.playOn.transcriptionComplete']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.transcriptionComplete': v,
+				};
+			}}
+		/>
+
+		<LabeledSwitch
+			id="play-sound-transformation"
+			label="Play sound after transformation"
+			checked={settings.value['sound.playOn.transformationComplete']}
+			onCheckedChange={(v) => {
+				settings.value = {
+					...settings.value,
+					'sound.playOn.transformationComplete': v,
+				};
+			}}
+		/>
 	</div>
 </div>
