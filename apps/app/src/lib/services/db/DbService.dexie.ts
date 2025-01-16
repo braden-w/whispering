@@ -272,7 +272,7 @@ class RecordingsDatabase extends Dexie {
 
 const db = new RecordingsDatabase();
 
-export function createDbRecordingsServiceDexie(): DbRecordingsService {
+export function createDbRecordingsServiceDexie() {
 	return {
 		async getAllRecordings() {
 			return tryAsync({
@@ -420,10 +420,10 @@ export function createDbRecordingsServiceDexie(): DbRecordingsService {
 				}
 			}
 		},
-	};
+	} satisfies DbRecordingsService;
 }
 
-export function createDbTransformationsServiceDexie(): DbTransformationsService {
+export function createDbTransformationsServiceDexie() {
 	return {
 		async getAllTransformations() {
 			return tryAsync({
@@ -726,5 +726,5 @@ export function createDbTransformationsServiceDexie(): DbTransformationsService 
 			markTransformationRunAsCompleted(transformationRun);
 			return Ok(transformationRun);
 		},
-	};
+	} satisfies DbTransformationsService;
 }
