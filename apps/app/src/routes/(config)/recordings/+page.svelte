@@ -190,11 +190,11 @@
 	let columnVisibility = createPersistedState({
 		key: 'whispering-recordings-data-table-column-visibility',
 		defaultValue: {
-			id: false,
-			title: false,
-			subtitle: false,
-			createdAt: false,
-			updatedAt: false,
+			ID: false,
+			Title: false,
+			Subtitle: false,
+			'Created At': false,
+			'Updated At': false,
 		},
 		schema: z.record(z.string(), z.boolean()),
 	});
