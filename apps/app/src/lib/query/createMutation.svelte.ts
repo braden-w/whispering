@@ -40,13 +40,6 @@ export function createMutation<
 		return unsubscribe; // Cleanup when no more subscribers
 	});
 
-	const mutate: CreateMutateFunction<TData, TError, TVariables, TContext> = (
-		variables,
-		mutateOptions,
-	) => {
-		observer.mutate(variables, mutateOptions).catch(noop);
-	};
-
 	return new Proxy(
 		{},
 		{
@@ -57,12 +50,14 @@ export function createMutation<
 
 				const result = {
 					...currentResult,
-					mutate,
+					mutate: (variables, mutateOptions) => {
+						observer.mutate(variables, mutateOptions).catch(noop);
+					},
 					mutateAsync: currentResult.mutate,
-				};
+				} satisfies CreateMutationResult<TData, TError, TVariables, TContext>;
 
 				if (anyProperty === 'value') return currentResult;
-				return result[anyProperty as keyof typeof result];
+				return Reflect.get(result, anyProperty);
 			},
 		},
 	) as CreateMutationResult<TData, TError, TVariables, TContext>;
