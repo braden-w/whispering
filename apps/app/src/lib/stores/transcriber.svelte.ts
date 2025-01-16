@@ -10,11 +10,12 @@ import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
+import { SvelteSet } from 'svelte/reactivity';
 
 export const transcriber = createTranscriber();
 
 function createTranscriber() {
-	const transcribingRecordingIds = $state(new Set<string>());
+	const transcribingRecordingIds = new SvelteSet<string>();
 	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
 
 	return {
@@ -39,16 +40,13 @@ function createTranscriber() {
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			const recordingWithTranscribingStatus = {
-				...recording,
-				transcriptionStatus: 'TRANSCRIBING',
-			} as const satisfies Recording;
-			const setStatusTranscribingResult =
-				await DbRecordingsService.updateRecording(
-					recordingWithTranscribingStatus,
-				);
+			const markRecordingTranscribingResult =
+				await DbRecordingsService.updateRecording({
+					...recording,
+					transcriptionStatus: 'TRANSCRIBING',
+				});
 
-			if (!setStatusTranscribingResult.ok) {
+			if (!markRecordingTranscribingResult.ok) {
 				toast.warning({
 					id: toastId,
 					title:
@@ -56,7 +54,7 @@ function createTranscriber() {
 					description: 'Continuing with the transcription process...',
 					action: {
 						type: 'more-details',
-						error: setStatusTranscribingResult.error,
+						error: markRecordingTranscribingResult.error,
 					},
 				});
 			}
@@ -70,11 +68,11 @@ function createTranscriber() {
 				});
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
-				const failedRecording = {
-					...recording,
-					transcriptionStatus: 'FAILED',
-				} as const satisfies Recording;
-				await DbRecordingsService.updateRecording(failedRecording);
+				const markTranscriptionFailedResult =
+					await DbRecordingsService.updateRecording({
+						...recording,
+						transcriptionStatus: 'FAILED',
+					});
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
