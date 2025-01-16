@@ -6,11 +6,11 @@ import {
 	type CreateQueryOptions,
 	type DefaultError,
 	type FunctionedParams,
-	QueryClient,
 	type QueryKey,
 	createMutation,
 	createQuery,
 } from '@tanstack/svelte-query';
+import { QueryClient } from '@tanstack/query-core';
 import { settings } from '../stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,
