@@ -102,7 +102,7 @@
 			{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
 				<LoadingTranscriptionIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'DONE'}
-				<RetryTranscriptionIcon class="h-4 w-4" />
+				<RetryTranscriptionIcon class="h-4 w-4 text-green-500" />
 			{:else if recording.transcriptionStatus === 'FAILED'}
 				<AlertCircleIcon class="h-4 w-4 text-red-500" />
 			{/if}
