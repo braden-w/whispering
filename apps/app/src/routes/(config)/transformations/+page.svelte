@@ -35,8 +35,6 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
-	import EditTransformationSidePanel from './-components/EditTransformationSidePanel.svelte';
-	import { sidebar } from './-components/EditTransformationSidePanel.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
@@ -268,12 +266,7 @@
 					{/each}
 				{:else if table.getRowModel().rows?.length}
 					{#each table.getRowModel().rows as row (row.id)}
-						{@const isSelected = row.id === sidebar.selectedTransformationId}
 						<Table.Row
-							class={cn('cursor-pointer group', {
-								'bg-muted/75': isSelected,
-							})}
-							onclick={() => sidebar.openTransformationById(row.id)}
 							style="view-transition-name: {createTransformationViewTransitionName(
 								{ transformationId: row.id },
 							)}"
