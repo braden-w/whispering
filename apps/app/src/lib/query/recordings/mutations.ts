@@ -31,6 +31,28 @@ export const createRecording = createMutation(() => ({
 	},
 }));
 
+export const updateRecording = createMutation(() => ({
+	mutationFn: async (recording: Recording) => {
+		const result = await DbRecordingsService.updateRecording(recording);
+		if (!result.ok) {
+			return result;
+		}
+
+		queryClient.setQueryData<Recording[]>(recordingsKeys.all, (oldData) => {
+			if (!oldData) return [recording];
+			return oldData.map((item) =>
+				item.id === recording.id ? recording : item,
+			);
+		});
+		queryClient.setQueryData<Recording>(
+			recordingsKeys.byId(recording.id),
+			recording,
+		);
+
+		return Ok(recording);
+	},
+}));
+
 export const updateRecordingWithToast = createMutation(() => ({
 	mutationFn: async (recording: Recording) => {
 		const result = await DbRecordingsService.updateRecording(recording);

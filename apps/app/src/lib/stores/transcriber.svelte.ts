@@ -11,6 +11,7 @@ import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { settings } from './settings.svelte';
 import { SvelteSet } from 'svelte/reactivity';
+import { updateRecording } from '$lib/query/recordings/mutations';
 
 export const transcriber = createTranscriber();
 
@@ -40,11 +41,12 @@ function createTranscriber() {
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			const markRecordingTranscribingResult =
-				await DbRecordingsService.updateRecording({
+			const markRecordingTranscribingResult = await updateRecording.mutateAsync(
+				{
 					...recording,
 					transcriptionStatus: 'TRANSCRIBING',
-				});
+				},
+			);
 
 			if (!markRecordingTranscribingResult.ok) {
 				toast.warning({
@@ -68,11 +70,9 @@ function createTranscriber() {
 				});
 			transcribingRecordingIds.delete(recording.id);
 			if (!transcriptionResult.ok) {
-				const markTranscriptionFailedResult =
-					await DbRecordingsService.updateRecording({
-						...recording,
-						transcriptionStatus: 'FAILED',
-					});
+				const markTranscriptionFailedResult = await updateRecording.mutateAsync(
+					{ ...recording, transcriptionStatus: 'FAILED' },
+				);
 				toast.error({
 					id: toastId,
 					...transcriptionResult.error,
@@ -80,14 +80,12 @@ function createTranscriber() {
 				return transcriptionResult;
 			}
 			const transcribedText = transcriptionResult.data;
-			const updatedRecording = {
+			const markTranscriptionSuccessResult = await updateRecording.mutateAsync({
 				...recording,
 				transcribedText,
 				transcriptionStatus: 'DONE',
-			} as const satisfies Recording;
-			const saveRecordingToDatabaseResult =
-				await DbRecordingsService.updateRecording(updatedRecording);
-			if (!saveRecordingToDatabaseResult.ok) {
+			});
+			if (!markTranscriptionSuccessResult.ok) {
 				toast.error({
 					id: toastId,
 					title: '⚠️ Unable to update recording after transcription',
@@ -95,10 +93,10 @@ function createTranscriber() {
 						"Transcription completed but unable to update recording's transcribed text and status in database",
 					action: {
 						type: 'more-details',
-						error: saveRecordingToDatabaseResult.error,
+						error: markTranscriptionSuccessResult.error,
 					},
 				});
-				return saveRecordingToDatabaseResult;
+				return markTranscriptionSuccessResult;
 			}
 
 			void playSoundIfEnabled('transcriptionComplete');
@@ -117,6 +115,7 @@ function createTranscriber() {
 						}),
 				},
 			});
+			const updatedRecording = markTranscriptionSuccessResult.data;
 			return Ok(updatedRecording);
 		},
 	};
