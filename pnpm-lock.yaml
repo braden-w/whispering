@@ -32,6 +32,9 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@tanstack/query-core':
+        specifier: ^5.64.1
+        version: 5.64.1
       '@tanstack/svelte-query':
         specifier: https://pkg.pr.new/@tanstack/svelte-query@56f67c7d62d60b26a3dfbf8e359f12257dcbc8eb
         version: https://pkg.pr.new/@tanstack/svelte-query@56f67c7d62d60b26a3dfbf8e359f12257dcbc8eb(svelte@5.16.0)
@@ -83,6 +86,9 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       dexie:
         specifier: ^4.0.10
         version: 4.0.10
@@ -2329,6 +2335,9 @@ packages:
   '@tanstack/query-core@5.62.9':
     resolution: {integrity: sha512-lwePd8hNYhyQ4nM/iRQ+Wz2cDtspGeZZHFZmCzHJ7mfKXt+9S301fULiY2IR2byJYY6Z03T427E5PoVfMexHjw==}
 
+  '@tanstack/query-core@5.64.1':
+    resolution: {integrity: sha512-978Wx4Wl4UJZbmvU/rkaM9cQtXXrbhK0lsz/UZhYIbyKYA8E4LdomTwyh2GHZ4oU0BKKoDH4YlKk2VscCUgNmg==}
+
   '@tanstack/query-core@https://pkg.pr.new/TanStack/query/@tanstack/query-core@56f67c7d62d60b26a3dfbf8e359f12257dcbc8eb':
     resolution: {tarball: https://pkg.pr.new/TanStack/query/@tanstack/query-core@56f67c7d62d60b26a3dfbf8e359f12257dcbc8eb}
     version: 5.62.7
@@ -2973,6 +2982,9 @@ packages:
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
@@ -7252,6 +7264,8 @@ snapshots:
 
   '@tanstack/query-core@5.62.9': {}
 
+  '@tanstack/query-core@5.64.1': {}
+
   '@tanstack/query-core@https://pkg.pr.new/TanStack/query/@tanstack/query-core@56f67c7d62d60b26a3dfbf8e359f12257dcbc8eb': {}
 
   '@tanstack/react-query@5.62.11(react@18.3.1)':
@@ -7943,6 +7957,8 @@ snapshots:
       css-tree: 1.1.3
 
   csstype@3.1.3: {}
+
+  date-fns@4.1.0: {}
 
   debug@4.4.0:
     dependencies:
