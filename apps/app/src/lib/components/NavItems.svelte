@@ -15,10 +15,6 @@
 	import { toggleMode } from 'mode-watcher';
 
 	let { class: className }: { class?: string } = $props();
-
-	const hasActiveTransformation = $derived(
-		settings.value['transformations.selectedTransformationId'] !== null,
-	);
 </script>
 
 <nav
@@ -41,11 +37,6 @@
 		class="relative"
 	>
 		<LayersIcon class="h-4 w-4" aria-hidden="true" />
-		{#if hasActiveTransformation}
-			<span
-				class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary before:absolute before:h-full before:w-full before:rounded-full before:bg-primary/50 before:animate-ping"
-			></span>
-		{/if}
 	</WhisperingButton>
 	<WhisperingButton
 		tooltipContent="Settings"
