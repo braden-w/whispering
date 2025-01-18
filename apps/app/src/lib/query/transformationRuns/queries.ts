@@ -7,16 +7,33 @@ import type { Accessor } from '../types';
 // Define the query key as a constant array
 export const transformationRunKeys = {
 	all: ['transformationRuns'] as const,
-	byId: (id: string) => ['transformationRuns', id] as const,
+	byTransformationId: (id: string) =>
+		['transformationRuns', 'transformationId', id] as const,
+	byRecordingId: (recordingId: string) =>
+		['transformationRuns', 'recordingId', recordingId] as const,
 };
 
 export const useTransformationRunsByIdQuery = (id: Accessor<string>) =>
 	createResultQuery(() => ({
-		queryKey: transformationRunKeys.byId(id()),
+		queryKey: transformationRunKeys.byTransformationId(id()),
 		queryFn: async () => {
 			const result =
 				await DbTransformationsService.getTransformationRunsByTransformationId(
 					id(),
+				);
+			return result;
+		},
+	}));
+
+export const useTransformationRunsByRecordingIdQuery = (
+	recordingId: Accessor<string>,
+) =>
+	createResultQuery(() => ({
+		queryKey: transformationRunKeys.byRecordingId(recordingId()),
+		queryFn: async () => {
+			const result =
+				await DbTransformationsService.getTransformationRunsByRecordingId(
+					recordingId(),
 				);
 			return result;
 		},

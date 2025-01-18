@@ -103,6 +103,9 @@ export type DbTransformationsService = {
 	getTransformationRunsByTransformationId: (
 		transformationId: string,
 	) => Promise<DbServiceResult<TransformationRun[]>>;
+	getTransformationRunsByRecordingId: (
+		recordingId: string,
+	) => Promise<DbServiceResult<TransformationRun[]>>;
 	createTransformationRun: (
 		transformationRun: Pick<
 			TransformationRun,

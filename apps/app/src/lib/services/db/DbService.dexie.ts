@@ -187,9 +187,9 @@ class RecordingsDatabase extends Dexie {
 						const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
 
 						await tx
-							.table<
-								RecordingsDbSchemaV2['recordingMetadata']
-							>('recordingMetadata')
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
 							.bulkAdd(metadata);
 						await tx
 							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
@@ -212,9 +212,9 @@ class RecordingsDatabase extends Dexie {
 					upgrade: async (tx) => {
 						// Get data from both tables
 						const metadata = await tx
-							.table<
-								RecordingsDbSchemaV2['recordingMetadata']
-							>('recordingMetadata')
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
 							.toArray();
 						const blobs = await tx
 							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
@@ -583,6 +583,23 @@ export function createDbTransformationsServiceDexie() {
 					DbServiceErr({
 						title:
 							'Error getting transformation runs by transformation id from Dexie',
+						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async getTransformationRunsByRecordingId(recordingId) {
+			return tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('recordingId')
+						.equals(recordingId)
+						.toArray(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title:
+							'Error getting transformation runs by recording id from Dexie',
 						description: 'Please try again',
 						error,
 					}),
