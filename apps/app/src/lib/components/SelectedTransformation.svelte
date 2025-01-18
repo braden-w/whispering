@@ -11,6 +11,8 @@
 	import { CheckIcon, ChevronsUpDownIcon, SettingsIcon } from 'lucide-svelte';
 	import { tick } from 'svelte';
 	import { Badge } from './ui/badge';
+	import { FilterIcon } from 'lucide-svelte';
+	import WhisperingButton from './WhisperingButton.svelte';
 
 	const transformationsQuery = useTransformationsQuery();
 
@@ -47,30 +49,26 @@
 <Popover.Root bind:open>
 	<Popover.Trigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
-			<Button
-				variant="outline"
+			<WhisperingButton
+				tooltipContent="Select post-processing"
 				role="combobox"
 				aria-expanded={open}
-				class="w-full justify-between"
-				{...props}
+				variant="ghost"
+				size="icon"
 				style="view-transition-name: {createTransformationViewTransitionName({
 					transformationId: displayTransformation?.id ?? null,
 				})}"
+				{...props}
 			>
-				{#if displayTransformation}
-					{@render renderTransformationIdTitle(displayTransformation)}
-				{:else}
-					No post-processing selected
-				{/if}
-				<ChevronsUpDownIcon class="opacity-50" />
-			</Button>
+				<FilterIcon class="h-4 w-4" />
+			</WhisperingButton>
 		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content class="w-80 max-w-xl p-0">
 		<Command.Root loop>
 			<Command.Input placeholder="Search transformations..." />
 			<Command.Empty>No transformation found.</Command.Empty>
-			<Command.Group>
+			<Command.Group class="overflow-y-auto max-h-[400px]">
 				{#each transformations as transformation (transformation.id)}
 					<Command.Item
 						value="${transformation.id} - ${transformation.title} - ${transformation.description}"
@@ -110,14 +108,15 @@
 						</div>
 					</Command.Item>
 				{/each}
-				<Command.Item
-					value="Manage transformations"
-					onSelect={() => goto('/transformations')}
-				>
-					<SettingsIcon class="h-4 w-4" />
-					Manage transformations
-				</Command.Item>
 			</Command.Group>
+			<Command.Item
+				value="Manage transformations"
+				onSelect={() => goto('/transformations')}
+				class="rounded-none py-3 bg-muted/50 text-muted-foreground"
+			>
+				<SettingsIcon class="h-4 w-4" />
+				Manage transformations
+			</Command.Item>
 		</Command.Root>
 	</Popover.Content>
 </Popover.Root>
