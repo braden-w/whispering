@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { LabeledInput } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
@@ -8,7 +9,6 @@
 		getRegisterShortcutsFromContext,
 		settings,
 	} from '$lib/stores/settings.svelte';
-	import { LabeledInput } from '$lib/components/labeled/index.js';
 
 	const recorder = getRecorderFromContext();
 	const registerShortcuts = getRegisterShortcutsFromContext();
