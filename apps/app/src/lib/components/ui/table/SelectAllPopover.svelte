@@ -9,8 +9,11 @@
 	const currentPageCount = $derived(table.getRowModel().rows.length);
 	const totalRowCount = $derived(table.getCoreRowModel().rows.length);
 
-	const selectedRowsCount = $derived(
-		table.getFilteredSelectedRowModel().rows.length,
+	const isSomeRowsSelected = $derived(
+		table.getIsSomeRowsSelected() ||
+			table.getIsSomePageRowsSelected() ||
+			table.getIsAllRowsSelected() ||
+			table.getIsAllPageRowsSelected(),
 	);
 </script>
 
@@ -21,9 +24,8 @@
 			aria-label="Selection options"
 		>
 			<Checkbox
-				checked={selectedRowsCount > 0}
-				indeterminate={selectedRowsCount > 0 &&
-					selectedRowsCount < totalRowCount}
+				checked={table.getIsAllRowsSelected()}
+				indeterminate={isSomeRowsSelected && !table.getIsAllRowsSelected()}
 				aria-label="Selection options"
 			/>
 		</DropdownMenu.Trigger>
@@ -47,10 +49,11 @@
 					Select all ({totalRowCount} items)
 				</DropdownMenu.Item>
 			{/if}
-			{#if selectedRowsCount > 0}
+			{#if isSomeRowsSelected}
 				<DropdownMenu.Item
 					onclick={() => {
 						table.toggleAllRowsSelected(false);
+						table.toggleAllPageRowsSelected(false);
 					}}
 				>
 					Clear selection
@@ -61,8 +64,7 @@
 {:else}
 	<Checkbox
 		checked={table.getIsAllPageRowsSelected()}
-		indeterminate={table.getIsSomePageRowsSelected() &&
-			!table.getIsAllPageRowsSelected()}
+		indeterminate={isSomeRowsSelected && !table.getIsAllPageRowsSelected()}
 		aria-label="Select all"
 		onCheckedChange={(value) => {
 			table.toggleAllPageRowsSelected(!!value);
