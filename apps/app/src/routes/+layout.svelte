@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
+	import '../app.css';
 	import { queryClient } from '$lib/query';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
-	import '../app.css';
-	import Services from './+layout/Services.svelte';
-	import { syncWindowAlwaysOnTopWithRecorderState } from './+layout/alwaysOnTop.svelte';
-	import { closeToTrayIfEnabled } from './+layout/closeToTray';
+	import GlobalSingletonsContext from './+layout/GlobalSingletonsContext.svelte';
+	import LayoutComponents from './+layout/LayoutComponents.svelte';
+	import Effects from './+layout/Effects.svelte';
 
 	let { children } = $props();
-
-	syncWindowAlwaysOnTopWithRecorderState();
-	closeToTrayIfEnabled();
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
@@ -29,5 +26,11 @@
 </svelte:head>
 
 <QueryClientProvider client={queryClient}>
-	<Services>{@render children()}</Services>
+	<GlobalSingletonsContext>
+		<Effects>
+			<LayoutComponents>
+				{@render children()}
+			</LayoutComponents>
+		</Effects>
+	</GlobalSingletonsContext>
 </QueryClientProvider>
