@@ -90,7 +90,7 @@
 						title: e.currentTarget.value,
 					});
 				}}
-				placeholder="'Format Meeting Notes' or 'Clean Up Transcript'"
+				placeholder="e.g., Format Meeting Notes"
 				description="A clear, concise name that describes what this transformation does"
 			/>
 			<LabeledTextarea
@@ -103,7 +103,7 @@
 						description: e.currentTarget.value,
 					});
 				}}
-				placeholder="'Formats meeting transcripts into clear bullet points and highlights action items'"
+				placeholder="e.g., Converts meeting transcripts into bullet points and highlights action items"
 				description="Describe what this transformation does, its purpose, and how it will be used"
 			/>
 		</section>
