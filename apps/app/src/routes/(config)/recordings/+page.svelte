@@ -58,7 +58,8 @@
 	const columns: ColumnDef<Recording>[] = [
 		{
 			id: 'select',
-			header: ({ table }) => renderComponent(SelectAllPopover, { table }),
+			header: ({ table }) =>
+				renderComponent(SelectAllPopover<Recording>, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),

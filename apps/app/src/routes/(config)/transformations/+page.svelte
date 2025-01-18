@@ -43,7 +43,8 @@
 	const columns: ColumnDef<Transformation>[] = [
 		{
 			id: 'select',
-			header: ({ table }) => renderComponent(SelectAllPopover, { table }),
+			header: ({ table }) =>
+				renderComponent(SelectAllPopover<Transformation>, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),
