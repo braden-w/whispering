@@ -35,6 +35,7 @@
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
+	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
 
 	const transformationsQuery = useTransformationsQuery();
 	const deleteTransformationsWithToast = useDeleteTransformationsWithToast();
@@ -42,12 +43,7 @@
 	const columns: ColumnDef<Transformation>[] = [
 		{
 			id: 'select',
-			header: ({ table }) =>
-				renderComponent(Checkbox, {
-					checked: table.getIsAllPageRowsSelected(),
-					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all',
-				}),
+			header: ({ table }) => renderComponent(SelectAllPopover, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),

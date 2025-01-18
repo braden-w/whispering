@@ -48,6 +48,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
@@ -57,12 +58,7 @@
 	const columns: ColumnDef<Recording>[] = [
 		{
 			id: 'select',
-			header: ({ table }) =>
-				renderComponent(Checkbox, {
-					checked: table.getIsAllPageRowsSelected(),
-					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all',
-				}),
+			header: ({ table }) => renderComponent(SelectAllPopover, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),
@@ -181,7 +177,9 @@
 				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
-				return renderComponent(RecordingRowActions, { recordingId: recording.id });
+				return renderComponent(RecordingRowActions, {
+					recordingId: recording.id,
+				});
 			},
 		},
 	];
