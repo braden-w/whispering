@@ -126,7 +126,10 @@
 			</Command.Group>
 			<Command.Item
 				value="Manage transformations"
-				onSelect={() => goto('/transformations')}
+				onSelect={() => {
+					goto('/transformations');
+					closeAndFocusTrigger();
+				}}
 				class="rounded-none p-2 bg-muted/50 text-muted-foreground"
 			>
 				<LayersIcon class="h-4 w-4 mx-2.5" />
