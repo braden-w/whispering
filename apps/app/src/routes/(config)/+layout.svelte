@@ -2,8 +2,10 @@
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { recorder } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 	import { cn } from '$lib/utils.js';
+
+	const recorder = getRecorderFromContext();
 
 	let { children } = $props();
 </script>

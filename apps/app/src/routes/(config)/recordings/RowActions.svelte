@@ -11,7 +11,7 @@
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
+	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
@@ -23,6 +23,8 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
+
+	const transcriber = getTranscriberFromContext();
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();

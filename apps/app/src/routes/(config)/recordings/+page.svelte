@@ -18,7 +18,7 @@
 	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
+	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -48,6 +48,8 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+
+	const transcriber = getTranscriberFromContext();
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	const deleteRecordingsWithToast = useDeleteRecordingsWithToast();

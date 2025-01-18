@@ -1,5 +1,5 @@
 import { moreDetailsDialog } from '$lib/components/MoreDetailsDialog.svelte';
-import { downloadIndexedDbBlobWithToast } from '$lib/query/download/mutations';
+import { useDownloadIndexedDbBlobWithToast } from '$lib/query/download/mutations';
 import { toast } from '$lib/services/toast';
 import { Ok, tryAsync } from '@epicenterhq/result';
 import type { Settings } from '@repo/shared';
@@ -108,6 +108,8 @@ class RecordingsDatabase extends Dexie {
 						{
 							label: 'Download Database Dump',
 							onClick: () => {
+								const downloadIndexedDbBlobWithToast =
+									useDownloadIndexedDbBlobWithToast();
 								const blob = new Blob([dumpString], {
 									type: 'application/json',
 								});
@@ -285,6 +287,8 @@ class RecordingsDatabase extends Dexie {
 }
 
 const db = new RecordingsDatabase();
+
+// const downloadIndexedDbBlobWithToast = useDownloadIndexedDbBlobWithToast();
 
 export function createDbRecordingsServiceDexie() {
 	return {
