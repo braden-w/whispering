@@ -12,9 +12,9 @@
 	import type { Transformation } from '$lib/services/db';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import { HistoryIcon, Loader2Icon, PlayIcon, TrashIcon } from 'lucide-svelte';
+	import { onDestroy } from 'svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { onDestroy } from 'svelte';
 
 	const updateTransformationWithToast = useUpdateTransformationWithToast();
 	const deleteTransformationWithToast = useDeleteTransformationWithToast();
