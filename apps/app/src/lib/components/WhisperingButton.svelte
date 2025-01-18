@@ -5,10 +5,11 @@
 	import type { Snippet } from 'svelte';
 
 	let {
+		id,
 		children,
 		tooltipContent,
 		...restProps
-	}: { tooltipContent: string | Snippet } & Props = $props();
+	}: { id?: string; tooltipContent: string | Snippet } & Props = $props();
 </script>
 
 {#snippet tooltip()}
@@ -21,9 +22,9 @@
 
 <Tooltip.Provider>
 	<Tooltip.Root>
-		<Tooltip.Trigger>
-			{#snippet child({ props })}
-				<Button {...mergeProps(restProps, props)}>
+		<Tooltip.Trigger {id}>
+			{#snippet child({ props: tooltipProps })}
+				<Button {...mergeProps(tooltipProps, restProps)}>
 					{@render children?.()}
 					<span class="sr-only">
 						{@render tooltip()}

@@ -55,6 +55,7 @@
 	<Popover.Trigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
 			<WhisperingButton
+				{...props}
 				class={className}
 				tooltipContent="Select post-processing"
 				role="combobox"
@@ -64,7 +65,6 @@
 				style="view-transition-name: {createTransformationViewTransitionName({
 					transformationId: selectedTransformation?.id ?? null,
 				})}"
-				{...props}
 			>
 				{#if selectedTransformation}
 					<FilterIcon class="h-4 w-4 text-green-500" />
