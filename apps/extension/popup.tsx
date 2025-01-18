@@ -62,7 +62,7 @@ function IndexPage() {
 				<div className="relative">
 					<WhisperingButton
 						tooltipContent="Toggle recording"
-						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
+						className="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 						onClick={async () => {
 							const toggleRecordingResult = await app.toggleRecording();
 							if (!toggleRecordingResult.ok) {
@@ -84,7 +84,7 @@ function IndexPage() {
 					{recorderState === 'SESSION+RECORDING' && (
 						<WhisperingButton
 							tooltipContent="Cancel recording"
-							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+							className="-right-14 absolute bottom-0 transform text-2xl"
 							onClick={async () => {
 								const cancelRecordingResult = await app.cancelRecording();
 								if (!cancelRecordingResult.ok) {
@@ -102,7 +102,7 @@ function IndexPage() {
 					{recorderState === 'SESSION' && (
 						<WhisperingButton
 							tooltipContent="End recording session"
-							className="-right-14 absolute bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+							className="-right-14 absolute bottom-0 transform text-2xl"
 							onClick={async () => {
 								const closeRecordingSessionResult =
 									await app.closeRecordingSession();
