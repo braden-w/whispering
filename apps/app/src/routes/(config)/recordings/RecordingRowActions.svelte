@@ -23,6 +23,7 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
+	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
@@ -117,6 +118,8 @@
 				<DownloadIcon class="h-4 w-4" />
 			{/if}
 		</WhisperingButton>
+
+		<ViewTransformationRunsDialog {recordingId} />
 
 		<WhisperingButton
 			tooltipContent="Delete recording"
