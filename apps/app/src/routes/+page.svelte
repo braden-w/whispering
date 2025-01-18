@@ -132,8 +132,6 @@
 				class="h-8 w-full"
 			></audio>
 		{/if}
-
-		<SelectedTransformation />
 	</div>
 
 	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />
