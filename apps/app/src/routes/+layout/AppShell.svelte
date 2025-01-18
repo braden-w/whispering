@@ -1,13 +1,39 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import FasterRerecordExplainedDialog from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
+	import { DbRecordingsService } from '$lib/services';
 	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
+	import { extension } from '@repo/extension';
 	import { ModeWatcher, mode } from 'mode-watcher';
+	import { onMount } from 'svelte';
 	import { Toaster, type ToasterProps } from 'svelte-sonner';
+	import { syncWindowAlwaysOnTopWithRecorderState } from './alwaysOnTop.svelte';
+	import { closeToTrayIfEnabled } from './closeToTrayIfEnabled';
 
 	const recorder = getRecorderFromContext();
+
+	if (window.__TAURI_INTERNALS__) {
+		syncWindowAlwaysOnTopWithRecorderState();
+		closeToTrayIfEnabled();
+	}
+
+	$effect(() => {
+		recorder.recorderState;
+		void DbRecordingsService.cleanupExpiredRecordings(settings.value);
+	});
+
+	onMount(async () => {
+		window.recorder = recorder;
+		window.goto = goto;
+		if (!window.__TAURI_INTERNALS__) {
+			const _notifyWhisperingTabReadyResult =
+				await extension.notifyWhisperingTabReady(undefined);
+		}
+	});
 
 	const TOASTER_SETTINGS = {
 		position: 'bottom-right',

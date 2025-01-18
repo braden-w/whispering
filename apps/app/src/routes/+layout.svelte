@@ -4,8 +4,7 @@
 	import { queryClient } from '$lib/query';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import GlobalSingletonsContext from './+layout/GlobalSingletonsContext.svelte';
-	import LayoutComponents from './+layout/LayoutComponents.svelte';
-	import Effects from './+layout/Effects.svelte';
+	import AppShell from './+layout/AppShell.svelte';
 
 	let { children } = $props();
 
@@ -27,10 +26,8 @@
 
 <QueryClientProvider client={queryClient}>
 	<GlobalSingletonsContext>
-		<Effects>
-			<LayoutComponents>
-				{@render children()}
-			</LayoutComponents>
-		</Effects>
+		<AppShell>
+			{@render children()}
+		</AppShell>
 	</GlobalSingletonsContext>
 </QueryClientProvider>
