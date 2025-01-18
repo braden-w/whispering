@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Separator } from '$lib/components/ui/separator';
+	import { useCreateTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { generateDefaultTransformation } from '$lib/services/db';
-	import { createTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { PlusIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
-	import { Separator } from '$lib/components/ui/separator';
+
+	const createTransformationWithToast = useCreateTransformationWithToast();
 
 	let isDialogOpen = $state(false);
 	let transformation = $state(generateDefaultTransformation());

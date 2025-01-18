@@ -1,16 +1,17 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { PencilIcon as EditIcon } from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { deleteRecordingWithToast } from '$lib/query/recordings/mutations';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { useDeleteRecordingWithToast } from '$lib/query/recordings/mutations';
 	import type { Recording } from '$lib/services/db';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { Loader2Icon } from 'lucide-svelte';
+	import { Loader2Icon, PencilIcon as EditIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
+
+	const deleteRecordingWithToast = useDeleteRecordingWithToast();
 
 	let {
 		recording,

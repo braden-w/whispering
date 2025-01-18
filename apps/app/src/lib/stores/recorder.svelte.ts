@@ -1,9 +1,9 @@
 import {
-	copyTextToClipboard,
-	copyTextToClipboardWithToast,
-	writeTextToCursor,
+	useCopyTextToClipboard,
+	useCopyTextToClipboardWithToast,
+	useWriteTextToCursor,
 } from '$lib/query/clipboard/mutations';
-import { createRecording } from '$lib/query/recordings/mutations';
+import { useCreateRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import {
 	playSoundIfEnabled,
@@ -23,6 +23,11 @@ import {
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+
+const copyTextToClipboard = useCopyTextToClipboard();
+const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+const writeTextToCursor = useWriteTextToCursor();
+const createRecording = useCreateRecording();
 
 export const recorder = createRecorder();
 

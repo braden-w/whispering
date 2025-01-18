@@ -14,8 +14,8 @@
 	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { deleteRecordingsWithToast } from '$lib/query/recordings/mutations';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { transcriber } from '$lib/stores/transcriber.svelte';
@@ -48,6 +48,9 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import RowActions from './RowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const deleteRecordingsWithToast = useDeleteRecordingsWithToast();
 
 	const columns: ColumnDef<Recording>[] = [
 		{

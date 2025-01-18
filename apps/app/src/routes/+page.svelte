@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
@@ -17,6 +17,7 @@
 	import { onDestroy } from 'svelte';
 
 	const latestRecordingQuery = useLatestRecording();
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
 	const latestRecording = $derived<Recording>(
 		latestRecordingQuery.data ?? {
