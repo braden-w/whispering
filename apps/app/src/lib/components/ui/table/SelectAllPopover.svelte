@@ -25,21 +25,26 @@
 			aria-label="Selection options"
 		/>
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="min-w-[220px]" align="start">
-		<DropdownMenu.Item
-			onclick={() => {
-				table.toggleAllPageRowsSelected(true);
-			}}
-		>
-			Select this page ({currentPageCount} items)
-		</DropdownMenu.Item>
-		<DropdownMenu.Item
-			onclick={() => {
-				table.toggleAllRowsSelected(true);
-			}}
-		>
-			Select all ({totalRowCount} items)
-		</DropdownMenu.Item>
+	<DropdownMenu.Content align="start">
+		{#if !table.getIsAllPageRowsSelected() || table.getIsAllRowsSelected()}
+			<DropdownMenu.Item
+				onclick={() => {
+					table.toggleAllRowsSelected(false);
+					table.toggleAllPageRowsSelected(true);
+				}}
+			>
+				Select this page ({currentPageCount} items)
+			</DropdownMenu.Item>
+		{/if}
+		{#if !table.getIsAllRowsSelected()}
+			<DropdownMenu.Item
+				onclick={() => {
+					table.toggleAllRowsSelected(true);
+				}}
+			>
+				Select all ({totalRowCount} items)
+			</DropdownMenu.Item>
+		{/if}
 		{#if selectedRowsCount > 0}
 			<DropdownMenu.Item
 				onclick={() => {
