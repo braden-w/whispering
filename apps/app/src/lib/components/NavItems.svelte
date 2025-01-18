@@ -1,10 +1,11 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { GithubIcon } from '$lib/components/icons';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
 	import {
-		FilterIcon,
+		LayersIcon,
 		ListIcon,
 		Minimize2Icon,
 		MoonIcon,
@@ -12,7 +13,6 @@
 		SunIcon,
 	} from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
-	import { settings } from '$lib/stores/settings.svelte';
 
 	let { class: className }: { class?: string } = $props();
 
@@ -40,7 +40,7 @@
 		size="icon"
 		class="relative"
 	>
-		<FilterIcon class="h-4 w-4" aria-hidden="true" />
+		<LayersIcon class="h-4 w-4" aria-hidden="true" />
 		{#if hasActiveTransformation}
 			<span
 				class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary before:absolute before:h-full before:w-full before:rounded-full before:bg-primary/50 before:animate-ping"
