@@ -12,6 +12,7 @@
 		FilterIcon,
 		FilterXIcon,
 		LayersIcon,
+		PlusIcon,
 	} from 'lucide-svelte';
 	import { tick } from 'svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
@@ -57,7 +58,7 @@
 			<WhisperingButton
 				{...props}
 				class={className}
-				tooltipContent="Select post-processing"
+				tooltipContent="Choose a transformation to automatically enhance your transcribed text"
 				role="combobox"
 				aria-expanded={open}
 				variant="ghost"
