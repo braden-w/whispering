@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
 import type { MaybePromise, WhisperingSoundNames } from '@repo/shared';
+import { QueryClient } from '@tanstack/query-core';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
@@ -10,7 +11,6 @@ import {
 	createMutation,
 	createQuery,
 } from '@tanstack/svelte-query';
-import { QueryClient } from '@tanstack/query-core';
 import { settings } from '../stores/settings.svelte';
 import {
 	createSetTrayIconDesktopService,

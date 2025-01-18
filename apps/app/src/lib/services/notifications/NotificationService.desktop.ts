@@ -1,11 +1,11 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import {
+	active,
 	isPermissionGranted,
+	removeActive,
 	requestPermission,
 	sendNotification,
-	active,
-	removeActive,
 } from '@tauri-apps/plugin-notification';
 import { nanoid } from 'nanoid/non-secure';
 import type { NotificationService } from './NotificationService';

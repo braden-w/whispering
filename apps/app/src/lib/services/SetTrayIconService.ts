@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { recorder } from '$lib/stores/recorder.svelte';
+import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 import { settings } from '$lib/stores/settings.svelte';
 import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
@@ -131,6 +131,7 @@ async function initTray() {
 				e.button === 'Left' &&
 				e.buttonState === 'Down'
 			) {
+				const recorder = getRecorderFromContext();
 				recorder.toggleRecordingWithToast();
 				return true;
 			}

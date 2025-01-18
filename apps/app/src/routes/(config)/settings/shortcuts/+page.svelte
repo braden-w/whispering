@@ -1,11 +1,17 @@
 <script lang="ts">
+	import { LabeledInput } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { registerShortcuts, settings } from '$lib/stores/settings.svelte';
-	import { LabeledInput } from '$lib/components/labeled/index.js';
+	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import {
+		getRegisterShortcutsFromContext,
+		settings,
+	} from '$lib/stores/settings.svelte';
+
+	const recorder = getRecorderFromContext();
+	const registerShortcuts = getRegisterShortcutsFromContext();
 </script>
 
 <svelte:head>

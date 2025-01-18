@@ -6,14 +6,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import { type Transformation } from '$lib/services/db';
-	import { deleteTransformationsWithToast } from '$lib/query/transformations/mutations';
+	import { useDeleteTransformationsWithToast } from '$lib/query/transformations/mutations';
 	import { useTransformationsQuery } from '$lib/query/transformations/queries';
-	import { cn } from '$lib/utils';
+	import { type Transformation } from '$lib/services/db';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 	import {
@@ -37,16 +35,16 @@
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
+	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
+
+	const transformationsQuery = useTransformationsQuery();
+	const deleteTransformationsWithToast = useDeleteTransformationsWithToast();
 
 	const columns: ColumnDef<Transformation>[] = [
 		{
 			id: 'select',
 			header: ({ table }) =>
-				renderComponent(Checkbox, {
-					checked: table.getIsAllPageRowsSelected(),
-					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all',
-				}),
+				renderComponent(SelectAllPopover<Transformation>, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),
@@ -118,8 +116,6 @@
 		schema: z.record(z.string(), z.boolean()),
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
-
-	const transformationsQuery = useTransformationsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,

@@ -1,6 +1,6 @@
+import { toast } from '$lib/services/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { toast } from '$lib/services/toast';
 import { tryAsync, trySync } from '@epicenterhq/result';
 import {
 	WhisperingErr,
@@ -8,7 +8,8 @@ import {
 	settingsSchema,
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
-import { recorder } from './recorder.svelte';
+import { getContext, setContext } from 'svelte';
+import { type Recorder, getRecorderFromContext } from './recorder.svelte';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',
@@ -26,6 +27,77 @@ export const settings = createPersistedState({
 });
 
 type RegisterShortcutJob = Promise<void>;
+
+export const initRegisterShortcutsInContext = ({
+	recorder,
+}: {
+	recorder: Recorder;
+}) => {
+	setContext('registerShortcuts', createRegisterShortcuts({ recorder }));
+};
+
+export const getRegisterShortcutsFromContext = () => {
+	return getContext<ReturnType<typeof createRegisterShortcuts>>(
+		'registerShortcuts',
+	);
+};
+
+function createRegisterShortcuts({ recorder }: { recorder: Recorder }) {
+	const jobQueue = createJobQueue<RegisterShortcutJob>();
+
+	const initialSilentJob = async () => {
+		unregisterAllLocalShortcuts();
+		await unregisterAllGlobalShortcuts();
+		registerLocalShortcut({
+			shortcut: settings.value['shortcuts.currentLocalShortcut'],
+			callback: recorder.toggleRecordingWithToast,
+		});
+		await registerGlobalShortcut({
+			shortcut: settings.value['shortcuts.currentGlobalShortcut'],
+			callback: recorder.toggleRecordingWithToast,
+		});
+	};
+
+	jobQueue.addJobToQueue(initialSilentJob());
+
+	return {
+		registerLocalShortcut: ({
+			shortcut,
+			callback,
+		}: {
+			shortcut: string;
+			callback: () => void;
+		}) => {
+			const job = async () => {
+				unregisterAllLocalShortcuts();
+				registerLocalShortcut({ shortcut, callback });
+				toast.success({
+					title: `Local shortcut set to ${shortcut}`,
+					description: 'Press the shortcut to start recording',
+				});
+			};
+			jobQueue.addJobToQueue(job());
+		},
+		registerGlobalShortcut: ({
+			shortcut,
+			callback,
+		}: {
+			shortcut: string;
+			callback: () => void;
+		}) => {
+			const job = async () => {
+				if (!window.__TAURI_INTERNALS__) return;
+				unregisterAllGlobalShortcuts();
+				await registerGlobalShortcut({ shortcut, callback });
+				toast.success({
+					title: `Global shortcut set to ${shortcut}`,
+					description: 'Press the shortcut to start recording',
+				});
+			};
+			jobQueue.addJobToQueue(job());
+		},
+	};
+}
 
 function unregisterAllLocalShortcuts() {
 	return trySync({
@@ -112,63 +184,4 @@ async function registerGlobalShortcut({
 				action: { type: 'more-details', error },
 			}),
 	});
-}
-
-export const registerShortcuts = createRegisterShortcuts();
-
-function createRegisterShortcuts() {
-	const jobQueue = createJobQueue<RegisterShortcutJob>();
-
-	const initialSilentJob = async () => {
-		unregisterAllLocalShortcuts();
-		await unregisterAllGlobalShortcuts();
-		registerLocalShortcut({
-			shortcut: settings.value['shortcuts.currentLocalShortcut'],
-			callback: recorder.toggleRecordingWithToast,
-		});
-		await registerGlobalShortcut({
-			shortcut: settings.value['shortcuts.currentGlobalShortcut'],
-			callback: recorder.toggleRecordingWithToast,
-		});
-	};
-
-	jobQueue.addJobToQueue(initialSilentJob());
-
-	return {
-		registerLocalShortcut: ({
-			shortcut,
-			callback,
-		}: {
-			shortcut: string;
-			callback: () => void;
-		}) => {
-			const job = async () => {
-				unregisterAllLocalShortcuts();
-				registerLocalShortcut({ shortcut, callback });
-				toast.success({
-					title: `Local shortcut set to ${shortcut}`,
-					description: 'Press the shortcut to start recording',
-				});
-			};
-			jobQueue.addJobToQueue(job());
-		},
-		registerGlobalShortcut: ({
-			shortcut,
-			callback,
-		}: {
-			shortcut: string;
-			callback: () => void;
-		}) => {
-			const job = async () => {
-				if (!window.__TAURI_INTERNALS__) return;
-				unregisterAllGlobalShortcuts();
-				await registerGlobalShortcut({ shortcut, callback });
-				toast.success({
-					title: `Global shortcut set to ${shortcut}`,
-					description: 'Press the shortcut to start recording',
-				});
-			};
-			jobQueue.addJobToQueue(job());
-		},
-	};
 }

@@ -3,10 +3,11 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { deleteTransformationWithToast } from '$lib/query/transformations/mutations';
+	import { useDeleteTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { useTransformationQuery } from '$lib/query/transformations/queries';
-	import { cn } from '$lib/utils';
 	import EditTransformationDialog from './EditTransformationDialog.svelte';
+
+	const deleteTransformationWithToast = useDeleteTransformationWithToast();
 
 	let { transformationId }: { transformationId: string } = $props();
 

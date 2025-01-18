@@ -1,10 +1,15 @@
-import { recorder } from '$lib/stores/recorder.svelte';
-import { transcriber } from '$lib/stores/transcriber.svelte';
+import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 import { settings } from '$lib/stores/settings.svelte';
+import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export function syncWindowAlwaysOnTopWithRecorderState() {
+	const recorder = getRecorderFromContext();
+	const transcriber = getTranscriberFromContext();
+
 	$effect(() => {
+		const setAlwaysOnTop = (value: boolean) =>
+			getCurrentWindow().setAlwaysOnTop(value);
 		switch (settings.value['system.alwaysOnTop']) {
 			case 'Always':
 				void setAlwaysOnTop(true);
@@ -31,9 +36,4 @@ export function syncWindowAlwaysOnTopWithRecorderState() {
 				break;
 		}
 	});
-}
-
-function setAlwaysOnTop(value: boolean) {
-	if (!window.__TAURI_INTERNALS__) return;
-	return getCurrentWindow().setAlwaysOnTop(value);
 }

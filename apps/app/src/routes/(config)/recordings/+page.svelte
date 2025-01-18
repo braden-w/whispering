@@ -14,11 +14,11 @@
 	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { deleteRecordingsWithToast } from '$lib/query/recordings/mutations';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
+	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -46,18 +46,20 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
-	import RowActions from './RowActions.svelte';
+	import RecordingRowActions from './RecordingRowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
+
+	const transcriber = getTranscriberFromContext();
+
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const deleteRecordingsWithToast = useDeleteRecordingsWithToast();
 
 	const columns: ColumnDef<Recording>[] = [
 		{
 			id: 'select',
 			header: ({ table }) =>
-				renderComponent(Checkbox, {
-					checked: table.getIsAllPageRowsSelected(),
-					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-					'aria-label': 'Select all',
-				}),
+				renderComponent(SelectAllPopover<Recording>, { table }),
 			cell: ({ row }) =>
 				renderComponent(Checkbox, {
 					checked: row.getIsSelected(),
@@ -176,7 +178,9 @@
 				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
-				return renderComponent(RowActions, { recordingId: recording.id });
+				return renderComponent(RecordingRowActions, {
+					recordingId: recording.id,
+				});
 			},
 		},
 	];
@@ -190,11 +194,11 @@
 	let columnVisibility = createPersistedState({
 		key: 'whispering-recordings-data-table-column-visibility',
 		defaultValue: {
-			id: false,
-			title: false,
-			subtitle: false,
-			createdAt: false,
-			updatedAt: false,
+			ID: false,
+			Title: false,
+			Subtitle: false,
+			'Created At': false,
+			'Updated At': false,
 		},
 		schema: z.record(z.string(), z.boolean()),
 	});

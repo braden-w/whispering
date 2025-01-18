@@ -1,11 +1,11 @@
 import { Ok, tryAsync } from '@epicenterhq/result';
+import { extension } from '@repo/extension';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
 	RecorderService,
 	RecordingSessionSettings,
 	UpdateStatusMessageFn,
 } from './RecorderService';
-import { extension } from '@repo/extension';
 
 const TIMESLICE_MS = 1000;
 const PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS = {

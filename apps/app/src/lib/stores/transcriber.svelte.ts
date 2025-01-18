@@ -1,5 +1,5 @@
-import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-import { updateRecording } from '$lib/query/recordings/mutations';
+import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+import { useUpdateRecording } from '$lib/query/recordings/mutations';
 import type { Recording } from '$lib/services/db';
 import {
 	playSoundIfEnabled,
@@ -9,12 +9,26 @@ import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { getContext, setContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { settings } from './settings.svelte';
 
-export const transcriber = createTranscriber();
+export type Transcriber = ReturnType<typeof createTranscriber>;
+
+export const initTranscriberInContext = () => {
+	const transcriber = createTranscriber();
+	setContext('transcriber', transcriber);
+	return transcriber;
+};
+
+export const getTranscriberFromContext = () => {
+	return getContext<Transcriber>('transcriber');
+};
 
 function createTranscriber() {
+	const updateRecording = useUpdateRecording();
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+
 	const transcribingRecordingIds = new SvelteSet<string>();
 	const isCurrentlyTranscribing = $derived(transcribingRecordingIds.size > 0);
 

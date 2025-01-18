@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { LabeledSelect } from '$lib/components/labeled/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { userConfiguredServices } from '$lib/services/index.js';
-	import { recorder } from '$lib/stores/recorder.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
 	import { toast } from '$lib/services/toast';
+	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';
-	import { LabeledSelect } from '$lib/components/labeled/index.js';
+
+	const recorder = getRecorderFromContext();
 
 	const getMediaDevices = async () => {
 		const enumerateRecordingDevicesResult =

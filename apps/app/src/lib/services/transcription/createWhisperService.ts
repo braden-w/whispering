@@ -1,12 +1,12 @@
 import { getExtensionFromAudioBlob } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
+import { z } from 'zod';
 import type { HttpService } from '../http/HttpService';
 import {
 	HttpServiceErrIntoTranscriptionServiceErr,
 	type TranscriptionService,
 	TranscriptionServiceErr,
 } from './TranscriptionService';
-import { z } from 'zod';
 
 const whisperApiResponseSchema = z.union([
 	z.object({ text: z.string() }),

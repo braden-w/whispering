@@ -21,10 +21,12 @@
 
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { CheckIcon, CopyIcon } from 'lucide-svelte';
 	import { Label } from './ui/label';
 	import { cn } from '$lib/utils';
+
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
 	const {
 		label,

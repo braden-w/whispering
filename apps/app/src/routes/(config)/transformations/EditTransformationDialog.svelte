@@ -2,18 +2,21 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Separator } from '$lib/components/ui/separator';
 	import {
-		deleteTransformationWithToast,
-		updateTransformationWithToast,
+		useDeleteTransformationWithToast,
+		useUpdateTransformationWithToast,
 	} from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
+	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import { HistoryIcon, Loader2Icon, PlayIcon, TrashIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
-	import { DEBOUNCE_TIME_MS } from '@repo/shared';
-	import { Separator } from '$lib/components/ui/separator';
+
+	const updateTransformationWithToast = useUpdateTransformationWithToast();
+	const deleteTransformationWithToast = useDeleteTransformationWithToast();
 
 	let {
 		transformation,

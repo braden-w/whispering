@@ -1,10 +1,12 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { recorder } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 
-	let { class: className }: { class?: string | undefined } = $props();
+	const recorder = getRecorderFromContext();
+
+	let { class: className }: { class?: string } = $props();
 </script>
 
 {#if recorder.recorderState === 'SESSION+RECORDING'}

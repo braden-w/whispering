@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import type { Recording } from '$lib/services/db';
+	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { onDestroy } from 'svelte';
 

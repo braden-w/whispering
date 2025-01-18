@@ -3,15 +3,15 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { downloadRecordingWithToast } from '$lib/query/download/mutations';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { useDownloadRecordingWithToast } from '$lib/query/download/mutations';
 	import {
-		deleteRecordingWithToast,
-		updateRecordingWithToast,
+		useDeleteRecordingWithToast,
+		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { transcriber } from '$lib/stores/transcriber.svelte';
+	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
@@ -23,6 +23,13 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
+
+	const transcriber = getTranscriberFromContext();
+
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const deleteRecordingWithToast = useDeleteRecordingWithToast();
+	const updateRecordingWithToast = useUpdateRecordingWithToast();
+	const downloadRecordingWithToast = useDownloadRecordingWithToast();
 
 	let { recordingId }: { recordingId: string } = $props();
 

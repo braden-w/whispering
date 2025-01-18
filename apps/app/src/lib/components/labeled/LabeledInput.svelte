@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import type { HTMLInputAttributes } from 'svelte/elements';
-	import type { Snippet } from 'svelte';
 	import { cn } from '$lib/utils';
+	import type { Snippet } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	let {
 		id,
