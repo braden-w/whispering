@@ -60,8 +60,8 @@
 	</DropdownMenu.Root>
 {:else}
 	<Checkbox
-		checked={selectedRowsCount > 0}
-		indeterminate={selectedRowsCount > 0 && selectedRowsCount < totalRowCount}
+		checked={table.getIsAllPageRowsSelected()}
+		indeterminate={table.getIsSomePageRowsSelected()}
 		aria-label="Select all"
 		onCheckedChange={(value) => {
 			table.toggleAllRowsSelected(!!value);
