@@ -8,6 +8,8 @@ export function syncWindowAlwaysOnTopWithRecorderState() {
 	const transcriber = getTranscriberFromContext();
 
 	$effect(() => {
+		const setAlwaysOnTop = (value: boolean) =>
+			getCurrentWindow().setAlwaysOnTop(value);
 		switch (settings.value['system.alwaysOnTop']) {
 			case 'Always':
 				void setAlwaysOnTop(true);
@@ -34,9 +36,4 @@ export function syncWindowAlwaysOnTopWithRecorderState() {
 				break;
 		}
 	});
-}
-
-function setAlwaysOnTop(value: boolean) {
-	if (!window.__TAURI_INTERNALS__) return;
-	return getCurrentWindow().setAlwaysOnTop(value);
 }

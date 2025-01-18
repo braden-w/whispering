@@ -10,8 +10,10 @@
 
 	const recorder = getRecorderFromContext();
 
-	syncWindowAlwaysOnTopWithRecorderState();
-	closeToTrayIfEnabled();
+	if (window.__TAURI_INTERNALS__) {
+		syncWindowAlwaysOnTopWithRecorderState();
+		closeToTrayIfEnabled();
+	}
 
 	$effect(() => {
 		recorder.recorderState;
