@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
-	import type { HTMLTextareaAttributes } from 'svelte/elements';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import type { Snippet } from 'svelte';
+	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
 	let {
 		id,

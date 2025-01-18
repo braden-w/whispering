@@ -15,8 +15,8 @@ import {
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import {
-	getTranscriberFromContext,
 	type Transcriber,
+	getTranscriberFromContext,
 } from '$lib/stores/transcriber.svelte';
 import { Ok } from '@epicenterhq/result';
 import {

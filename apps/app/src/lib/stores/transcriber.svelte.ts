@@ -9,9 +9,9 @@ import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
+import { getContext, setContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { settings } from './settings.svelte';
-import { getContext, setContext } from 'svelte';
 
 export type Transcriber = ReturnType<typeof createTranscriber>;
 

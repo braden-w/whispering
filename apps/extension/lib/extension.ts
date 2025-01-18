@@ -2,6 +2,11 @@ import { Err, type Ok, tryAsync } from '@epicenterhq/result';
 import { sendToBackgroundViaRelay } from '@plasmohq/messaging';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
+	OpenWhisperingTabMessage,
+	OpenWhisperingTabResult,
+} from '~background/messages/extension/openWhisperingTab';
+import type { PingResult } from '~background/messages/extension/ping';
+import type {
 	ClearNotificationMessage,
 	ClearNotificationResult,
 } from '../background/messages/extension/clearNotification';
@@ -29,11 +34,6 @@ import type {
 	WriteTextToCursorMessage,
 	WriteTextToCursorResult,
 } from '../background/messages/extension/writeTextToCursor';
-import type {
-	OpenWhisperingTabMessage,
-	OpenWhisperingTabResult,
-} from '~background/messages/extension/openWhisperingTab';
-import type { PingResult } from '~background/messages/extension/ping';
 
 type SendMessageToExtensionErrProperties = {
 	_tag: 'SendMessageToExtensionError';

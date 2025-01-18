@@ -1,8 +1,8 @@
 import { Ok } from '@epicenterhq/result';
 import type { HttpService } from '../http/HttpService';
 import {
-	TranscriptionServiceErr,
 	type TranscriptionService,
+	TranscriptionServiceErr,
 } from './TranscriptionService';
 import { createWhisperService } from './createWhisperService';
 

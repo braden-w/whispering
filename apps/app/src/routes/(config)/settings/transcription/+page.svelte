@@ -1,7 +1,10 @@
 <script lang="ts">
-	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
-	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import CopyableCode from '$lib/components/CopyableCode.svelte';
+	import {
+		LabeledInput,
+		LabeledSelect,
+		LabeledTextarea,
+	} from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
@@ -13,11 +16,8 @@
 		TRANSCRIPTION_SERVICE_OPTIONS,
 		WHISPERING_URL,
 	} from '@repo/shared';
-	import {
-		LabeledInput,
-		LabeledSelect,
-		LabeledTextarea,
-	} from '$lib/components/labeled/index.js';
+	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
+	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
 </script>
 
 <svelte:head>

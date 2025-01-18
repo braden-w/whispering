@@ -2,8 +2,8 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 	import type { Transformation } from '$lib/services/db';
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
-	import RenderTransformationTest from './RenderTransformationTest.svelte';
 	import RenderTransformationRuns from './RenderTransformationRuns.svelte';
+	import RenderTransformationTest from './RenderTransformationTest.svelte';
 
 	let {
 		transformation,

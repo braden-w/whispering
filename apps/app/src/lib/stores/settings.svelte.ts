@@ -1,6 +1,6 @@
+import { toast } from '$lib/services/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
-import { toast } from '$lib/services/toast';
 import { tryAsync, trySync } from '@epicenterhq/result';
 import {
 	WhisperingErr,
@@ -8,8 +8,8 @@ import {
 	settingsSchema,
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
-import { getRecorderFromContext, type Recorder } from './recorder.svelte';
 import { getContext, setContext } from 'svelte';
+import { type Recorder, getRecorderFromContext } from './recorder.svelte';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',
@@ -42,11 +42,7 @@ export const getRegisterShortcutsFromContext = () => {
 	);
 };
 
-function createRegisterShortcuts({
-	recorder,
-}: {
-	recorder: Recorder;
-}) {
+function createRegisterShortcuts({ recorder }: { recorder: Recorder }) {
 	const jobQueue = createJobQueue<RegisterShortcutJob>();
 
 	const initialSilentJob = async () => {

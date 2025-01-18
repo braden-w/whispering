@@ -4,8 +4,8 @@
 	import { cn } from '$lib/utils';
 	import { LogicalSize, getCurrentWindow } from '@tauri-apps/api/window';
 	import {
-		ListIcon,
 		FilterIcon,
+		ListIcon,
 		Minimize2Icon,
 		MoonIcon,
 		SlidersVerticalIcon,

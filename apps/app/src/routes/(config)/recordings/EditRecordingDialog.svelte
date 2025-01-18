@@ -8,7 +8,7 @@
 	import { useDeleteRecordingWithToast } from '$lib/query/recordings/mutations';
 	import type { Recording } from '$lib/services/db';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { Loader2Icon, PencilIcon as EditIcon } from 'lucide-svelte';
+	import { PencilIcon as EditIcon, Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();

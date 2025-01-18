@@ -1,4 +1,4 @@
-import { z, type ZodBoolean } from 'zod';
+import { type ZodBoolean, z } from 'zod';
 import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
