@@ -58,7 +58,9 @@
 			<WhisperingButton
 				{...props}
 				class={className}
-				tooltipContent="Choose a transformation to automatically enhance your transcribed text"
+				tooltipContent={selectedTransformation
+					? ''
+					: 'Select a transformation to automatically enhance your transcribed text'}
 				role="combobox"
 				aria-expanded={open}
 				variant="ghost"
