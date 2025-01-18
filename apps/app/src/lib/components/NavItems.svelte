@@ -12,8 +12,13 @@
 		SunIcon,
 	} from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
+	import { settings } from '$lib/stores/settings.svelte';
 
 	let { class: className }: { class?: string } = $props();
+
+	const hasActiveTransformation = $derived(
+		settings.value['transformations.selectedTransformationId'] !== null,
+	);
 </script>
 
 <nav
@@ -33,8 +38,19 @@
 		href="/transformations"
 		variant="ghost"
 		size="icon"
+		class="relative"
 	>
 		<FilterIcon class="h-4 w-4" aria-hidden="true" />
+		{#if hasActiveTransformation}
+			<span class="absolute -right-0.5 -top-0.5 flex">
+				<span class="absolute inline-flex h-2 w-2 rounded-full bg-primary">
+				</span>
+				<span
+					class="relative inline-flex h-2 w-2 rounded-full bg-primary/50 animate-ping"
+				>
+				</span>
+			</span>
+		{/if}
 	</WhisperingButton>
 	<WhisperingButton
 		tooltipContent="Settings"
@@ -78,3 +94,17 @@
 		</WhisperingButton>
 	{/if}
 </nav>
+
+<style>
+	@keyframes ping {
+		75%,
+		100% {
+			transform: scale(2);
+			opacity: 0;
+		}
+	}
+
+	.animate-ping {
+		animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+	}
+</style>
