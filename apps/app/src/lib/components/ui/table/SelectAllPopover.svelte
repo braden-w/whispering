@@ -10,10 +10,7 @@
 	const totalRowCount = $derived(table.getCoreRowModel().rows.length);
 
 	const isSomeRowsSelected = $derived(
-		table.getIsSomeRowsSelected() ||
-			table.getIsSomePageRowsSelected() ||
-			table.getIsAllRowsSelected() ||
-			table.getIsAllPageRowsSelected(),
+		table.getSelectedRowModel().rows.length > 0,
 	);
 </script>
 
