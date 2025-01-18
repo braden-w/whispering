@@ -22,7 +22,7 @@
 	<Tooltip.Root>
 		<Tooltip.Trigger>
 			{#snippet child({ props })}
-				<Button {...props} {...restProps}>
+				<Button {...restProps} {...props}>
 					{@render children?.()}
 					<span class="sr-only">
 						{@render tooltip()}
