@@ -61,10 +61,11 @@
 {:else}
 	<Checkbox
 		checked={table.getIsAllPageRowsSelected()}
-		indeterminate={table.getIsSomePageRowsSelected()}
+		indeterminate={table.getIsSomePageRowsSelected() &&
+			!table.getIsAllPageRowsSelected()}
 		aria-label="Select all"
 		onCheckedChange={(value) => {
-			table.toggleAllRowsSelected(!!value);
+			table.toggleAllPageRowsSelected(!!value);
 		}}
 	/>
 {/if}
