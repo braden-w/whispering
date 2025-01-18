@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button, type Props } from '$lib/components/ui/button/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { mergeProps } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -22,7 +23,7 @@
 	<Tooltip.Root>
 		<Tooltip.Trigger>
 			{#snippet child({ props })}
-				<Button {...restProps} {...props}>
+				<Button {...mergeProps(restProps, props)}>
 					{@render children?.()}
 					<span class="sr-only">
 						{@render tooltip()}
