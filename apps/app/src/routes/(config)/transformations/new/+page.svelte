@@ -21,7 +21,10 @@
 	<Card.Content class="space-y-6">
 		<RenderTransformation
 			{transformation}
-			onChange={(newTransformation) => {
+			setTransformation={(newTransformation) => {
+				transformation = newTransformation;
+			}}
+			setTransformationDebounced={(newTransformation) => {
 				transformation = newTransformation;
 			}}
 		/>

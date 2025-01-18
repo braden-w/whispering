@@ -14,6 +14,7 @@
 	import { HistoryIcon, Loader2Icon, PlayIcon, TrashIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
+	import { onDestroy } from 'svelte';
 
 	const updateTransformationWithToast = useUpdateTransformationWithToast();
 	const deleteTransformationWithToast = useDeleteTransformationWithToast();
@@ -32,8 +33,9 @@
 			updateTransformationWithToast.mutate($state.snapshot(newTransformation));
 		}, DEBOUNCE_TIME_MS);
 	}
-	$effect(() => {
-		return () => clearTimeout(saveTimeout);
+
+	onDestroy(() => {
+		clearTimeout(saveTimeout);
 	});
 </script>
 
