@@ -46,7 +46,7 @@
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
-	import RowActions from './RowActions.svelte';
+	import RecordingRowActions from './RecordingRowActions.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 
 	const transcriber = getTranscriberFromContext();
@@ -181,7 +181,7 @@
 				}),
 			cell: ({ getValue }) => {
 				const recording = getValue<Recording>();
-				return renderComponent(RowActions, { recordingId: recording.id });
+				return renderComponent(RecordingRowActions, { recordingId: recording.id });
 			},
 		},
 	];
