@@ -69,7 +69,7 @@
 			tooltipContent="Toggle recording"
 			onclick={recorder.toggleRecordingWithToast}
 			variant="ghost"
-			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out hover:scale-110 focus:scale-110"
+			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 		>
 			<span
 				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
@@ -79,7 +79,7 @@
 			</span>
 		</WhisperingButton>
 		<CancelOrEndRecordingSessionButton
-			class="absolute -right-14 bottom-0 transform text-2xl hover:scale-110 focus:scale-110"
+			class="absolute -right-14 bottom-0 transform text-2xl"
 		/>
 	</div>
 
@@ -132,8 +132,6 @@
 				class="h-8 w-full"
 			></audio>
 		{/if}
-
-		<SelectedTransformation />
 	</div>
 
 	<NavItems class="xs:flex -mb-2.5 -mt-1 hidden" />

@@ -1,6 +1,5 @@
 <script lang="ts" generics="TData">
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Table } from '@tanstack/svelte-table';
 

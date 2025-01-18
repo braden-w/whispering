@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { Button, type Props } from '$lib/components/ui/button/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { mergeProps } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
 	let {
+		id,
 		children,
 		tooltipContent,
 		...restProps
-	}: { tooltipContent: string | Snippet } & Props = $props();
+	}: { id?: string; tooltipContent: string | Snippet } & Props = $props();
 </script>
 
 {#snippet tooltip()}
@@ -20,9 +22,9 @@
 
 <Tooltip.Provider>
 	<Tooltip.Root>
-		<Tooltip.Trigger>
-			{#snippet child({ props })}
-				<Button {...props} {...restProps}>
+		<Tooltip.Trigger {id}>
+			{#snippet child({ props: tooltipProps })}
+				<Button {...mergeProps(tooltipProps, restProps)}>
 					{@render children?.()}
 					<span class="sr-only">
 						{@render tooltip()}
@@ -30,7 +32,7 @@
 				</Button>
 			{/snippet}
 		</Tooltip.Trigger>
-		<Tooltip.Content>
+		<Tooltip.Content class="max-w-xs text-center">
 			{@render tooltip()}
 		</Tooltip.Content>
 	</Tooltip.Root>

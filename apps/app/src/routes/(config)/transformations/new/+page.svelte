@@ -2,9 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { createTransformationWithToast } from '$lib/query/transformations/mutations';
+	import { useCreateTransformationWithToast } from '$lib/query/transformations/mutations';
 	import { generateDefaultTransformation } from '$lib/services/db';
 	import RenderTransformation from '../-components/RenderTransformation.svelte';
+
+	const createTransformationWithToast = useCreateTransformationWithToast();
 
 	let transformation = $state(generateDefaultTransformation());
 </script>
@@ -19,7 +21,10 @@
 	<Card.Content class="space-y-6">
 		<RenderTransformation
 			{transformation}
-			onChange={(newTransformation) => {
+			setTransformation={(newTransformation) => {
+				transformation = newTransformation;
+			}}
+			setTransformationDebounced={(newTransformation) => {
 				transformation = newTransformation;
 			}}
 		/>

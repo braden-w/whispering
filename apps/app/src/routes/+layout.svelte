@@ -3,8 +3,8 @@
 	import '../app.css';
 	import { queryClient } from '$lib/query';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
-	import GlobalSingletonsContext from './+layout/GlobalSingletonsContext.svelte';
 	import AppShell from './+layout/AppShell.svelte';
+	import GlobalSingletonsContext from './+layout/GlobalSingletonsContext.svelte';
 
 	let { children } = $props();
 

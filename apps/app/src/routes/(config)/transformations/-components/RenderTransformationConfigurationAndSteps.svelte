@@ -74,7 +74,8 @@
 	<Card.Header>
 		<Card.Title>Configuration</Card.Title>
 		<Card.Description>
-			Configure the title, description, and steps for your transformation
+			Configure the title, description, and steps for how your transformation
+			will process your text
 		</Card.Description>
 	</Card.Header>
 	<Card.Content class="space-y-8">
@@ -89,7 +90,7 @@
 						title: e.currentTarget.value,
 					});
 				}}
-				placeholder="Enter a descriptive title for this transformation"
+				placeholder="e.g., Format Meeting Notes"
 				description="A clear, concise name that describes what this transformation does"
 			/>
 			<LabeledTextarea
@@ -102,20 +103,21 @@
 						description: e.currentTarget.value,
 					});
 				}}
-				placeholder="Explain how this transformation works and when to use it"
-				description="Provide details about the transformation's purpose and expected outcomes"
+				placeholder="e.g., Converts meeting transcripts into bullet points and highlights action items"
+				description="Describe what this transformation does, its purpose, and how it will be used"
 			/>
 		</section>
 
 		<Separator />
 
 		<section class="space-y-4">
-			<h3 class="font-medium mb-4">Transformation Steps</h3>
+			<h3 class="font-medium mb-4">Processing Steps</h3>
 			{#if transformation.steps.length === 0}
 				<Alert.Root variant="warning">
-					<Alert.Title>No steps added</Alert.Title>
+					<Alert.Title>Add your first processing step</Alert.Title>
 					<Alert.Description>
-						Please add at least one step to your transformation for it to work.
+						Each step will process your transcribed text in sequence. Start by
+						adding a step below to define how your text should be transformed.
 					</Alert.Description>
 				</Alert.Root>
 			{/if}
@@ -180,8 +182,8 @@
 							{#if step.type === 'prompt_transform'}
 								<Card.Description>
 									{index === 0
-										? `'{{input}}' is the user input`
-										: `'{{input}}' is the output from the previous step`}
+										? `Use '{{input}}' to refer to the original text`
+										: `Use '{{input}}' to refer to the text from step ${index}`}
 								</Card.Description>
 							{/if}
 						</Card.Header>
@@ -207,7 +209,7 @@
 													),
 												});
 											}}
-											placeholder="Enter text to find"
+											placeholder="Text or pattern to search for in the transcript"
 										/>
 										<LabeledInput
 											id="find_replace.replaceText"
@@ -227,7 +229,7 @@
 													),
 												});
 											}}
-											placeholder="Enter replacement text"
+											placeholder="Text to use as the replacement"
 										/>
 									</div>
 									<Accordion.Root type="single" class="w-full">
@@ -253,7 +255,7 @@
 															),
 														});
 													}}
-													description="Enable regular expressions for more advanced text matching patterns"
+													description="Enable advanced pattern matching using regular expressions (for power users)"
 												/>
 											</Accordion.Content>
 										</Accordion.Item>
@@ -376,7 +378,7 @@
 												),
 											});
 										}}
-										placeholder="Example: You are an expert proofreader. Please take in the following text and correct any grammatical errors"
+										placeholder="Define the AI's role and expertise, e.g., 'You are an expert at formatting meeting notes. Structure the text into clear sections with bullet points.'"
 									/>
 									<LabeledTextarea
 										id="prompt_transform.userPromptTemplate"
@@ -396,13 +398,13 @@
 												),
 											});
 										}}
-										placeholder="Example: Please analyze this text and improve its clarity: {'{{input}}'}"
+										placeholder="Tell the AI what to do with your text. Use {'{{input}}'} where you want your text to appear, e.g., 'Format this transcript into clear sections: {'{{input}}'}'"
 									>
 										{#snippet description()}
 											{#if step['prompt_transform.userPromptTemplate'] && !step['prompt_transform.userPromptTemplate'].includes('{{input}}')}
 												<p class="text-amber-500 text-sm font-semibold">
-													Please include {'{{input}}'} in your template to inject
-													the input text into the prompt!
+													Remember to include {'{{input}}'}in your prompt - this
+													is where your text will be inserted!
 												</p>
 											{/if}
 										{/snippet}
@@ -436,7 +438,9 @@
 				class="w-full mt-2"
 			>
 				<PlusIcon class="mr-2 h-4 w-4" />
-				Add Step
+				{transformation.steps.length === 0
+					? 'Add Your First Step'
+					: 'Add Another Step'}
 			</Button>
 		</section>
 	</Card.Content>

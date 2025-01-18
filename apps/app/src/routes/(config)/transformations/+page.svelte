@@ -7,6 +7,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
 	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { useDeleteTransformationsWithToast } from '$lib/query/transformations/mutations';
@@ -35,7 +36,6 @@
 	import CreateTransformationButton from './CreateTransformationButton.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
-	import SelectAllPopover from '$lib/components/ui/table/SelectAllPopover.svelte';
 
 	const transformationsQuery = useTransformationsQuery();
 	const deleteTransformationsWithToast = useDeleteTransformationsWithToast();
