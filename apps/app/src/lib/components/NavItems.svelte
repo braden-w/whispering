@@ -43,12 +43,8 @@
 		<FilterIcon class="h-4 w-4" aria-hidden="true" />
 		{#if hasActiveTransformation}
 			<span class="absolute -right-0.5 -top-0.5 flex">
-				<span class="absolute inline-flex h-2 w-2 rounded-full bg-primary">
-				</span>
-				<span
-					class="relative inline-flex h-2 w-2 rounded-full bg-primary/50 animate-ping"
-				>
-				</span>
+				<span class="absolute h-2 w-2 rounded-full bg-primary"> </span>
+				<span class="h-2 w-2 rounded-full bg-primary/50 animate-ping"> </span>
 			</span>
 		{/if}
 	</WhisperingButton>
