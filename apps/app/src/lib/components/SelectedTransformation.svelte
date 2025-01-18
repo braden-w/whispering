@@ -59,8 +59,8 @@
 				{...props}
 				class={className}
 				tooltipContent={selectedTransformation
-					? ''
-					: 'Select a transformation to automatically enhance your transcribed text'}
+					? 'Change post-processing transformation to run after your text is transcribed'
+					: 'Select a post-processing transformation to run after your text is transcribed'}
 				role="combobox"
 				aria-expanded={open}
 				variant="ghost"

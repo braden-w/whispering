@@ -32,7 +32,7 @@
 				</Button>
 			{/snippet}
 		</Tooltip.Trigger>
-		<Tooltip.Content>
+		<Tooltip.Content class="max-w-xs text-center">
 			{@render tooltip()}
 		</Tooltip.Content>
 	</Tooltip.Root>
