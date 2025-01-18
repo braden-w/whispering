@@ -81,7 +81,7 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-80 max-w-xl p-0">
 		<Command.Root loop>
-			<Command.Input placeholder="Search transformations..." />
+			<Command.Input placeholder="Select transcription post-processing..." />
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group class="overflow-y-auto max-h-[400px]">
 				{#each transformations as transformation (transformation.id)}
