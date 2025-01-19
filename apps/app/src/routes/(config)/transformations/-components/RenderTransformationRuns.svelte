@@ -11,6 +11,10 @@
 
 	let { transformationId }: { transformationId: string } = $props();
 
+	const transformationsQuery = useTransformationRunsByIdQuery(
+		() => transformationId,
+	);
+
 	let expandedRunId = $state<string | null>(null);
 
 	function toggleRunExpanded(runId: string) {
@@ -20,10 +24,6 @@
 	function formatDate(dateStr: string) {
 		return format(new Date(dateStr), 'MMM d, yyyy h:mm a');
 	}
-
-	const transformationsQuery = useTransformationRunsByIdQuery(
-		() => transformationId,
-	);
 </script>
 
 {#if transformationsQuery.isLoading}
