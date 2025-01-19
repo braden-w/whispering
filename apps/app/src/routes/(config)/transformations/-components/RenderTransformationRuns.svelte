@@ -11,7 +11,7 @@
 
 	let { transformationId }: { transformationId: string } = $props();
 
-	const transformationsQuery = useTransformationRunsByIdQuery(
+	const transformationRunsByIdQuery = useTransformationRunsByIdQuery(
 		() => transformationId,
 	);
 
@@ -26,14 +26,15 @@
 	}
 </script>
 
-{#if transformationsQuery.isLoading}
+{#if transformationRunsByIdQuery.isLoading}
 	<div class="text-muted-foreground text-sm">Loading runs...</div>
-{:else if transformationsQuery.error}
+{:else if transformationRunsByIdQuery.error}
 	<div class="text-destructive text-sm">
-		{transformationsQuery.error.title}: {transformationsQuery.error.description}
+		{transformationRunsByIdQuery.error.title}: {transformationRunsByIdQuery
+			.error.description}
 	</div>
-{:else if transformationsQuery.data}
-	{@const runs = transformationsQuery.data}
+{:else if transformationRunsByIdQuery.data}
+	{@const runs = transformationRunsByIdQuery.data}
 	{#if runs.length === 0}
 		<div class="flex h-full items-center justify-center">
 			<div class="flex flex-col items-center gap-4 text-center">
