@@ -27,6 +27,21 @@ export const useTransformationRunsByTransformationIdQuery = (
 		},
 	}));
 
+export const useLatestTransformationRunByTransformationIdQuery = (
+	id: Accessor<string>,
+) =>
+	createResultQuery(() => ({
+		queryKey: transformationRunKeys.byTransformationId(id()),
+		queryFn: async () => {
+			const result =
+				await DbTransformationsService.getTransformationRunsByTransformationId(
+					id(),
+				);
+			return result;
+		},
+		select: (data) => data?.[0] ?? null,
+	}));
+
 export const useTransformationRunsByRecordingIdQuery = (
 	recordingId: Accessor<string>,
 ) =>
