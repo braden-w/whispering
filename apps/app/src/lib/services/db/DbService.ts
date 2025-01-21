@@ -11,7 +11,6 @@ import { nanoid } from 'nanoid/non-secure';
 type DbErrorProperties = {
 	_tag: 'DbServiceError';
 	title: string;
-	description: string;
 	error: unknown;
 };
 
@@ -21,7 +20,14 @@ export type DbServiceResult<T> = Ok<T> | DbServiceErr;
 export const DbServiceErr = (
 	properties: Omit<DbErrorProperties, '_tag'>,
 ): DbServiceErr => {
-	return Err({ _tag: 'DbServiceError', ...properties });
+	return Err({
+		_tag: 'DbServiceError',
+		description:
+			properties.error instanceof Error
+				? properties.error.message
+				: 'Unknown error',
+		...properties,
+	});
 };
 
 export function generateDefaultTransformation(): Transformation {
