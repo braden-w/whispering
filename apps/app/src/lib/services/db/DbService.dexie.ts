@@ -577,8 +577,15 @@ export function createDbTransformationsServiceDexie() {
 					db.transformationRuns
 						.where('transformationId')
 						.equals(transformationId)
-						.reverse() // Most recent first
-						.toArray(),
+						.reverse()
+						.toArray()
+						.then((runs) =>
+							runs.sort(
+								(a, b) =>
+									new Date(b.startedAt).getTime() -
+									new Date(a.startedAt).getTime(),
+							),
+						),
 				mapErr: (error) =>
 					DbServiceErr({
 						title:
