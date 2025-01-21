@@ -42,5 +42,5 @@ export const useLatestTransformationRunByRecordingIdQuery = (
 			DbTransformationsService.getTransformationRunsByRecordingId(
 				recordingId(),
 			),
-		select: (data) => data?.[0] ?? null,
+		select: (data) => data.at(0) ?? null,
 	}));

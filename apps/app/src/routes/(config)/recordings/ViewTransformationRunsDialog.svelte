@@ -4,36 +4,46 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ListIcon } from 'lucide-svelte';
 	import RenderTransformationRuns from '../transformations/-components/RenderTransformationRuns.svelte';
+	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 
 	let { recordingId }: { recordingId: string } = $props();
+
+	const latestTransformationRunByRecordingIdQuery =
+		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
+
 	let isOpen = $state(false);
 </script>
 
-<Dialog.Root bind:open={isOpen}>
-	<Dialog.Trigger>
-		{#snippet child({ props })}
-			<WhisperingButton
-				{...props}
-				variant="ghost"
-				size="icon"
-				tooltipContent="View Transformation Runs"
-			>
-				<ListIcon class="h-4 w-4" />
-			</WhisperingButton>
-		{/snippet}
-	</Dialog.Trigger>
-	<Dialog.Content class="max-w-4xl">
-		<Dialog.Header>
-			<Dialog.Title>Transformation Runs</Dialog.Title>
-			<Dialog.Description>
-				View all transformation runs for this recording
-			</Dialog.Description>
-		</Dialog.Header>
-		<div class="max-h-[60vh] overflow-y-auto">
-			<RenderTransformationRuns transformationId={recordingId} />
-		</div>
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (isOpen = false)}>Close</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+{#if latestTransformationRunByRecordingIdQuery.data}
+	<Dialog.Root bind:open={isOpen}>
+		<Dialog.Trigger>
+			{#snippet child({ props })}
+				<WhisperingButton
+					{...props}
+					variant="outline"
+					tooltipContent="View Transformation Runs"
+					class="w-full max-w-md text-left text-sm leading-snug overflow-y-auto h-full max-h-32 whitespace-pre-wrap break-words [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+				>
+					<div class="pt-0.5">
+						{latestTransformationRunByRecordingIdQuery.data?.output}
+					</div>
+				</WhisperingButton>
+			{/snippet}
+		</Dialog.Trigger>
+		<Dialog.Content class="max-w-4xl">
+			<Dialog.Header>
+				<Dialog.Title>Transformation Runs</Dialog.Title>
+				<Dialog.Description>
+					View all transformation runs for this recording
+				</Dialog.Description>
+			</Dialog.Header>
+			<div class="max-h-[60vh] overflow-y-auto">
+				<RenderTransformationRuns {recordingId} />
+			</div>
+			<Dialog.Footer>
+				<Button variant="outline" onclick={() => (isOpen = false)}>Close</Button
+				>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+{/if}
