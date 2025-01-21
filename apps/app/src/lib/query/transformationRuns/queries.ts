@@ -18,13 +18,8 @@ export const useTransformationRunsByTransformationIdQuery = (
 ) =>
 	createResultQuery(() => ({
 		queryKey: transformationRunKeys.byTransformationId(id()),
-		queryFn: async () => {
-			const result =
-				await DbTransformationsService.getTransformationRunsByTransformationId(
-					id(),
-				);
-			return result;
-		},
+		queryFn: () =>
+			DbTransformationsService.getTransformationRunsByTransformationId(id()),
 	}));
 
 export const useLatestTransformationRunByTransformationIdQuery = (
@@ -32,13 +27,8 @@ export const useLatestTransformationRunByTransformationIdQuery = (
 ) =>
 	createResultQuery(() => ({
 		queryKey: transformationRunKeys.byTransformationId(id()),
-		queryFn: async () => {
-			const result =
-				await DbTransformationsService.getTransformationRunsByTransformationId(
-					id(),
-				);
-			return result;
-		},
+		queryFn: () =>
+			DbTransformationsService.getTransformationRunsByTransformationId(id()),
 		select: (data) => data?.[0] ?? null,
 	}));
 
@@ -47,11 +37,8 @@ export const useTransformationRunsByRecordingIdQuery = (
 ) =>
 	createResultQuery(() => ({
 		queryKey: transformationRunKeys.byRecordingId(recordingId()),
-		queryFn: async () => {
-			const result =
-				await DbTransformationsService.getTransformationRunsByRecordingId(
-					recordingId(),
-				);
-			return result;
-		},
+		queryFn: () =>
+			DbTransformationsService.getTransformationRunsByRecordingId(
+				recordingId(),
+			),
 	}));
