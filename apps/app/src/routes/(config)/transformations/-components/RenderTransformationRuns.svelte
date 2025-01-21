@@ -5,15 +5,14 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
-	import { useTransformationRunsByIdQuery } from '$lib/query/transformationRuns/queries';
+	import { useTransformationRunsByTransformationIdQuery } from '$lib/query/transformationRuns/queries';
 	import { format } from 'date-fns';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
 	let { transformationId }: { transformationId: string } = $props();
 
-	const transformationRunsByIdQuery = useTransformationRunsByIdQuery(
-		() => transformationId,
-	);
+	const transformationRunsByIdQuery =
+		useTransformationRunsByTransformationIdQuery(() => transformationId);
 
 	let expandedRunId = $state<string | null>(null);
 

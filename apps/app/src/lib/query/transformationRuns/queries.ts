@@ -13,7 +13,9 @@ export const transformationRunKeys = {
 		['transformationRuns', 'recordingId', recordingId] as const,
 };
 
-export const useTransformationRunsByIdQuery = (id: Accessor<string>) =>
+export const useTransformationRunsByTransformationIdQuery = (
+	id: Accessor<string>,
+) =>
 	createResultQuery(() => ({
 		queryKey: transformationRunKeys.byTransformationId(id()),
 		queryFn: async () => {
