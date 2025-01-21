@@ -74,9 +74,11 @@
 				{:else}
 					<FilterXIcon class="h-4 w-4 text-amber-500" />
 				{/if}
-				<span
-					class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary before:absolute before:left-0 before:top-0 before:h-full before:w-full before:rounded-full before:bg-primary/50 before:animate-ping"
-				></span>
+				{#if !selectedTransformation}
+					<span
+						class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary before:absolute before:left-0 before:top-0 before:h-full before:w-full before:rounded-full before:bg-primary/50 before:animate-ping"
+					></span>
+				{/if}
 			</WhisperingButton>
 		{/snippet}
 	</Popover.Trigger>
