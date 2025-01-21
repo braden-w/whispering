@@ -602,7 +602,14 @@ export function createDbTransformationsServiceDexie() {
 					db.transformationRuns
 						.where('recordingId')
 						.equals(recordingId)
-						.toArray(),
+						.toArray()
+						.then((runs) =>
+							runs.sort(
+								(a, b) =>
+									new Date(b.startedAt).getTime() -
+									new Date(a.startedAt).getTime(),
+							),
+						),
 				mapErr: (error) =>
 					DbServiceErr({
 						title:
