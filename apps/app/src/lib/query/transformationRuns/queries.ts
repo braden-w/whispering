@@ -22,16 +22,6 @@ export const useTransformationRunsByTransformationIdQuery = (
 			DbTransformationsService.getTransformationRunsByTransformationId(id()),
 	}));
 
-export const useLatestTransformationRunByTransformationIdQuery = (
-	id: Accessor<string>,
-) =>
-	createResultQuery(() => ({
-		queryKey: transformationRunKeys.byTransformationId(id()),
-		queryFn: () =>
-			DbTransformationsService.getTransformationRunsByTransformationId(id()),
-		select: (data) => data?.[0] ?? null,
-	}));
-
 export const useTransformationRunsByRecordingIdQuery = (
 	recordingId: Accessor<string>,
 ) =>
@@ -41,4 +31,16 @@ export const useTransformationRunsByRecordingIdQuery = (
 			DbTransformationsService.getTransformationRunsByRecordingId(
 				recordingId(),
 			),
+	}));
+
+export const useLatestTransformationRunByRecordingIdQuery = (
+	recordingId: Accessor<string>,
+) =>
+	createResultQuery(() => ({
+		queryKey: transformationRunKeys.byRecordingId(recordingId()),
+		queryFn: () =>
+			DbTransformationsService.getTransformationRunsByRecordingId(
+				recordingId(),
+			),
+		select: (data) => data?.[0] ?? null,
 	}));
