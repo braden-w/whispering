@@ -14,7 +14,7 @@ type DbErrorProperties = {
 	error: unknown;
 };
 
-export type DbServiceErr = Err<DbErrorProperties>;
+export type DbServiceErr = Err<DbErrorProperties & { description: string }>;
 export type DbServiceResult<T> = Ok<T> | DbServiceErr;
 
 export const DbServiceErr = (
