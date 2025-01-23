@@ -4,12 +4,18 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ListIcon } from 'lucide-svelte';
 	import RenderTransformationRuns from '../transformations/-components/RenderTransformationRuns.svelte';
-	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import {
+		useLatestTransformationRunByRecordingIdQuery,
+		useTransformationRunsByRecordingIdQuery,
+	} from '$lib/query/transformationRuns/queries';
 
 	let { recordingId }: { recordingId: string } = $props();
 
 	const latestTransformationRunByRecordingIdQuery =
 		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
+
+	const transformationRunsByRecordingIdQuery =
+		useTransformationRunsByRecordingIdQuery(() => recordingId);
 
 	let isOpen = $state(false);
 </script>
@@ -36,7 +42,18 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<div class="max-h-[60vh] overflow-y-auto">
-				<RenderTransformationRuns {recordingId} />
+				{#if transformationRunsByRecordingIdQuery.isPending}
+					<div class="text-muted-foreground text-sm">Loading runs...</div>
+				{:else if transformationRunsByRecordingIdQuery.error}
+					<div class="text-destructive text-sm">
+						{transformationRunsByRecordingIdQuery.error.title}:
+						{transformationRunsByRecordingIdQuery.error.description}
+					</div>
+				{:else if transformationRunsByRecordingIdQuery.data}
+					<RenderTransformationRuns
+						runs={transformationRunsByRecordingIdQuery.data}
+					/>
+				{/if}
 			</div>
 			<Dialog.Footer>
 				<Button variant="outline" onclick={() => (isOpen = false)}>Close</Button
