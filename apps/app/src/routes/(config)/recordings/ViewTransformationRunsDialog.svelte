@@ -22,11 +22,9 @@
 					{...props}
 					variant="outline"
 					tooltipContent="View Transformation Runs"
-					class="w-full max-w-md text-left text-sm leading-snug overflow-y-auto h-full max-h-32 whitespace-pre-wrap break-words [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+					class="w-full block max-w-md text-left text-sm leading-snug overflow-y-auto h-full max-h-24 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
 				>
-					<div class="pt-0.5">
-						{latestTransformationRunByRecordingIdQuery.data?.output}
-					</div>
+					{latestTransformationRunByRecordingIdQuery.data?.output}
 				</WhisperingButton>
 			{/snippet}
 		</Dialog.Trigger>
