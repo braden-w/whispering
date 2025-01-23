@@ -5,14 +5,14 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
-	import { useTransformationRunsByTransformationIdQuery } from '$lib/query/transformationRuns/queries';
+	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import { format } from 'date-fns';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
-	let { transformationId }: { transformationId: string } = $props();
+	let { recordingId }: { recordingId: string } = $props();
 
-	const transformationRunsByIdQuery =
-		useTransformationRunsByTransformationIdQuery(() => transformationId);
+	const transformationRunsByRecordingIdQuery =
+		useTransformationRunsByRecordingIdQuery(() => recordingId);
 
 	let expandedRunId = $state<string | null>(null);
 
@@ -25,15 +25,15 @@
 	}
 </script>
 
-{#if transformationRunsByIdQuery.isLoading}
+{#if transformationRunsByRecordingIdQuery.isLoading}
 	<div class="text-muted-foreground text-sm">Loading runs...</div>
-{:else if transformationRunsByIdQuery.error}
+{:else if transformationRunsByRecordingIdQuery.error}
 	<div class="text-destructive text-sm">
-		{transformationRunsByIdQuery.error.title}: {transformationRunsByIdQuery
-			.error.description}
+		{transformationRunsByRecordingIdQuery.error.title}:
+		{transformationRunsByRecordingIdQuery.error.description}
 	</div>
-{:else if transformationRunsByIdQuery.data}
-	{@const runs = transformationRunsByIdQuery.data}
+{:else if transformationRunsByRecordingIdQuery.data}
+	{@const runs = transformationRunsByRecordingIdQuery.data}
 	{#if runs.length === 0}
 		<div class="flex h-full items-center justify-center">
 			<div class="flex flex-col items-center gap-4 text-center">
