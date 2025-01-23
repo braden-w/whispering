@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CopyableCode from '$lib/components/CopyableCode.svelte';
+	import Copyable from '$lib/components/Copyable.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -79,15 +79,15 @@
 				{#if expandedRunId === run.id}
 					<Table.Row>
 						<Table.Cell class="space-y-4" colspan={4}>
-							<CopyableCode codeText={run.input} label="Input" />
+							<Copyable variant="prose" codeText={run.input} label="Input" />
 							{#if run.output}
-								<CopyableCode codeText={run.output} label="Output" />
-							{:else if run.error}
-								<CopyableCode
-									codeText={run.error}
-									label="Error"
-									variant="error"
+								<Copyable
+									variant="prose"
+									codeText={run.output}
+									label="Output"
 								/>
+							{:else if run.error}
+								<Copyable variant="error" codeText={run.error} label="Error" />
 							{/if}
 							{#if run.stepRuns.length > 0}
 								<div class="flex flex-col gap-2">
@@ -124,17 +124,18 @@
 														</Table.Cell>
 														<Table.Cell>
 															{#if stepRun.output}
-																<CopyableCode
+																<Copyable
+																	variant="prose"
 																	codeText={stepRun.output}
 																	hideLabel
 																	label="Output"
 																/>
 															{:else if stepRun.error}
-																<CopyableCode
+																<Copyable
+																	variant="error"
 																	codeText={stepRun.error}
 																	hideLabel
 																	label="Error"
-																	variant="error"
 																/>
 															{/if}
 														</Table.Cell>

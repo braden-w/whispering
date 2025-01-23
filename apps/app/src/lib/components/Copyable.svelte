@@ -1,21 +1,19 @@
 <script lang="ts" module>
 	import { type VariantProps, tv } from 'tailwind-variants';
 
-	export const copyableCodeVariants = tv({
-		base: 'relative whitespace-normal rounded p-4 pr-12 font-mono text-sm font-semibold',
+	export const copyableVariants = tv({
+		base: 'relative whitespace-normal rounded p-4 pr-12 text-sm',
 		variants: {
 			variant: {
-				default: 'bg-muted text-muted-foreground',
+				code: 'bg-muted text-muted-foreground font-semibold font-mono',
+				prose: 'bg-muted text-muted-foreground',
 				error: 'bg-destructive/10 text-destructive',
 			},
 		},
-		defaultVariants: {
-			variant: 'default',
-		},
 	});
 
-	export type CopyableCodeVariant = VariantProps<
-		typeof copyableCodeVariants
+	export type CopyableVariants = VariantProps<
+		typeof copyableVariants
 	>['variant'];
 </script>
 
@@ -37,7 +35,7 @@
 		label: string;
 		hideLabel?: boolean;
 		codeText: string;
-		variant?: CopyableCodeVariant;
+		variant: CopyableVariants;
 	} = $props();
 	let hasCopied = $state(false);
 
@@ -54,7 +52,7 @@
 	<Label class={cn('text-sm', hideLabel && 'sr-only')}>
 		{label}
 	</Label>
-	<pre class={copyableCodeVariants({ variant })}>
+	<pre class={copyableVariants({ variant })}>
 	<WhisperingButton
 			tooltipContent="Copy to clipboard"
 			size="icon"

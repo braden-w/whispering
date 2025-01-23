@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CopyableCode from '$lib/components/CopyableCode.svelte';
+	import Copyable from '$lib/components/Copyable.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -38,7 +38,8 @@
 		<Dialog.Header>
 			<Dialog.Title>Transcribed Text</Dialog.Title>
 		</Dialog.Header>
-		<CopyableCode
+		<Copyable
+			variant="prose"
 			codeText={transcribedText}
 			label="Transcribed Text"
 			hideLabel
