@@ -1,26 +1,23 @@
 <script lang="ts">
+	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ListIcon } from 'lucide-svelte';
+	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import RenderTransformationRuns from '../transformations/-components/RenderTransformationRuns.svelte';
-	import {
-		useLatestTransformationRunByRecordingIdQuery,
-		useTransformationRunsByRecordingIdQuery,
-	} from '$lib/query/transformationRuns/queries';
 
 	let { recordingId }: { recordingId: string } = $props();
-
-	const latestTransformationRunByRecordingIdQuery =
-		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
 	const transformationRunsByRecordingIdQuery =
 		useTransformationRunsByRecordingIdQuery(() => recordingId);
 
+	const latestTransformationRunByRecordingId = $derived(
+		transformationRunsByRecordingIdQuery.data?.at(0) ?? null,
+	);
+
 	let isOpen = $state(false);
 </script>
 
-{#if latestTransformationRunByRecordingIdQuery.data}
+{#if latestTransformationRunByRecordingId}
 	<Dialog.Root bind:open={isOpen}>
 		<Dialog.Trigger>
 			{#snippet child({ props })}
@@ -30,7 +27,7 @@
 					tooltipContent="View Transformation Runs"
 					class="w-full block max-w-md text-left text-sm leading-snug overflow-y-auto h-full max-h-24 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
 				>
-					{latestTransformationRunByRecordingIdQuery.data?.output}
+					{latestTransformationRunByRecordingId.output}
 				</WhisperingButton>
 			{/snippet}
 		</Dialog.Trigger>
