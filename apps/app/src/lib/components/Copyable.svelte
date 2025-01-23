@@ -29,12 +29,12 @@
 	const {
 		label,
 		hideLabel,
-		codeText,
+		copyableText,
 		variant,
 	}: {
 		label: string;
 		hideLabel?: boolean;
-		codeText: string;
+		copyableText: string;
 		variant: CopyableVariants;
 	} = $props();
 	let hasCopied = $state(false);
@@ -60,7 +60,7 @@
 			class="absolute right-4 top-4 h-4 w-4"
 			onclick={() =>
 				copyTextToClipboardWithToast.mutate(
-					{ label: 'code', text: codeText },
+					{ label: 'code', text: copyableText },
 					{ onSuccess: () => (hasCopied = true) },
 				)}>
 			<span class="sr-only">Copy</span>
@@ -70,6 +70,6 @@
 				<CopyIcon />
 			{/if}
 		</WhisperingButton>
-{codeText}
+{copyableText}
 </pre>
 </div>

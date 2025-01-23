@@ -40,7 +40,7 @@
 		</Dialog.Header>
 		<Copyable
 			variant="prose"
-			codeText={transcribedText}
+			copyableText={transcribedText}
 			label="Transcribed Text"
 			hideLabel
 		/>

@@ -79,15 +79,23 @@
 				{#if expandedRunId === run.id}
 					<Table.Row>
 						<Table.Cell class="space-y-4" colspan={4}>
-							<Copyable variant="prose" codeText={run.input} label="Input" />
+							<Copyable
+								variant="prose"
+								copyableText={run.input}
+								label="Input"
+							/>
 							{#if run.output}
 								<Copyable
 									variant="prose"
-									codeText={run.output}
+									copyableText={run.output}
 									label="Output"
 								/>
 							{:else if run.error}
-								<Copyable variant="error" codeText={run.error} label="Error" />
+								<Copyable
+									variant="error"
+									copyableText={run.error}
+									label="Error"
+								/>
 							{/if}
 							{#if run.stepRuns.length > 0}
 								<div class="flex flex-col gap-2">
@@ -126,14 +134,14 @@
 															{#if stepRun.output}
 																<Copyable
 																	variant="prose"
-																	codeText={stepRun.output}
+																	copyableText={stepRun.output}
 																	hideLabel
 																	label="Output"
 																/>
 															{:else if stepRun.error}
 																<Copyable
 																	variant="error"
-																	codeText={stepRun.error}
+																	copyableText={stepRun.error}
 																	hideLabel
 																	label="Error"
 																/>
