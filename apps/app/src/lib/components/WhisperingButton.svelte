@@ -9,7 +9,7 @@
 		children,
 		tooltipContent,
 		...restProps
-	}: { id?: string; tooltipContent: string | Snippet } & Props = $props();
+	}: Props & { tooltipContent: string | Snippet } = $props();
 </script>
 
 {#snippet tooltip()}
@@ -22,7 +22,7 @@
 
 <Tooltip.Provider>
 	<Tooltip.Root>
-		<Tooltip.Trigger {id}>
+		<Tooltip.Trigger id={id ?? undefined}>
 			{#snippet child({ props: tooltipProps })}
 				<Button {...mergeProps(tooltipProps, restProps)}>
 					{@render children?.()}
