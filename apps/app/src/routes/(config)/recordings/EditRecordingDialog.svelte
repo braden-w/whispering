@@ -46,7 +46,7 @@
 			</WhisperingButton>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="overflow-y-auto max-h-[90vh]">
+	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Edit recording</Dialog.Title>
 			<Dialog.Description>Changes are saved automatically.</Dialog.Description>
