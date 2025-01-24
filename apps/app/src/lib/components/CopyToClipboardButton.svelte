@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button, type Props } from '$lib/components/ui/button/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import {
 		type CopyToClipboardLabel,
@@ -13,11 +14,12 @@
 		class: className,
 		label,
 		copyableText,
+		...restProps
 	}: {
 		class?: string;
 		label: CopyToClipboardLabel;
 		copyableText: string;
-	} = $props();
+	} & Props = $props();
 
 	let hasCopied = $state(false);
 
@@ -40,6 +42,7 @@
 			{ label, text: copyableText },
 			{ onSuccess: () => (hasCopied = true) },
 		)}
+	{...restProps}
 >
 	<span class="sr-only">Copy</span>
 	{#if hasCopied}
