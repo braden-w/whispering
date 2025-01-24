@@ -10,13 +10,14 @@ export const useCopyTextToClipboard = () =>
 		},
 	}));
 
+export type CopyToClipboardLabel = 'transcribed text' | 'transcribed text (joined)' | 'code';
 export const useCopyTextToClipboardWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async ({
 			label,
 			text,
 		}: {
-			label: 'transcribed text' | 'transcribed text (joined)' | 'code';
+			label: CopyToClipboardLabel;
 			text: string;
 		}) => {
 			const result = await ClipboardService.setClipboardText(text);

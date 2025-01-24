@@ -6,7 +6,7 @@
 		variants: {
 			variant: {
 				code: 'bg-muted text-muted-foreground font-semibold font-mono',
-				prose: 'bg-muted text-muted-foreground',
+				text: 'bg-muted text-muted-foreground',
 				error: 'bg-destructive/10 text-destructive',
 			},
 		},
@@ -18,13 +18,9 @@
 </script>
 
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { CheckIcon, CopyIcon } from 'lucide-svelte';
-	import { Label } from './ui/label';
 	import { cn } from '$lib/utils';
-
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	import CopyToClipboardButton from './CopyToClipboardButton.svelte';
+	import { Label } from './ui/label';
 
 	const {
 		label,
@@ -37,15 +33,6 @@
 		copyableText: string;
 		variant: CopyableVariants;
 	} = $props();
-	let hasCopied = $state(false);
-
-	$effect(() => {
-		if (hasCopied) {
-			setTimeout(() => {
-				hasCopied = false;
-			}, 2000);
-		}
-	});
 </script>
 
 <div class="flex flex-col gap-2">
@@ -53,23 +40,10 @@
 		{label}
 	</Label>
 	<pre class={copyableVariants({ variant })}>
-	<WhisperingButton
-			tooltipContent="Copy to clipboard"
-			size="icon"
-			variant="ghost"
-			class="absolute right-4 top-4 h-4 w-4"
-			onclick={() =>
-				copyTextToClipboardWithToast.mutate(
-					{ label: 'code', text: copyableText },
-					{ onSuccess: () => (hasCopied = true) },
-				)}>
-			<span class="sr-only">Copy</span>
-    {#if hasCopied}
-				<CheckIcon />
-			{:else}
-				<CopyIcon />
-			{/if}
-		</WhisperingButton>
 {copyableText}
+	<CopyToClipboardButton
+			class="absolute right-4 top-4"
+			label={variant === 'code' ? 'code' : 'transcribed text'}
+			{copyableText}></CopyToClipboardButton>
 </pre>
 </div>
