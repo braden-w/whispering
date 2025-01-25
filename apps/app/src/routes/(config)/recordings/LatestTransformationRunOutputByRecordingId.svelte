@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 
@@ -9,12 +9,8 @@
 		recordingId: string;
 	} = $props();
 
-	const transformationRunsByRecordingIdQuery =
-		useTransformationRunsByRecordingIdQuery(() => recordingId);
-
-	const latestTransformationRunByRecordingId = $derived(
-		transformationRunsByRecordingIdQuery.data?.at(0) ?? null,
-	);
+	const latestTransformationRunByRecordingId =
+		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
 	const buttonViewTransitionName = getRecordingTransitionId({
 		recordingId,
@@ -22,10 +18,10 @@
 	});
 </script>
 
-{#if latestTransformationRunByRecordingId?.output}
+{#if latestTransformationRunByRecordingId.data?.output}
 	<CopyableTextDialog
 		id={buttonViewTransitionName}
-		text={latestTransformationRunByRecordingId.output}
+		text={latestTransformationRunByRecordingId.data.output}
 		{buttonViewTransitionName}
 	/>
 {/if}

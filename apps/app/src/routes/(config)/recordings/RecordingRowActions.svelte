@@ -25,6 +25,8 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
@@ -33,6 +35,9 @@
 	const downloadRecordingWithToast = useDownloadRecordingWithToast();
 
 	let { recordingId }: { recordingId: string } = $props();
+
+	const latestTransformationRunByRecordingIdQuery =
+		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
 	const recordingQuery = useRecordingQuery(() => recordingId);
 
@@ -98,18 +103,38 @@
 			})}
 		/>
 
-		<CopyToClipboardButton
-			label="latest transformation run output"
-			copyableText={recording.latestTransformationRunOutput}
-			viewTransitionName={getRecordingTransitionId({
-				recordingId,
-				propertyName: 'latestTransformationRunOutput',
-			})}
-		>
-			{#snippet copyIcon()}
-				<LayersIcon />
-			{/snippet}
-		</CopyToClipboardButton>
+		{#if latestTransformationRunByRecordingIdQuery.isPending}
+			<Loader2Icon class="h-4 w-4 animate-spin" />
+		{:else if latestTransformationRunByRecordingIdQuery.isError}
+			<WhisperingTooltip
+				id={getRecordingTransitionId({
+					recordingId,
+					propertyName: 'latestTransformationRunOutput',
+				})}
+				tooltipContent="Error fetching latest transformation run output"
+			>
+				{#snippet trigger({ tooltip, tooltipProps })}
+					<AlertCircleIcon class="text-red-500" {...tooltipProps} />
+					<span class="sr-only">
+						{@render tooltip()}
+					</span>
+				{/snippet}
+			</WhisperingTooltip>
+		{:else}
+			<CopyToClipboardButton
+				label="latest transformation run output"
+				copyableText={latestTransformationRunByRecordingIdQuery.data?.output ??
+					''}
+				viewTransitionName={getRecordingTransitionId({
+					recordingId,
+					propertyName: 'latestTransformationRunOutput',
+				})}
+			>
+				{#snippet copyIcon()}
+					<LayersIcon />
+				{/snippet}
+			</CopyToClipboardButton>
+		{/if}
 
 		<ViewTransformationRunsDialog {recordingId} />
 
