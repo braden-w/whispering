@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
+	import CopyToClipboardButton from '$lib/components/CopyToClipboardButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
+	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDownloadRecordingWithToast } from '$lib/query/download/mutations';
@@ -92,7 +93,19 @@
 		<CopyToClipboardButton
 			label="transcribed text"
 			copyableText={recording.transcribedText}
-			viewTransitionName={buttonViewTransitionName}
+			viewTransitionName={createRecordingViewTransitionName({
+				recordingId,
+				propertyName: 'transcribedText',
+			})}
+		/>
+
+		<CopyToClipboardButton
+			label="latest transformation run output"
+			copyableText={recording.latestTransformationRunOutput}
+			viewTransitionName={createRecordingViewTransitionName({
+				recordingId,
+				propertyName: 'latestTransformationRunOutput',
+			})}
 		/>
 
 		<WhisperingButton
