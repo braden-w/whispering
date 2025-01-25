@@ -2,7 +2,6 @@
 	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import CopyableTextPopover from './CopyableTextPopover.svelte';
-	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	let {
 		recordingId,
@@ -23,12 +22,9 @@
 	});
 </script>
 
-<div class="flex items-center gap-2">
-	{#if latestTransformationRunByRecordingId?.output}
-		<CopyableTextPopover
-			text={latestTransformationRunByRecordingId.output}
-			{buttonViewTransitionName}
-		/>
-	{/if}
-	<ViewTransformationRunsDialog {recordingId} />
-</div>
+{#if latestTransformationRunByRecordingId?.output}
+	<CopyableTextPopover
+		text={latestTransformationRunByRecordingId.output}
+		{buttonViewTransitionName}
+	/>
+{/if}

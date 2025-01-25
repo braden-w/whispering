@@ -1,5 +1,4 @@
 <script lang="ts">
-	import CopyToClipboardButton from '$lib/components/CopyToClipboardButton.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import CopyableTextPopover from './CopyableTextPopover.svelte';
 
@@ -17,11 +16,4 @@
 	});
 </script>
 
-<div class="flex items-center gap-2">
-	<CopyableTextPopover text={transcribedText} {buttonViewTransitionName} />
-	<CopyToClipboardButton
-		label="transcribed text"
-		copyableText={transcribedText}
-		style="view-transition-name: {buttonViewTransitionName}-copy-button"
-	/>
-</div>
+<CopyableTextPopover text={transcribedText} {buttonViewTransitionName} />
