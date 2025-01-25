@@ -43,10 +43,9 @@
 				</WhisperingTooltip>
 			{/snippet}
 		</Dialog.Trigger>
-		<Dialog.Content>
+		<Dialog.Content class="max-w-4xl">
 			<Card.Title class="text-lg">Transcribed Text</Card.Title>
-			<pre
-				class="relative whitespace-normal rounded p-4 text-sm prose bg-muted text-muted-foreground max-h-96 overflow-y-auto">{text}</pre>
+			<Textarea class="w-full max-h-96 h-full" readonly value={text} />
 			<Dialog.Footer>
 				<Button variant="outline" onclick={() => (isDialogOpen = false)}>
 					Close
