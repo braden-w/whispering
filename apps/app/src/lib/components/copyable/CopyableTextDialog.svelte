@@ -31,7 +31,7 @@
 					{#snippet trigger({ tooltipProps, tooltip })}
 						<Textarea
 							{...mergeProps(tooltipProps, dialogTriggerProps)}
-							class="h-full resize-none overflow-y-auto text-wrap text-left text-sm leading-snug hover:bg-accent hover:text-accent-foreground"
+							class="h-full resize-none overflow-y-auto text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
 							readonly
 							value={text}
 							style="view-transition-name: {buttonViewTransitionName}"
