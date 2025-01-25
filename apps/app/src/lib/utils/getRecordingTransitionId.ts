@@ -1,6 +1,6 @@
 import type { Recording } from '$lib/services/db';
 
-export function createRecordingViewTransitionName({
+export function getRecordingTransitionId({
 	recordingId,
 	propertyName,
 }: {

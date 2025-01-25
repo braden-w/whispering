@@ -50,7 +50,7 @@
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 
 	const transcriber = getTranscriberFromContext();

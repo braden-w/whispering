@@ -12,7 +12,7 @@
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
 		AlertCircleIcon,
@@ -92,7 +92,7 @@
 		<CopyToClipboardButton
 			label="transcribed text"
 			copyableText={recording.transcribedText}
-			viewTransitionName={createRecordingViewTransitionName({
+			viewTransitionName={getRecordingTransitionId({
 				recordingId,
 				propertyName: 'transcribedText',
 			})}
@@ -101,7 +101,7 @@
 		<CopyToClipboardButton
 			label="latest transformation run output"
 			copyableText={recording.latestTransformationRunOutput}
-			viewTransitionName={createRecordingViewTransitionName({
+			viewTransitionName={getRecordingTransitionId({
 				recordingId,
 				propertyName: 'latestTransformationRunOutput',
 			})}

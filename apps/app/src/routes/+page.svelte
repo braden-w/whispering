@@ -12,7 +12,7 @@
 	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
@@ -90,7 +90,7 @@
 				id="transcribed-text"
 				class="w-full"
 				placeholder="Transcribed text will appear here..."
-				style="view-transition-name: {createRecordingViewTransitionName({
+				style="view-transition-name: {getRecordingTransitionId({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}"
@@ -107,7 +107,7 @@
 						text: latestRecording.transcribedText,
 					})}
 				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				style="view-transition-name: {createRecordingViewTransitionName({
+				style="view-transition-name: {getRecordingTransitionId({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}-copy-button"
@@ -123,7 +123,7 @@
 
 		{#if blobUrl}
 			<audio
-				style="view-transition-name: {createRecordingViewTransitionName({
+				style="view-transition-name: {getRecordingTransitionId({
 					recordingId: latestRecording.id,
 					propertyName: 'blob',
 				})}"

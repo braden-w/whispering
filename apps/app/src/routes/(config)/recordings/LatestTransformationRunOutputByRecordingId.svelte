@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 
 	let {
@@ -16,7 +16,7 @@
 		transformationRunsByRecordingIdQuery.data?.at(0) ?? null,
 	);
 
-	const buttonViewTransitionName = createRecordingViewTransitionName({
+	const buttonViewTransitionName = getRecordingTransitionId({
 		recordingId,
 		propertyName: 'latestTransformationRunOutput',
 	});
