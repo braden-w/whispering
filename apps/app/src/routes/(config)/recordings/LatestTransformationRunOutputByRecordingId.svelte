@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import CopyableTextPopover from '$lib/components/copyable/CopyableTextPopover.svelte';
+	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 
 	let {
 		recordingId,
@@ -23,7 +23,7 @@
 </script>
 
 {#if latestTransformationRunByRecordingId?.output}
-	<CopyableTextPopover
+	<CopyableTextDialog
 		text={latestTransformationRunByRecordingId.output}
 		{buttonViewTransitionName}
 	/>

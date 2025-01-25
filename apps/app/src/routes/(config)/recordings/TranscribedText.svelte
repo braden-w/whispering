@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import CopyableTextPopover from '$lib/components/copyable/CopyableTextPopover.svelte';
+	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 
 	let {
 		recordingId,
@@ -16,4 +16,4 @@
 	});
 </script>
 
-<CopyableTextPopover text={transcribedText} {buttonViewTransitionName} />
+<CopyableTextDialog text={transcribedText} {buttonViewTransitionName} />
