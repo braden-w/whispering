@@ -23,6 +23,7 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 		LayersIcon,
+		CopyIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
@@ -101,7 +102,6 @@
 		/>
 
 		<CopyToClipboardButton
-			class="relative"
 			label="latest transformation run output"
 			copyableText={recording.latestTransformationRunOutput}
 			viewTransitionName={createRecordingViewTransitionName({
@@ -109,7 +109,9 @@
 				propertyName: 'latestTransformationRunOutput',
 			})}
 		>
-			<LayersIcon class="!size-3 absolute right-0.5 top-0.5" />
+			{#snippet copyIcon()}
+				<LayersIcon />
+			{/snippet}
 		</CopyToClipboardButton>
 
 		<WhisperingButton
