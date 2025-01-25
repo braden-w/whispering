@@ -28,7 +28,6 @@
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
-	import { ClipboardIcon } from '$lib/components/icons';
 
 	let {
 		transformation,
@@ -167,7 +166,7 @@
 										class="h-8 w-8"
 										onclick={() => duplicateStep(index)}
 									>
-										<ClipboardIcon class="h-4 w-4" />
+										<CopyIcon class="h-4 w-4" />
 									</WhisperingButton>
 									<WhisperingButton
 										tooltipContent="Delete step"
