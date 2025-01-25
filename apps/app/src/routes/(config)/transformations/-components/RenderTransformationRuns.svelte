@@ -79,14 +79,10 @@
 				{#if expandedRunId === run.id}
 					<Table.Row>
 						<Table.Cell class="space-y-4" colspan={4}>
-							<Copyable
-								variant="prose"
-								copyableText={run.input}
-								label="Input"
-							/>
+							<Copyable variant="text" copyableText={run.input} label="Input" />
 							{#if run.output}
 								<Copyable
-									variant="prose"
+									variant="text"
 									copyableText={run.output}
 									label="Output"
 								/>
@@ -133,7 +129,7 @@
 														<Table.Cell>
 															{#if stepRun.output}
 																<Copyable
-																	variant="prose"
+																	variant="text"
 																	copyableText={stepRun.output}
 																	hideLabel
 																	label="Output"
