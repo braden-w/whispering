@@ -5,7 +5,7 @@ export function createRecordingViewTransitionName({
 	propertyName,
 }: {
 	recordingId: string;
-	propertyName: keyof Recording;
+	propertyName: keyof Recording | 'latestTransformationRunOutput';
 }): string {
 	return `recording-${recordingId}-${propertyName}` as const;
 }
