@@ -27,7 +27,7 @@
 				{...props}
 				variant="outline"
 				tooltipContent="View Transcribed Text"
-				class="w-full block max-w-48 text-left text-sm leading-snug overflow-y-auto h-full max-h-12 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+				class="w-full block text-left text-sm leading-snug overflow-y-auto h-full max-h-12 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
 				style="view-transition-name: {buttonViewTransitionName}"
 			>
 				{text}
