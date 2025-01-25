@@ -5,7 +5,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Popover from '$lib/components/ui/popover';
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { CopyIcon } from 'lucide-svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
@@ -54,7 +54,7 @@
 					);
 				}}
 			>
-				<CopyIcon class="h-4 w-4" />
+				<ClipboardIcon class="h-4 w-4" />
 				Copy Text
 			</Button>
 		</Dialog.Footer>
