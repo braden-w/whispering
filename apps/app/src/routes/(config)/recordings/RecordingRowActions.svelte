@@ -114,6 +114,8 @@
 			{/snippet}
 		</CopyToClipboardButton>
 
+		<ViewTransformationRunsDialog {recordingId} />
+
 		<WhisperingButton
 			tooltipContent="Download recording"
 			onclick={() => downloadRecordingWithToast.mutate(recording)}
@@ -126,8 +128,6 @@
 				<DownloadIcon class="h-4 w-4" />
 			{/if}
 		</WhisperingButton>
-
-		<ViewTransformationRunsDialog {recordingId} />
 
 		<WhisperingButton
 			tooltipContent="Delete recording"
