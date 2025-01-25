@@ -4,7 +4,6 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDownloadRecordingWithToast } from '$lib/query/download/mutations';
 	import {
 		useDeleteRecordingWithToast,
@@ -18,19 +17,17 @@
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
+		LayersIcon,
 		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
-		LayersIcon,
-		CopyIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();
 	const updateRecordingWithToast = useUpdateRecordingWithToast();
 	const downloadRecordingWithToast = useDownloadRecordingWithToast();
