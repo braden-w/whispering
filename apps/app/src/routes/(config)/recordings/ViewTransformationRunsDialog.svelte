@@ -11,52 +11,45 @@
 	const transformationRunsByRecordingIdQuery =
 		useTransformationRunsByRecordingIdQuery(() => recordingId);
 
-	const latestTransformationRunByRecordingId = $derived(
-		transformationRunsByRecordingIdQuery.data?.at(0) ?? null,
-	);
-
 	let isOpen = $state(false);
 </script>
 
-{#if latestTransformationRunByRecordingId}
-	<Dialog.Root bind:open={isOpen}>
-		<Dialog.Trigger>
-			{#snippet child({ props })}
-				<WhisperingButton
-					{...props}
-					variant="outline"
-					tooltipContent="View Transformation Runs"
-				>
-					<HistoryIcon class="h-4 w-4" />
-					<span class="sr-only">View Transformation Runs</span>
-				</WhisperingButton>
-			{/snippet}
-		</Dialog.Trigger>
-		<Dialog.Content class="max-w-4xl">
-			<Dialog.Header>
-				<Dialog.Title>Transformation Runs</Dialog.Title>
-				<Dialog.Description>
-					View all transformation runs for this recording
-				</Dialog.Description>
-			</Dialog.Header>
-			<div class="max-h-[60vh] overflow-y-auto">
-				{#if transformationRunsByRecordingIdQuery.isPending}
-					<div class="text-muted-foreground text-sm">Loading runs...</div>
-				{:else if transformationRunsByRecordingIdQuery.error}
-					<div class="text-destructive text-sm">
-						{transformationRunsByRecordingIdQuery.error.title}:
-						{transformationRunsByRecordingIdQuery.error.description}
-					</div>
-				{:else if transformationRunsByRecordingIdQuery.data}
-					<RenderTransformationRuns
-						runs={transformationRunsByRecordingIdQuery.data}
-					/>
-				{/if}
-			</div>
-			<Dialog.Footer>
-				<Button variant="outline" onclick={() => (isOpen = false)}>Close</Button
-				>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
-{/if}
+<Dialog.Root bind:open={isOpen}>
+	<Dialog.Trigger>
+		{#snippet child({ props })}
+			<WhisperingButton
+				{...props}
+				variant="outline"
+				tooltipContent="View Transformation Runs"
+			>
+				<HistoryIcon class="h-4 w-4" />
+				<span class="sr-only">View Transformation Runs</span>
+			</WhisperingButton>
+		{/snippet}
+	</Dialog.Trigger>
+	<Dialog.Content class="max-w-4xl">
+		<Dialog.Header>
+			<Dialog.Title>Transformation Runs</Dialog.Title>
+			<Dialog.Description>
+				View all transformation runs for this recording
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="max-h-[60vh] overflow-y-auto">
+			{#if transformationRunsByRecordingIdQuery.isPending}
+				<div class="text-muted-foreground text-sm">Loading runs...</div>
+			{:else if transformationRunsByRecordingIdQuery.error}
+				<div class="text-destructive text-sm">
+					{transformationRunsByRecordingIdQuery.error.title}:
+					{transformationRunsByRecordingIdQuery.error.description}
+				</div>
+			{:else if transformationRunsByRecordingIdQuery.data}
+				<RenderTransformationRuns
+					runs={transformationRunsByRecordingIdQuery.data}
+				/>
+			{/if}
+		</div>
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (isOpen = false)}>Close</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
