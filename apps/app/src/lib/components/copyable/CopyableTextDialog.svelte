@@ -31,10 +31,11 @@
 					{#snippet trigger({ tooltipProps, tooltip })}
 						<Textarea
 							{...mergeProps(tooltipProps, dialogTriggerProps)}
-							class="h-full resize-none overflow-y-auto text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
+							class="h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
 							readonly
 							value={text}
 							style="view-transition-name: {buttonViewTransitionName}"
+							rows={3}
 						/>
 						<span class="sr-only">
 							{@render tooltip()}
@@ -45,7 +46,7 @@
 		</Dialog.Trigger>
 		<Dialog.Content class="max-w-4xl">
 			<Card.Title class="text-lg">Transcribed Text</Card.Title>
-			<Textarea class="w-full max-h-96 h-full" readonly value={text} />
+			<Textarea readonly value={text} rows={20} />
 			<Dialog.Footer>
 				<Button variant="outline" onclick={() => (isDialogOpen = false)}>
 					Close
