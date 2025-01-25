@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
-	import CopyableTextPopover from './CopyableTextPopover.svelte';
+	import CopyableTextPopover from '$lib/components/copyable/CopyableTextPopover.svelte';
 
 	let {
 		recordingId,

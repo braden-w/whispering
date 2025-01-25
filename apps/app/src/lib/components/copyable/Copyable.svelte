@@ -19,8 +19,8 @@
 
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import CopyToClipboardButton from './CopyToClipboardButton.svelte';
-	import { Label } from './ui/label';
+	import CopyToClipboardButton from '../CopyToClipboardButton.svelte';
+	import { Label } from '../ui/label';
 
 	const {
 		label,

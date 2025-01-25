@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Copyable from '$lib/components/Copyable.svelte';
+	import Copyable from '$lib/components/copyable/Copyable.svelte';
 	import {
 		LabeledInput,
 		LabeledSelect,
