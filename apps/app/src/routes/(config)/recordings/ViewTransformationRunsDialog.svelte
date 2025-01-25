@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import { HistoryIcon } from 'lucide-svelte';
 	import RenderTransformationRuns from '../transformations/-components/RenderTransformationRuns.svelte';
 
 	let { recordingId }: { recordingId: string } = $props();
@@ -25,9 +26,9 @@
 					{...props}
 					variant="outline"
 					tooltipContent="View Transformation Runs"
-					class="w-full block max-w-md text-left text-sm leading-snug overflow-y-auto h-full max-h-24 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
 				>
-					{latestTransformationRunByRecordingId.output}
+					<HistoryIcon class="h-4 w-4" />
+					<span class="sr-only">View Transformation Runs</span>
 				</WhisperingButton>
 			{/snippet}
 		</Dialog.Trigger>
