@@ -24,6 +24,7 @@
 
 {#if latestTransformationRunByRecordingId?.output}
 	<CopyableTextDialog
+		id={buttonViewTransitionName}
 		text={latestTransformationRunByRecordingId.output}
 		{buttonViewTransitionName}
 	/>
