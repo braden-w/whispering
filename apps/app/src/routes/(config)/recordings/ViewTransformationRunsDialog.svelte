@@ -19,7 +19,8 @@
 		{#snippet child({ props })}
 			<WhisperingButton
 				{...props}
-				variant="outline"
+				variant="ghost"
+				size="icon"
 				tooltipContent="View Transformation Runs"
 			>
 				<HistoryIcon class="h-4 w-4" />
