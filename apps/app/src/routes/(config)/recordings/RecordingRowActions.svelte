@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import CopyToClipboardButton from '$lib/components/CopyToClipboardButton.svelte';
+	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
