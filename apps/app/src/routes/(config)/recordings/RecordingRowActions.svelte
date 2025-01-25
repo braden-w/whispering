@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { TrashIcon } from '$lib/components/icons';
+	import { ClipboardIcon, TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDownloadRecordingWithToast } from '$lib/query/download/mutations';
 	import {
 		useDeleteRecordingWithToast,
@@ -11,6 +12,7 @@
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
+	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
 		AlertCircleIcon,
@@ -21,9 +23,11 @@
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
+	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();
 	const updateRecordingWithToast = useUpdateRecordingWithToast();
 	const downloadRecordingWithToast = useDownloadRecordingWithToast();
@@ -86,6 +90,23 @@
 		/>
 
 		<WhisperingButton
+			tooltipContent="Copy transcribed text"
+			onclick={() =>
+				copyTextToClipboardWithToast.mutate({
+					label: 'transcribed text',
+					text: recording.transcribedText,
+				})}
+			variant="ghost"
+			size="icon"
+			style="view-transition-name: {createRecordingViewTransitionName({
+				recordingId: recording.id,
+				propertyName: 'transcribedText',
+			})}-copy-button"
+		>
+			<ClipboardIcon class="h-4 w-4" />
+		</WhisperingButton>
+
+		<WhisperingButton
 			tooltipContent="Download recording"
 			onclick={() => downloadRecordingWithToast.mutate(recording)}
 			variant="ghost"
@@ -97,6 +118,8 @@
 				<DownloadIcon class="h-4 w-4" />
 			{/if}
 		</WhisperingButton>
+
+		<ViewTransformationRunsDialog {recordingId} />
 
 		<WhisperingButton
 			tooltipContent="Delete recording"
