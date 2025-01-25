@@ -51,6 +51,7 @@
 	import TranscribedText from './TranscribedText.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
@@ -152,11 +153,8 @@
 			cell: ({ getValue, row }) => {
 				const transcribedText = getValue<string>();
 				return renderComponent(TranscribedText, {
+					recordingId: row.id,
 					transcribedText,
-					buttonViewTransitionName: createRecordingViewTransitionName({
-						recordingId: row.id,
-						propertyName: 'transcribedText',
-					}),
 				});
 			},
 		},
@@ -166,11 +164,13 @@
 			header: ({ column }) =>
 				renderComponent(SortableTableHeader, {
 					column,
-					headerText: 'Transformation Runs',
+					headerText: 'Latest Transformation Run Output',
 				}),
 			cell: ({ getValue }) => {
 				const recordingId = getValue<string>();
-				return renderComponent(ViewTransformationRunsDialog, { recordingId });
+				return renderComponent(LatestTransformationRunOutputByRecordingId, {
+					recordingId,
+				});
 			},
 		},
 		{
