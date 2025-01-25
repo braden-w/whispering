@@ -5,7 +5,8 @@
 		type CopyToClipboardLabel,
 		useCopyTextToClipboardWithToast,
 	} from '$lib/query/clipboard/mutations';
-	import { CheckIcon, CopyIcon } from 'lucide-svelte';
+	import { CheckIcon } from 'lucide-svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
@@ -44,6 +45,6 @@
 	{#if hasCopied}
 		<CheckIcon />
 	{:else}
-		<CopyIcon />
+		<ClipboardIcon />
 	{/if}
 </WhisperingButton>
