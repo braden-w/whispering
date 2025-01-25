@@ -1,26 +1,25 @@
 <script lang="ts">
-	import { type Props } from '$lib/components/ui/button/index.js';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
 	import {
 		type CopyToClipboardLabel,
 		useCopyTextToClipboardWithToast,
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
-	import { ClipboardIcon } from '$lib/components/icons';
+	import type { Snippet } from 'svelte';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
 	let {
-		class: className,
 		label,
 		copyableText,
 		viewTransitionName,
-		children,
+		copyIcon: providedCopyIcon,
 	}: {
-		class?: string;
 		label: CopyToClipboardLabel;
 		copyableText: string;
 		viewTransitionName?: string;
+		copyIcon?: Snippet;
 	} = $props();
 
 	let hasCopied = $state(false);
@@ -35,10 +34,9 @@
 </script>
 
 <WhisperingButton
-	tooltipContent="Copy to clipboard"
+	tooltipContent="Copy {label} to clipboard"
 	size="icon"
 	variant="ghost"
-	class={className}
 	onclick={() =>
 		copyTextToClipboardWithToast.mutate(
 			{ label, text: copyableText },
@@ -52,7 +50,14 @@
 	{#if hasCopied}
 		<CheckIcon />
 	{:else}
-		<ClipboardIcon />
-		{@render children?.()}
+		{@render copyIcon()}
 	{/if}
 </WhisperingButton>
+
+{#snippet copyIcon()}
+	{#if providedCopyIcon}
+		{@render providedCopyIcon()}
+	{:else}
+		<ClipboardIcon />
+	{/if}
+{/snippet}
