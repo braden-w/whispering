@@ -1,10 +1,11 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import { ClipboardIcon } from '$lib/components/icons';
+	import { Textarea } from '$lib/components/ui/textarea';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
@@ -25,12 +26,17 @@
 			{#snippet child({ props })}
 				<WhisperingButton
 					{...props}
-					variant="outline"
+					variant="ghost"
 					tooltipContent="View Transcribed Text"
-					class="w-full block text-left text-sm leading-snug overflow-y-auto h-full max-h-12 text-wrap [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+					class="w-full h-full px-0 py-0"
 					style="view-transition-name: {buttonViewTransitionName}"
 				>
-					{text}
+					<Textarea
+						class="h-full max-h-12 text-left text-wrap text-sm leading-snug overflow-y-auto"
+						readonly
+						value={text}
+						style="view-transition-name: {buttonViewTransitionName}"
+					/>
 				</WhisperingButton>
 			{/snippet}
 		</Dialog.Trigger>
