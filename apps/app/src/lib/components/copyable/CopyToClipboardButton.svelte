@@ -7,6 +7,7 @@
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
+	import type { Props } from '$lib/components/ui/button';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
@@ -15,11 +16,13 @@
 		copyableText,
 		viewTransitionName,
 		copyIcon: providedCopyIcon,
+		class: className,
 	}: {
 		label: CopyToClipboardLabel;
 		copyableText: string;
 		viewTransitionName?: string;
 		copyIcon?: Snippet;
+		class?: string;
 	} = $props();
 
 	let hasCopied = $state(false);
@@ -45,6 +48,7 @@
 	style={viewTransitionName
 		? `view-transition-name: ${viewTransitionName};`
 		: undefined}
+	class={className}
 >
 	<span class="sr-only">Copy</span>
 	{#if hasCopied}
