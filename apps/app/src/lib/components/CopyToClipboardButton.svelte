@@ -10,11 +10,14 @@
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
-	const {
+	let {
+		class: className,
 		label,
 		copyableText,
 		viewTransitionName,
+		children,
 	}: {
+		class?: string;
 		label: CopyToClipboardLabel;
 		copyableText: string;
 		viewTransitionName?: string;
@@ -35,6 +38,7 @@
 	tooltipContent="Copy to clipboard"
 	size="icon"
 	variant="ghost"
+	class={className}
 	onclick={() =>
 		copyTextToClipboardWithToast.mutate(
 			{ label, text: copyableText },
@@ -49,5 +53,6 @@
 		<CheckIcon />
 	{:else}
 		<ClipboardIcon />
+		{@render children?.()}
 	{/if}
 </WhisperingButton>
