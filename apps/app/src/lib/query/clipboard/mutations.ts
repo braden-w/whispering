@@ -10,7 +10,11 @@ export const useCopyTextToClipboard = () =>
 		},
 	}));
 
-export type CopyToClipboardLabel = 'transcribed text' | 'transcribed text (joined)' | 'code';
+export type CopyToClipboardLabel =
+	| 'transcribed text'
+	| 'transcribed text (joined)'
+	| 'code'
+	| 'latest transformation run output';
 export const useCopyTextToClipboardWithToast = () =>
 	createMutation(() => ({
 		mutationFn: async ({
