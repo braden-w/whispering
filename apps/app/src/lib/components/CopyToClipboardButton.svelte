@@ -13,10 +13,11 @@
 	const {
 		label,
 		copyableText,
-		...restProps
-	}: Props & {
+		viewTransitionName,
+	}: {
 		label: CopyToClipboardLabel;
 		copyableText: string;
+		viewTransitionName?: string;
 	} = $props();
 
 	let hasCopied = $state(false);
@@ -31,7 +32,6 @@
 </script>
 
 <WhisperingButton
-	{...restProps}
 	tooltipContent="Copy to clipboard"
 	size="icon"
 	variant="ghost"
@@ -40,6 +40,9 @@
 			{ label, text: copyableText },
 			{ onSuccess: () => (hasCopied = true) },
 		)}
+	style={viewTransitionName
+		? `view-transition-name: ${viewTransitionName};`
+		: undefined}
 >
 	<span class="sr-only">Copy</span>
 	{#if hasCopied}

@@ -89,22 +89,11 @@
 			}}
 		/>
 
-		<WhisperingButton
-			tooltipContent="Copy transcribed text"
-			onclick={() =>
-				copyTextToClipboardWithToast.mutate({
-					label: 'transcribed text',
-					text: recording.transcribedText,
-				})}
-			variant="ghost"
-			size="icon"
-			style="view-transition-name: {createRecordingViewTransitionName({
-				recordingId: recording.id,
-				propertyName: 'transcribedText',
-			})}-copy-button"
-		>
-			<ClipboardIcon class="h-4 w-4" />
-		</WhisperingButton>
+		<CopyToClipboardButton
+			label="transcribed text"
+			copyableText={recording.transcribedText}
+			viewTransitionName={buttonViewTransitionName}
+		/>
 
 		<WhisperingButton
 			tooltipContent="Download recording"
