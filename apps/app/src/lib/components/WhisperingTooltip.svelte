@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Button, type Props } from '$lib/components/ui/button/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { mergeProps } from 'bits-ui';
 	import type { Snippet } from 'svelte';
@@ -10,7 +9,7 @@
 		tooltipContent,
 		...restProps
 	}: {
-		id: string | null | undefined;
+		id: string;
 		trigger: Snippet<
 			[{ tooltipProps: Record<string, unknown>; tooltip: Snippet<[]> }]
 		>;
@@ -28,7 +27,7 @@
 
 <Tooltip.Provider>
 	<Tooltip.Root>
-		<Tooltip.Trigger id={id ?? undefined}>
+		<Tooltip.Trigger {id}>
 			{#snippet child({ props: tooltipProps })}
 				{@render trigger?.({
 					tooltipProps: mergeProps(tooltipProps, restProps),

@@ -1,18 +1,21 @@
 <script lang="ts">
-	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { mergeProps } from 'bits-ui';
+	import WhisperingTooltip from '../WhisperingTooltip.svelte';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 
 	let {
+		id,
 		text,
 		buttonViewTransitionName,
 	}: {
+		id: string;
 		text: string;
 		buttonViewTransitionName: string;
 	} = $props();
@@ -22,22 +25,22 @@
 
 {#if text}
 	<Dialog.Root bind:open={isDialogOpen}>
-		<Dialog.Trigger>
-			{#snippet child({ props })}
-				<WhisperingButton
-					{...props}
-					variant="ghost"
-					tooltipContent="View Transcribed Text"
-					class="w-full h-full px-0 py-0"
-					style="view-transition-name: {buttonViewTransitionName}"
-				>
-					<Textarea
-						class="h-full max-h-12 text-left text-wrap text-sm leading-snug overflow-y-auto"
-						readonly
-						value={text}
-						style="view-transition-name: {buttonViewTransitionName}"
-					/>
-				</WhisperingButton>
+		<Dialog.Trigger {id}>
+			{#snippet child({ props: dialogTriggerProps })}
+				<WhisperingTooltip {id} tooltipContent="View Transcribed Text">
+					{#snippet trigger({ tooltipProps, tooltip })}
+						<Textarea
+							{...mergeProps(tooltipProps, dialogTriggerProps)}
+							class="h-full resize-none overflow-y-auto text-wrap text-left text-sm leading-snug hover:bg-accent hover:text-accent-foreground"
+							readonly
+							value={text}
+							style="view-transition-name: {buttonViewTransitionName}"
+						/>
+						<span class="sr-only">
+							{@render tooltip()}
+						</span>
+					{/snippet}
+				</WhisperingTooltip>
 			{/snippet}
 		</Dialog.Trigger>
 		<Dialog.Content>
