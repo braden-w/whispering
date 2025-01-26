@@ -1,7 +1,5 @@
-import { browser } from '$app/environment';
 import type { Result } from '@epicenterhq/result';
 import type { MaybePromise, WhisperingSoundNames } from '@repo/shared';
-import { QueryClient } from '@tanstack/query-core';
 import {
 	type CreateMutationOptions,
 	type CreateQueryOptions,
