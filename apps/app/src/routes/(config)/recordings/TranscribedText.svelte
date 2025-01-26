@@ -10,10 +10,10 @@
 		transcribedText: string;
 	} = $props();
 
-	const buttonViewTransitionName = getRecordingTransitionId({
+	const id = getRecordingTransitionId({
 		recordingId,
 		propertyName: 'transcribedText',
 	});
 </script>
 
-<CopyableTextDialog text={transcribedText} {buttonViewTransitionName} />
+<CopyableTextDialog {id} text={transcribedText} />

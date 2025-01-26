@@ -12,7 +12,7 @@
 	const latestTransformationRunByRecordingId =
 		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
-	const buttonViewTransitionName = getRecordingTransitionId({
+	const id = getRecordingTransitionId({
 		recordingId,
 		propertyName: 'latestTransformationRunOutput',
 	});
@@ -20,8 +20,7 @@
 
 {#if latestTransformationRunByRecordingId.data?.output}
 	<CopyableTextDialog
-		id={buttonViewTransitionName}
+		{id}
 		text={latestTransformationRunByRecordingId.data.output}
-		{buttonViewTransitionName}
 	/>
 {/if}

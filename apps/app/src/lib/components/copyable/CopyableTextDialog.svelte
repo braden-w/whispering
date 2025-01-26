@@ -13,11 +13,9 @@
 	let {
 		id,
 		text,
-		buttonViewTransitionName,
 	}: {
 		id: string;
 		text: string;
-		buttonViewTransitionName: string;
 	} = $props();
 
 	let isDialogOpen = $state(false);
@@ -34,7 +32,7 @@
 							class="h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
 							readonly
 							value={text}
-							style="view-transition-name: {buttonViewTransitionName}"
+							style="view-transition-name: {id}"
 							rows={3}
 						/>
 						<span class="sr-only">
