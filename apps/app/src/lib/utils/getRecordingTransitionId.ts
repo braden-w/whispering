@@ -10,12 +10,12 @@ export function getRecordingTransitionId({
 	return `recording-${recordingId}-${propertyName}` as const;
 }
 
-export function getTransformationRunTransitionId({
-	transformationRunId,
+export function getTransformationStepRunTransitionId({
+	stepRunId,
 	propertyName,
 }: {
-	transformationRunId: string;
+	stepRunId: string;
 	propertyName: keyof TransformationRun;
 }): string {
-	return `transformation-run-${transformationRunId}-${propertyName}` as const;
+	return `transformation-run-${stepRunId}-${propertyName}` as const;
 }

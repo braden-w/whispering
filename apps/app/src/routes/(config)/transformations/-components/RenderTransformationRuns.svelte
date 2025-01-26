@@ -7,7 +7,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
 	import type { TransformationRun } from '$lib/services/db';
-	import { getTransformationRunTransitionId } from '$lib/utils/getRecordingTransitionId';
+	import { getTransformationStepRunTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { format } from 'date-fns';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
@@ -127,8 +127,8 @@
 														</Table.Cell>
 														<Table.Cell>
 															<CopyableTextDialog
-																id={getTransformationRunTransitionId({
-																	transformationRunId: stepRun.id,
+																id={getTransformationStepRunTransitionId({
+																	stepRunId: stepRun.id,
 																	propertyName: 'input',
 																})}
 																text={stepRun.input}
@@ -137,16 +137,16 @@
 														<Table.Cell>
 															{#if stepRun.output}
 																<CopyableTextDialog
-																	id={getTransformationRunTransitionId({
-																		transformationRunId: stepRun.id,
+																	id={getTransformationStepRunTransitionId({
+																		stepRunId: stepRun.id,
 																		propertyName: 'output',
 																	})}
 																	text={stepRun.output}
 																/>
 															{:else if stepRun.error}
 																<CopyableTextDialog
-																	id={getTransformationRunTransitionId({
-																		transformationRunId: stepRun.id,
+																	id={getTransformationStepRunTransitionId({
+																		stepRunId: stepRun.id,
 																		propertyName: 'error',
 																	})}
 																	text={stepRun.error}
