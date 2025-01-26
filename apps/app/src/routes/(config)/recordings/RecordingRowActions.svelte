@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
-	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
+	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { TrashIcon } from '$lib/components/icons';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { useDownloadRecordingWithToast } from '$lib/query/download/mutations';
@@ -10,6 +11,7 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
+	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
@@ -25,8 +27,6 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
-	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 
 	const transcriber = getTranscriberFromContext();
 

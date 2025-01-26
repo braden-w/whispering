@@ -46,12 +46,11 @@
 	} from 'lucide-svelte';
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
+	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedText from './TranscribedText.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
-	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 
 	const transcriber = getTranscriberFromContext();
 

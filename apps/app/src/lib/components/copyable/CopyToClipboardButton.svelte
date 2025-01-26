@@ -7,7 +7,6 @@
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
-	import type { Props } from '$lib/components/ui/button';
 
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 

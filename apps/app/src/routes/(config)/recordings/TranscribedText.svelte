@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 
 	let {
 		recordingId,
