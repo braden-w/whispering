@@ -9,7 +9,7 @@
 		ListIcon,
 		Minimize2Icon,
 		MoonIcon,
-		SlidersVerticalIcon,
+		SettingsIcon,
 		SunIcon,
 	} from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
@@ -44,7 +44,7 @@
 		variant="ghost"
 		size="icon"
 	>
-		<SlidersVerticalIcon class="h-4 w-4" aria-hidden="true" />
+		<SettingsIcon class="h-4 w-4" aria-hidden="true" />
 	</WhisperingButton>
 	<WhisperingButton
 		tooltipContent="View project on GitHub"
