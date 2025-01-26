@@ -29,11 +29,11 @@
 					{#snippet trigger({ tooltipProps, tooltip })}
 						<Textarea
 							{...mergeProps(tooltipProps, dialogTriggerProps)}
-							class="h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
+							class="min-h-0 h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
 							readonly
 							value={text}
 							style="view-transition-name: {id}"
-							rows={3}
+							rows={2}
 						/>
 						<span class="sr-only">
 							{@render tooltip()}
