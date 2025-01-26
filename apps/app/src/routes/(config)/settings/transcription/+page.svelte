@@ -193,7 +193,7 @@
 	<LabeledTextarea
 		id="transcription-prompt"
 		label="System Prompt"
-		placeholder="Optional system prompt to guide the transcription"
+		placeholder="e.g., This is an academic lecture about quantum physics with technical terms like 'eigenvalue' and 'Schrödinger'"
 		value={settings.value['transcription.prompt']}
 		oninput={({ currentTarget: { value } }) => {
 			settings.value = {
@@ -201,6 +201,6 @@
 				'transcription.prompt': value,
 			};
 		}}
-		description="Custom instructions to guide the transcription process. Leave empty for default behavior."
+		description="Helps Whisper better recognize specific terms, names, or context during initial transcription. Not for text transformations - use the Transformations tab for post-processing rules."
 	/>
 </div>
