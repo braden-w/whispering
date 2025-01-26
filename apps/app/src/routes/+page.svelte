@@ -1,7 +1,6 @@
 <script lang="ts">
-	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
+	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -78,7 +77,7 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<CancelOrEndRecordingSessionButton
+		<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
 			class="absolute -right-14 bottom-0 transform text-2xl"
 		/>
 	</div>

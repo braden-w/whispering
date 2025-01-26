@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
+	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
@@ -27,7 +27,7 @@
 			<span class="text-lg font-bold">whispering</span>
 		</WhisperingButton>
 	</div>
-	<CancelOrEndRecordingSessionButton />
+	<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton />
 	<WhisperingButton
 		tooltipContent="Toggle recording"
 		onclick={recorder.toggleRecordingWithToast}
