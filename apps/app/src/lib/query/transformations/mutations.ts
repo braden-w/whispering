@@ -259,7 +259,9 @@ export const useRunTransformationWithToast = () =>
 
 			const transformationRun = transformationRunResult.data;
 			queryClient.setQueryData<TransformationRun[]>(
-				transformationRunKeys.byId(transformationRun.transformationId),
+				transformationRunKeys.byTransformationId(
+					transformationRun.transformationId,
+				),
 				(oldData) => {
 					if (!oldData) return [transformationRun];
 					return [transformationRun, ...oldData];

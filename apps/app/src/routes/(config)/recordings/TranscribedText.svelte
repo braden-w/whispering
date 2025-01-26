@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { createRecordingViewTransitionName } from '$lib/utils/createRecordingViewTransitionName';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
+	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 
 	let {
 		recordingId,
 		transcribedText,
-	}: { recordingId: string; transcribedText: string } = $props();
+	}: {
+		recordingId: string;
+		transcribedText: string;
+	} = $props();
+
+	const id = getRecordingTransitionId({
+		recordingId,
+		propertyName: 'transcribedText',
+	});
 </script>
 
-<p
-	class="max-h-12 overflow-y-auto"
-	style="view-transition-name: {createRecordingViewTransitionName({
-		recordingId: recordingId,
-		propertyName: 'transcribedText',
-	})}"
->
-	{transcribedText}
-</p>
+<CopyableTextDialog {id} text={transcribedText} />

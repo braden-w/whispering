@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Resizable from '$lib/components/ui/resizable';
+	import { useTransformationRunsByTransformationIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Transformation } from '$lib/services/db';
 	import RenderTransformationConfigurationAndSteps from './RenderTransformationConfigurationAndSteps.svelte';
 	import RenderTransformationRuns from './RenderTransformationRuns.svelte';
@@ -14,6 +15,9 @@
 		setTransformation: (transformation: Transformation) => void;
 		setTransformationDebounced: (transformation: Transformation) => void;
 	} = $props();
+
+	const transformationRunsByTransformationIdQuery =
+		useTransformationRunsByTransformationIdQuery(() => transformation.id);
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
@@ -32,7 +36,18 @@
 			</Resizable.Pane>
 			<Resizable.Handle withHandle />
 			<Resizable.Pane>
-				<RenderTransformationRuns transformationId={transformation.id} />
+				{#if transformationRunsByTransformationIdQuery.isPending}
+					<div class="text-muted-foreground text-sm">Loading runs...</div>
+				{:else if transformationRunsByTransformationIdQuery.error}
+					<div class="text-destructive text-sm">
+						{transformationRunsByTransformationIdQuery.error.title}:
+						{transformationRunsByTransformationIdQuery.error.description}
+					</div>
+				{:else if transformationRunsByTransformationIdQuery.data}
+					<RenderTransformationRuns
+						runs={transformationRunsByTransformationIdQuery.data}
+					/>
+				{/if}
 			</Resizable.Pane>
 		</Resizable.PaneGroup>
 	</Resizable.Pane>

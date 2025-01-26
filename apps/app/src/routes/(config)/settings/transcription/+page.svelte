@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CopyableCode from '$lib/components/CopyableCode.svelte';
+	import Copyable from '$lib/components/copyable/Copyable.svelte';
 	import {
 		LabeledInput,
 		LabeledSelect,
@@ -114,15 +114,17 @@
 					</Tabs.List>
 
 					<Tabs.Content value="cpu-mode">
-						<CopyableCode
+						<Copyable
+							variant="code"
 							label="For computers without CUDA support:"
-							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
+							copyableText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cpu`}
 						/>
 					</Tabs.Content>
 					<Tabs.Content value="gpu-mode">
-						<CopyableCode
+						<Copyable
+							variant="code"
 							label="For computers with CUDA support:"
-							codeText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
+							copyableText={`docker run -e ALLOW_ORIGINS='["${WHISPERING_URL}"]' --gpus=all --publish 8000:8000 --volume ~/.cache/huggingface:/root/.cache/huggingface fedirz/faster-whisper-server:latest-cuda`}
 						/>
 					</Tabs.Content>
 				</Tabs.Root>

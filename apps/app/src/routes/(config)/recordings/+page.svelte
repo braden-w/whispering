@@ -49,6 +49,9 @@
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
+	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 
 	const transcriber = getTranscriberFromContext();
 
@@ -152,6 +155,21 @@
 				return renderComponent(TranscribedText, {
 					recordingId: row.id,
 					transcribedText,
+				});
+			},
+		},
+		{
+			id: 'Transformation Runs',
+			accessorFn: ({ id }) => id,
+			header: ({ column }) =>
+				renderComponent(SortableTableHeader, {
+					column,
+					headerText: 'Latest Transformation Run Output',
+				}),
+			cell: ({ getValue }) => {
+				const recordingId = getValue<string>();
+				return renderComponent(LatestTransformationRunOutputByRecordingId, {
+					recordingId,
 				});
 			},
 		},

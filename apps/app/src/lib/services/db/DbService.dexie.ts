@@ -298,7 +298,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting all recordings from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -316,7 +315,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting latest recording from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -331,7 +329,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting recording by id from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -351,7 +348,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding recording to Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -372,7 +368,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating recording in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -388,7 +383,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error deleting recording from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -403,7 +397,6 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error deleting recordings from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -426,7 +419,6 @@ export function createDbRecordingsServiceDexie() {
 							DbServiceErr({
 								title:
 									'Unable to get recording count while cleaning up old recordings',
-								description: 'Please try again',
 								error,
 							}),
 					});
@@ -449,7 +441,6 @@ export function createDbRecordingsServiceDexie() {
 						mapErr: (error) =>
 							DbServiceErr({
 								title: 'Unable to clean up old recordings',
-								description: 'Some old recordings could not be deleted',
 								error,
 							}),
 					});
@@ -467,7 +458,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting all transformations from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -483,7 +473,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting transformation by id from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -501,7 +490,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding transformation to Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -520,7 +508,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -534,7 +521,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error deleting transformation from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -549,7 +535,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error deleting transformations from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -563,7 +548,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting transformation run by id from Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -577,13 +561,42 @@ export function createDbTransformationsServiceDexie() {
 					db.transformationRuns
 						.where('transformationId')
 						.equals(transformationId)
-						.reverse() // Most recent first
-						.toArray(),
+						.reverse()
+						.toArray()
+						.then((runs) =>
+							runs.sort(
+								(a, b) =>
+									new Date(b.startedAt).getTime() -
+									new Date(a.startedAt).getTime(),
+							),
+						),
 				mapErr: (error) =>
 					DbServiceErr({
 						title:
 							'Error getting transformation runs by transformation id from Dexie',
-						description: 'Please try again',
+						error,
+					}),
+			});
+		},
+
+		async getTransformationRunsByRecordingId(recordingId) {
+			return tryAsync({
+				try: () =>
+					db.transformationRuns
+						.where('recordingId')
+						.equals(recordingId)
+						.toArray()
+						.then((runs) =>
+							runs.sort(
+								(a, b) =>
+									new Date(b.startedAt).getTime() -
+									new Date(a.startedAt).getTime(),
+							),
+						),
+				mapErr: (error) =>
+					DbServiceErr({
+						title:
+							'Error getting transformation runs by recording id from Dexie',
 						error,
 					}),
 			});
@@ -606,7 +619,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding transformation run to Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -647,7 +659,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error adding step run to transformation run in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -685,7 +696,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -723,7 +733,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
@@ -752,7 +761,6 @@ export function createDbTransformationsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error updating transformation step run status in Dexie',
-						description: 'Please try again',
 						error,
 					}),
 			});
