@@ -1,11 +1,13 @@
 <script lang="ts">
 	import Copyable from '$lib/components/copyable/Copyable.svelte';
+	import CopyableTextDialog from '$lib/components/copyable/CopyableTextDialog.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
 	import type { TransformationRun } from '$lib/services/db';
+	import { getTransformationRunTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { format } from 'date-fns';
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 
@@ -124,22 +126,30 @@
 																: '-'}
 														</Table.Cell>
 														<Table.Cell>
-															{stepRun.input}
+															<CopyableTextDialog
+																id={getTransformationRunTransitionId({
+																	transformationRunId: stepRun.id,
+																	propertyName: 'input',
+																})}
+																text={stepRun.input}
+															/>
 														</Table.Cell>
 														<Table.Cell>
 															{#if stepRun.output}
-																<Copyable
-																	variant="text"
-																	copyableText={stepRun.output}
-																	hideLabel
-																	label="Output"
+																<CopyableTextDialog
+																	id={getTransformationRunTransitionId({
+																		transformationRunId: stepRun.id,
+																		propertyName: 'output',
+																	})}
+																	text={stepRun.output}
 																/>
 															{:else if stepRun.error}
-																<Copyable
-																	variant="error"
-																	copyableText={stepRun.error}
-																	hideLabel
-																	label="Error"
+																<CopyableTextDialog
+																	id={getTransformationRunTransitionId({
+																		transformationRunId: stepRun.id,
+																		propertyName: 'error',
+																	})}
+																	text={stepRun.error}
 																/>
 															{/if}
 														</Table.Cell>
