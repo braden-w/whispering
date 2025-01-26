@@ -158,7 +158,7 @@
 			},
 		},
 		{
-			id: 'Transformation Runs',
+			id: 'Latest Transformation Run Output',
 			accessorFn: ({ id }) => id,
 			header: ({ column }) =>
 				renderComponent(SortableTableHeader, {
