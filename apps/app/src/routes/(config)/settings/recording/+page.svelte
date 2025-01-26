@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LabeledSelect } from '$lib/components/labeled/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { useGetMediaDevices } from '$lib/query/audio/queries';
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
 	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
@@ -8,17 +9,13 @@
 	import { BITRATE_OPTIONS } from '@repo/shared';
 
 	const recorder = getRecorderFromContext();
+	const getMediaDevicesQuery = useGetMediaDevices();
 
-	const getMediaDevices = async () => {
-		const enumerateRecordingDevicesResult =
-			await userConfiguredServices.recorder.enumerateRecordingDevices();
-		if (!enumerateRecordingDevicesResult.ok) {
-			toast.warning(enumerateRecordingDevicesResult.error);
-			return [];
+	$effect(() => {
+		if (getMediaDevicesQuery.isError) {
+			toast.warning(getMediaDevicesQuery.error);
 		}
-		return enumerateRecordingDevicesResult.data;
-	};
-	const getMediaDevicesPromise = getMediaDevices();
+	});
 </script>
 
 <svelte:head>
@@ -34,7 +31,7 @@
 	</div>
 	<Separator />
 
-	{#await getMediaDevicesPromise}
+	{#if getMediaDevicesQuery.isPending}
 		<LabeledSelect
 			id="recording-device"
 			label="Recording Device"
@@ -44,8 +41,13 @@
 			onSelectedChange={() => {}}
 			disabled
 		/>
-	{:then mediaDevices}
-		{@const items = mediaDevices.map((device) => ({
+	{:else if getMediaDevicesQuery.isError}
+		<p class="text-sm text-red-500">
+			{getMediaDevicesQuery.error.title}: {getMediaDevicesQuery.error
+				.description}
+		</p>
+	{:else}
+		{@const items = getMediaDevicesQuery.data.map((device) => ({
 			value: device.deviceId,
 			label: device.label,
 		}))}
@@ -63,9 +65,7 @@
 			}}
 			placeholder="Select a device"
 		/>
-	{:catch error}
-		<p>Error with listing media devices: {error.message}</p>
-	{/await}
+	{/if}
 
 	<LabeledSelect
 		id="bit-rate"
