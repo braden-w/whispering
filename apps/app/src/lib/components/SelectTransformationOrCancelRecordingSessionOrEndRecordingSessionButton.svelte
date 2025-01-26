@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
-	import SelectedTransformation from './SelectedTransformation.svelte';
+	import SelectTransformationCombobox from './SelectTransformationCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 
@@ -42,5 +42,5 @@
 		{/snippet}
 	</WhisperingButton>
 {:else}
-	<SelectedTransformation class={className} />
+	<SelectTransformationCombobox class={className} />
 {/if}
