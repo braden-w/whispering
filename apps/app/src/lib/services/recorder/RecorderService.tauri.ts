@@ -32,7 +32,7 @@ export function createRecorderServiceTauri(): RecorderService {
 			const deviceInfos = invokeResult.data;
 			return Ok(deviceInfos);
 		},
-		initRecordingSession: async (
+		ensureRecordingSession: async (
 			settings,
 			{ sendStatus: sendUpdateStatus },
 		) => {
@@ -53,7 +53,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				});
 			return Ok(undefined);
 		},
-		closeRecordingSession: async (_, { sendStatus: sendUpdateStatus }) => {
+		closeRecordingSession: async ({ sendStatus: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: '🔄 Closing Session',
 				description:

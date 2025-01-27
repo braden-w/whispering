@@ -86,8 +86,8 @@ export function createRecorderServiceWeb(): RecorderService {
 		},
 		enumerateRecordingDevices,
 
-		initRecordingSession: async (settings, { sendStatus }) => {
-			if (currentSession) return Err({ _tag: 'AlreadyActiveSession' });
+		ensureRecordingSession: async (settings, { sendStatus }) => {
+			if (currentSession) return Ok(undefined);
 			const acquireStreamResult = await acquireStream(settings, {
 				sendStatus,
 			});
@@ -97,8 +97,8 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(undefined);
 		},
 
-		closeRecordingSession: async (_, { sendStatus }) => {
-			if (!currentSession) return Err({ _tag: 'NoActiveSession' });
+		closeRecordingSession: async ({ sendStatus }) => {
+			if (!currentSession) return Ok(undefined);
 			sendStatus({
 				title: '🎙️ Cleaning Up',
 				description:
