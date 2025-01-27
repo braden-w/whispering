@@ -83,3 +83,45 @@ export function useCancelRecorderWithToast(toastId: Accessor<string>) {
 		},
 	}));
 }
+
+export function useCloseRecordingSessionWithToast(toastId: Accessor<string>) {
+	return createMutation<
+		void,
+		WhisperingErrProperties | { _tag: 'NoActiveSession' }
+	>(() => ({
+		onMutate: () => {
+			toast.loading({
+				id: toastId(),
+				title: '⏳ Closing recording session...',
+				description: 'Wrapping things up, just a moment...',
+			});
+		},
+		mutationFn: async () => {
+			const closeResult =
+				await userConfiguredServices.recorder.closeRecordingSession(undefined, {
+					sendStatus: (options) => toast.loading({ id: toastId(), ...options }),
+				});
+			if (!closeResult.ok) {
+				throw closeResult.error;
+			}
+		},
+		onError: async (error) => {
+			switch (error._tag) {
+				case 'NoActiveSession':
+					// await setRecorderState('IDLE');
+					return;
+				case 'WhisperingError':
+					toast.error({ id: toastId(), ...error });
+					return;
+			}
+		},
+		onSuccess: async () => {
+			// await setRecorderState('IDLE');
+			toast.success({
+				id: toastId(),
+				title: '✨ Session Closed Successfully',
+				description: 'Your recording session has been neatly wrapped up',
+			});
+		},
+	}));
+}

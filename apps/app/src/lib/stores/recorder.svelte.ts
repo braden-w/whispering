@@ -363,34 +363,6 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 			return recorderState;
 		},
 
-		closeRecordingSessionWithToast: async () => {
-			const toastId = nanoid();
-			toast.loading({
-				id: toastId,
-				title: '⏳ Closing recording session...',
-				description: 'Wrapping things up, just a moment...',
-			});
-			const closeResult =
-				await userConfiguredServices.recorder.closeRecordingSession(undefined, {
-					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-				});
-			if (!closeResult.ok) {
-				switch (closeResult.error._tag) {
-					case 'NoActiveSession':
-						await setRecorderState('IDLE');
-						return;
-					case 'WhisperingError':
-						toast.error({ id: toastId, ...closeResult.error });
-						return;
-				}
-			}
-			await setRecorderState('IDLE');
-			toast.success({
-				id: toastId,
-				title: '✨ Session Closed Successfully',
-				description: 'Your recording session has been neatly wrapped up',
-			});
-		},
 
 		toggleRecordingWithToast: () => {
 			if (recorderState === 'SESSION+RECORDING') {
