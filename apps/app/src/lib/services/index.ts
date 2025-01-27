@@ -34,22 +34,11 @@ import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
 import { createFasterWhisperServerTranscriptionService } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createGroqTranscriptionService } from './transcription/TranscriptionService.groq';
 import { createOpenaiTranscriptionService } from './transcription/TranscriptionService.openai';
+import type { Accessor } from '$lib/query/types';
 
 type QueryResultFunction<TData, TError> = () => MaybePromise<
 	Result<TData, TError>
 >;
-
-type CreateResultQueryOptions<
-	TQueryFnData,
-	TError,
-	TData,
-	TQueryKey extends QueryKey,
-> = Omit<
-	CreateQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
-	'queryFn'
-> & {
-	queryFn: QueryResultFunction<TQueryFnData, TError>;
-};
 
 export function createResultQuery<
 	TQueryFnData = unknown,
@@ -57,8 +46,13 @@ export function createResultQuery<
 	TData = TQueryFnData,
 	TQueryKey extends QueryKey = QueryKey,
 >(
-	options: FunctionedParams<
-		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+	options: Accessor<
+		Omit<
+			CreateQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+			'queryFn'
+		> & {
+			queryFn: QueryResultFunction<TQueryFnData, TError>;
+		}
 	>,
 ) {
 	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => {
