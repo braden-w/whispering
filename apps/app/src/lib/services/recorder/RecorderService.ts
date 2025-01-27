@@ -26,7 +26,7 @@ export type RecorderService = {
 		settings: RecordingSessionSettings,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
 	) => Promise<WhisperingResult<void>>;
-	closeRecordingSession: (callbacks: {
+	ensureRecordingSessionClosed: (callbacks: {
 		sendStatus: UpdateStatusMessageFn;
 	}) => Promise<WhisperingResult<void>>;
 	startRecording: (
