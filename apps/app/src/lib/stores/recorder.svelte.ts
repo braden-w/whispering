@@ -14,10 +14,7 @@ import {
 } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
-import {
-	type Transcriber,
-	getTranscriberFromContext,
-} from '$lib/stores/transcriber.svelte';
+import type { Transcriber } from '$lib/stores/transcriber.svelte';
 import { Ok } from '@epicenterhq/result';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
@@ -50,13 +47,13 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 	const writeTextToCursor = useWriteTextToCursor();
 	const createRecording = useCreateRecording();
 
-	async function maybeCopyMaybePaste({
+	const maybeCopyMaybePaste = async ({
 		transcribedText,
 		toastId,
 	}: {
 		transcribedText: string;
 		toastId: string;
-	}) {
+	}) => {
 		if (!settings.value['transcription.clipboard.copyOnSuccess']) {
 			return;
 		}
@@ -146,9 +143,7 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 				goto: WHISPERING_RECORDINGS_PATHNAME,
 			},
 		});
-	}
-
-	let recorderState = $state<WhisperingRecordingState>('IDLE');
+	};
 
 	const setRecorderState = async (newValue: WhisperingRecordingState) => {
 		recorderState = newValue;
@@ -404,77 +399,8 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 				startRecordingWithToast();
 			}
 		},
-
-		cancelRecordingWithToast: async () => {
-			const toastId = nanoid();
-			toast.loading({
-				id: toastId,
-				title: '🔄 Cancelling recording...',
-				description: 'Discarding the current recording...',
-			});
-			const cancelResult =
-				await userConfiguredServices.recorder.cancelRecording(undefined, {
-					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
-				});
-			if (!cancelResult.ok) {
-				toast.error({ id: toastId, ...cancelResult.error });
-				return;
-			}
-			await setRecorderState('SESSION');
-			if (settings.value['recording.isFasterRerecordEnabled']) {
-				toast.success({
-					id: toastId,
-					title: '🚫 Recording Cancelled',
-					description:
-						'Recording discarded, but session remains open for a new take',
-				});
-				await setRecorderState('SESSION');
-			} else {
-				toast.loading({
-					id: toastId,
-					title: '⏳ Closing session...',
-					description: 'Wrapping up your recording session...',
-				});
-				const closeSessionResult =
-					await userConfiguredServices.recorder.closeRecordingSession(
-						undefined,
-						{
-							sendStatus: (options) =>
-								toast.loading({ id: toastId, ...options }),
-						},
-					);
-				if (!closeSessionResult.ok) {
-					switch (closeSessionResult.error._tag) {
-						case 'NoActiveSession':
-							await setRecorderState('IDLE');
-							return;
-						case 'WhisperingError':
-							toast.error({
-								id: toastId,
-								title: '❌ Failed to close session while cancelling recording',
-								description:
-									'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
-								action: {
-									type: 'more-details',
-									error: closeSessionResult.error,
-								},
-							});
-							return;
-					}
-				}
-				toast.success({
-					id: toastId,
-					title: '✅ All Done!',
-					description: 'Recording cancelled and session closed successfully',
-				});
-				await setRecorderState('IDLE');
-			}
-			void playSoundIfEnabled('cancel');
-			console.info('Recording cancelled');
-		},
 	};
 }
-
 async function processTranscribedText({
 	transcribedText,
 	recordingId,

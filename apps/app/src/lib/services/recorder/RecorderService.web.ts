@@ -79,6 +79,11 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 
 	return {
+		getRecorderState: () => {
+			if (!currentSession) return Ok('IDLE');
+			if (currentSession.recorder) return Ok('SESSION+RECORDING');
+			return Ok('SESSION');
+		},
 		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {

@@ -1,5 +1,5 @@
 import type { Err } from '@epicenterhq/result';
-import type { WhisperingResult } from '@repo/shared';
+import type { MaybePromise, WhisperingRecordingState, WhisperingResult } from '@repo/shared';
 
 export type UpdateStatusMessageFn = (args: {
 	title: string;
@@ -12,6 +12,9 @@ export type RecordingSessionSettings = {
 };
 
 export type RecorderService = {
+	getRecorderState: () => MaybePromise<
+		WhisperingResult<WhisperingRecordingState>
+	>;
 	enumerateRecordingDevices: () => Promise<
 		WhisperingResult<Pick<MediaDeviceInfo, 'deviceId' | 'label'>[]>
 	>;

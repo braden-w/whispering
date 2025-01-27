@@ -1,10 +1,22 @@
 import { Err, Ok, tryAsync } from '@epicenterhq/result';
-import { WhisperingErr } from '@repo/shared';
+import { WhisperingErr, type WhisperingRecordingState } from '@repo/shared';
 import { invoke as tauriInvoke } from '@tauri-apps/api/core';
 import type { RecorderService } from './RecorderService';
 
 export function createRecorderServiceTauri(): RecorderService {
 	return {
+		getRecorderState: async () => {
+			const result =
+				await invoke<WhisperingRecordingState>('get_recorder_state');
+			if (!result.ok)
+				return WhisperingErr({
+					title: '🎤 Unable to Get Recorder State',
+					description:
+						'We encountered an issue while getting the recorder state. This could be because your microphone is being used by another app, your microphone permissions are denied, or the selected recording device is disconnected',
+					action: { type: 'more-details', error: result.error },
+				});
+			return Ok(result.data);
+		},
 		enumerateRecordingDevices: async () => {
 			const invokeResult = await invoke<{ deviceId: string; label: string }[]>(
 				'enumerate_recording_devices',
