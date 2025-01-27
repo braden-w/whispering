@@ -1,3 +1,4 @@
+import type { Accessor } from '$lib/query/types';
 import type { Result } from '@epicenterhq/result';
 import type { MaybePromise, WhisperingSoundNames } from '@repo/shared';
 import {
@@ -34,7 +35,6 @@ import { createPlaySoundServiceWeb } from './sound/PlaySoundService.web';
 import { createFasterWhisperServerTranscriptionService } from './transcription/TranscriptionService.fasterWhisperServer';
 import { createGroqTranscriptionService } from './transcription/TranscriptionService.groq';
 import { createOpenaiTranscriptionService } from './transcription/TranscriptionService.openai';
-import type { Accessor } from '$lib/query/types';
 
 type QueryResultFunction<TData, TError> = () => MaybePromise<
 	Result<TData, TError>
@@ -69,23 +69,9 @@ export function createResultQuery<
 	});
 }
 
-type MutationResultFunction<
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
-> = (variables: TVariables) => MaybePromise<Result<TData, TError>>;
-
-type CreateResultMutationOptions<
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
-	TContext = unknown,
-> = Omit<
-	CreateMutationOptions<TData, TError, TVariables, TContext>,
-	'mutationFn'
-> & {
-	mutationFn: MutationResultFunction<TData, TError, TVariables>;
-};
+type MutationResultFunction<TData, TError, TVariables> = (
+	variables: TVariables,
+) => MaybePromise<Result<TData, TError>>;
 
 export function createResultMutation<
 	TData = unknown,
@@ -93,8 +79,13 @@ export function createResultMutation<
 	TVariables = void,
 	TContext = unknown,
 >(
-	options: FunctionedParams<
-		CreateResultMutationOptions<TData, TError, TVariables, TContext>
+	options: Accessor<
+		Omit<
+			CreateMutationOptions<TData, TError, TVariables, TContext>,
+			'mutationFn'
+		> & {
+			mutationFn: MutationResultFunction<TData, TError, TVariables>;
+		}
 	>,
 ) {
 	return createMutation<TData, TError, TVariables, TContext>(() => {

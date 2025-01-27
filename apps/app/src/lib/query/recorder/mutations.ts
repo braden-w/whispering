@@ -1,13 +1,15 @@
-import { playSoundIfEnabled, userConfiguredServices } from '$lib/services';
+import {
+	createResultMutation,
+	playSoundIfEnabled,
+	userConfiguredServices
+} from '$lib/services';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import type { WhisperingErrProperties } from '@repo/shared';
-import { createMutation } from '@tanstack/svelte-query';
-import { nanoid } from 'nanoid/non-secure';
 import type { Accessor } from '../types';
 
 export function useCancelRecorderWithToast(toastId: Accessor<string>) {
-	return createMutation<void, WhisperingErrProperties, void>(() => ({
+	return createResultMutation(() => ({
 		onMutate: () => {
 			toast.loading({
 				id: toastId(),
@@ -20,12 +22,9 @@ export function useCancelRecorderWithToast(toastId: Accessor<string>) {
 				await userConfiguredServices.recorder.cancelRecording(undefined, {
 					sendStatus: (options) => toast.loading({ id: toastId(), ...options }),
 				});
-			if (!cancelResult.ok) {
-				throw cancelResult.error;
-			}
+			return cancelResult;
 		},
 		onSuccess: async (_data, _variables, ctx) => {
-			if (!ctx) return;
 			// await setRecorderState('SESSION');
 			if (settings.value['recording.isFasterRerecordEnabled']) {
 				toast.success({
@@ -85,7 +84,7 @@ export function useCancelRecorderWithToast(toastId: Accessor<string>) {
 }
 
 export function useCloseRecordingSessionWithToast(toastId: Accessor<string>) {
-	return createMutation<
+	return createResultMutation<
 		void,
 		WhisperingErrProperties | { _tag: 'NoActiveSession' }
 	>(() => ({
@@ -101,9 +100,7 @@ export function useCloseRecordingSessionWithToast(toastId: Accessor<string>) {
 				await userConfiguredServices.recorder.closeRecordingSession(undefined, {
 					sendStatus: (options) => toast.loading({ id: toastId(), ...options }),
 				});
-			if (!closeResult.ok) {
-				throw closeResult.error;
-			}
+			return closeResult;
 		},
 		onError: async (error) => {
 			switch (error._tag) {
