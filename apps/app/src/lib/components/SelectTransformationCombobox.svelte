@@ -12,11 +12,10 @@
 		FilterIcon,
 		FilterXIcon,
 		LayersIcon,
-		PlusIcon,
 	} from 'lucide-svelte';
-	import { tick } from 'svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
 	import { Badge } from './ui/badge';
+	import { useCombobox } from './useCombobox.svelte';
 
 	const transformationsQuery = useTransformationsQuery();
 
@@ -29,14 +28,7 @@
 		),
 	);
 
-	let open = $state(false);
-	let triggerRef = $state<HTMLButtonElement | null>(null);
-	function closeAndFocusTrigger() {
-		open = false;
-		tick().then(() => {
-			triggerRef?.focus();
-		});
-	}
+	const combobox = useCombobox();
 
 	let { class: className }: { class?: string } = $props();
 </script>
@@ -52,8 +44,8 @@
 	</div>
 {/snippet}
 
-<Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef}>
+<Popover.Root bind:open={combobox.open}>
+	<Popover.Trigger bind:ref={combobox.triggerRef}>
 		{#snippet child({ props })}
 			<WhisperingButton
 				{...props}
@@ -62,7 +54,7 @@
 					? 'Change post-processing transformation to run after your text is transcribed'
 					: 'Select a post-processing transformation to run after your text is transcribed'}
 				role="combobox"
-				aria-expanded={open}
+				aria-expanded={combobox.open}
 				variant="ghost"
 				size="icon"
 				style="view-transition-name: {createTransformationViewTransitionName({
@@ -105,7 +97,7 @@
 									'transformations.selectedTransformationId': transformation.id,
 								};
 							}
-							closeAndFocusTrigger();
+							combobox.closeAndFocusTrigger();
 						}}
 						class="flex items-center gap-2 p-2"
 					>
@@ -131,7 +123,7 @@
 				value="Manage transformations"
 				onSelect={() => {
 					goto('/transformations');
-					closeAndFocusTrigger();
+					combobox.closeAndFocusTrigger();
 				}}
 				class="rounded-none p-2 bg-muted/50 text-muted-foreground"
 			>
