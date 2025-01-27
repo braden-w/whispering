@@ -4,27 +4,21 @@ import { settings } from '$lib/stores/settings.svelte';
 import type { WhisperingErrProperties } from '@repo/shared';
 import { createMutation } from '@tanstack/svelte-query';
 import { nanoid } from 'nanoid/non-secure';
+import type { Accessor } from '../types';
 
-export function useCancelRecorderWithToast() {
-	return createMutation<
-		void,
-		WhisperingErrProperties,
-		void,
-		{ toastId: string }
-	>(() => ({
+export function useCancelRecorderWithToast(toastId: Accessor<string>) {
+	return createMutation<void, WhisperingErrProperties, void>(() => ({
 		onMutate: () => {
-			const toastId = nanoid();
 			toast.loading({
-				id: toastId,
+				id: toastId(),
 				title: '🔄 Cancelling recording...',
 				description: 'Discarding the current recording...',
 			});
-			return { toastId };
 		},
 		mutationFn: async () => {
 			const cancelResult =
 				await userConfiguredServices.recorder.cancelRecording(undefined, {
-					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+					sendStatus: (options) => toast.loading({ id: toastId(), ...options }),
 				});
 			if (!cancelResult.ok) {
 				throw cancelResult.error;
@@ -32,11 +26,10 @@ export function useCancelRecorderWithToast() {
 		},
 		onSuccess: async (_data, _variables, ctx) => {
 			if (!ctx) return;
-			const { toastId } = ctx;
 			// await setRecorderState('SESSION');
 			if (settings.value['recording.isFasterRerecordEnabled']) {
 				toast.success({
-					id: toastId,
+					id: toastId(),
 					title: '🚫 Recording Cancelled',
 					description:
 						'Recording discarded, but session remains open for a new take',
@@ -44,7 +37,7 @@ export function useCancelRecorderWithToast() {
 				// await setRecorderState('SESSION');
 			} else {
 				toast.loading({
-					id: toastId,
+					id: toastId(),
 					title: '⏳ Closing session...',
 					description: 'Wrapping up your recording session...',
 				});
@@ -53,7 +46,7 @@ export function useCancelRecorderWithToast() {
 						undefined,
 						{
 							sendStatus: (options) =>
-								toast.loading({ id: toastId, ...options }),
+								toast.loading({ id: toastId(), ...options }),
 						},
 					);
 				if (!closeSessionResult.ok) {
@@ -63,7 +56,7 @@ export function useCancelRecorderWithToast() {
 							return;
 						case 'WhisperingError':
 							toast.error({
-								id: toastId,
+								id: toastId(),
 								title: '❌ Failed to close session while cancelling recording',
 								description:
 									'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
@@ -76,7 +69,7 @@ export function useCancelRecorderWithToast() {
 					}
 				}
 				toast.success({
-					id: toastId,
+					id: toastId(),
 					title: '✅ All Done!',
 					description: 'Recording cancelled and session closed successfully',
 				});
@@ -85,10 +78,8 @@ export function useCancelRecorderWithToast() {
 			void playSoundIfEnabled('cancel');
 			console.info('Recording cancelled');
 		},
-		onError: (error, _, ctx) => {
-			if (!ctx) return;
-			const { toastId } = ctx;
-			toast.error({ id: toastId, ...error });
+		onError: (error) => {
+			toast.error({ id: toastId(), ...error });
 		},
 	}));
 }
