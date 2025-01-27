@@ -289,14 +289,23 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 							},
 						);
 					if (!closeSessionResult.ok) {
-						toast.warning({
-							id: stopRecordingToastId,
-							title: '⚠️ Unable to close session after recording',
-							description:
-								'You might need to restart the application to continue recording',
-							action: { type: 'more-details', error: closeSessionResult.error },
-						});
-						return;
+						switch (closeSessionResult.error._tag) {
+							case 'NoActiveSession':
+								await setRecorderState('IDLE');
+								return;
+							case 'WhisperingError':
+								toast.warning({
+									id: stopRecordingToastId,
+									title: '⚠️ Unable to close session after recording',
+									description:
+										'You might need to restart the application to continue recording',
+									action: {
+										type: 'more-details',
+										error: closeSessionResult.error,
+									},
+								});
+								return;
+						}
 					}
 					await setRecorderState('IDLE');
 				})(),
@@ -324,8 +333,14 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 					},
 				);
 			if (!initResult.ok) {
-				toast.error({ id: startRecordingToastId, ...initResult.error });
-				return;
+				switch (initResult.error._tag) {
+					case 'AlreadyActiveSession':
+						await setRecorderState('SESSION');
+						return;
+					case 'WhisperingError':
+						toast.error({ id: startRecordingToastId, ...initResult.error });
+						return;
+				}
 			}
 			await setRecorderState('SESSION');
 		}
@@ -365,8 +380,14 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 				});
 			if (!closeResult.ok) {
-				toast.error({ id: toastId, ...closeResult.error });
-				return;
+				switch (closeResult.error._tag) {
+					case 'NoActiveSession':
+						await setRecorderState('IDLE');
+						return;
+					case 'WhisperingError':
+						toast.error({ id: toastId, ...closeResult.error });
+						return;
+				}
 			}
 			await setRecorderState('IDLE');
 			toast.success({
@@ -423,14 +444,23 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 						},
 					);
 				if (!closeSessionResult.ok) {
-					toast.error({
-						id: toastId,
-						title: '❌ Failed to close session while cancelling recording',
-						description:
-							'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
-						action: { type: 'more-details', error: closeSessionResult.error },
-					});
-					return;
+					switch (closeSessionResult.error._tag) {
+						case 'NoActiveSession':
+							await setRecorderState('IDLE');
+							return;
+						case 'WhisperingError':
+							toast.error({
+								id: toastId,
+								title: '❌ Failed to close session while cancelling recording',
+								description:
+									'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
+								action: {
+									type: 'more-details',
+									error: closeSessionResult.error,
+								},
+							});
+							return;
+					}
 				}
 				toast.success({
 					id: toastId,

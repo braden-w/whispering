@@ -1,4 +1,4 @@
-import { Ok, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
@@ -82,6 +82,7 @@ export function createRecorderServiceWeb(): RecorderService {
 		enumerateRecordingDevices,
 
 		initRecordingSession: async (settings, { sendStatus }) => {
+			if (currentSession) return Err({ _tag: 'AlreadyActiveSession' });
 			const acquireStreamResult = await acquireStream(settings, {
 				sendStatus,
 			});
@@ -92,7 +93,7 @@ export function createRecorderServiceWeb(): RecorderService {
 		},
 
 		closeRecordingSession: async (_, { sendStatus }) => {
-			if (!currentSession) return Ok(undefined);
+			if (!currentSession) return Err({ _tag: 'NoActiveSession' });
 			sendStatus({
 				title: '🎙️ Cleaning Up',
 				description:

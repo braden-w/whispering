@@ -1,3 +1,4 @@
+import type { Err } from '@epicenterhq/result';
 import type { WhisperingResult } from '@repo/shared';
 
 export type UpdateStatusMessageFn = (args: {
@@ -17,11 +18,11 @@ export type RecorderService = {
 	initRecordingSession: (
 		settings: RecordingSessionSettings,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
+	) => Promise<WhisperingResult<void> | Err<{ _tag: 'AlreadyActiveSession' }>>;
 	closeRecordingSession: (
 		_: undefined,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
+	) => Promise<WhisperingResult<void> | Err<{ _tag: 'NoActiveSession' }>>;
 	startRecording: (
 		recordingId: string,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
