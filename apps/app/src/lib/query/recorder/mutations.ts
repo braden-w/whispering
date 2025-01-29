@@ -7,15 +7,15 @@ import {
 import type { UpdateStatusMessageFn } from '$lib/services/recorder/RecorderService';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
+import { noop } from '@tanstack/table-core';
 import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
 import {
 	useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste,
 	useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
-} from '../transcriber/mutations';
+} from '../transcriber/transcriber';
 import { recorderKeys, useRecorderState } from './queries';
-import { noop } from '@tanstack/table-core';
 
 const invalidateRecorderState = () =>
 	queryClient.invalidateQueries({
