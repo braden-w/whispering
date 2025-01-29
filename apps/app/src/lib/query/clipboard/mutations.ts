@@ -1,11 +1,6 @@
 import { ClipboardService, createResultMutation } from '$lib/services';
 import { toast } from '$lib/services/toast';
 
-export async function copyTextToClipboard(text: string) {
-	const result = await ClipboardService.setClipboardText(text);
-	return result;
-}
-
 export type CopyToClipboardLabel =
 	| 'transcribed text'
 	| 'transcribed text (joined)'
@@ -34,9 +29,4 @@ export function useCopyTextToClipboardWithToast() {
 			});
 		},
 	}));
-}
-
-export async function writeTextToCursor(text: string) {
-	const result = await ClipboardService.writeTextToCursor(text);
-	return result;
 }

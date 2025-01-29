@@ -1,9 +1,5 @@
-import {
-	copyTextToClipboard,
-	useCopyTextToClipboardWithToast,
-	writeTextToCursor,
-} from '$lib/query/clipboard/mutations';
-import { createResultMutation } from '$lib/services';
+import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+import { ClipboardService, createResultMutation } from '$lib/services';
 import type { Recording } from '$lib/services/db';
 import {
 	DbTransformationsService,
@@ -17,14 +13,13 @@ import { Ok } from '@epicenterhq/result';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	WhisperingErr,
-	WhisperingWarning,
 	type WhisperingResult,
+	WhisperingWarning,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { queryClient } from '..';
 import { useUpdateRecording } from '../recordings/mutations';
 import { transcriberKeys } from './queries';
-import { createMutation } from '@tanstack/svelte-query';
 
 export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	toastId = nanoid(),
@@ -235,7 +230,7 @@ function useCopyIfSetPasteIfSet({
 				title: '⏳ Copying to clipboard...',
 				description: 'Copying the transcribed text to your clipboard...',
 			});
-			const copyResult = await copyTextToClipboard(text);
+			const copyResult = await ClipboardService.setClipboardText(text);
 			if (!copyResult.ok) {
 				return WhisperingWarning({
 					title: '⚠️ Clipboard Access Failed',
@@ -254,7 +249,7 @@ function useCopyIfSetPasteIfSet({
 				description: 'Pasting the transcription to your cursor...',
 			});
 
-			const pasteResult = await writeTextToCursor(text);
+			const pasteResult = await ClipboardService.writeTextToCursor(text);
 			if (!pasteResult.ok) {
 				return WhisperingWarning({
 					title: '⚠️ Paste Operation Failed',
