@@ -224,7 +224,7 @@ function useCopyIfSetPasteIfSet({
 	return createMutation(() => ({
 		mutationFn: async (text: string) => {
 			if (!settings.value['transcription.clipboard.copyOnSuccess']) {
-				return ['transcribed', null] as const;
+				return { status: 'transcribed', error: null } as const;
 			}
 			toast.loading({
 				id: toastId,
@@ -233,10 +233,13 @@ function useCopyIfSetPasteIfSet({
 			});
 			const copyResult = await ClipboardService.setClipboardText(text);
 			if (!copyResult.ok) {
-				return ['transcribedButCopyFailed', copyResult.error] as const;
+				return {
+					status: 'transcribedButCopyFailed',
+					error: copyResult.error,
+				} as const;
 			}
 			if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
-				return ['transcribedAndCopied', null] as const;
+				return { status: 'transcribedAndCopied', error: null } as const;
 			}
 
 			toast.loading({
@@ -247,14 +250,17 @@ function useCopyIfSetPasteIfSet({
 
 			const pasteResult = await ClipboardService.writeTextToCursor(text);
 			if (!pasteResult.ok) {
-				return [
-					'transcribedAndCopiedButPasteFailed',
-					pasteResult.error,
-				] as const;
+				return {
+					status: 'transcribedAndCopiedButPasteFailed',
+					error: pasteResult.error,
+				} as const;
 			}
-			return ['transcribedAndCopiedAndPasted', null] as const;
+			return {
+				status: 'transcribedAndCopiedAndPasted',
+				error: null,
+			} as const;
 		},
-		onSuccess: ([status, error], text) => {
+		onSuccess: ({ status, error }, text) => {
 			switch (status) {
 				case 'transcribed':
 					toast.success({
