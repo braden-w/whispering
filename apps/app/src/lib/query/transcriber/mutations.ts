@@ -1,7 +1,7 @@
 import {
-	useCopyTextToClipboard,
-	useCopyTextToClipboardWithToast,
-	useWriteTextToCursor,
+	copyTextToClipboard,
+	copyTextToClipboardWithToast,
+	writeTextToCursor,
 } from '$lib/query/clipboard/mutations';
 import { createResultMutation } from '$lib/services';
 import type { Recording } from '$lib/services/db';
@@ -17,12 +17,14 @@ import { Ok } from '@epicenterhq/result';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	WhisperingErr,
+	WhisperingWarning,
 	type WhisperingResult,
 } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { queryClient } from '..';
 import { useUpdateRecording } from '../recordings/mutations';
 import { transcriberKeys } from './queries';
+import { createMutation } from '@tanstack/svelte-query';
 
 export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	toastId = nanoid(),
@@ -30,7 +32,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	toastId?: string;
 } = {}) {
 	const updateRecording = useUpdateRecording();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet({ toastId });
 	return createResultMutation(() => ({
 		onMutate: async (recording) => {
 			toast.loading({
@@ -104,16 +106,13 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 					type: 'button',
 					label: 'Copy to clipboard',
 					onClick: () =>
-						copyTextToClipboardWithToast.mutate({
+						copyTextToClipboardWithToast({
 							label: 'transcribed text',
 							text: transcribedText,
 						}),
 				},
 			});
-			await copyIfSetPasteIfSet({
-				transcribedText,
-				toastId: toastId,
-			});
+			copyIfSetPasteIfSet.mutate(transcribedText);
 		},
 		onError: (error, recording) => {
 			toast.error({ id: toastId, ...error });
@@ -133,10 +132,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste(
 	toastId: string,
 ) {
-	const copyTextToClipboard = useCopyTextToClipboard();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
-	const writeTextToCursor = useWriteTextToCursor();
-
+	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet({ toastId });
 	return createResultMutation(() => ({
 		onMutate: () => {
 			toast.loading({
@@ -217,126 +213,113 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 		},
 		onSuccess: (transformedText, { recordingId, selectedTransformationId }) => {
 			void playSoundIfEnabled('transformationComplete');
-			await copyIfSetPasteIfSet({
-				transcribedText: transformedText,
-				toastId: toastId,
-			});
+			copyIfSetPasteIfSet.mutate(transformedText);
 		},
 	}));
 }
 
-async function copyIfSetPasteIfSet({
-	transcribedText,
+function useCopyIfSetPasteIfSet({
 	toastId,
 }: {
-	transcribedText: string;
 	toastId: string;
 }) {
-	const copyTextToClipboard = useCopyTextToClipboard();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
-	const writeTextToCursor = useWriteTextToCursor();
-
-	let status:
-		| 'transcribed'
-		| 'transcribedAndCopied'
-		| 'transcribedAndCopiedAndPasted' = 'transcribed';
-
-	const toastBasedOnStatus = () => {
-		switch (status) {
-			case 'transcribed':
-				toast.success({
-					id: toastId,
-					title: '📝 Recording transcribed!',
-					description: transcribedText,
-					descriptionClass: 'line-clamp-2',
-					action: {
-						type: 'button',
-						label: 'Copy to clipboard',
-						onClick: () =>
-							copyTextToClipboardWithToast.mutate({
-								label: 'transcribed text',
-								text: transcribedText,
-							}),
-					},
-				});
-				return;
-			case 'transcribedAndCopied':
-				toast.success({
-					id: toastId,
-					title: '📝 Recording transcribed and copied to clipboard!',
-					description: transcribedText,
-					descriptionClass: 'line-clamp-2',
-					action: {
-						type: 'link',
-						label: 'Go to recordings',
-						goto: WHISPERING_RECORDINGS_PATHNAME,
-					},
-				});
-				return;
-			case 'transcribedAndCopiedAndPasted':
-				toast.success({
-					id: toastId,
-					title:
-						'📝📋✍️ Recording transcribed, copied to clipboard, and pasted!',
-					description: transcribedText,
-					descriptionClass: 'line-clamp-2',
-					action: {
-						type: 'link',
-						label: 'Go to recordings',
-						goto: WHISPERING_RECORDINGS_PATHNAME,
-					},
-				});
-				return;
-		}
-	};
-
-	if (!settings.value['transcription.clipboard.copyOnSuccess']) {
-		toastBasedOnStatus();
-		return;
-	}
-
-	toast.loading({
-		id: toastId,
-		title: '⏳ Copying to clipboard...',
-		description: 'Copying the transcribed text to your clipboard...',
-	});
-	await copyTextToClipboard.mutateAsync(transcribedText, {
-		onSuccess: () => {
-			status = 'transcribedAndCopied';
-		},
-		onError: (error) => {
-			toast.warning({
-				title: '⚠️ Clipboard Access Failed',
-				description:
-					'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-				action: { type: 'more-details', error },
+	return createResultMutation(() => ({
+		mutationFn: async (text: string) => {
+			if (!settings.value['transcription.clipboard.copyOnSuccess']) {
+				return Ok('transcribed' as const);
+			}
+			toast.loading({
+				id: toastId,
+				title: '⏳ Copying to clipboard...',
+				description: 'Copying the transcribed text to your clipboard...',
 			});
-		},
-	});
+			const copyResult = await copyTextToClipboard(text);
+			if (!copyResult.ok) {
+				return WhisperingWarning({
+					title: '⚠️ Clipboard Access Failed',
+					description:
+						'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
+					action: { type: 'more-details', error: copyResult.error },
+				});
+			}
+			if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
+				return Ok('transcribedAndCopied' as const);
+			}
 
-	if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
-		toastBasedOnStatus();
-		return;
-	}
-
-	toast.loading({
-		id: toastId,
-		title: '⏳ Pasting ...',
-		description: 'Pasting the transcription to your cursor...',
-	});
-	await writeTextToCursor.mutateAsync(transcribedText, {
-		onError: (error) => {
-			toast.warning({
-				title: '⚠️ Paste Operation Failed',
-				description:
-					'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-				action: { type: 'more-details', error },
+			toast.loading({
+				id: toastId,
+				title: '⏳ Pasting ...',
+				description: 'Pasting the transcription to your cursor...',
 			});
-		},
-		onSuccess: () => {
-			status = 'transcribedAndCopiedAndPasted';
-		},
-	});
 
-	toastBasedOnStatus();
+			const pasteResult = await writeTextToCursor(text);
+			if (!pasteResult.ok) {
+				return WhisperingWarning({
+					title: '⚠️ Paste Operation Failed',
+					description:
+						'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
+					action: { type: 'more-details', error: pasteResult.error },
+				});
+			}
+			return Ok('transcribedAndCopiedAndPasted' as const);
+		},
+		onSuccess: (status, text) => {
+			switch (status) {
+				case 'transcribed':
+					toast.success({
+						id: toastId,
+						title: '📝 Recording transcribed!',
+						description: text,
+						descriptionClass: 'line-clamp-2',
+						action: {
+							type: 'button',
+							label: 'Copy to clipboard',
+							onClick: () =>
+								copyTextToClipboardWithToast({
+									label: 'transcribed text',
+									text: text,
+								}),
+						},
+					});
+					return;
+				case 'transcribedAndCopied':
+					toast.success({
+						id: toastId,
+						title: '📝 Recording transcribed and copied to clipboard!',
+						description: text,
+						descriptionClass: 'line-clamp-2',
+						action: {
+							type: 'link',
+							label: 'Go to recordings',
+							goto: WHISPERING_RECORDINGS_PATHNAME,
+						},
+					});
+					return;
+				case 'transcribedAndCopiedAndPasted':
+					toast.success({
+						id: toastId,
+						title:
+							'📝📋✍️ Recording transcribed, copied to clipboard, and pasted!',
+						description: text,
+						descriptionClass: 'line-clamp-2',
+						action: {
+							type: 'link',
+							label: 'Go to recordings',
+							goto: WHISPERING_RECORDINGS_PATHNAME,
+						},
+					});
+					return;
+			}
+		},
+		onError: ({ variant, ...error }) => {
+			switch (variant) {
+				case 'error':
+					toast.error({ id: toastId, ...error });
+					break;
+				case 'warning':
+					toast.warning(error);
+					break;
+			}
+		},
+	}));
 }
