@@ -13,7 +13,6 @@
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
@@ -27,9 +26,10 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } from '$lib/query/transcriber/mutations';
 
-	const transcriber = getTranscriberFromContext();
-
+	const transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste =
+		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();
 	const updateRecordingWithToast = useUpdateRecordingWithToast();
 	const downloadRecordingWithToast = useDownloadRecordingWithToast();
@@ -72,7 +72,9 @@
 						? 'Retry transcription'
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
-				transcriber.transcribeAndUpdateRecordingWithToast(recording)}
+				transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
+					recording,
+				)}
 			variant="ghost"
 			size="icon"
 		>
