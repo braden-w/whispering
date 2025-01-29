@@ -15,6 +15,7 @@ import {
 	useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
 } from '../transcriber/mutations';
 import { recorderKeys, useRecorderState } from './queries';
+import { noop } from '@tanstack/table-core';
 
 const invalidateRecorderState = () =>
 	queryClient.invalidateQueries({
@@ -38,14 +39,14 @@ function createRecorder() {
 	const startRecordingWithToast = useStartRecordingWithToast();
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
 		useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
-	const ensureRecordingSessionClosed = useEnsureRecordingSessionClosed();
+	const ensureRecordingSessionClosedSilent =
+		useEnsureRecordingSessionClosedSilent();
 	const cancelRecorderWithToast = useCancelRecorderWithToast();
 
 	return {
 		get recorderState() {
 			return recorderState;
 		},
-
 		toggleRecordingWithToast: () => {
 			if (recorderState.data === 'SESSION+RECORDING') {
 				stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast.mutate();
@@ -53,16 +54,15 @@ function createRecorder() {
 				startRecordingWithToast.mutate();
 			}
 		},
-
-		cancelRecorderWithToast: cancelRecorderWithToast,
-
-		ensureRecordingSessionClosed: ensureRecordingSessionClosed,
+		cancelRecorderWithToast,
+		ensureRecordingSessionClosedSilent,
 	};
 }
 
 function useCancelRecorderWithToast() {
 	const toastId = nanoid();
-	const ensureRecordingSessionClosed = useEnsureRecordingSessionClosed();
+	const ensureRecordingSessionClosedWithToast =
+		useEnsureRecordingSessionClosedWithToast();
 	return createResultMutation(() => ({
 		onMutate: () => {
 			toast.loading({
@@ -87,7 +87,7 @@ function useCancelRecorderWithToast() {
 						'Recording discarded, but session remains open for a new take',
 				});
 			} else {
-				ensureRecordingSessionClosed.mutate(
+				ensureRecordingSessionClosedWithToast.mutate(
 					{
 						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 					},
@@ -189,7 +189,8 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 		useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste(
 			toastId,
 		);
-	const ensureRecordingSessionClosed = useEnsureRecordingSessionClosed();
+	const ensureRecordingSessionClosedWithToast =
+		useEnsureRecordingSessionClosedWithToast();
 	return createResultMutation(() => ({
 		onMutate: () => {
 			toast.loading({
@@ -284,7 +285,7 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 								title: '⏳ Closing recording session...',
 								description: 'Wrapping things up, just a moment...',
 							});
-							ensureRecordingSessionClosed.mutate(
+							ensureRecordingSessionClosedWithToast.mutate(
 								{
 									sendStatus: (options) =>
 										toast.loading({ id: toastId, ...options }),
@@ -321,17 +322,27 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 	}));
 }
 
-function useEnsureRecordingSessionClosed() {
+function useEnsureRecordingSessionClosedSilent() {
+	return createResultMutation(() => ({
+		mutationFn: async () => {
+			const closeResult =
+				await userConfiguredServices.recorder.ensureRecordingSessionClosed({
+					sendStatus: noop,
+				});
+			return closeResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
+}
+
+function useEnsureRecordingSessionClosedWithToast() {
 	return createResultMutation(() => ({
 		mutationFn: async ({
 			sendStatus,
-		}: { sendStatus: UpdateStatusMessageFn | undefined }) => {
-			const toastId = nanoid();
+		}: { sendStatus: UpdateStatusMessageFn }) => {
 			const closeResult =
 				await userConfiguredServices.recorder.ensureRecordingSessionClosed({
-					sendStatus:
-						sendStatus ??
-						((options) => toast.loading({ id: toastId, ...options })),
+					sendStatus,
 				});
 			return closeResult;
 		},

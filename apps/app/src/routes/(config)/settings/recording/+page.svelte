@@ -4,7 +4,7 @@
 	import { useGetMediaDevices } from '$lib/query/audio/queries';
 	import { userConfiguredServices } from '$lib/services/index.js';
 	import { toast } from '$lib/services/toast';
-	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/query/recorder/mutations';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 
@@ -57,7 +57,7 @@
 			{items}
 			selected={settings.value['recording.selectedAudioInputDeviceId']}
 			onSelectedChange={(selected) => {
-				void recorder.closeRecordingSessionWithToast();
+				recorder.ensureRecordingSessionClosedSilent.mutate();
 				settings.value = {
 					...settings.value,
 					'recording.selectedAudioInputDeviceId': selected,
