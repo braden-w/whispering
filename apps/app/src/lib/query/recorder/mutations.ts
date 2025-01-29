@@ -39,7 +39,6 @@ function createRecorder() {
 	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
 		useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
 	const ensureRecordingSessionClosed = useEnsureRecordingSessionClosed();
-
 	const cancelRecorderWithToast = useCancelRecorderWithToast();
 
 	return {
