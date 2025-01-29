@@ -11,7 +11,7 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
-	import { useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } from '$lib/query/transcriber/mutations';
+	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
@@ -28,8 +28,7 @@
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
-	const transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste =
-		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
+	const transcriber = getTranscriberFromContext();
 	const deleteRecordingWithToast = useDeleteRecordingWithToast();
 	const updateRecordingWithToast = useUpdateRecordingWithToast();
 	const downloadRecordingWithToast = useDownloadRecordingWithToast();
@@ -72,7 +71,7 @@
 						? 'Retry transcription'
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
-				transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
+				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
 					recording,
 				)}
 			variant="ghost"
