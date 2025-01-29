@@ -45,7 +45,7 @@ function createRecorder() {
 
 	return {
 		get recorderState() {
-			return recorderState;
+			return recorderState.data;
 		},
 		toggleRecordingWithToast: () => {
 			if (recorderState.data === 'SESSION+RECORDING') {

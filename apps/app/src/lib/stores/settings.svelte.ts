@@ -1,3 +1,4 @@
+import type { Recorder } from '$lib/query/recorder/mutations';
 import { toast } from '$lib/services/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
@@ -9,7 +10,6 @@ import {
 } from '@repo/shared';
 import hotkeys from 'hotkeys-js';
 import { getContext, setContext } from 'svelte';
-import { type Recorder, getRecorderFromContext } from './recorder.svelte';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',

@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+import { getRecorderFromContext } from '$lib/query/recorder/mutations';
 import { settings } from '$lib/stores/settings.svelte';
 import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';

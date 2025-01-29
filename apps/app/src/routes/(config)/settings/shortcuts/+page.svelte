@@ -4,7 +4,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/query/recorder/mutations';
 	import {
 		getRegisterShortcutsFromContext,
 		settings,
