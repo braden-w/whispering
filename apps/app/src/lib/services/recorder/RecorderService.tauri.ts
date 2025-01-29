@@ -93,7 +93,6 @@ export function createRecorderServiceTauri(): RecorderService {
 					'Saving your recording and preparing the final audio file...',
 			});
 			const result = await invoke<number[]>('stop_recording');
-			console.log('🚀 ~ stopRecording: ~ result:', result);
 			if (!result.ok)
 				return WhisperingErr({
 					title: '⏹️ Recording Stop Failed',
@@ -102,9 +101,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				});
 
 			const float32Array = new Float32Array(result.data);
-			console.log('🚀 ~ stopRecording: ~ float32Array:', float32Array);
 			const blob = createWavFromFloat32(float32Array);
-			console.log('🚀 ~ stopRecording: ~ blob:', blob);
 			return Ok(blob);
 		},
 		cancelRecording: async ({ sendStatus: sendUpdateStatus }) => {
