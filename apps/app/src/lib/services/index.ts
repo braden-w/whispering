@@ -69,10 +69,6 @@ export function createResultQuery<
 	});
 }
 
-type MutationResultFunction<TData, TError, TVariables> = (
-	variables: TVariables,
-) => MaybePromise<Result<TData, TError>>;
-
 export function createResultMutation<
 	TData = unknown,
 	TError = DefaultError,
@@ -84,7 +80,9 @@ export function createResultMutation<
 			CreateMutationOptions<TData, TError, TVariables, TContext>,
 			'mutationFn'
 		> & {
-			mutationFn: MutationResultFunction<TData, TError, TVariables>;
+			mutationFn: (
+				variables: TVariables,
+			) => MaybePromise<Result<TData, TError>>;
 		}
 	>,
 ) {
