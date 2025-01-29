@@ -12,28 +12,28 @@ export type CopyToClipboardLabel =
 	| 'code'
 	| 'latest transformation run output';
 
-export async function copyTextToClipboardWithToast({
-	label,
-	text,
-}: {
-	label: CopyToClipboardLabel;
-	text: string;
-}) {
-	const result = await ClipboardService.setClipboardText(text);
-	if (!result.ok) {
-		toast.error({
-			title: `Error copying ${label} to clipboard`,
-			description: result.error.description,
-			action: { type: 'more-details', error: result.error },
-		});
-		return result;
-	}
-	toast.success({
-		title: `Copied ${label} to clipboard!`,
-		description: text,
-		descriptionClass: 'line-clamp-2',
-	});
-	return result;
+export function useCopyTextToClipboardWithToast() {
+	return createResultMutation(() => ({
+		mutationFn: async ({
+			text,
+		}: { label: CopyToClipboardLabel; text: string }) => {
+			const copyResult = await ClipboardService.setClipboardText(text);
+			return copyResult;
+		},
+		onSuccess: (_data, { label, text }) => {
+			toast.success({
+				title: `Copied ${label} to clipboard!`,
+				description: text,
+				descriptionClass: 'line-clamp-2',
+			});
+		},
+		onError: (error, { label }) => {
+			toast.error({
+				title: `Error copying ${label} to clipboard`,
+				description: error.description,
+			});
+		},
+	}));
 }
 
 export async function writeTextToCursor(text: string) {

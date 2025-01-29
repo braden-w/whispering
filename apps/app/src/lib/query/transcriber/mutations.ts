@@ -1,6 +1,6 @@
 import {
 	copyTextToClipboard,
-	copyTextToClipboardWithToast,
+	useCopyTextToClipboardWithToast,
 	writeTextToCursor,
 } from '$lib/query/clipboard/mutations';
 import { createResultMutation } from '$lib/services';
@@ -33,6 +33,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 } = {}) {
 	const updateRecording = useUpdateRecording();
 	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet({ toastId });
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	return createResultMutation(() => ({
 		onMutate: async (recording) => {
 			toast.loading({
@@ -106,7 +107,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 					type: 'button',
 					label: 'Copy to clipboard',
 					onClick: () =>
-						copyTextToClipboardWithToast({
+						copyTextToClipboardWithToast.mutate({
 							label: 'transcribed text',
 							text: transcribedText,
 						}),
@@ -223,6 +224,7 @@ function useCopyIfSetPasteIfSet({
 }: {
 	toastId: string;
 }) {
+	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	return createResultMutation(() => ({
 		mutationFn: async (text: string) => {
 			if (!settings.value['transcription.clipboard.copyOnSuccess']) {
@@ -275,7 +277,7 @@ function useCopyIfSetPasteIfSet({
 							type: 'button',
 							label: 'Copy to clipboard',
 							onClick: () =>
-								copyTextToClipboardWithToast({
+								copyTextToClipboardWithToast.mutate({
 									label: 'transcribed text',
 									text: text,
 								}),
