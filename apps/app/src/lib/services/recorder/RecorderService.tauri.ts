@@ -86,7 +86,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				});
 			return Ok(undefined);
 		},
-		stopRecording: async (_, { sendStatus: sendUpdateStatus }) => {
+		stopRecording: async ({ sendStatus: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: '⏸️ Finishing Up',
 				description:
@@ -107,7 +107,7 @@ export function createRecorderServiceTauri(): RecorderService {
 			console.log('🚀 ~ stopRecording: ~ blob:', blob);
 			return Ok(blob);
 		},
-		cancelRecording: async (_, { sendStatus: sendUpdateStatus }) => {
+		cancelRecording: async ({ sendStatus: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: '🛑 Cancelling',
 				description:

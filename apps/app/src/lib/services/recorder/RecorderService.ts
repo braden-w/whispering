@@ -33,12 +33,10 @@ export type RecorderService = {
 		recordingId: string,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
 	) => Promise<WhisperingResult<void>>;
-	stopRecording: (
-		_: undefined,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<Blob>>;
-	cancelRecording: (
-		_: undefined,
-		callbacks: { sendStatus: UpdateStatusMessageFn },
-	) => Promise<WhisperingResult<void>>;
+	stopRecording: (callbacks: { sendStatus: UpdateStatusMessageFn }) => Promise<
+		WhisperingResult<Blob>
+	>;
+	cancelRecording: (callbacks: {
+		sendStatus: UpdateStatusMessageFn;
+	}) => Promise<WhisperingResult<void>>;
 };

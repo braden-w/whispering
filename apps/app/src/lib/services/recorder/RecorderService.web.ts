@@ -187,7 +187,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(undefined);
 		},
 
-		stopRecording: async (_, { sendStatus }) => {
+		stopRecording: async ({ sendStatus }) => {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return WhisperingErr({
 					title: '⚠️ Nothing to Stop',
@@ -239,7 +239,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(blob);
 		},
 
-		cancelRecording: async (_, { sendStatus }) => {
+		cancelRecording: async ({ sendStatus }) => {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return WhisperingErr({
 					title: '⚠️ Nothing to Cancel',
