@@ -1,6 +1,9 @@
 import { queryClient } from '$lib/query';
 import type { Recording } from '$lib/services/db';
-import { DbRecordingsService } from '$lib/services/index.js';
+import {
+	createResultMutation,
+	DbRecordingsService,
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
@@ -8,7 +11,7 @@ import { createMutation } from '@tanstack/svelte-query';
 import { recordingsKeys } from './queries';
 
 export const useCreateRecording = () =>
-	createMutation(() => ({
+	createResultMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbRecordingsService.createRecording(recording);
 			if (!result.ok) {
@@ -36,7 +39,7 @@ export const useCreateRecording = () =>
 	}));
 
 export const useUpdateRecording = () =>
-	createMutation(() => ({
+	createResultMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbRecordingsService.updateRecording(recording);
 			if (!result.ok) {
@@ -62,7 +65,7 @@ export const useUpdateRecording = () =>
 	}));
 
 export const useUpdateRecordingWithToast = () =>
-	createMutation(() => ({
+	createResultMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbRecordingsService.updateRecording(recording);
 			if (!result.ok) {
@@ -99,7 +102,7 @@ export const useUpdateRecordingWithToast = () =>
 	}));
 
 export const useDeleteRecordingWithToast = () =>
-	createMutation(() => ({
+	createResultMutation(() => ({
 		mutationFn: async (recording: Recording) => {
 			const result = await DbRecordingsService.deleteRecording(recording);
 			if (!result.ok) {
@@ -132,7 +135,7 @@ export const useDeleteRecordingWithToast = () =>
 	}));
 
 export const useDeleteRecordingsWithToast = () =>
-	createMutation(() => ({
+	createResultMutation(() => ({
 		mutationFn: async (recordings: Recording[]) => {
 			const result = await DbRecordingsService.deleteRecordings(recordings);
 			if (!result.ok) {
