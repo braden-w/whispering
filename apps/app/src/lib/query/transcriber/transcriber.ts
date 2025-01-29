@@ -71,7 +71,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	toastId?: string;
 } = {}) {
 	const updateRecording = useUpdateRecording();
-	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet({ toastId });
+	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet();
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	return createResultMutation(() => ({
 		onMutate: async (recording) => {
@@ -152,7 +152,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 						}),
 				},
 			});
-			copyIfSetPasteIfSet.mutate(transcribedText);
+			copyIfSetPasteIfSet.mutate({ text: transcribedText, toastId });
 		},
 		onError: (error, recording) => {
 			toast.error({ id: toastId, ...error });
@@ -169,12 +169,10 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	}));
 }
 
-export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste(
-	toastId: string,
-) {
-	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet({ toastId });
+export function useTransformTranscribedTextFromRecordingWithSoundWithCopyPaste() {
+	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet();
 	return createResultMutation(() => ({
-		onMutate: () => {
+		onMutate: ({ toastId }) => {
 			toast.loading({
 				id: toastId,
 				title: '🔄 Running transformation...',
@@ -190,6 +188,7 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 			transcribedText: string;
 			recordingId: string;
 			selectedTransformationId: string;
+			toastId: string;
 		}): Promise<WhisperingResult<string>> => {
 			const getTransformationResult =
 				await DbTransformationsService.getTransformationById(
@@ -245,27 +244,29 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 
 			return Ok(transformationRun.output);
 		},
-		onError: (error) => {
+		onError: (error, { toastId }) => {
 			toast.error({
 				id: toastId,
 				...error,
 			});
 		},
-		onSuccess: (transformedText, { recordingId, selectedTransformationId }) => {
+		onSuccess: (transformedText, { toastId }) => {
 			void playSoundIfEnabled('transformationComplete');
-			copyIfSetPasteIfSet.mutate(transformedText);
+			copyIfSetPasteIfSet.mutate({ text: transformedText, toastId });
 		},
 	}));
 }
 
-function useCopyIfSetPasteIfSet({
-	toastId,
-}: {
-	toastId: string;
-}) {
+function useCopyIfSetPasteIfSet() {
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	return createMutation(() => ({
-		mutationFn: async (text: string) => {
+		mutationFn: async ({
+			text,
+			toastId,
+		}: {
+			text: string;
+			toastId: string;
+		}) => {
 			if (!settings.value['transcription.clipboard.copyOnSuccess']) {
 				return { status: 'transcribed', error: null } as const;
 			}
@@ -303,7 +304,7 @@ function useCopyIfSetPasteIfSet({
 				error: null,
 			} as const;
 		},
-		onSuccess: ({ status, error }, text) => {
+		onSuccess: ({ status, error }, { text, toastId }) => {
 			switch (status) {
 				case 'transcribed':
 					toast.success({
