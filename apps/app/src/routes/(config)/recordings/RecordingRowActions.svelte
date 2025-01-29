@@ -11,6 +11,7 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
+	import { useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } from '$lib/query/transcriber/mutations';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
@@ -18,7 +19,7 @@
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
-		LayersIcon,
+		FileStackIcon,
 		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
@@ -26,7 +27,6 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } from '$lib/query/transcriber/mutations';
 
 	const transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste =
 		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
@@ -133,7 +133,7 @@
 				})}
 			>
 				{#snippet copyIcon()}
-					<LayersIcon />
+					<FileStackIcon />
 				{/snippet}
 			</CopyToClipboardButton>
 		{/if}
