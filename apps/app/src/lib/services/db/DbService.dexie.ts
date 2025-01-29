@@ -320,6 +320,21 @@ export function createDbRecordingsServiceDexie() {
 			});
 		},
 
+		async getTranscribingRecordingIds() {
+			return tryAsync({
+				try: () =>
+					db.recordings
+						.where('transcriptionStatus')
+						.equals('TRANSCRIBING' satisfies Recording['transcriptionStatus'])
+						.primaryKeys(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting transcribing recording ids from Dexie',
+						error,
+					}),
+			});
+		},
+
 		async getRecordingById(id: string) {
 			return tryAsync({
 				try: async () => {
