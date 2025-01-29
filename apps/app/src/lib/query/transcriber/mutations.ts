@@ -20,6 +20,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { queryClient } from '..';
 import { useUpdateRecording } from '../recordings/mutations';
 import { transcriberKeys } from './queries';
+import { createMutation } from '@tanstack/svelte-query';
 
 export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 	toastId = nanoid(),
@@ -220,10 +221,10 @@ function useCopyIfSetPasteIfSet({
 	toastId: string;
 }) {
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
-	return createResultMutation(() => ({
+	return createMutation(() => ({
 		mutationFn: async (text: string) => {
 			if (!settings.value['transcription.clipboard.copyOnSuccess']) {
-				return Ok('transcribed' as const);
+				return ['transcribed', null] as const;
 			}
 			toast.loading({
 				id: toastId,
@@ -232,15 +233,10 @@ function useCopyIfSetPasteIfSet({
 			});
 			const copyResult = await ClipboardService.setClipboardText(text);
 			if (!copyResult.ok) {
-				return WhisperingWarning({
-					title: '⚠️ Clipboard Access Failed',
-					description:
-						'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-					action: { type: 'more-details', error: copyResult.error },
-				});
+				return ['transcribedButCopyFailed', copyResult.error] as const;
 			}
 			if (!settings.value['transcription.clipboard.pasteOnSuccess']) {
-				return Ok('transcribedAndCopied' as const);
+				return ['transcribedAndCopied', null] as const;
 			}
 
 			toast.loading({
@@ -251,16 +247,14 @@ function useCopyIfSetPasteIfSet({
 
 			const pasteResult = await ClipboardService.writeTextToCursor(text);
 			if (!pasteResult.ok) {
-				return WhisperingWarning({
-					title: '⚠️ Paste Operation Failed',
-					description:
-						'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-					action: { type: 'more-details', error: pasteResult.error },
-				});
+				return [
+					'transcribedAndCopiedButPasteFailed',
+					pasteResult.error,
+				] as const;
 			}
-			return Ok('transcribedAndCopiedAndPasted' as const);
+			return ['transcribedAndCopiedAndPasted', null] as const;
 		},
-		onSuccess: (status, text) => {
+		onSuccess: ([status, error], text) => {
 			switch (status) {
 				case 'transcribed':
 					toast.success({
@@ -279,6 +273,30 @@ function useCopyIfSetPasteIfSet({
 						},
 					});
 					return;
+				case 'transcribedButCopyFailed':
+					toast.success({
+						id: toastId,
+						title: '📝 Recording transcribed!',
+						description: text,
+						descriptionClass: 'line-clamp-2',
+						action: {
+							type: 'button',
+							label: 'Copy to clipboard',
+							onClick: () =>
+								copyTextToClipboardWithToast.mutate({
+									label: 'transcribed text',
+									text: text,
+								}),
+						},
+					});
+					toast.warning({
+						id: toastId,
+						title: '⚠️ Clipboard Access Failed',
+						description:
+							'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
+						action: { type: 'more-details', error: error },
+					});
+					return;
 				case 'transcribedAndCopied':
 					toast.success({
 						id: toastId,
@@ -290,6 +308,25 @@ function useCopyIfSetPasteIfSet({
 							label: 'Go to recordings',
 							goto: WHISPERING_RECORDINGS_PATHNAME,
 						},
+					});
+					return;
+				case 'transcribedAndCopiedButPasteFailed':
+					toast.success({
+						id: toastId,
+						title: '📝 Recording transcribed and copied to clipboard!',
+						description: text,
+						descriptionClass: 'line-clamp-2',
+						action: {
+							type: 'link',
+							label: 'Go to recordings',
+							goto: WHISPERING_RECORDINGS_PATHNAME,
+						},
+					});
+					toast.warning({
+						title: '⚠️ Paste Operation Failed',
+						description:
+							'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
+						action: { type: 'more-details', error: error },
 					});
 					return;
 				case 'transcribedAndCopiedAndPasted':
@@ -306,16 +343,6 @@ function useCopyIfSetPasteIfSet({
 						},
 					});
 					return;
-			}
-		},
-		onError: ({ variant, ...error }) => {
-			switch (variant) {
-				case 'error':
-					toast.error({ id: toastId, ...error });
-					break;
-				case 'warning':
-					toast.warning(error);
-					break;
 			}
 		},
 	}));
