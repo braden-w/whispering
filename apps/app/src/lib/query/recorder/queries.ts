@@ -13,5 +13,6 @@ export function useRecorderState() {
 				await userConfiguredServices.recorder.getRecorderState();
 			return recorderStateResult;
 		},
+		initialData: 'IDLE' as const,
 	}));
 }
