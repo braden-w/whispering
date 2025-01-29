@@ -123,25 +123,24 @@ function useCancelRecorderWithToast() {
 }
 
 function useStartRecordingWithToast() {
-	const toastId = nanoid();
-	const ensureRecordingSession = useEnsureRecordingSession(toastId);
+	const ensureRecordingSession = useEnsureRecordingSession();
 	return createResultMutation(() => ({
-		onMutate: async () => {
+		onMutate: async (toastId) => {
 			toast.loading({
 				id: toastId,
 				title: '🎙️ Preparing to record...',
 				description: 'Setting up your recording environment...',
 			});
-			await ensureRecordingSession.mutateAsync();
+			await ensureRecordingSession.mutateAsync(toastId);
 		},
-		mutationFn: async () => {
+		mutationFn: async (toastId: string) => {
 			const startRecordingResult =
 				await userConfiguredServices.recorder.startRecording(nanoid(), {
 					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 				});
 			return startRecordingResult;
 		},
-		onSuccess: () => {
+		onSuccess: (_data, toastId) => {
 			toast.success({
 				id: toastId,
 				title: '🎙️ Whispering is recording...',
@@ -150,16 +149,16 @@ function useStartRecordingWithToast() {
 			console.info('Recording started');
 			void playSoundIfEnabled('start');
 		},
-		onError: (error) => {
+		onError: (error, toastId) => {
 			toast.error({ id: toastId, ...error });
 		},
 		onSettled: invalidateRecorderState,
 	}));
 }
 
-function useEnsureRecordingSession(toastId: string) {
+function useEnsureRecordingSession() {
 	return createResultMutation(() => ({
-		mutationFn: async () => {
+		mutationFn: async (toastId: string) => {
 			const ensureRecordingSessionResult =
 				await userConfiguredServices.recorder.ensureRecordingSession(
 					{
@@ -173,7 +172,7 @@ function useEnsureRecordingSession(toastId: string) {
 				);
 			return ensureRecordingSessionResult;
 		},
-		onError: (error) => {
+		onError: (error, toastId) => {
 			toast.error({ id: toastId, ...error });
 		},
 		onSettled: invalidateRecorderState,
