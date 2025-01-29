@@ -253,8 +253,12 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 								: 'Recording saved and session closed successfully',
 						});
 
+						const transcribeAndTransformToastId = nanoid();
 						transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
-							createdRecording,
+							{
+								recording: createdRecording,
+								toastId: transcribeAndTransformToastId,
+							},
 							{
 								onSuccess: async (transcribedText) => {
 									if (
@@ -263,7 +267,7 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 										return;
 
 									toast.loading({
-										id: toastId,
+										id: transcribeAndTransformToastId,
 										title: '🔄 Running transformation...',
 										description:
 											'Applying your selected transformation to the transcribed text...',
@@ -277,7 +281,7 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 												settings.value[
 													'transformations.selectedTransformationId'
 												],
-											toastId,
+											toastId: transcribeAndTransformToastId,
 										},
 									);
 								},

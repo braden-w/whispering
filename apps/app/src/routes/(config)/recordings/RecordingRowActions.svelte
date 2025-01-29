@@ -25,6 +25,7 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
+	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
@@ -72,7 +73,10 @@
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
 				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-					recording,
+					{
+						recording,
+						toastId: nanoid(),
+					},
 				)}
 			variant="ghost"
 			size="icon"

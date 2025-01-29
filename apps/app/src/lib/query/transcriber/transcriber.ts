@@ -65,16 +65,12 @@ function createTranscriber() {
 	};
 }
 
-export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
-	toastId = nanoid(),
-}: {
-	toastId?: string;
-} = {}) {
+export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste() {
 	const updateRecording = useUpdateRecording();
 	const copyIfSetPasteIfSet = useCopyIfSetPasteIfSet();
 	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
 	return createResultMutation(() => ({
-		onMutate: async (recording) => {
+		onMutate: async ({ recording, toastId }) => {
 			toast.loading({
 				id: toastId,
 				title: '📋 Transcribing...',
@@ -99,7 +95,9 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 				},
 			);
 		},
-		mutationFn: async (recording: Recording) => {
+		mutationFn: async ({
+			recording,
+		}: { recording: Recording; toastId: string }) => {
 			if (!recording.blob) {
 				return WhisperingErr({
 					title: '⚠️ Recording blob not found',
@@ -114,7 +112,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 				});
 			return transcriptionResult;
 		},
-		onSuccess: async (transcribedText, recording) => {
+		onSuccess: async (transcribedText, { recording, toastId }) => {
 			await updateRecording.mutateAsync(
 				{
 					...recording,
@@ -154,7 +152,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 			});
 			copyIfSetPasteIfSet.mutate({ text: transcribedText, toastId });
 		},
-		onError: (error, recording) => {
+		onError: (error, { recording, toastId }) => {
 			toast.error({ id: toastId, ...error });
 			updateRecording.mutate({
 				...recording,
