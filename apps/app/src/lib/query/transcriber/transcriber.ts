@@ -112,8 +112,8 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 				});
 			return transcriptionResult;
 		},
-		onSuccess: async (transcribedText, { recording, toastId }) => {
-			await updateRecording.mutateAsync(
+		onSuccess: (transcribedText, { recording, toastId }) => {
+			updateRecording.mutate(
 				{
 					...recording,
 					transcribedText,
