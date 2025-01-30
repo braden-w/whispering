@@ -8,7 +8,7 @@
 	import { PlusIcon } from 'lucide-svelte';
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 
-	const createTransformationWithToast = useCreateTransformationWithToast();
+	const { createTransformationWithToast } = useCreateTransformationWithToast();
 
 	let isDialogOpen = $state(false);
 	let transformation = $state(generateDefaultTransformation());

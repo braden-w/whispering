@@ -16,8 +16,8 @@
 	import { onDestroy } from 'svelte';
 
 	const recorder = getRecorderFromContext();
-	const latestRecordingQuery = useLatestRecording();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const { latestRecordingQuery } = useLatestRecording();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const latestRecording = $derived<Recording>(
 		latestRecordingQuery.data ?? {

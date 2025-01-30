@@ -13,34 +13,43 @@ export const transformationRunKeys = {
 		['transformationRuns', 'recordingId', recordingId] as const,
 };
 
-export const useTransformationRunsByTransformationIdQuery = (
+export function useTransformationRunsByTransformationIdQuery(
 	id: Accessor<string>,
-) =>
-	createResultQuery(() => ({
-		queryKey: transformationRunKeys.byTransformationId(id()),
-		queryFn: () =>
-			DbTransformationsService.getTransformationRunsByTransformationId(id()),
-	}));
+) {
+	return {
+		transformationRunsByTransformationIdQuery: createResultQuery(() => ({
+			queryKey: transformationRunKeys.byTransformationId(id()),
+			queryFn: () =>
+				DbTransformationsService.getTransformationRunsByTransformationId(id()),
+		})),
+	};
+}
 
-export const useTransformationRunsByRecordingIdQuery = (
+export function useTransformationRunsByRecordingIdQuery(
 	recordingId: Accessor<string>,
-) =>
-	createResultQuery(() => ({
-		queryKey: transformationRunKeys.byRecordingId(recordingId()),
-		queryFn: () =>
-			DbTransformationsService.getTransformationRunsByRecordingId(
-				recordingId(),
-			),
-	}));
+) {
+	return {
+		transformationRunsByRecordingIdQuery: createResultQuery(() => ({
+			queryKey: transformationRunKeys.byRecordingId(recordingId()),
+			queryFn: () =>
+				DbTransformationsService.getTransformationRunsByRecordingId(
+					recordingId(),
+				),
+		})),
+	};
+}
 
-export const useLatestTransformationRunByRecordingIdQuery = (
+export function useLatestTransformationRunByRecordingIdQuery(
 	recordingId: Accessor<string>,
-) =>
-	createResultQuery(() => ({
-		queryKey: transformationRunKeys.byRecordingId(recordingId()),
-		queryFn: () =>
-			DbTransformationsService.getTransformationRunsByRecordingId(
-				recordingId(),
-			),
-		select: (data) => data.at(0),
-	}));
+) {
+	return {
+		latestTransformationRunByRecordingIdQuery: createResultQuery(() => ({
+			queryKey: transformationRunKeys.byRecordingId(recordingId()),
+			queryFn: () =>
+				DbTransformationsService.getTransformationRunsByRecordingId(
+					recordingId(),
+				),
+			select: (data) => data.at(0),
+		})),
+	};
+}

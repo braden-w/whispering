@@ -6,7 +6,7 @@
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
 
-	const runTransformationTestWithToast = useRunTransformationWithToast();
+	const { runTransformationWithToast } = useRunTransformationWithToast();
 
 	let { transformation }: { transformation: Transformation } = $props();
 
@@ -42,7 +42,7 @@
 
 	<Button
 		onclick={() =>
-			runTransformationTestWithToast.mutate(
+			runTransformationWithToast.mutate(
 				{
 					recordingId: null,
 					input,
@@ -56,17 +56,17 @@
 					},
 				},
 			)}
-		disabled={runTransformationTestWithToast.isPending ||
+		disabled={runTransformationWithToast.isPending ||
 			!input.trim() ||
 			transformation.steps.length === 0}
 		class="w-full"
 	>
-		{#if runTransformationTestWithToast.isPending}
+		{#if runTransformationWithToast.isPending}
 			<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
 			<PlayIcon class="mr-2 h-4 w-4" />
 		{/if}
-		{runTransformationTestWithToast.isPending
+		{runTransformationWithToast.isPending
 			? 'Running Transformation...'
 			: 'Run Transformation'}
 	</Button>

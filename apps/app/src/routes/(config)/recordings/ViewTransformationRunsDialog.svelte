@@ -8,7 +8,7 @@
 
 	let { recordingId }: { recordingId: string } = $props();
 
-	const transformationRunsByRecordingIdQuery =
+	const { transformationRunsByRecordingIdQuery } =
 		useTransformationRunsByRecordingIdQuery(() => recordingId);
 
 	let isOpen = $state(false);

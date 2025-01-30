@@ -10,45 +10,48 @@ import { createMutation } from '@tanstack/svelte-query';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from './queries';
 
-export const useCreateTransformationWithToast = () =>
-	createMutation(() => ({
-		mutationFn: async (
-			...params: Parameters<
-				typeof DbTransformationsService.createTransformation
-			>
-		) => {
-			const result = await DbTransformationsService.createTransformation(
-				...params,
-			);
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to create transformation!',
-					description: 'Your transformation could not be created.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
-		},
-		onSuccess: (transformation) => {
-			queryClient.setQueryData<Transformation[]>(
-				transformationsKeys.all,
-				(oldData) => {
-					if (!oldData) return [transformation];
-					return [...oldData, transformation];
-				},
-			);
-			queryClient.setQueryData<Transformation>(
-				transformationsKeys.byId(transformation.id),
-				transformation,
-			);
+export function useCreateTransformationWithToast() {
+	return {
+		createTransformationWithToast: createMutation(() => ({
+			mutationFn: async (
+				...params: Parameters<
+					typeof DbTransformationsService.createTransformation
+				>
+			) => {
+				const result = await DbTransformationsService.createTransformation(
+					...params,
+				);
+				if (!result.ok) {
+					toast.error({
+						title: 'Failed to create transformation!',
+						description: 'Your transformation could not be created.',
+						action: { type: 'more-details', error: result.error },
+					});
+					throw result.error;
+				}
+				return result.data;
+			},
+			onSuccess: (transformation) => {
+				queryClient.setQueryData<Transformation[]>(
+					transformationsKeys.all,
+					(oldData) => {
+						if (!oldData) return [transformation];
+						return [...oldData, transformation];
+					},
+				);
+				queryClient.setQueryData<Transformation>(
+					transformationsKeys.byId(transformation.id),
+					transformation,
+				);
 
-			toast.success({
-				title: 'Created transformation!',
-				description: 'Your transformation has been created successfully.',
-			});
-		},
-	}));
+				toast.success({
+					title: 'Created transformation!',
+					description: 'Your transformation has been created successfully.',
+				});
+			},
+		})),
+	};
+}
 
 export function useUpdateTransformation() {
 	return {

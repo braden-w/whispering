@@ -50,10 +50,11 @@
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedText from './TranscribedText.svelte';
+	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
-	const deleteRecordingsWithToast = useDeleteRecordingsWithToast();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
+	const { deleteRecordingsWithToast } = useDeleteRecordingsWithToast();
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -224,7 +225,7 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const recordingsQuery = useRecordingsQuery();
+	const { recordingsQuery } = useRecordingsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -355,7 +356,10 @@
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
 									transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-										recording.original,
+										{
+											recording: recording.original,
+											toastId: nanoid(),
+										},
 									),
 								),
 							)}

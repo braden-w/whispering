@@ -9,7 +9,7 @@
 	import { BITRATE_OPTIONS } from '@repo/shared';
 
 	const recorder = getRecorderFromContext();
-	const getMediaDevicesQuery = useGetMediaDevices();
+	const { getMediaDevicesQuery } = useGetMediaDevices();
 
 	$effect(() => {
 		if (getMediaDevicesQuery.isError) {
@@ -57,7 +57,7 @@
 			{items}
 			selected={settings.value['recording.selectedAudioInputDeviceId']}
 			onSelectedChange={(selected) => {
-				recorder.ensureRecordingSessionClosedSilent.mutate();
+				recorder.ensureRecordingSessionClosedSilent();
 				settings.value = {
 					...settings.value,
 					'recording.selectedAudioInputDeviceId': selected,

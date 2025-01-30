@@ -37,8 +37,8 @@
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 	import TransformationRowActions from './TransformationRowActions.svelte';
 
-	const transformationsQuery = useTransformationsQuery();
-	const deleteTransformationsWithToast = useDeleteTransformationsWithToast();
+	const { transformationsQuery } = useTransformationsQuery();
+	const { deleteTransformationsWithToast } = useDeleteTransformationsWithToast();
 
 	const columns: ColumnDef<Transformation>[] = [
 		{

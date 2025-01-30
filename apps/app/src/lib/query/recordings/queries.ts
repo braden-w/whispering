@@ -34,7 +34,7 @@ export function useRecordingsQuery() {
 
 export function useLatestRecording() {
 	return {
-		latestRecording: createQuery(() => ({
+		latestRecordingQuery: createQuery(() => ({
 			queryKey: recordingsKeys.latest,
 			queryFn: async () => {
 				const result = await DbRecordingsService.getLatestRecording();
