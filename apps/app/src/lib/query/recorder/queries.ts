@@ -6,13 +6,15 @@ export const recorderKeys = {
 };
 
 export function useRecorderState() {
-	return createResultQuery(() => ({
-		queryKey: recorderKeys.state,
-		queryFn: async () => {
-			const recorderStateResult =
-				await userConfiguredServices.recorder.getRecorderState();
-			return recorderStateResult;
-		},
-		initialData: 'IDLE' as const,
-	}));
+	return {
+		recorderState: createResultQuery(() => ({
+			queryKey: recorderKeys.state,
+			queryFn: async () => {
+				const recorderStateResult =
+					await userConfiguredServices.recorder.getRecorderState();
+				return recorderStateResult;
+			},
+			initialData: 'IDLE' as const,
+		})),
+	};
 }
