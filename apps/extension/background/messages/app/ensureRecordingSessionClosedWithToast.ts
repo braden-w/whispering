@@ -14,7 +14,7 @@ const closeRecordingSession = async () => {
 		commandName: 'closeRecordingSession',
 		func: () => {
 			try {
-				window.recorder.closeRecordingSessionWithToast();
+				window.recorder.ensureRecordingSessionClosedWithToast();
 				return { ok: true, data: undefined } as const;
 			} catch (error) {
 				return {

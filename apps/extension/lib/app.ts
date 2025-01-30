@@ -1,7 +1,7 @@
 import { sendToBackground } from '@plasmohq/messaging';
 import { type Settings, WhisperingErr } from '@repo/shared';
 import type { CancelRecordingResponse } from '~background/messages/app/cancelRecording';
-import type { CloseRecordingSessionResponse } from '~background/messages/app/closeRecordingSession';
+import type { CloseRecordingSessionResponse } from '~background/messages/app/ensureRecordingSessionClosedWithToast';
 import type { GetSettingsResponse } from '~background/messages/app/getSettings';
 import type {
 	SetSettingsRequest,
@@ -51,9 +51,9 @@ export const app = {
 		}
 		return response;
 	},
-	closeRecordingSession: async () => {
+	ensureRecordingSessionClosedWithToast: async () => {
 		const response = (await sendToBackground({
-			name: 'app/closeRecordingSession',
+			name: 'app/ensureRecordingSessionClosedWithToast',
 		})) as CloseRecordingSessionResponse;
 		return response;
 	},
