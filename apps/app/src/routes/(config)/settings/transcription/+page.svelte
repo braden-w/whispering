@@ -201,6 +201,6 @@
 				'transcription.prompt': value,
 			};
 		}}
-		description="Helps Whisper better recognize specific terms, names, or context during initial transcription. Not for text transformations - use the Transformations tab for post-processing rules."
+		description="Helps transcription service (e.g., Whisper) better recognize specific terms, names, or context during initial transcription. Not for text transformations - use the Transformations tab for post-processing rules."
 	/>
 </div>
