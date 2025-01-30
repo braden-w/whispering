@@ -37,13 +37,18 @@ export const getRecorderFromContext = () => {
 function createRecorder() {
 	const recorderState = useRecorderState();
 	const startRecordingWithToast = useStartRecordingWithToast();
-	const stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast =
-		useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast();
+	const stopRecordingWithToast = useStopRecordingWithToast();
 	const ensureRecordingSessionClosedSilent =
 		useEnsureRecordingSessionClosedSilent();
 	const ensureRecordingSessionClosedWithToast =
 		useEnsureRecordingSessionClosedWithToast();
 	const cancelRecorderWithToast = useCancelRecorderWithToast();
+
+	const createRecording = useCreateRecording();
+	const transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste =
+		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
+	const transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste =
+		useTransformTranscribedTextFromRecordingWithSoundWithCopyPaste();
 
 	return {
 		get recorderState() {
@@ -52,8 +57,122 @@ function createRecorder() {
 		toggleRecordingWithToast: () => {
 			const toastId = nanoid();
 			if (recorderState.data === 'SESSION+RECORDING') {
-				stopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast.mutate(
+				stopRecordingWithToast.mutate(
 					{ toastId },
+					{
+						onSuccess: async (blob) => {
+							console.info('Recording stopped');
+							void playSoundIfEnabled('stop');
+
+							const now = new Date().toISOString();
+							const newRecordingId = nanoid();
+
+							createRecording.mutate(
+								{
+									id: newRecordingId,
+									title: '',
+									subtitle: '',
+									createdAt: now,
+									updatedAt: now,
+									timestamp: now,
+									transcribedText: '',
+									blob,
+									transcriptionStatus: 'UNPROCESSED',
+								},
+								{
+									onError(error, variables, context) {
+										toast.error({
+											id: toastId,
+											title: '❌ Database Save Failed',
+											description:
+												'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
+											action: {
+												type: 'more-details',
+												error: error,
+											},
+										});
+									},
+									onSuccess: (createdRecording) => {
+										toast.loading({
+											id: toastId,
+											title: '✨ Recording Complete!',
+											description: settings.value[
+												'recording.isFasterRerecordEnabled'
+											]
+												? 'Recording saved! Ready for another take'
+												: 'Recording saved and session closed successfully',
+										});
+
+										const transcribeAndTransformToastId = nanoid();
+										transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
+											{
+												recording: createdRecording,
+												toastId: transcribeAndTransformToastId,
+											},
+											{
+												onSuccess: async (transcribedText) => {
+													if (
+														settings.value[
+															'transformations.selectedTransformationId'
+														]
+													) {
+														transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
+															{
+																transcribedText,
+																recordingId: createdRecording.id,
+																selectedTransformationId:
+																	settings.value[
+																		'transformations.selectedTransformationId'
+																	],
+																toastId: transcribeAndTransformToastId,
+															},
+														);
+													}
+												},
+											},
+										);
+
+										if (!settings.value['recording.isFasterRerecordEnabled']) {
+											toast.loading({
+												id: toastId,
+												title: '⏳ Closing recording session...',
+												description: 'Wrapping things up, just a moment...',
+											});
+											ensureRecordingSessionClosedWithToast.mutate(
+												{
+													sendStatus: (options) =>
+														toast.loading({ id: toastId, ...options }),
+												},
+												{
+													onSuccess: async () => {
+														toast.success({
+															id: toastId,
+															title: '✨ Session Closed Successfully',
+															description:
+																'Your recording session has been neatly wrapped up',
+														});
+													},
+													onError: (error) => {
+														toast.warning({
+															id: toastId,
+															title:
+																'⚠️ Unable to close session after recording',
+															description:
+																'You might need to restart the application to continue recording',
+															action: {
+																type: 'more-details',
+																error: error,
+															},
+														});
+													},
+												},
+											);
+										}
+									},
+								},
+							);
+						},
+					},
 				);
 			} else {
 				startRecordingWithToast.mutate(toastId);
@@ -187,14 +306,7 @@ function useEnsureRecordingSession() {
 	}));
 }
 
-function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToast() {
-	const createRecording = useCreateRecording();
-	const transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste =
-		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
-	const transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste =
-		useTransformTranscribedTextFromRecordingWithSoundWithCopyPaste();
-	const ensureRecordingSessionClosedWithToast =
-		useEnsureRecordingSessionClosedWithToast();
+function useStopRecordingWithToast() {
 	return createResultMutation(() => ({
 		onMutate: ({ toastId }) => {
 			toast.loading({
@@ -212,120 +324,12 @@ function useStopRecordingAndTranscribeAndCopyToClipboardAndPasteToCursorWithToas
 		onError: (error, { toastId }) => {
 			toast.error({ id: toastId, ...error });
 		},
-		onSuccess: async (blob, { toastId }) => {
-			console.info('Recording stopped');
-			void playSoundIfEnabled('stop');
-
-			const now = new Date().toISOString();
-			const newRecordingId = nanoid();
-
-			createRecording.mutate(
-				{
-					id: newRecordingId,
-					title: '',
-					subtitle: '',
-					createdAt: now,
-					updatedAt: now,
-					timestamp: now,
-					transcribedText: '',
-					blob,
-					transcriptionStatus: 'UNPROCESSED',
-				},
-				{
-					onError(error, variables, context) {
-						toast.error({
-							id: toastId,
-							title: '❌ Database Save Failed',
-							description:
-								'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
-							action: {
-								type: 'more-details',
-								error: error,
-							},
-						});
-					},
-					onSuccess: (createdRecording) => {
-						toast.loading({
-							id: toastId,
-							title: '✨ Recording Complete!',
-							description: settings.value['recording.isFasterRerecordEnabled']
-								? 'Recording saved! Ready for another take'
-								: 'Recording saved and session closed successfully',
-						});
-
-						const transcribeAndTransformToastId = nanoid();
-						transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
-							{
-								recording: createdRecording,
-								toastId: transcribeAndTransformToastId,
-							},
-							{
-								onSuccess: async (transcribedText) => {
-									if (
-										!settings.value['transformations.selectedTransformationId']
-									)
-										return;
-
-									toast.loading({
-										id: transcribeAndTransformToastId,
-										title: '🔄 Running transformation...',
-										description:
-											'Applying your selected transformation to the transcribed text...',
-									});
-
-									transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
-										{
-											transcribedText,
-											recordingId: createdRecording.id,
-											selectedTransformationId:
-												settings.value[
-													'transformations.selectedTransformationId'
-												],
-											toastId: transcribeAndTransformToastId,
-										},
-									);
-								},
-							},
-						);
-
-						if (!settings.value['recording.isFasterRerecordEnabled']) {
-							toast.loading({
-								id: toastId,
-								title: '⏳ Closing recording session...',
-								description: 'Wrapping things up, just a moment...',
-							});
-							ensureRecordingSessionClosedWithToast.mutate(
-								{
-									sendStatus: (options) =>
-										toast.loading({ id: toastId, ...options }),
-								},
-								{
-									onSuccess: async () => {
-										toast.success({
-											id: toastId,
-											title: '✨ Session Closed Successfully',
-											description:
-												'Your recording session has been neatly wrapped up',
-										});
-									},
-									onError: (error) => {
-										toast.warning({
-											id: toastId,
-											title: '⚠️ Unable to close session after recording',
-											description:
-												'You might need to restart the application to continue recording',
-											action: {
-												type: 'more-details',
-												error: error,
-											},
-										});
-									},
-								},
-							);
-						}
-					},
-				},
-			);
+		onSuccess: async (_blob, { toastId }) => {
+			toast.success({
+				id: toastId,
+				title: '🎙️ Recording stopped',
+				description: 'Your recording has been saved',
+			});
 		},
 		onSettled: invalidateRecorderState,
 	}));
