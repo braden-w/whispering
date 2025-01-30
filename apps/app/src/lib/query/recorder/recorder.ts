@@ -6,14 +6,14 @@ import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import {
 	useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste,
-	useTransformTranscribedTextFromRecordingWithSoundWithCopyPaste,
+	useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
 } from '../transcriber/transcriber';
 import {
-	useCancelRecorderWithToast,
-	useEnsureRecordingSessionClosedSilent,
-	useEnsureRecordingSessionClosedWithToast,
-	useStartRecordingWithToast,
-	useStopRecordingWithToast,
+	useCancelRecorder,
+	useEnsureRecordingSession,
+	useEnsureRecordingSessionClosed,
+	useStartRecording,
+	useStopRecording,
 } from './mutations';
 import { useRecorderState } from './queries';
 
@@ -31,31 +31,46 @@ export const getRecorderFromContext = () => {
 
 function createRecorder() {
 	const { recorderState } = useRecorderState();
-	const { startRecordingWithToast } = useStartRecordingWithToast();
-	const { stopRecordingWithToast } = useStopRecordingWithToast();
-	const { ensureRecordingSessionClosedSilent } =
-		useEnsureRecordingSessionClosedSilent();
-	const { ensureRecordingSessionClosedWithToast } =
-		useEnsureRecordingSessionClosedWithToast();
-	const { cancelRecorderWithToast } = useCancelRecorderWithToast();
+	const { startRecording } = useStartRecording();
+	const { stopRecording } = useStopRecording();
+	const {
+		ensureRecordingSessionClosedSilent,
+		ensureRecordingSessionClosedWithToast,
+	} = useEnsureRecordingSessionClosed();
+	const { cancelRecorder } = useCancelRecorder();
+	const { ensureRecordingSession } = useEnsureRecordingSession();
 
 	const { createRecording } = useCreateRecording();
 	const { transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
 		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
-	const { transformTranscribedTextFromRecordingWithSoundWithCopyPaste } =
-		useTransformTranscribedTextFromRecordingWithSoundWithCopyPaste();
+	const {
+		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
+	} = useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste();
 
 	return {
 		get recorderState() {
 			return recorderState.data;
 		},
-		toggleRecordingWithToast: () => {
+		toggleRecordingWithToast: async () => {
 			const toastId = nanoid();
 			if (recorderState.data === 'SESSION+RECORDING') {
-				stopRecordingWithToast.mutate(
+				toast.loading({
+					id: toastId,
+					title: '⏸️ Stopping recording...',
+					description: 'Finalizing your audio capture...',
+				});
+				stopRecording.mutate(
 					{ toastId },
 					{
+						onError: (error, { toastId }) => {
+							toast.error({ id: toastId, ...error });
+						},
 						onSuccess: async (blob) => {
+							toast.success({
+								id: toastId,
+								title: '🎙️ Recording stopped',
+								description: 'Your recording has been saved',
+							});
 							console.info('Recording stopped');
 							void playSoundIfEnabled('stop');
 
@@ -111,7 +126,7 @@ function createRecorder() {
 															'transformations.selectedTransformationId'
 														]
 													) {
-														transformTranscribedTextFromRecordingWithSoundWithCopyPaste.mutate(
+														transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
 															{
 																transcribedText,
 																recordingId: createdRecording.id,
@@ -170,10 +185,89 @@ function createRecorder() {
 					},
 				);
 			} else {
-				startRecordingWithToast.mutate(toastId);
+				toast.loading({
+					id: toastId,
+					title: '🎙️ Preparing to record...',
+					description: 'Setting up your recording environment...',
+				});
+				ensureRecordingSession.mutate(toastId, {
+					onError: (error, toastId) => {
+						toast.error({ id: toastId, ...error });
+					},
+					onSuccess: (_data, toastId) => {
+						startRecording.mutate(toastId, {
+							onError: (error, toastId) => {
+								toast.error({ id: toastId, ...error });
+							},
+							onSuccess: (_data, toastId) => {
+								toast.success({
+									id: toastId,
+									title: '🎙️ Whispering is recording...',
+									description: 'Speak now and stop recording when done',
+								});
+								console.info('Recording started');
+								void playSoundIfEnabled('start');
+							},
+						});
+					},
+				});
 			}
 		},
-		cancelRecorderWithToast: cancelRecorderWithToast.mutate,
+		cancelRecorderWithToast: () => {
+			const toastId = nanoid();
+			toast.loading({
+				id: toastId,
+				title: '⏸️ Canceling recording...',
+				description: 'Cleaning up recording session...',
+			});
+			cancelRecorder.mutate(
+				{ toastId },
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+					onSuccess: async (_data, _variables, ctx) => {
+						if (settings.value['recording.isFasterRerecordEnabled']) {
+							toast.success({
+								id: toastId,
+								title: '🚫 Recording Cancelled',
+								description:
+									'Recording discarded, but session remains open for a new take',
+							});
+						} else {
+							ensureRecordingSessionClosedWithToast.mutate(
+								{
+									sendStatus: (options) =>
+										toast.loading({ id: toastId, ...options }),
+								},
+								{
+									onSuccess: () => {
+										toast.success({
+											id: toastId,
+											title: '✅ All Done!',
+											description:
+												'Recording cancelled and session closed successfully',
+										});
+										void playSoundIfEnabled('cancel');
+										console.info('Recording cancelled');
+									},
+									onError: (error) => {
+										toast.error({
+											id: toastId,
+											title:
+												'❌ Failed to close session while cancelling recording',
+											description:
+												'Your recording was cancelled but we encountered an issue while closing your session. You may need to restart the application.',
+											action: { type: 'more-details', error: error },
+										});
+									},
+								},
+							);
+						}
+					},
+				},
+			);
+		},
 		ensureRecordingSessionClosedSilent:
 			ensureRecordingSessionClosedSilent.mutate,
 		ensureRecordingSessionClosedWithToast:
