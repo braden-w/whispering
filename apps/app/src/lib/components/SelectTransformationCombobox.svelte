@@ -17,7 +17,7 @@
 	import { Badge } from './ui/badge';
 	import { useCombobox } from './useCombobox.svelte';
 
-	const transformationsQuery = useTransformationsQuery();
+	const { transformationsQuery } = useTransformationsQuery();
 
 	const transformations = $derived(transformationsQuery.data ?? []);
 

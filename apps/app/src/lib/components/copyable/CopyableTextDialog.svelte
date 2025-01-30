@@ -8,7 +8,7 @@
 	import { mergeProps } from 'bits-ui';
 	import WhisperingTooltip from '../WhisperingTooltip.svelte';
 
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	let {
 		id,

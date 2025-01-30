@@ -8,7 +8,7 @@
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getRecorderFromContext } from '$lib/query/recorder/mutations';
+	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
@@ -16,8 +16,8 @@
 	import { onDestroy } from 'svelte';
 
 	const recorder = getRecorderFromContext();
-	const latestRecordingQuery = useLatestRecording();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const { latestRecordingQuery } = useLatestRecording();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const latestRecording = $derived<Recording>(
 		latestRecordingQuery.data ?? {

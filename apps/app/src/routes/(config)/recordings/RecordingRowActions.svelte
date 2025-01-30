@@ -30,16 +30,16 @@
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	const transcriber = getTranscriberFromContext();
-	const deleteRecordingWithToast = useDeleteRecordingWithToast();
-	const updateRecordingWithToast = useUpdateRecordingWithToast();
-	const downloadRecordingWithToast = useDownloadRecordingWithToast();
+	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
+	const { updateRecordingWithToast } = useUpdateRecordingWithToast();
+	const { downloadRecordingWithToast } = useDownloadRecordingWithToast();
 
 	let { recordingId }: { recordingId: string } = $props();
 
-	const latestTransformationRunByRecordingIdQuery =
+	const { latestTransformationRunByRecordingIdQuery } =
 		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
-	const recordingQuery = useRecordingQuery(() => recordingId);
+	const { recordingQuery } = useRecordingQuery(() => recordingId);
 
 	const recording = $derived(recordingQuery.data);
 

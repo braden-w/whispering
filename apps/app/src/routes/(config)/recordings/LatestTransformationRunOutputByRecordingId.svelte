@@ -9,7 +9,7 @@
 		recordingId: string;
 	} = $props();
 
-	const latestTransformationRunByRecordingId =
+	const { latestTransformationRunByRecordingIdQuery } =
 		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
 	const id = getRecordingTransitionId({
@@ -18,9 +18,9 @@
 	});
 </script>
 
-{#if latestTransformationRunByRecordingId.data?.output}
+{#if latestTransformationRunByRecordingIdQuery.data?.output}
 	<CopyableTextDialog
 		{id}
-		text={latestTransformationRunByRecordingId.data.output}
+		text={latestTransformationRunByRecordingIdQuery.data.output}
 	/>
 {/if}

@@ -1,4 +1,4 @@
-import type { Recorder } from '$lib/query/recorder/mutations';
+import type { Recorder } from '$lib/query/recorder/recorder';
 import { toast } from '$lib/services/toast';
 import { createJobQueue } from '$lib/utils/createJobQueue';
 import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
