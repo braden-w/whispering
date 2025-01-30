@@ -2,9 +2,8 @@
 	import { LabeledSelect } from '$lib/components/labeled/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { useGetMediaDevices } from '$lib/query/audio/queries';
-	import { userConfiguredServices } from '$lib/services/index.js';
+	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
 	import { toast } from '$lib/services/toast';
-	import { getRecorderFromContext } from '$lib/query/recorder/mutations';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { BITRATE_OPTIONS } from '@repo/shared';
 
