@@ -16,7 +16,7 @@
 		setTransformationDebounced: (transformation: Transformation) => void;
 	} = $props();
 
-	const transformationRunsByTransformationIdQuery =
+	const { transformationRunsByTransformationIdQuery } =
 		useTransformationRunsByTransformationIdQuery(() => transformation.id);
 </script>
 

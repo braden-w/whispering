@@ -1,4 +1,4 @@
-import { Ok, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, tryAsync } from '@epicenterhq/result';
 import { extension } from '@repo/extension';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import type {
@@ -79,9 +79,15 @@ export function createRecorderServiceWeb(): RecorderService {
 	};
 
 	return {
+		getRecorderState: () => {
+			if (!currentSession) return Ok('IDLE');
+			if (currentSession.recorder) return Ok('SESSION+RECORDING');
+			return Ok('SESSION');
+		},
 		enumerateRecordingDevices,
 
-		initRecordingSession: async (settings, { sendStatus }) => {
+		ensureRecordingSession: async (settings, { sendStatus }) => {
+			if (currentSession) return Ok(undefined);
 			const acquireStreamResult = await acquireStream(settings, {
 				sendStatus,
 			});
@@ -91,7 +97,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(undefined);
 		},
 
-		closeRecordingSession: async (_, { sendStatus }) => {
+		ensureRecordingSessionClosed: async ({ sendStatus }) => {
 			if (!currentSession) return Ok(undefined);
 			sendStatus({
 				title: '🎙️ Cleaning Up',
@@ -181,7 +187,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(undefined);
 		},
 
-		stopRecording: async (_, { sendStatus }) => {
+		stopRecording: async ({ sendStatus }) => {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return WhisperingErr({
 					title: '⚠️ Nothing to Stop',
@@ -233,7 +239,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(blob);
 		},
 
-		cancelRecording: async (_, { sendStatus }) => {
+		cancelRecording: async ({ sendStatus }) => {
 			if (!currentSession?.recorder?.mediaRecorder) {
 				return WhisperingErr({
 					title: '⚠️ Nothing to Cancel',

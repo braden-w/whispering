@@ -6,7 +6,7 @@
 	import { generateDefaultTransformation } from '$lib/services/db';
 	import RenderTransformation from '../-components/RenderTransformation.svelte';
 
-	const createTransformationWithToast = useCreateTransformationWithToast();
+	const { createTransformationWithToast } = useCreateTransformationWithToast();
 
 	let transformation = $state(generateDefaultTransformation());
 </script>

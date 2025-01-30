@@ -16,8 +16,8 @@
 	import RenderTransformation from './-components/RenderTransformation.svelte';
 	import MarkTransformationActiveButton from './MarkTransformationActiveButton.svelte';
 
-	const updateTransformationWithToast = useUpdateTransformationWithToast();
-	const deleteTransformationWithToast = useDeleteTransformationWithToast();
+	const { updateTransformationWithToast } = useUpdateTransformationWithToast();
+	const { deleteTransformationWithToast } = useDeleteTransformationWithToast();
 
 	let {
 		transformation,

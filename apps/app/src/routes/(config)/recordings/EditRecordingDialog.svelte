@@ -11,7 +11,7 @@
 	import { PencilIcon as EditIcon, Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 
-	const deleteRecordingWithToast = useDeleteRecordingWithToast();
+	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
 
 	let {
 		recording,

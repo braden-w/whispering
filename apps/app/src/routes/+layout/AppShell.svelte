@@ -5,7 +5,7 @@
 	import MoreDetailsDialog from '$lib/components/MoreDetailsDialog.svelte';
 	import NotificationLog from '$lib/components/NotificationLog.svelte';
 	import { DbRecordingsService } from '$lib/services';
-	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { extension } from '@repo/extension';
 	import { ModeWatcher, mode } from 'mode-watcher';

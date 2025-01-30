@@ -1,6 +1,6 @@
-import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
 import { settings } from '$lib/stores/settings.svelte';
-import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export function syncWindowAlwaysOnTopWithRecorderState() {

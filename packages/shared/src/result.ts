@@ -3,7 +3,8 @@ import type { ToastAndNotifyOptions } from './toasts.js';
 
 export type WhisperingErrProperties = {
 	_tag: 'WhisperingError';
-} & ToastAndNotifyOptions;
+	variant: 'error' | 'warning';
+} & Omit<ToastAndNotifyOptions, 'variant'>;
 
 export type WhisperingErr = Err<WhisperingErrProperties>;
 export type WhisperingResult<T> = Ok<T> | WhisperingErr;

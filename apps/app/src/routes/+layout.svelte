@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import { onNavigate } from '$app/navigation';
 	import '../app.css';
 	import { queryClient } from '$lib/query';
@@ -30,4 +31,5 @@
 			{@render children()}
 		</AppShell>
 	</GlobalSingletonsContext>
+	<SvelteQueryDevtools initialIsOpen={false} />
 </QueryClientProvider>

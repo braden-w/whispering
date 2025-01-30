@@ -1,3 +1,4 @@
+import type { Accessor } from '$lib/query/types';
 import type { Result } from '@epicenterhq/result';
 import type { MaybePromise, WhisperingSoundNames } from '@repo/shared';
 import {
@@ -39,26 +40,19 @@ type QueryResultFunction<TData, TError> = () => MaybePromise<
 	Result<TData, TError>
 >;
 
-type CreateResultQueryOptions<
-	TQueryFnData,
-	TError,
-	TData,
-	TQueryKey extends QueryKey,
-> = Omit<
-	CreateQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
-	'queryFn'
-> & {
-	queryFn: QueryResultFunction<TQueryFnData, TError>;
-};
-
 export function createResultQuery<
 	TQueryFnData = unknown,
 	TError = DefaultError,
 	TData = TQueryFnData,
 	TQueryKey extends QueryKey = QueryKey,
 >(
-	options: FunctionedParams<
-		CreateResultQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+	options: Accessor<
+		Omit<
+			CreateQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+			'queryFn'
+		> & {
+			queryFn: QueryResultFunction<TQueryFnData, TError>;
+		}
 	>,
 ) {
 	return createQuery<TQueryFnData, TError, TData, TQueryKey>(() => {
@@ -75,32 +69,21 @@ export function createResultQuery<
 	});
 }
 
-type MutationResultFunction<
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
-> = (variables: TVariables) => MaybePromise<Result<TData, TError>>;
-
-type CreateResultMutationOptions<
-	TData = unknown,
-	TError = unknown,
-	TVariables = unknown,
-	TContext = unknown,
-> = Omit<
-	CreateMutationOptions<TData, TError, TVariables, TContext>,
-	'mutationFn'
-> & {
-	mutationFn: MutationResultFunction<TData, TError, TVariables>;
-};
-
 export function createResultMutation<
 	TData = unknown,
 	TError = DefaultError,
 	TVariables = void,
 	TContext = unknown,
 >(
-	options: FunctionedParams<
-		CreateResultMutationOptions<TData, TError, TVariables, TContext>
+	options: Accessor<
+		Omit<
+			CreateMutationOptions<TData, TError, TVariables, TContext>,
+			'mutationFn'
+		> & {
+			mutationFn: (
+				variables: TVariables,
+			) => MaybePromise<Result<TData, TError>>;
+		}
 	>,
 ) {
 	return createMutation<TData, TError, TVariables, TContext>(() => {

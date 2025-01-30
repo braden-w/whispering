@@ -8,7 +8,7 @@
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	let {
 		label,

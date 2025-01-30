@@ -187,9 +187,9 @@ class RecordingsDatabase extends Dexie {
 						const blobs = oldRecordings.map(({ id, blob }) => ({ id, blob }));
 
 						await tx
-							.table<
-								RecordingsDbSchemaV2['recordingMetadata']
-							>('recordingMetadata')
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
 							.bulkAdd(metadata);
 						await tx
 							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
@@ -212,9 +212,9 @@ class RecordingsDatabase extends Dexie {
 					upgrade: async (tx) => {
 						// Get data from both tables
 						const metadata = await tx
-							.table<
-								RecordingsDbSchemaV2['recordingMetadata']
-							>('recordingMetadata')
+							.table<RecordingsDbSchemaV2['recordingMetadata']>(
+								'recordingMetadata',
+							)
 							.toArray();
 						const blobs = await tx
 							.table<RecordingsDbSchemaV2['recordingBlobs']>('recordingBlobs')
@@ -315,6 +315,21 @@ export function createDbRecordingsServiceDexie() {
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting latest recording from Dexie',
+						error,
+					}),
+			});
+		},
+
+		async getTranscribingRecordingIds() {
+			return tryAsync({
+				try: () =>
+					db.recordings
+						.where('transcriptionStatus')
+						.equals('TRANSCRIBING' satisfies Recording['transcriptionStatus'])
+						.primaryKeys(),
+				mapErr: (error) =>
+					DbServiceErr({
+						title: 'Error getting transcribing recording ids from Dexie',
 						error,
 					}),
 			});

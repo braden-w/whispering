@@ -1,9 +1,11 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+	import { nanoid } from 'nanoid/non-secure';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
-	import SelectedTransformation from './SelectedTransformation.svelte';
+	import SelectTransformationCombobox from './SelectTransformationCombobox.svelte';
+	import { toast } from '$lib/services/toast';
 
 	const recorder = getRecorderFromContext();
 
@@ -13,7 +15,7 @@
 {#if recorder.recorderState === 'SESSION+RECORDING'}
 	<WhisperingButton
 		tooltipContent="Cancel recording"
-		onclick={recorder.cancelRecordingWithToast}
+		onclick={() => recorder.cancelRecorderWithToast()}
 		variant="ghost"
 		size="icon"
 		class={className}
@@ -23,7 +25,14 @@
 	</WhisperingButton>
 {:else if recorder.recorderState === 'SESSION'}
 	<WhisperingButton
-		onclick={recorder.closeRecordingSessionWithToast}
+		onclick={() => {
+			const toastId = nanoid();
+			recorder.ensureRecordingSessionClosedWithToast({
+				sendStatus: (status) => {
+					toast.info({ id: toastId, ...status });
+				},
+			});
+		}}
 		variant="ghost"
 		size="icon"
 		class={className}
@@ -42,5 +51,5 @@
 		{/snippet}
 	</WhisperingButton>
 {:else}
-	<SelectedTransformation class={className} />
+	<SelectTransformationCombobox class={className} />
 {/if}

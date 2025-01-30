@@ -1,7 +1,6 @@
 <script lang="ts">
-	import CancelOrEndRecordingSessionButton from '$lib/components/CancelOrEndRecordingSessionButton.svelte';
+	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import SelectedTransformation from '$lib/components/SelectedTransformation.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -9,7 +8,7 @@
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getRecorderFromContext } from '$lib/stores/recorder.svelte';
+	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
@@ -17,8 +16,8 @@
 	import { onDestroy } from 'svelte';
 
 	const recorder = getRecorderFromContext();
-	const latestRecordingQuery = useLatestRecording();
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
+	const { latestRecordingQuery } = useLatestRecording();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const latestRecording = $derived<Recording>(
 		latestRecordingQuery.data ?? {
@@ -78,7 +77,7 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<CancelOrEndRecordingSessionButton
+		<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
 			class="absolute -right-14 bottom-0 transform text-2xl"
 		/>
 	</div>

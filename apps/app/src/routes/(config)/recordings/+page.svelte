@@ -18,8 +18,8 @@
 	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
+	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
 	import type { Recording } from '$lib/services/db';
-	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
 	import {
@@ -50,12 +50,11 @@
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedText from './TranscribedText.svelte';
-	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
-
-	const copyTextToClipboardWithToast = useCopyTextToClipboardWithToast();
-	const deleteRecordingsWithToast = useDeleteRecordingsWithToast();
+	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
+	const { deleteRecordingsWithToast } = useDeleteRecordingsWithToast();
 
 	const columns: ColumnDef<Recording>[] = [
 		{
@@ -226,7 +225,7 @@
 	});
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
-	const recordingsQuery = useRecordingsQuery();
+	const { recordingsQuery } = useRecordingsQuery();
 
 	const table = createTable({
 		getRowId: (originalRow) => originalRow.id,
@@ -356,8 +355,11 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									transcriber.transcribeAndUpdateRecordingWithToast(
-										recording.original,
+									transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+										{
+											recording: recording.original,
+											toastId: nanoid(),
+										},
 									),
 								),
 							)}

@@ -12,59 +12,68 @@ export const recordingsKeys = {
 	byId: (id: string) => [...recordingsKeys.all, id] as const,
 };
 
-export const useRecordingsQuery = () =>
-	createQuery(() => ({
-		queryKey: recordingsKeys.all,
-		queryFn: async () => {
-			const result = await DbRecordingsService.getAllRecordings();
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to fetch recordings!',
-					description: 'Your recordings could not be fetched.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
-		},
-	}));
+export function useRecordingsQuery() {
+	return {
+		recordingsQuery: createQuery(() => ({
+			queryKey: recordingsKeys.all,
+			queryFn: async () => {
+				const result = await DbRecordingsService.getAllRecordings();
+				if (!result.ok) {
+					toast.error({
+						title: 'Failed to fetch recordings!',
+						description: 'Your recordings could not be fetched.',
+						action: { type: 'more-details', error: result.error },
+					});
+					throw result.error;
+				}
+				return result.data;
+			},
+		})),
+	};
+}
 
-export const useLatestRecording = () =>
-	createQuery(() => ({
-		queryKey: recordingsKeys.latest,
-		queryFn: async () => {
-			const result = await DbRecordingsService.getLatestRecording();
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to fetch latest recording!',
-					description: 'Your latest recording could not be fetched.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
-		},
-	}));
+export function useLatestRecording() {
+	return {
+		latestRecordingQuery: createQuery(() => ({
+			queryKey: recordingsKeys.latest,
+			queryFn: async () => {
+				const result = await DbRecordingsService.getLatestRecording();
+				if (!result.ok) {
+					toast.error({
+						title: 'Failed to fetch latest recording!',
+						description: 'Your latest recording could not be fetched.',
+						action: { type: 'more-details', error: result.error },
+					});
+					throw result.error;
+				}
+				return result.data;
+			},
+		})),
+	};
+}
 
-export const useRecordingQuery = (id: Accessor<string>) =>
-	createQuery(() => ({
-		queryKey: recordingsKeys.byId(id()),
-		queryFn: async () => {
-			const result = await DbRecordingsService.getRecordingById(id());
-			if (!result.ok) {
-				toast.error({
-					title: 'Failed to fetch recording!',
-					description: 'Your recording could not be fetched.',
-					action: { type: 'more-details', error: result.error },
-				});
-				throw result.error;
-			}
-			return result.data;
-		},
-		initialData: () =>
-			queryClient
-				.getQueryData<Recording[]>(recordingsKeys.all)
-				?.find((r) => r.id === id()),
-		initialDataUpdatedAt: () =>
-			queryClient.getQueryState(recordingsKeys.all)?.dataUpdatedAt,
-	}));
+export function useRecordingQuery(id: Accessor<string>) {
+	return {
+		recordingQuery: createQuery(() => ({
+			queryKey: recordingsKeys.byId(id()),
+			queryFn: async () => {
+				const result = await DbRecordingsService.getRecordingById(id());
+				if (!result.ok) {
+					toast.error({
+						title: 'Failed to fetch recording!',
+						description: 'Your recording could not be fetched.',
+						action: { type: 'more-details', error: result.error },
+					});
+					throw result.error;
+				}
+				return result.data;
+			},
+			initialData: () =>
+				queryClient
+					.getQueryData<Recording[]>(recordingsKeys.all)
+					?.find((r) => r.id === id()),
+			initialDataUpdatedAt: () =>
+				queryClient.getQueryState(recordingsKeys.all)?.dataUpdatedAt,
+		})),
+	};
+}

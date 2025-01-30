@@ -1,5 +1,5 @@
 import '@tanstack/svelte-table';
-import type { recorder } from './lib/stores/recorder.svelte';
+import type { Recorder } from './lib/query/recorder/mutations';
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
@@ -13,7 +13,7 @@ declare global {
 	}
 	interface Window {
 		__TAURI_INTERNALS__: Record<string, unknown>;
-		recorder: typeof recorder;
+		recorder: Recorder;
 		goto: (url: string) => Promise<void>;
 	}
 }

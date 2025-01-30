@@ -11,35 +11,35 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
+	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getTranscriberFromContext } from '$lib/stores/transcriber.svelte';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
-		LayersIcon,
+		FileStackIcon,
 		Loader2Icon,
 		EllipsisIcon as LoadingTranscriptionIcon,
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
+	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
 	const transcriber = getTranscriberFromContext();
-
-	const deleteRecordingWithToast = useDeleteRecordingWithToast();
-	const updateRecordingWithToast = useUpdateRecordingWithToast();
-	const downloadRecordingWithToast = useDownloadRecordingWithToast();
+	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
+	const { updateRecordingWithToast } = useUpdateRecordingWithToast();
+	const { downloadRecordingWithToast } = useDownloadRecordingWithToast();
 
 	let { recordingId }: { recordingId: string } = $props();
 
-	const latestTransformationRunByRecordingIdQuery =
+	const { latestTransformationRunByRecordingIdQuery } =
 		useLatestTransformationRunByRecordingIdQuery(() => recordingId);
 
-	const recordingQuery = useRecordingQuery(() => recordingId);
+	const { recordingQuery } = useRecordingQuery(() => recordingId);
 
 	const recording = $derived(recordingQuery.data);
 
@@ -72,7 +72,12 @@
 						? 'Retry transcription'
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
-				transcriber.transcribeAndUpdateRecordingWithToast(recording)}
+				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+					{
+						recording,
+						toastId: nanoid(),
+					},
+				)}
 			variant="ghost"
 			size="icon"
 		>
@@ -131,7 +136,7 @@
 				})}
 			>
 				{#snippet copyIcon()}
-					<LayersIcon />
+					<FileStackIcon />
 				{/snippet}
 			</CopyToClipboardButton>
 		{/if}
