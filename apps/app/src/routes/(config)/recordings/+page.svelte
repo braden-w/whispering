@@ -356,10 +356,7 @@
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
 									transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-										{
-											recording: recording.original,
-											toastId: nanoid(),
-										},
+										{ recording: recording.original },
 									),
 								),
 							)}

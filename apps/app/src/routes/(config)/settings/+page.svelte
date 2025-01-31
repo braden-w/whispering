@@ -28,7 +28,7 @@
 	<Separator />
 
 	<LabeledSwitch
-		id="copy-to-clipboard"
+		id="transcription.clipboard.copyOnSuccess"
 		label="Copy text to clipboard on successful transcription"
 		checked={settings.value['transcription.clipboard.copyOnSuccess']}
 		onCheckedChange={(v) => {
@@ -40,7 +40,7 @@
 	/>
 
 	<LabeledSwitch
-		id="paste-from-clipboard"
+		id="transcription.clipboard.pasteOnSuccess"
 		label="Paste contents from clipboard after successful transcription"
 		checked={settings.value['transcription.clipboard.pasteOnSuccess']}
 		onCheckedChange={(v) => {
@@ -51,6 +51,35 @@
 		}}
 		disabled={!settings.value['transcription.clipboard.copyOnSuccess']}
 	/>
+
+	<Separator />
+
+	<LabeledSwitch
+		id="transformation.clipboard.copyOnSuccess"
+		label="Copy text to clipboard on successful transformation"
+		checked={settings.value['transformation.clipboard.copyOnSuccess']}
+		onCheckedChange={(v) => {
+			settings.value = {
+				...settings.value,
+				'transformation.clipboard.copyOnSuccess': v,
+			};
+		}}
+	/>
+
+	<LabeledSwitch
+		id="transformation.clipboard.pasteOnSuccess"
+		label="Paste contents from clipboard after successful transformation"
+		checked={settings.value['transformation.clipboard.pasteOnSuccess']}
+		onCheckedChange={(v) => {
+			settings.value = {
+				...settings.value,
+				'transformation.clipboard.pasteOnSuccess': v,
+			};
+		}}
+		disabled={!settings.value['transformation.clipboard.copyOnSuccess']}
+	/>
+
+	<Separator />
 
 	<LabeledSwitch
 		id="faster-rerecord"

@@ -31,5 +31,5 @@
 			{@render children()}
 		</AppShell>
 	</GlobalSingletonsContext>
-	<SvelteQueryDevtools initialIsOpen={false} />
+	<SvelteQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
 </QueryClientProvider>

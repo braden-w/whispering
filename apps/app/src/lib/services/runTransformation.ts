@@ -21,13 +21,13 @@ export const createRunTransformationService = ({
 	HttpService: HttpService;
 }) => ({
 	runTransformation: async ({
-		recordingId,
 		input,
 		transformation,
+		recordingId,
 	}: {
-		recordingId: string | null;
 		input: string;
 		transformation: Transformation;
+		recordingId: string | null;
 	}): Promise<DbServiceResult<TransformationRun>> => {
 		const createTransformationRunResult =
 			await DbTransformationsService.createTransformationRun({

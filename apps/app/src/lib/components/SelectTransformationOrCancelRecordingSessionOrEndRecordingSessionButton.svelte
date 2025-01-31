@@ -26,12 +26,7 @@
 {:else if recorder.recorderState === 'SESSION'}
 	<WhisperingButton
 		onclick={() => {
-			const toastId = nanoid();
-			recorder.ensureRecordingSessionClosedWithToast({
-				sendStatus: (status) => {
-					toast.info({ id: toastId, ...status });
-				},
-			});
+			recorder.ensureRecordingSessionClosedWithToast();
 		}}
 		variant="ghost"
 		size="icon"
