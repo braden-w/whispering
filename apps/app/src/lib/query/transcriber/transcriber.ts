@@ -54,7 +54,8 @@ function createTranscriber() {
 		},
 	}));
 
-	const { copyIfSetPasteIfSet } = useCopyIfSetPasteIfSet();
+	const { copyIfSetPasteIfSetWithClipboard } =
+		useCopyIfSetPasteIfSetWithClipboard();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const { transcribeAndUpdateRecording } =
@@ -99,7 +100,10 @@ function createTranscriber() {
 									}),
 							},
 						});
-						copyIfSetPasteIfSet.mutate({ text: transcribedText, toastId });
+						copyIfSetPasteIfSetWithClipboard.mutate({
+							text: transcribedText,
+							toastId,
+						});
 					},
 				},
 			);
@@ -188,7 +192,8 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 }
 
 export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste() {
-	const { copyIfSetPasteIfSet } = useCopyIfSetPasteIfSet();
+	const { copyIfSetPasteIfSetWithClipboard } =
+		useCopyIfSetPasteIfSetWithClipboard();
 	return {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste:
 			createResultMutation(() => ({
@@ -272,16 +277,19 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 				},
 				onSuccess: (transformedText, { toastId }) => {
 					void playSoundIfEnabled('transformationComplete');
-					copyIfSetPasteIfSet.mutate({ text: transformedText, toastId });
+					copyIfSetPasteIfSetWithClipboard.mutate({
+						text: transformedText,
+						toastId,
+					});
 				},
 			})),
 	};
 }
 
-function useCopyIfSetPasteIfSet() {
+function useCopyIfSetPasteIfSetWithClipboard() {
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 	return {
-		copyIfSetPasteIfSet: createMutation(() => ({
+		copyIfSetPasteIfSetWithClipboard: createMutation(() => ({
 			mutationFn: async ({
 				text,
 				toastId,
