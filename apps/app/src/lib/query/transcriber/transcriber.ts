@@ -108,8 +108,55 @@ function createTranscriber() {
 				},
 			);
 		},
-		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste:
-			transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate,
+		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
+			recording,
+			selectedTransformationId,
+		}: {
+			recording: Recording;
+			selectedTransformationId: string;
+		}) => {
+			const toastId = nanoid();
+			toast.loading({
+				id: toastId,
+				title: '🔄 Running transformation...',
+				description:
+					'Applying your selected transformation to the transcribed text...',
+			});
+			transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
+				{
+					transcribedText: recording.transcribedText,
+					selectedTransformationId,
+					recordingId: recording.id,
+				},
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+					onSuccess: (transformedText) => {
+						void playSoundIfEnabled('transformationComplete');
+						toast.success({
+							id: toastId,
+							title: '📋 Recording transformed!',
+							description: transformedText,
+							descriptionClass: 'line-clamp-2',
+							action: {
+								type: 'button',
+								label: 'Copy to clipboard',
+								onClick: () =>
+									copyTextToClipboardWithToast.mutate({
+										label: 'transformed text',
+										text: transformedText,
+									}),
+							},
+						});
+						copyIfSetPasteIfSetWithClipboard.mutate({
+							text: transformedText,
+							toastId,
+						});
+					},
+				},
+			);
+		},
 	};
 }
 
@@ -151,7 +198,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 					);
 				return transcriptionResult;
 			},
-			onError: (error, { recording }) => {
+			onError: (_error, { recording }) => {
 				updateRecording.mutate(
 					{ ...recording, transcriptionStatus: 'FAILED' },
 					{
@@ -192,28 +239,17 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 }
 
 export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste() {
-	const { copyIfSetPasteIfSetWithClipboard } =
-		useCopyIfSetPasteIfSetWithClipboard();
 	return {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste:
 			createResultMutation(() => ({
-				onMutate: ({ toastId }) => {
-					toast.loading({
-						id: toastId,
-						title: '🔄 Running transformation...',
-						description:
-							'Applying your selected transformation to the transcribed text...',
-					});
-				},
 				mutationFn: async ({
 					transcribedText,
-					recordingId,
 					selectedTransformationId,
+					recordingId,
 				}: {
 					transcribedText: string;
-					recordingId: string;
 					selectedTransformationId: string;
-					toastId: string;
+					recordingId: string;
 				}): Promise<WhisperingResult<string>> => {
 					const getTransformationResult =
 						await DbTransformationsService.getTransformationById(
@@ -238,9 +274,9 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 
 					const transformationResult =
 						await RunTransformationService.runTransformation({
-							recordingId,
 							input: transcribedText,
 							transformation,
+							recordingId,
 						});
 
 					if (!transformationResult.ok) {
@@ -268,19 +304,6 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 					}
 
 					return Ok(transformationRun.output);
-				},
-				onError: (error, { toastId }) => {
-					toast.error({
-						id: toastId,
-						...error,
-					});
-				},
-				onSuccess: (transformedText, { toastId }) => {
-					void playSoundIfEnabled('transformationComplete');
-					copyIfSetPasteIfSetWithClipboard.mutate({
-						text: transformedText,
-						toastId,
-					});
 				},
 			})),
 	};

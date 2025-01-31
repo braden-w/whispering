@@ -4,6 +4,7 @@ import { toast } from '$lib/services/toast';
 export type CopyToClipboardLabel =
 	| 'transcribed text'
 	| 'transcribed text (joined)'
+	| 'transformed text'
 	| 'code'
 	| 'latest transformation run output';
 
