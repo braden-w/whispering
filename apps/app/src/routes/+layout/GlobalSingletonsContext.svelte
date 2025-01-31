@@ -4,7 +4,7 @@
 	import { initRegisterShortcutsInContext } from '$lib/stores/settings.svelte';
 
 	const transcriber = initTranscriberInContext();
-	const recorder = initRecorderInContext();
+	const recorder = initRecorderInContext({ transcriber });
 	const registerShortcuts = initRegisterShortcutsInContext({ recorder });
 
 	let { children } = $props();
