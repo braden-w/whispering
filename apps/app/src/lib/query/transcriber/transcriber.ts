@@ -39,25 +39,11 @@ export const getTranscriberFromContext = () => {
 };
 
 const transcriberKeys = {
-	isCurrentlyTranscribing: ['transcriber', 'isCurrentlyTranscribing'] as const,
-};
-
-const transcriberMutationKeys = {
+	transcribe: ['transcriber', 'transcribe'] as const,
 	transform: ['transcriber', 'transform'] as const,
 } as const;
 
 function createTranscriber() {
-	const isCurrentlyTranscribing = createResultQuery(() => ({
-		queryKey: transcriberKeys.isCurrentlyTranscribing,
-		queryFn: async () => {
-			const transcribingRecordingIdsResult =
-				await DbRecordingsService.getTranscribingRecordingIds();
-			if (!transcribingRecordingIdsResult.ok)
-				return transcribingRecordingIdsResult;
-			return Ok(transcribingRecordingIdsResult.data.length > 0);
-		},
-	}));
-
 	const { copyIfSetPasteIfSetWithClipboard } =
 		useCopyIfSetPasteIfSetWithClipboard();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
@@ -70,12 +56,16 @@ function createTranscriber() {
 
 	return {
 		get isCurrentlyTranscribing() {
-			return isCurrentlyTranscribing.data ?? false;
+			return (
+				queryClient.isMutating({
+					mutationKey: transcriberKeys.transcribe,
+				}) > 0
+			);
 		},
 		get isCurrentlyTransforming() {
 			return (
 				queryClient.isMutating({
-					mutationKey: transcriberMutationKeys.transform,
+					mutationKey: transcriberKeys.transform,
 				}) > 0
 			);
 		},
@@ -177,6 +167,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 	const { updateRecording } = useUpdateRecording();
 	return {
 		transcribeAndUpdateRecording: createResultMutation(() => ({
+			mutationKey: transcriberKeys.transcribe,
 			onMutate: ({ recording }: { recording: Recording }) => {
 				updateRecording.mutate(
 					{ ...recording, transcriptionStatus: 'TRANSCRIBING' },
@@ -191,7 +182,6 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 						},
 					},
 				);
-				queryClient.setQueryData(transcriberKeys.isCurrentlyTranscribing, true);
 			},
 			mutationFn: async ({ recording }: { recording: Recording }) => {
 				if (!recording.blob) {
@@ -242,11 +232,6 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 					},
 				);
 			},
-			onSettled: () => {
-				queryClient.invalidateQueries({
-					queryKey: transcriberKeys.isCurrentlyTranscribing,
-				});
-			},
 		})),
 	};
 }
@@ -255,7 +240,7 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 	return {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste:
 			createResultMutation(() => ({
-				mutationKey: transcriberMutationKeys.transform,
+				mutationKey: transcriberKeys.transform,
 				mutationFn: async ({
 					transcribedText,
 					selectedTransformationId,
