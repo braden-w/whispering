@@ -5,10 +5,6 @@ import { settings } from '$lib/stores/settings.svelte';
 import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import {
-	useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste,
-	useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
-} from '../transcriber/transcriber';
-import {
 	useCancelRecorder,
 	useEnsureRecordingSession,
 	useEnsureRecordingSessionClosed,
@@ -17,11 +13,16 @@ import {
 } from './mutations';
 import { useRecorderState } from './queries';
 import { noop } from '@tanstack/table-core';
+import type { Transcriber } from '../transcriber/transcriber';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 
-export const initRecorderInContext = () => {
-	const recorder = createRecorder();
+export const initRecorderInContext = ({
+	transcriber,
+}: {
+	transcriber: Transcriber;
+}) => {
+	const recorder = createRecorder({ transcriber });
 	setContext('recorder', recorder);
 	return recorder;
 };
@@ -30,22 +31,14 @@ export const getRecorderFromContext = () => {
 	return getContext<Recorder>('recorder');
 };
 
-function createRecorder() {
+function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 	const { recorderState } = useRecorderState();
 	const { startRecording } = useStartRecording();
 	const { stopRecording } = useStopRecording();
 	const { ensureRecordingSessionClosed } = useEnsureRecordingSessionClosed();
 	const { cancelRecorder } = useCancelRecorder();
 	const { ensureRecordingSession } = useEnsureRecordingSession();
-
 	const { createRecording } = useCreateRecording();
-	const {
-		transcribeAndUpdateRecording:
-			transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste,
-	} = useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
-	const {
-		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
-	} = useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste();
 
 	return {
 		get recorderState() {
@@ -102,7 +95,7 @@ function createRecorder() {
 											},
 										});
 									},
-									onSuccess: (createdRecording) => {
+									onSuccess: async (createdRecording) => {
 										toast.loading({
 											id: toastId,
 											title: '✨ Recording Complete!',
@@ -112,33 +105,6 @@ function createRecorder() {
 												? 'Recording saved! Ready for another take'
 												: 'Recording saved and session closed successfully',
 										});
-
-										const transcribeAndTransformToastId = nanoid();
-										transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
-											{
-												recording: createdRecording,
-											},
-											{
-												onSuccess: async (transcribedText) => {
-													if (
-														settings.value[
-															'transformations.selectedTransformationId'
-														]
-													) {
-														transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
-															{
-																transcribedText,
-																recordingId: createdRecording.id,
-																selectedTransformationId:
-																	settings.value[
-																		'transformations.selectedTransformationId'
-																	],
-															},
-														);
-													}
-												},
-											},
-										);
 
 										if (!settings.value['recording.isFasterRerecordEnabled']) {
 											toast.loading({
@@ -173,6 +139,26 @@ function createRecorder() {
 															},
 														});
 													},
+												},
+											);
+										}
+
+										const transcribedText =
+											await transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+												{ recording: createdRecording, toastId },
+											);
+										if (
+											settings.value['transformations.selectedTransformationId']
+										) {
+											await transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+												{
+													input: transcribedText,
+													recordingId: createdRecording.id,
+													selectedTransformationId:
+														settings.value[
+															'transformations.selectedTransformationId'
+														],
+													toastId,
 												},
 											);
 										}

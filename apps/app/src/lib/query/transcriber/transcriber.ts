@@ -13,10 +13,8 @@ import { Ok } from '@epicenterhq/result';
 import {
 	WHISPERING_RECORDINGS_PATHNAME,
 	WhisperingErr,
-	type WhisperingErrProperties,
 	type WhisperingResult,
 } from '@repo/shared';
-import { createMutation } from '@tanstack/svelte-query';
 import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
@@ -40,12 +38,97 @@ const transcriberKeys = {
 } as const;
 
 function createTranscriber() {
+	const { transcribeAndUpdateRecording } = useTranscribeAndUpdateRecording();
+	const { transformTranscribedTextFromRecording } =
+		useTransformTranscribedTextFromRecording();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
-	const { transcribeAndUpdateRecording } =
-		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
-	const {
-		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
-	} = useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste();
+
+	const maybeCopyAndPaste = async ({
+		text,
+		toastId,
+		shouldCopy,
+		shouldPaste,
+		statusToToastText,
+	}: {
+		text: string;
+		toastId: string;
+		shouldCopy: boolean;
+		shouldPaste: boolean;
+		statusToToastText: (status: null | 'COPIED' | 'COPIED+PASTED') => string;
+	}) => {
+		const toastNull = () =>
+			toast.success({
+				id: toastId,
+				title: statusToToastText(null),
+				description: text,
+				descriptionClass: 'line-clamp-2',
+				action: {
+					type: 'button',
+					label: 'Copy to clipboard',
+					onClick: () =>
+						copyTextToClipboardWithToast.mutate({
+							label: 'transcribed text',
+							text: text,
+						}),
+				},
+			});
+
+		const toastCopied = () =>
+			toast.success({
+				id: toastId,
+				title: '📝 Recording transcribed and copied to clipboard!',
+				description: text,
+				descriptionClass: 'line-clamp-2',
+				action: {
+					type: 'link',
+					label: 'Go to recordings',
+					goto: WHISPERING_RECORDINGS_PATHNAME,
+				},
+			});
+
+		const toastCopiedAndPasted = () =>
+			toast.success({
+				id: toastId,
+				title: statusToToastText('COPIED+PASTED'),
+				description: text,
+				descriptionClass: 'line-clamp-2',
+				action: {
+					type: 'link',
+					label: 'Go to recordings',
+					goto: WHISPERING_RECORDINGS_PATHNAME,
+				},
+			});
+		if (!shouldCopy) return toastNull();
+
+		const copyResult = await ClipboardService.setClipboardText(text);
+		if (!copyResult.ok) {
+			toast.warning({
+				id: toastId,
+				title: '⚠️ Clipboard Access Failed',
+				description:
+					'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
+				action: { type: 'more-details', error: copyResult.error },
+			});
+			toastNull();
+			return;
+		}
+
+		if (!shouldPaste) return toastCopied();
+
+		const pasteResult = await ClipboardService.writeTextToCursor(text);
+		if (!pasteResult.ok) {
+			toast.warning({
+				title: '⚠️ Paste Operation Failed',
+				description:
+					'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
+				action: { type: 'more-details', error: pasteResult.error },
+			});
+			toastCopied();
+			return;
+		}
+
+		toastCopiedAndPasted();
+	};
 
 	return {
 		get isCurrentlyTranscribing() {
@@ -64,16 +147,17 @@ function createTranscriber() {
 		},
 		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
 			recording,
+			toastId = nanoid(),
 		}: {
 			recording: Recording;
+			toastId?: string;
 		}) => {
-			const toastId = nanoid();
 			toast.loading({
 				id: toastId,
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			transcribeAndUpdateRecording.mutate(
+			return await transcribeAndUpdateRecording.mutateAsync(
 				{ recording },
 				{
 					onError: (error) => {
@@ -81,7 +165,7 @@ function createTranscriber() {
 					},
 					onSuccess: async (transcribedText) => {
 						void playSoundIfEnabled('transcriptionComplete');
-						void maybeCopyAndPaste({
+						maybeCopyAndPaste({
 							text: transcribedText,
 							toastId,
 							shouldCopy:
@@ -104,24 +188,27 @@ function createTranscriber() {
 			);
 		},
 		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
-			recording,
+			input,
 			selectedTransformationId,
+			recordingId,
+			toastId = nanoid(),
 		}: {
-			recording: Recording;
+			input: string;
 			selectedTransformationId: string;
+			recordingId: string;
+			toastId?: string;
 		}) => {
-			const toastId = nanoid();
 			toast.loading({
 				id: toastId,
 				title: '🔄 Running transformation...',
 				description:
 					'Applying your selected transformation to the transcribed text...',
 			});
-			transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste.mutate(
+			return await transformTranscribedTextFromRecording.mutateAsync(
 				{
-					transcribedText: recording.transcribedText,
+					transcribedText: input,
 					selectedTransformationId,
-					recordingId: recording.id,
+					recordingId,
 				},
 				{
 					onError: (error) => {
@@ -129,7 +216,7 @@ function createTranscriber() {
 					},
 					onSuccess: (transformedText) => {
 						void playSoundIfEnabled('transformationComplete');
-						void maybeCopyAndPaste({
+						maybeCopyAndPaste({
 							text: transformedText,
 							toastId,
 							shouldCopy:
@@ -154,7 +241,7 @@ function createTranscriber() {
 	};
 }
 
-export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste() {
+function useTranscribeAndUpdateRecording() {
 	const { updateRecording } = useUpdateRecording();
 	return {
 		transcribeAndUpdateRecording: createResultMutation(() => ({
@@ -227,163 +314,73 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 	};
 }
 
-export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste() {
+function useTransformTranscribedTextFromRecording() {
 	return {
-		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste:
-			createResultMutation(() => ({
-				mutationKey: transcriberKeys.transform,
-				mutationFn: async ({
-					transcribedText,
-					selectedTransformationId,
-					recordingId,
-				}: {
-					transcribedText: string;
-					selectedTransformationId: string;
-					recordingId: string;
-				}): Promise<WhisperingResult<string>> => {
-					const getTransformationResult =
-						await DbTransformationsService.getTransformationById(
-							selectedTransformationId,
-						);
-					if (!getTransformationResult.ok) {
-						return WhisperingErr({
-							title: '⚠️ Transformation not found',
-							description:
-								'Could not find the selected transformation. Using original transcription.',
-						});
-					}
+		transformTranscribedTextFromRecording: createResultMutation(() => ({
+			mutationKey: transcriberKeys.transform,
+			mutationFn: async ({
+				transcribedText,
+				selectedTransformationId,
+				recordingId,
+			}: {
+				transcribedText: string;
+				selectedTransformationId: string;
+				recordingId: string;
+			}): Promise<WhisperingResult<string>> => {
+				const getTransformationResult =
+					await DbTransformationsService.getTransformationById(
+						selectedTransformationId,
+					);
+				if (!getTransformationResult.ok) {
+					return WhisperingErr({
+						title: '⚠️ Transformation not found',
+						description:
+							'Could not find the selected transformation. Using original transcription.',
+					});
+				}
 
-					const transformation = getTransformationResult.data;
-					if (!transformation) {
-						return WhisperingErr({
-							title: '⚠️ Transformation not found',
-							description:
-								'Could not find the selected transformation. Using original transcription.',
-						});
-					}
+				const transformation = getTransformationResult.data;
+				if (!transformation) {
+					return WhisperingErr({
+						title: '⚠️ Transformation not found',
+						description:
+							'Could not find the selected transformation. Using original transcription.',
+					});
+				}
 
-					const transformationResult =
-						await RunTransformationService.runTransformation({
-							input: transcribedText,
-							transformation,
-							recordingId,
-						});
+				const transformationResult =
+					await RunTransformationService.runTransformation({
+						input: transcribedText,
+						transformation,
+						recordingId,
+					});
 
-					if (!transformationResult.ok) {
-						return WhisperingErr({
-							title: '⚠️ Transformation failed',
-							description:
-								'Failed to apply the transformation. Using original transcription.',
-						});
-					}
+				if (!transformationResult.ok) {
+					return WhisperingErr({
+						title: '⚠️ Transformation failed',
+						description:
+							'Failed to apply the transformation. Using original transcription.',
+					});
+				}
 
-					const transformationRun = transformationResult.data;
-					if (transformationRun.error) {
-						return WhisperingErr({
-							title: '⚠️ Transformation error',
-							description: transformationRun.error,
-						});
-					}
+				const transformationRun = transformationResult.data;
+				if (transformationRun.error) {
+					return WhisperingErr({
+						title: '⚠️ Transformation error',
+						description: transformationRun.error,
+					});
+				}
 
-					if (!transformationRun.output) {
-						return WhisperingErr({
-							title: '⚠️ Transformation produced no output',
-							description:
-								'The transformation completed but produced no output. Using original transcription.',
-						});
-					}
+				if (!transformationRun.output) {
+					return WhisperingErr({
+						title: '⚠️ Transformation produced no output',
+						description:
+							'The transformation completed but produced no output. Using original transcription.',
+					});
+				}
 
-					return Ok(transformationRun.output);
-				},
-			})),
+				return Ok(transformationRun.output);
+			},
+		})),
 	};
-}
-
-async function maybeCopyAndPaste({
-	text,
-	toastId,
-	shouldCopy,
-	shouldPaste,
-	statusToToastText,
-}: {
-	text: string;
-	toastId: string;
-	shouldCopy: boolean;
-	shouldPaste: boolean;
-	statusToToastText: (status: null | 'COPIED' | 'COPIED+PASTED') => string;
-}) {
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
-
-	const toastNull = () =>
-		toast.success({
-			id: toastId,
-			title: statusToToastText(null),
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'button',
-				label: 'Copy to clipboard',
-				onClick: () =>
-					copyTextToClipboardWithToast.mutate({
-						label: 'transcribed text',
-						text: text,
-					}),
-			},
-		});
-
-	const toastCopied = () =>
-		toast.success({
-			id: toastId,
-			title: '📝 Recording transcribed and copied to clipboard!',
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'link',
-				label: 'Go to recordings',
-				goto: WHISPERING_RECORDINGS_PATHNAME,
-			},
-		});
-
-	const toastCopiedAndPasted = () =>
-		toast.success({
-			id: toastId,
-			title: statusToToastText('COPIED+PASTED'),
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'link',
-				label: 'Go to recordings',
-				goto: WHISPERING_RECORDINGS_PATHNAME,
-			},
-		});
-	if (!shouldCopy) return toastNull();
-
-	const copyResult = await ClipboardService.setClipboardText(text);
-	if (!copyResult.ok) {
-		toast.warning({
-			id: toastId,
-			title: '⚠️ Clipboard Access Failed',
-			description:
-				'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-			action: { type: 'more-details', error: copyResult.error },
-		});
-		toastNull();
-		return;
-	}
-
-	if (!shouldPaste) return toastCopied();
-
-	const pasteResult = await ClipboardService.writeTextToCursor(text);
-	if (!pasteResult.ok) {
-		toast.warning({
-			title: '⚠️ Paste Operation Failed',
-			description:
-				'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-			action: { type: 'more-details', error: pasteResult.error },
-		});
-		toastCopied();
-		return;
-	}
-
-	toastCopiedAndPasted();
 }
