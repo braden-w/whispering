@@ -54,7 +54,6 @@ function createTranscriber() {
 		},
 	}));
 
-	const { updateRecording } = useUpdateRecording();
 	const { copyIfSetPasteIfSet } = useCopyIfSetPasteIfSet();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
