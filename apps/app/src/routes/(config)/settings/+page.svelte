@@ -79,6 +79,8 @@
 		disabled={!settings.value['transformation.clipboard.copyOnSuccess']}
 	/>
 
+	<Separator />
+
 	<LabeledSwitch
 		id="faster-rerecord"
 		checked={settings.value['recording.isFasterRerecordEnabled']}
