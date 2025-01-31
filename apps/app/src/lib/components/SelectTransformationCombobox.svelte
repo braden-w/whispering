@@ -33,8 +33,12 @@
 	let {
 		class: className,
 		onSelect,
-	}: { class?: string; onSelect: (transformation: Transformation) => void } =
-		$props();
+		hideCheckIconOnSelectedTransformation = false,
+	}: {
+		class?: string;
+		onSelect: (transformation: Transformation) => void;
+		hideCheckIconOnSelectedTransformation?: boolean;
+	} = $props();
 </script>
 
 {#snippet renderTransformationIdTitle(transformation: Transformation)}
@@ -97,7 +101,9 @@
 					>
 						<CheckIcon
 							class={cn('h-4 w-4 flex-shrink-0 mx-2', {
-								'text-transparent': !isSelectedTransformation,
+								'text-transparent':
+									!isSelectedTransformation ||
+									hideCheckIconOnSelectedTransformation,
 							})}
 						/>
 						<div class="flex flex-col min-w-0">
