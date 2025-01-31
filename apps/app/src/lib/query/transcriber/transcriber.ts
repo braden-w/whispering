@@ -100,10 +100,7 @@ function createTranscriber() {
 									}),
 							},
 						});
-						copyIfSetPasteIfSet.mutate({
-							text: transcribedText,
-							toastId,
-						});
+						copyIfSetPasteIfSet.mutate({ text: transcribedText, toastId });
 					},
 				},
 			);
