@@ -28,6 +28,7 @@
 	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
 
 	const transcriber = getTranscriberFromContext();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
@@ -92,9 +93,12 @@
 		<WhisperingButton
 			tooltipContent="Run transformation on transcribed text"
 			onclick={() => {
-				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-					{ recording },
-				);
+				transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
+					input: recording.transcribedText,
+					recordingId: recording.id,
+					selectedTransformationId:
+						settings.value['transformations.selectedTransformationId'],
+				});
 			}}
 			variant="ghost"
 			size="icon"
