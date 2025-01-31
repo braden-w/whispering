@@ -113,7 +113,7 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 	const { updateRecording } = useUpdateRecording();
 	return {
 		transcribeAndUpdateRecording: createResultMutation(() => ({
-			onMutate: async ({ recording }: { recording: Recording }) => {
+			onMutate: ({ recording }: { recording: Recording }) => {
 				updateRecording.mutate(
 					{ ...recording, transcriptionStatus: 'TRANSCRIBING' },
 					{
