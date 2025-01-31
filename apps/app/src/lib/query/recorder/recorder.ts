@@ -16,6 +16,7 @@ import {
 	useStopRecording,
 } from './mutations';
 import { useRecorderState } from './queries';
+import { noop } from '@tanstack/table-core';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 
@@ -33,10 +34,7 @@ function createRecorder() {
 	const { recorderState } = useRecorderState();
 	const { startRecording } = useStartRecording();
 	const { stopRecording } = useStopRecording();
-	const {
-		ensureRecordingSessionClosedSilent,
-		ensureRecordingSessionClosedWithToast,
-	} = useEnsureRecordingSessionClosed();
+	const { ensureRecordingSessionClosed } = useEnsureRecordingSessionClosed();
 	const { cancelRecorder } = useCancelRecorder();
 	const { ensureRecordingSession } = useEnsureRecordingSession();
 
@@ -148,7 +146,7 @@ function createRecorder() {
 												title: '⏳ Closing recording session...',
 												description: 'Wrapping things up, just a moment...',
 											});
-											ensureRecordingSessionClosedWithToast.mutate(
+											ensureRecordingSessionClosed.mutate(
 												{
 													sendStatus: (options) =>
 														toast.loading({ id: toastId, ...options }),
@@ -235,7 +233,7 @@ function createRecorder() {
 									'Recording discarded, but session remains open for a new take',
 							});
 						} else {
-							ensureRecordingSessionClosedWithToast.mutate(
+							ensureRecordingSessionClosed.mutate(
 								{
 									sendStatus: (options) =>
 										toast.loading({ id: toastId, ...options }),
@@ -268,9 +266,33 @@ function createRecorder() {
 				},
 			);
 		},
-		ensureRecordingSessionClosedSilent:
-			ensureRecordingSessionClosedSilent.mutate,
-		ensureRecordingSessionClosedWithToast:
-			ensureRecordingSessionClosedWithToast.mutate,
+		ensureRecordingSessionClosedSilent: () => {
+			const toastId = nanoid();
+			ensureRecordingSessionClosed.mutate(
+				{
+					sendStatus: noop,
+				},
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+				},
+			);
+		},
+		ensureRecordingSessionClosedWithToast: () => {
+			const toastId = nanoid();
+			return ensureRecordingSessionClosed.mutate(
+				{
+					sendStatus: (status) => {
+						toast.info({ id: toastId, ...status });
+					},
+				},
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+				},
+			);
+		},
 	};
 }

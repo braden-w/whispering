@@ -12,9 +12,7 @@ import { queryClient } from '..';
 import { recorderKeys } from './queries';
 
 const invalidateRecorderState = () =>
-	queryClient.invalidateQueries({
-		queryKey: recorderKeys.state,
-	});
+	queryClient.invalidateQueries({ queryKey: recorderKeys.state });
 
 export function useCancelRecorder() {
 	return {
@@ -85,17 +83,7 @@ export function useStopRecording() {
 
 export function useEnsureRecordingSessionClosed() {
 	return {
-		ensureRecordingSessionClosedSilent: createResultMutation(() => ({
-			mutationFn: async () => {
-				const closeResult =
-					await userConfiguredServices.recorder.ensureRecordingSessionClosed({
-						sendStatus: noop,
-					});
-				return closeResult;
-			},
-			onSettled: invalidateRecorderState,
-		})),
-		ensureRecordingSessionClosedWithToast: createResultMutation(() => ({
+		ensureRecordingSessionClosed: createResultMutation(() => ({
 			mutationFn: async ({
 				sendStatus,
 			}: { sendStatus: UpdateStatusMessageFn }) => {
