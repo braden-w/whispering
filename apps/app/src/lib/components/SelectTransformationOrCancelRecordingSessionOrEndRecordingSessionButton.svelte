@@ -2,10 +2,9 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
-	import { nanoid } from 'nanoid/non-secure';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 	import SelectTransformationCombobox from './SelectTransformationCombobox.svelte';
-	import { toast } from '$lib/services/toast';
 
 	const recorder = getRecorderFromContext();
 
@@ -46,5 +45,17 @@
 		{/snippet}
 	</WhisperingButton>
 {:else}
-	<SelectTransformationCombobox class={className} />
+	<SelectTransformationCombobox
+		class={className}
+		onSelect={(transformation) => {
+			settings.value = {
+				...settings.value,
+				'transformations.selectedTransformationId':
+					settings.value['transformations.selectedTransformationId'] ===
+					transformation.id
+						? null
+						: transformation.id,
+			};
+		}}
+	/>
 {/if}

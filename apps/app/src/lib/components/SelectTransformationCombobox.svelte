@@ -30,7 +30,11 @@
 
 	const combobox = useCombobox();
 
-	let { class: className }: { class?: string } = $props();
+	let {
+		class: className,
+		onSelect,
+	}: { class?: string; onSelect: (transformation: Transformation) => void } =
+		$props();
 </script>
 
 {#snippet renderTransformationIdTitle(transformation: Transformation)}
@@ -83,20 +87,7 @@
 					<Command.Item
 						value="${transformation.id} - ${transformation.title} - ${transformation.description}"
 						onSelect={() => {
-							if (
-								settings.value['transformations.selectedTransformationId'] ===
-								transformation.id
-							) {
-								settings.value = {
-									...settings.value,
-									'transformations.selectedTransformationId': null,
-								};
-							} else {
-								settings.value = {
-									...settings.value,
-									'transformations.selectedTransformationId': transformation.id,
-								};
-							}
+							onSelect(transformation);
 							combobox.closeAndFocusTrigger();
 						}}
 						class="flex items-center gap-2 p-2"
