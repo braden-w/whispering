@@ -79,9 +79,11 @@ function createTranscriber() {
 				}) > 0
 			);
 		},
-		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste: async (
-			recording: Recording,
-		) => {
+		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
+			recording,
+		}: {
+			recording: Recording;
+		}) => {
 			const toastId = nanoid();
 			toast.loading({
 				id: toastId,
