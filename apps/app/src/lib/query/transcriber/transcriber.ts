@@ -44,7 +44,7 @@ const transcriberKeys = {
 } as const;
 
 function createTranscriber() {
-	const { copyIfSetPasteIfSetWithClipboard } =
+	const { copyIfSetPasteIfSetWithClipboard: copyAndPasteWithToast } =
 		useCopyIfSetPasteIfSetWithClipboard();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
@@ -88,22 +88,7 @@ function createTranscriber() {
 					},
 					onSuccess: (transcribedText) => {
 						void playSoundIfEnabled('transcriptionComplete');
-						toast.success({
-							id: toastId,
-							title: '📋 Recording transcribed!',
-							description: transcribedText,
-							descriptionClass: 'line-clamp-2',
-							action: {
-								type: 'button',
-								label: 'Copy to clipboard',
-								onClick: () =>
-									copyTextToClipboardWithToast.mutate({
-										label: 'transcribed text',
-										text: transcribedText,
-									}),
-							},
-						});
-						copyIfSetPasteIfSetWithClipboard.mutate({
+						copyAndPasteWithToast.mutate({
 							text: transcribedText,
 							toastId,
 						});
@@ -152,7 +137,7 @@ function createTranscriber() {
 									}),
 							},
 						});
-						copyIfSetPasteIfSetWithClipboard.mutate({
+						copyAndPasteWithToast.mutate({
 							text: transformedText,
 							toastId,
 						});

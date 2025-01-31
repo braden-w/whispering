@@ -39,8 +39,10 @@ function createRecorder() {
 	const { ensureRecordingSession } = useEnsureRecordingSession();
 
 	const { createRecording } = useCreateRecording();
-	const { transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
-		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
+	const {
+		transcribeAndUpdateRecording:
+			transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste,
+	} = useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
 	const {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
 	} = useTransformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste();
@@ -115,7 +117,6 @@ function createRecorder() {
 										transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
 											{
 												recording: createdRecording,
-												toastId: transcribeAndTransformToastId,
 											},
 											{
 												onSuccess: async (transcribedText) => {
@@ -132,7 +133,6 @@ function createRecorder() {
 																	settings.value[
 																		'transformations.selectedTransformationId'
 																	],
-																toastId: transcribeAndTransformToastId,
 															},
 														);
 													}
@@ -224,7 +224,7 @@ function createRecorder() {
 					onError: (error) => {
 						toast.error({ id: toastId, ...error });
 					},
-					onSuccess: async (_data, _variables, ctx) => {
+					onSuccess: async () => {
 						if (settings.value['recording.isFasterRerecordEnabled']) {
 							toast.success({
 								id: toastId,
