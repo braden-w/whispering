@@ -21,9 +21,9 @@
 		DownloadIcon,
 		FileStackIcon,
 		Loader2Icon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
+		EllipsisIcon,
+		RepeatIcon,
+		PlayIcon,
 	} from 'lucide-svelte';
 	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
@@ -79,11 +79,11 @@
 			size="icon"
 		>
 			{#if recording.transcriptionStatus === 'UNPROCESSED'}
-				<StartTranscriptionIcon class="h-4 w-4" />
+				<PlayIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
-				<LoadingTranscriptionIcon class="h-4 w-4" />
+				<EllipsisIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'DONE'}
-				<RetryTranscriptionIcon class="h-4 w-4 text-green-500" />
+				<RepeatIcon class="h-4 w-4 text-green-500" />
 			{:else if recording.transcriptionStatus === 'FAILED'}
 				<AlertCircleIcon class="h-4 w-4 text-red-500" />
 			{/if}
@@ -99,7 +99,7 @@
 			variant="ghost"
 			size="icon"
 		>
-			<PencilIcon class="h-4 w-4" />
+			<PlayIcon class="h-4 w-4" />
 		</WhisperingButton>
 
 		<EditRecordingDialog
