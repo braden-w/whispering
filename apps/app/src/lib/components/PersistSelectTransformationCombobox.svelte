@@ -4,7 +4,6 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { useTransformationsQuery } from '$lib/query/transformations/queries';
 	import type { Transformation } from '$lib/services/db';
-	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 	import {
@@ -21,22 +20,21 @@
 
 	const transformations = $derived(transformationsQuery.data ?? []);
 
-	const selectedTransformation = $derived(
-		transformations.find(
-			(t) =>
-				t.id === settings.value['transformations.selectedTransformationId'],
-		),
-	);
-
-	const combobox = useCombobox();
-
 	let {
 		class: className,
+		selectedTransformationId,
 		onSelect,
 	}: {
 		class?: string;
+		selectedTransformationId: string | null;
 		onSelect: (transformation: Transformation) => void;
 	} = $props();
+
+	const selectedTransformation = $derived(
+		transformations.find((t) => t.id === selectedTransformationId),
+	);
+
+	const combobox = useCombobox();
 </script>
 
 {#snippet renderTransformationIdTitle(transformation: Transformation)}
@@ -63,6 +61,9 @@
 				aria-expanded={combobox.open}
 				variant="ghost"
 				size="icon"
+				style="view-transition-name: {createTransformationViewTransitionName({
+					transformationId: selectedTransformation?.id ?? null,
+				})}"
 			>
 				{#if selectedTransformation}
 					<FilterIcon class="h-4 w-4 text-green-500" />
@@ -84,8 +85,7 @@
 			<Command.Group class="overflow-y-auto max-h-[400px]">
 				{#each transformations as transformation (transformation.id)}
 					{@const isSelectedTransformation =
-						settings.value['transformations.selectedTransformationId'] ===
-						transformation.id}
+						selectedTransformationId === transformation.id}
 					<Command.Item
 						value="${transformation.id} - ${transformation.title} - ${transformation.description}"
 						onSelect={() => {
@@ -94,6 +94,11 @@
 						}}
 						class="flex items-center gap-2 p-2"
 					>
+						<CheckIcon
+							class={cn('h-4 w-4 flex-shrink-0 mx-2', {
+								'text-transparent': !isSelectedTransformation,
+							})}
+						/>
 						<div class="flex flex-col min-w-0">
 							{@render renderTransformationIdTitle(transformation)}
 							{#if transformation.description}

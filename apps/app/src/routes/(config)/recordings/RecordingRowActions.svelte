@@ -25,10 +25,10 @@
 		RepeatIcon,
 		PlayIcon,
 	} from 'lucide-svelte';
-	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
+	import SelectTransformationCombobox from '$lib/components/SelectTransformationCombobox.svelte';
 
 	const transcriber = getTranscriberFromContext();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
@@ -90,6 +90,15 @@
 			{/if}
 		</WhisperingButton>
 
+		<SelectTransformationCombobox
+			onSelect={(transformation) => {
+				transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
+					input: recording.transcribedText,
+					recordingId: recording.id,
+					selectedTransformationId: transformation.id,
+				});
+			}}
+		/>
 		<WhisperingButton
 			tooltipContent="Run transformation on transcribed text"
 			onclick={() => {

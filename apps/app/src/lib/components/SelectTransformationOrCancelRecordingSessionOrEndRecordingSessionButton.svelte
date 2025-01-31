@@ -4,7 +4,7 @@
 	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
-	import SelectTransformationCombobox from './SelectTransformationCombobox.svelte';
+	import PersistSelectTransformationCombobox from './PersistSelectTransformationCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 
@@ -45,8 +45,11 @@
 		{/snippet}
 	</WhisperingButton>
 {:else}
-	<SelectTransformationCombobox
+	<PersistSelectTransformationCombobox
 		class={className}
+		selectedTransformationId={settings.value[
+			'transformations.selectedTransformationId'
+		]}
 		onSelect={(transformation) => {
 			settings.value = {
 				...settings.value,
