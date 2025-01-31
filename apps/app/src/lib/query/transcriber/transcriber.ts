@@ -57,7 +57,7 @@ function createTranscriber() {
 	const { copyIfSetPasteIfSet } = useCopyIfSetPasteIfSet();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
-	const { transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
+	const { transcribeAndUpdateRecording } =
 		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
 	const {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste,
@@ -76,7 +76,7 @@ function createTranscriber() {
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
+			transcribeAndUpdateRecording.mutate(
 				{ recording },
 				{
 					onError: (error) => {
@@ -112,92 +112,78 @@ function createTranscriber() {
 export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste() {
 	const { updateRecording } = useUpdateRecording();
 	return {
-		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste:
-			createResultMutation(() => ({
-				onMutate: async ({ recording }: { recording: Recording }) => {
-					updateRecording.mutate(
-						{
-							...recording,
-							transcriptionStatus: 'TRANSCRIBING',
+		transcribeAndUpdateRecording: createResultMutation(() => ({
+			onMutate: async ({ recording }: { recording: Recording }) => {
+				updateRecording.mutate(
+					{ ...recording, transcriptionStatus: 'TRANSCRIBING' },
+					{
+						onError: (error) => {
+							toast.warning({
+								title:
+									'⚠️ Unable to set recording transcription status to transcribing',
+								description: 'Continuing with the transcription process...',
+								action: { type: 'more-details', error },
+							});
 						},
-						{
-							onError: (error) => {
-								toast.warning({
-									title:
-										'⚠️ Unable to set recording transcription status to transcribing',
-									description: 'Continuing with the transcription process...',
-									action: { type: 'more-details', error },
-								});
-							},
-						},
-					);
-					queryClient.setQueryData(
-						transcriberKeys.isCurrentlyTranscribing,
-						true,
-					);
-				},
-				mutationFn: async ({ recording }: { recording: Recording }) => {
-					if (!recording.blob) {
-						return WhisperingErr({
-							title: '⚠️ Recording blob not found',
-							description: "Your recording doesn't have a blob to transcribe.",
-						});
-					}
-					const transcriptionResult =
-						await userConfiguredServices.transcription.transcribe(
-							recording.blob,
-							{
-								outputLanguage: settings.value['transcription.outputLanguage'],
-								prompt: settings.value['transcription.prompt'],
-								temperature: settings.value['transcription.temperature'],
-							},
-						);
-					return transcriptionResult;
-				},
-				onError: (error, { recording }) => {
-					updateRecording.mutate(
-						{
-							...recording,
-							transcriptionStatus: 'FAILED',
-						},
-						{
-							onError: (error) => {
-								toast.error({
-									title:
-										'⚠️ Unable to set recording transcription status to failed',
-									description:
-										'Transcription failed and failed again to update recording transcription status to failed',
-									action: { type: 'more-details', error },
-								});
-							},
-						},
-					);
-				},
-				onSuccess: (transcribedText, { recording }) => {
-					updateRecording.mutate(
-						{
-							...recording,
-							transcribedText,
-							transcriptionStatus: 'DONE',
-						},
-						{
-							onError: (error) => {
-								toast.error({
-									title: '⚠️ Unable to update recording after transcription',
-									description:
-										"Transcription completed but unable to update recording's transcribed text and status in database",
-									action: { type: 'more-details', error },
-								});
-							},
-						},
-					);
-				},
-				onSettled: () => {
-					queryClient.invalidateQueries({
-						queryKey: transcriberKeys.isCurrentlyTranscribing,
+					},
+				);
+				queryClient.setQueryData(transcriberKeys.isCurrentlyTranscribing, true);
+			},
+			mutationFn: async ({ recording }: { recording: Recording }) => {
+				if (!recording.blob) {
+					return WhisperingErr({
+						title: '⚠️ Recording blob not found',
+						description: "Your recording doesn't have a blob to transcribe.",
 					});
-				},
-			})),
+				}
+				const transcriptionResult =
+					await userConfiguredServices.transcription.transcribe(
+						recording.blob,
+						{
+							outputLanguage: settings.value['transcription.outputLanguage'],
+							prompt: settings.value['transcription.prompt'],
+							temperature: settings.value['transcription.temperature'],
+						},
+					);
+				return transcriptionResult;
+			},
+			onError: (error, { recording }) => {
+				updateRecording.mutate(
+					{ ...recording, transcriptionStatus: 'FAILED' },
+					{
+						onError: (error) => {
+							toast.error({
+								title:
+									'⚠️ Unable to set recording transcription status to failed',
+								description:
+									'Transcription failed and failed again to update recording transcription status to failed',
+								action: { type: 'more-details', error },
+							});
+						},
+					},
+				);
+			},
+			onSuccess: (transcribedText, { recording }) => {
+				updateRecording.mutate(
+					{ ...recording, transcribedText, transcriptionStatus: 'DONE' },
+					{
+						onError: (error) => {
+							toast.error({
+								title: '⚠️ Unable to update recording after transcription',
+								description:
+									"Transcription completed but unable to update recording's transcribed text and status in database",
+								action: { type: 'more-details', error },
+							});
+						},
+					},
+				);
+			},
+			onSettled: () => {
+				queryClient.invalidateQueries({
+					queryKey: transcriberKeys.isCurrentlyTranscribing,
+				});
+			},
+		})),
 	};
 }
 
