@@ -77,72 +77,33 @@ function createTranscriber() {
 				title: '📋 Transcribing...',
 				description: 'Your recording is being transcribed...',
 			});
-			updateRecording.mutate(
-				{ ...recording, transcriptionStatus: 'TRANSCRIBING' },
+			transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
+				{ recording },
 				{
 					onError: (error) => {
-						toast.warning({
-							id: toastId,
-							title:
-								'⚠️ Unable to set recording transcription status to transcribing',
-							description: 'Continuing with the transcription process...',
-							action: { type: 'more-details', error },
-						});
+						toast.error({ id: toastId, ...error });
 					},
-					onSuccess: () => {
-						transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste.mutate(
-							{ recording },
-							{
-								onError: (error) => {
-									toast.error({ id: toastId, ...error });
-									updateRecording.mutate({
-										...recording,
-										transcriptionStatus: 'FAILED',
-									});
-								},
-								onSuccess: (transcribedText) => {
-									updateRecording.mutate(
-										{
-											...recording,
-											transcribedText,
-											transcriptionStatus: 'DONE',
-										},
-										{
-											onError: (error) => {
-												toast.error({
-													id: toastId,
-													title:
-														'⚠️ Unable to update recording after transcription',
-													description:
-														"Transcription completed but unable to update recording's transcribed text and status in database",
-													action: { type: 'more-details', error },
-												});
-											},
-										},
-									);
-									void playSoundIfEnabled('transcriptionComplete');
-									toast.success({
-										id: toastId,
-										title: '📋 Recording transcribed!',
-										description: transcribedText,
-										descriptionClass: 'line-clamp-2',
-										action: {
-											type: 'button',
-											label: 'Copy to clipboard',
-											onClick: () =>
-												copyTextToClipboardWithToast.mutate({
-													label: 'transcribed text',
-													text: transcribedText,
-												}),
-										},
-									});
-									copyIfSetPasteIfSet.mutate({
+					onSuccess: (transcribedText) => {
+						void playSoundIfEnabled('transcriptionComplete');
+						toast.success({
+							id: toastId,
+							title: '📋 Recording transcribed!',
+							description: transcribedText,
+							descriptionClass: 'line-clamp-2',
+							action: {
+								type: 'button',
+								label: 'Copy to clipboard',
+								onClick: () =>
+									copyTextToClipboardWithToast.mutate({
+										label: 'transcribed text',
 										text: transcribedText,
-										toastId,
-									});
-								},
+									}),
 							},
-						);
+						});
+						copyIfSetPasteIfSet.mutate({
+							text: transcribedText,
+							toastId,
+						});
 					},
 				},
 			);
@@ -153,10 +114,27 @@ function createTranscriber() {
 }
 
 export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste() {
+	const { updateRecording } = useUpdateRecording();
 	return {
 		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste:
 			createResultMutation(() => ({
-				onMutate: async () => {
+				onMutate: async ({ recording }: { recording: Recording }) => {
+					updateRecording.mutate(
+						{
+							...recording,
+							transcriptionStatus: 'TRANSCRIBING',
+						},
+						{
+							onError: (error) => {
+								toast.warning({
+									title:
+										'⚠️ Unable to set recording transcription status to transcribing',
+									description: 'Continuing with the transcription process...',
+									action: { type: 'more-details', error },
+								});
+							},
+						},
+					);
 					queryClient.setQueryData(
 						transcriberKeys.isCurrentlyTranscribing,
 						true,
@@ -179,6 +157,44 @@ export function useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste()
 							},
 						);
 					return transcriptionResult;
+				},
+				onError: (error, { recording }) => {
+					updateRecording.mutate(
+						{
+							...recording,
+							transcriptionStatus: 'FAILED',
+						},
+						{
+							onError: (error) => {
+								toast.error({
+									title:
+										'⚠️ Unable to set recording transcription status to failed',
+									description:
+										'Transcription failed and failed again to update recording transcription status to failed',
+									action: { type: 'more-details', error },
+								});
+							},
+						},
+					);
+				},
+				onSuccess: (transcribedText, { recording }) => {
+					updateRecording.mutate(
+						{
+							...recording,
+							transcribedText,
+							transcriptionStatus: 'DONE',
+						},
+						{
+							onError: (error) => {
+								toast.error({
+									title: '⚠️ Unable to update recording after transcription',
+									description:
+										"Transcription completed but unable to update recording's transcribed text and status in database",
+									action: { type: 'more-details', error },
+								});
+							},
+						},
+					);
 				},
 				onSettled: () => {
 					queryClient.invalidateQueries({
