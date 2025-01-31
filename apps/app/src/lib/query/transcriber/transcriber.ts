@@ -42,6 +42,10 @@ const transcriberKeys = {
 	isCurrentlyTranscribing: ['transcriber', 'isCurrentlyTranscribing'] as const,
 };
 
+const transcriberMutationKeys = {
+	transform: ['transcriber', 'transform'] as const,
+} as const;
+
 function createTranscriber() {
 	const isCurrentlyTranscribing = createResultQuery(() => ({
 		queryKey: transcriberKeys.isCurrentlyTranscribing,
@@ -67,6 +71,13 @@ function createTranscriber() {
 	return {
 		get isCurrentlyTranscribing() {
 			return isCurrentlyTranscribing.data ?? false;
+		},
+		get isCurrentlyTransforming() {
+			return (
+				queryClient.isMutating({
+					mutationKey: transcriberMutationKeys.transform,
+				}) > 0
+			);
 		},
 		transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste: async (
 			recording: Recording,
@@ -242,6 +253,7 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 	return {
 		transformTranscribedTextFromRecordingWithToastWithSoundWithCopyPaste:
 			createResultMutation(() => ({
+				mutationKey: transcriberMutationKeys.transform,
 				mutationFn: async ({
 					transcribedText,
 					selectedTransformationId,
