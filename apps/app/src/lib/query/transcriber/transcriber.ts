@@ -41,8 +41,6 @@ const transcriberKeys = {
 
 function createTranscriber() {
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
-	const { copyAndPasteTranscriptWithToast } =
-		useCopyAndPasteTranscriptWithToast();
 	const { transcribeAndUpdateRecording } =
 		useTranscribeAndUpdateRecordingWithToastWithSoundWithCopyPaste();
 	const {
@@ -167,9 +165,59 @@ function createTranscriber() {
 					},
 					onSuccess: (transformedText) => {
 						void playSoundIfEnabled('transformationComplete');
-						copyAndPasteTranscriptWithToast.mutate({
+						void maybeCopyAndPaste({
 							text: transformedText,
 							toastId,
+							shouldCopy:
+								settings.value['transformation.clipboard.copyOnSuccess'],
+							shouldPaste:
+								settings.value['transformation.clipboard.pasteOnSuccess'],
+							onToastAction: ({ status, toastId, text }) => {
+								switch (status) {
+									case null:
+										return toast.success({
+											id: toastId,
+											title: '🔄 Transformation complete!',
+											description: text,
+											descriptionClass: 'line-clamp-2',
+											action: {
+												type: 'button',
+												label: 'Copy to clipboard',
+												onClick: () =>
+													copyTextToClipboardWithToast.mutate({
+														label: 'transcribed text',
+														text: text,
+													}),
+											},
+										});
+									case 'COPIED':
+										return toast.success({
+											id: toastId,
+											title:
+												'🔄 Transformation complete and copied to clipboard!',
+											description: text,
+											descriptionClass: 'line-clamp-2',
+											action: {
+												type: 'link',
+												label: 'Go to recordings',
+												goto: WHISPERING_RECORDINGS_PATHNAME,
+											},
+										});
+									case 'COPIED+PASTED':
+										return toast.success({
+											id: toastId,
+											title:
+												'🔄 Transformation complete, copied to clipboard, and pasted!',
+											description: text,
+											descriptionClass: 'line-clamp-2',
+											action: {
+												type: 'link',
+												label: 'Go to recordings',
+												goto: WHISPERING_RECORDINGS_PATHNAME,
+											},
+										});
+								}
+							},
 						});
 					},
 				},
@@ -320,100 +368,6 @@ export function useTransformTranscribedTextFromRecordingWithToastWithSoundWithCo
 					return Ok(transformationRun.output);
 				},
 			})),
-	};
-}
-
-function useCopyAndPasteTranscriptWithToast() {
-	return {
-		copyAndPasteTranscriptWithToast: createMutation(() => ({
-			mutationFn: async ({ text }: { text: string }) => {},
-			onSuccess: ({ status, error }, { text, toastId }) => {},
-		})),
-	};
-}
-
-function usePasteTextIfEnabled() {
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
-	return {
-		copyAndPasteTranscriptWithToast: createMutation(() => ({
-			mutationFn: async ({ text }: { text: string }) => {},
-			onSuccess: ({ status, error }, { text, toastId }) => {
-				switch (status) {
-					case 'transcribed':
-						return;
-					case 'transcribedButCopyFailed':
-						toast.success({
-							id: toastId,
-							title: '📝 Recording transcribed!',
-							description: text,
-							descriptionClass: 'line-clamp-2',
-							action: {
-								type: 'button',
-								label: 'Copy to clipboard',
-								onClick: () =>
-									copyTextToClipboardWithToast.mutate({
-										label: 'transcribed text',
-										text: text,
-									}),
-							},
-						});
-						toast.warning({
-							id: toastId,
-							title: '⚠️ Clipboard Access Failed',
-							description:
-								'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-							action: { type: 'more-details', error: error },
-						});
-						return;
-					case 'transcribedAndCopied':
-						toast.success({
-							id: toastId,
-							title: '📝 Recording transcribed and copied to clipboard!',
-							description: text,
-							descriptionClass: 'line-clamp-2',
-							action: {
-								type: 'link',
-								label: 'Go to recordings',
-								goto: WHISPERING_RECORDINGS_PATHNAME,
-							},
-						});
-						return;
-					case 'transcribedAndCopiedButPasteFailed':
-						toast.success({
-							id: toastId,
-							title: '📝 Recording transcribed and copied to clipboard!',
-							description: text,
-							descriptionClass: 'line-clamp-2',
-							action: {
-								type: 'link',
-								label: 'Go to recordings',
-								goto: WHISPERING_RECORDINGS_PATHNAME,
-							},
-						});
-						toast.warning({
-							title: '⚠️ Paste Operation Failed',
-							description:
-								'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-							action: { type: 'more-details', error: error },
-						});
-						return;
-					case 'transcribedAndCopiedAndPasted':
-						toast.success({
-							id: toastId,
-							title:
-								'📝📋✍️ Recording transcribed, copied to clipboard, and pasted!',
-							description: text,
-							descriptionClass: 'line-clamp-2',
-							action: {
-								type: 'link',
-								label: 'Go to recordings',
-								goto: WHISPERING_RECORDINGS_PATHNAME,
-							},
-						});
-						return;
-				}
-			},
-		})),
 	};
 }
 
