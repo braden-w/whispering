@@ -99,21 +99,6 @@
 				});
 			}}
 		/>
-		<WhisperingButton
-			tooltipContent="Run transformation on transcribed text"
-			onclick={() => {
-				transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
-					input: recording.transcribedText,
-					recordingId: recording.id,
-					selectedTransformationId:
-						settings.value['transformations.selectedTransformationId'],
-				});
-			}}
-			variant="ghost"
-			size="icon"
-		>
-			<PlayIcon class="h-4 w-4" />
-		</WhisperingButton>
 
 		<EditRecordingDialog
 			{recording}

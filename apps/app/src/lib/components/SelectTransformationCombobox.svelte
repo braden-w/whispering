@@ -4,15 +4,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { useTransformationsQuery } from '$lib/query/transformations/queries';
 	import type { Transformation } from '$lib/services/db';
-	import { settings } from '$lib/stores/settings.svelte';
-	import { cn } from '$lib/utils';
-	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
-	import {
-		CheckIcon,
-		FilterIcon,
-		FilterXIcon,
-		LayersIcon,
-	} from 'lucide-svelte';
+	import { LayersIcon, PlayIcon } from 'lucide-svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
 	import { Badge } from './ui/badge';
 	import { useCombobox } from './useCombobox.svelte';
@@ -20,13 +12,6 @@
 	const { transformationsQuery } = useTransformationsQuery();
 
 	const transformations = $derived(transformationsQuery.data ?? []);
-
-	const selectedTransformation = $derived(
-		transformations.find(
-			(t) =>
-				t.id === settings.value['transformations.selectedTransformationId'],
-		),
-	);
 
 	const combobox = useCombobox();
 
@@ -56,24 +41,13 @@
 			<WhisperingButton
 				{...props}
 				class={className}
-				tooltipContent={selectedTransformation
-					? 'Change post-processing transformation to run after your text is transcribed'
-					: 'Select a post-processing transformation to run after your text is transcribed'}
+				tooltipContent="Run a post-processing transformation to run on your recording"
 				role="combobox"
 				aria-expanded={combobox.open}
 				variant="ghost"
 				size="icon"
 			>
-				{#if selectedTransformation}
-					<FilterIcon class="h-4 w-4 text-green-500" />
-				{:else}
-					<FilterXIcon class="h-4 w-4 text-amber-500" />
-				{/if}
-				{#if !selectedTransformation}
-					<span
-						class="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary before:absolute before:left-0 before:top-0 before:h-full before:w-full before:rounded-full before:bg-primary/50 before:animate-ping"
-					></span>
-				{/if}
+				<PlayIcon class="h-4 w-4" />
 			</WhisperingButton>
 		{/snippet}
 	</Popover.Trigger>
@@ -83,9 +57,6 @@
 			<Command.Empty>No transformation found.</Command.Empty>
 			<Command.Group class="overflow-y-auto max-h-[400px]">
 				{#each transformations as transformation (transformation.id)}
-					{@const isSelectedTransformation =
-						settings.value['transformations.selectedTransformationId'] ===
-						transformation.id}
 					<Command.Item
 						value="${transformation.id} - ${transformation.title} - ${transformation.description}"
 						onSelect={() => {
