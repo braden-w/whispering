@@ -176,8 +176,8 @@ function SettingsCard() {
 			<CardContent className="space-y-6">
 				<div className="flex items-center gap-2">
 					<Switch
-						id="copy-to-clipboard"
-						aria-labelledby="copy-to-clipboard"
+						id="transcription.clipboard.copyOnSuccess"
+						aria-labelledby="transcription.clipboard.copyOnSuccess"
 						checked={settings['transcription.clipboard.copyOnSuccess']}
 						onCheckedChange={(newValue) =>
 							setSettings({
@@ -186,14 +186,14 @@ function SettingsCard() {
 							})
 						}
 					/>
-					<Label htmlFor="copy-to-clipboard">
+					<Label htmlFor="transcription.clipboard.copyOnSuccess">
 						Copy text to clipboard on successful transcription
 					</Label>
 				</div>
 				<div className="flex items-center gap-2">
 					<Switch
-						id="paste-from-clipboard"
-						aria-labelledby="paste-from-clipboard"
+						id="transcription.clipboard.pasteOnSuccess"
+						aria-labelledby="transcription.clipboard.pasteOnSuccess"
 						checked={settings['transcription.clipboard.pasteOnSuccess']}
 						onCheckedChange={(newValue) =>
 							setSettings({
@@ -201,9 +201,45 @@ function SettingsCard() {
 								'transcription.clipboard.pasteOnSuccess': newValue,
 							})
 						}
+						disabled={!settings['transcription.clipboard.copyOnSuccess']}
 					/>
-					<Label htmlFor="paste-from-clipboard">
+					<Label htmlFor="transcription.clipboard.pasteOnSuccess">
 						Paste contents from clipboard after successful transcription
+					</Label>
+				</div>
+
+				<div className="flex items-center gap-2">
+					<Switch
+						id="transformation.clipboard.copyOnSuccess"
+						aria-labelledby="transformation.clipboard.copyOnSuccess"
+						checked={settings['transformation.clipboard.copyOnSuccess']}
+						onCheckedChange={(newValue) =>
+							setSettings({
+								...settings,
+								'transformation.clipboard.copyOnSuccess': newValue,
+							})
+						}
+					/>
+					<Label htmlFor="transformation.clipboard.copyOnSuccess">
+						Copy text to clipboard on successful transformation
+					</Label>
+				</div>
+
+				<div className="flex items-center gap-2">
+					<Switch
+						id="transformation.clipboard.pasteOnSuccess"
+						aria-labelledby="transformation.clipboard.pasteOnSuccess"
+						checked={settings['transformation.clipboard.pasteOnSuccess']}
+						onCheckedChange={(newValue) =>
+							setSettings({
+								...settings,
+								'transformation.clipboard.pasteOnSuccess': newValue,
+							})
+						}
+						disabled={!settings['transformation.clipboard.copyOnSuccess']}
+					/>
+					<Label htmlFor="transformation.clipboard.pasteOnSuccess">
+						Paste contents from clipboard after successful transformation
 					</Label>
 				</div>
 

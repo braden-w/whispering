@@ -18,6 +18,8 @@ export const getDefaultSettings = () =>
 		'sound.playOn.transformationComplete': true,
 		'transcription.clipboard.copyOnSuccess': true,
 		'transcription.clipboard.pasteOnSuccess': true,
+		'transformation.clipboard.copyOnSuccess': true,
+		'transformation.clipboard.pasteOnSuccess': true,
 		'recording.isFasterRerecordEnabled': false,
 		'system.closeToTray': false,
 		'system.alwaysOnTop': 'Never',
@@ -62,6 +64,8 @@ export const settingsSchema = z.object({
 
 	'transcription.clipboard.copyOnSuccess': z.boolean(),
 	'transcription.clipboard.pasteOnSuccess': z.boolean(),
+	'transformation.clipboard.copyOnSuccess': z.boolean(),
+	'transformation.clipboard.pasteOnSuccess': z.boolean(),
 	'recording.isFasterRerecordEnabled': z.boolean(),
 
 	'system.closeToTray': z.boolean(),
