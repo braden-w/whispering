@@ -73,10 +73,7 @@
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
 				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-					{
-						recording,
-						toastId: nanoid(),
-					},
+					{ recording },
 				)}
 			variant="ghost"
 			size="icon"
@@ -90,6 +87,19 @@
 			{:else if recording.transcriptionStatus === 'FAILED'}
 				<AlertCircleIcon class="h-4 w-4 text-red-500" />
 			{/if}
+		</WhisperingButton>
+
+		<WhisperingButton
+			tooltipContent="Run transformation on transcribed text"
+			onclick={() => {
+				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+					{ recording },
+				);
+			}}
+			variant="ghost"
+			size="icon"
+		>
+			<PencilIcon class="h-4 w-4" />
 		</WhisperingButton>
 
 		<EditRecordingDialog
