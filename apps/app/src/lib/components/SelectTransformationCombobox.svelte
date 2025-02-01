@@ -4,7 +4,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { useTransformationsQuery } from '$lib/query/transformations/queries';
 	import type { Transformation } from '$lib/services/db';
-	import { LayersIcon, PlayIcon } from 'lucide-svelte';
+	import { LayersIcon } from 'lucide-svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
 	import { Badge } from './ui/badge';
 	import { useCombobox } from './useCombobox.svelte';
@@ -47,7 +47,7 @@
 				variant="ghost"
 				size="icon"
 			>
-				<PlayIcon class="h-4 w-4" />
+				<LayersIcon class="h-4 w-4" />
 			</WhisperingButton>
 		{/snippet}
 	</Popover.Trigger>
