@@ -16,4 +16,4 @@
 	});
 </script>
 
-<CopyableTextDialog {id} text={transcribedText} />
+<CopyableTextDialog {id} label="Transcribed Text" text={transcribedText} />

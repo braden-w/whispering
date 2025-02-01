@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
+	import SelectTransformationCombobox from '$lib/components/SelectTransformationCombobox.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
@@ -19,16 +20,14 @@
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
+		EllipsisIcon,
 		FileStackIcon,
 		Loader2Icon,
-		EllipsisIcon,
-		RepeatIcon,
 		PlayIcon,
+		RepeatIcon,
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { settings } from '$lib/stores/settings.svelte';
-	import SelectTransformationCombobox from '$lib/components/SelectTransformationCombobox.svelte';
 
 	const transcriber = getTranscriberFromContext();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();

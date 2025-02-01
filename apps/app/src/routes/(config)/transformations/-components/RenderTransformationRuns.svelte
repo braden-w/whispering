@@ -131,6 +131,7 @@
 																	stepRunId: stepRun.id,
 																	propertyName: 'input',
 																})}
+																label="Input"
 																text={stepRun.input}
 															/>
 														</Table.Cell>
@@ -141,6 +142,7 @@
 																		stepRunId: stepRun.id,
 																		propertyName: 'output',
 																	})}
+																	label="Output"
 																	text={stepRun.output}
 																/>
 															{:else if stepRun.error}
@@ -149,6 +151,7 @@
 																		stepRunId: stepRun.id,
 																		propertyName: 'error',
 																	})}
+																	label="Error"
 																	text={stepRun.error}
 																/>
 															{/if}

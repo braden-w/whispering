@@ -13,9 +13,11 @@
 	let {
 		id,
 		text,
+		label,
 	}: {
 		id: string;
 		text: string;
+		label: string;
 	} = $props();
 
 	let isDialogOpen = $state(false);
@@ -25,7 +27,7 @@
 	<Dialog.Root bind:open={isDialogOpen}>
 		<Dialog.Trigger {id}>
 			{#snippet child({ props: dialogTriggerProps })}
-				<WhisperingTooltip {id} tooltipContent="View Transcribed Text">
+				<WhisperingTooltip {id} tooltipContent="View {label}">
 					{#snippet trigger({ tooltipProps, tooltip })}
 						<Textarea
 							{...mergeProps(tooltipProps, dialogTriggerProps)}

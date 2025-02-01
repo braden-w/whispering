@@ -21,6 +21,7 @@
 {#if latestTransformationRunByRecordingIdQuery.data?.output}
 	<CopyableTextDialog
 		{id}
+		label="Latest Transformation Run Output"
 		text={latestTransformationRunByRecordingIdQuery.data.output}
 	/>
 {/if}
