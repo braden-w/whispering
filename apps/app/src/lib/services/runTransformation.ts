@@ -233,97 +233,110 @@ export function createRunTransformationService({
 		}
 	};
 
-	return {
-		transformInput: async ({
-			input,
-			transformation,
-		}: { input: string; transformation: Transformation }): Promise<
-			RunTransformationResult<TransformationRun>
-		> => {
-			const createTransformationRunResult =
-				await DbTransformationsService.createTransformationRun({
-					transformationId: transformation.id,
-					recordingId: null,
-					input,
-				});
+	const runTransformation = async ({
+		input,
+		transformation,
+		recordingId,
+	}: {
+		input: string;
+		transformation: Transformation;
+		recordingId: string | null;
+	}): Promise<RunTransformationResult<TransformationRun>> => {
+		const createTransformationRunResult =
+			await DbTransformationsService.createTransformationRun({
+				transformationId: transformation.id,
+				recordingId,
+				input,
+			});
 
-			if (!createTransformationRunResult.ok)
+		if (!createTransformationRunResult.ok)
+			return RunTransformationError({
+				title: '⚠️ Failed to create transformation run',
+				description: 'Could not create the transformation run.',
+			});
+
+		const transformationRun = createTransformationRunResult.data;
+
+		let currentInput = input;
+
+		for (const step of transformation.steps) {
+			const newTransformationStepRunResult =
+				await DbTransformationsService.addTransformationStepRunToTransformationRun(
+					{ transformationRun, stepId: step.id, input: currentInput },
+				);
+
+			if (!newTransformationStepRunResult.ok)
 				return RunTransformationError({
-					title: '⚠️ Failed to create transformation run',
-					description: 'Could not create the transformation run.',
+					title: '⚠️ Failed to add transformation step run',
+					description: 'Could not add the transformation step run.',
 				});
 
-			const transformationRun = createTransformationRunResult.data;
+			const newTransformationStepRun = newTransformationStepRunResult.data;
 
-			let currentInput = input;
+			const handleStepResult = await handleStep({
+				input: currentInput,
+				step,
+				HttpService,
+			});
 
-			for (const step of transformation.steps) {
-				const newTransformationStepRunResult =
-					await DbTransformationsService.addTransformationStepRunToTransformationRun(
-						{ transformationRun, stepId: step.id, input: currentInput },
-					);
-
-				if (!newTransformationStepRunResult.ok)
-					return RunTransformationError({
-						title: '⚠️ Failed to add transformation step run',
-						description: 'Could not add the transformation step run.',
-					});
-
-				const newTransformationStepRun = newTransformationStepRunResult.data;
-
-				const handleStepResult = await handleStep({
-					input: currentInput,
-					step,
-					HttpService,
-				});
-
-				if (!handleStepResult.ok) {
-					const dbResult =
-						await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
-							{
-								transformationRun,
-								stepRunId: newTransformationStepRun.id,
-								error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
-							},
-						);
-					if (!dbResult.ok)
-						return RunTransformationError({
-							title: '⚠️ Failed to mark transformation run and step as failed',
-							description:
-								'Could not mark the transformation run and step as failed.',
-						});
-					return dbResult;
-				}
-
+			if (!handleStepResult.ok) {
 				const dbResult =
-					await DbTransformationsService.markTransformationRunStepAsCompleted({
-						transformationRun,
-						stepRunId: newTransformationStepRun.id,
-						output: handleStepResult.data,
-					});
-
+					await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
+						{
+							transformationRun,
+							stepRunId: newTransformationStepRun.id,
+							error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
+						},
+					);
 				if (!dbResult.ok)
 					return RunTransformationError({
-						title: '⚠️ Failed to mark transformation run step as completed',
+						title: '⚠️ Failed to mark transformation run and step as failed',
 						description:
-							'Could not mark the transformation run step as completed.',
+							'Could not mark the transformation run and step as failed.',
 					});
-
-				currentInput = handleStepResult.data;
+				return dbResult;
 			}
 
 			const dbResult =
-				await DbTransformationsService.markTransformationRunAsCompleted({
+				await DbTransformationsService.markTransformationRunStepAsCompleted({
 					transformationRun,
-					output: currentInput,
+					stepRunId: newTransformationStepRun.id,
+					output: handleStepResult.data,
 				});
 
 			if (!dbResult.ok)
 				return RunTransformationError({
-					title: '⚠️ Failed to mark transformation run as completed',
-					description: 'Could not mark the transformation run as completed.',
+					title: '⚠️ Failed to mark transformation run step as completed',
+					description:
+						'Could not mark the transformation run step as completed.',
 				});
-			return dbResult;
+
+			currentInput = handleStepResult.data;
+		}
+
+		const dbResult =
+			await DbTransformationsService.markTransformationRunAsCompleted({
+				transformationRun,
+				output: currentInput,
+			});
+
+		if (!dbResult.ok)
+			return RunTransformationError({
+				title: '⚠️ Failed to mark transformation run as completed',
+				description: 'Could not mark the transformation run as completed.',
+			});
+		return dbResult;
+	};
+
+	return {
+		transformInput: async ({
+			input,
+			transformation,
+		}: {
+			input: string;
+			transformation: Transformation;
+		}): Promise<RunTransformationResult<TransformationRun>> => {
+			return runTransformation({ input, transformation, recordingId: null });
 		},
 		transformRecording: async ({
 			transformationId,
@@ -353,90 +366,11 @@ export function createRunTransformationService({
 
 			const transformation = getTransformationResult.data;
 
-			const createTransformationRunResult =
-				await DbTransformationsService.createTransformationRun({
-					transformationId,
-					recordingId,
-					input: recording.transcribedText,
-				});
-
-			if (!createTransformationRunResult.ok)
-				return RunTransformationError({
-					title: '⚠️ Failed to create transformation run',
-					description: 'Could not create the transformation run.',
-				});
-
-			const transformationRun = createTransformationRunResult.data;
-
-			let currentInput = recording.transcribedText;
-
-			for (const step of transformation.steps) {
-				const newTransformationStepRunResult =
-					await DbTransformationsService.addTransformationStepRunToTransformationRun(
-						{ transformationRun, stepId: step.id, input: currentInput },
-					);
-
-				if (!newTransformationStepRunResult.ok)
-					return RunTransformationError({
-						title: '⚠️ Failed to add transformation step run',
-						description: 'Could not add the transformation step run.',
-					});
-
-				const newTransformationStepRun = newTransformationStepRunResult.data;
-
-				const handleStepResult = await handleStep({
-					input: currentInput,
-					step,
-					HttpService,
-				});
-
-				if (!handleStepResult.ok) {
-					const dbResult =
-						await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
-							{
-								transformationRun,
-								stepRunId: newTransformationStepRun.id,
-								error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
-							},
-						);
-					if (!dbResult.ok)
-						return RunTransformationError({
-							title: '⚠️ Failed to mark transformation run and step as failed',
-							description:
-								'Could not mark the transformation run and step as failed.',
-						});
-					return dbResult;
-				}
-
-				const dbResult =
-					await DbTransformationsService.markTransformationRunStepAsCompleted({
-						transformationRun,
-						stepRunId: newTransformationStepRun.id,
-						output: handleStepResult.data,
-					});
-
-				if (!dbResult.ok)
-					return RunTransformationError({
-						title: '⚠️ Failed to mark transformation run step as completed',
-						description:
-							'Could not mark the transformation run step as completed.',
-					});
-
-				currentInput = handleStepResult.data;
-			}
-
-			const dbResult =
-				await DbTransformationsService.markTransformationRunAsCompleted({
-					transformationRun,
-					output: currentInput,
-				});
-
-			if (!dbResult.ok)
-				return RunTransformationError({
-					title: '⚠️ Failed to mark transformation run as completed',
-					description: 'Could not mark the transformation run as completed.',
-				});
-			return dbResult;
+			return runTransformation({
+				input: recording.transcribedText,
+				transformation,
+				recordingId,
+			});
 		},
 	};
 }
