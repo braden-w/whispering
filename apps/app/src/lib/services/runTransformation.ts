@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type {
 	DbServiceResult,
 	DbTransformationsService,
+	Recording,
 	Transformation,
 	TransformationRun,
 	TransformationStep,
@@ -13,87 +14,160 @@ import type { HttpService } from './http/HttpService';
 
 type StepResult = WhisperingResult<string>;
 
-export const createRunTransformationService = ({
+export function createRunTransformationService({
 	DbTransformationsService,
 	HttpService,
 }: {
 	DbTransformationsService: DbTransformationsService;
 	HttpService: HttpService;
-}) => ({
-	runTransformation: async ({
-		input,
-		transformation,
-		recordingId,
-	}: {
-		input: string;
-		transformation: Transformation;
-		recordingId: string | null;
-	}): Promise<DbServiceResult<TransformationRun>> => {
-		const createTransformationRunResult =
-			await DbTransformationsService.createTransformationRun({
-				transformationId: transformation.id,
-				recordingId,
-				input,
-			});
+}) {
+	return {
+		transformInput: async ({
+			input,
+			transformation,
+		}: {
+			input: string;
+			transformation: Transformation;
+		}): Promise<DbServiceResult<TransformationRun>> => {
+			const createTransformationRunResult =
+				await DbTransformationsService.createTransformationRun({
+					transformationId: transformation.id,
+					recordingId: null,
+					input,
+				});
 
-		if (!createTransformationRunResult.ok) return createTransformationRunResult;
+			if (!createTransformationRunResult.ok)
+				return createTransformationRunResult;
 
-		const transformationRun = createTransformationRunResult.data;
+			const transformationRun = createTransformationRunResult.data;
 
-		let currentInput = input;
+			let currentInput = input;
 
-		for (const step of transformation.steps) {
-			const newTransformationStepRunResult =
-				await DbTransformationsService.addTransformationStepRunToTransformationRun(
-					{ transformationRun, stepId: step.id, input: currentInput },
-				);
-
-			if (!newTransformationStepRunResult.ok)
-				return newTransformationStepRunResult;
-
-			const newTransformationStepRun = newTransformationStepRunResult.data;
-
-			const handleStepResult = await handleStep({
-				input: currentInput,
-				step,
-				HttpService,
-			});
-
-			if (!handleStepResult.ok) {
-				const dbResult =
-					await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
-						{
-							transformationRun,
-							stepRunId: newTransformationStepRun.id,
-							error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
-						},
+			for (const step of transformation.steps) {
+				const newTransformationStepRunResult =
+					await DbTransformationsService.addTransformationStepRunToTransformationRun(
+						{ transformationRun, stepId: step.id, input: currentInput },
 					);
+
+				if (!newTransformationStepRunResult.ok)
+					return newTransformationStepRunResult;
+
+				const newTransformationStepRun = newTransformationStepRunResult.data;
+
+				const handleStepResult = await handleStep({
+					input: currentInput,
+					step,
+					HttpService,
+				});
+
+				if (!handleStepResult.ok) {
+					const dbResult =
+						await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
+							{
+								transformationRun,
+								stepRunId: newTransformationStepRun.id,
+								error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
+							},
+						);
+					if (!dbResult.ok) return dbResult;
+					return dbResult;
+				}
+
+				const dbResult =
+					await DbTransformationsService.markTransformationRunStepAsCompleted({
+						transformationRun,
+						stepRunId: newTransformationStepRun.id,
+						output: handleStepResult.data,
+					});
+
 				if (!dbResult.ok) return dbResult;
-				return dbResult;
+
+				currentInput = handleStepResult.data;
 			}
 
 			const dbResult =
-				await DbTransformationsService.markTransformationRunStepAsCompleted({
+				await DbTransformationsService.markTransformationRunAsCompleted({
 					transformationRun,
-					stepRunId: newTransformationStepRun.id,
-					output: handleStepResult.data,
+					output: currentInput,
 				});
 
 			if (!dbResult.ok) return dbResult;
+			return dbResult;
+		},
+		transformRecording: async ({
+			transformation,
+			recording,
+		}: {
+			transformation: Transformation;
+			recording: Recording;
+		}): Promise<DbServiceResult<TransformationRun>> => {
+			const createTransformationRunResult =
+				await DbTransformationsService.createTransformationRun({
+					transformationId: transformation.id,
+					recordingId: recording.id,
+					input: recording.transcribedText,
+				});
 
-			currentInput = handleStepResult.data;
-		}
+			if (!createTransformationRunResult.ok)
+				return createTransformationRunResult;
 
-		const dbResult =
-			await DbTransformationsService.markTransformationRunAsCompleted({
-				transformationRun,
-				output: currentInput,
-			});
+			const transformationRun = createTransformationRunResult.data;
 
-		if (!dbResult.ok) return dbResult;
-		return dbResult;
-	},
-});
+			let currentInput = recording.transcribedText;
+
+			for (const step of transformation.steps) {
+				const newTransformationStepRunResult =
+					await DbTransformationsService.addTransformationStepRunToTransformationRun(
+						{ transformationRun, stepId: step.id, input: currentInput },
+					);
+
+				if (!newTransformationStepRunResult.ok)
+					return newTransformationStepRunResult;
+
+				const newTransformationStepRun = newTransformationStepRunResult.data;
+
+				const handleStepResult = await handleStep({
+					input: currentInput,
+					step,
+					HttpService,
+				});
+
+				if (!handleStepResult.ok) {
+					const dbResult =
+						await DbTransformationsService.markTransformationRunAndRunStepAsFailed(
+							{
+								transformationRun,
+								stepRunId: newTransformationStepRun.id,
+								error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
+							},
+						);
+					if (!dbResult.ok) return dbResult;
+					return dbResult;
+				}
+
+				const dbResult =
+					await DbTransformationsService.markTransformationRunStepAsCompleted({
+						transformationRun,
+						stepRunId: newTransformationStepRun.id,
+						output: handleStepResult.data,
+					});
+
+				if (!dbResult.ok) return dbResult;
+
+				currentInput = handleStepResult.data;
+			}
+
+			const dbResult =
+				await DbTransformationsService.markTransformationRunAsCompleted({
+					transformationRun,
+					output: currentInput,
+				});
+
+			if (!dbResult.ok) return dbResult;
+			return dbResult;
+		},
+	};
+}
 
 async function handleStep({
 	input,

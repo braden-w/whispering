@@ -2,16 +2,16 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { useRunTransformationWithToast } from '$lib/query/transformations/mutations';
+	import { useTransformInputWithToast } from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
-
-	const { runTransformationWithToast } = useRunTransformationWithToast();
 
 	let { transformation }: { transformation: Transformation } = $props();
 
 	let input = $state('');
 	let output = $state('');
+
+	const { transformInputWithToast } = useTransformInputWithToast();
 </script>
 
 <Card.Header>
@@ -42,12 +42,8 @@
 
 	<Button
 		onclick={() =>
-			runTransformationWithToast.mutate(
-				{
-					recordingId: null,
-					input,
-					transformation,
-				},
+			transformInputWithToast.mutate(
+				{ input, transformation },
 				{
 					onSuccess: (o) => {
 						if (o) {
@@ -56,17 +52,17 @@
 					},
 				},
 			)}
-		disabled={runTransformationWithToast.isPending ||
+		disabled={transformInputWithToast.isPending ||
 			!input.trim() ||
 			transformation.steps.length === 0}
 		class="w-full"
 	>
-		{#if runTransformationWithToast.isPending}
+		{#if transformInputWithToast.isPending}
 			<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
 			<PlayIcon class="mr-2 h-4 w-4" />
 		{/if}
-		{runTransformationWithToast.isPending
+		{transformInputWithToast.isPending
 			? 'Running Transformation...'
 			: 'Run Transformation'}
 	</Button>

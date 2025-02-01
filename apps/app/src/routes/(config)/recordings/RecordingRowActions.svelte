@@ -92,7 +92,6 @@
 		<SelectTransformationCombobox
 			onSelect={(transformation) => {
 				transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
-					input: recording.transcribedText,
 					recordingId: recording.id,
 					selectedTransformationId: transformation.id,
 				});

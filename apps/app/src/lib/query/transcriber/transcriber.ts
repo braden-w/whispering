@@ -1,5 +1,9 @@
 import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-import { ClipboardService, createResultMutation } from '$lib/services';
+import {
+	ClipboardService,
+	createResultMutation,
+	DbRecordingsService,
+} from '$lib/services';
 import type { Recording } from '$lib/services/db';
 import {
 	DbTransformationsService,
@@ -40,8 +44,7 @@ const transcriberKeys = {
 
 function createTranscriber() {
 	const { transcribeAndUpdateRecording } = useTranscribeAndUpdateRecording();
-	const { transformTranscribedTextFromRecording } =
-		useTransformTranscribedTextFromRecording();
+	const { transformRecording } = useTransformRecording();
 	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const maybeCopyAndPaste = async ({
@@ -189,12 +192,10 @@ function createTranscriber() {
 			);
 		},
 		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
-			input,
 			selectedTransformationId,
 			recordingId,
 			toastId = nanoid(),
 		}: {
-			input: string;
 			selectedTransformationId: string;
 			recordingId: string;
 			toastId?: string;
@@ -205,9 +206,8 @@ function createTranscriber() {
 				description:
 					'Applying your selected transformation to the transcribed text...',
 			});
-			return await transformTranscribedTextFromRecording.mutateAsync(
+			return await transformRecording.mutateAsync(
 				{
-					transcribedText: input,
 					selectedTransformationId,
 					recordingId,
 				},
@@ -310,82 +310,6 @@ function useTranscribeAndUpdateRecording() {
 						},
 					},
 				);
-			},
-		})),
-	};
-}
-
-function useTransformTranscribedTextFromRecording() {
-	return {
-		transformTranscribedTextFromRecording: createResultMutation(() => ({
-			mutationKey: transcriberKeys.transform,
-			mutationFn: async ({
-				transcribedText,
-				selectedTransformationId,
-				recordingId,
-			}: {
-				transcribedText: string;
-				selectedTransformationId: string;
-				recordingId: string;
-			}): Promise<WhisperingResult<string>> => {
-				const getTransformationResult =
-					await DbTransformationsService.getTransformationById(
-						selectedTransformationId,
-					);
-				if (!getTransformationResult.ok) {
-					return WhisperingErr({
-						title: '⚠️ Transformation not found',
-						description:
-							'Could not find the selected transformation. Using original transcription.',
-					});
-				}
-
-				const transformation = getTransformationResult.data;
-				if (!transformation) {
-					return WhisperingErr({
-						title: '⚠️ Transformation not found',
-						description:
-							'Could not find the selected transformation. Using original transcription.',
-					});
-				}
-
-				const transformationResult =
-					await RunTransformationService.runTransformation({
-						input: transcribedText,
-						transformation,
-						recordingId,
-					});
-
-				if (!transformationResult.ok) {
-					return WhisperingErr({
-						title: '⚠️ Transformation failed',
-						description:
-							'Failed to apply the transformation. Using original transcription.',
-					});
-				}
-
-				const transformationRun = transformationResult.data;
-				if (transformationRun.error) {
-					return WhisperingErr({
-						title: '⚠️ Transformation error',
-						description: transformationRun.error,
-					});
-				}
-
-				if (!transformationRun.output) {
-					return WhisperingErr({
-						title: '⚠️ Transformation produced no output',
-						description:
-							'The transformation completed but produced no output. Using original transcription.',
-					});
-				}
-
-				return Ok(transformationRun.output);
-			},
-			onSettled: (_data, _error, { recordingId }) => {
-				queryClient.invalidateQueries({
-					queryKey: transformationRunKeys.runsByRecordingId(recordingId),
-				});
 			},
 		})),
 	};

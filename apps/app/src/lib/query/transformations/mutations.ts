@@ -1,26 +1,34 @@
-import { queryClient } from '$lib/query';
+import { createResultMutation, DbRecordingsService } from '$lib/services';
 import {
-	createResultMutation,
 	DbTransformationsService,
 	RunTransformationService,
-} from '$lib/services';
-import type { Transformation, TransformationRun } from '$lib/services/db';
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
-import { createMutation } from '@tanstack/svelte-query';
-import { transformationRunKeys } from '../transformationRuns/queries';
-import { transformationsKeys } from './queries';
-import { WhisperingErr } from '@repo/shared';
 import { Ok } from '@epicenterhq/result';
+import { WhisperingErr, type WhisperingResult } from '@repo/shared';
+import { queryClient } from '..';
+import { transformationRunKeys } from '../transformationRuns/queries';
+import type { Transformation, TransformationRun } from '$lib/services/db';
+import { createMutation } from '@tanstack/svelte-query';
+import { transformationsKeys } from './queries';
 
 export const transformationsMutationKeys = {
+	transformInput: ({
+		transformationId,
+		input,
+	}: {
+		transformationId: string;
+		input: string;
+	}) => ['transformations', transformationId, 'input', input] as const,
 	transformRecording: ({
 		recordingId,
 		transformationId,
 	}: {
 		recordingId: string;
 		transformationId: string;
-	}) => ['transformations', { recordingId, transformationId }] as const,
+	}) =>
+		['transformations', transformationId, 'recording', recordingId] as const,
 };
 
 export function useCreateTransformationWithToast() {
@@ -241,15 +249,14 @@ export function useDeleteTransformationsWithToast() {
 	};
 }
 
-export function useRunTransformationWithToast() {
+export function useTransformInputWithToast() {
 	return {
-		runTransformationWithToast: createResultMutation(() => ({
+		transformInputWithToast: createResultMutation(() => ({
+			mutationKey: transformationsMutationKeys.transformInput,
 			mutationFn: async ({
-				recordingId,
 				input,
 				transformation,
 			}: {
-				recordingId: string | null;
 				input: string;
 				transformation: Transformation;
 			}) => {
@@ -267,17 +274,15 @@ export function useRunTransformationWithToast() {
 				}
 
 				const transformationRunResult =
-					await RunTransformationService.runTransformation({
-						recordingId,
+					await RunTransformationService.transformInput({
 						input,
 						transformation,
 					});
 
 				if (!transformationRunResult.ok) {
 					return WhisperingErr({
-						title: 'Unexpected database error while running transformation',
-						description:
-							'The transformation ran as expected but there was an unexpected database error',
+						title: 'Unexpected error while running transformation',
+						description: 'See more details for the error',
 						action: {
 							type: 'more-details',
 							error: transformationRunResult.error,
@@ -313,6 +318,84 @@ export function useRunTransformationWithToast() {
 			},
 			onError: (error) => {
 				toast.error({ ...error });
+			},
+		})),
+	};
+}
+
+function useTransformRecording() {
+	return {
+		transformRecording: createResultMutation(() => ({
+			mutationKey: transcriberKeys.transform,
+			mutationFn: async ({
+				selectedTransformationId,
+				recordingId,
+			}: {
+				selectedTransformationId: string;
+				recordingId: string;
+			}): Promise<WhisperingResult<string>> => {
+				const getTransformationResult =
+					await DbTransformationsService.getTransformationById(
+						selectedTransformationId,
+					);
+				if (!getTransformationResult.ok || !getTransformationResult.data) {
+					return WhisperingErr({
+						title: '⚠️ Transformation not found',
+						description:
+							'Could not find the selected transformation. Using original transcription.',
+					});
+				}
+
+				const transformation = getTransformationResult.data;
+
+				const getRecordingResult =
+					await DbRecordingsService.getRecordingById(recordingId);
+				if (!getRecordingResult.ok || !getRecordingResult.data) {
+					return WhisperingErr({
+						title: '⚠️ Recording not found',
+						description: 'Could not find the recording..',
+					});
+				}
+
+				const recording = getRecordingResult.data;
+
+				const transformationResult =
+					await RunTransformationService.transformRecording({
+						transformation,
+						recording,
+					});
+
+				if (!transformationResult.ok) {
+					return WhisperingErr({
+						title: '⚠️ Transformation failed',
+						description:
+							'Failed to apply the transformation on the recording..',
+						action: { type: 'more-details', error: transformationResult.error },
+					});
+				}
+
+				const transformationRun = transformationResult.data;
+				if (transformationRun.error) {
+					return WhisperingErr({
+						title: '⚠️ Transformation error',
+						description: transformationRun.error,
+					});
+				}
+
+				if (!transformationRun.output) {
+					return WhisperingErr({
+						title: '⚠️ Transformation produced no output',
+						description:
+							'The transformation completed but produced no output. Using original transcription.',
+					});
+				}
+
+				return Ok(transformationRun.output);
+			},
+			onSettled: (_data, _error, { recordingId }) => {
+				queryClient.invalidateQueries({
+					queryKey: transformationRunKeys.runsByRecordingId(recordingId),
+				});
 			},
 		})),
 	};
