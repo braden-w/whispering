@@ -7,30 +7,30 @@ import type { Accessor } from '../types';
 // Define the query key as a constant array
 export const transformationRunKeys = {
 	all: ['transformationRuns'] as const,
-	byTransformationId: (id: string) =>
+	runsByTransformationId: (id: string) =>
 		['transformationRuns', 'transformationId', id] as const,
-	byRecordingId: (recordingId: string) =>
+	runsByRecordingId: (recordingId: string) =>
 		['transformationRuns', 'recordingId', recordingId] as const,
 };
 
-export function useTransformationRunsByTransformationIdQuery(
+export function useGetTransformationRunsByTransformationId(
 	id: Accessor<string>,
 ) {
 	return {
 		transformationRunsByTransformationIdQuery: createResultQuery(() => ({
-			queryKey: transformationRunKeys.byTransformationId(id()),
+			queryKey: transformationRunKeys.runsByTransformationId(id()),
 			queryFn: () =>
 				DbTransformationsService.getTransformationRunsByTransformationId(id()),
 		})),
 	};
 }
 
-export function useTransformationRunsByRecordingIdQuery(
+export function useGetTransformationRunsByRecordingId(
 	recordingId: Accessor<string>,
 ) {
 	return {
 		transformationRunsByRecordingIdQuery: createResultQuery(() => ({
-			queryKey: transformationRunKeys.byRecordingId(recordingId()),
+			queryKey: transformationRunKeys.runsByRecordingId(recordingId()),
 			queryFn: () =>
 				DbTransformationsService.getTransformationRunsByRecordingId(
 					recordingId(),
@@ -44,7 +44,7 @@ export function useLatestTransformationRunByRecordingIdQuery(
 ) {
 	return {
 		latestTransformationRunByRecordingIdQuery: createResultQuery(() => ({
-			queryKey: transformationRunKeys.byRecordingId(recordingId()),
+			queryKey: transformationRunKeys.runsByRecordingId(recordingId()),
 			queryFn: () =>
 				DbTransformationsService.getTransformationRunsByRecordingId(
 					recordingId(),
