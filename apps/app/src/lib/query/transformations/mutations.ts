@@ -1,5 +1,6 @@
 import { queryClient } from '$lib/query';
 import {
+	createResultMutation,
 	DbTransformationsService,
 	RunTransformationService,
 } from '$lib/services';
@@ -9,6 +10,18 @@ import { settings } from '$lib/stores/settings.svelte';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from './queries';
+import { WhisperingErr } from '@repo/shared';
+import { Ok } from '@epicenterhq/result';
+
+export const transformationsMutationKeys = {
+	transformRecording: ({
+		recordingId,
+		transformationId,
+	}: {
+		recordingId: string;
+		transformationId: string;
+	}) => ['transformations', { recordingId, transformationId }] as const,
+};
 
 export function useCreateTransformationWithToast() {
 	return {
@@ -230,7 +243,7 @@ export function useDeleteTransformationsWithToast() {
 
 export function useRunTransformationWithToast() {
 	return {
-		runTransformationWithToast: createMutation(() => ({
+		runTransformationWithToast: createResultMutation(() => ({
 			mutationFn: async ({
 				recordingId,
 				input,
@@ -241,19 +254,16 @@ export function useRunTransformationWithToast() {
 				transformation: Transformation;
 			}) => {
 				if (!input.trim()) {
-					toast.error({
+					return WhisperingErr({
 						title: 'No input provided',
 						description: 'Please enter some text to transform',
 					});
-					return;
 				}
-
 				if (transformation.steps.length === 0) {
-					toast.error({
+					return WhisperingErr({
 						title: 'No steps configured',
 						description: 'Please add at least one transformation step',
 					});
-					return;
 				}
 
 				const transformationRunResult =
@@ -264,7 +274,7 @@ export function useRunTransformationWithToast() {
 					});
 
 				if (!transformationRunResult.ok) {
-					toast.error({
+					return WhisperingErr({
 						title: 'Unexpected database error while running transformation',
 						description:
 							'The transformation ran as expected but there was an unexpected database error',
@@ -273,12 +283,11 @@ export function useRunTransformationWithToast() {
 							error: transformationRunResult.error,
 						},
 					});
-					return;
 				}
 
 				const transformationRun = transformationRunResult.data;
 				queryClient.setQueryData<TransformationRun[]>(
-					transformationRunKeys.byTransformationId(
+					transformationRunKeys.runsByTransformationId(
 						transformationRun.transformationId,
 					),
 					(oldData) => {
@@ -288,17 +297,22 @@ export function useRunTransformationWithToast() {
 				);
 
 				if (transformationRun.error) {
-					toast.error({
+					return WhisperingErr({
 						title: 'Transformation failed',
 						description: transformationRun.error,
 					});
 				}
 
+				return Ok(transformationRun.output);
+			},
+			onSuccess: (output) => {
 				toast.success({
 					title: 'Transformation complete',
 					description: 'The text has been successfully transformed',
 				});
-				return transformationRun.output;
+			},
+			onError: (error) => {
+				toast.error({ ...error });
 			},
 		})),
 	};
