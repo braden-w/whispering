@@ -13,7 +13,7 @@ export const transformationRunKeys = {
 		['transformationRuns', 'recordingId', recordingId] as const,
 };
 
-export function useGetTransformationRunsByTransformationId(
+export function useTransformationRunsByTransformationIdQuery(
 	id: Accessor<string>,
 ) {
 	return {
