@@ -382,9 +382,9 @@ function useTransformTranscribedTextFromRecording() {
 
 				return Ok(transformationRun.output);
 			},
-			onSuccess: (_, { recordingId }) => {
+			onSettled: (_data, _error, { recordingId }) => {
 				queryClient.invalidateQueries({
-					queryKey: transformationRunKeys.byRecordingId(recordingId),
+					queryKey: transformationRunKeys.runsByRecordingId(recordingId),
 				});
 			},
 		})),
