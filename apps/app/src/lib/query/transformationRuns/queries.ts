@@ -25,7 +25,7 @@ export function useGetTransformationRunsByTransformationId(
 	};
 }
 
-export function useGetTransformationRunsByRecordingId(
+export function useTransformationRunsByRecordingId(
 	recordingId: Accessor<string>,
 ) {
 	return {
