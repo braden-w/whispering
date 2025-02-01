@@ -12,6 +12,7 @@ import { transformationRunKeys } from '../transformationRuns/queries';
 import type { Transformation, TransformationRun } from '$lib/services/db';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationsKeys } from './queries';
+import type { Accessor } from '../types';
 
 export const transformationsMutationKeys = {
 	transformInput: ({
@@ -323,80 +324,58 @@ export function useTransformInputWithToast() {
 	};
 }
 
-function useTransformRecording() {
-	return {
-		transformRecording: createResultMutation(() => ({
-			mutationKey: transcriberKeys.transform,
-			mutationFn: async ({
-				selectedTransformationId,
-				recordingId,
-			}: {
-				selectedTransformationId: string;
-				recordingId: string;
-			}): Promise<WhisperingResult<string>> => {
-				const getTransformationResult =
-					await DbTransformationsService.getTransformationById(
-						selectedTransformationId,
-					);
-				if (!getTransformationResult.ok || !getTransformationResult.data) {
-					return WhisperingErr({
-						title: '⚠️ Transformation not found',
-						description:
-							'Could not find the selected transformation. Using original transcription.',
-					});
-				}
-
-				const transformation = getTransformationResult.data;
-
-				const getRecordingResult =
-					await DbRecordingsService.getRecordingById(recordingId);
-				if (!getRecordingResult.ok || !getRecordingResult.data) {
-					return WhisperingErr({
-						title: '⚠️ Recording not found',
-						description: 'Could not find the recording..',
-					});
-				}
-
-				const recording = getRecordingResult.data;
-
-				const transformationResult =
-					await RunTransformationService.transformRecording({
-						transformation,
-						recording,
-					});
-
-				if (!transformationResult.ok) {
-					return WhisperingErr({
-						title: '⚠️ Transformation failed',
-						description:
-							'Failed to apply the transformation on the recording..',
-						action: { type: 'more-details', error: transformationResult.error },
-					});
-				}
-
-				const transformationRun = transformationResult.data;
-				if (transformationRun.error) {
-					return WhisperingErr({
-						title: '⚠️ Transformation error',
-						description: transformationRun.error,
-					});
-				}
-
-				if (!transformationRun.output) {
-					return WhisperingErr({
-						title: '⚠️ Transformation produced no output',
-						description:
-							'The transformation completed but produced no output. Using original transcription.',
-					});
-				}
-
-				return Ok(transformationRun.output);
-			},
-			onSettled: (_data, _error, { recordingId }) => {
-				queryClient.invalidateQueries({
-					queryKey: transformationRunKeys.runsByRecordingId(recordingId),
+export function useTransformRecording({
+	recordingId,
+	transformationId,
+}: {
+	recordingId: Accessor<string>;
+	transformationId: Accessor<string>;
+}) {
+	const transformRecording = createResultMutation(() => ({
+		mutationKey: transformationsMutationKeys.transformRecording({
+			recordingId: recordingId(),
+			transformationId: transformationId(),
+		}),
+		mutationFn: async (): Promise<WhisperingResult<string>> => {
+			const transformationResult =
+				await RunTransformationService.transformRecording({
+					transformationId: transformationId(),
+					recordingId: recordingId(),
 				});
-			},
-		})),
-	};
+
+			if (!transformationResult.ok) {
+				return WhisperingErr({
+					title: '⚠️ Transformation failed',
+					description: 'Failed to apply the transformation on the recording..',
+					action: {
+						type: 'more-details',
+						error: transformationResult.error,
+					},
+				});
+			}
+
+			const transformationRun = transformationResult.data;
+			if (transformationRun.error) {
+				return WhisperingErr({
+					title: '⚠️ Transformation error',
+					description: transformationRun.error,
+				});
+			}
+
+			if (!transformationRun.output) {
+				return WhisperingErr({
+					title: '⚠️ Transformation produced no output',
+					description: 'The transformation completed but produced no output.',
+				});
+			}
+
+			return Ok(transformationRun.output);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({
+				queryKey: transformationRunKeys.runsByRecordingId(recordingId()),
+			});
+		},
+	}));
+	return { transformRecording };
 }
