@@ -19,6 +19,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
 import { useUpdateRecording } from '../recordings/mutations';
+import { transformationRunKeys } from '../transformationRuns/queries';
 
 export type Transcriber = ReturnType<typeof createTranscriber>;
 
@@ -380,6 +381,11 @@ function useTransformTranscribedTextFromRecording() {
 				}
 
 				return Ok(transformationRun.output);
+			},
+			onSuccess: (_, { recordingId }) => {
+				queryClient.invalidateQueries({
+					queryKey: transformationRunKeys.byRecordingId(recordingId),
+				});
 			},
 		})),
 	};
