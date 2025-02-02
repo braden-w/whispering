@@ -1,4 +1,8 @@
-import { createResultMutation, DbRecordingsService } from '$lib/services';
+import {
+	createResultMutation,
+	DbRecordingsService,
+	playSoundIfEnabled,
+} from '$lib/services';
 import {
 	DbTransformationsService,
 	RunTransformationService,
@@ -13,6 +17,8 @@ import type { Transformation, TransformationRun } from '$lib/services/db';
 import { createMutation } from '@tanstack/svelte-query';
 import { transformationsKeys } from './queries';
 import type { Accessor } from '../types';
+import { nanoid } from 'nanoid/non-secure';
+import { maybeCopyAndPaste } from '../transcriber/transcriber';
 
 export const transformationsMutationKeys = {
 	transformInput: ({
@@ -253,7 +259,6 @@ export function useDeleteTransformationsWithToast() {
 export function useTransformInputWithToast() {
 	return {
 		transformInputWithToast: createResultMutation(() => ({
-			mutationKey: transformationsMutationKeys.transformInput,
 			mutationFn: async ({
 				input,
 				transformation,
@@ -324,23 +329,19 @@ export function useTransformInputWithToast() {
 	};
 }
 
-export function useTransformRecording({
-	recordingId,
-	transformationId,
-}: {
-	recordingId: Accessor<string>;
-	transformationId: Accessor<string>;
-}) {
+export function useTransformRecording() {
 	const transformRecording = createResultMutation(() => ({
-		mutationKey: transformationsMutationKeys.transformRecording({
-			recordingId: recordingId(),
-			transformationId: transformationId(),
-		}),
-		mutationFn: async (): Promise<WhisperingResult<string>> => {
+		mutationFn: async ({
+			recordingId,
+			transformationId,
+		}: {
+			recordingId: string;
+			transformationId: string;
+		}): Promise<WhisperingResult<string>> => {
 			const transformationResult =
 				await RunTransformationService.transformRecording({
-					transformationId: transformationId(),
-					recordingId: recordingId(),
+					transformationId,
+					recordingId,
 				});
 
 			if (!transformationResult.ok) {
@@ -371,11 +372,60 @@ export function useTransformRecording({
 
 			return Ok(transformationRun.output);
 		},
-		onSettled: () => {
+		onSettled: (_data, _error, { recordingId }) => {
 			queryClient.invalidateQueries({
-				queryKey: transformationRunKeys.runsByRecordingId(recordingId()),
+				queryKey: transformationRunKeys.runsByRecordingId(recordingId),
 			});
 		},
 	}));
-	return { transformRecording };
+	return {
+		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
+			recordingId,
+			transformationId,
+			toastId = nanoid(),
+		}: {
+			recordingId: string;
+			transformationId: string;
+			toastId?: string;
+		}) => {
+			toast.loading({
+				id: toastId,
+				title: '🔄 Running transformation...',
+				description:
+					'Applying your selected transformation to the transcribed text...',
+			});
+			return await transformRecording.mutateAsync(
+				{
+					recordingId,
+					transformationId,
+				},
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+					onSuccess: (transformedText) => {
+						void playSoundIfEnabled('transformationComplete');
+						maybeCopyAndPaste({
+							text: transformedText,
+							toastId,
+							shouldCopy:
+								settings.value['transformation.clipboard.copyOnSuccess'],
+							shouldPaste:
+								settings.value['transformation.clipboard.pasteOnSuccess'],
+							statusToToastText: (status) => {
+								switch (status) {
+									case null:
+										return '🔄 Transformation complete!';
+									case 'COPIED':
+										return '🔄 Transformation complete and copied to clipboard!';
+									case 'COPIED+PASTED':
+										return '🔄 Transformation complete, copied to clipboard, and pasted!';
+								}
+							},
+						});
+					},
+				},
+			);
+		},
+	};
 }

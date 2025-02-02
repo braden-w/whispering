@@ -1,29 +1,17 @@
-import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-import {
-	ClipboardService,
-	createResultMutation,
-	DbRecordingsService,
-} from '$lib/services';
+import { ClipboardService, createResultMutation } from '$lib/services';
 import type { Recording } from '$lib/services/db';
 import {
-	DbTransformationsService,
-	RunTransformationService,
 	playSoundIfEnabled,
 	userConfiguredServices,
 } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
-import { Ok } from '@epicenterhq/result';
-import {
-	WHISPERING_RECORDINGS_PATHNAME,
-	WhisperingErr,
-	type WhisperingResult,
-} from '@repo/shared';
+import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
+import { copyTextToClipboardWithToast } from '../clipboard/mutations';
 import { useUpdateRecording } from '../recordings/mutations';
-import { transformationRunKeys } from '../transformationRuns/queries';
 
 export type Transcriber = ReturnType<typeof createTranscriber>;
 
@@ -44,95 +32,6 @@ const transcriberKeys = {
 
 function createTranscriber() {
 	const { transcribeAndUpdateRecording } = useTranscribeAndUpdateRecording();
-	const { transformRecording } = useTransformRecording();
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
-
-	const maybeCopyAndPaste = async ({
-		text,
-		toastId,
-		shouldCopy,
-		shouldPaste,
-		statusToToastText,
-	}: {
-		text: string;
-		toastId: string;
-		shouldCopy: boolean;
-		shouldPaste: boolean;
-		statusToToastText: (status: null | 'COPIED' | 'COPIED+PASTED') => string;
-	}) => {
-		const toastNull = () =>
-			toast.success({
-				id: toastId,
-				title: statusToToastText(null),
-				description: text,
-				descriptionClass: 'line-clamp-2',
-				action: {
-					type: 'button',
-					label: 'Copy to clipboard',
-					onClick: () =>
-						copyTextToClipboardWithToast.mutate({
-							label: 'transcribed text',
-							text: text,
-						}),
-				},
-			});
-
-		const toastCopied = () =>
-			toast.success({
-				id: toastId,
-				title: '📝 Recording transcribed and copied to clipboard!',
-				description: text,
-				descriptionClass: 'line-clamp-2',
-				action: {
-					type: 'link',
-					label: 'Go to recordings',
-					goto: WHISPERING_RECORDINGS_PATHNAME,
-				},
-			});
-
-		const toastCopiedAndPasted = () =>
-			toast.success({
-				id: toastId,
-				title: statusToToastText('COPIED+PASTED'),
-				description: text,
-				descriptionClass: 'line-clamp-2',
-				action: {
-					type: 'link',
-					label: 'Go to recordings',
-					goto: WHISPERING_RECORDINGS_PATHNAME,
-				},
-			});
-		if (!shouldCopy) return toastNull();
-
-		const copyResult = await ClipboardService.setClipboardText(text);
-		if (!copyResult.ok) {
-			toast.warning({
-				id: toastId,
-				title: '⚠️ Clipboard Access Failed',
-				description:
-					'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-				action: { type: 'more-details', error: copyResult.error },
-			});
-			toastNull();
-			return;
-		}
-
-		if (!shouldPaste) return toastCopied();
-
-		const pasteResult = await ClipboardService.writeTextToCursor(text);
-		if (!pasteResult.ok) {
-			toast.warning({
-				title: '⚠️ Paste Operation Failed',
-				description:
-					'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-				action: { type: 'more-details', error: pasteResult.error },
-			});
-			toastCopied();
-			return;
-		}
-
-		toastCopiedAndPasted();
-	};
 
 	return {
 		get isCurrentlyTranscribing() {
@@ -184,54 +83,6 @@ function createTranscriber() {
 										return '📝 Recording transcribed and copied to clipboard!';
 									case 'COPIED+PASTED':
 										return '📝📋✍️ Recording transcribed, copied to clipboard, and pasted!';
-								}
-							},
-						});
-					},
-				},
-			);
-		},
-		transformAndUpdateRecordingWithToastWithSoundWithCopyPaste: async ({
-			selectedTransformationId,
-			recordingId,
-			toastId = nanoid(),
-		}: {
-			selectedTransformationId: string;
-			recordingId: string;
-			toastId?: string;
-		}) => {
-			toast.loading({
-				id: toastId,
-				title: '🔄 Running transformation...',
-				description:
-					'Applying your selected transformation to the transcribed text...',
-			});
-			return await transformRecording.mutateAsync(
-				{
-					selectedTransformationId,
-					recordingId,
-				},
-				{
-					onError: (error) => {
-						toast.error({ id: toastId, ...error });
-					},
-					onSuccess: (transformedText) => {
-						void playSoundIfEnabled('transformationComplete');
-						maybeCopyAndPaste({
-							text: transformedText,
-							toastId,
-							shouldCopy:
-								settings.value['transformation.clipboard.copyOnSuccess'],
-							shouldPaste:
-								settings.value['transformation.clipboard.pasteOnSuccess'],
-							statusToToastText: (status) => {
-								switch (status) {
-									case null:
-										return '🔄 Transformation complete!';
-									case 'COPIED':
-										return '🔄 Transformation complete and copied to clipboard!';
-									case 'COPIED+PASTED':
-										return '🔄 Transformation complete, copied to clipboard, and pasted!';
 								}
 							},
 						});
@@ -313,4 +164,91 @@ function useTranscribeAndUpdateRecording() {
 			},
 		})),
 	};
+}
+
+export async function maybeCopyAndPaste({
+	text,
+	toastId,
+	shouldCopy,
+	shouldPaste,
+	statusToToastText,
+}: {
+	text: string;
+	toastId: string;
+	shouldCopy: boolean;
+	shouldPaste: boolean;
+	statusToToastText: (status: null | 'COPIED' | 'COPIED+PASTED') => string;
+}) {
+	const toastNull = () =>
+		toast.success({
+			id: toastId,
+			title: statusToToastText(null),
+			description: text,
+			descriptionClass: 'line-clamp-2',
+			action: {
+				type: 'button',
+				label: 'Copy to clipboard',
+				onClick: () =>
+					copyTextToClipboardWithToast({
+						label: 'transcribed text',
+						text: text,
+					}),
+			},
+		});
+
+	const toastCopied = () =>
+		toast.success({
+			id: toastId,
+			title: '📝 Recording transcribed and copied to clipboard!',
+			description: text,
+			descriptionClass: 'line-clamp-2',
+			action: {
+				type: 'link',
+				label: 'Go to recordings',
+				goto: WHISPERING_RECORDINGS_PATHNAME,
+			},
+		});
+
+	const toastCopiedAndPasted = () =>
+		toast.success({
+			id: toastId,
+			title: statusToToastText('COPIED+PASTED'),
+			description: text,
+			descriptionClass: 'line-clamp-2',
+			action: {
+				type: 'link',
+				label: 'Go to recordings',
+				goto: WHISPERING_RECORDINGS_PATHNAME,
+			},
+		});
+	if (!shouldCopy) return toastNull();
+
+	const copyResult = await ClipboardService.setClipboardText(text);
+	if (!copyResult.ok) {
+		toast.warning({
+			id: toastId,
+			title: '⚠️ Clipboard Access Failed',
+			description:
+				'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
+			action: { type: 'more-details', error: copyResult.error },
+		});
+		toastNull();
+		return;
+	}
+
+	if (!shouldPaste) return toastCopied();
+
+	const pasteResult = await ClipboardService.writeTextToCursor(text);
+	if (!pasteResult.ok) {
+		toast.warning({
+			title: '⚠️ Paste Operation Failed',
+			description:
+				'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
+			action: { type: 'more-details', error: pasteResult.error },
+		});
+		toastCopied();
+		return;
+	}
+
+	toastCopiedAndPasted();
 }

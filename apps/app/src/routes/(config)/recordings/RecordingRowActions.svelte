@@ -28,8 +28,11 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { useTransformRecording } from '$lib/query/transformations/mutations';
 
 	const transcriber = getTranscriberFromContext();
+	const { transformAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
+		useTransformRecording();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
 	const { updateRecordingWithToast } = useUpdateRecordingWithToast();
 	const { downloadRecordingWithToast } = useDownloadRecordingWithToast();
@@ -90,12 +93,11 @@
 		</WhisperingButton>
 
 		<SelectTransformationCombobox
-			onSelect={(transformation) => {
-				transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
+			onSelect={(transformation) =>
+				transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
 					recordingId: recording.id,
-					selectedTransformationId: transformation.id,
-				});
-			}}
+					transformationId: transformation.id,
+				})}
 		/>
 
 		<EditRecordingDialog

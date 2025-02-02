@@ -14,6 +14,7 @@ import {
 import { useRecorderState } from './queries';
 import { noop } from '@tanstack/table-core';
 import type { Transcriber } from '../transcriber/transcriber';
+import { useTransformRecording } from '../transformations/mutations';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 
@@ -39,6 +40,8 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 	const { cancelRecorder } = useCancelRecorder();
 	const { ensureRecordingSession } = useEnsureRecordingSession();
 	const { createRecording } = useCreateRecording();
+	const { transformAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
+		useTransformRecording();
 
 	return {
 		get recorderState() {
@@ -149,10 +152,10 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 										if (
 											settings.value['transformations.selectedTransformationId']
 										) {
-											await transcriber.transformAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+											await transformAndUpdateRecordingWithToastWithSoundWithCopyPaste(
 												{
 													recordingId: createdRecording.id,
-													selectedTransformationId:
+													transformationId:
 														settings.value[
 															'transformations.selectedTransformationId'
 														],
