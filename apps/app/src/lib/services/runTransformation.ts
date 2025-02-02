@@ -14,7 +14,7 @@ type TransformErrorProperties = {
 	_tag: 'TransformError';
 	code:
 		| 'RECORDING_NOT_FOUND'
-		| 'EMPTY_INPUT'
+		| 'NO_INPUT'
 		| 'TRANSFORMATION_NOT_FOUND'
 		| 'NO_STEPS_CONFIGURED'
 		| 'FAILED_TO_CREATE_TRANSFORMATION_RUN'
@@ -29,7 +29,7 @@ export type TransformResult<T> = Ok<T> | TransformError;
 
 export const TransformErrorToWhisperingErr = ({ error }: TransformError) => {
 	switch (error.code) {
-		case 'EMPTY_INPUT':
+		case 'NO_INPUT':
 			return WhisperingErr({
 				title: '⚠️ Empty input',
 				description: 'Please enter some text to transform',
@@ -397,7 +397,7 @@ export function createRunTransformationService({
 			transformationId: string;
 		}): Promise<TransformResult<TransformationRun>> => {
 			if (!input.trim()) {
-				return TransformError({ code: 'EMPTY_INPUT' });
+				return TransformError({ code: 'NO_INPUT' });
 			}
 			return runTransformation({
 				input,

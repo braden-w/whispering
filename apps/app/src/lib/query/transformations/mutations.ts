@@ -266,13 +266,6 @@ export function useTransformInputWithToast() {
 			input: string;
 			transformationId: string;
 		}) => {
-			if (!input.trim()) {
-				return WhisperingErr({
-					title: 'No input provided',
-					description: 'Please enter some text to transform',
-				});
-			}
-
 			const transformationRunResult =
 				await RunTransformationService.transformInput({
 					input,
