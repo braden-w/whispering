@@ -29,6 +29,7 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
 	const transformer = getTransformerFromContext();
@@ -93,9 +94,10 @@
 
 		<SelectTransformationCombobox
 			onSelect={(transformation) =>
-				transformer.transformRecording({
+				transformer.transformRecording.mutate({
 					recordingId: recording.id,
 					transformationId: transformation.id,
+					toastId: nanoid(),
 				})}
 		/>
 

@@ -81,10 +81,19 @@ export function createTransformer() {
 	}));
 	const transformRecording = createResultMutation(() => ({
 		mutationKey: transformerKeys.transformRecording,
+		onMutate: ({ toastId }) => {
+			toast.loading({
+				id: toastId,
+				title: '🔄 Running transformation...',
+				description:
+					'Applying your selected transformation to the transcribed text...',
+			});
+		},
 		mutationFn: async ({
 			recordingId,
 			transformationId,
 		}: {
+			toastId: string;
 			recordingId: string;
 			transformationId: string;
 		}): Promise<WhisperingResult<string>> => {
@@ -136,6 +145,28 @@ export function createTransformer() {
 			});
 			queryClient.invalidateQueries({
 				queryKey: transformationsKeys.byId(transformationId),
+			});
+		},
+		onError: (error, { toastId }) => {
+			toast.error({ id: toastId, ...error });
+		},
+		onSuccess: (output, { toastId }) => {
+			void playSoundIfEnabled('transformationComplete');
+			maybeCopyAndPaste({
+				text: output,
+				toastId,
+				shouldCopy: settings.value['transformation.clipboard.copyOnSuccess'],
+				shouldPaste: settings.value['transformation.clipboard.pasteOnSuccess'],
+				statusToToastText: (status) => {
+					switch (status) {
+						case null:
+							return '🔄 Transformation complete!';
+						case 'COPIED':
+							return '🔄 Transformation complete and copied to clipboard!';
+						case 'COPIED+PASTED':
+							return '🔄 Transformation complete, copied to clipboard, and pasted!';
+					}
+				},
 			});
 		},
 	}));
@@ -197,53 +228,6 @@ export function createTransformer() {
 				},
 			);
 		},
-		transformRecording: async ({
-			recordingId,
-			transformationId,
-			toastId = nanoid(),
-		}: {
-			recordingId: string;
-			transformationId: string;
-			toastId?: string;
-		}) => {
-			toast.loading({
-				id: toastId,
-				title: '🔄 Running transformation...',
-				description:
-					'Applying your selected transformation to the transcribed text...',
-			});
-			return await transformRecording.mutateAsync(
-				{
-					recordingId,
-					transformationId,
-				},
-				{
-					onError: (error) => {
-						toast.error({ id: toastId, ...error });
-					},
-					onSuccess: (output) => {
-						void playSoundIfEnabled('transformationComplete');
-						maybeCopyAndPaste({
-							text: output,
-							toastId,
-							shouldCopy:
-								settings.value['transformation.clipboard.copyOnSuccess'],
-							shouldPaste:
-								settings.value['transformation.clipboard.pasteOnSuccess'],
-							statusToToastText: (status) => {
-								switch (status) {
-									case null:
-										return '🔄 Transformation complete!';
-									case 'COPIED':
-										return '🔄 Transformation complete and copied to clipboard!';
-									case 'COPIED+PASTED':
-										return '🔄 Transformation complete, copied to clipboard, and pasted!';
-								}
-							},
-						});
-					},
-				},
-			);
-		},
+		transformRecording,
 	};
 }

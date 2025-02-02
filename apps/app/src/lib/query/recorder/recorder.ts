@@ -156,7 +156,7 @@ function createRecorder({
 										if (
 											settings.value['transformations.selectedTransformationId']
 										) {
-											await transformer.transformRecording({
+											transformer.transformRecording.mutate({
 												recordingId: createdRecording.id,
 												transformationId:
 													settings.value[
