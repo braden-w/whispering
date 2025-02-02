@@ -304,15 +304,6 @@ export function useTransformInputWithToast() {
 
 			return Ok(transformationRun.output);
 		},
-		onSuccess: (output) => {
-			toast.success({
-				title: 'Transformation complete',
-				description: 'The text has been successfully transformed',
-			});
-		},
-		onError: (error) => {
-			toast.error({ ...error });
-		},
 	}));
 	return {
 		transformInputWithToast: async ({
@@ -337,6 +328,27 @@ export function useTransformInputWithToast() {
 				{
 					onError: (error) => {
 						toast.error({ id: toastId, ...error });
+					},
+					onSuccess: (output) => {
+						void playSoundIfEnabled('transformationComplete');
+						maybeCopyAndPaste({
+							text: output,
+							toastId,
+							shouldCopy:
+								settings.value['transformation.clipboard.copyOnSuccess'],
+							shouldPaste:
+								settings.value['transformation.clipboard.pasteOnSuccess'],
+							statusToToastText: (status) => {
+								switch (status) {
+									case null:
+										return '🔄 Transformation complete!';
+									case 'COPIED':
+										return '🔄 Transformation complete and copied to clipboard!';
+									case 'COPIED+PASTED':
+										return '🔄 Transformation complete, copied to clipboard, and pasted!';
+								}
+							},
+						});
 					},
 				},
 			);
@@ -422,10 +434,10 @@ export function useTransformRecording() {
 					onError: (error) => {
 						toast.error({ id: toastId, ...error });
 					},
-					onSuccess: (transformedText) => {
+					onSuccess: (output) => {
 						void playSoundIfEnabled('transformationComplete');
 						maybeCopyAndPaste({
-							text: transformedText,
+							text: output,
 							toastId,
 							shouldCopy:
 								settings.value['transformation.clipboard.copyOnSuccess'],
