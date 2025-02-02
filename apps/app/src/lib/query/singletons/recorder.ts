@@ -57,12 +57,32 @@ function createRecorder({
 	}));
 
 	const startRecording = createResultMutation(() => ({
-		mutationFn: async (toastId: string) => {
+		onMutate: async ({ toastId }) => {
+			toast.loading({
+				id: toastId,
+				title: '🎙️ Preparing to record...',
+				description: 'Setting up your recording environment...',
+			});
+			await ensureRecordingSession.mutateAsync(toastId);
+		},
+		mutationFn: async ({ toastId }: { toastId: string }) => {
 			const startRecordingResult =
 				await userConfiguredServices.recorder.startRecording(nanoid(), {
 					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 				});
 			return startRecordingResult;
+		},
+		onError: (error, { toastId }) => {
+			toast.error({ id: toastId, ...error });
+		},
+		onSuccess: (_data, { toastId }) => {
+			toast.success({
+				id: toastId,
+				title: '🎙️ Whispering is recording...',
+				description: 'Speak now and stop recording when done',
+			});
+			console.info('Recording started');
+			void playSoundIfEnabled('start');
 		},
 		onSettled: invalidateRecorderState,
 	}));
@@ -242,34 +262,9 @@ function createRecorder({
 		toggleRecordingWithToast: async () => {
 			const toastId = nanoid();
 			if (recorderState.data === 'SESSION+RECORDING') {
-				stopRecording.mutate({ toastId }, {});
+				stopRecording.mutate({ toastId });
 			} else {
-				toast.loading({
-					id: toastId,
-					title: '🎙️ Preparing to record...',
-					description: 'Setting up your recording environment...',
-				});
-				ensureRecordingSession.mutate(toastId, {
-					onError: (error, toastId) => {
-						toast.error({ id: toastId, ...error });
-					},
-					onSuccess: (_data, toastId) => {
-						startRecording.mutate(toastId, {
-							onError: (error, toastId) => {
-								toast.error({ id: toastId, ...error });
-							},
-							onSuccess: (_data, toastId) => {
-								toast.success({
-									id: toastId,
-									title: '🎙️ Whispering is recording...',
-									description: 'Speak now and stop recording when done',
-								});
-								console.info('Recording started');
-								void playSoundIfEnabled('start');
-							},
-						});
-					},
-				});
+				startRecording.mutate({ toastId });
 			}
 		},
 		cancelRecorderWithToast: () => {
