@@ -19,6 +19,7 @@ import { transformationsKeys } from './queries';
 import type { Accessor } from '../types';
 import { nanoid } from 'nanoid/non-secure';
 import { maybeCopyAndPaste } from '../transcriber/transcriber';
+import { RunTransformationErrorToWhisperingErr } from '$lib/services/runTransformation';
 
 export const transformationsMutationKeys = {
 	transformInput: ({
@@ -257,75 +258,96 @@ export function useDeleteTransformationsWithToast() {
 }
 
 export function useTransformInputWithToast() {
-	return {
-		transformInputWithToast: createResultMutation(() => ({
-			mutationFn: async ({
-				input,
-				transformation,
-			}: {
-				input: string;
-				transformation: Transformation;
-			}) => {
-				if (!input.trim()) {
-					return WhisperingErr({
-						title: 'No input provided',
-						description: 'Please enter some text to transform',
-					});
-				}
-				if (transformation.steps.length === 0) {
-					return WhisperingErr({
-						title: 'No steps configured',
-						description: 'Please add at least one transformation step',
-					});
-				}
-
-				const transformationRunResult =
-					await RunTransformationService.transformInput({
-						input,
-						transformation,
-					});
-
-				if (!transformationRunResult.ok) {
-					return WhisperingErr({
-						title: 'Unexpected error while running transformation',
-						description: 'See more details for the error',
-						action: {
-							type: 'more-details',
-							error: transformationRunResult.error,
-						},
-					});
-				}
-
-				const transformationRun = transformationRunResult.data;
-				queryClient.setQueryData<TransformationRun[]>(
-					transformationRunKeys.runsByTransformationId(
-						transformationRun.transformationId,
-					),
-					(oldData) => {
-						if (!oldData) return [transformationRun];
-						return [transformationRun, ...oldData];
-					},
-				);
-
-				if (transformationRun.error) {
-					return WhisperingErr({
-						title: 'Transformation failed',
-						description: transformationRun.error,
-					});
-				}
-
-				return Ok(transformationRun.output);
-			},
-			onSuccess: (output) => {
-				toast.success({
-					title: 'Transformation complete',
-					description: 'The text has been successfully transformed',
+	const transformInput = createResultMutation(() => ({
+		mutationFn: async ({
+			input,
+			transformationId,
+		}: {
+			input: string;
+			transformationId: string;
+		}) => {
+			if (!input.trim()) {
+				return WhisperingErr({
+					title: 'No input provided',
+					description: 'Please enter some text to transform',
 				});
-			},
-			onError: (error) => {
-				toast.error({ ...error });
-			},
-		})),
+			}
+
+			const transformationRunResult =
+				await RunTransformationService.transformInput({
+					input,
+					transformationId,
+				});
+
+			if (!transformationRunResult.ok) {
+				return RunTransformationErrorToWhisperingErr(transformationRunResult);
+			}
+
+			const transformationRun = transformationRunResult.data;
+			queryClient.setQueryData<TransformationRun[]>(
+				transformationRunKeys.runsByTransformationId(
+					transformationRun.transformationId,
+				),
+				(oldData) => {
+					if (!oldData) return [transformationRun];
+					return [transformationRun, ...oldData];
+				},
+			);
+
+			if (transformationRun.error) {
+				return WhisperingErr({
+					title: '⚠️ Transformation failed',
+					description: 'Failed to apply the transformation on the input.',
+					action: { type: 'more-details', error: transformationRun.error },
+				});
+			}
+
+			if (!transformationRun.output) {
+				return WhisperingErr({
+					title: '⚠️ Transformation produced no output',
+					description: 'The transformation completed but produced no output.',
+				});
+			}
+
+			return Ok(transformationRun.output);
+		},
+		onSuccess: (output) => {
+			toast.success({
+				title: 'Transformation complete',
+				description: 'The text has been successfully transformed',
+			});
+		},
+		onError: (error) => {
+			toast.error({ ...error });
+		},
+	}));
+	return {
+		transformInputWithToast: async ({
+			input,
+			transformationId,
+			toastId = nanoid(),
+		}: {
+			input: string;
+			transformationId: string;
+			toastId?: string;
+		}) => {
+			toast.loading({
+				id: toastId,
+				title: '🔄 Running transformation...',
+				description: 'Applying your selected transformation to the input...',
+			});
+			return await transformInput.mutateAsync(
+				{
+					input,
+					transformationId,
+				},
+				{
+					onError: (error) => {
+						toast.error({ id: toastId, ...error });
+					},
+				},
+			);
+		},
 	};
 }
 
@@ -359,7 +381,11 @@ export function useTransformRecording() {
 			if (transformationRun.error) {
 				return WhisperingErr({
 					title: '⚠️ Transformation error',
-					description: transformationRun.error,
+					description: 'Failed to apply the transformation on the recording.',
+					action: {
+						type: 'more-details',
+						error: transformationRun.error,
+					},
 				});
 			}
 

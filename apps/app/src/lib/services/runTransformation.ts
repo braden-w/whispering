@@ -5,18 +5,68 @@ import { z } from 'zod';
 import { DbRecordingsService } from '.';
 import type {
 	DbTransformationsService,
-	Transformation,
 	TransformationRun,
-	TransformationStep,
+	TransformationStep
 } from './db';
 import type { HttpService } from './http/HttpService';
 
 type RunTransformationErrorProperties = {
 	_tag: 'RunTransformationError';
+	code:
+		| 'TRANSFORMATION_NOT_FOUND'
+		| 'NO_STEPS_CONFIGURED'
+		| 'FAILED_TO_CREATE_TRANSFORMATION_RUN'
+		| 'FAILED_TO_ADD_TRANSFORMATION_STEP_RUN'
+		| 'FAILED_TO_MARK_TRANSFORMATION_RUN_AND_STEP_AS_FAILED'
+		| 'FAILED_TO_MARK_TRANSFORMATION_RUN_STEP_AS_COMPLETED'
+		| 'FAILED_TO_MARK_TRANSFORMATION_RUN_AS_COMPLETED';
 };
 
 export type RunTransformationError = Err<RunTransformationErrorProperties>;
 export type RunTransformationResult<T> = Ok<T> | RunTransformationError;
+
+export const RunTransformationErrorToWhisperingErr = ({
+	error,
+}: RunTransformationError) => {
+	switch (error.code) {
+		case 'TRANSFORMATION_NOT_FOUND':
+			return WhisperingErr({
+				title: '⚠️ Transformation not found',
+				description: 'Could not find the selected transformation.',
+			});
+		case 'NO_STEPS_CONFIGURED':
+			return WhisperingErr({
+				title: 'No steps configured',
+				description: 'Please add at least one transformation step',
+			});
+		case 'FAILED_TO_CREATE_TRANSFORMATION_RUN':
+			return WhisperingErr({
+				title: '⚠️ Failed to create transformation run',
+				description: 'Could not create the transformation run.',
+			});
+		case 'FAILED_TO_ADD_TRANSFORMATION_STEP_RUN':
+			return WhisperingErr({
+				title: '⚠️ Failed to add transformation step run',
+				description: 'Could not add the transformation step run.',
+			});
+		case 'FAILED_TO_MARK_TRANSFORMATION_RUN_AND_STEP_AS_FAILED':
+			return WhisperingErr({
+				title: '⚠️ Failed to mark transformation run and step as failed',
+				description:
+					'Could not mark the transformation run and step as failed.',
+			});
+		case 'FAILED_TO_MARK_TRANSFORMATION_RUN_STEP_AS_COMPLETED':
+			return WhisperingErr({
+				title: '⚠️ Failed to mark transformation run step as completed',
+				description: 'Could not mark the transformation run step as completed.',
+			});
+		case 'FAILED_TO_MARK_TRANSFORMATION_RUN_AS_COMPLETED':
+			return WhisperingErr({
+				title: '⚠️ Failed to mark transformation run as completed',
+				description: 'Could not mark the transformation run as completed.',
+			});
+	}
+};
 
 export const RunTransformationError = <
 	T extends Omit<RunTransformationErrorProperties, '_tag'>,
@@ -235,13 +285,25 @@ export function createRunTransformationService({
 
 	const runTransformation = async ({
 		input,
-		transformation,
+		transformationId,
 		recordingId,
 	}: {
 		input: string;
-		transformation: Transformation;
+		transformationId: string;
 		recordingId: string | null;
 	}): Promise<RunTransformationResult<TransformationRun>> => {
+		const getTransformationResult =
+			await DbTransformationsService.getTransformationById(transformationId);
+		if (!getTransformationResult.ok || !getTransformationResult.data) {
+			return RunTransformationError({ code: 'TRANSFORMATION_NOT_FOUND' });
+		}
+
+		const transformation = getTransformationResult.data;
+
+		if (transformation.steps.length === 0) {
+			return RunTransformationError({ code: 'NO_STEPS_CONFIGURED' });
+		}
+
 		const createTransformationRunResult =
 			await DbTransformationsService.createTransformationRun({
 				transformationId: transformation.id,
@@ -251,8 +313,7 @@ export function createRunTransformationService({
 
 		if (!createTransformationRunResult.ok)
 			return RunTransformationError({
-				title: '⚠️ Failed to create transformation run',
-				description: 'Could not create the transformation run.',
+				code: 'FAILED_TO_CREATE_TRANSFORMATION_RUN',
 			});
 
 		const transformationRun = createTransformationRunResult.data;
@@ -267,8 +328,7 @@ export function createRunTransformationService({
 
 			if (!newTransformationStepRunResult.ok)
 				return RunTransformationError({
-					title: '⚠️ Failed to add transformation step run',
-					description: 'Could not add the transformation step run.',
+					code: 'FAILED_TO_ADD_TRANSFORMATION_STEP_RUN',
 				});
 
 			const newTransformationStepRun = newTransformationStepRunResult.data;
@@ -290,9 +350,7 @@ export function createRunTransformationService({
 					);
 				if (!dbResult.ok)
 					return RunTransformationError({
-						title: '⚠️ Failed to mark transformation run and step as failed',
-						description:
-							'Could not mark the transformation run and step as failed.',
+						code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_AND_STEP_AS_FAILED',
 					});
 				return dbResult;
 			}
@@ -306,9 +364,7 @@ export function createRunTransformationService({
 
 			if (!dbResult.ok)
 				return RunTransformationError({
-					title: '⚠️ Failed to mark transformation run step as completed',
-					description:
-						'Could not mark the transformation run step as completed.',
+					code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_STEP_AS_COMPLETED',
 				});
 
 			currentInput = handleStepResult.data;
@@ -322,8 +378,7 @@ export function createRunTransformationService({
 
 		if (!dbResult.ok)
 			return RunTransformationError({
-				title: '⚠️ Failed to mark transformation run as completed',
-				description: 'Could not mark the transformation run as completed.',
+				code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_AS_COMPLETED',
 			});
 		return dbResult;
 	};
@@ -331,12 +386,16 @@ export function createRunTransformationService({
 	return {
 		transformInput: async ({
 			input,
-			transformation,
+			transformationId,
 		}: {
 			input: string;
-			transformation: Transformation;
+			transformationId: string;
 		}): Promise<RunTransformationResult<TransformationRun>> => {
-			return runTransformation({ input, transformation, recordingId: null });
+			return runTransformation({
+				input,
+				transformationId,
+				recordingId: null,
+			});
 		},
 		transformRecording: async ({
 			transformationId,
@@ -348,27 +407,13 @@ export function createRunTransformationService({
 			const getRecordingResult =
 				await DbRecordingsService.getRecordingById(recordingId);
 			if (!getRecordingResult.ok || !getRecordingResult.data) {
-				return RunTransformationError({
-					title: '⚠️ Recording not found',
-					description: 'Could not find the recording..',
-				});
+				return RunTransformationError({ code: 'RECORDING_NOT_FOUND' });
 			}
 			const recording = getRecordingResult.data;
 
-			const getTransformationResult =
-				await DbTransformationsService.getTransformationById(transformationId);
-			if (!getTransformationResult.ok || !getTransformationResult.data) {
-				return RunTransformationError({
-					title: '⚠️ Transformation not found',
-					description: 'Could not find the selected transformation.',
-				});
-			}
-
-			const transformation = getTransformationResult.data;
-
 			return runTransformation({
 				input: recording.transcribedText,
-				transformation,
+				transformationId,
 				recordingId,
 			});
 		},
