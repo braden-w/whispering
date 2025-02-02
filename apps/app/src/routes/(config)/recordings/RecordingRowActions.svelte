@@ -12,9 +12,9 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
-	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
+	import { getTranscriberFromContext } from '$lib/query/singletons/transcriber';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
-	import { getTransformerFromContext } from '$lib/query/transformer/transformer';
+	import { getTransformerFromContext } from '$lib/query/singletons/transformer';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';

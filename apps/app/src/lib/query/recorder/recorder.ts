@@ -13,8 +13,8 @@ import {
 } from './mutations';
 import { useRecorderState } from './queries';
 import { noop } from '@tanstack/table-core';
-import type { Transcriber } from '../transcriber/transcriber';
-import type { Transformer } from '../transformer/transformer';
+import type { Transcriber } from '../singletons/transcriber';
+import type { Transformer } from '../singletons/transformer';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 

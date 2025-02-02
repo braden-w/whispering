@@ -18,7 +18,7 @@
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
-	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
+	import { getTranscriberFromContext } from '$lib/query/singletons/transcriber';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '$lib/utils';
 	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';

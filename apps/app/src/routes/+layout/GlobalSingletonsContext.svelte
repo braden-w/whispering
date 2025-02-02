@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { initTranscriberInContext } from '$lib/query/transcriber/transcriber';
+	import { initTranscriberInContext } from '$lib/query/singletons/transcriber';
 	import { initRecorderInContext } from '$lib/query/recorder/recorder';
-	import { initTransformerInContext } from '$lib/query/transformer/transformer';
+	import { initTransformerInContext } from '$lib/query/singletons/transformer';
 	import { initRegisterShortcutsInContext } from '$lib/stores/settings.svelte';
 
 	const transcriber = initTranscriberInContext();

@@ -2,7 +2,7 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { getTransformerFromContext } from '$lib/query/transformer/transformer';
+	import { getTransformerFromContext } from '$lib/query/singletons/transformer';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
 	import { nanoid } from 'nanoid/non-secure';

@@ -7,7 +7,7 @@ import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { queryClient } from '..';
-import { maybeCopyAndPaste } from '../transcriber/transcriber';
+import { maybeCopyAndPaste } from './maybeCopyAndPaste';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from '../transformations/queries';
 import { getContext } from 'svelte';

@@ -1,4 +1,4 @@
-import { ClipboardService, createResultMutation } from '$lib/services';
+import { createResultMutation } from '$lib/services';
 import type { Recording } from '$lib/services/db';
 import {
 	playSoundIfEnabled,
@@ -6,12 +6,11 @@ import {
 } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
-import { WHISPERING_RECORDINGS_PATHNAME, WhisperingErr } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
+import { WhisperingErr } from '@repo/shared';
 import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
-import { copyTextToClipboardWithToast } from '../clipboard/mutations';
 import { useUpdateRecording } from '../recordings/mutations';
+import { maybeCopyAndPaste } from './maybeCopyAndPaste';
 
 export type Transcriber = ReturnType<typeof createTranscriber>;
 
@@ -138,91 +137,4 @@ function createTranscriber() {
 		},
 		transcribeRecording,
 	};
-}
-
-export async function maybeCopyAndPaste({
-	text,
-	toastId,
-	shouldCopy,
-	shouldPaste,
-	statusToToastText,
-}: {
-	text: string;
-	toastId: string;
-	shouldCopy: boolean;
-	shouldPaste: boolean;
-	statusToToastText: (status: null | 'COPIED' | 'COPIED+PASTED') => string;
-}) {
-	const toastNull = () =>
-		toast.success({
-			id: toastId,
-			title: statusToToastText(null),
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'button',
-				label: 'Copy to clipboard',
-				onClick: () =>
-					copyTextToClipboardWithToast({
-						label: 'transcribed text',
-						text: text,
-					}),
-			},
-		});
-
-	const toastCopied = () =>
-		toast.success({
-			id: toastId,
-			title: '📝 Recording transcribed and copied to clipboard!',
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'link',
-				label: 'Go to recordings',
-				goto: WHISPERING_RECORDINGS_PATHNAME,
-			},
-		});
-
-	const toastCopiedAndPasted = () =>
-		toast.success({
-			id: toastId,
-			title: statusToToastText('COPIED+PASTED'),
-			description: text,
-			descriptionClass: 'line-clamp-2',
-			action: {
-				type: 'link',
-				label: 'Go to recordings',
-				goto: WHISPERING_RECORDINGS_PATHNAME,
-			},
-		});
-	if (!shouldCopy) return toastNull();
-
-	const copyResult = await ClipboardService.setClipboardText(text);
-	if (!copyResult.ok) {
-		toast.warning({
-			id: toastId,
-			title: '⚠️ Clipboard Access Failed',
-			description:
-				'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-			action: { type: 'more-details', error: copyResult.error },
-		});
-		toastNull();
-		return;
-	}
-
-	if (!shouldPaste) return toastCopied();
-
-	const pasteResult = await ClipboardService.writeTextToCursor(text);
-	if (!pasteResult.ok) {
-		toast.warning({
-			title: '⚠️ Paste Operation Failed',
-			description:
-				'Text was copied to clipboard but could not be pasted automatically. Please use Ctrl+V (Cmd+V on Mac) to paste manually.',
-			action: { type: 'more-details', error: pasteResult.error },
-		});
-		toastCopied();
-		return;
-	}
-
-	toastCopiedAndPasted();
 }
