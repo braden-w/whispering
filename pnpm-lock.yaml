@@ -21,8 +21,8 @@ importers:
   apps/app:
     dependencies:
       '@epicenterhq/result':
-        specifier: ^0.5.2
-        version: 0.5.2
+        specifier: ^0.6.0
+        version: 0.6.0
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.3.1)
@@ -444,6 +444,9 @@ packages:
 
   '@epicenterhq/result@0.5.2':
     resolution: {integrity: sha512-JOXLWgN2iee0OS1Vnp4GsI1w8buJZa0q4UXDZG6CSWqPn9xh/8Uj3P6ASj/1fQmDMZWoc0xoTl/QIlOKL1MzQg==}
+
+  '@epicenterhq/result@0.6.0':
+    resolution: {integrity: sha512-iU2wqaPH5MMnlyTS03XxXEwMrTf7wger9jHj+KC2mIBCRvjwK6LPqL2HtstE5yorRg2FMU9w9p+Q0ojqd/ETbA==}
 
   '@esbuild/aix-ppc64@0.24.2':
     resolution: {integrity: sha512-thpVCb/rhxE/BnMLQ7GReQLLN8q9qbHmI55F4489/ByVg2aQaQ6kbcLb6FHkocZzQhxc4gx0sCk0tJkKBFzDhA==}
@@ -5249,6 +5252,8 @@ snapshots:
     optional: true
 
   '@epicenterhq/result@0.5.2': {}
+
+  '@epicenterhq/result@0.6.0': {}
 
   '@esbuild/aix-ppc64@0.24.2':
     optional: true

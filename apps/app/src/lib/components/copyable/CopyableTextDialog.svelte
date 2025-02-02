@@ -4,11 +4,9 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { mergeProps } from 'bits-ui';
 	import WhisperingTooltip from '../WhisperingTooltip.svelte';
-
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	let {
 		id,
@@ -54,7 +52,7 @@
 				<Button
 					variant="outline"
 					onclick={() => {
-						copyTextToClipboardWithToast.mutate(
+						copyTextToClipboardWithToast(
 							{
 								label: 'transcribed text',
 								text: text,

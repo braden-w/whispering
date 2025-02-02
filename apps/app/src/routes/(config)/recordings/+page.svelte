@@ -15,7 +15,7 @@
 	import SortableTableHeader from '$lib/components/ui/table/SortableTableHeader.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useDeleteRecordingsWithToast } from '$lib/query/recordings/mutations';
 	import { useRecordingsQuery } from '$lib/query/recordings/queries';
 	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
@@ -53,7 +53,6 @@
 	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 	const { deleteRecordingsWithToast } = useDeleteRecordingsWithToast();
 
 	const columns: ColumnDef<Recording>[] = [
@@ -425,15 +424,13 @@
 								<WhisperingButton
 									tooltipContent="Copy transcriptions"
 									onclick={() => {
-										copyTextToClipboardWithToast.mutate(
+										copyTextToClipboardWithToast(
 											{
 												label: 'transcribed text (joined)',
 												text: joinedTranscriptionsText,
 											},
 											{
-												onSuccess: () => {
-													isDialogOpen = false;
-												},
+												onSuccess: () => (isDialogOpen = false),
 											},
 										);
 									}}
