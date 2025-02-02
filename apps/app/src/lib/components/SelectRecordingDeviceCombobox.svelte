@@ -7,7 +7,7 @@
 <script lang="ts">
 	import * as Popover from '$lib/components/ui/popover';
 	import { settings } from '$lib/stores/settings.svelte';
-	import { MicIcon, MicOffIcon } from 'lucide-svelte';
+	import { MicIcon } from 'lucide-svelte';
 	import SelectRecordingDeviceComboboxCommand from './SelectRecordingDeviceComboboxCommand.svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
 
@@ -35,7 +35,7 @@
 				{#if isDeviceSelected}
 					<MicIcon class="h-4 w-4 text-green-500" />
 				{:else}
-					<MicOffIcon class="h-4 w-4 text-amber-500" />
+					<MicIcon class="h-4 w-4 text-amber-500" />
 				{/if}
 				{#if !isDeviceSelected}
 					<span
