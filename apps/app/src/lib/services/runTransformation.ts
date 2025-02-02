@@ -6,13 +6,14 @@ import { DbRecordingsService } from '.';
 import type {
 	DbTransformationsService,
 	TransformationRun,
-	TransformationStep
+	TransformationStep,
 } from './db';
 import type { HttpService } from './http/HttpService';
 
 type RunTransformationErrorProperties = {
 	_tag: 'RunTransformationError';
 	code:
+		| 'RECORDING_NOT_FOUND'
 		| 'TRANSFORMATION_NOT_FOUND'
 		| 'NO_STEPS_CONFIGURED'
 		| 'FAILED_TO_CREATE_TRANSFORMATION_RUN'
