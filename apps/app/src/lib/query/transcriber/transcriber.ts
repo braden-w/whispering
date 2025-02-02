@@ -33,9 +33,17 @@ const transcriberKeys = {
 function createTranscriber() {
 	const { updateRecording } = useUpdateRecording();
 
-	const transcribeAndUpdateRecording = createResultMutation(() => ({
+	const transcribeRecording = createResultMutation(() => ({
 		mutationKey: transcriberKeys.transcribe,
-		onMutate: ({ recording }: { recording: Recording }) => {
+		onMutate: ({
+			recording,
+			toastId,
+		}: { recording: Recording; toastId: string }) => {
+			toast.loading({
+				id: toastId,
+				title: '📋 Transcribing...',
+				description: 'Your recording is being transcribed...',
+			});
 			updateRecording.mutate(
 				{ ...recording, transcriptionStatus: 'TRANSCRIBING' },
 				{
@@ -50,7 +58,12 @@ function createTranscriber() {
 				},
 			);
 		},
-		mutationFn: async ({ recording }: { recording: Recording }) => {
+		mutationFn: async ({
+			recording,
+		}: {
+			recording: Recording;
+			toastId: string;
+		}) => {
 			if (!recording.blob) {
 				return WhisperingErr({
 					title: '⚠️ Recording blob not found',
@@ -65,7 +78,8 @@ function createTranscriber() {
 				});
 			return transcriptionResult;
 		},
-		onError: (_error, { recording }) => {
+		onError: (error, { recording, toastId }) => {
+			toast.error({ id: toastId, ...error });
 			updateRecording.mutate(
 				{ ...recording, transcriptionStatus: 'FAILED' },
 				{
@@ -80,7 +94,7 @@ function createTranscriber() {
 				},
 			);
 		},
-		onSuccess: (transcribedText, { recording }) => {
+		onSuccess: (transcribedText, { recording, toastId }) => {
 			updateRecording.mutate(
 				{ ...recording, transcribedText, transcriptionStatus: 'DONE' },
 				{
@@ -94,6 +108,23 @@ function createTranscriber() {
 					},
 				},
 			);
+			void playSoundIfEnabled('transcriptionComplete');
+			maybeCopyAndPaste({
+				text: transcribedText,
+				toastId,
+				shouldCopy: settings.value['transcription.clipboard.copyOnSuccess'],
+				shouldPaste: settings.value['transcription.clipboard.pasteOnSuccess'],
+				statusToToastText(status) {
+					switch (status) {
+						case null:
+							return '📝 Recording transcribed!';
+						case 'COPIED':
+							return '📝 Recording transcribed and copied to clipboard!';
+						case 'COPIED+PASTED':
+							return '📝📋✍️ Recording transcribed, copied to clipboard, and pasted!';
+					}
+				},
+			});
 		},
 	}));
 
@@ -105,48 +136,7 @@ function createTranscriber() {
 				}) > 0
 			);
 		},
-		transcribeRecording: async ({
-			recording,
-			toastId = nanoid(),
-		}: {
-			recording: Recording;
-			toastId?: string;
-		}) => {
-			toast.loading({
-				id: toastId,
-				title: '📋 Transcribing...',
-				description: 'Your recording is being transcribed...',
-			});
-			return await transcribeAndUpdateRecording.mutateAsync(
-				{ recording },
-				{
-					onError: (error) => {
-						toast.error({ id: toastId, ...error });
-					},
-					onSuccess: async (transcribedText) => {
-						void playSoundIfEnabled('transcriptionComplete');
-						maybeCopyAndPaste({
-							text: transcribedText,
-							toastId,
-							shouldCopy:
-								settings.value['transcription.clipboard.copyOnSuccess'],
-							shouldPaste:
-								settings.value['transcription.clipboard.pasteOnSuccess'],
-							statusToToastText(status) {
-								switch (status) {
-									case null:
-										return '📝 Recording transcribed!';
-									case 'COPIED':
-										return '📝 Recording transcribed and copied to clipboard!';
-									case 'COPIED+PASTED':
-										return '📝📋✍️ Recording transcribed, copied to clipboard, and pasted!';
-								}
-							},
-						});
-					},
-				},
-			);
-		},
+		transcribeRecording,
 	};
 }
 

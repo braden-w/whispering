@@ -149,22 +149,27 @@ function createRecorder({
 											);
 										}
 
-										await transcriber.transcribeRecording({
-											recording: createdRecording,
-											toastId,
-										});
-										if (
-											settings.value['transformations.selectedTransformationId']
-										) {
-											transformer.transformRecording.mutate({
-												recordingId: createdRecording.id,
-												transformationId:
-													settings.value[
-														'transformations.selectedTransformationId'
-													],
-												toastId,
-											});
-										}
+										transcriber.transcribeRecording.mutate(
+											{ recording: createdRecording, toastId },
+											{
+												onSuccess: () => {
+													if (
+														settings.value[
+															'transformations.selectedTransformationId'
+														]
+													) {
+														transformer.transformRecording.mutate({
+															recordingId: createdRecording.id,
+															transformationId:
+																settings.value[
+																	'transformations.selectedTransformationId'
+																],
+															toastId,
+														});
+													}
+												},
+											},
+										);
 									},
 								},
 							);
