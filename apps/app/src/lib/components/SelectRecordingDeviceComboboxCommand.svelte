@@ -5,7 +5,7 @@
 	import { toast } from '$lib/services/toast';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
-	import { CheckIcon, MicIcon } from 'lucide-svelte';
+	import { CheckIcon, RefreshCwIcon } from 'lucide-svelte';
 	import { combobox } from './SelectRecordingDeviceCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
@@ -69,7 +69,7 @@
 		}}
 		class="rounded-none p-2 bg-muted/50 text-muted-foreground"
 	>
-		<MicIcon class="h-4 w-4 mx-2.5" />
+		<RefreshCwIcon class="h-4 w-4 mx-2.5" />
 		Refresh devices
 	</Command.Item>
 </Command.Root>
