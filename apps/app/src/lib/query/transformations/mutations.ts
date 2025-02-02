@@ -257,7 +257,7 @@ export function useDeleteTransformationsWithToast() {
 	};
 }
 
-export function useTransformInputWithToast() {
+export function useTransformInput() {
 	const transformInput = createResultMutation(() => ({
 		mutationFn: async ({
 			input,
@@ -265,7 +265,7 @@ export function useTransformInputWithToast() {
 		}: {
 			input: string;
 			transformationId: string;
-		}) => {
+		}): Promise<WhisperingResult<string>> => {
 			const transformationRunResult =
 				await RunTransformationService.transformInput({
 					input,
@@ -277,15 +277,6 @@ export function useTransformInputWithToast() {
 			}
 
 			const transformationRun = transformationRunResult.data;
-			queryClient.setQueryData<TransformationRun[]>(
-				transformationRunKeys.runsByTransformationId(
-					transformationRun.transformationId,
-				),
-				(oldData) => {
-					if (!oldData) return [transformationRun];
-					return [transformationRun, ...oldData];
-				},
-			);
 
 			if (transformationRun.error) {
 				return WhisperingErr({
@@ -303,6 +294,15 @@ export function useTransformInputWithToast() {
 			}
 
 			return Ok(transformationRun.output);
+		},
+		onSettled: (_data, _error, { transformationId }) => {
+			queryClient.invalidateQueries({
+				queryKey:
+					transformationRunKeys.runsByTransformationId(transformationId),
+			});
+			queryClient.invalidateQueries({
+				queryKey: transformationsKeys.byId(transformationId),
+			});
 		},
 	}));
 	return {
@@ -375,10 +375,7 @@ export function useTransformRecording() {
 				return WhisperingErr({
 					title: '⚠️ Transformation failed',
 					description: 'Failed to apply the transformation on the recording..',
-					action: {
-						type: 'more-details',
-						error: transformationResult.error,
-					},
+					action: { type: 'more-details', error: transformationResult.error },
 				});
 			}
 
@@ -403,9 +400,16 @@ export function useTransformRecording() {
 
 			return Ok(transformationRun.output);
 		},
-		onSettled: (_data, _error, { recordingId }) => {
+		onSettled: (_data, _error, { recordingId, transformationId }) => {
 			queryClient.invalidateQueries({
 				queryKey: transformationRunKeys.runsByRecordingId(recordingId),
+			});
+			queryClient.invalidateQueries({
+				queryKey:
+					transformationRunKeys.runsByTransformationId(transformationId),
+			});
+			queryClient.invalidateQueries({
+				queryKey: transformationsKeys.byId(transformationId),
 			});
 		},
 	}));

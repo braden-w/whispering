@@ -2,7 +2,7 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { useTransformInputWithToast } from '$lib/query/transformations/mutations';
+	import { useTransformInput } from '$lib/query/transformations/mutations';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
 
@@ -11,7 +11,7 @@
 	let input = $state('');
 	let output = $state('');
 
-	const { transformInputWithToast } = useTransformInputWithToast();
+	const { transformInputWithToast } = useTransformInput();
 </script>
 
 <Card.Header>

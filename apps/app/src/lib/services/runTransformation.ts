@@ -34,6 +34,11 @@ export const TransformErrorToWhisperingErr = ({ error }: TransformError) => {
 				title: '⚠️ Empty input',
 				description: 'Please enter some text to transform',
 			});
+		case 'RECORDING_NOT_FOUND':
+			return WhisperingErr({
+				title: '⚠️ Recording not found',
+				description: 'Could not find the selected recording.',
+			});
 		case 'TRANSFORMATION_NOT_FOUND':
 			return WhisperingErr({
 				title: '⚠️ Transformation not found',
