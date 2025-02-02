@@ -39,7 +39,11 @@
 						recorder.ensureRecordingSessionClosedSilent();
 						settings.value = {
 							...settings.value,
-							'recording.selectedAudioInputDeviceId': device.deviceId,
+							'recording.selectedAudioInputDeviceId':
+								settings.value['recording.selectedAudioInputDeviceId'] ===
+								device.deviceId
+									? null
+									: device.deviceId,
 						};
 						combobox.closeAndFocusTrigger();
 					}}
