@@ -1,4 +1,4 @@
-import { ClipboardService, createResultMutation } from '$lib/services';
+import { ClipboardService } from '$lib/services';
 import { toast } from '$lib/services/toast';
 import { createMutation } from '@epicenterhq/result';
 
