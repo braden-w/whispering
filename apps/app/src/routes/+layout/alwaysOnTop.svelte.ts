@@ -1,4 +1,4 @@
-import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 import { getTranscriberFromContext } from '$lib/query/singletons/transcriber';
 import { settings } from '$lib/stores/settings.svelte';
 import { getCurrentWindow } from '@tauri-apps/api/window';

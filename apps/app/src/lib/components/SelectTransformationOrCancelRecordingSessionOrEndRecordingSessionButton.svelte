@@ -1,7 +1,7 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
 	import PersistSelectTransformationCombobox from './PersistSelectTransformationCombobox.svelte';

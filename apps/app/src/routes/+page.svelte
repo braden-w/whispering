@@ -7,7 +7,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';

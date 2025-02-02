@@ -1,20 +1,18 @@
 import { useCreateRecording } from '$lib/query/recordings/mutations';
-import { playSoundIfEnabled } from '$lib/services/index.js';
+import { createResultMutation, createResultQuery } from '$lib/services';
+import {
+	playSoundIfEnabled,
+	userConfiguredServices,
+} from '$lib/services/index.js';
+import type { UpdateStatusMessageFn } from '$lib/services/recorder/RecorderService';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
+import { noop } from '@tanstack/table-core';
 import { nanoid } from 'nanoid/non-secure';
 import { getContext, setContext } from 'svelte';
-import {
-	useCancelRecorder,
-	useEnsureRecordingSession,
-	useEnsureRecordingSessionClosed,
-	useStartRecording,
-	useStopRecording,
-} from './mutations';
-import { useRecorderState } from './queries';
-import { noop } from '@tanstack/table-core';
-import type { Transcriber } from '../singletons/transcriber';
-import type { Transformer } from '../singletons/transformer';
+import { queryClient } from '..';
+import type { Transcriber } from './transcriber';
+import type { Transformer } from './transformer';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 
@@ -34,17 +32,92 @@ export const getRecorderFromContext = () => {
 	return getContext<Recorder>('recorder');
 };
 
+const recorderKeys = {
+	all: ['recorder'] as const,
+	state: ['recorder', 'state'] as const,
+};
+
 function createRecorder({
 	transcriber,
 	transformer,
 }: { transcriber: Transcriber; transformer: Transformer }) {
-	const { recorderState } = useRecorderState();
-	const { startRecording } = useStartRecording();
-	const { stopRecording } = useStopRecording();
-	const { ensureRecordingSessionClosed } = useEnsureRecordingSessionClosed();
-	const { cancelRecorder } = useCancelRecorder();
-	const { ensureRecordingSession } = useEnsureRecordingSession();
+	const invalidateRecorderState = () =>
+		queryClient.invalidateQueries({ queryKey: recorderKeys.state });
+
 	const { createRecording } = useCreateRecording();
+
+	const recorderState = createResultQuery(() => ({
+		queryKey: recorderKeys.state,
+		queryFn: async () => {
+			const recorderStateResult =
+				await userConfiguredServices.recorder.getRecorderState();
+			return recorderStateResult;
+		},
+		initialData: 'IDLE' as const,
+	}));
+
+	const startRecording = createResultMutation(() => ({
+		mutationFn: async (toastId: string) => {
+			const startRecordingResult =
+				await userConfiguredServices.recorder.startRecording(nanoid(), {
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				});
+			return startRecordingResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
+
+	const stopRecording = createResultMutation(() => ({
+		mutationFn: async ({ toastId }: { toastId: string }) => {
+			const stopResult = await userConfiguredServices.recorder.stopRecording({
+				sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+			});
+			return stopResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
+
+	const ensureRecordingSession = createResultMutation(() => ({
+		mutationFn: async (toastId: string) => {
+			const ensureRecordingSessionResult =
+				await userConfiguredServices.recorder.ensureRecordingSession(
+					{
+						deviceId: settings.value['recording.selectedAudioInputDeviceId'],
+						bitsPerSecond:
+							Number(settings.value['recording.bitrateKbps']) * 1000,
+					},
+					{
+						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+					},
+				);
+			return ensureRecordingSessionResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
+
+	const ensureRecordingSessionClosed = createResultMutation(() => ({
+		mutationFn: async ({
+			sendStatus,
+		}: { sendStatus: UpdateStatusMessageFn }) => {
+			const closeResult =
+				await userConfiguredServices.recorder.ensureRecordingSessionClosed({
+					sendStatus,
+				});
+			return closeResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
+
+	const cancelRecorder = createResultMutation(() => ({
+		mutationFn: async ({ toastId }: { toastId: string }) => {
+			const cancelResult =
+				await userConfiguredServices.recorder.cancelRecording({
+					sendStatus: (options) => toast.loading({ id: toastId, ...options }),
+				});
+			return cancelResult;
+		},
+		onSettled: invalidateRecorderState,
+	}));
 
 	return {
 		get recorderState() {

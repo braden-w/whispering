@@ -2,7 +2,7 @@
 	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import { cn } from '$lib/utils.js';
 
 	const recorder = getRecorderFromContext();
