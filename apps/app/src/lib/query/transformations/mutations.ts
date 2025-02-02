@@ -1,43 +1,20 @@
-import {
-	createResultMutation,
-	DbRecordingsService,
-	playSoundIfEnabled,
-} from '$lib/services';
+import { createResultMutation, playSoundIfEnabled } from '$lib/services';
+import type { Transformation } from '$lib/services/db';
 import {
 	DbTransformationsService,
 	RunTransformationService,
 } from '$lib/services/index.js';
+import { TransformErrorToWhisperingErr } from '$lib/services/runTransformation';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import { queryClient } from '..';
-import { transformationRunKeys } from '../transformationRuns/queries';
-import type { Transformation, TransformationRun } from '$lib/services/db';
 import { createMutation } from '@tanstack/svelte-query';
-import { transformationsKeys } from './queries';
-import type { Accessor } from '../types';
 import { nanoid } from 'nanoid/non-secure';
+import { queryClient } from '..';
 import { maybeCopyAndPaste } from '../transcriber/transcriber';
-import { TransformErrorToWhisperingErr } from '$lib/services/runTransformation';
-
-export const transformationsMutationKeys = {
-	transformInput: ({
-		transformationId,
-		input,
-	}: {
-		transformationId: string;
-		input: string;
-	}) => ['transformations', transformationId, 'input', input] as const,
-	transformRecording: ({
-		recordingId,
-		transformationId,
-	}: {
-		recordingId: string;
-		transformationId: string;
-	}) =>
-		['transformations', transformationId, 'recording', recordingId] as const,
-};
+import { transformationRunKeys } from '../transformationRuns/queries';
+import { transformationsKeys } from './queries';
 
 export function useCreateTransformationWithToast() {
 	return {
