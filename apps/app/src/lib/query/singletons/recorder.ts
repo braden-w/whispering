@@ -321,9 +321,7 @@ function createRecorder({
 		ensureRecordingSessionClosedSilent: () => {
 			const toastId = nanoid();
 			ensureRecordingSessionClosed.mutate(
-				{
-					sendStatus: noop,
-				},
+				{ sendStatus: noop },
 				{
 					onError: (error) => {
 						toast.error({ id: toastId, ...error });
