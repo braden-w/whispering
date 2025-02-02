@@ -105,13 +105,6 @@ function createTranscriber() {
 				}) > 0
 			);
 		},
-		get isCurrentlyTransforming() {
-			return (
-				queryClient.isMutating({
-					mutationKey: transcriberKeys.transform,
-				}) > 0
-			);
-		},
 		transcribeRecording: async ({
 			recording,
 			toastId = nanoid(),

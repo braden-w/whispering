@@ -14,16 +14,18 @@ import {
 import { useRecorderState } from './queries';
 import { noop } from '@tanstack/table-core';
 import type { Transcriber } from '../transcriber/transcriber';
-import { useTransformRecording } from '../transformations/mutations';
+import type { Transformer } from '../transformer/transformer';
 
 export type Recorder = ReturnType<typeof createRecorder>;
 
 export const initRecorderInContext = ({
 	transcriber,
+	transformer,
 }: {
 	transcriber: Transcriber;
+	transformer: Transformer;
 }) => {
-	const recorder = createRecorder({ transcriber });
+	const recorder = createRecorder({ transcriber, transformer });
 	setContext('recorder', recorder);
 	return recorder;
 };
@@ -32,7 +34,10 @@ export const getRecorderFromContext = () => {
 	return getContext<Recorder>('recorder');
 };
 
-function createRecorder({ transcriber }: { transcriber: Transcriber }) {
+function createRecorder({
+	transcriber,
+	transformer,
+}: { transcriber: Transcriber; transformer: Transformer }) {
 	const { recorderState } = useRecorderState();
 	const { startRecording } = useStartRecording();
 	const { stopRecording } = useStopRecording();
@@ -40,8 +45,6 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 	const { cancelRecorder } = useCancelRecorder();
 	const { ensureRecordingSession } = useEnsureRecordingSession();
 	const { createRecording } = useCreateRecording();
-	const { transformAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
-		useTransformRecording();
 
 	return {
 		get recorderState() {
@@ -153,16 +156,14 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 										if (
 											settings.value['transformations.selectedTransformationId']
 										) {
-											await transformAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-												{
-													recordingId: createdRecording.id,
-													transformationId:
-														settings.value[
-															'transformations.selectedTransformationId'
-														],
-													toastId,
-												},
-											);
+											await transformer.transformRecording({
+												recordingId: createdRecording.id,
+												transformationId:
+													settings.value[
+														'transformations.selectedTransformationId'
+													],
+												toastId,
+											});
 										}
 									},
 								},

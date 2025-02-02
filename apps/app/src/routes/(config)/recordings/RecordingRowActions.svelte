@@ -14,6 +14,7 @@
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import { getTransformerFromContext } from '$lib/query/transformer/transformer';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
@@ -28,11 +29,9 @@
 	} from 'lucide-svelte';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { useTransformRecording } from '$lib/query/transformations/mutations';
 
 	const transcriber = getTranscriberFromContext();
-	const { transformAndUpdateRecordingWithToastWithSoundWithCopyPaste } =
-		useTransformRecording();
+	const transformer = getTransformerFromContext();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
 	const { updateRecordingWithToast } = useUpdateRecordingWithToast();
 	const { downloadRecordingWithToast } = useDownloadRecordingWithToast();
@@ -94,7 +93,7 @@
 
 		<SelectTransformationCombobox
 			onSelect={(transformation) =>
-				transformAndUpdateRecordingWithToastWithSoundWithCopyPaste({
+				transformer.transformRecording({
 					recordingId: recording.id,
 					transformationId: transformation.id,
 				})}
