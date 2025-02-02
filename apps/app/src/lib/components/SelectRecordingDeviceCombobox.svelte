@@ -1,14 +1,17 @@
+<script module lang="ts">
+	import { useCombobox } from './useCombobox.svelte';
+
+	export const combobox = useCombobox();
+</script>
+
 <script lang="ts">
 	import * as Popover from '$lib/components/ui/popover';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { MicIcon, MicOffIcon } from 'lucide-svelte';
 	import SelectRecordingDeviceComboboxCommand from './SelectRecordingDeviceComboboxCommand.svelte';
 	import WhisperingButton from './WhisperingButton.svelte';
-	import { useCombobox } from './useCombobox.svelte';
 
 	let { class: className }: { class?: string } = $props();
-
-	const combobox = useCombobox();
 
 	const isDeviceSelected = $derived(
 		!!settings.value['recording.selectedAudioInputDeviceId'],

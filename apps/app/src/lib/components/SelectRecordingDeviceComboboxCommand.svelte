@@ -6,11 +6,10 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils';
 	import { CheckIcon, MicIcon } from 'lucide-svelte';
-	import { useCombobox } from './useCombobox.svelte';
+	import { combobox } from './SelectRecordingDeviceCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { getMediaDevicesQuery } = useGetMediaDevices();
-	const combobox = useCombobox();
 
 	$effect(() => {
 		if (getMediaDevicesQuery.isError) {
