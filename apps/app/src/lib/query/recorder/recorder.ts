@@ -146,9 +146,10 @@ function createRecorder({ transcriber }: { transcriber: Transcriber }) {
 											);
 										}
 
-										await transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-											{ recording: createdRecording, toastId },
-										);
+										await transcriber.transcribeRecording({
+											recording: createdRecording,
+											toastId,
+										});
 										if (
 											settings.value['transformations.selectedTransformationId']
 										) {

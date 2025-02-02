@@ -75,9 +75,9 @@
 						? 'Retry transcription'
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
-				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-					{ recording },
-				)}
+				transcriber.transcribeRecording({
+					recording,
+				})}
 			variant="ghost"
 			size="icon"
 		>

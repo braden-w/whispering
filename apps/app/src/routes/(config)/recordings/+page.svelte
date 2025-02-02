@@ -354,7 +354,7 @@
 						onclick={() =>
 							Promise.allSettled(
 								selectedRecordingRows.map((recording) =>
-									transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
+									transcriber.transcribeRecording(
 										{ recording: recording.original },
 									),
 								),
