@@ -10,10 +10,11 @@ import type {
 } from './db';
 import type { HttpService } from './http/HttpService';
 
-type RunTransformationErrorProperties = {
-	_tag: 'RunTransformationError';
+type TransformErrorProperties = {
+	_tag: 'TransformError';
 	code:
 		| 'RECORDING_NOT_FOUND'
+		| 'EMPTY_INPUT'
 		| 'TRANSFORMATION_NOT_FOUND'
 		| 'NO_STEPS_CONFIGURED'
 		| 'FAILED_TO_CREATE_TRANSFORMATION_RUN'
@@ -23,13 +24,16 @@ type RunTransformationErrorProperties = {
 		| 'FAILED_TO_MARK_TRANSFORMATION_RUN_AS_COMPLETED';
 };
 
-export type RunTransformationError = Err<RunTransformationErrorProperties>;
-export type RunTransformationResult<T> = Ok<T> | RunTransformationError;
+export type TransformError = Err<TransformErrorProperties>;
+export type TransformResult<T> = Ok<T> | TransformError;
 
-export const RunTransformationErrorToWhisperingErr = ({
-	error,
-}: RunTransformationError) => {
+export const TransformErrorToWhisperingErr = ({ error }: TransformError) => {
 	switch (error.code) {
+		case 'EMPTY_INPUT':
+			return WhisperingErr({
+				title: '⚠️ Empty input',
+				description: 'Please enter some text to transform',
+			});
 		case 'TRANSFORMATION_NOT_FOUND':
 			return WhisperingErr({
 				title: '⚠️ Transformation not found',
@@ -69,15 +73,15 @@ export const RunTransformationErrorToWhisperingErr = ({
 	}
 };
 
-export const RunTransformationError = <
-	T extends Omit<RunTransformationErrorProperties, '_tag'>,
+export const TransformError = <
+	T extends Omit<TransformErrorProperties, '_tag'>,
 >(
 	properties: T,
 ) =>
 	Err({
-		_tag: 'RunTransformationError',
+		_tag: 'TransformError',
 		...properties,
-	}) satisfies RunTransformationError;
+	}) satisfies TransformError;
 
 type StepResult = WhisperingResult<string>;
 
@@ -292,17 +296,17 @@ export function createRunTransformationService({
 		input: string;
 		transformationId: string;
 		recordingId: string | null;
-	}): Promise<RunTransformationResult<TransformationRun>> => {
+	}): Promise<TransformResult<TransformationRun>> => {
 		const getTransformationResult =
 			await DbTransformationsService.getTransformationById(transformationId);
 		if (!getTransformationResult.ok || !getTransformationResult.data) {
-			return RunTransformationError({ code: 'TRANSFORMATION_NOT_FOUND' });
+			return TransformError({ code: 'TRANSFORMATION_NOT_FOUND' });
 		}
 
 		const transformation = getTransformationResult.data;
 
 		if (transformation.steps.length === 0) {
-			return RunTransformationError({ code: 'NO_STEPS_CONFIGURED' });
+			return TransformError({ code: 'NO_STEPS_CONFIGURED' });
 		}
 
 		const createTransformationRunResult =
@@ -313,7 +317,7 @@ export function createRunTransformationService({
 			});
 
 		if (!createTransformationRunResult.ok)
-			return RunTransformationError({
+			return TransformError({
 				code: 'FAILED_TO_CREATE_TRANSFORMATION_RUN',
 			});
 
@@ -328,7 +332,7 @@ export function createRunTransformationService({
 				);
 
 			if (!newTransformationStepRunResult.ok)
-				return RunTransformationError({
+				return TransformError({
 					code: 'FAILED_TO_ADD_TRANSFORMATION_STEP_RUN',
 				});
 
@@ -350,7 +354,7 @@ export function createRunTransformationService({
 						},
 					);
 				if (!dbResult.ok)
-					return RunTransformationError({
+					return TransformError({
 						code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_AND_STEP_AS_FAILED',
 					});
 				return dbResult;
@@ -364,7 +368,7 @@ export function createRunTransformationService({
 				});
 
 			if (!dbResult.ok)
-				return RunTransformationError({
+				return TransformError({
 					code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_STEP_AS_COMPLETED',
 				});
 
@@ -378,7 +382,7 @@ export function createRunTransformationService({
 			});
 
 		if (!dbResult.ok)
-			return RunTransformationError({
+			return TransformError({
 				code: 'FAILED_TO_MARK_TRANSFORMATION_RUN_AS_COMPLETED',
 			});
 		return dbResult;
@@ -391,7 +395,10 @@ export function createRunTransformationService({
 		}: {
 			input: string;
 			transformationId: string;
-		}): Promise<RunTransformationResult<TransformationRun>> => {
+		}): Promise<TransformResult<TransformationRun>> => {
+			if (!input.trim()) {
+				return TransformError({ code: 'EMPTY_INPUT' });
+			}
 			return runTransformation({
 				input,
 				transformationId,
@@ -404,11 +411,11 @@ export function createRunTransformationService({
 		}: {
 			transformationId: string;
 			recordingId: string;
-		}): Promise<RunTransformationResult<TransformationRun>> => {
+		}): Promise<TransformResult<TransformationRun>> => {
 			const getRecordingResult =
 				await DbRecordingsService.getRecordingById(recordingId);
 			if (!getRecordingResult.ok || !getRecordingResult.data) {
-				return RunTransformationError({ code: 'RECORDING_NOT_FOUND' });
+				return TransformError({ code: 'RECORDING_NOT_FOUND' });
 			}
 			const recording = getRecordingResult.data;
 

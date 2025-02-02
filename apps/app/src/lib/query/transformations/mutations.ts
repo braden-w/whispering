@@ -19,7 +19,7 @@ import { transformationsKeys } from './queries';
 import type { Accessor } from '../types';
 import { nanoid } from 'nanoid/non-secure';
 import { maybeCopyAndPaste } from '../transcriber/transcriber';
-import { RunTransformationErrorToWhisperingErr } from '$lib/services/runTransformation';
+import { TransformErrorToWhisperingErr } from '$lib/services/runTransformation';
 
 export const transformationsMutationKeys = {
 	transformInput: ({
@@ -280,7 +280,7 @@ export function useTransformInputWithToast() {
 				});
 
 			if (!transformationRunResult.ok) {
-				return RunTransformationErrorToWhisperingErr(transformationRunResult);
+				return TransformErrorToWhisperingErr(transformationRunResult);
 			}
 
 			const transformationRun = transformationRunResult.data;
