@@ -77,7 +77,7 @@ export const settingsSchema = z.object({
 	] as const),
 	'database.maxRecordingCount': z.string().regex(/^\d+$/, 'Must be a number'),
 
-	'recording.selectedAudioInputDeviceId': z.string(),
+	'recording.selectedAudioInputDeviceId': z.string().nullable(),
 	'recording.bitrateKbps': z
 		.enum(BITRATE_VALUES_KBPS)
 		.optional()
