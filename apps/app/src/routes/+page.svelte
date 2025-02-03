@@ -14,6 +14,7 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -76,9 +77,11 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
-			class="absolute -right-14 bottom-0 transform text-2xl"
-		/>
+		<div class="absolute -right-24 bottom-0 flex items-center gap-1">
+			<SelectRecordingDeviceCombobox />
+			<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
+			/>
+		</div>
 	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
