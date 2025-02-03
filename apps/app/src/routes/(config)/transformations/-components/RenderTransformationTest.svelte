@@ -2,16 +2,17 @@
 	import { LabeledTextarea } from '$lib/components/labeled/index.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { useRunTransformationWithToast } from '$lib/query/transformations/mutations';
+	import { getTransformerFromContext } from '$lib/query/singletons/transformer';
 	import type { Transformation } from '$lib/services/db';
 	import { Loader2Icon, PlayIcon } from 'lucide-svelte';
-
-	const { runTransformationWithToast } = useRunTransformationWithToast();
+	import { nanoid } from 'nanoid/non-secure';
 
 	let { transformation }: { transformation: Transformation } = $props();
 
 	let input = $state('');
 	let output = $state('');
+
+	const transformer = getTransformerFromContext();
 </script>
 
 <Card.Header>
@@ -42,31 +43,21 @@
 
 	<Button
 		onclick={() =>
-			runTransformationWithToast.mutate(
-				{
-					recordingId: null,
-					input,
-					transformation,
-				},
-				{
-					onSuccess: (o) => {
-						if (o) {
-							output = o;
-						}
-					},
-				},
+			transformer.transformInput.mutate(
+				{ input, transformationId: transformation.id, toastId: nanoid() },
+				{ onSuccess: (o) => (output = o) },
 			)}
-		disabled={runTransformationWithToast.isPending ||
+		disabled={transformer.transformInput.isPending ||
 			!input.trim() ||
 			transformation.steps.length === 0}
 		class="w-full"
 	>
-		{#if runTransformationWithToast.isPending}
+		{#if transformer.transformInput.isPending}
 			<Loader2Icon class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
 			<PlayIcon class="mr-2 h-4 w-4" />
 		{/if}
-		{runTransformationWithToast.isPending
+		{transformer.transformInput.isPending
 			? 'Running Transformation...'
 			: 'Run Transformation'}
 	</Button>

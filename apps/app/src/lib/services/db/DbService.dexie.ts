@@ -108,7 +108,7 @@ class RecordingsDatabase extends Dexie {
 						{
 							label: 'Download Database Dump',
 							onClick: () => {
-								const downloadIndexedDbBlobWithToast =
+								const { downloadIndexedDbBlobWithToast } =
 									useDownloadIndexedDbBlobWithToast();
 								const blob = new Blob([dumpString], {
 									type: 'application/json',

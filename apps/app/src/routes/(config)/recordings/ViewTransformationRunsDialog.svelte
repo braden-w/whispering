@@ -2,14 +2,14 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { useTransformationRunsByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import { useTransformationRunsByRecordingId } from '$lib/query/transformationRuns/queries';
 	import { HistoryIcon } from 'lucide-svelte';
 	import RenderTransformationRuns from '../transformations/-components/RenderTransformationRuns.svelte';
 
 	let { recordingId }: { recordingId: string } = $props();
 
 	const { transformationRunsByRecordingIdQuery } =
-		useTransformationRunsByRecordingIdQuery(() => recordingId);
+		useTransformationRunsByRecordingId(() => recordingId);
 
 	let isOpen = $state(false);
 </script>

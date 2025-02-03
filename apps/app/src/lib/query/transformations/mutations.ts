@@ -1,13 +1,11 @@
-import { queryClient } from '$lib/query';
+import type { Transformation } from '$lib/services/db';
 import {
-	DbTransformationsService,
-	RunTransformationService,
-} from '$lib/services';
-import type { Transformation, TransformationRun } from '$lib/services/db';
+	DbTransformationsService
+} from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { createMutation } from '@tanstack/svelte-query';
-import { transformationRunKeys } from '../transformationRuns/queries';
+import { queryClient } from '..';
 import { transformationsKeys } from './queries';
 
 export function useCreateTransformationWithToast() {
@@ -223,82 +221,6 @@ export function useDeleteTransformationsWithToast() {
 					title: 'Deleted transformations!',
 					description: 'Your transformations have been deleted successfully.',
 				});
-			},
-		})),
-	};
-}
-
-export function useRunTransformationWithToast() {
-	return {
-		runTransformationWithToast: createMutation(() => ({
-			mutationFn: async ({
-				recordingId,
-				input,
-				transformation,
-			}: {
-				recordingId: string | null;
-				input: string;
-				transformation: Transformation;
-			}) => {
-				if (!input.trim()) {
-					toast.error({
-						title: 'No input provided',
-						description: 'Please enter some text to transform',
-					});
-					return;
-				}
-
-				if (transformation.steps.length === 0) {
-					toast.error({
-						title: 'No steps configured',
-						description: 'Please add at least one transformation step',
-					});
-					return;
-				}
-
-				const transformationRunResult =
-					await RunTransformationService.runTransformation({
-						recordingId,
-						input,
-						transformation,
-					});
-
-				if (!transformationRunResult.ok) {
-					toast.error({
-						title: 'Unexpected database error while running transformation',
-						description:
-							'The transformation ran as expected but there was an unexpected database error',
-						action: {
-							type: 'more-details',
-							error: transformationRunResult.error,
-						},
-					});
-					return;
-				}
-
-				const transformationRun = transformationRunResult.data;
-				queryClient.setQueryData<TransformationRun[]>(
-					transformationRunKeys.byTransformationId(
-						transformationRun.transformationId,
-					),
-					(oldData) => {
-						if (!oldData) return [transformationRun];
-						return [transformationRun, ...oldData];
-					},
-				);
-
-				if (transformationRun.error) {
-					toast.error({
-						title: 'Transformation failed',
-						description: transformationRun.error,
-					});
-				}
-
-				toast.success({
-					title: 'Transformation complete',
-					description: 'The text has been successfully transformed',
-				});
-				return transformationRun.output;
 			},
 		})),
 	};

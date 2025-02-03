@@ -1,11 +1,10 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
-	import { nanoid } from 'nanoid/non-secure';
+	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { fasterRerecordExplainedDialog } from './FasterRerecordExplainedDialog.svelte';
-	import SelectTransformationCombobox from './SelectTransformationCombobox.svelte';
-	import { toast } from '$lib/services/toast';
+	import PersistSelectTransformationCombobox from './PersistSelectTransformationCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 
@@ -26,12 +25,7 @@
 {:else if recorder.recorderState === 'SESSION'}
 	<WhisperingButton
 		onclick={() => {
-			const toastId = nanoid();
-			recorder.ensureRecordingSessionClosedWithToast({
-				sendStatus: (status) => {
-					toast.info({ id: toastId, ...status });
-				},
-			});
+			recorder.ensureRecordingSessionClosedWithToast();
 		}}
 		variant="ghost"
 		size="icon"
@@ -51,5 +45,20 @@
 		{/snippet}
 	</WhisperingButton>
 {:else}
-	<SelectTransformationCombobox class={className} />
+	<PersistSelectTransformationCombobox
+		class={className}
+		selectedTransformationId={settings.value[
+			'transformations.selectedTransformationId'
+		]}
+		onSelect={(transformation) => {
+			settings.value = {
+				...settings.value,
+				'transformations.selectedTransformationId':
+					settings.value['transformations.selectedTransformationId'] ===
+					transformation.id
+						? null
+						: transformation.id,
+			};
+		}}
+	/>
 {/if}

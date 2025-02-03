@@ -2,13 +2,11 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import {
+		copyTextToClipboardWithToast,
 		type CopyToClipboardLabel,
-		useCopyTextToClipboardWithToast,
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
-
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	let {
 		label,
@@ -40,7 +38,7 @@
 	size="icon"
 	variant="ghost"
 	onclick={() =>
-		copyTextToClipboardWithToast.mutate(
+		copyTextToClipboardWithToast(
 			{ label, text: copyableText },
 			{ onSuccess: () => (hasCopied = true) },
 		)}

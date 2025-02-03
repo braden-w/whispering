@@ -4,18 +4,18 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { mergeProps } from 'bits-ui';
 	import WhisperingTooltip from '../WhisperingTooltip.svelte';
-
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	let {
 		id,
 		text,
+		label,
 	}: {
 		id: string;
 		text: string;
+		label: string;
 	} = $props();
 
 	let isDialogOpen = $state(false);
@@ -25,7 +25,7 @@
 	<Dialog.Root bind:open={isDialogOpen}>
 		<Dialog.Trigger {id}>
 			{#snippet child({ props: dialogTriggerProps })}
-				<WhisperingTooltip {id} tooltipContent="View Transcribed Text">
+				<WhisperingTooltip {id} tooltipContent="View {label}">
 					{#snippet trigger({ tooltipProps, tooltip })}
 						<Textarea
 							{...mergeProps(tooltipProps, dialogTriggerProps)}
@@ -52,7 +52,7 @@
 				<Button
 					variant="outline"
 					onclick={() => {
-						copyTextToClipboardWithToast.mutate(
+						copyTextToClipboardWithToast(
 							{
 								label: 'transcribed text',
 								text: text,

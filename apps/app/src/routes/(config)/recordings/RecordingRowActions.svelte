@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
+	import SelectTransformationCombobox from '$lib/components/SelectTransformationCombobox.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import WhisperingTooltip from '$lib/components/WhisperingTooltip.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
@@ -11,25 +12,27 @@
 		useUpdateRecordingWithToast,
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
-	import { getTranscriberFromContext } from '$lib/query/transcriber/transcriber';
+	import { getTranscriberFromContext } from '$lib/query/singletons/transcriber';
 	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
+	import { getTransformerFromContext } from '$lib/query/singletons/transformer';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
 	import {
 		AlertCircleIcon,
 		DownloadIcon,
+		EllipsisIcon,
 		FileStackIcon,
 		Loader2Icon,
-		EllipsisIcon as LoadingTranscriptionIcon,
-		RepeatIcon as RetryTranscriptionIcon,
-		PlayIcon as StartTranscriptionIcon,
+		PlayIcon,
+		RepeatIcon,
 	} from 'lucide-svelte';
-	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
+	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
+	const transformer = getTransformerFromContext();
 	const { deleteRecordingWithToast } = useDeleteRecordingWithToast();
 	const { updateRecordingWithToast } = useUpdateRecordingWithToast();
 	const { downloadRecordingWithToast } = useDownloadRecordingWithToast();
@@ -72,25 +75,32 @@
 						? 'Retry transcription'
 						: 'Transcription failed - click to try again'}
 			onclick={() =>
-				transcriber.transcribeAndUpdateRecordingWithToastWithSoundWithCopyPaste(
-					{
-						recording,
-						toastId: nanoid(),
-					},
-				)}
+				transcriber.transcribeRecording.mutate({
+					recording,
+					toastId: nanoid(),
+				})}
 			variant="ghost"
 			size="icon"
 		>
 			{#if recording.transcriptionStatus === 'UNPROCESSED'}
-				<StartTranscriptionIcon class="h-4 w-4" />
+				<PlayIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'TRANSCRIBING'}
-				<LoadingTranscriptionIcon class="h-4 w-4" />
+				<EllipsisIcon class="h-4 w-4" />
 			{:else if recording.transcriptionStatus === 'DONE'}
-				<RetryTranscriptionIcon class="h-4 w-4 text-green-500" />
+				<RepeatIcon class="h-4 w-4 text-green-500" />
 			{:else if recording.transcriptionStatus === 'FAILED'}
 				<AlertCircleIcon class="h-4 w-4 text-red-500" />
 			{/if}
 		</WhisperingButton>
+
+		<SelectTransformationCombobox
+			onSelect={(transformation) =>
+				transformer.transformRecording.mutate({
+					recordingId: recording.id,
+					transformationId: transformation.id,
+					toastId: nanoid(),
+				})}
+		/>
 
 		<EditRecordingDialog
 			{recording}

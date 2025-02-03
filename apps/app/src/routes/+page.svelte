@@ -5,19 +5,19 @@
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { useCopyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import type { Recording } from '$lib/services/db';
-	import { getRecorderFromContext } from '$lib/query/recorder/recorder';
+	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
+	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
+	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
-	const { copyTextToClipboardWithToast } = useCopyTextToClipboardWithToast();
 
 	const latestRecording = $derived<Recording>(
 		latestRecordingQuery.data ?? {
@@ -77,9 +77,11 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
-			class="absolute -right-14 bottom-0 transform text-2xl"
-		/>
+		<div class="absolute -right-24 bottom-0 flex items-center gap-1">
+			<SelectRecordingDeviceCombobox />
+			<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
+			/>
+		</div>
 	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
@@ -101,7 +103,7 @@
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
-					copyTextToClipboardWithToast.mutate({
+					copyTextToClipboardWithToast({
 						label: 'transcribed text',
 						text: latestRecording.transcribedText,
 					})}
