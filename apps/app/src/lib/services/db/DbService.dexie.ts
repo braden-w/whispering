@@ -14,42 +14,15 @@ import type {
 	TransformationStepRun,
 } from './DbService';
 import { DbServiceErr } from './DbService';
+import type {
+	RecordingsDbSchemaV1,
+	RecordingsDbSchemaV2,
+	RecordingsDbSchemaV3,
+	RecordingsDbSchemaV4,
+	RecordingsDbSchemaV5,
+} from './DbServiceTypes';
 
 const DB_NAME = 'RecordingDB';
-
-type RecordingsDbSchemaV4 = {
-	recordings: Recording;
-	transformations: Transformation;
-	transformationRuns: TransformationRun;
-};
-
-type RecordingsDbSchemaV3 = {
-	recordings: RecordingsDbSchemaV1['recordings'];
-};
-
-type RecordingsDbSchemaV2 = {
-	recordingMetadata: Omit<RecordingsDbSchemaV1['recordings'], 'blob'>;
-	recordingBlobs: { id: string; blob: Blob | undefined };
-};
-
-type RecordingsDbSchemaV1 = {
-	recordings: {
-		id: string;
-		title: string;
-		subtitle: string;
-		timestamp: string;
-		transcribedText: string;
-		blob: Blob | undefined;
-		/**
-		 * A recording
-		 * 1. Begins in an 'UNPROCESSED' state
-		 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
-		 * 3. Finally is marked as 'DONE' when the transcription is complete.
-		 * 4. If the transcription fails, it is marked as 'FAILED'
-		 */
-		transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE' | 'FAILED';
-	};
-};
 
 class RecordingsDatabase extends Dexie {
 	recordings!: Dexie.Table<Recording, string>;
@@ -262,7 +235,39 @@ class RecordingsDatabase extends Dexie {
 				});
 			});
 
-		// V5: Change the "subtitle" field to "description"
+		// V5: Save recording blob as ArrayBuffer
+		this.version(0.5)
+			.stores({
+				recordings: '&id, timestamp, createdAt, updatedAt',
+				transformations: '&id, createdAt, updatedAt',
+				transformationRuns: '&id, transformationId, recordingId, startedAt',
+			})
+			.upgrade(async (tx) => {
+				await wrapUpgradeWithErrorHandling({
+					tx,
+					version: 0.5,
+					upgrade: async (tx) => {
+						const oldRecordings = await tx
+							.table<RecordingsDbSchemaV4['recordings']>('recordings')
+							.toArray();
+
+						const newRecordings = oldRecordings.map(
+							async ({ blob, ...record }) =>
+								({
+									...record,
+									arrayBuffer: blob
+										? await blob.arrayBuffer().catch(() => undefined)
+										: undefined,
+								}) satisfies RecordingsDbSchemaV5['recordings'],
+						);
+
+						await tx.table('recordings').clear();
+						await tx.table('recordings').bulkAdd(newRecordings);
+					},
+				});
+			});
+
+		// V6: Change the "subtitle" field to "description"
 		// this.version(5)
 		// 	.stores({
 		// 		recordings: '&id, timestamp, createdAt, updatedAt',
@@ -271,7 +276,7 @@ class RecordingsDatabase extends Dexie {
 		// 	})
 		// 	.upgrade(async (tx) => {
 		// 		const oldRecordings = await tx
-		// 			.table<RecordingsDbSchemaV4['recordings']>('recordings')
+		// 			.table<RecordingsDbSchemaV5['recordings']>('recordings')
 		// 			.toArray();
 
 		// 		const newRecordings = oldRecordings.map(
