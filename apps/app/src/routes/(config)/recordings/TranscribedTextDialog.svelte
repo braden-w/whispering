@@ -5,9 +5,11 @@
 	let {
 		recordingId,
 		transcribedText,
+		rows = 2,
 	}: {
 		recordingId: string;
 		transcribedText: string;
+		rows?: number;
 	} = $props();
 
 	const id = getRecordingTransitionId({
@@ -16,4 +18,9 @@
 	});
 </script>
 
-<CopyableTextDialog {id} label="Transcribed Text" text={transcribedText} />
+<CopyableTextDialog
+	{id}
+	label="Transcribed Text"
+	text={transcribedText}
+	{rows}
+/>

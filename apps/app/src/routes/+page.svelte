@@ -90,6 +90,7 @@
 				transcribedText={latestRecording.transcriptionStatus === 'TRANSCRIBING'
 					? '...'
 					: latestRecording.transcribedText}
+				rows={1}
 			/>
 			<!-- 
 			<Input

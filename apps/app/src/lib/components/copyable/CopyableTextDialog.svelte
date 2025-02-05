@@ -12,10 +12,12 @@
 		id,
 		text,
 		label,
+		rows = 2,
 	}: {
 		id: string;
 		text: string;
 		label: string;
+		rows?: number;
 	} = $props();
 
 	let isDialogOpen = $state(false);
@@ -32,7 +34,7 @@
 						readonly
 						value={text}
 						style="view-transition-name: {id}"
-						rows={2}
+						{rows}
 					/>
 					<span class="sr-only">
 						{@render tooltip()}
