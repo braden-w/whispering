@@ -236,6 +236,7 @@ export function createRecorderServiceWeb(): RecorderService {
 				description: 'Successfully saved your audio recording!',
 			});
 			const blob = stopResult.data;
+			currentSession.recorder = null;
 			return Ok(blob);
 		},
 
