@@ -2,7 +2,7 @@ import type { Recording, Transformation, TransformationRun } from './DbService';
 
 export type RecordingsDbSchemaV5 = {
 	recordings: Omit<Recording, 'blob'> & {
-		arrayBuffer: ArrayBuffer | undefined;
+		serializedAudio: { arrayBuffer: ArrayBuffer; blobType: string } | undefined;
 	};
 	transformations: Transformation;
 	transformationRuns: TransformationRun;
