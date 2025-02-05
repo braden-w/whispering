@@ -1,21 +1,20 @@
 <script lang="ts">
-	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
+	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
+	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
-	import type { Recording } from '$lib/services/db';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
+	import type { Recording } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
-	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
