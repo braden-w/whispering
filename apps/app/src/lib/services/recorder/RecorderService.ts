@@ -11,7 +11,7 @@ export type UpdateStatusMessageFn = (args: {
 }) => void;
 
 export type RecordingSessionSettings = {
-	deviceId: string;
+	deviceId: string | null;
 	bitsPerSecond: number;
 };
 

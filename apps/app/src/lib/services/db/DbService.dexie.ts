@@ -14,47 +14,26 @@ import type {
 	TransformationStepRun,
 } from './DbService';
 import { DbServiceErr } from './DbService';
+import type {
+	RecordingsDbSchemaV1,
+	RecordingsDbSchemaV2,
+	RecordingsDbSchemaV3,
+	RecordingsDbSchemaV4,
+	RecordingsDbSchemaV5,
+} from './DbServiceTypes';
 
 const DB_NAME = 'RecordingDB';
 
-type RecordingsDbSchemaV4 = {
-	recordings: Recording;
-	transformations: Transformation;
-	transformationRuns: TransformationRun;
-};
-
-type RecordingsDbSchemaV3 = {
-	recordings: RecordingsDbSchemaV1['recordings'];
-};
-
-type RecordingsDbSchemaV2 = {
-	recordingMetadata: Omit<RecordingsDbSchemaV1['recordings'], 'blob'>;
-	recordingBlobs: { id: string; blob: Blob | undefined };
-};
-
-type RecordingsDbSchemaV1 = {
-	recordings: {
-		id: string;
-		title: string;
-		subtitle: string;
-		timestamp: string;
-		transcribedText: string;
-		blob: Blob | undefined;
-		/**
-		 * A recording
-		 * 1. Begins in an 'UNPROCESSED' state
-		 * 2. Moves to 'TRANSCRIBING' while the audio is being transcribed
-		 * 3. Finally is marked as 'DONE' when the transcription is complete.
-		 * 4. If the transcription fails, it is marked as 'FAILED'
-		 */
-		transcriptionStatus: 'UNPROCESSED' | 'TRANSCRIBING' | 'DONE' | 'FAILED';
-	};
-};
-
 class RecordingsDatabase extends Dexie {
-	recordings!: Dexie.Table<Recording, string>;
-	transformations!: Dexie.Table<Transformation, string>;
-	transformationRuns!: Dexie.Table<TransformationRun, string>;
+	recordings!: Dexie.Table<RecordingsDbSchemaV5['recordings'], string>;
+	transformations!: Dexie.Table<
+		RecordingsDbSchemaV5['transformations'],
+		string
+	>;
+	transformationRuns!: Dexie.Table<
+		RecordingsDbSchemaV5['transformationRuns'],
+		string
+	>;
 
 	constructor() {
 		super(DB_NAME);
@@ -86,8 +65,8 @@ class RecordingsDatabase extends Dexie {
 					}
 				};
 
-				const dumps = await Promise.all(
-					DUMP_TABLE_NAMES.map((name) => dumpTable(name)),
+				const dumps = await Dexie.waitFor(
+					Promise.all(DUMP_TABLE_NAMES.map((name) => dumpTable(name))),
 				);
 
 				const dumpState = {
@@ -262,7 +241,39 @@ class RecordingsDatabase extends Dexie {
 				});
 			});
 
-		// V5: Change the "subtitle" field to "description"
+		// V5: Save recording blob as ArrayBuffer
+		this.version(0.5)
+			.stores({
+				recordings: '&id, timestamp, createdAt, updatedAt',
+				transformations: '&id, createdAt, updatedAt',
+				transformationRuns: '&id, transformationId, recordingId, startedAt',
+			})
+			.upgrade(async (tx) => {
+				await wrapUpgradeWithErrorHandling({
+					tx,
+					version: 0.5,
+					upgrade: async (tx) => {
+						const oldRecordings = await tx
+							.table<RecordingsDbSchemaV4['recordings']>('recordings')
+							.toArray();
+
+						const newRecordings = await Dexie.waitFor(
+							Promise.all(
+								oldRecordings.map(async (record) => {
+									const recordingWithSerializedAudio =
+										await recordingToRecordingWithSerializedAudio(record);
+									return recordingWithSerializedAudio;
+								}),
+							),
+						);
+
+						await Dexie.waitFor(tx.table('recordings').clear());
+						await Dexie.waitFor(tx.table('recordings').bulkAdd(newRecordings));
+					},
+				});
+			});
+
+		// V6: Change the "subtitle" field to "description"
 		// this.version(5)
 		// 	.stores({
 		// 		recordings: '&id, timestamp, createdAt, updatedAt',
@@ -271,7 +282,7 @@ class RecordingsDatabase extends Dexie {
 		// 	})
 		// 	.upgrade(async (tx) => {
 		// 		const oldRecordings = await tx
-		// 			.table<RecordingsDbSchemaV4['recordings']>('recordings')
+		// 			.table<RecordingsDbSchemaV5['recordings']>('recordings')
 		// 			.toArray();
 
 		// 		const newRecordings = oldRecordings.map(
@@ -290,11 +301,49 @@ const db = new RecordingsDatabase();
 
 // const downloadIndexedDbBlobWithToast = useDownloadIndexedDbBlobWithToast();
 
+const recordingToRecordingWithSerializedAudio = async (
+	recording: Recording,
+): Promise<RecordingsDbSchemaV5['recordings']> => {
+	const { blob, ...rest } = recording;
+	if (!blob) return { ...rest, serializedAudio: undefined };
+
+	const arrayBuffer = await blob.arrayBuffer().catch((error) => {
+		console.error('Error getting array buffer from blob', blob, error);
+		return undefined;
+	});
+	if (!arrayBuffer) return { ...rest, serializedAudio: undefined };
+
+	return { ...rest, serializedAudio: { arrayBuffer, blobType: blob.type } };
+};
+
+const recordingWithSerializedAudioToRecording = (
+	recording: RecordingsDbSchemaV5['recordings'],
+): Recording => {
+	const { serializedAudio, ...rest } = recording;
+	if (!serializedAudio) return { ...rest, blob: undefined };
+
+	const { arrayBuffer, blobType } = serializedAudio;
+
+	const blob = new Blob([arrayBuffer], { type: blobType });
+
+	return { ...rest, blob };
+};
+
 export function createDbRecordingsServiceDexie() {
 	return {
 		async getAllRecordings() {
 			return tryAsync({
-				try: () => db.recordings.orderBy('timestamp').reverse().toArray(),
+				try: async () => {
+					const recordings = await db.recordings
+						.orderBy('timestamp')
+						.reverse()
+						.toArray();
+					return Dexie.waitFor(
+						Promise.all(
+							recordings.map(recordingWithSerializedAudioToRecording),
+						),
+					);
+				},
 				mapErr: (error) =>
 					DbServiceErr({
 						title: 'Error getting all recordings from Dexie',
@@ -310,7 +359,8 @@ export function createDbRecordingsServiceDexie() {
 						.orderBy('timestamp')
 						.reverse()
 						.first();
-					return latestRecording ?? null;
+					if (!latestRecording) return null;
+					return recordingWithSerializedAudioToRecording(latestRecording);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -338,8 +388,9 @@ export function createDbRecordingsServiceDexie() {
 		async getRecordingById(id: string) {
 			return tryAsync({
 				try: async () => {
-					const maybeRecording = (await db.recordings.get(id)) ?? null;
-					return maybeRecording;
+					const maybeRecording = await db.recordings.get(id);
+					if (!maybeRecording) return null;
+					return recordingWithSerializedAudioToRecording(maybeRecording);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -356,9 +407,14 @@ export function createDbRecordingsServiceDexie() {
 				createdAt: now,
 				updatedAt: now,
 			} satisfies Recording;
+
+			const dbRecording = await recordingToRecordingWithSerializedAudio(
+				recordingWithTimestamps,
+			);
+
 			const createRecordingResult = await tryAsync({
 				try: async () => {
-					await db.recordings.add(recordingWithTimestamps);
+					await db.recordings.add(dbRecording);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
@@ -376,9 +432,14 @@ export function createDbRecordingsServiceDexie() {
 				...recording,
 				updatedAt: now,
 			} satisfies Recording;
+
+			const dbRecording = await recordingToRecordingWithSerializedAudio(
+				recordingWithTimestamp,
+			);
+
 			const updateRecordingResult = await tryAsync({
 				try: async () => {
-					await db.recordings.put(recordingWithTimestamp);
+					await db.recordings.put(dbRecording);
 				},
 				mapErr: (error) =>
 					DbServiceErr({
