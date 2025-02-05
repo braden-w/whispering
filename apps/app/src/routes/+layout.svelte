@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import { onNavigate } from '$app/navigation';
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import '../app.css';
 	import { queryClient } from '$lib/query';
 	import { QueryClientProvider } from '@tanstack/svelte-query';

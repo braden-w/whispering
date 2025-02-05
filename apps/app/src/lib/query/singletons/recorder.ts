@@ -40,7 +40,10 @@ const recorderKeys = {
 function createRecorder({
 	transcriber,
 	transformer,
-}: { transcriber: Transcriber; transformer: Transformer }) {
+}: {
+	transcriber: Transcriber;
+	transformer: Transformer;
+}) {
 	const invalidateRecorderState = () =>
 		queryClient.invalidateQueries({ queryKey: recorderKeys.state });
 
@@ -234,7 +237,9 @@ function createRecorder({
 	const ensureRecordingSessionClosed = createResultMutation(() => ({
 		mutationFn: async ({
 			sendStatus,
-		}: { sendStatus: UpdateStatusMessageFn }) => {
+		}: {
+			sendStatus: UpdateStatusMessageFn;
+		}) => {
 			const closeResult =
 				await userConfiguredServices.recorder.ensureRecordingSessionClosed({
 					sendStatus,

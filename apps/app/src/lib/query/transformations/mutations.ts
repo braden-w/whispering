@@ -1,7 +1,5 @@
 import type { Transformation } from '$lib/services/db';
-import {
-	DbTransformationsService
-} from '$lib/services/index.js';
+import { DbTransformationsService } from '$lib/services/index.js';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { createMutation } from '@tanstack/svelte-query';

@@ -44,13 +44,13 @@
 		RepeatIcon as RetryTranscriptionIcon,
 		PlayIcon as StartTranscriptionIcon,
 	} from 'lucide-svelte';
+	import { nanoid } from 'nanoid/non-secure';
 	import { createRawSnippet } from 'svelte';
 	import { z } from 'zod';
 	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
 	import TranscribedTextDialog from './TranscribedTextDialog.svelte';
-	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
 	const { deleteRecordingsWithToast } = useDeleteRecordingsWithToast();

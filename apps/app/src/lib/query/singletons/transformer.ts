@@ -5,13 +5,11 @@ import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
+import { getContext, setContext } from 'svelte';
 import { queryClient } from '..';
-import { maybeCopyAndPaste } from './maybeCopyAndPaste';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from '../transformations/queries';
-import { getContext } from 'svelte';
-import { setContext } from 'svelte';
+import { maybeCopyAndPaste } from './maybeCopyAndPaste';
 
 export type Transformer = ReturnType<typeof createTransformer>;
 

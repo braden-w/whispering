@@ -13,8 +13,8 @@
 	} from '$lib/query/recordings/mutations';
 	import { useRecordingQuery } from '$lib/query/recordings/queries';
 	import { getTranscriberFromContext } from '$lib/query/singletons/transcriber';
-	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import { getTransformerFromContext } from '$lib/query/singletons/transformer';
+	import { useLatestTransformationRunByRecordingIdQuery } from '$lib/query/transformationRuns/queries';
 	import type { Recording } from '$lib/services/db';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { DEBOUNCE_TIME_MS } from '@repo/shared';
@@ -27,9 +27,9 @@
 		PlayIcon,
 		RepeatIcon,
 	} from 'lucide-svelte';
+	import { nanoid } from 'nanoid/non-secure';
 	import EditRecordingDialog from './EditRecordingDialog.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
-	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
 	const transformer = getTransformerFromContext();

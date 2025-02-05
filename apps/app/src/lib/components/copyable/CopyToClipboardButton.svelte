@@ -1,13 +1,13 @@
 <script lang="ts">
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
+	import type { Props } from '$lib/components/ui/button';
 	import {
-		copyTextToClipboardWithToast,
 		type CopyToClipboardLabel,
+		copyTextToClipboardWithToast,
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
-	import type { Props } from '$lib/components/ui/button';
 
 	let {
 		label,

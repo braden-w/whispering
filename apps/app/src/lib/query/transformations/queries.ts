@@ -29,9 +29,8 @@ export function useTransformationQuery(id: Accessor<string>) {
 		transformationQuery: createResultQuery(() => ({
 			queryKey: transformationsKeys.byId(id()),
 			queryFn: async () => {
-				const result = await DbTransformationsService.getTransformationById(
-					id(),
-				);
+				const result =
+					await DbTransformationsService.getTransformationById(id());
 				return result;
 			},
 			initialData: () =>

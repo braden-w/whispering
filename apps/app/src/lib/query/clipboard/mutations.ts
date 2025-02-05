@@ -12,7 +12,10 @@ export type CopyToClipboardLabel =
 export const copyTextToClipboardWithToast = createMutation({
 	mutationFn: async ({
 		text,
-	}: { label: CopyToClipboardLabel; text: string }) => {
+	}: {
+		label: CopyToClipboardLabel;
+		text: string;
+	}) => {
 		const copyResult = await ClipboardService.setClipboardText(text);
 		return copyResult;
 	},

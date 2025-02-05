@@ -37,7 +37,10 @@ function createTranscriber() {
 		onMutate: ({
 			recording,
 			toastId,
-		}: { recording: Recording; toastId: string }) => {
+		}: {
+			recording: Recording;
+			toastId: string;
+		}) => {
 			toast.loading({
 				id: toastId,
 				title: '📋 Transcribing...',
@@ -84,7 +87,8 @@ function createTranscriber() {
 				{
 					onError: (error) => {
 						toast.error({
-							title: '⚠️ Unable to set recording transcription status to failed',
+							title:
+								'⚠️ Unable to set recording transcription status to failed',
 							description:
 								'Transcription failed and failed again to update recording transcription status to failed',
 							action: { type: 'more-details', error },

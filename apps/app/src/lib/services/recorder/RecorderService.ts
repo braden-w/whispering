@@ -33,9 +33,9 @@ export type RecorderService = {
 		recordingId: string,
 		callbacks: { sendStatus: UpdateStatusMessageFn },
 	) => Promise<WhisperingResult<void>>;
-	stopRecording: (callbacks: { sendStatus: UpdateStatusMessageFn }) => Promise<
-		WhisperingResult<Blob>
-	>;
+	stopRecording: (callbacks: {
+		sendStatus: UpdateStatusMessageFn;
+	}) => Promise<WhisperingResult<Blob>>;
 	cancelRecording: (callbacks: {
 		sendStatus: UpdateStatusMessageFn;
 	}) => Promise<WhisperingResult<void>>;
