@@ -5,8 +5,6 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import type { Recording } from '$lib/services/db';
@@ -15,6 +13,7 @@
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
+	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -86,7 +85,14 @@
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
 		<div class="flex w-full items-center gap-2">
-			<Label for="transcribed-text" class="sr-only">Transcribed Text</Label>
+			<TranscribedTextDialog
+				recordingId={latestRecording.id}
+				transcribedText={latestRecording.transcriptionStatus === 'TRANSCRIBING'
+					? '...'
+					: latestRecording.transcribedText}
+				rows={1}
+			/>
+			<!-- 
 			<Input
 				id="transcribed-text"
 				class="w-full"
@@ -99,7 +105,7 @@
 				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
 					? '...'
 					: latestRecording.transcribedText}
-			/>
+			/> -->
 			<CopyToClipboardButton
 				label="transcribed text"
 				copyableText={latestRecording.transcribedText}
