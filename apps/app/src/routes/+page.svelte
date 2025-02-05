@@ -1,7 +1,6 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
-	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
-	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
+	import RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
@@ -14,6 +13,7 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
+	import { Input } from '$lib/components/ui/input';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -62,12 +62,13 @@
 		</p>
 	</div>
 
-	<div class="relative">
+	<div class="flex items-end justify-between w-full max-w-md gap-2">
+		<div class="flex-1"></div>
 		<WhisperingButton
 			tooltipContent="Toggle recording"
 			onclick={recorder.toggleRecordingWithToast}
 			variant="ghost"
-			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+			class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 		>
 			<span
 				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
@@ -76,56 +77,43 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<div class="absolute -right-24 bottom-0 flex items-center gap-1">
-			<SelectRecordingDeviceCombobox />
-			<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
-			/>
+		<div class="flex-1 flex-justify-center mb-2">
+			<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton />
 		</div>
 	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
-		<div class="flex w-full items-center gap-2">
-			<TranscribedTextDialog
-				recordingId={latestRecording.id}
-				transcribedText={latestRecording.transcriptionStatus === 'TRANSCRIBING'
-					? '...'
-					: latestRecording.transcribedText}
-				rows={1}
-			/>
-			<!-- 
-			<Input
-				id="transcribed-text"
-				class="w-full"
-				placeholder="Transcribed text will appear here..."
-				style="view-transition-name: {getRecordingTransitionId({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}"
-				readonly
-				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
-					? '...'
-					: latestRecording.transcribedText}
-			/> -->
-			<CopyToClipboardButton
-				label="transcribed text"
-				copyableText={latestRecording.transcribedText}
-				viewTransitionName={getRecordingTransitionId({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}
-				size="default"
-				variant="secondary"
-				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-			>
-				{#snippet copyIcon()}
-					{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-						<Loader2Icon class="h-6 w-6 animate-spin" />
-					{:else}
-						<ClipboardIcon class="h-6 w-6" />
-					{/if}
-				{/snippet}
-			</CopyToClipboardButton>
-		</div>
+		{#if latestRecording.transcribedText !== ''}
+			<div class="flex w-full items-center gap-2">
+				<TranscribedTextDialog
+					recordingId={latestRecording.id}
+					transcribedText={latestRecording.transcriptionStatus ===
+					'TRANSCRIBING'
+						? '...'
+						: latestRecording.transcribedText}
+					rows={1}
+				/>
+				<CopyToClipboardButton
+					label="transcribed text"
+					copyableText={latestRecording.transcribedText}
+					viewTransitionName={getRecordingTransitionId({
+						recordingId: latestRecording.id,
+						propertyName: 'transcribedText',
+					})}
+					size="default"
+					variant="secondary"
+					disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+				>
+					{#snippet copyIcon()}
+						{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+							<Loader2Icon class="h-6 w-6 animate-spin" />
+						{:else}
+							<ClipboardIcon class="h-6 w-6" />
+						{/if}
+					{/snippet}
+				</CopyToClipboardButton>
+			</div>
+		{/if}
 
 		{#if blobUrl}
 			<audio
