@@ -49,7 +49,7 @@
 	import LatestTransformationRunOutputByRecordingId from './LatestTransformationRunOutputByRecordingId.svelte';
 	import RecordingRowActions from './RecordingRowActions.svelte';
 	import RenderAudioUrl from './RenderAudioUrl.svelte';
-	import TranscribedText from './TranscribedText.svelte';
+	import TranscribedTextDialog from './TranscribedTextDialog.svelte';
 	import { nanoid } from 'nanoid/non-secure';
 
 	const transcriber = getTranscriberFromContext();
@@ -150,7 +150,7 @@
 			cell: ({ getValue, row }) => {
 				const transcribedText = getValue<string>();
 				if (!transcribedText) return;
-				return renderComponent(TranscribedText, {
+				return renderComponent(TranscribedTextDialog, {
 					recordingId: row.id,
 					transcribedText,
 				});
