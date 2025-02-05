@@ -1,20 +1,20 @@
 <script lang="ts">
-	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
+	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
+	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
+	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
-	import type { Recording } from '$lib/services/db';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
+	import type { Recording } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
-	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
-	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -100,26 +100,25 @@
 					? '...'
 					: latestRecording.transcribedText}
 			/>
-			<WhisperingButton
-				tooltipContent="Copy transcribed text"
-				onclick={() =>
-					copyTextToClipboardWithToast({
-						label: 'transcribed text',
-						text: latestRecording.transcribedText,
-					})}
-				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				style="view-transition-name: {getRecordingTransitionId({
+			<CopyToClipboardButton
+				label="transcribed text"
+				copyableText={latestRecording.transcribedText}
+				viewTransitionName={getRecordingTransitionId({
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
-				})}-copy-button"
+				})}
+				size="default"
+				variant="secondary"
 				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 			>
-				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-					<Loader2Icon class="h-6 w-6 animate-spin" />
-				{:else}
-					<ClipboardIcon class="h-6 w-6" />
-				{/if}
-			</WhisperingButton>
+				{#snippet copyIcon()}
+					{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+						<Loader2Icon class="h-6 w-6 animate-spin" />
+					{:else}
+						<ClipboardIcon class="h-6 w-6" />
+					{/if}
+				{/snippet}
+			</CopyToClipboardButton>
 		</div>
 
 		{#if blobUrl}
