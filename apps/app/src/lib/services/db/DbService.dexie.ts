@@ -65,8 +65,8 @@ class RecordingsDatabase extends Dexie {
 					}
 				};
 
-				const dumps = await Promise.all(
-					DUMP_TABLE_NAMES.map((name) => dumpTable(name)),
+				const dumps = await Dexie.waitFor(
+					Promise.all(DUMP_TABLE_NAMES.map((name) => dumpTable(name))),
 				);
 
 				const dumpState = {
@@ -257,12 +257,15 @@ class RecordingsDatabase extends Dexie {
 							.table<RecordingsDbSchemaV4['recordings']>('recordings')
 							.toArray();
 
-						const newRecordings = [];
-						for (const record of oldRecordings) {
-							const recordingWithSerializedAudio =
-								await recordingToRecordingWithSerializedAudio(record);
-							newRecordings.push(recordingWithSerializedAudio);
-						}
+						const newRecordings = await Dexie.waitFor(
+							Promise.all(
+								oldRecordings.map(async (record) => {
+									const recordingWithSerializedAudio =
+										await recordingToRecordingWithSerializedAudio(record);
+									return recordingWithSerializedAudio;
+								}),
+							),
+						);
 
 						await Dexie.waitFor(tx.table('recordings').clear());
 						await Dexie.waitFor(tx.table('recordings').bulkAdd(newRecordings));
@@ -335,8 +338,10 @@ export function createDbRecordingsServiceDexie() {
 						.orderBy('timestamp')
 						.reverse()
 						.toArray();
-					return Promise.all(
-						recordings.map(recordingWithSerializedAudioToRecording),
+					return Dexie.waitFor(
+						Promise.all(
+							recordings.map(recordingWithSerializedAudioToRecording),
+						),
 					);
 				},
 				mapErr: (error) =>
