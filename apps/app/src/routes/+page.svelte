@@ -92,20 +92,6 @@
 						: latestRecording.transcribedText}
 					rows={1}
 				/>
-				<!-- 
-			<Input
-				id="transcribed-text"
-				class="w-full"
-				placeholder="Transcribed text will appear here..."
-				style="view-transition-name: {getRecordingTransitionId({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}"
-				readonly
-				value={latestRecording.transcriptionStatus === 'TRANSCRIBING'
-					? '...'
-					: latestRecording.transcribedText}
-			/> -->
 				<CopyToClipboardButton
 					label="transcribed text"
 					copyableText={latestRecording.transcribedText}
