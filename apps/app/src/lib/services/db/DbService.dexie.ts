@@ -257,16 +257,15 @@ class RecordingsDatabase extends Dexie {
 							.table<RecordingsDbSchemaV4['recordings']>('recordings')
 							.toArray();
 
-						const newRecordings = await Promise.all(
-							oldRecordings.map(async (record) => {
-								const recordingWithSerializedAudio =
-									await recordingToRecordingWithSerializedAudio(record);
-								return recordingWithSerializedAudio;
-							}),
-						);
+						const newRecordings = [];
+						for (const record of oldRecordings) {
+							const recordingWithSerializedAudio =
+								await recordingToRecordingWithSerializedAudio(record);
+							newRecordings.push(recordingWithSerializedAudio);
+						}
 
-						await tx.table('recordings').clear();
-						await tx.table('recordings').bulkAdd(newRecordings);
+						await Dexie.waitFor(tx.table('recordings').clear());
+						await Dexie.waitFor(tx.table('recordings').bulkAdd(newRecordings));
 					},
 				});
 			});
@@ -305,7 +304,10 @@ const recordingToRecordingWithSerializedAudio = async (
 	const { blob, ...rest } = recording;
 	if (!blob) return { ...rest, serializedAudio: undefined };
 
-	const arrayBuffer = await blob.arrayBuffer().catch(() => undefined);
+	const arrayBuffer = await blob.arrayBuffer().catch((error) => {
+		console.error('Error getting array buffer from blob', blob, error);
+		return undefined;
+	});
 	if (!arrayBuffer) return { ...rest, serializedAudio: undefined };
 
 	return { ...rest, serializedAudio: { arrayBuffer, blobType: blob.type } };
