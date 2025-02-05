@@ -1,7 +1,6 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
-	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
-	import SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
+	import RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
@@ -76,11 +75,9 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<div class="absolute -right-24 bottom-0 flex items-center gap-1">
-			<SelectRecordingDeviceCombobox />
-			<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton
-			/>
-		</div>
+		<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
+			class="absolute -right-24 bottom-0"
+		/>
 	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
