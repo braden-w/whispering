@@ -62,12 +62,13 @@
 		</p>
 	</div>
 
-	<div class="relative">
+	<div class="flex items-end justify-between w-full max-w-md gap-2">
+		<div class="flex-1"></div>
 		<WhisperingButton
 			tooltipContent="Toggle recording"
 			onclick={recorder.toggleRecordingWithToast}
 			variant="ghost"
-			class="h-full w-full transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+			class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 		>
 			<span
 				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
@@ -76,9 +77,9 @@
 				{recorderStateAsIcon}
 			</span>
 		</WhisperingButton>
-		<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
-			class="absolute -right-24 bottom-0"
-		/>
+		<div class="flex-1 flex-justify-center mb-2">
+			<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton />
+		</div>
 	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
