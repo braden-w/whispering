@@ -15,6 +15,7 @@
 	import { onDestroy } from 'svelte';
 	import { copyTextToClipboardWithToast } from '$lib/query/clipboard/mutations';
 	import SelectRecordingDeviceCombobox from '$lib/components/SelectRecordingDeviceCombobox.svelte';
+	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -100,6 +101,23 @@
 					? '...'
 					: latestRecording.transcribedText}
 			/>
+			<CopyToClipboardButton
+				label="transcribed text"
+				copyableText={latestRecording.transcribedText}
+				viewTransitionName={getRecordingTransitionId({
+					recordingId: latestRecording.id,
+					propertyName: 'transcribedText',
+				})}
+				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+			>
+				{#snippet copyIcon()}
+					{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
+						<Loader2Icon class="h-6 w-6 animate-spin" />
+					{:else}
+						<ClipboardIcon class="h-6 w-6" />
+					{/if}
+				{/snippet}
+			</CopyToClipboardButton>
 			<WhisperingButton
 				tooltipContent="Copy transcribed text"
 				onclick={() =>
@@ -113,13 +131,7 @@
 					propertyName: 'transcribedText',
 				})}-copy-button"
 				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-			>
-				{#if latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-					<Loader2Icon class="h-6 w-6 animate-spin" />
-				{:else}
-					<ClipboardIcon class="h-6 w-6" />
-				{/if}
-			</WhisperingButton>
+			></WhisperingButton>
 		</div>
 
 		{#if blobUrl}

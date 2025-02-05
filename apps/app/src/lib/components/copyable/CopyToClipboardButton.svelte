@@ -14,12 +14,14 @@
 		viewTransitionName,
 		copyIcon: providedCopyIcon,
 		class: className,
+		disabled,
 	}: {
 		label: CopyToClipboardLabel;
 		copyableText: string;
 		viewTransitionName?: string;
 		copyIcon?: Snippet;
 		class?: string;
+		disabled?: boolean;
 	} = $props();
 
 	let hasCopied = $state(false);
@@ -46,6 +48,7 @@
 		? `view-transition-name: ${viewTransitionName};`
 		: undefined}
 	class={className}
+	{disabled}
 >
 	<span class="sr-only">Copy</span>
 	{#if hasCopied}
