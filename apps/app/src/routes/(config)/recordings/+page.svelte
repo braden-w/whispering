@@ -149,6 +149,7 @@
 				}),
 			cell: ({ getValue, row }) => {
 				const transcribedText = getValue<string>();
+				if (!transcribedText) return;
 				return renderComponent(TranscribedText, {
 					recordingId: row.id,
 					transcribedText,

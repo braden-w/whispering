@@ -21,50 +21,48 @@
 	let isDialogOpen = $state(false);
 </script>
 
-{#if text}
-	<Dialog.Root bind:open={isDialogOpen}>
-		<Dialog.Trigger {id}>
-			{#snippet child({ props: dialogTriggerProps })}
-				<WhisperingTooltip {id} tooltipContent="View {label}">
-					{#snippet trigger({ tooltipProps, tooltip })}
-						<Textarea
-							{...mergeProps(tooltipProps, dialogTriggerProps)}
-							class="min-h-0 h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
-							readonly
-							value={text}
-							style="view-transition-name: {id}"
-							rows={2}
-						/>
-						<span class="sr-only">
-							{@render tooltip()}
-						</span>
-					{/snippet}
-				</WhisperingTooltip>
-			{/snippet}
-		</Dialog.Trigger>
-		<Dialog.Content class="max-w-4xl">
-			<Card.Title class="text-lg">Transcribed Text</Card.Title>
-			<Textarea readonly value={text} rows={20} />
-			<Dialog.Footer>
-				<Button variant="outline" onclick={() => (isDialogOpen = false)}>
-					Close
-				</Button>
-				<Button
-					variant="outline"
-					onclick={() => {
-						copyTextToClipboardWithToast(
-							{
-								label: 'transcribed text',
-								text: text,
-							},
-							{ onSuccess: () => (isDialogOpen = false) },
-						);
-					}}
-				>
-					<ClipboardIcon class="h-4 w-4" />
-					Copy Text
-				</Button>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
-{/if}
+<Dialog.Root bind:open={isDialogOpen}>
+	<Dialog.Trigger {id}>
+		{#snippet child({ props: dialogTriggerProps })}
+			<WhisperingTooltip {id} tooltipContent="View {label}">
+				{#snippet trigger({ tooltipProps, tooltip })}
+					<Textarea
+						{...mergeProps(tooltipProps, dialogTriggerProps)}
+						class="min-h-0 h-full resize-none text-wrap text-left text-sm leading-snug hover:cursor-pointer hover:bg-accent hover:text-accent-foreground"
+						readonly
+						value={text}
+						style="view-transition-name: {id}"
+						rows={2}
+					/>
+					<span class="sr-only">
+						{@render tooltip()}
+					</span>
+				{/snippet}
+			</WhisperingTooltip>
+		{/snippet}
+	</Dialog.Trigger>
+	<Dialog.Content class="max-w-4xl">
+		<Card.Title class="text-lg">Transcribed Text</Card.Title>
+		<Textarea readonly value={text} rows={20} />
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (isDialogOpen = false)}>
+				Close
+			</Button>
+			<Button
+				variant="outline"
+				onclick={() => {
+					copyTextToClipboardWithToast(
+						{
+							label: 'transcribed text',
+							text: text,
+						},
+						{ onSuccess: () => (isDialogOpen = false) },
+					);
+				}}
+			>
+				<ClipboardIcon class="h-4 w-4" />
+				Copy Text
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
