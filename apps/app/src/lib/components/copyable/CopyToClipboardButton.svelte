@@ -7,6 +7,7 @@
 	} from '$lib/query/clipboard/mutations';
 	import { CheckIcon } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
+	import type { Props } from '$lib/components/ui/button';
 
 	let {
 		label,
@@ -14,6 +15,8 @@
 		viewTransitionName,
 		copyIcon: providedCopyIcon,
 		class: className,
+		size = 'icon',
+		variant = 'ghost',
 		disabled,
 	}: {
 		label: CopyToClipboardLabel;
@@ -21,8 +24,7 @@
 		viewTransitionName?: string;
 		copyIcon?: Snippet;
 		class?: string;
-		disabled?: boolean;
-	} = $props();
+	} & Pick<Props, 'disabled' | 'variant' | 'size'> = $props();
 
 	let hasCopied = $state(false);
 
@@ -37,8 +39,6 @@
 
 <WhisperingButton
 	tooltipContent="Copy {label} to clipboard"
-	size="icon"
-	variant="ghost"
 	onclick={() =>
 		copyTextToClipboardWithToast(
 			{ label, text: copyableText },
@@ -48,6 +48,8 @@
 		? `view-transition-name: ${viewTransitionName};`
 		: undefined}
 	class={className}
+	{size}
+	{variant}
 	{disabled}
 >
 	<span class="sr-only">Copy</span>

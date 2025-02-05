@@ -108,6 +108,8 @@
 					recordingId: latestRecording.id,
 					propertyName: 'transcribedText',
 				})}
+				size="default"
+				variant="secondary"
 				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
 			>
 				{#snippet copyIcon()}
@@ -118,20 +120,6 @@
 					{/if}
 				{/snippet}
 			</CopyToClipboardButton>
-			<WhisperingButton
-				tooltipContent="Copy transcribed text"
-				onclick={() =>
-					copyTextToClipboardWithToast({
-						label: 'transcribed text',
-						text: latestRecording.transcribedText,
-					})}
-				class="dark:bg-secondary dark:text-secondary-foreground px-4 py-2"
-				style="view-transition-name: {getRecordingTransitionId({
-					recordingId: latestRecording.id,
-					propertyName: 'transcribedText',
-				})}-copy-button"
-				disabled={latestRecording.transcriptionStatus === 'TRANSCRIBING'}
-			></WhisperingButton>
 		</div>
 
 		{#if blobUrl}
