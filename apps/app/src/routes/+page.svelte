@@ -4,6 +4,7 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
+	import * as Tabs from '$lib/components/ui/tabs';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import type { Recording } from '$lib/services/db';
@@ -13,8 +14,6 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
-	import { Input } from '$lib/components/ui/input';
-	import * as Tabs from '$lib/components/ui/tabs';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -33,9 +32,15 @@
 		},
 	);
 
-	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
-	);
+	let selectedTab = $state<'voice-activated' | 'manual'>('voice-activated');
+	const recorderStateAsIcon = $derived.by(() => {
+		switch (selectedTab) {
+			case 'voice-activated':
+				return recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
+			case 'manual':
+				return recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '⏺️';
+		}
+	});
 
 	const blobUrlManager = createBlobUrlManager();
 
@@ -63,15 +68,15 @@
 		</p>
 	</div>
 
-	<Tabs.Root value="voice" class="w-full max-w-md">
+	<Tabs.Root bind:value={selectedTab} class="w-full max-w-md">
 		<Tabs.List class="grid w-full grid-cols-2">
-			<Tabs.Trigger value="voice" class="font-medium">
+			<Tabs.Trigger value="voice-activated" class="font-medium">
 				Voice Activated
 			</Tabs.Trigger>
 			<Tabs.Trigger value="manual" class="font-medium">Manual</Tabs.Trigger>
 		</Tabs.List>
 		<div class="mt-6">
-			<Tabs.Content value="voice">
+			<Tabs.Content value="voice-activated">
 				<div class="flex items-end justify-between w-full gap-2">
 					<div class="flex-1"></div>
 					<WhisperingButton
