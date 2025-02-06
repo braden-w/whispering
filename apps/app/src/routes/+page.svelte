@@ -14,6 +14,7 @@
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
 	import { Input } from '$lib/components/ui/input';
+	import * as Tabs from '$lib/components/ui/tabs';
 
 	const recorder = getRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -62,25 +63,61 @@
 		</p>
 	</div>
 
-	<div class="flex items-end justify-between w-full max-w-md gap-2">
-		<div class="flex-1"></div>
-		<WhisperingButton
-			tooltipContent="Toggle recording"
-			onclick={recorder.toggleRecordingWithToast}
-			variant="ghost"
-			class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
-		>
-			<span
-				style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
-				class="text-[100px] leading-none"
-			>
-				{recorderStateAsIcon}
-			</span>
-		</WhisperingButton>
-		<div class="flex-1 flex-justify-center mb-2">
-			<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton />
+	<Tabs.Root value="voice" class="w-full max-w-md">
+		<Tabs.List class="grid w-full grid-cols-2">
+			<Tabs.Trigger value="voice" class="font-medium">
+				Voice Activated
+			</Tabs.Trigger>
+			<Tabs.Trigger value="manual" class="font-medium">Manual</Tabs.Trigger>
+		</Tabs.List>
+		<div class="mt-6">
+			<Tabs.Content value="voice">
+				<div class="flex items-end justify-between w-full gap-2">
+					<div class="flex-1"></div>
+					<WhisperingButton
+						tooltipContent="Toggle recording"
+						onclick={recorder.toggleRecordingWithToast}
+						variant="ghost"
+						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+					>
+						<span
+							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
+							class="text-[100px] leading-none"
+						>
+							{recorderStateAsIcon}
+						</span>
+					</WhisperingButton>
+					<div class="flex-1 flex-justify-center mb-2">
+						<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
+						/>
+					</div>
+				</div>
+			</Tabs.Content>
+
+			<Tabs.Content value="manual">
+				<div class="flex items-end justify-between w-full gap-2">
+					<div class="flex-1"></div>
+					<WhisperingButton
+						tooltipContent="Toggle recording"
+						onclick={recorder.toggleRecordingWithToast}
+						variant="ghost"
+						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+					>
+						<span
+							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
+							class="text-[100px] leading-none"
+						>
+							{recorderStateAsIcon}
+						</span>
+					</WhisperingButton>
+					<div class="flex-1 flex-justify-center mb-2">
+						<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
+						/>
+					</div>
+				</div>
+			</Tabs.Content>
 		</div>
-	</div>
+	</Tabs.Root>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
 		{#if latestRecording.transcribedText !== ''}
