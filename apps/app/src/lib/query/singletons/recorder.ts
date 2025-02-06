@@ -309,7 +309,7 @@ function createRecorder({
 
 	return {
 		get recorderState() {
-			return recorderState.data;
+			return recorderState.data ?? 'IDLE';
 		},
 		toggleRecordingWithToast: async () => {
 			const toastId = nanoid();
