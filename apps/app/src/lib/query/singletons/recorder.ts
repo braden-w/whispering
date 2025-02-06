@@ -159,7 +159,7 @@ function createRecorder({
 								title: '⏳ Closing recording session...',
 								description: 'Wrapping things up, just a moment...',
 							});
-							ensureRecordingSessionClosed.mutate(
+							closeRecordingSession.mutate(
 								{
 									sendStatus: (options) =>
 										toast.loading({ id: toastId, ...options }),
@@ -234,14 +234,14 @@ function createRecorder({
 		onSettled: invalidateRecorderState,
 	}));
 
-	const ensureRecordingSessionClosed = createResultMutation(() => ({
+	const closeRecordingSession = createResultMutation(() => ({
 		mutationFn: async ({
 			sendStatus,
 		}: {
 			sendStatus: UpdateStatusMessageFn;
 		}) => {
 			const closeResult =
-				await userConfiguredServices.recorder.ensureRecordingSessionClosed({
+				await userConfiguredServices.recorder.closeRecordingSession({
 					sendStatus,
 				});
 			return closeResult;
@@ -276,7 +276,7 @@ function createRecorder({
 						'Recording discarded, but session remains open for a new take',
 				});
 			} else {
-				ensureRecordingSessionClosed.mutate(
+				closeRecordingSession.mutate(
 					{
 						sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 					},
@@ -323,9 +323,9 @@ function createRecorder({
 			const toastId = nanoid();
 			cancelRecorder.mutate({ toastId });
 		},
-		ensureRecordingSessionClosedSilent: () => {
+		closeRecordingSessionSilent: () => {
 			const toastId = nanoid();
-			ensureRecordingSessionClosed.mutate(
+			closeRecordingSession.mutate(
 				{ sendStatus: noop },
 				{
 					onError: (error) => {
@@ -334,9 +334,9 @@ function createRecorder({
 				},
 			);
 		},
-		ensureRecordingSessionClosedWithToast: () => {
+		closeRecordingSessionWithToast: () => {
 			const toastId = nanoid();
-			return ensureRecordingSessionClosed.mutate(
+			return closeRecordingSession.mutate(
 				{
 					sendStatus: (status) => {
 						toast.info({ id: toastId, ...status });

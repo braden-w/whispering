@@ -36,7 +36,7 @@
 				<Command.Item
 					value={device.label}
 					onSelect={() => {
-						recorder.ensureRecordingSessionClosedSilent();
+						recorder.closeRecordingSessionSilent();
 						settings.value = {
 							...settings.value,
 							'recording.selectedAudioInputDeviceId':

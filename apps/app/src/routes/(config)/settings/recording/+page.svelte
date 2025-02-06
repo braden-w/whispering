@@ -56,7 +56,7 @@
 			{items}
 			selected={settings.value['recording.selectedAudioInputDeviceId']}
 			onSelectedChange={(selected) => {
-				recorder.ensureRecordingSessionClosedSilent();
+				recorder.closeRecordingSessionSilent();
 				settings.value = {
 					...settings.value,
 					'recording.selectedAudioInputDeviceId': selected,

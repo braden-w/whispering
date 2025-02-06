@@ -97,7 +97,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			return Ok(undefined);
 		},
 
-		ensureRecordingSessionClosed: async ({ sendStatus }) => {
+		closeRecordingSession: async ({ sendStatus }) => {
 			if (!currentSession) return Ok(undefined);
 			sendStatus({
 				title: '🎙️ Cleaning Up',

@@ -27,7 +27,7 @@
 {:else if recorder.recorderState === 'SESSION'}
 	<WhisperingButton
 		onclick={() => {
-			recorder.ensureRecordingSessionClosedWithToast();
+			recorder.closeRecordingSessionWithToast();
 		}}
 		variant="ghost"
 		size="icon"
