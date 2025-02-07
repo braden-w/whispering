@@ -132,7 +132,7 @@ function createRecorder({
 					transcriptionStatus: 'UNPROCESSED',
 				},
 				{
-					onError(error, variables, context) {
+					onError(error) {
 						toast.error({
 							id: toastId,
 							title: '❌ Database Save Failed',
