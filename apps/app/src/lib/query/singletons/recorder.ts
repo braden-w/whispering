@@ -85,7 +85,7 @@ function createRecorder({
 				description: 'Speak now and stop recording when done',
 			});
 			console.info('Recording started');
-			void playSoundIfEnabled('start');
+			void playSoundIfEnabled('start-manual');
 		},
 		onSettled: invalidateRecorderState,
 	}));

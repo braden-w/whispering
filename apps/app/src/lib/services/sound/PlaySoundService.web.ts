@@ -3,12 +3,14 @@ import { extension } from '@repo/extension';
 import { WhisperingErr } from '@repo/shared';
 import type { PlaySoundService } from './PlaySoundService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
-import startSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import startManualSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import startVadSoundSrc from './assets/zapsplat_household_alarm_clock_large_snooze_button_press_002_12969.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import transformationCompleteSoundSrc from './assets/zapsplat_multimedia_notification_alert_ping_bright_chime_001_93276.mp3';
 import transcriptionCompleteSoundSrc from './assets/zapsplat_multimedia_ui_notification_classic_bell_synth_success_107505.mp3';
 
-const startSound = new Audio(startSoundSrc);
+const startVadSound = new Audio(startVadSoundSrc);
+const startManualSound = new Audio(startManualSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 const transcriptionCompleteSound = new Audio(transcriptionCompleteSoundSrc);
@@ -19,8 +21,11 @@ export function createPlaySoundServiceWeb(): PlaySoundService {
 		playSound: async (soundName) => {
 			if (!document.hidden) {
 				switch (soundName) {
-					case 'start':
-						await startSound.play();
+					case 'start-vad':
+						await startVadSound.play();
+						break;
+					case 'start-manual':
+						await startManualSound.play();
 						break;
 					case 'stop':
 						await stopSound.play();

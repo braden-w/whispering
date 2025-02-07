@@ -179,7 +179,7 @@ function createVadRecorder({
 					'Speak now. Will transcribe until you end the voice activated capture session',
 			});
 			console.info('Voice activated capture started');
-			void playSoundIfEnabled('start');
+			void playSoundIfEnabled('start-vad');
 		},
 		onSettled: invalidateVadState,
 	}));
