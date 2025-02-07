@@ -14,7 +14,7 @@ export const toggleRecording = async () => {
 		commandName: 'toggleRecording',
 		func: () => {
 			try {
-				window.recorder.toggleRecordingWithToast();
+				window.recorder.toggleRecording();
 				return { ok: true, data: undefined } as const;
 			} catch (error) {
 				return {

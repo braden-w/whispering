@@ -132,7 +132,7 @@ async function initTray() {
 				e.buttonState === 'Down'
 			) {
 				const recorder = getRecorderFromContext();
-				recorder.toggleRecordingWithToast();
+				recorder.toggleRecording();
 				return true;
 			}
 			return false;

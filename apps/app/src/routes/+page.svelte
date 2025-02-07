@@ -81,7 +81,7 @@
 					<div class="flex-1"></div>
 					<WhisperingButton
 						tooltipContent="Toggle recording"
-						onclick={recorder.toggleRecordingWithToast}
+						onclick={recorder.toggleRecording}
 						variant="ghost"
 						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 					>
@@ -104,7 +104,7 @@
 					<div class="flex-1"></div>
 					<WhisperingButton
 						tooltipContent="Toggle recording"
-						onclick={recorder.toggleRecordingWithToast}
+						onclick={recorder.toggleRecording}
 						variant="ghost"
 						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 					>

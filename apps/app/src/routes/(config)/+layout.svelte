@@ -30,7 +30,7 @@
 	<SelectTransformationOrCancelRecordingSessionOrEndRecordingSessionButton />
 	<WhisperingButton
 		tooltipContent="Toggle recording"
-		onclick={recorder.toggleRecordingWithToast}
+		onclick={recorder.toggleRecording}
 		variant="ghost"
 		size="icon"
 		style="view-transition-name: microphone-icon"

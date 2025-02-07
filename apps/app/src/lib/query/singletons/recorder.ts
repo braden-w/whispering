@@ -311,7 +311,7 @@ function createRecorder({
 		get recorderState() {
 			return recorderState.data ?? 'IDLE';
 		},
-		toggleRecordingWithToast: async () => {
+		toggleRecording: async () => {
 			const toastId = nanoid();
 			if (recorderState.data === 'SESSION+RECORDING') {
 				stopRecording.mutate({ toastId });
