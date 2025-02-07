@@ -261,7 +261,7 @@ export type WhisperingSoundNames =
 	| 'start-vad'
 	| 'start-manual'
 	| 'stop-manual'
-	| 'vad-captured'
+	| 'on-stopped-voice-activated-sesion'
 	| 'cancel'
 	| 'transcriptionComplete'
 	| 'transformationComplete';

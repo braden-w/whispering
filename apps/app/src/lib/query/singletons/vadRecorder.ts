@@ -208,7 +208,7 @@ function createVadRecorder({
 			const { toastId } = ctx;
 
 			console.info('Stopping voice activated capture');
-			void playSoundIfEnabled('stop-manual');
+			void playSoundIfEnabled('on-stopped-voice-activated-sesion');
 
 			if (!settings.value['recording.isFasterRerecordEnabled']) {
 				toast.loading({

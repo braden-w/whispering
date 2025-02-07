@@ -4,6 +4,7 @@ import { WhisperingErr } from '@repo/shared';
 import type { PlaySoundService } from './PlaySoundService';
 import stopSoundSrc from './assets/sound_ex_machina_Button_Blip.mp3';
 import startManualSoundSrc from './assets/zapsplat_household_alarm_clock_button_press_12967.mp3';
+import onSpeechEndSoundSrc from './assets/zapsplat_household_alarm_clock_large_snooze_button_press_001_12968.mp3';
 import startVadSoundSrc from './assets/zapsplat_household_alarm_clock_large_snooze_button_press_002_12969.mp3';
 import cancelSoundSrc from './assets/zapsplat_multimedia_click_button_short_sharp_73510.mp3';
 import transformationCompleteSoundSrc from './assets/zapsplat_multimedia_notification_alert_ping_bright_chime_001_93276.mp3';
@@ -11,6 +12,7 @@ import transcriptionCompleteSoundSrc from './assets/zapsplat_multimedia_ui_notif
 
 const startVadSound = new Audio(startVadSoundSrc);
 const startManualSound = new Audio(startManualSoundSrc);
+const onSpeechEndSound = new Audio(onSpeechEndSoundSrc);
 const stopSound = new Audio(stopSoundSrc);
 const cancelSound = new Audio(cancelSoundSrc);
 const transcriptionCompleteSound = new Audio(transcriptionCompleteSoundSrc);
@@ -26,6 +28,9 @@ export function createPlaySoundServiceWeb(): PlaySoundService {
 						break;
 					case 'start-manual':
 						await startManualSound.play();
+						break;
+					case 'on-stopped-voice-activated-sesion':
+						await onSpeechEndSound.play();
 						break;
 					case 'stop-manual':
 						await stopSound.play();
