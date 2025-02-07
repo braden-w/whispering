@@ -65,7 +65,7 @@ function createVadRecorder({
 						description: 'Your voice activated speech has been captured.',
 					});
 					console.info('Voice activated speech captured');
-					void playSoundIfEnabled('stop');
+					void playSoundIfEnabled('stop-manual');
 
 					const now = new Date().toISOString();
 					const newRecordingId = nanoid();
@@ -206,6 +206,10 @@ function createVadRecorder({
 		onSuccess: async (_, _variables, ctx) => {
 			if (!ctx) return;
 			const { toastId } = ctx;
+
+			console.info('Stopping voice activated capture');
+			void playSoundIfEnabled('stop-manual');
+
 			if (!settings.value['recording.isFasterRerecordEnabled']) {
 				toast.loading({
 					id: toastId,

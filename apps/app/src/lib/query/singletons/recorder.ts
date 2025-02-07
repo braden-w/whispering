@@ -114,7 +114,7 @@ function createRecorder({
 				description: 'Your recording has been saved',
 			});
 			console.info('Recording stopped');
-			void playSoundIfEnabled('stop');
+			void playSoundIfEnabled('stop-manual');
 
 			const now = new Date().toISOString();
 			const newRecordingId = nanoid();

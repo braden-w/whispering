@@ -205,7 +205,7 @@ export function createRecorderServiceWeb(): RecorderService {
 			const stopResult = await tryAsync({
 				try: () =>
 					new Promise<Blob>((resolve, reject) => {
-						recorder.mediaRecorder.addEventListener('stop', () => {
+						recorder.mediaRecorder.addEventListener('stop-manual', () => {
 							const audioBlob = new Blob(recorder.recordedChunks, {
 								type: recorder.mediaRecorder.mimeType,
 							});

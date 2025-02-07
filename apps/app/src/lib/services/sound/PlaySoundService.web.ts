@@ -27,7 +27,7 @@ export function createPlaySoundServiceWeb(): PlaySoundService {
 					case 'start-manual':
 						await startManualSound.play();
 						break;
-					case 'stop':
+					case 'stop-manual':
 						await stopSound.play();
 						break;
 					case 'cancel':

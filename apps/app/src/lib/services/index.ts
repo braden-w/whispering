@@ -192,7 +192,7 @@ export const playSoundIfEnabled = (soundName: WhisperingSoundNames) => {
 				void PlaySoundService.playSound(soundName);
 			}
 			break;
-		case 'stop':
+		case 'stop-manual':
 			if (settings.value['sound.playOn.stop']) {
 				void PlaySoundService.playSound(soundName);
 			}

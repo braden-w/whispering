@@ -260,7 +260,8 @@ export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
 export type WhisperingSoundNames =
 	| 'start-vad'
 	| 'start-manual'
-	| 'stop'
+	| 'stop-manual'
+	| 'vad-captured'
 	| 'cancel'
 	| 'transcriptionComplete'
 	| 'transformationComplete';
