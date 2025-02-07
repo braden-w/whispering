@@ -13,7 +13,7 @@ const sounds = {
 	'start-vad': new Audio(startVadSoundSrc),
 	'start-manual': new Audio(startManualSoundSrc),
 	'stop-manual': new Audio(stopSoundSrc),
-	'on-stopped-voice-activated-sesion': new Audio(onSpeechEndSoundSrc),
+	'on-stopped-voice-activated-session': new Audio(onSpeechEndSoundSrc),
 	cancel: new Audio(cancelSoundSrc),
 	transcriptionComplete: new Audio(transcriptionCompleteSoundSrc),
 	transformationComplete: new Audio(transformationCompleteSoundSrc),

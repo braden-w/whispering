@@ -29,7 +29,7 @@ export function createPlaySoundServiceWeb(): PlaySoundService {
 					case 'start-manual':
 						await startManualSound.play();
 						break;
-					case 'on-stopped-voice-activated-sesion':
+					case 'on-stopped-voice-activated-session':
 						await onSpeechEndSound.play();
 						break;
 					case 'stop-manual':
