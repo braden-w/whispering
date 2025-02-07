@@ -35,11 +35,11 @@
 	);
 
 	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'SESSION+RECORDING' ? '⏹️' : '⏺️',
+		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
 	);
 
 	const vadRecorderStateAsIcon = $derived(
-		vadRecorder.vadState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
+		vadRecorder.vadState === 'SESSION+RECORDING' ? '❌' : '🎙️',
 	);
 
 	const blobUrlManager = createBlobUrlManager();
