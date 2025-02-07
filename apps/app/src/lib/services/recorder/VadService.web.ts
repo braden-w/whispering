@@ -1,6 +1,6 @@
 import { Ok, trySync } from '@epicenterhq/result';
 import { WhisperingErr } from '@repo/shared';
-import { MicVAD } from '@ricky0123/vad-web';
+import { MicVAD, utils } from '@ricky0123/vad-web';
 
 export function createVadServiceWeb() {
 	let maybeVad: MicVAD | null = null;
@@ -15,9 +15,8 @@ export function createVadServiceWeb() {
 				},
 				onSpeechEnd: (audio) => {
 					console.log('Speech ended');
-					const blob = new Blob([audio], {
-						type: 'audio/wav',
-					});
+					const wavBuffer = utils.encodeWAV(audio);
+					const blob = new Blob([wavBuffer], { type: 'audio/wav' });
 					blobQueue.push(blob);
 				},
 				onVADMisfire: () => {
