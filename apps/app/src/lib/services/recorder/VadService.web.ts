@@ -1,14 +1,22 @@
 import { Ok, trySync } from '@epicenterhq/result';
-import { WhisperingErr } from '@repo/shared';
+import { WhisperingErr, type WhisperingRecordingState } from '@repo/shared';
 import { MicVAD, utils } from '@ricky0123/vad-web';
 import { toast } from '../toast';
 
 export function createVadServiceWeb() {
 	let maybeVad: MicVAD | null = null;
+	let isActivelyListening = false;
 	const blobQueue: Blob[] = [];
 
 	return {
-		ensureVad: async () => {
+		getVadState: (): WhisperingRecordingState => {
+			if (!maybeVad) return 'IDLE';
+			if (isActivelyListening) return 'SESSION+RECORDING';
+			return 'SESSION';
+		},
+		ensureVad: async ({
+			onSpeechEnd,
+		}: { onSpeechEnd: (blob: Blob) => void }) => {
 			if (maybeVad) return Ok(maybeVad);
 			maybeVad = await MicVAD.new({
 				onSpeechStart: () => {
@@ -67,6 +75,8 @@ export function createVadServiceWeb() {
 								: 'An unknown error occurred while starting the VAD.',
 					}),
 			});
+			if (!startResult.ok) return startResult;
+			isActivelyListening = true;
 			return startResult;
 		},
 		pauseVad: async () => {
@@ -87,6 +97,8 @@ export function createVadServiceWeb() {
 								: 'An unknown error occurred while pausing the VAD.',
 					}),
 			});
+			if (!pauseResult.ok) return pauseResult;
+			isActivelyListening = false;
 			return pauseResult;
 		},
 		destroyVad: async () => {
@@ -109,6 +121,8 @@ export function createVadServiceWeb() {
 			});
 			if (!destroyResult.ok) return destroyResult;
 			maybeVad = null;
+			isActivelyListening = false;
+			return Ok(undefined);
 		},
 	};
 }
