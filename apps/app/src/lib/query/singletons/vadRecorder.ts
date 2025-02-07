@@ -254,8 +254,5 @@ function createVadRecorder({
 				startActiveListening.mutate();
 			}
 		},
-		closeVadSession: () => {
-			closeVadSession.mutate();
-		},
 	};
 }
