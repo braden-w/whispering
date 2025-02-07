@@ -14,8 +14,10 @@
 	import { Loader2Icon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
+	import { getVadRecorderFromContext } from '$lib/query/singletons/vadRecorder';
 
 	const recorder = getRecorderFromContext();
+	const vadRecorder = getVadRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
 
 	const latestRecording = $derived<Recording>(
@@ -32,15 +34,13 @@
 		},
 	);
 
-	let selectedTab = $state<'voice-activated' | 'manual'>('voice-activated');
-	const recorderStateAsIcon = $derived.by(() => {
-		switch (selectedTab) {
-			case 'voice-activated':
-				return recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
-			case 'manual':
-				return recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '⏺️';
-		}
-	});
+	const recorderStateAsIcon = $derived(
+		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '⏺️',
+	);
+
+	const vadRecorderStateAsIcon = $derived(
+		vadRecorder.vadState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
+	);
 
 	const blobUrlManager = createBlobUrlManager();
 
@@ -68,7 +68,7 @@
 		</p>
 	</div>
 
-	<Tabs.Root bind:value={selectedTab} class="w-full max-w-md">
+	<Tabs.Root value="voice-activated" class="w-full max-w-md">
 		<Tabs.List class="grid w-full grid-cols-2">
 			<Tabs.Trigger value="voice-activated" class="font-medium">
 				Voice Activated
@@ -81,7 +81,7 @@
 					<div class="flex-1"></div>
 					<WhisperingButton
 						tooltipContent="Toggle recording"
-						onclick={recorder.toggleRecording}
+						onclick={vadRecorder.toggleVad}
 						variant="ghost"
 						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
 					>
@@ -89,7 +89,7 @@
 							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
 							class="text-[100px] leading-none"
 						>
-							{recorderStateAsIcon}
+							{vadRecorderStateAsIcon}
 						</span>
 					</WhisperingButton>
 					<div class="flex-1 flex-justify-center mb-2">

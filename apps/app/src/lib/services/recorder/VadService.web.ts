@@ -6,7 +6,6 @@ import { toast } from '../toast';
 export function createVadServiceWeb() {
 	let maybeVad: MicVAD | null = null;
 	let isActivelyListening = false;
-	const blobQueue: Blob[] = [];
 
 	return {
 		getVadState: (): WhisperingRecordingState => {
@@ -28,11 +27,7 @@ export function createVadServiceWeb() {
 				onSpeechEnd: (audio) => {
 					const wavBuffer = utils.encodeWAV(audio);
 					const blob = new Blob([wavBuffer], { type: 'audio/wav' });
-					blobQueue.push(blob);
-					toast.success({
-						title: '🎙️ Speech ended',
-						description: 'Recording finished. Review your session.',
-					});
+					onSpeechEnd(blob);
 				},
 				onVADMisfire: () => {
 					console.log('VAD misfire');
@@ -54,6 +49,7 @@ export function createVadServiceWeb() {
 			});
 			if (!destroyResult.ok) return destroyResult;
 			maybeVad = null;
+			isActivelyListening = false;
 			return Ok(undefined);
 		},
 		startVad: async () => {
