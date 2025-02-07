@@ -35,7 +35,7 @@
 	);
 
 	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '⏺️',
+		recorder.recorderState === 'SESSION+RECORDING' ? '⏹️' : '⏺️',
 	);
 
 	const vadRecorderStateAsIcon = $derived(
