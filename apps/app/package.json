@@ -1,6 +1,6 @@
 {
 	"name": "@repo/app",
-	"version": "6.2.0",
+	"version": "6.3.0",
 	"private": true,
 	"scripts": {
 		"dev:web": "vite dev",
