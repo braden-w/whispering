@@ -32,6 +32,7 @@ export function createVadServiceWeb() {
 				onVADMisfire: () => {
 					console.log('VAD misfire');
 				},
+				model: 'v5',
 			});
 			return Ok(maybeVad);
 		},
