@@ -4,22 +4,17 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
-	import * as Tabs from '$lib/components/ui/tabs';
+	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
+	import { getVadRecorderFromContext } from '$lib/query/singletons/vadRecorder';
 	import type { Recording } from '$lib/services/db';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { createBlobUrlManager } from '$lib/utils/blobUrlManager';
 	import { getRecordingTransitionId } from '$lib/utils/getRecordingTransitionId';
-	import { Loader2Icon } from 'lucide-svelte';
+	import { AudioLinesIcon, Loader2Icon, MicIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
-	import { getVadRecorderFromContext } from '$lib/query/singletons/vadRecorder';
-	import { Button } from '$lib/components/ui/button';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
-	import { MicIcon, AudioLinesIcon } from 'lucide-svelte';
-	import { cn } from '$lib/utils';
-
 	const recorder = getRecorderFromContext();
 	const vadRecorder = getVadRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -38,14 +33,6 @@
 		},
 	);
 
-	const recorderStateAsIcon = $derived(
-		recorder.recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️',
-	);
-
-	const vadRecorderStateAsIcon = $derived(
-		vadRecorder.vadState === 'SESSION+RECORDING' ? '︎︎🚫' : '🎙️',
-	);
-
 	const blobUrlManager = createBlobUrlManager();
 
 	const blobUrl = $derived.by(() => {
@@ -57,7 +44,7 @@
 		blobUrlManager.revokeCurrentUrl();
 	});
 
-	let mode = $state<'voice-activated' | 'manual'>('voice-activated');
+	let mode = $state<'manual' | 'voice-activated'>('manual');
 </script>
 
 <svelte:head>
@@ -119,7 +106,11 @@
 							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
 							class="text-[100px] leading-none"
 						>
-							{recorderStateAsIcon}
+							{#if recorder.recorderState === 'SESSION+RECORDING'}
+								⏹️
+							{:else}
+								🎙️
+							{/if}
 						</span>
 					</WhisperingButton>
 				{:else}
@@ -135,7 +126,11 @@
 							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
 							class="text-[100px] leading-none"
 						>
-							{vadRecorderStateAsIcon}
+							{#if vadRecorder.vadState === 'SESSION+RECORDING'}
+								🛑
+							{:else}
+								🎬
+							{/if}
 						</span>
 					</WhisperingButton>
 				{/if}
