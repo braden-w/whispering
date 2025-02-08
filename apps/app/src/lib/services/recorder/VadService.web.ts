@@ -15,9 +15,11 @@ export function createVadServiceWeb() {
 		},
 		ensureVad: async ({
 			onSpeechEnd,
-		}: { onSpeechEnd: (blob: Blob) => void }) => {
+			deviceId,
+		}: { onSpeechEnd: (blob: Blob) => void; deviceId: string | null }) => {
 			if (maybeVad) return Ok(maybeVad);
 			maybeVad = await MicVAD.new({
+				additionalAudioConstraints: deviceId ? { deviceId } : undefined,
 				onSpeechStart: () => {
 					toast.success({
 						title: '🎙️ Speech started',

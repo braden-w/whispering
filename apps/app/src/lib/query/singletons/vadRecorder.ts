@@ -57,6 +57,7 @@ function createVadRecorder({
 	const ensureVadSession = createResultMutation(() => ({
 		mutationFn: async () => {
 			const ensureVadResult = await VadService.ensureVad({
+				deviceId: settings.value['recording.selectedAudioInputDeviceId'],
 				onSpeechEnd: (blob) => {
 					const toastId = nanoid();
 					toast.success({
