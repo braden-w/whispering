@@ -46,8 +46,7 @@
 		{items}
 		value={selected}
 		onValueChange={(selected) => {
-			const selectedValue = selected as T | '';
-			if (!selectedValue) return;
+			const selectedValue = selected as T;
 			onSelectedChange(selectedValue);
 		}}
 		{disabled}
