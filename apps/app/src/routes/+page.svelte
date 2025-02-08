@@ -92,90 +92,86 @@
 		</ToggleGroup.Item>
 	</ToggleGroup.Root>
 
-	<div class="w-full max-w-md">
-		<div class="mt-6">
-			<div class="flex items-end justify-between w-full gap-2">
-				<div class="flex-1"></div>
-				{#if mode === 'manual'}
-					<WhisperingButton
-						tooltipContent={recorder.recorderState === 'SESSION+RECORDING'
-							? 'Stop recording'
-							: 'Start recording'}
-						onclick={recorder.toggleRecording}
-						variant="ghost"
-						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
-					>
-						<span
-							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
-							class="text-[100px] leading-none"
-						>
-							{#if recorder.recorderState === 'SESSION+RECORDING'}
-								⏹️
-							{:else}
-								🎙️
-							{/if}
-						</span>
-					</WhisperingButton>
-				{:else}
-					<WhisperingButton
-						tooltipContent={vadRecorder.vadState === 'SESSION+RECORDING'
-							? 'Stop voice activated session'
-							: 'Start voice activated session'}
-						onclick={vadRecorder.toggleVad}
-						variant="ghost"
-						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
-					>
-						<span
-							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
-							class="text-[100px] leading-none"
-						>
-							{#if vadRecorder.vadState === 'SESSION+RECORDING'}
-								🛑
-							{:else}
-								🎬
-							{/if}
-						</span>
-					</WhisperingButton>
-				{/if}
-				<div class="flex-1 flex-justify-center mb-2">
+	<div class="max-w-md flex items-end justify-between w-full gap-2">
+		<div class="flex-1"></div>
+		{#if mode === 'manual'}
+			<WhisperingButton
+				tooltipContent={recorder.recorderState === 'SESSION+RECORDING'
+					? 'Stop recording'
+					: 'Start recording'}
+				onclick={recorder.toggleRecording}
+				variant="ghost"
+				class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+			>
+				<span
+					style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
+					class="text-[100px] leading-none"
+				>
 					{#if recorder.recorderState === 'SESSION+RECORDING'}
-						<WhisperingButton
-							tooltipContent="Cancel recording"
-							onclick={() => recorder.cancelRecorderWithToast()}
-							variant="ghost"
-							size="icon"
-							style="view-transition-name: cancel-icon;"
-						>
-							🚫
-						</WhisperingButton>
-					{:else if recorder.recorderState === 'SESSION'}
-						<WhisperingButton
-							onclick={() => {
-								recorder.closeRecordingSessionWithToast();
-							}}
-							variant="ghost"
-							size="icon"
-							style="view-transition-name: end-session-icon;"
-						>
-							🔴
-							{#snippet tooltipContent()}
-								End recording session
-								<Button
-									variant="link"
-									size="inline"
-									onclick={() => fasterRerecordExplainedDialog.open()}
-								>
-									(What's that?)
-								</Button>
-							{/snippet}
-						</WhisperingButton>
-					{:else if vadRecorder.vadState === 'SESSION+RECORDING' || vadRecorder.vadState === 'SESSION'}
-						<!-- Render nothing -->
+						⏹️
 					{:else}
-						<RecordingControls></RecordingControls>
+						🎙️
 					{/if}
-				</div>
-			</div>
+				</span>
+			</WhisperingButton>
+		{:else}
+			<WhisperingButton
+				tooltipContent={vadRecorder.vadState === 'SESSION+RECORDING'
+					? 'Stop voice activated session'
+					: 'Start voice activated session'}
+				onclick={vadRecorder.toggleVad}
+				variant="ghost"
+				class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+			>
+				<span
+					style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
+					class="text-[100px] leading-none"
+				>
+					{#if vadRecorder.vadState === 'SESSION+RECORDING'}
+						🛑
+					{:else}
+						🎬
+					{/if}
+				</span>
+			</WhisperingButton>
+		{/if}
+		<div class="flex-1 flex-justify-center mb-2">
+			{#if recorder.recorderState === 'SESSION+RECORDING'}
+				<WhisperingButton
+					tooltipContent="Cancel recording"
+					onclick={() => recorder.cancelRecorderWithToast()}
+					variant="ghost"
+					size="icon"
+					style="view-transition-name: cancel-icon;"
+				>
+					🚫
+				</WhisperingButton>
+			{:else if recorder.recorderState === 'SESSION'}
+				<WhisperingButton
+					onclick={() => {
+						recorder.closeRecordingSessionWithToast();
+					}}
+					variant="ghost"
+					size="icon"
+					style="view-transition-name: end-session-icon;"
+				>
+					🔴
+					{#snippet tooltipContent()}
+						End recording session
+						<Button
+							variant="link"
+							size="inline"
+							onclick={() => fasterRerecordExplainedDialog.open()}
+						>
+							(What's that?)
+						</Button>
+					{/snippet}
+				</WhisperingButton>
+			{:else if vadRecorder.vadState === 'SESSION+RECORDING' || vadRecorder.vadState === 'SESSION'}
+				<!-- Render nothing -->
+			{:else}
+				<RecordingControls></RecordingControls>
+			{/if}
 		</div>
 	</div>
 
