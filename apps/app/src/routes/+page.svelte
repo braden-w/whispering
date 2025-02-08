@@ -79,7 +79,14 @@
 		value={mode}
 		class="w-full grid grid-cols-2 gap-2"
 		onValueChange={(value) => {
-			if (value) mode = value as 'voice-activated' | 'manual';
+			switch (value) {
+				case 'voice-activated':
+					mode = 'voice-activated';
+					break;
+				case 'manual':
+					mode = 'manual';
+					break;
+			}
 		}}
 	>
 		<ToggleGroup.Item
