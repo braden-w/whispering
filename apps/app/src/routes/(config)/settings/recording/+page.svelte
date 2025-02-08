@@ -81,5 +81,6 @@
 			};
 		}}
 		placeholder="Select a bitrate"
+		description="16kbps is recommended since the Whisper model internally processes at 16kHz. Higher bitrates won't improve transcription quality."
 	/>
 </div>
