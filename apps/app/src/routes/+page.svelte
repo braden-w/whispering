@@ -39,7 +39,7 @@
 	);
 
 	const vadRecorderStateAsIcon = $derived(
-		vadRecorder.vadState === 'SESSION+RECORDING' ? '︎⏸︎' : '🎙️',
+		vadRecorder.vadState === 'SESSION+RECORDING' ? '︎︎🚫' : '🎙️',
 	);
 
 	const blobUrlManager = createBlobUrlManager();
