@@ -17,7 +17,7 @@
 	import { getVadRecorderFromContext } from '$lib/query/singletons/vadRecorder';
 	import { Button } from '$lib/components/ui/button';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
-	import { Mic, Hand } from 'lucide-svelte';
+	import { MicIcon, AudioLinesIcon } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 
 	const recorder = getRecorderFromContext();
@@ -89,16 +89,16 @@
 			}
 		}}
 	>
+		<ToggleGroup.Item value="manual" aria-label="Switch to manual mode">
+			<MicIcon class="h-4 w-4" />
+			Record
+		</ToggleGroup.Item>
 		<ToggleGroup.Item
 			value="voice-activated"
 			aria-label="Switch to voice activated mode"
 		>
-			<Mic class="h-4 w-4" />
+			<AudioLinesIcon class="h-4 w-4" />
 			Voice Activated
-		</ToggleGroup.Item>
-		<ToggleGroup.Item value="manual" aria-label="Switch to manual mode">
-			<Hand class="h-4 w-4" />
-			Manual
 		</ToggleGroup.Item>
 	</ToggleGroup.Root>
 
@@ -106,23 +106,7 @@
 		<div class="mt-6">
 			<div class="flex items-end justify-between w-full gap-2">
 				<div class="flex-1"></div>
-				{#if mode === 'voice-activated'}
-					<WhisperingButton
-						tooltipContent={vadRecorder.vadState === 'SESSION+RECORDING'
-							? 'Stop voice activated session'
-							: 'Start voice activated session'}
-						onclick={vadRecorder.toggleVad}
-						variant="ghost"
-						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
-					>
-						<span
-							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
-							class="text-[100px] leading-none"
-						>
-							{vadRecorderStateAsIcon}
-						</span>
-					</WhisperingButton>
-				{:else}
+				{#if mode === 'manual'}
 					<WhisperingButton
 						tooltipContent={recorder.recorderState === 'SESSION+RECORDING'
 							? 'Stop recording'
@@ -136,6 +120,22 @@
 							class="text-[100px] leading-none"
 						>
 							{recorderStateAsIcon}
+						</span>
+					</WhisperingButton>
+				{:else}
+					<WhisperingButton
+						tooltipContent={vadRecorder.vadState === 'SESSION+RECORDING'
+							? 'Stop voice activated session'
+							: 'Start voice activated session'}
+						onclick={vadRecorder.toggleVad}
+						variant="ghost"
+						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
+					>
+						<span
+							style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5)); view-transition-name: microphone-icon;"
+							class="text-[100px] leading-none"
+						>
+							{vadRecorderStateAsIcon}
 						</span>
 					</WhisperingButton>
 				{/if}
