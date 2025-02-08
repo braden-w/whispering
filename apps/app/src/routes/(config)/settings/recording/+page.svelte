@@ -54,7 +54,7 @@
 			id="recording-device"
 			label="Recording Device"
 			{items}
-			selected={settings.value['recording.selectedAudioInputDeviceId']}
+			selected={settings.value['recording.selectedAudioInputDeviceId'] ?? ''}
 			onSelectedChange={(selected) => {
 				recorder.closeRecordingSessionSilent();
 				settings.value = {
