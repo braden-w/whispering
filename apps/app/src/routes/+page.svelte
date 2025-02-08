@@ -15,6 +15,7 @@
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
 	import { getVadRecorderFromContext } from '$lib/query/singletons/vadRecorder';
+	import { Button } from '$lib/components/ui/button';
 
 	const recorder = getRecorderFromContext();
 	const vadRecorder = getVadRecorderFromContext();
@@ -52,6 +53,8 @@
 	onDestroy(() => {
 		blobUrlManager.revokeCurrentUrl();
 	});
+
+	let mode = $state<'voice-activated' | 'manual'>('voice-activated');
 </script>
 
 <svelte:head>
@@ -68,17 +71,22 @@
 		</p>
 	</div>
 
-	<Tabs.Root value="voice-activated" class="w-full max-w-md">
-		<Tabs.List class="grid w-full grid-cols-2">
-			<Tabs.Trigger value="voice-activated" class="font-medium">
-				Voice Activated
-			</Tabs.Trigger>
-			<Tabs.Trigger value="manual" class="font-medium">Manual</Tabs.Trigger>
-		</Tabs.List>
+	<div class="w-full max-w-md">
+		<Button
+			variant="outline"
+			class="w-full mb-6"
+			onclick={() =>
+				(mode = mode === 'voice-activated' ? 'manual' : 'voice-activated')}
+		>
+			{mode === 'voice-activated'
+				? 'Switch to Manual'
+				: 'Switch to Voice Activated'}
+		</Button>
+
 		<div class="mt-6">
-			<Tabs.Content value="voice-activated">
-				<div class="flex items-end justify-between w-full gap-2">
-					<div class="flex-1"></div>
+			<div class="flex items-end justify-between w-full gap-2">
+				<div class="flex-1"></div>
+				{#if mode === 'voice-activated'}
 					<WhisperingButton
 						tooltipContent="Toggle recording"
 						onclick={vadRecorder.toggleVad}
@@ -92,16 +100,7 @@
 							{vadRecorderStateAsIcon}
 						</span>
 					</WhisperingButton>
-					<div class="flex-1 flex-justify-center mb-2">
-						<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
-						/>
-					</div>
-				</div>
-			</Tabs.Content>
-
-			<Tabs.Content value="manual">
-				<div class="flex items-end justify-between w-full gap-2">
-					<div class="flex-1"></div>
+				{:else}
 					<WhisperingButton
 						tooltipContent="Toggle recording"
 						onclick={recorder.toggleRecording}
@@ -115,14 +114,14 @@
 							{recorderStateAsIcon}
 						</span>
 					</WhisperingButton>
-					<div class="flex-1 flex-justify-center mb-2">
-						<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
-						/>
-					</div>
+				{/if}
+				<div class="flex-1 flex-justify-center mb-2">
+					<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
+					/>
 				</div>
-			</Tabs.Content>
+			</div>
 		</div>
-	</Tabs.Root>
+	</div>
 
 	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
 		{#if latestRecording.transcribedText !== ''}
