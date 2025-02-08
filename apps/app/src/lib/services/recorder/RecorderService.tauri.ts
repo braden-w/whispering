@@ -53,7 +53,7 @@ export function createRecorderServiceTauri(): RecorderService {
 				});
 			return Ok(undefined);
 		},
-		ensureRecordingSessionClosed: async ({ sendStatus: sendUpdateStatus }) => {
+		closeRecordingSession: async ({ sendStatus: sendUpdateStatus }) => {
 			sendUpdateStatus({
 				title: '🔄 Closing Session',
 				description:

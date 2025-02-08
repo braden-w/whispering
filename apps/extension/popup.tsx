@@ -38,8 +38,7 @@ function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
 
-	const recorderStateAsIcon =
-		recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
+	const recorderStateAsIcon = recorderState === 'SESSION+RECORDING' ? '⏹️' : '🎙️';
 
 	const copyToClipboardText = (() => {
 		if (recorderState === 'LOADING') return '...';
@@ -105,7 +104,7 @@ function IndexPage() {
 							className="-right-14 absolute bottom-0 transform text-2xl"
 							onClick={async () => {
 								const closeRecordingSessionResult =
-									await app.ensureRecordingSessionClosedWithToast();
+									await app.closeRecordingSessionWithToast();
 								if (!closeRecordingSessionResult.ok) {
 									await extension.createNotification({
 										notifyOptions: closeRecordingSessionResult.error,

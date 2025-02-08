@@ -14,6 +14,8 @@ export const WHISPERING_SETTINGS_PATHNAME = '/settings' as const;
 export const DEBOUNCE_TIME_MS = 500;
 
 export const BITRATE_VALUES_KBPS = [
+	'16',
+	'32',
 	'64',
 	'96',
 	'128',
@@ -28,7 +30,7 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 }));
 
 export const DEFAULT_BITRATE_KBPS =
-	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
+	'16' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
 export const ALWAYS_ON_TOP_VALUES = [
 	'Always',
@@ -53,7 +55,7 @@ export type WhisperingRecordingState = z.infer<typeof recordingStateSchema>;
 export const recorderStateToIcons = {
 	IDLE: '🎙️',
 	SESSION: '🎙️',
-	'SESSION+RECORDING': '🔲',
+	'SESSION+RECORDING': '⏹️',
 } as const satisfies Record<WhisperingRecordingState, string>;
 
 /** Supported languages pulled from OpenAI Website: https://platform.openai.com/docs/guides/speech-to-text/supported-languages */
@@ -258,8 +260,10 @@ export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
 );
 
 export type WhisperingSoundNames =
-	| 'start'
-	| 'stop'
+	| 'start-vad'
+	| 'start-manual'
+	| 'stop-manual'
+	| 'on-stopped-voice-activated-session'
 	| 'cancel'
 	| 'transcriptionComplete'
 	| 'transformationComplete';

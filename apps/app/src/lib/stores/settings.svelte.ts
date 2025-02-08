@@ -50,11 +50,11 @@ function createRegisterShortcuts({ recorder }: { recorder: Recorder }) {
 		await unregisterAllGlobalShortcuts();
 		registerLocalShortcut({
 			shortcut: settings.value['shortcuts.currentLocalShortcut'],
-			callback: recorder.toggleRecordingWithToast,
+			callback: recorder.toggleRecording,
 		});
 		await registerGlobalShortcut({
 			shortcut: settings.value['shortcuts.currentGlobalShortcut'],
-			callback: recorder.toggleRecordingWithToast,
+			callback: recorder.toggleRecording,
 		});
 	};
 

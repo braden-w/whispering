@@ -53,7 +53,7 @@
 		{#snippet child({ props })}
 			<WhisperingButton
 				{...props}
-				class={className}
+				class={cn('relative', className)}
 				tooltipContent={selectedTransformation
 					? 'Change post-processing transformation to run after your text is transcribed'
 					: 'Select a post-processing transformation to run after your text is transcribed'}
