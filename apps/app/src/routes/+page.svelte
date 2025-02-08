@@ -108,7 +108,9 @@
 				<div class="flex-1"></div>
 				{#if mode === 'voice-activated'}
 					<WhisperingButton
-						tooltipContent="Toggle recording"
+						tooltipContent={vadRecorder.vadState === 'SESSION+RECORDING'
+							? 'Stop voice activated session'
+							: 'Start voice activated session'}
 						onclick={vadRecorder.toggleVad}
 						variant="ghost"
 						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
@@ -122,7 +124,9 @@
 					</WhisperingButton>
 				{:else}
 					<WhisperingButton
-						tooltipContent="Toggle recording"
+						tooltipContent={recorder.recorderState === 'SESSION+RECORDING'
+							? 'Stop recording'
+							: 'Start recording'}
 						onclick={recorder.toggleRecording}
 						variant="ghost"
 						class="flex-shrink-0 size-32 transform items-center justify-center overflow-hidden duration-300 ease-in-out"
