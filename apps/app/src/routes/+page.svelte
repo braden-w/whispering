@@ -1,9 +1,9 @@
 <script lang="ts">
 	import NavItems from '$lib/components/NavItems.svelte';
-	import RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton from '$lib/components/RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 	import { useLatestRecording } from '$lib/query/recordings/queries';
 	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
@@ -15,6 +15,9 @@
 	import { AudioLinesIcon, Loader2Icon, MicIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
+	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
+	import RecordingControls from '$lib/components/RecordingControls.svelte';
+
 	const recorder = getRecorderFromContext();
 	const vadRecorder = getVadRecorderFromContext();
 	const { latestRecordingQuery } = useLatestRecording();
@@ -135,8 +138,42 @@
 					</WhisperingButton>
 				{/if}
 				<div class="flex-1 flex-justify-center mb-2">
-					<RecordingControlsOrCancelRecordingSessionOrEndRecordingSessionButton
-					/>
+					{#if recorder.recorderState === 'SESSION+RECORDING'}
+						<WhisperingButton
+							tooltipContent="Cancel recording"
+							onclick={() => recorder.cancelRecorderWithToast()}
+							variant="ghost"
+							size="icon"
+							style="view-transition-name: cancel-icon;"
+						>
+							🚫
+						</WhisperingButton>
+					{:else if recorder.recorderState === 'SESSION'}
+						<WhisperingButton
+							onclick={() => {
+								recorder.closeRecordingSessionWithToast();
+							}}
+							variant="ghost"
+							size="icon"
+							style="view-transition-name: end-session-icon;"
+						>
+							🔴
+							{#snippet tooltipContent()}
+								End recording session
+								<Button
+									variant="link"
+									size="inline"
+									onclick={() => fasterRerecordExplainedDialog.open()}
+								>
+									(What's that?)
+								</Button>
+							{/snippet}
+						</WhisperingButton>
+					{:else if vadRecorder.vadState === 'SESSION+RECORDING' || vadRecorder.vadState === 'SESSION'}
+						<!-- Render nothing -->
+					{:else}
+						<RecordingControls></RecordingControls>
+					{/if}
 				</div>
 			</div>
 		</div>
