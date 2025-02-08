@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
 	import NavItems from '$lib/components/NavItems.svelte';
+	import RecordingControls from '$lib/components/RecordingControls.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import CopyToClipboardButton from '$lib/components/copyable/CopyToClipboardButton.svelte';
 	import { ClipboardIcon } from '$lib/components/icons';
@@ -15,8 +17,6 @@
 	import { AudioLinesIcon, Loader2Icon, MicIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
-	import { fasterRerecordExplainedDialog } from '$lib/components/FasterRerecordExplainedDialog.svelte';
-	import RecordingControls from '$lib/components/RecordingControls.svelte';
 
 	const recorder = getRecorderFromContext();
 	const vadRecorder = getVadRecorderFromContext();
