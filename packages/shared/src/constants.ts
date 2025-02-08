@@ -14,6 +14,8 @@ export const WHISPERING_SETTINGS_PATHNAME = '/settings' as const;
 export const DEBOUNCE_TIME_MS = 500;
 
 export const BITRATE_VALUES_KBPS = [
+	'16',
+	'32',
 	'64',
 	'96',
 	'128',
@@ -28,7 +30,7 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 }));
 
 export const DEFAULT_BITRATE_KBPS =
-	'64' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
+	'16' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
 export const ALWAYS_ON_TOP_VALUES = [
 	'Always',
