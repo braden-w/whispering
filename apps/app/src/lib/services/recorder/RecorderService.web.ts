@@ -8,9 +8,10 @@ import type {
 } from './RecorderService';
 
 const TIMESLICE_MS = 1000;
-const PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS = {
+// Whisper API recommends a mono channel at 16kHz
+const WHISPER_RECOMMENDED_MEDIA_TRACK_CONSTRAINTS = {
 	channelCount: { ideal: 1 },
-	sampleRate: { ideal: 16000 },
+	sampleRate: { ideal: 16_000 },
 } satisfies MediaTrackConstraints;
 
 type RecordingSession = {
@@ -263,7 +264,7 @@ async function hasExistingAudioPermission(): Promise<boolean> {
 	} catch {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+				audio: WHISPER_RECOMMENDED_MEDIA_TRACK_CONSTRAINTS,
 			});
 			for (const track of stream.getTracks()) {
 				track.stop();
@@ -307,7 +308,7 @@ async function enumerateRecordingDevices() {
 	return tryAsync({
 		try: async () => {
 			const allAudioDevicesStream = await navigator.mediaDevices.getUserMedia({
-				audio: PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
+				audio: WHISPER_RECOMMENDED_MEDIA_TRACK_CONSTRAINTS,
 			});
 			const devices = await navigator.mediaDevices.enumerateDevices();
 			for (const track of allAudioDevicesStream.getTracks()) {
@@ -337,8 +338,8 @@ async function getStreamForDeviceId(recordingDeviceId: string) {
 		try: async () => {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				audio: {
+					...WHISPER_RECOMMENDED_MEDIA_TRACK_CONSTRAINTS,
 					deviceId: { exact: recordingDeviceId },
-					...PREFERRED_NAVIGATOR_MEDIA_DEVICES_USER_MEDIA_OPTIONS,
 				},
 			});
 			return stream;
