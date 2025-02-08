@@ -13,7 +13,7 @@
 <header
 	class={cn(
 		'border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur ',
-		'flex h-14 w-full items-center px-4 md:px-8',
+		'flex h-14 w-full items-center px-4 md:px-8 gap-1.5',
 	)}
 	style="view-transition-name: header"
 >

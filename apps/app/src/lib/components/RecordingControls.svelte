@@ -7,7 +7,7 @@
 	let { class: className }: { class?: string } = $props();
 </script>
 
-<div class={cn('flex items-center gap-1', className)}>
+<div class={cn('flex items-center gap-1.5', className)}>
 	<SelectRecordingDeviceCombobox />
 	<PersistSelectTransformationCombobox
 		selectedTransformationId={settings.value[

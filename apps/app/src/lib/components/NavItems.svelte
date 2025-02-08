@@ -18,7 +18,7 @@
 </script>
 
 <nav
-	class={cn('flex items-center', className)}
+	class={cn('flex items-center gap-1.5', className)}
 	style="view-transition-name: nav"
 >
 	<WhisperingButton
