@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { getRecorderFromContext } from '$lib/query/singletons/recorder';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils.js';
 	import PersistSelectTransformationCombobox from './PersistSelectTransformationCombobox.svelte';
 	import SelectRecordingDeviceCombobox from './SelectRecordingDeviceCombobox.svelte';
-
-	const recorder = getRecorderFromContext();
 
 	let { class: className }: { class?: string } = $props();
 </script>
