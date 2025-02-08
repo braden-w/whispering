@@ -38,8 +38,7 @@ function IndexPage() {
 	const recorderState = useWhisperingRecorderState();
 	const transcribedText = useWhisperingTranscribedText();
 
-	const recorderStateAsIcon =
-		recorderState === 'SESSION+RECORDING' ? '🔲' : '🎙️';
+	const recorderStateAsIcon = recorderState === 'SESSION+RECORDING' ? '⏹️' : '🎙️';
 
 	const copyToClipboardText = (() => {
 		if (recorderState === 'LOADING') return '...';

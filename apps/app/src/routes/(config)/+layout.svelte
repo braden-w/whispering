@@ -36,7 +36,7 @@
 		style="view-transition-name: microphone-icon"
 	>
 		{#if recorder.recorderState === 'SESSION+RECORDING'}
-			🔲
+			⏹️
 		{:else}
 			🎙️
 		{/if}

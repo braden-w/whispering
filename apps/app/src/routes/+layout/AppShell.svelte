@@ -54,7 +54,7 @@
 		class="text-[48px] leading-none"
 	>
 		{#if recorder.recorderState === 'SESSION+RECORDING'}
-			🔲
+			⏹️
 		{:else}
 			🎙️
 		{/if}
