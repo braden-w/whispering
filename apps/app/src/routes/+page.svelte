@@ -67,7 +67,7 @@
 	<ToggleGroup.Root
 		type="single"
 		value={mode}
-		class="w-full grid grid-cols-2 gap-2"
+		class="max-w-xs w-full grid grid-cols-2 gap-2"
 		onValueChange={(value) => {
 			switch (value) {
 				case 'voice-activated':
@@ -175,7 +175,7 @@
 		</div>
 	</div>
 
-	<div class="xxs:flex hidden w-full max-w-80 flex-col items-center gap-2">
+	<div class="xxs:flex hidden w-full max-w-xs flex-col items-center gap-2">
 		{#if latestRecording.transcribedText !== ''}
 			<div class="flex w-full items-center gap-2">
 				<TranscribedTextDialog
