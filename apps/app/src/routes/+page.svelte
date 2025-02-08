@@ -85,26 +85,11 @@
 		<ToggleGroup.Item
 			value="voice-activated"
 			aria-label="Switch to voice activated mode"
-			class={cn(
-				'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-				mode === 'voice-activated'
-					? 'bg-primary text-primary-foreground shadow hover:bg-primary/90'
-					: 'hover:bg-muted hover:text-muted-foreground',
-			)}
 		>
 			<Mic class="h-4 w-4" />
 			Voice Activated
 		</ToggleGroup.Item>
-		<ToggleGroup.Item
-			value="manual"
-			aria-label="Switch to manual mode"
-			class={cn(
-				'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-				mode === 'manual'
-					? 'bg-primary text-primary-foreground shadow hover:bg-primary/90'
-					: 'hover:bg-muted hover:text-muted-foreground',
-			)}
-		>
+		<ToggleGroup.Item value="manual" aria-label="Switch to manual mode">
 			<Hand class="h-4 w-4" />
 			Manual
 		</ToggleGroup.Item>
