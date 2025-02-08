@@ -92,7 +92,7 @@
 		</ToggleGroup.Item>
 	</ToggleGroup.Root>
 
-	<div class="max-w-md flex items-end justify-between w-full gap-2">
+	<div class="max-w-md flex items-end justify-between w-full gap-2 pt-1">
 		<div class="flex-1"></div>
 		{#if mode === 'manual'}
 			<WhisperingButton
