@@ -78,6 +78,23 @@ function createTranscriber() {
 					prompt: settings.value['transcription.prompt'],
 					temperature: settings.value['transcription.temperature'],
 				});
+			if (!transcriptionResult.ok) return transcriptionResult;
+			const transcribedText = transcriptionResult.data;
+
+			await updateRecording.mutateAsync(
+				{ ...recording, transcribedText },
+				{
+					onError: (error) => {
+						toast.error({
+							title: '⚠️ Unable to update recording after transcription',
+							description:
+								"Transcription completed but unable to update recording's transcribed text in database",
+							action: { type: 'more-details', error },
+						});
+					},
+				},
+			);
+
 			return transcriptionResult;
 		},
 		onError: (error, { recording, toastId }) => {
