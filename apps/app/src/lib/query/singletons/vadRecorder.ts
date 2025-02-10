@@ -107,11 +107,11 @@ function createVadRecorder({
 										: 'Voice activated capture complete! Session closed successfully',
 								});
 
-								const transcribeAndToastId = nanoid();
+								const transcribeToastId = nanoid();
 								transcriber.transcribeRecording.mutate(
 									{
 										recording: createdRecording,
-										toastId: transcribeAndToastId,
+										toastId: transcribeToastId,
 									},
 									{
 										onSuccess: () => {
@@ -120,13 +120,14 @@ function createVadRecorder({
 													'transformations.selectedTransformationId'
 												]
 											) {
+												const transformToastId = nanoid();
 												transformer.transformRecording.mutate({
 													recordingId: createdRecording.id,
 													transformationId:
 														settings.value[
 															'transformations.selectedTransformationId'
 														],
-													toastId: transcribeAndToastId,
+													toastId: transformToastId,
 												});
 											}
 										},

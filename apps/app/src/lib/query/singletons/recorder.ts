@@ -189,21 +189,22 @@ function createRecorder({
 							);
 						}
 
-						const transcribeAndToastId = nanoid();
+						const transcribeToastId = nanoid();
 						transcriber.transcribeRecording.mutate(
-							{ recording: createdRecording, toastId: transcribeAndToastId },
+							{ recording: createdRecording, toastId: transcribeToastId },
 							{
 								onSuccess: () => {
 									if (
 										settings.value['transformations.selectedTransformationId']
 									) {
+										const transformToastId = nanoid();
 										transformer.transformRecording.mutate({
 											recordingId: createdRecording.id,
 											transformationId:
 												settings.value[
 													'transformations.selectedTransformationId'
 												],
-											toastId: transcribeAndToastId,
+											toastId: transformToastId,
 										});
 									}
 								},
