@@ -36,7 +36,7 @@ export async function maybeCopyAndPaste({
 	const toastCopied = () =>
 		toast.success({
 			id: toastId,
-			title: '📝 Recording transcribed and copied to clipboard!',
+			title: statusToToastText('COPIED'),
 			description: text,
 			descriptionClass: 'line-clamp-2',
 			action: {
