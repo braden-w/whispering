@@ -36,7 +36,7 @@ export function createClipboardServiceExtension(): ClipboardService {
  *
  * @param text - The text to be inserted.
  */
-export function writeTextToCursor(text: string): void {
+function writeTextToCursor(text: string): void {
 	const activeElement = document.activeElement;
 	if (!isHTMLElement(activeElement)) return;
 
