@@ -11,7 +11,7 @@ export function createClipboardServiceDesktop(): ClipboardService {
 			try: () => invoke<void>('write_text', { text }),
 			mapErr: (error) =>
 				WhisperingErr({
-					title: 'Unable to paste from clipboard',
+					title: '⚠️ Unable to paste from clipboard',
 					description:
 						'There was an error pasting from the clipboard using the Tauri Invoke API. Please try again.',
 					action: { type: 'more-details', error },
@@ -24,7 +24,7 @@ export function createClipboardServiceDesktop(): ClipboardService {
 				try: () => writeText(text),
 				mapErr: (error) =>
 					WhisperingErr({
-						title: 'Unable to copy to clipboard',
+						title: '⚠️ Unable to copy to clipboard',
 						description:
 							'There was an error writing to the clipboard using the Tauri Clipboard Manager API. Please try again.',
 						action: { type: 'more-details', error },
@@ -48,7 +48,7 @@ export function createClipboardServiceDesktop(): ClipboardService {
 					}),
 				mapErr: (error) =>
 					WhisperingErr({
-						title: 'Unable to ensure accessibility is enabled',
+						title: '⚠️ Unable to ensure accessibility is enabled',
 						description:
 							'There was an error checking if accessibility is enabled using the Tauri Invoke API. Please try again.',
 						action: { type: 'more-details', error },

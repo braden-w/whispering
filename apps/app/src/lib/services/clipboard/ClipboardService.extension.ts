@@ -9,7 +9,7 @@ export function createClipboardServiceExtension(): ClipboardService {
 				try: () => navigator.clipboard.writeText(text),
 				mapErr: (error) =>
 					WhisperingErr({
-						title: 'Unable to write to clipboard',
+						title: '⚠️ Unable to write to clipboard',
 						description:
 							'There was an error writing to the clipboard using the browser Clipboard API. Please try again.',
 						action: { type: 'more-details', error },
@@ -21,7 +21,7 @@ export function createClipboardServiceExtension(): ClipboardService {
 				try: () => writeTextToCursor(text),
 				mapErr: (error) =>
 					WhisperingErr({
-						title: 'Unable to write text to cursor',
+						title: '⚠️ Unable to write text to cursor',
 						description:
 							'There was an error writing to the cursor using the browser Clipboard API. Please try again.',
 						action: { type: 'more-details', error },

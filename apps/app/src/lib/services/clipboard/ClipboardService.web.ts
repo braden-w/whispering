@@ -10,7 +10,7 @@ export function createClipboardServiceWeb(): ClipboardService {
 				try: () => navigator.clipboard.writeText(text),
 				mapErr: (error) =>
 					WhisperingErr({
-						title: 'Unable to copy to clipboard',
+						title: '⚠️ Unable to copy to clipboard',
 						description:
 							'There was an error copying to the clipboard using the browser Clipboard API. Please try again.',
 						action: { type: 'more-details', error },
@@ -40,7 +40,7 @@ export function createClipboardServiceWeb(): ClipboardService {
 				const errProperties = writeTextToCursorResult.error;
 				if (errProperties._tag === 'ExtensionNotAvailableError') {
 					return WhisperingErr({
-						title: 'Extension Not Available',
+						title: '⚠️ Extension Not Available',
 						description:
 							'The Whispering extension is not available. Please install it to enable writing transcribed text to the cursor.',
 						action: { type: 'more-details', error: errProperties },

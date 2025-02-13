@@ -62,12 +62,7 @@ export async function maybeCopyAndPaste({
 
 	const copyResult = await ClipboardService.setClipboardText(text);
 	if (!copyResult.ok) {
-		toast.warning({
-			title: '⚠️ Clipboard Access Failed',
-			description:
-				'Could not copy text to clipboard. This may be due to browser restrictions or permissions. You can copy the text manually below.',
-			action: { type: 'more-details', error: copyResult.error },
-		});
+		toast.warning(copyResult.error);
 		toastNull();
 		return;
 	}
