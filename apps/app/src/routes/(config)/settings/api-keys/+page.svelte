@@ -3,6 +3,7 @@
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
+	import GoogleApiKeyInput from '../../-components/GoogleApiKeyInput.svelte';
 </script>
 
 <svelte:head>
@@ -21,4 +22,5 @@
 	<OpenAiApiKeyInput />
 	<AnthropicApiKeyInput />
 	<GroqApiKeyInput />
+	<GoogleApiKeyInput />
 </div>

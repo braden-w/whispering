@@ -19,6 +19,7 @@
 	} from '$lib/services/db/DbService';
 	import {
 		ANTHROPIC_INFERENCE_MODEL_OPTIONS,
+		GOOGLE_INFERENCE_MODEL_OPTIONS,
 		GROQ_INFERENCE_MODEL_OPTIONS,
 		INFERENCE_PROVIDER_OPTIONS,
 		OPENAI_INFERENCE_MODEL_OPTIONS,
@@ -28,6 +29,7 @@
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
+	import GoogleApiKeyInput from '../../-components/GoogleApiKeyInput.svelte';
 
 	let {
 		transformation,
@@ -357,6 +359,30 @@
 													});
 												}}
 											/>
+										{:else if step['prompt_transform.inference.provider'] === 'Google'}
+											<LabeledSelect
+												id="prompt_transform.inference.provider.Google.model"
+												label="Model"
+												items={GOOGLE_INFERENCE_MODEL_OPTIONS}
+												selected={step[
+													'prompt_transform.inference.provider.Google.model'
+												]}
+												placeholder="Select a model"
+												onSelectedChange={(value) => {
+													setTransformation({
+														...transformation,
+														steps: transformation.steps.map((s, i) =>
+															i === index
+																? {
+																		...s,
+																		'prompt_transform.inference.provider.Google.model':
+																			value,
+																	}
+																: s,
+														),
+													});
+												}}
+											/>
 										{/if}
 									</div>
 
@@ -421,6 +447,8 @@
 													<GroqApiKeyInput />
 												{:else if step['prompt_transform.inference.provider'] === 'Anthropic'}
 													<AnthropicApiKeyInput />
+												{:else if step['prompt_transform.inference.provider'] === 'Google'}
+													<GoogleApiKeyInput />
 												{/if}
 											</Accordion.Content>
 										</Accordion.Item>
