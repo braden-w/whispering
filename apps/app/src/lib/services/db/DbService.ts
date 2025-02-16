@@ -52,6 +52,7 @@ export function generateDefaultTransformationStep(): TransformationStep {
 		'prompt_transform.inference.provider.Groq.model': 'llama-3.3-70b-versatile',
 		'prompt_transform.inference.provider.Anthropic.model':
 			'claude-3-5-sonnet-latest',
+		'prompt_transform.inference.provider.Google.model': 'gemini-2.0-flash',
 
 		'prompt_transform.systemPromptTemplate': '',
 		'prompt_transform.userPromptTemplate': '',
