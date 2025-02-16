@@ -212,7 +212,12 @@ export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
 	label: model,
 }));
 
-export const INFERENCE_PROVIDERS = ['OpenAI', 'Groq', 'Anthropic'] as const;
+export const INFERENCE_PROVIDERS = [
+	'OpenAI',
+	'Groq',
+	'Anthropic',
+	'Google',
+] as const;
 
 export const INFERENCE_PROVIDER_OPTIONS = INFERENCE_PROVIDERS.map(
 	(provider) => ({
@@ -253,6 +258,18 @@ export const ANTHROPIC_INFERENCE_MODELS = [
 ] as const;
 
 export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
+	(model) => ({
+		value: model,
+		label: model,
+	}),
+);
+
+export const GOOGLE_INFERENCE_MODELS = [
+	'gemini-2.0-flash',
+	'gemini-2.0-flash-lite-preview',
+] as const;
+
+export const GOOGLE_INFERENCE_MODEL_OPTIONS = GOOGLE_INFERENCE_MODELS.map(
 	(model) => ({
 		value: model,
 		label: model,

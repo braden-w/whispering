@@ -277,6 +277,81 @@ export function createRunTransformationService({
 						return Ok(responseText);
 					}
 
+					case 'Google': {
+						const model =
+							step['prompt_transform.inference.provider.Google.model'];
+						const combinedPrompt = `${systemPrompt}\n${userPrompt}`;
+
+						const result = await HttpService.post({
+							url: `https://generativelanguage.googleapis.com/v1beta2/models/${model}:generateContent?key=${settings.value['apiKeys.google']}`,
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								parts: [{ text: combinedPrompt }],
+							}),
+							schema: z.object({
+								candidates: z.array(
+									z.object({
+										content: z.object({
+											parts: z.array(
+												z.object({
+													text: z.string(),
+												}),
+											),
+											role: z.string(),
+										}),
+										finishReason: z.string(),
+										citationMetadata: z.object({
+											citationSources: z.array(
+												z.object({
+													endIndex: z.number(),
+													uri: z.string(),
+												}),
+											),
+										}),
+										avgLogprobs: z.number(),
+									}),
+								),
+								usageMetadata: z.object({
+									promptTokenCount: z.number(),
+									candidatesTokenCount: z.number(),
+									totalTokenCount: z.number(),
+									promptTokensDetails: z.array(
+										z.object({
+											modality: z.string(),
+											tokenCount: z.number(),
+										}),
+									),
+									candidatesTokensDetails: z.array(
+										z.object({
+											modality: z.string(),
+											tokenCount: z.number(),
+										}),
+									),
+								}),
+								modelVersion: z.string(),
+							}),
+						});
+
+						if (!result.ok) {
+							return WhisperingErr({
+								title: 'Google API Error',
+								description: 'Error calling Google API',
+								action: { type: 'more-details', error: result.error },
+							});
+						}
+
+						const responseText =
+							result.data.candidates[0]?.content?.parts[0]?.text;
+						if (!responseText) {
+							return WhisperingErr({
+								title: 'Empty response',
+								description: 'Google API returned an empty response',
+							});
+						}
+
+						return Ok(responseText);
+					}
+
 					default:
 						return WhisperingErr({
 							title: 'Invalid provider',
