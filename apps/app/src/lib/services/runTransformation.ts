@@ -1,6 +1,6 @@
 import { settings } from '$lib/stores/settings.svelte';
 import { GoogleGenerativeAI, Outcome } from '@google/generative-ai';
-import { Err, Ok, tryAsync } from '@epicenterhq/result';
+import { Err, Ok, tryAsync, type Result } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { z } from 'zod';
 import { DbRecordingsService } from '.';
@@ -10,6 +10,7 @@ import type {
 	TransformationStep,
 } from './db';
 import type { HttpService } from './http/HttpService';
+import { getErrorMessage } from '$lib/utils';
 
 type TransformErrorProperties = {
 	_tag: 'TransformError';
@@ -89,8 +90,6 @@ export const TransformError = <
 		...properties,
 	}) satisfies TransformError;
 
-type StepResult = WhisperingResult<string>;
-
 export function createRunTransformationService({
 	DbTransformationsService,
 	HttpService,
@@ -106,7 +105,7 @@ export function createRunTransformationService({
 		input: string;
 		step: TransformationStep;
 		HttpService: HttpService;
-	}): Promise<StepResult> => {
+	}): Promise<Result<string, string>> => {
 		switch (step.type) {
 			case 'find_replace': {
 				const findText = step['find_replace.findText'];
@@ -118,11 +117,7 @@ export function createRunTransformationService({
 						const regex = new RegExp(findText, 'g');
 						return Ok(input.replace(regex, replaceText));
 					} catch (error) {
-						return WhisperingErr({
-							title: 'Invalid regex pattern',
-							description: 'The provided regex pattern is invalid',
-							action: { type: 'more-details', error },
-						});
+						return Err(`Invalid regex pattern: ${getErrorMessage(error)}`);
 					}
 				}
 
@@ -168,19 +163,15 @@ export function createRunTransformationService({
 						});
 
 						if (!result.ok) {
-							return WhisperingErr({
-								title: 'OpenAI API Error',
-								description: 'Error calling OpenAI API',
-								action: { type: 'more-details', error: result.error },
-							});
+							const { error, code } = result.error;
+							return Err(
+								`OpenAI API Error: ${getErrorMessage(error)} (${code})`,
+							);
 						}
 
 						const responseText = result.data.choices[0]?.message?.content;
 						if (!responseText) {
-							return WhisperingErr({
-								title: 'Empty response',
-								description: 'OpenAI API returned an empty response',
-							});
+							return Err('OpenAI API returned an empty response');
 						}
 
 						return Ok(responseText);
@@ -214,19 +205,13 @@ export function createRunTransformationService({
 						});
 
 						if (!result.ok) {
-							return WhisperingErr({
-								title: 'Groq API Error',
-								description: 'Error calling Groq API',
-								action: { type: 'more-details', error: result.error },
-							});
+							const { error, code } = result.error;
+							return Err(`Groq API Error: ${getErrorMessage(error)} (${code})`);
 						}
 
 						const responseText = result.data.choices[0]?.message?.content;
 						if (!responseText) {
-							return WhisperingErr({
-								title: 'Empty response',
-								description: 'Groq API returned an empty response',
-							});
+							return Err('Groq API returned an empty response');
 						}
 
 						return Ok(responseText);
@@ -260,19 +245,15 @@ export function createRunTransformationService({
 						});
 
 						if (!result.ok) {
-							return WhisperingErr({
-								title: 'Anthropic API Error',
-								description: 'Error calling Anthropic API',
-								action: { type: 'more-details', error: result.error },
-							});
+							const { error, code } = result.error;
+							return Err(
+								`Anthropic API Error: ${getErrorMessage(error)} (${code})`,
+							);
 						}
 
 						const responseText = result.data.content[0]?.text;
 						if (!responseText) {
-							return WhisperingErr({
-								title: 'Empty response',
-								description: 'Anthropic API returned an empty response',
-							});
+							return Err('Anthropic API returned an empty response');
 						}
 
 						return Ok(responseText);
@@ -294,11 +275,7 @@ export function createRunTransformationService({
 								return await model.generateContent(combinedPrompt);
 							},
 							mapErr: (error) => {
-								return WhisperingErr({
-									title: 'Google API Error',
-									description: 'Error calling Google API',
-									action: { type: 'more-details', error },
-								});
+								return Err(`Google API Error: ${getErrorMessage(error)}`);
 							},
 						});
 						if (!result.ok) return result;
@@ -306,28 +283,19 @@ export function createRunTransformationService({
 						const responseText = result.data.response.text();
 
 						if (!responseText) {
-							return WhisperingErr({
-								title: 'Empty response',
-								description: 'Google API returned an empty response',
-							});
+							return Err('Google API returned an empty response');
 						}
 
 						return Ok(responseText);
 					}
 
 					default:
-						return WhisperingErr({
-							title: 'Invalid provider',
-							description: `Unsupported provider: ${provider}`,
-						});
+						return Err(`Unsupported provider: ${provider}`);
 				}
 			}
 
 			default:
-				return WhisperingErr({
-					title: 'Invalid step type',
-					description: `Unsupported step type: ${step.type}`,
-				});
+				return Err(`Unsupported step type: ${step.type}`);
 		}
 	};
 
@@ -393,7 +361,7 @@ export function createRunTransformationService({
 						{
 							transformationRun,
 							stepRunId: newTransformationStepRun.id,
-							error: `${handleStepResult.error.title}: ${handleStepResult.error.description}`,
+							error: handleStepResult.error,
 						},
 					);
 				if (!dbResult.ok)

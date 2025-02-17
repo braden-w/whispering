@@ -73,3 +73,8 @@ export function getExtensionFromAudioBlob(blob: Blob) {
 	if (mimeIncludes('flac')) return 'flac';
 	return 'mp3';
 }
+
+export function getErrorMessage(error: unknown) {
+	if (error instanceof Error) return error.message;
+	return String(error);
+}
