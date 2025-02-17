@@ -275,7 +275,7 @@ export function createRunTransformationService({
 								return await model.generateContent(combinedPrompt);
 							},
 							mapErr: (error) => {
-								return Err(`Google API Error: ${getErrorMessage(error)}`);
+								return Err(getErrorMessage(error));
 							},
 						});
 						if (!result.ok) return result;
