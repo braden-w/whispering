@@ -80,7 +80,6 @@ export function getErrorMessage(error: unknown) {
 	const message = (error as { message?: unknown })?.message;
 	if (typeof message === 'string') return message;
 	const e = (error as { error?: unknown })?.error;
-	if (e instanceof Error) return e.message;
-	if (typeof e === 'string') return e;
+	if (e) return getErrorMessage(e);
 	return JSON.stringify(error);
 }
