@@ -10,6 +10,7 @@ import { queryClient } from '..';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from '../transformations/queries';
 import { maybeCopyAndPaste } from './maybeCopyAndPaste';
+import { getErrorMessage } from '$lib/utils';
 
 export type Transformer = ReturnType<typeof createTransformer>;
 
@@ -61,7 +62,7 @@ export function createTransformer() {
 			if (transformationRun.error) {
 				return WhisperingErr({
 					title: '⚠️ Transformation failed',
-					description: 'Failed to apply the transformation on the input.',
+					description: transformationRun.error,
 					action: { type: 'more-details', error: transformationRun.error },
 				});
 			}
