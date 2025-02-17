@@ -76,5 +76,11 @@ export function getExtensionFromAudioBlob(blob: Blob) {
 
 export function getErrorMessage(error: unknown) {
 	if (error instanceof Error) return error.message;
-	return String(error);
+	if (typeof error === 'string') return error;
+	const message = (error as { message?: unknown })?.message;
+	if (typeof message === 'string') return message;
+	const e = (error as { error?: unknown })?.error;
+	if (e instanceof Error) return e.message;
+	if (typeof e === 'string') return e;
+	return JSON.stringify(error);
 }

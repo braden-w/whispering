@@ -1,6 +1,7 @@
 import { tryAsync } from '@epicenterhq/result';
 import type { HttpService } from './HttpService';
 import { HttpServiceErr } from './HttpService';
+import { getErrorMessage } from '$lib/utils';
 
 export function createHttpServiceWeb(): HttpService {
 	return {
@@ -21,7 +22,7 @@ export function createHttpServiceWeb(): HttpService {
 				return HttpServiceErr({
 					code: 'HttpError',
 					status: response.status,
-					error: await response.json(),
+					error: getErrorMessage(await response.json()),
 				});
 			}
 			const parseResult = await tryAsync({
