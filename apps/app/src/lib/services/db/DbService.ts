@@ -1,6 +1,7 @@
 import { Err, type Ok } from '@epicenterhq/result';
 import type {
 	ANTHROPIC_INFERENCE_MODELS,
+	GOOGLE_INFERENCE_MODELS,
 	GROQ_INFERENCE_MODELS,
 	INFERENCE_PROVIDERS,
 	OPENAI_INFERENCE_MODELS,
@@ -51,6 +52,7 @@ export function generateDefaultTransformationStep(): TransformationStep {
 		'prompt_transform.inference.provider.Groq.model': 'llama-3.3-70b-versatile',
 		'prompt_transform.inference.provider.Anthropic.model':
 			'claude-3-5-sonnet-latest',
+		'prompt_transform.inference.provider.Google.model': 'gemini-2.0-flash',
 
 		'prompt_transform.systemPromptTemplate': '',
 		'prompt_transform.userPromptTemplate': '',
@@ -191,6 +193,7 @@ export type Transformation = {
 		'prompt_transform.inference.provider.OpenAI.model': (typeof OPENAI_INFERENCE_MODELS)[number];
 		'prompt_transform.inference.provider.Groq.model': (typeof GROQ_INFERENCE_MODELS)[number];
 		'prompt_transform.inference.provider.Anthropic.model': (typeof ANTHROPIC_INFERENCE_MODELS)[number];
+		'prompt_transform.inference.provider.Google.model': (typeof GOOGLE_INFERENCE_MODELS)[number];
 
 		'prompt_transform.systemPromptTemplate': string;
 		'prompt_transform.userPromptTemplate': string;

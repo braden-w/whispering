@@ -46,6 +46,7 @@ export const getDefaultSettings = () =>
 		'apiKeys.openai': '',
 		'apiKeys.anthropic': '',
 		'apiKeys.groq': '',
+		'apiKeys.google': '',
 
 		'shortcuts.currentLocalShortcut': 'space',
 		'shortcuts.currentGlobalShortcut': 'CommandOrControl+Shift+;',
@@ -99,6 +100,7 @@ export const settingsSchema = z.object({
 	'apiKeys.openai': z.string(),
 	'apiKeys.anthropic': z.string(),
 	'apiKeys.groq': z.string(),
+	'apiKeys.google': z.string(),
 
 	'shortcuts.currentLocalShortcut': z.string(),
 	'shortcuts.currentGlobalShortcut': z.string(),

@@ -1,6 +1,6 @@
 {
 	"name": "@repo/app",
-	"version": "6.3.1",
+	"version": "6.4.0",
 	"private": true,
 	"scripts": {
 		"dev:web": "vite dev",
@@ -48,6 +48,7 @@
 	"type": "module",
 	"dependencies": {
 		"@epicenterhq/result": "^0.6.0",
+		"@google/generative-ai": "^0.21.0",
 		"@plasmohq/messaging": "^0.6.2",
 		"@repo/extension": "workspace:*",
 		"@repo/shared": "workspace:*",

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import AnthropicApiKeyInput from '../../-components/AnthropicApiKeyInput.svelte';
+	import GoogleApiKeyInput from '../../-components/GoogleApiKeyInput.svelte';
 	import GroqApiKeyInput from '../../-components/GroqApiKeyInput.svelte';
 	import OpenAiApiKeyInput from '../../-components/OpenAiApiKeyInput.svelte';
 </script>
@@ -21,4 +22,5 @@
 	<OpenAiApiKeyInput />
 	<AnthropicApiKeyInput />
 	<GroqApiKeyInput />
+	<GoogleApiKeyInput />
 </div>

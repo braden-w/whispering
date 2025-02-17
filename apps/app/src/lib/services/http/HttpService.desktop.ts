@@ -1,3 +1,4 @@
+import { getErrorMessage } from '$lib/utils';
 import { tryAsync } from '@epicenterhq/result';
 import { fetch } from '@tauri-apps/plugin-http';
 import type { HttpService } from './HttpService';
@@ -22,7 +23,7 @@ export function createHttpServiceDesktop(): HttpService {
 				return HttpServiceErr({
 					code: 'HttpError',
 					status: response.status,
-					error: await response.json(),
+					error: getErrorMessage(await response.json()),
 				});
 			}
 			const parseResult = await tryAsync({

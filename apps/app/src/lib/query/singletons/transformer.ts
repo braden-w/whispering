@@ -3,6 +3,7 @@ import { RunTransformationService } from '$lib/services/index.js';
 import { TransformErrorToWhisperingErr } from '$lib/services/runTransformation';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
+import { getErrorMessage } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { getContext, setContext } from 'svelte';
@@ -61,7 +62,7 @@ export function createTransformer() {
 			if (transformationRun.error) {
 				return WhisperingErr({
 					title: '⚠️ Transformation failed',
-					description: 'Failed to apply the transformation on the input.',
+					description: transformationRun.error,
 					action: { type: 'more-details', error: transformationRun.error },
 				});
 			}
