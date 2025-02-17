@@ -33,15 +33,17 @@ export function HttpServiceErrIntoTranscriptionServiceErr({
 	error,
 }: HttpServiceErr): TranscriptionServiceErr {
 	switch (error.code) {
-		case 'NetworkError':
+		case 'NetworkError': {
+			const { error: origErr, code } = error;
 			return TranscriptionServiceErr({
 				title: '🌐 Network Connection Failed',
 				description:
-					error.error instanceof Error
-						? `Unable to reach the transcription service: ${error.error.message}. Please check your internet connection and try again.`
+					origErr instanceof Error
+						? `Unable to reach the transcription service: ${origErr.message} (${code}). Please check your internet connection and try again.`
 						: 'Unable to establish a connection to our transcription service. This could be due to a firewall, VPN, or network connectivity issue.',
-				action: { type: 'more-details', error: error.error },
+				action: { type: 'more-details', error: origErr },
 			});
+		}
 
 		case 'HttpError': {
 			const status = error.status;
