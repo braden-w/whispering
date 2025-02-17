@@ -3,6 +3,7 @@ import { RunTransformationService } from '$lib/services/index.js';
 import { TransformErrorToWhisperingErr } from '$lib/services/runTransformation';
 import { toast } from '$lib/services/toast';
 import { settings } from '$lib/stores/settings.svelte';
+import { getErrorMessage } from '$lib/utils';
 import { Ok } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { getContext, setContext } from 'svelte';
@@ -10,7 +11,6 @@ import { queryClient } from '..';
 import { transformationRunKeys } from '../transformationRuns/queries';
 import { transformationsKeys } from '../transformations/queries';
 import { maybeCopyAndPaste } from './maybeCopyAndPaste';
-import { getErrorMessage } from '$lib/utils';
 
 export type Transformer = ReturnType<typeof createTransformer>;
 

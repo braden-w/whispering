@@ -1,6 +1,7 @@
 import { settings } from '$lib/stores/settings.svelte';
+import { getErrorMessage } from '$lib/utils';
+import { Err, Ok, type Result, tryAsync } from '@epicenterhq/result';
 import { GoogleGenerativeAI, Outcome } from '@google/generative-ai';
-import { Err, Ok, tryAsync, type Result } from '@epicenterhq/result';
 import { WhisperingErr, type WhisperingResult } from '@repo/shared';
 import { z } from 'zod';
 import { DbRecordingsService } from '.';
@@ -10,7 +11,6 @@ import type {
 	TransformationStep,
 } from './db';
 import type { HttpService } from './http/HttpService';
-import { getErrorMessage } from '$lib/utils';
 
 type TransformErrorProperties = {
 	_tag: 'TransformError';

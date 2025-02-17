@@ -1,7 +1,7 @@
+import { getErrorMessage } from '$lib/utils';
 import { tryAsync } from '@epicenterhq/result';
 import type { HttpService } from './HttpService';
 import { HttpServiceErr } from './HttpService';
-import { getErrorMessage } from '$lib/utils';
 
 export function createHttpServiceWeb(): HttpService {
 	return {
