@@ -47,9 +47,7 @@
 				{ input, transformationId: transformation.id, toastId: nanoid() },
 				{ onSuccess: (o) => (output = o) },
 			)}
-		disabled={transformer.transformInput.isPending ||
-			!input.trim() ||
-			transformation.steps.length === 0}
+		disabled={!input.trim() || transformation.steps.length === 0}
 		class="w-full"
 	>
 		{#if transformer.transformInput.isPending}
