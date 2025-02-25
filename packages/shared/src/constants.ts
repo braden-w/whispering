@@ -252,9 +252,12 @@ export const GROQ_INFERENCE_MODEL_OPTIONS = GROQ_INFERENCE_MODELS.map(
 
 // https://docs.anthropic.com/claude/docs/models-overview
 export const ANTHROPIC_INFERENCE_MODELS = [
+	'claude-3-7-sonnet-latest',
 	'claude-3-5-sonnet-latest',
 	'claude-3-5-haiku-latest',
 	'claude-3-opus-latest',
+	'claude-3-sonnet-latest',
+	'claude-3-haiku-latest',
 ] as const;
 
 export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
@@ -265,7 +268,9 @@ export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
 );
 
 export const GOOGLE_INFERENCE_MODELS = [
+	'gemini-2.0-pro',
 	'gemini-2.0-flash',
+	'gemini-2.0-flash-thinking',
 	'gemini-2.0-flash-lite-preview',
 ] as const;
 
