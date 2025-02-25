@@ -27,7 +27,7 @@
 			<span class="text-lg font-bold">whispering</span>
 		</WhisperingButton>
 	</div>
-	<RecordingControls />
+	<RecordingControls class="hidden sm:flex" />
 	<WhisperingButton
 		tooltipContent="Toggle recording"
 		onclick={recorder.toggleRecording}
