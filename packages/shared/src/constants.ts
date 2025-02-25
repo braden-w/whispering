@@ -30,7 +30,7 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 }));
 
 export const DEFAULT_BITRATE_KBPS =
-	'16' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
+	'128' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
 
 export const ALWAYS_ON_TOP_VALUES = [
 	'Always',
