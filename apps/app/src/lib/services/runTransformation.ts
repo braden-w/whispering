@@ -271,6 +271,7 @@ export function createRunTransformationService({
 								const model = genAI.getGenerativeModel({
 									model:
 										step['prompt_transform.inference.provider.Google.model'],
+									generationConfig: { temperature: 0 },
 								});
 								return await model.generateContent(combinedPrompt);
 							},
