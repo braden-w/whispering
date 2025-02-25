@@ -252,9 +252,12 @@ export const GROQ_INFERENCE_MODEL_OPTIONS = GROQ_INFERENCE_MODELS.map(
 
 // https://docs.anthropic.com/claude/docs/models-overview
 export const ANTHROPIC_INFERENCE_MODELS = [
+	'claude-3-7-sonnet-latest',
 	'claude-3-5-sonnet-latest',
 	'claude-3-5-haiku-latest',
 	'claude-3-opus-latest',
+	'claude-3-sonnet-latest',
+	'claude-3-haiku-latest',
 ] as const;
 
 export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
