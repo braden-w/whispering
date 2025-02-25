@@ -268,7 +268,9 @@ export const ANTHROPIC_INFERENCE_MODEL_OPTIONS = ANTHROPIC_INFERENCE_MODELS.map(
 );
 
 export const GOOGLE_INFERENCE_MODELS = [
+	'gemini-2.0-pro',
 	'gemini-2.0-flash',
+	'gemini-2.0-flash-thinking',
 	'gemini-2.0-flash-lite-preview',
 ] as const;
 
