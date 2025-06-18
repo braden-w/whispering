@@ -1,17 +1,27 @@
 <script lang="ts">
 	import { commandCallbacks } from '$lib/commands';
 	import NavItems from '$lib/components/NavItems.svelte';
-	import TransformationSelector from '$lib/components/TransformationSelector.svelte';
+	import {
+		DeviceSelector,
+		TranscriptionSelector,
+		TransformationSelector,
+	} from '$lib/components/settings';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
-	import DeviceSelector from '$lib/components/device-selectors/DeviceSelector.svelte';
 	import { rpc } from '$lib/query';
 	import { settings } from '$lib/stores/settings.svelte';
 	import { cn } from '$lib/utils.js';
-	import { recorderStateToIcons, vadStateToIcons } from '@repo/shared';
+	import {
+		recorderStateToIcons,
+		cpalStateToIcons,
+		vadStateToIcons,
+	} from '@repo/shared';
 	import { createQuery } from '@tanstack/svelte-query';
 
 	const getRecorderStateQuery = createQuery(
 		rpc.manualRecorder.getRecorderState.options,
+	);
+	const getCpalStateQuery = createQuery(
+		rpc.cpalRecorder.getRecorderState.options,
 	);
 	const getVadStateQuery = createQuery(rpc.vadRecorder.getVadState.options);
 
@@ -36,7 +46,6 @@
 		</WhisperingButton>
 	</div>
 	{#if settings.value['recording.mode'] === 'manual'}
-		{@const currentMethod = settings.value[`recording.manual.method`]}
 		{#if getRecorderStateQuery.data === 'RECORDING'}
 			<WhisperingButton
 				tooltipContent="Cancel recording"
@@ -48,21 +57,14 @@
 				🚫
 			</WhisperingButton>
 		{:else}
-			<DeviceSelector
-				selectedDeviceId={settings.value[
-					`recording.manual.${currentMethod}.selectedDeviceId`
-				]}
-				updateSelectedDevice={(deviceId) => {
-					settings.value = {
-						...settings.value,
-						[`recording.manual.${currentMethod}.selectedDeviceId`]: deviceId,
-					};
-				}}
-			/>
+			<DeviceSelector settingsKey="recording.manual.selectedDeviceId" />
+			<TranscriptionSelector />
 			<TransformationSelector />
 		{/if}
 		<WhisperingButton
-			tooltipContent="Toggle recording"
+			tooltipContent={getRecorderStateQuery.data === 'RECORDING'
+				? 'Stop recording'
+				: 'Start recording'}
 			onclick={commandCallbacks.toggleManualRecording}
 			variant="ghost"
 			size="icon"
@@ -70,20 +72,37 @@
 		>
 			{recorderStateToIcons[getRecorderStateQuery.data ?? 'IDLE']}
 		</WhisperingButton>
+	{:else if settings.value['recording.mode'] === 'cpal'}
+		{#if getCpalStateQuery.data === 'RECORDING'}
+			<WhisperingButton
+				tooltipContent="Cancel CPAL recording"
+				onclick={commandCallbacks.cancelCpalRecording}
+				variant="ghost"
+				size="icon"
+				style="view-transition-name: cancel-icon;"
+			>
+				🚫
+			</WhisperingButton>
+		{:else}
+			<DeviceSelector settingsKey="recording.cpal.selectedDeviceId" />
+			<TranscriptionSelector />
+			<TransformationSelector />
+		{/if}
+		<WhisperingButton
+			tooltipContent={getCpalStateQuery.data === 'RECORDING'
+				? 'Stop CPAL recording'
+				: 'Start CPAL recording'}
+			onclick={commandCallbacks.toggleCpalRecording}
+			variant="ghost"
+			size="icon"
+			style="view-transition-name: microphone-icon"
+		>
+			{cpalStateToIcons[getCpalStateQuery.data ?? 'IDLE']}
+		</WhisperingButton>
 	{:else if settings.value['recording.mode'] === 'vad'}
-		{@const currentMethod = settings.value[`recording.vad.method`]}
 		{#if getVadStateQuery.data === 'IDLE'}
-			<DeviceSelector
-				selectedDeviceId={settings.value[
-					`recording.vad.${currentMethod}.selectedDeviceId`
-				]}
-				updateSelectedDevice={(deviceId) => {
-					settings.value = {
-						...settings.value,
-						[`recording.vad.${currentMethod}.selectedDeviceId`]: deviceId,
-					};
-				}}
-			/>
+			<DeviceSelector settingsKey="recording.vad.selectedDeviceId" />
+			<TranscriptionSelector />
 			<TransformationSelector />
 		{/if}
 		<WhisperingButton
@@ -94,6 +113,24 @@
 			style="view-transition-name: microphone-icon"
 		>
 			{vadStateToIcons[getVadStateQuery.data ?? 'IDLE']}
+		</WhisperingButton>
+	{:else if settings.value['recording.mode'] === 'live'}
+		{#if true}
+			<DeviceSelector settingsKey="recording.live.selectedDeviceId" />
+			<TranscriptionSelector />
+			<TransformationSelector />
+		{/if}
+		<WhisperingButton
+			tooltipContent="Toggle live recording"
+			onclick={() => {
+				// TODO: Implement live recording toggle
+				alert('Live recording not yet implemented');
+			}}
+			variant="ghost"
+			size="icon"
+			style="view-transition-name: microphone-icon"
+		>
+			🎬
 		</WhisperingButton>
 	{/if}
 

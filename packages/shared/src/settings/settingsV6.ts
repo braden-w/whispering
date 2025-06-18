@@ -4,11 +4,12 @@ import {
 	ALWAYS_ON_TOP_VALUES,
 	BITRATE_VALUES_KBPS,
 	DEFAULT_BITRATE_KBPS,
+	ELEVENLABS_TRANSCRIPTION_MODELS,
 	GROQ_MODELS,
-	MANUAL_RECORDING_METHODS,
+	OPENAI_TRANSCRIPTION_MODELS,
 	RECORDING_MODES,
 	SUPPORTED_LANGUAGES,
-	TRANSCRIPTION_SERVICES,
+	TRANSCRIPTION_SERVICE_IDS,
 	type WhisperingSoundNames,
 } from '../constants.js';
 import type { SettingsV5 } from './settingsV5.js';
@@ -45,7 +46,7 @@ export const settingsV6Schema = z.object({
 
 	// Mode-specific method settings
 	'recording.manual.method': z
-		.enum(MANUAL_RECORDING_METHODS)
+		.enum(['navigator', 'tauri'])
 		.default('navigator'),
 	// Manual mode method-specific settings
 	'recording.manual.navigator.selectedDeviceId': z.string().nullable(),
@@ -73,13 +74,17 @@ export const settingsV6Schema = z.object({
 		.optional()
 		.default(DEFAULT_BITRATE_KBPS),
 
-	// Shared transcription settings
-	'transcription.selectedTranscriptionService': z.enum(TRANSCRIPTION_SERVICES),
+	'transcription.selectedTranscriptionService': z.enum(
+		TRANSCRIPTION_SERVICE_IDS,
+	),
+	// Shared settings in transcription
 	'transcription.outputLanguage': z.enum(SUPPORTED_LANGUAGES),
 	'transcription.prompt': z.string(),
 	'transcription.temperature': z.string(),
 
 	// Service-specific settings
+	'transcription.openai.model': z.enum(OPENAI_TRANSCRIPTION_MODELS),
+	'transcription.elevenlabs.model': z.enum(ELEVENLABS_TRANSCRIPTION_MODELS),
 	'transcription.groq.model': z.enum(GROQ_MODELS),
 	'transcription.fasterWhisperServer.serverUrl': z.string(),
 	'transcription.fasterWhisperServer.serverModel': z.string(),
@@ -148,5 +153,9 @@ export const migrateV5ToV6 = (settings: SettingsV5): SettingsV6 => {
 
 		'recording.live.navigator.selectedDeviceId': navigatorSelectedDeviceId,
 		'recording.live.navigator.bitrateKbps': navigatorBitrateKbps,
+
+		'transcription.openai.model': 'whisper-1',
+		'transcription.elevenlabs.model': 'scribe_v1',
+		'transcription.groq.model': 'whisper-large-v3',
 	};
 };

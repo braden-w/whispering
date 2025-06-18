@@ -5,19 +5,19 @@ import { defineMutation, defineQuery } from '../_utils';
 import { queryClient } from '../index';
 
 const recorderKeys = {
-	state: ['recorder', 'state'] as const,
-	startRecording: ['recorder', 'startRecording'] as const,
-	stopRecording: ['recorder', 'stopRecording'] as const,
-	cancelRecording: ['recorder', 'cancelRecording'] as const,
+	state: ['cpalRecorder', 'state'] as const,
+	startRecording: ['cpalRecorder', 'startRecording'] as const,
+	stopRecording: ['cpalRecorder', 'stopRecording'] as const,
+	cancelRecording: ['cpalRecorder', 'cancelRecording'] as const,
 } as const;
 
 const invalidateRecorderState = () =>
 	queryClient.invalidateQueries({ queryKey: recorderKeys.state });
 
-export const manualRecorder = {
+export const cpalRecorder = {
 	getRecorderState: defineQuery({
 		queryKey: recorderKeys.state,
-		resultQueryFn: () => services.manualRecorder.getRecorderState(),
+		resultQueryFn: () => services.cpalRecorder.getRecorderState(),
 		initialData: 'IDLE' as WhisperingRecordingState,
 	}),
 
@@ -25,16 +25,13 @@ export const manualRecorder = {
 		mutationKey: recorderKeys.startRecording,
 		resultMutationFn: ({
 			toastId,
-			settings,
+			selectedDeviceId,
 		}: {
 			toastId: string;
-			settings: {
-				selectedDeviceId: string | null;
-				bitrateKbps: string;
-			};
+			selectedDeviceId: string | null;
 		}) =>
-			services.manualRecorder.startRecording(
-				settings,
+			services.cpalRecorder.startRecording(
+				{ selectedDeviceId },
 				{ sendStatus: (options) => toast.loading({ id: toastId, ...options }) },
 			),
 		onSettled: invalidateRecorderState,
@@ -43,7 +40,7 @@ export const manualRecorder = {
 	stopRecording: defineMutation({
 		mutationKey: recorderKeys.stopRecording,
 		resultMutationFn: ({ toastId }: { toastId: string }) =>
-			services.manualRecorder.stopRecording({
+			services.cpalRecorder.stopRecording({
 				sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 			}),
 		onSettled: invalidateRecorderState,
@@ -52,7 +49,7 @@ export const manualRecorder = {
 	cancelRecording: defineMutation({
 		mutationKey: recorderKeys.cancelRecording,
 		resultMutationFn: ({ toastId }: { toastId: string }) =>
-			services.manualRecorder.cancelRecording({
+			services.cpalRecorder.cancelRecording({
 				sendStatus: (options) => toast.loading({ id: toastId, ...options }),
 			}),
 		onSettled: invalidateRecorderState,
