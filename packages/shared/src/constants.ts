@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { CloudIcon, HexagonIcon, PauseIcon, ServerIcon } from 'lucide-svelte';
+import type { SettingsV6 } from './settings/settingsV6.js';
 
 export const WHISPERING_URL =
 	process.env.NODE_ENV === 'production'
@@ -29,26 +31,19 @@ export const BITRATE_OPTIONS = BITRATE_VALUES_KBPS.map((bitrate) => ({
 	value: bitrate,
 }));
 
-export const RECORDING_MODES = ['manual', 'vad', 'live'] as const;
+export const RECORDING_MODES = ['manual', 'cpal', 'vad', 'live'] as const;
 export type RecordingMode = (typeof RECORDING_MODES)[number];
 export const RECORDING_MODE_OPTIONS = [
-	{ label: 'Manual', value: 'manual', icon: '🎙️' },
-	{ label: 'Voice Activated', value: 'vad', icon: '🎤' },
-	{ label: 'Live', value: 'live', icon: '🎬' },
+	{ label: 'Manual', value: 'manual', icon: '🎙️', desktopOnly: false },
+	{ label: 'CPAL', value: 'cpal', icon: '🔊', desktopOnly: true },
+	{ label: 'Voice Activated', value: 'vad', icon: '🎤', desktopOnly: false },
+	{ label: 'Live', value: 'live', icon: '🎬', desktopOnly: false },
 ] as const satisfies {
 	label: string;
 	value: RecordingMode;
 	icon: string;
+	desktopOnly: boolean;
 }[];
-
-export const MANUAL_RECORDING_METHODS = ['navigator', 'tauri'] as const;
-
-export const MANUAL_RECORDING_METHOD_OPTIONS = MANUAL_RECORDING_METHODS.map(
-	(method) => ({
-		label: method === 'navigator' ? 'Browser API' : 'Native (Tauri)',
-		value: method,
-	}),
-);
 
 export const DEFAULT_BITRATE_KBPS =
 	'128' as const satisfies (typeof BITRATE_VALUES_KBPS)[number];
@@ -70,6 +65,11 @@ export const recordingStateSchema = z.enum(['IDLE', 'RECORDING']);
 export type WhisperingRecordingState = z.infer<typeof recordingStateSchema>;
 
 export const recorderStateToIcons = {
+	IDLE: '🎙️',
+	RECORDING: '⏹️',
+} as const satisfies Record<WhisperingRecordingState, string>;
+
+export const cpalStateToIcons = {
 	IDLE: '🎙️',
 	RECORDING: '⏹️',
 } as const satisfies Record<WhisperingRecordingState, string>;
@@ -148,19 +148,102 @@ export const SUPPORTED_LANGUAGES = [
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const TRANSCRIPTION_SERVICES = [
+export const GROQ_MODELS = [
+	'whisper-large-v3',
+	'whisper-large-v3-turbo',
+	'distil-whisper-large-v3-en',
+] as const;
+
+// TODO: Remove this in favor of inline map options
+export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
+	value: model,
+	label: model,
+}));
+
+export const OPENAI_TRANSCRIPTION_MODELS = ['whisper-1'] as const;
+
+export const ELEVENLABS_TRANSCRIPTION_MODELS = ['scribe_v1'] as const;
+
+export const TRANSCRIPTION_SERVICE_IDS = [
 	'OpenAI',
 	'Groq',
 	'faster-whisper-server',
 	'ElevenLabs',
 ] as const;
 
+type TranscriptionServiceId = (typeof TRANSCRIPTION_SERVICE_IDS)[number];
+
+type BaseTranscriptionService = {
+	id: TranscriptionServiceId;
+	name: string;
+	icon: unknown;
+};
+
+type ApiTranscriptionService = BaseTranscriptionService & {
+	type: 'api';
+	models: readonly string[];
+	defaultModel: string;
+	modelSettingKey: string;
+	apiKeyField: keyof SettingsV6;
+};
+
+type ServerTranscriptionService = BaseTranscriptionService & {
+	type: 'server';
+	serverUrlField: keyof SettingsV6;
+};
+
+type SatisfiedTranscriptionService =
+	| ApiTranscriptionService
+	| ServerTranscriptionService;
+
+export const TRANSCRIPTION_SERVICES = [
+	{
+		id: 'OpenAI',
+		name: 'OpenAI Whisper',
+		icon: HexagonIcon,
+		models: OPENAI_TRANSCRIPTION_MODELS,
+		defaultModel: 'whisper-1',
+		modelSettingKey: 'transcription.openai.model',
+		apiKeyField: 'apiKeys.openai',
+		type: 'api',
+	},
+	{
+		id: 'Groq',
+		name: 'Groq Whisper',
+		icon: CloudIcon,
+		models: GROQ_MODELS,
+		defaultModel: 'whisper-large-v3',
+		modelSettingKey: 'transcription.groq.model',
+		apiKeyField: 'apiKeys.groq',
+		type: 'api',
+	},
+	{
+		id: 'ElevenLabs',
+		name: 'ElevenLabs',
+		icon: PauseIcon,
+		models: ['scribe_v1'],
+		defaultModel: 'scribe_v1',
+		modelSettingKey: 'transcription.elevenlabs.model',
+		apiKeyField: 'apiKeys.elevenlabs',
+		type: 'api',
+	},
+	{
+		id: 'faster-whisper-server',
+		name: 'Faster Whisper Server',
+		icon: ServerIcon,
+		serverUrlField: 'transcription.fasterWhisperServer.serverUrl',
+		type: 'server',
+	},
+] as const satisfies SatisfiedTranscriptionService[];
+
 export const TRANSCRIPTION_SERVICE_OPTIONS = TRANSCRIPTION_SERVICES.map(
 	(service) => ({
-		value: service,
-		label: service,
+		label: service.name,
+		value: service.id,
 	}),
 );
+
+export type TranscriptionService = (typeof TRANSCRIPTION_SERVICES)[number];
 
 const SUPPORTED_LANGUAGES_TO_LABEL = {
 	auto: 'Auto',
@@ -227,17 +310,6 @@ export const SUPPORTED_LANGUAGES_OPTIONS = SUPPORTED_LANGUAGES.map(
 	(lang) =>
 		({ label: SUPPORTED_LANGUAGES_TO_LABEL[lang], value: lang }) as const,
 );
-
-export const GROQ_MODELS = [
-	'whisper-large-v3',
-	'whisper-large-v3-turbo',
-	'distil-whisper-large-v3-en',
-] as const;
-
-export const GROQ_MODELS_OPTIONS = GROQ_MODELS.map((model) => ({
-	value: model,
-	label: model,
-}));
 
 export const INFERENCE_PROVIDERS = [
 	'OpenAI',
@@ -312,6 +384,9 @@ export type WhisperingSoundNames =
 	| 'manual-start'
 	| 'manual-stop'
 	| 'manual-cancel'
+	| 'cpal-start'
+	| 'cpal-stop'
+	| 'cpal-cancel'
 	| 'vad-start'
 	| 'vad-capture'
 	| 'vad-stop'
