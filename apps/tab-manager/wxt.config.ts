@@ -14,4 +14,7 @@ export default defineConfig({
 			},
 		},
 	}),
+	webExt: {
+		disabled: true,
+	},
 });
