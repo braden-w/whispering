@@ -12,9 +12,12 @@
 		"zip": "wxt zip",
 		"zip:firefox": "wxt zip -b firefox",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"format": "prettier --write .",
+		"lint": "eslint --fix .",
 		"postinstall": "wxt prepare"
 	},
 	"devDependencies": {
+		"@repo/config": "workspace:*",
 		"@tailwindcss/vite": "^4.0.0",
 		"@tsconfig/svelte": "^5.0.4",
 		"@wxt-dev/module-svelte": "^2.0.3",
