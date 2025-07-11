@@ -21,6 +21,8 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@tsconfig/svelte": "^5.0.4",
 		"@wxt-dev/module-svelte": "^2.0.3",
+		"eslint": "^9.30.1",
+		"prettier": "^3.6.2",
 		"svelte": "^5.28.2",
 		"svelte-check": "^4.1.6",
 		"tailwindcss": "^4.0.0",
