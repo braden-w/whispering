@@ -1,14 +1,3 @@
-import { browser } from '$app/environment';
-import { QueryClient } from '@tanstack/svelte-query';
-
-export const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			enabled: browser,
-		},
-	},
-});
-
 // Import all query modules
 import { clipboard } from './clipboard';
 import { cpalRecorder } from './cpal-recorder';
