@@ -1,4 +1,3 @@
-import { WhisperingErr } from '$lib/result';
 import { DbServiceErr } from '$lib/services/db';
 import { settings } from '$lib/stores/settings.svelte';
 import { nanoid } from 'nanoid/non-secure';
@@ -14,170 +13,6 @@ import { transcription } from './transcription';
 import { transformations } from './transformations';
 import { transformer } from './transformer';
 import { vadRecorder } from './vad-recorder';
-
-/**
- * Processes a recording through the full pipeline: save → transcribe → transform
- *
- * This function handles the complete flow from recording creation through transcription:
- * 1. Creates recording metadata and saves to database
- * 2. Handles database save errors
- * 3. Shows completion toast
- * 4. Executes transcription flow
- * 5. Applies transformation if one is selected
- */
-async function processRecordingPipeline({
-	blob,
-	toastId,
-	completionTitle,
-	completionDescription,
-}: {
-	blob: Blob;
-	toastId: string;
-	completionTitle: string;
-	completionDescription: string;
-}) {
-	const now = new Date().toISOString();
-	const newRecordingId = nanoid();
-
-	const { data: createdRecording, error: createRecordingError } =
-		await recordings.createRecording.execute({
-			id: newRecordingId,
-			title: '',
-			subtitle: '',
-			createdAt: now,
-			updatedAt: now,
-			timestamp: now,
-			transcribedText: '',
-			blob,
-			transcriptionStatus: 'UNPROCESSED',
-		});
-
-	if (createRecordingError) {
-		notify.error.execute({
-			id: toastId,
-			title: '❌ Failed to save recording',
-			description:
-				'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
-			action: { type: 'more-details', error: createRecordingError },
-		});
-		return;
-	}
-
-	notify.success.execute({
-		id: toastId,
-		title: completionTitle,
-		description: completionDescription,
-	});
-
-	const transcribeToastId = nanoid();
-	notify.loading.execute({
-		id: transcribeToastId,
-		title: '📋 Transcribing...',
-		description: 'Your recording is being transcribed...',
-	});
-
-	const { data: transcribedText, error: transcribeError } =
-		await transcription.transcribeRecording.execute(createdRecording);
-
-	if (transcribeError) {
-		if (transcribeError.name === 'WhisperingError') {
-			notify.error.execute({ id: transcribeToastId, ...transcribeError });
-			return;
-		}
-		notify.error.execute({
-			id: transcribeToastId,
-			title: '❌ Failed to transcribe recording',
-			description: 'Your recording could not be transcribed.',
-			action: { type: 'more-details', error: transcribeError },
-		});
-		return;
-	}
-
-	sound.playSoundIfEnabled.execute('transcriptionComplete');
-
-	await delivery.deliverTranscriptionResult.execute({
-		text: transcribedText,
-		toastId: transcribeToastId,
-	});
-
-	// Determine if we need to chain to transformation
-	const transformationId =
-		settings.value['transformations.selectedTransformationId'];
-
-	// Check if transformation is valid if specified
-	if (!transformationId) return;
-	const { data: transformation, error: getTransformationError } =
-		await transformations.queries
-			.getTransformationById(() => transformationId)
-			.fetch();
-
-	const couldNotRetrieveTransformation = getTransformationError;
-	const transformationNoLongerExists = !transformation;
-
-	if (couldNotRetrieveTransformation) {
-		notify.error.execute({
-			id: nanoid(),
-			title: '❌ Failed to get transformation',
-			description:
-				'Your transformation could not be retrieved. Please try again.',
-			action: { type: 'more-details', error: getTransformationError },
-		});
-		return;
-	}
-
-	if (transformationNoLongerExists) {
-		settings.value = {
-			...settings.value,
-			'transformations.selectedTransformationId': null,
-		};
-		notify.warning.execute({
-			id: nanoid(),
-			title: '⚠️ No matching transformation found',
-			description:
-				'No matching transformation found. Please select a different transformation.',
-			action: {
-				type: 'link',
-				label: 'Select a different transformation',
-				href: '/transformations',
-			},
-		});
-		return;
-	}
-
-	const transformToastId = nanoid();
-	notify.loading.execute({
-		id: transformToastId,
-		title: '🔄 Running transformation...',
-		description:
-			'Applying your selected transformation to the transcribed text...',
-	});
-	const { data: transformationRun, error: transformError } =
-		await transformer.transformRecording.execute({
-			recordingId: createdRecording.id,
-			transformation,
-		});
-	if (transformError) {
-		notify.error.execute({ id: transformToastId, ...transformError });
-		return;
-	}
-
-	if (transformationRun.status === 'failed') {
-		notify.error.execute({
-			id: transformToastId,
-			title: '⚠️ Transformation error',
-			description: transformationRun.error,
-			action: { type: 'more-details', error: transformationRun.error },
-		});
-		return;
-	}
-
-	sound.playSoundIfEnabled.execute('transformationComplete');
-
-	await delivery.deliverTransformationResult.execute({
-		text: transformationRun.output,
-		toastId: transformToastId,
-	});
-}
 
 // Internal mutations for manual recording
 const startManualRecording = defineMutation({
@@ -375,27 +210,8 @@ const stopCpalRecording = defineMutation({
 });
 
 export const commands = {
-	// Push to talk command
-	pushToTalk: defineMutation({
-		mutationKey: ['commands', 'pushToTalk'] as const,
-		resultMutationFn: async () => {
-			const { data: recorderState, error: getRecorderStateError } =
-				await manualRecorder.getRecorderState.fetch();
-			if (getRecorderStateError) {
-				notify.error.execute({
-					id: nanoid(),
-					title: '❌ Failed to get recorder state',
-					description: 'Your recording could not be started. Please try again.',
-					action: { type: 'more-details', error: getRecorderStateError },
-				});
-				return Err(getRecorderStateError);
-			}
-			if (recorderState === 'RECORDING') {
-				return await stopManualRecording.execute(undefined);
-			}
-			return await startManualRecording.execute(undefined);
-		},
-	}),
+	startManualRecording,
+	stopManualRecording,
 
 	// Toggle manual recording
 	toggleManualRecording: defineMutation({
@@ -719,3 +535,167 @@ export const commands = {
 		},
 	}),
 };
+
+/**
+ * Processes a recording through the full pipeline: save → transcribe → transform
+ *
+ * This function handles the complete flow from recording creation through transcription:
+ * 1. Creates recording metadata and saves to database
+ * 2. Handles database save errors
+ * 3. Shows completion toast
+ * 4. Executes transcription flow
+ * 5. Applies transformation if one is selected
+ */
+async function processRecordingPipeline({
+	blob,
+	toastId,
+	completionTitle,
+	completionDescription,
+}: {
+	blob: Blob;
+	toastId: string;
+	completionTitle: string;
+	completionDescription: string;
+}) {
+	const now = new Date().toISOString();
+	const newRecordingId = nanoid();
+
+	const { data: createdRecording, error: createRecordingError } =
+		await recordings.createRecording.execute({
+			id: newRecordingId,
+			title: '',
+			subtitle: '',
+			createdAt: now,
+			updatedAt: now,
+			timestamp: now,
+			transcribedText: '',
+			blob,
+			transcriptionStatus: 'UNPROCESSED',
+		});
+
+	if (createRecordingError) {
+		notify.error.execute({
+			id: toastId,
+			title: '❌ Failed to save recording',
+			description:
+				'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
+			action: { type: 'more-details', error: createRecordingError },
+		});
+		return;
+	}
+
+	notify.success.execute({
+		id: toastId,
+		title: completionTitle,
+		description: completionDescription,
+	});
+
+	const transcribeToastId = nanoid();
+	notify.loading.execute({
+		id: transcribeToastId,
+		title: '📋 Transcribing...',
+		description: 'Your recording is being transcribed...',
+	});
+
+	const { data: transcribedText, error: transcribeError } =
+		await transcription.transcribeRecording.execute(createdRecording);
+
+	if (transcribeError) {
+		if (transcribeError.name === 'WhisperingError') {
+			notify.error.execute({ id: transcribeToastId, ...transcribeError });
+			return;
+		}
+		notify.error.execute({
+			id: transcribeToastId,
+			title: '❌ Failed to transcribe recording',
+			description: 'Your recording could not be transcribed.',
+			action: { type: 'more-details', error: transcribeError },
+		});
+		return;
+	}
+
+	sound.playSoundIfEnabled.execute('transcriptionComplete');
+
+	await delivery.deliverTranscriptionResult.execute({
+		text: transcribedText,
+		toastId: transcribeToastId,
+	});
+
+	// Determine if we need to chain to transformation
+	const transformationId =
+		settings.value['transformations.selectedTransformationId'];
+
+	// Check if transformation is valid if specified
+	if (!transformationId) return;
+	const { data: transformation, error: getTransformationError } =
+		await transformations.queries
+			.getTransformationById(() => transformationId)
+			.fetch();
+
+	const couldNotRetrieveTransformation = getTransformationError;
+	const transformationNoLongerExists = !transformation;
+
+	if (couldNotRetrieveTransformation) {
+		notify.error.execute({
+			id: nanoid(),
+			title: '❌ Failed to get transformation',
+			description:
+				'Your transformation could not be retrieved. Please try again.',
+			action: { type: 'more-details', error: getTransformationError },
+		});
+		return;
+	}
+
+	if (transformationNoLongerExists) {
+		settings.value = {
+			...settings.value,
+			'transformations.selectedTransformationId': null,
+		};
+		notify.warning.execute({
+			id: nanoid(),
+			title: '⚠️ No matching transformation found',
+			description:
+				'No matching transformation found. Please select a different transformation.',
+			action: {
+				type: 'link',
+				label: 'Select a different transformation',
+				href: '/transformations',
+			},
+		});
+		return;
+	}
+
+	const transformToastId = nanoid();
+	notify.loading.execute({
+		id: transformToastId,
+		title: '🔄 Running transformation...',
+		description:
+			'Applying your selected transformation to the transcribed text...',
+	});
+	const { data: transformationRun, error: transformError } =
+		await transformer.transformRecording.execute({
+			recordingId: createdRecording.id,
+			transformation,
+		});
+	if (transformError) {
+		notify.error.execute({ id: transformToastId, ...transformError });
+		return;
+	}
+
+	if (transformationRun.status === 'failed') {
+		notify.error.execute({
+			id: transformToastId,
+			title: '⚠️ Transformation error',
+			description: transformationRun.error,
+			action: { type: 'more-details', error: transformationRun.error },
+		});
+		return;
+	}
+
+	sound.playSoundIfEnabled.execute('transformationComplete');
+
+	await delivery.deliverTransformationResult.execute({
+		text: transformationRun.output,
+		toastId: transformToastId,
+	});
+}
