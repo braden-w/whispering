@@ -13,13 +13,25 @@ export const commands = [
 		id: 'pushToTalk',
 		title: 'Push to talk',
 		on: 'Both',
-		callback: () => rpc.commands.pushToTalk.execute(undefined),
+		callback: () => rpc.commands.toggleManualRecording.execute(undefined),
 	},
 	{
 		id: 'toggleManualRecording',
 		title: 'Toggle recording',
 		on: 'Pressed',
 		callback: () => rpc.commands.toggleManualRecording.execute(undefined),
+	},
+	{
+		id: 'startManualRecording',
+		title: 'Start recording',
+		on: 'Pressed',
+		callback: () => rpc.commands.startManualRecording.execute(undefined),
+	},
+	{
+		id: 'stopManualRecording',
+		title: 'Stop recording',
+		on: 'Pressed',
+		callback: () => rpc.commands.stopManualRecording.execute(undefined),
 	},
 	{
 		id: 'cancelManualRecording',
