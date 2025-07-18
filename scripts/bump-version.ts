@@ -8,6 +8,7 @@
  * - App package.json
  * - Tauri configuration
  * - Cargo.toml
+ * - Cargo.lock (via cargo update)
  *
  * Usage: bun run bump-version <new-version>
  * Example: bun run bump-version 7.0.1
@@ -15,6 +16,10 @@
 
 import * as fs from 'node:fs/promises';
 import { join } from 'node:path';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const execAsync = promisify(exec);
 
 /** Extract new version from command line arguments */
 const newVersion = process.argv[2];
@@ -77,6 +82,21 @@ for (const { path, type } of files) {
 	}
 
 	console.log(`✅ Updated ${path}`);
+}
+
+/**
+ * Update Cargo.lock by running cargo update
+ */
+try {
+	console.log('\n🔄 Updating Cargo.lock...');
+	const { stdout, stderr } = await execAsync('cd apps/app/src-tauri && cargo update -p whispering');
+	if (stderr && !stderr.includes('Locking')) {
+		console.error(`⚠️  Cargo update warning: ${stderr}`);
+	}
+	console.log('✅ Updated Cargo.lock');
+} catch (error) {
+	console.error('❌ Failed to update Cargo.lock:', error.message);
+	console.log('   You may need to run: cd apps/app/src-tauri && cargo update -p whispering');
 }
 
 /**
