@@ -119,6 +119,7 @@ import { Input } from '$lib/components/ui/input';
 - **Marketing language**: "game-changing", "revolutionary", "unleash", "empower"
 - **Structured sections**: "Key Features:", "Benefits:", "Why This Matters:"
 - **Vague superlatives**: "incredibly powerful", "seamlessly integrates", "robust solution"
+- **AI adjectives**: "perfectly", "effortlessly", "beautifully", "elegantly"
 
 ### Writing Natural Prose
 - **Start with a story or problem**: "I was paying $30/month..." not "Introducing..."
@@ -146,6 +147,105 @@ What it actually does → Technical details → Genuine question to community
 - Present facts and let users draw conclusions
 - Include real limitations and use cases
 - Make pricing transparent with actual provider costs
+
+# Social Media Post Guidelines
+
+## Platform-Specific Brevity
+- **LinkedIn**: 3-5 lines max. State the feature, drop the link, done.
+- **Twitter/X**: Each tweet should have ONE idea. Don't overexplain.
+- **Reddit technical subs**: Focus on implementation details, not benefits
+
+## What to Remove
+- All hashtags except when platform culture expects them
+- Section headers in post content ("## Implementation", "## Benefits")
+- Bullet lists of features/benefits
+- Marketing phrases ("game-changing", "seamless", "powerful")
+- Call-to-action phrases ("See it in action!", "Try it today!")
+- Explanations of philosophy (they can read the GitHub)
+
+## What to Add
+- Specific technical details that developers care about
+- Actual implementation challenges and solutions
+- Links to relevant libraries/APIs used
+- One unique feature detail ("with your model of choice")
+
+## Examples: LinkedIn Posts
+
+### Good (Actual Human Post)
+```
+Whispering now supports direct file uploads! 🎙️
+
+Simply drag and drop (or click to browse) your audio files for instant transcription, with your model of choice.
+
+Free open-source app: https://github.com/braden-w/whispering
+```
+
+### Bad (AI-Generated Feel)
+```
+Excited to announce that Whispering now supports direct file uploads! 🚀
+
+This game-changing feature allows you to:
+✅ Drag and drop any audio/video file
+✅ Get instant, accurate transcriptions
+✅ Save time and boost productivity
+
+Built with the same philosophy of transparency and user control, you pay only actual API costs (just 2¢/hour!) with no hidden fees or subscriptions.
+
+Ready to revolutionize your workflow? Try it now!
+
+🔗 GitHub: https://github.com/braden-w/whispering
+
+#OpenSource #Productivity #Innovation #DeveloperTools #Transcription
+```
+
+## Examples: Reddit Technical Posts
+
+### Good (Focused on Implementation)
+```
+Hey r/sveltejs! Just shipped a file upload feature for Whispering and wanted to share how I implemented drag-and-drop files using the excellent shadcn-svelte-extras library.
+
+I used the FileDropZone component from [shadcn-svelte-extras](https://www.shadcn-svelte-extras.com/components/file-drop-zone), which provided a really clean abstraction that allows users to drop and click to upload files:
+
+```svelte
+<FileDropZone
+  accept="{ACCEPT_AUDIO}, {ACCEPT_VIDEO}"
+  maxFiles={10}
+  maxFileSize={25 * MEGABYTE}
+  onUpload={(files) => {
+    if (files.length > 0) {
+      handleFileUpload(files);
+    }
+  }}
+/>
+```
+
+Whispering is a desktop Tauri app too, and the drag-and-drop didn't work on desktop (although the click to select files still worked). So for desktop, I reached for Tauri's [onDragDropEvent](https://tauri.app/reference/javascript/api/namespacewebviewwindow/#ondragdropevent) to provide native support for dragging and dropping anywhere into the application.
+
+If you're building Svelte 5 apps and need file uploads, definitely check out shadcn-svelte-extras. It saved me hours of implementation time.
+
+**Whispering** is a large-scale production Svelte 5 + Tauri app with a lot of best practices baked in. If you're interested in seeing how these patterns work in a real application:
+
+https://github.com/braden-w/whispering
+
+Happy to answer any questions about the implementation!
+```
+
+### Bad (Marketing-Focused)
+```
+## The Problem
+Users were asking for file upload support...
+
+## The Solution  
+I implemented a beautiful drag-and-drop interface...
+
+## Key Benefits
+- User-friendly interface
+- Supports multiple file formats
+- Lightning-fast processing
+
+## Why This Matters
+This transforms the user experience...
+```
 
 # Writing Style Examples
 
