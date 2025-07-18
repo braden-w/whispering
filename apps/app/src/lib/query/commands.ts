@@ -13,6 +13,7 @@ import { transcription } from './transcription';
 import { transformations } from './transformations';
 import { transformer } from './transformer';
 import { vadRecorder } from './vad-recorder';
+import { WhisperingErr } from '$lib/result';
 
 // Internal mutations for manual recording
 const startManualRecording = defineMutation({
@@ -30,12 +31,7 @@ const startManualRecording = defineMutation({
 			});
 
 		if (startRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to start recording',
-				description: 'Your recording could not be started. Please try again.',
-				action: { type: 'more-details', error: startRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...startRecordingError });
 			return Err(startRecordingError);
 		}
 
@@ -104,12 +100,7 @@ const stopManualRecording = defineMutation({
 		const { data: blob, error: stopRecordingError } =
 			await manualRecorder.stopRecording.execute({ toastId });
 		if (stopRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to stop recording',
-				description: 'Your recording could not be stopped. Please try again.',
-				action: { type: 'more-details', error: stopRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...stopRecordingError });
 			return Err(stopRecordingError);
 		}
 
@@ -149,12 +140,7 @@ const startCpalRecording = defineMutation({
 			});
 
 		if (startRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to start CPAL recording',
-				description: 'Your recording could not be started. Please try again.',
-				action: { type: 'more-details', error: startRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...startRecordingError });
 			return Err(startRecordingError);
 		}
 
@@ -181,12 +167,7 @@ const stopCpalRecording = defineMutation({
 		const { data: blob, error: stopRecordingError } =
 			await cpalRecorder.stopRecording.execute({ toastId });
 		if (stopRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to stop CPAL recording',
-				description: 'Your recording could not be stopped. Please try again.',
-				action: { type: 'more-details', error: stopRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...stopRecordingError });
 			return Err(stopRecordingError);
 		}
 
@@ -220,13 +201,14 @@ export const commands = {
 			const { data: recorderState, error: getRecorderStateError } =
 				await manualRecorder.getRecorderState.fetch();
 			if (getRecorderStateError) {
-				notify.error.execute({
-					id: nanoid(),
-					title: '❌ Failed to get recorder state',
-					description: 'Your recording could not be started. Please try again.',
+				const { error: whisperingError } = WhisperingErr({
+					title:
+						'❌ Failed to get recorder state before toggling manual recording',
+					description: getRecorderStateError.message,
 					action: { type: 'more-details', error: getRecorderStateError },
 				});
-				return Err(getRecorderStateError);
+				notify.error.execute({ id: nanoid(), ...whisperingError });
+				return Err(whisperingError);
 			}
 			if (recorderState === 'RECORDING') {
 				return await stopManualRecording.execute(undefined);
@@ -248,13 +230,7 @@ export const commands = {
 			const { data: cancelRecordingResult, error: cancelRecordingError } =
 				await manualRecorder.cancelRecording.execute({ toastId });
 			if (cancelRecordingError) {
-				notify.error.execute({
-					id: toastId,
-					title: '❌ Failed to cancel recording',
-					description:
-						'Your recording could not be cancelled. Please try again.',
-					action: { type: 'more-details', error: cancelRecordingError },
-				});
+				notify.error.execute({ id: toastId, ...cancelRecordingError });
 				return Err(cancelRecordingError);
 			}
 			switch (cancelRecordingResult.status) {
@@ -413,13 +389,7 @@ export const commands = {
 						const { data: recorderState, error: getRecorderStateError } =
 							await cpalRecorder.getRecorderState.fetch();
 						if (getRecorderStateError) {
-							notify.error.execute({
-								id: nanoid(),
-								title: '❌ Failed to get CPAL recorder state',
-								description:
-									'Your recording could not be started. Please try again.',
-								action: { type: 'more-details', error: getRecorderStateError },
-							});
+							notify.error.execute({ id: nanoid(), ...getRecorderStateError });
 							return Err(getRecorderStateError);
 						}
 						if (recorderState === 'RECORDING') {
@@ -441,13 +411,7 @@ export const commands = {
 						const { data: cancelRecordingResult, error: cancelRecordingError } =
 							await cpalRecorder.cancelRecording.execute({ toastId });
 						if (cancelRecordingError) {
-							notify.error.execute({
-								id: toastId,
-								title: '❌ Failed to cancel CPAL recording',
-								description:
-									'Your recording could not be cancelled. Please try again.',
-								action: { type: 'more-details', error: cancelRecordingError },
-							});
+							notify.error.execute({ id: toastId, ...cancelRecordingError });
 							return Err(cancelRecordingError);
 						}
 						switch (cancelRecordingResult.status) {
@@ -576,9 +540,9 @@ async function processRecordingPipeline({
 	if (createRecordingError) {
 		notify.error.execute({
 			id: toastId,
-			title: '❌ Failed to save recording',
-			description:
-				'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
+			title:
+				'❌ Your recording was captured but could not be saved to the database.',
+			description: createRecordingError.message,
 			action: { type: 'more-details', error: createRecordingError },
 		});
 		return;

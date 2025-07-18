@@ -53,14 +53,14 @@ export const settings = {
 					...settingsStore.value,
 					'recording.mode': newMode,
 				};
-			}
 
-			// Show success notification
-			rpc.notify.success.execute({
-				id: toastId,
-				title: '✅ Recording mode switched',
-				description: `Switched to ${newMode} recording mode`,
-			});
+				// Show success notification
+				rpc.notify.success.execute({
+					id: toastId,
+					title: '✅ Recording mode switched',
+					description: `Switched to ${newMode} recording mode`,
+				});
+			}
 
 			return Ok(newMode);
 		},
