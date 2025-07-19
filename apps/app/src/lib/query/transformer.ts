@@ -1,5 +1,6 @@
 import {
 	WhisperingErr,
+	fromTaggedErr,
 	type WhisperingError,
 	type WhisperingResult,
 } from '$lib/result';
@@ -48,9 +49,8 @@ export const transformer = {
 					});
 
 				if (transformationRunError)
-					return WhisperingErr({
+					return fromTaggedErr(transformationRunError, {
 						title: '⚠️ Transformation failed',
-						description: transformationRunError.message,
 						action: { type: 'more-details', error: transformationRunError },
 					});
 
@@ -106,7 +106,7 @@ export const transformer = {
 			if (getRecordingError || !recording) {
 				return WhisperingErr({
 					title: '⚠️ Recording not found',
-					description: 'Could not find the selected recording.',
+					description: getRecordingError?.message ?? 'Could not find the selected recording.',
 				});
 			}
 
@@ -118,9 +118,8 @@ export const transformer = {
 				});
 
 			if (transformationRunError)
-				return WhisperingErr({
+				return fromTaggedErr(transformationRunError, {
 					title: '⚠️ Transformation failed',
-					description: transformationRunError.message,
 					action: { type: 'more-details', error: transformationRunError },
 				});
 

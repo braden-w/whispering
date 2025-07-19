@@ -10,6 +10,7 @@
 	import { type PressedKeys } from '$lib/utils/createPressedKeys.svelte';
 	import KeyboardShortcutRecorder from './KeyboardShortcutRecorder.svelte';
 	import { createKeyRecorder } from './create-key-recorder.svelte';
+	import { fromTaggedError } from '$lib/result';
 
 	const {
 		command,
@@ -102,11 +103,12 @@
 				});
 
 			if (unregisterError) {
-				rpc.notify.error.execute({
-					title: 'Error clearing global shortcut',
-					description: unregisterError.message,
-					action: { type: 'more-details', error: unregisterError },
-				});
+				rpc.notify.error.execute(
+					fromTaggedError(
+						unregisterError,
+						{ title: 'Error clearing global shortcut' },
+					),
+				);
 			}
 
 			settings.value = {

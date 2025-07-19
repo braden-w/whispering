@@ -1,0 +1,100 @@
+name: Sync AGENTS.md and CLAUDE.md
+
+on:
+  push:
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-files:
+    runs-on: ubuntu-latest
+    # Skip if the commit author is github-actions bot to prevent loops
+    if: github.actor != 'github-actions[bot]'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history for better diff analysis
+      
+      - name: Determine which file changed
+        id: check_changes
+        run: |
+          # For manual triggers, check which file was modified most recently
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            AGENTS_TIME=$(git log -1 --format="%at" -- AGENTS.md 2>/dev/null || echo "0")
+            CLAUDE_TIME=$(git log -1 --format="%at" -- CLAUDE.md 2>/dev/null || echo "0")
+            
+            if [ "$AGENTS_TIME" -gt "$CLAUDE_TIME" ]; then
+              echo "source=AGENTS.md" >> $GITHUB_OUTPUT
+              echo "target=CLAUDE.md" >> $GITHUB_OUTPUT
+              echo "sync_needed=true" >> $GITHUB_OUTPUT
+            elif [ "$CLAUDE_TIME" -gt "$AGENTS_TIME" ]; then
+              echo "source=CLAUDE.md" >> $GITHUB_OUTPUT
+              echo "target=AGENTS.md" >> $GITHUB_OUTPUT
+              echo "sync_needed=true" >> $GITHUB_OUTPUT
+            else
+              echo "sync_needed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # For push events, use the before/after comparison
+            if [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+              # Normal push with history
+              AGENTS_CHANGED=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -c "^AGENTS.md$" || true)
+              CLAUDE_CHANGED=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -c "^CLAUDE.md$" || true)
+            else
+              # New branch or force push - check against parent
+              AGENTS_CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -c "^AGENTS.md$" || true)
+              CLAUDE_CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -c "^CLAUDE.md$" || true)
+            fi
+            
+            if [ "$AGENTS_CHANGED" -gt 0 ] && [ "$CLAUDE_CHANGED" -eq 0 ]; then
+              echo "source=AGENTS.md" >> $GITHUB_OUTPUT
+              echo "target=CLAUDE.md" >> $GITHUB_OUTPUT
+              echo "sync_needed=true" >> $GITHUB_OUTPUT
+            elif [ "$CLAUDE_CHANGED" -gt 0 ] && [ "$AGENTS_CHANGED" -eq 0 ]; then
+              echo "source=CLAUDE.md" >> $GITHUB_OUTPUT
+              echo "target=AGENTS.md" >> $GITHUB_OUTPUT
+              echo "sync_needed=true" >> $GITHUB_OUTPUT
+            else
+              echo "sync_needed=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: Sync files
+        if: steps.check_changes.outputs.sync_needed == 'true'
+        run: |
+          # Ensure both files exist
+          if [ -f "${{ steps.check_changes.outputs.source }}" ]; then
+            cp "${{ steps.check_changes.outputs.source }}" "${{ steps.check_changes.outputs.target }}"
+          else
+            echo "Source file ${{ steps.check_changes.outputs.source }} not found!"
+            exit 1
+          fi
+      
+      - name: Check for differences after sync
+        id: check_diff
+        if: steps.check_changes.outputs.sync_needed == 'true'
+        run: |
+          if git diff --quiet HEAD -- "${{ steps.check_changes.outputs.target }}"; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.sync_needed == 'true' && steps.check_diff.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add "${{ steps.check_changes.outputs.target }}"
+          git commit -m "chore: sync ${{ steps.check_changes.outputs.target }} with ${{ steps.check_changes.outputs.source }}"
+          git push

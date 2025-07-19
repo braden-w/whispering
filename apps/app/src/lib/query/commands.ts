@@ -1,3 +1,4 @@
+import { fromTaggedErr, fromTaggedError, WhisperingErr } from '$lib/result';
 import { DbServiceErr } from '$lib/services/db';
 import { settings } from '$lib/stores/settings.svelte';
 import { nanoid } from 'nanoid/non-secure';
@@ -25,17 +26,10 @@ const startManualRecording = defineMutation({
 			description: 'Setting up your recording environment...',
 		});
 		const { data: deviceAcquisitionOutcome, error: startRecordingError } =
-			await manualRecorder.startRecording.execute({
-				toastId,
-			});
+			await manualRecorder.startRecording.execute({ toastId });
 
 		if (startRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to start recording',
-				description: 'Your recording could not be started. Please try again.',
-				action: { type: 'more-details', error: startRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...startRecordingError });
 			return Err(startRecordingError);
 		}
 
@@ -104,12 +98,7 @@ const stopManualRecording = defineMutation({
 		const { data: blob, error: stopRecordingError } =
 			await manualRecorder.stopRecording.execute({ toastId });
 		if (stopRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to stop recording',
-				description: 'Your recording could not be stopped. Please try again.',
-				action: { type: 'more-details', error: stopRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...stopRecordingError });
 			return Err(stopRecordingError);
 		}
 
@@ -149,12 +138,7 @@ const startCpalRecording = defineMutation({
 			});
 
 		if (startRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to start CPAL recording',
-				description: 'Your recording could not be started. Please try again.',
-				action: { type: 'more-details', error: startRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...startRecordingError });
 			return Err(startRecordingError);
 		}
 
@@ -181,12 +165,7 @@ const stopCpalRecording = defineMutation({
 		const { data: blob, error: stopRecordingError } =
 			await cpalRecorder.stopRecording.execute({ toastId });
 		if (stopRecordingError) {
-			notify.error.execute({
-				id: toastId,
-				title: '❌ Failed to stop CPAL recording',
-				description: 'Your recording could not be stopped. Please try again.',
-				action: { type: 'more-details', error: stopRecordingError },
-			});
+			notify.error.execute({ id: toastId, ...stopRecordingError });
 			return Err(stopRecordingError);
 		}
 
@@ -220,13 +199,13 @@ export const commands = {
 			const { data: recorderState, error: getRecorderStateError } =
 				await manualRecorder.getRecorderState.fetch();
 			if (getRecorderStateError) {
-				notify.error.execute({
-					id: nanoid(),
-					title: '❌ Failed to get recorder state',
-					description: 'Your recording could not be started. Please try again.',
+				const whisperingError = fromTaggedError(getRecorderStateError, {
+					title:
+						'❌ Failed to get recorder state before toggling manual recording',
 					action: { type: 'more-details', error: getRecorderStateError },
 				});
-				return Err(getRecorderStateError);
+				notify.error.execute(whisperingError);
+				return Err(whisperingError);
 			}
 			if (recorderState === 'RECORDING') {
 				return await stopManualRecording.execute(undefined);
@@ -248,13 +227,7 @@ export const commands = {
 			const { data: cancelRecordingResult, error: cancelRecordingError } =
 				await manualRecorder.cancelRecording.execute({ toastId });
 			if (cancelRecordingError) {
-				notify.error.execute({
-					id: toastId,
-					title: '❌ Failed to cancel recording',
-					description:
-						'Your recording could not be cancelled. Please try again.',
-					action: { type: 'more-details', error: cancelRecordingError },
-				});
+				notify.error.execute({ id: toastId, ...cancelRecordingError });
 				return Err(cancelRecordingError);
 			}
 			switch (cancelRecordingResult.status) {
@@ -413,13 +386,7 @@ export const commands = {
 						const { data: recorderState, error: getRecorderStateError } =
 							await cpalRecorder.getRecorderState.fetch();
 						if (getRecorderStateError) {
-							notify.error.execute({
-								id: nanoid(),
-								title: '❌ Failed to get CPAL recorder state',
-								description:
-									'Your recording could not be started. Please try again.',
-								action: { type: 'more-details', error: getRecorderStateError },
-							});
+							notify.error.execute(getRecorderStateError);
 							return Err(getRecorderStateError);
 						}
 						if (recorderState === 'RECORDING') {
@@ -441,13 +408,7 @@ export const commands = {
 						const { data: cancelRecordingResult, error: cancelRecordingError } =
 							await cpalRecorder.cancelRecording.execute({ toastId });
 						if (cancelRecordingError) {
-							notify.error.execute({
-								id: toastId,
-								title: '❌ Failed to cancel CPAL recording',
-								description:
-									'Your recording could not be cancelled. Please try again.',
-								action: { type: 'more-details', error: cancelRecordingError },
-							});
+							notify.error.execute({ id: toastId, ...cancelRecordingError });
 							return Err(cancelRecordingError);
 						}
 						switch (cancelRecordingResult.status) {
@@ -505,7 +466,6 @@ export const commands = {
 
 			if (invalidFiles.length > 0) {
 				notify.warning.execute({
-					id: nanoid(),
 					title: '⚠️ Some files were skipped',
 					description: `${invalidFiles.length} file(s) were not audio or video files`,
 				});
@@ -576,9 +536,9 @@ async function processRecordingPipeline({
 	if (createRecordingError) {
 		notify.error.execute({
 			id: toastId,
-			title: '❌ Failed to save recording',
-			description:
-				'Your recording was captured but could not be saved to the database. Please check your storage space and permissions.',
+			title:
+				'❌ Your recording was captured but could not be saved to the database.',
+			description: createRecordingError.message,
 			action: { type: 'more-details', error: createRecordingError },
 		});
 		return;
@@ -632,17 +592,15 @@ async function processRecordingPipeline({
 			.getTransformationById(() => transformationId)
 			.fetch();
 
-	const couldNotRetrieveTransformation = getTransformationError;
 	const transformationNoLongerExists = !transformation;
 
-	if (couldNotRetrieveTransformation) {
-		notify.error.execute({
-			id: nanoid(),
-			title: '❌ Failed to get transformation',
-			description:
-				'Your transformation could not be retrieved. Please try again.',
-			action: { type: 'more-details', error: getTransformationError },
-		});
+	if (getTransformationError) {
+		notify.error.execute(
+			fromTaggedError(getTransformationError, {
+				title: '❌ Failed to get transformation',
+				action: { type: 'more-details', error: getTransformationError },
+			}),
+		);
 		return;
 	}
 
@@ -652,7 +610,6 @@ async function processRecordingPipeline({
 			'transformations.selectedTransformationId': null,
 		};
 		notify.warning.execute({
-			id: nanoid(),
 			title: '⚠️ No matching transformation found',
 			description:
 				'No matching transformation found. Please select a different transformation.',
