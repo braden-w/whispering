@@ -1,5 +1,5 @@
 import type { WhisperingRecordingState } from '$lib/constants/audio';
-import { WhisperingErr } from '$lib/result';
+import { fromTaggedErr } from '$lib/result';
 import * as services from '$lib/services';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from 'wellcrafted/result';
@@ -23,9 +23,8 @@ export const cpalRecorder = {
 			const { data: recorderState, error: getRecorderStateError } =
 				await services.cpalRecorder.getRecorderState();
 			if (getRecorderStateError) {
-				return WhisperingErr({
+				return fromTaggedErr(getRecorderStateError, {
 					title: '❌ Failed to get recorder state',
-					description: getRecorderStateError.message,
 					action: { type: 'more-details', error: getRecorderStateError },
 				});
 			}
@@ -56,9 +55,8 @@ export const cpalRecorder = {
 				);
 
 			if (startRecordingError) {
-				return WhisperingErr({
+				return fromTaggedErr(startRecordingError, {
 					title: '❌ Failed to start CPAL recording',
-					description: startRecordingError.message,
 					action: { type: 'more-details', error: startRecordingError },
 				});
 			}
@@ -77,9 +75,8 @@ export const cpalRecorder = {
 				});
 
 			if (stopRecordingError) {
-				return WhisperingErr({
+				return fromTaggedErr(stopRecordingError, {
 					title: '❌ Failed to stop CPAL recording',
-					description: stopRecordingError.message,
 					action: { type: 'more-details', error: stopRecordingError },
 				});
 			}
@@ -98,9 +95,8 @@ export const cpalRecorder = {
 				});
 
 			if (cancelRecordingError) {
-				return WhisperingErr({
+				return fromTaggedErr(cancelRecordingError, {
 					title: '❌ Failed to cancel CPAL recording',
-					description: cancelRecordingError.message,
 					action: { type: 'more-details', error: cancelRecordingError },
 				});
 			}

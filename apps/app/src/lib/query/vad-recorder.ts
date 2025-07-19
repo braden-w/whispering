@@ -1,5 +1,5 @@
 import type { VadState } from '$lib/constants/audio';
-import { WhisperingErr } from '$lib/result';
+import { fromTaggedErr } from '$lib/result';
 import * as services from '$lib/services';
 import { settings } from '$lib/stores/settings.svelte';
 import { Ok } from 'wellcrafted/result';
@@ -50,10 +50,9 @@ export const vadRecorder = {
 				});
 
 			if (startListeningError) {
-				return WhisperingErr({
-						title: '❌ Failed to start voice activity detection',
-						description: startListeningError.message,
-						action: { type: 'more-details', error: startListeningError },
+				return fromTaggedErr(startListeningError, {
+					title: '❌ Failed to start voice activity detection',
+					action: { type: 'more-details', error: startListeningError },
 				});
 			}
 
@@ -69,10 +68,9 @@ export const vadRecorder = {
 				await services.vad.stopActiveListening();
 
 			if (stopListeningError) {
-				return WhisperingErr({
-						title: '❌ Failed to stop voice activity detection',
-						description: stopListeningError.message,
-						action: { type: 'more-details', error: stopListeningError },
+				return fromTaggedErr(stopListeningError, {
+					title: '❌ Failed to stop voice activity detection',
+					action: { type: 'more-details', error: stopListeningError },
 				});
 			}
 

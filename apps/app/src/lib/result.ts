@@ -37,3 +37,16 @@ export const WhisperingWarningErr = (
 export type WhisperingResult<T> = Ok<T> | Err<WhisperingError>;
 
 export type MaybePromise<T> = T | Promise<T>;
+
+export const fromTaggedError = (
+	error: TaggedError<string>,
+	opts: Omit<Parameters<typeof WhisperingError>[0], 'description'>,
+): WhisperingError => WhisperingError({ ...opts, description: error.message });
+
+export const fromTaggedErr = (
+	error: TaggedError<string>,
+	opts: Omit<Parameters<typeof WhisperingError>[0], 'description'>,
+) => Err(fromTaggedError(error, opts));
+
+// Deprecated: Use fromTaggedError instead
+export const TaggedToWhisperingError = fromTaggedError;
