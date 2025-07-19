@@ -89,14 +89,18 @@ for (const { path, type } of files) {
  */
 try {
 	console.log('\n🔄 Updating Cargo.lock...');
-	const { stdout, stderr } = await execAsync('cd apps/app/src-tauri && cargo update -p whispering');
+	const { stdout, stderr } = await execAsync(
+		'cd apps/app/src-tauri && cargo update -p whispering',
+	);
 	if (stderr && !stderr.includes('Locking')) {
 		console.error(`⚠️  Cargo update warning: ${stderr}`);
 	}
 	console.log('✅ Updated Cargo.lock');
 } catch (error) {
 	console.error('❌ Failed to update Cargo.lock:', error.message);
-	console.log('   You may need to run: cd apps/app/src-tauri && cargo update -p whispering');
+	console.log(
+		'   You may need to run: cd apps/app/src-tauri && cargo update -p whispering',
+	);
 }
 
 /**
