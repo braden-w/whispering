@@ -123,6 +123,16 @@ The query layer co-locates three key things in one place: (1) the service call, 
 
 A critical responsibility of the query layer is transforming service-specific errors into `WhisperingError` types that work seamlessly with our toast notification system. This transformation happens inside `resultMutationFn` or `resultQueryFn`, creating a clean boundary between business logic errors and UI presentation.
 
+### Error Handling Architecture
+
+The error handling follows a clear pattern across three layers:
+
+1. **Service Layer**: Returns domain-specific tagged errors (e.g., `ManualRecorderServiceError`)
+2. **Query Layer**: Wraps service errors into `WhisperingError` objects
+3. **UI Layer**: Uses `WhisperingError` directly without re-wrapping
+
+This pattern ensures consistent error handling and avoids double-wrapping errors.
+
 ### How It Works
 
 Services return their own specific error types (e.g., `ManualRecorderServiceError`, `CpalRecorderServiceError`), which contain detailed error information. The query layer transforms these into `WhisperingError` with UI-friendly formatting:
@@ -191,6 +201,7 @@ startRecording: defineMutation({
 - **Consistent UI**: All errors are transformed to a format that toasts understand
 - **Detailed Context**: Original service errors are preserved in the `action` field
 - **Type Safety**: TypeScript knows exactly what error types flow through each layer
+- **No Double Wrapping**: Each error is wrapped exactly once, at the query layer
 
 ### Real Example: CPAL Recorder
 
@@ -216,12 +227,62 @@ getRecorderState: defineQuery({
 });
 ```
 
+### Anti-Patterns to Avoid
+
+#### ❌ Double Wrapping
+```typescript
+// BAD: Don't wrap an already-wrapped WhisperingError
+if (getRecorderStateError) {
+    const whisperingError = WhisperingErr({
+        title: '❌ Failed to get recorder state',
+        description: getRecorderStateError.message,
+        action: { type: 'more-details', error: getRecorderStateError },
+    });
+    notify.error.execute({ id: nanoid(), ...whisperingError.error });
+    return whisperingError;
+}
+```
+
+#### ❌ Inconsistent Query Layer
+```typescript
+// BAD: Query layer should wrap errors, not return raw service errors
+getRecorderState: defineQuery({
+    queryKey: recorderKeys.state,
+    resultQueryFn: () => services.manualRecorder.getRecorderState(), // Missing error wrapping!
+    initialData: 'IDLE' as WhisperingRecordingState,
+})
+```
+
+#### ✅ Correct Pattern
+```typescript
+// GOOD: Query wraps service errors, UI uses them directly
+getRecorderState: defineQuery({
+    resultQueryFn: async () => {
+        const { data, error } = await services.manualRecorder.getRecorderState();
+        if (error) {
+            return Err(WhisperingError({
+                title: '❌ Failed to get recorder state',
+                description: error.message,
+                action: { type: 'more-details', error },
+            }));
+        }
+        return Ok(data);
+    },
+})
+
+// In UI/command layer - use WhisperingError directly
+if (error) {
+    notify.error.execute(error); // No re-wrapping!
+}
+```
+
 This pattern ensures that:
 
 - Services remain pure and testable with their own error types
 - The query layer handles all UI-specific error formatting
 - Toast notifications receive properly formatted `WhisperingError` objects
 - Original error context is preserved for debugging
+- Errors are wrapped exactly once, avoiding redundant object creation
 
 ## Static Site Generation Advantage
 

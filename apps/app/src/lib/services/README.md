@@ -136,7 +136,17 @@ type CpalRecorderServiceError = TaggedError<'CpalRecorderServiceError'>;
 type DeviceStreamServiceError = TaggedError<'DeviceStreamServiceError'>;
 ```
 
-#### Error Type Best Practices
+### Error Handling Architecture
+
+The error handling follows a clear pattern across three layers:
+
+1. **Service Layer**: Returns domain-specific tagged errors
+2. **Query Layer**: Wraps service errors into `WhisperingError` objects
+3. **UI Layer**: Displays `WhisperingError` objects in toasts without re-wrapping
+
+This pattern ensures consistent error handling and avoids double-wrapping errors.
+
+### Error Type Best Practices
 
 1. **Name Convention**: Use `{ServiceName}ServiceError` format
 
@@ -185,7 +195,7 @@ type DeviceStreamServiceError = TaggedError<'DeviceStreamServiceError'>;
    });
    ```
 
-#### Important: Services Don't Know About UI
+### Important: Services Don't Know About UI
 
 Services should **never** import or use `WhisperingError`. That transformation happens in the query layer:
 
@@ -203,7 +213,7 @@ The query layer is responsible for transforming service errors into `WhisperingE
 - Error types can evolve independently
 - UI concerns don't leak into business logic
 
-#### Real-World Example: Recording Service Errors
+### Real-World Example: Recording Service Errors
 
 ```typescript
 // In manual-recorder.ts
@@ -251,6 +261,23 @@ This example shows:
 - Detailed error messages for different failure scenarios
 - Error mapping when consuming other services
 - Rich context for debugging
+
+### Anti-Pattern: Double Wrapping
+
+Never wrap an already-wrapped error. The query layer handles the single transformation from service error to `WhisperingError`:
+
+```typescript
+// ❌ BAD: Service returns tagged error, query wraps it, then UI wraps again
+if (error) {
+    const whisperingError = WhisperingErr({ /* ... */ });
+    notify.error.execute({ ...whisperingError.error }); // Double wrapping!
+}
+
+// ✅ GOOD: Service returns tagged error, query wraps it, UI uses directly
+if (error) {
+    notify.error.execute(error); // Already a WhisperingError from query layer
+}
+```
 
 ## Service Patterns
 
