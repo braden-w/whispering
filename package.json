@@ -20,5 +20,8 @@
 		"@types/node": "^22.15.32",
 		"concurrently": "latest",
 		"turbo": "latest"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": ["esbuild"]
 	}
 }
