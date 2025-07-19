@@ -161,13 +161,18 @@ What it actually does → Technical details → Genuine question to community
 - Bullet lists of features/benefits
 - Marketing phrases ("game-changing", "seamless", "powerful")
 - Call-to-action phrases ("See it in action!", "Try it today!")
-- Explanations of philosophy (they can read the GitHub)
+- Redundant adjectives ("excellent", "really")
 
 ## What to Add
 - Specific technical details that developers care about
 - Actual implementation challenges and solutions
 - Links to relevant libraries/APIs used
 - One unique feature detail ("with your model of choice")
+- Disclaimers when recommending tools ("Not affiliated, it just...")
+- Personal standards/opinions ("by my standards", "slated for cleanup")
+- Formal transitions with proper punctuation (semicolons, periods)
+- Include disclaimers when praising external tools
+- Use more precise language ("functionality" vs just "function")
 
 ## Examples: LinkedIn Posts
 
@@ -202,9 +207,9 @@ Ready to revolutionize your workflow? Try it now!
 
 ### Good (Focused on Implementation)
 ```
-Hey r/sveltejs! Just shipped a file upload feature for Whispering and wanted to share how I implemented drag-and-drop files using the excellent shadcn-svelte-extras library.
+Hey r/sveltejs! Just shipped a file upload feature for Whispering and wanted to share how I implemented drag-and-drop files.
 
-I used the FileDropZone component from [shadcn-svelte-extras](https://www.shadcn-svelte-extras.com/components/file-drop-zone), which provided a really clean abstraction that allows users to drop and click to upload files:
+I used the [FileDropZone component from shadcn-svelte-extras](https://www.shadcn-svelte-extras.com/components/file-drop-zone), which provided a clean abstraction that allows users to drop and click to upload files:
 
 ```svelte
 <FileDropZone
@@ -219,13 +224,13 @@ I used the FileDropZone component from [shadcn-svelte-extras](https://www.shadcn
 />
 ```
 
-Whispering is a desktop Tauri app too, and the drag-and-drop didn't work on desktop (although the click to select files still worked). So for desktop, I reached for Tauri's [onDragDropEvent](https://tauri.app/reference/javascript/api/namespacewebviewwindow/#ondragdropevent) to provide native support for dragging and dropping anywhere into the application.
+The component handles web drag-and-drop, but since Whispering is a Tauri desktop app, drag-and-drop functionality didn't work on the desktop (click-to-select still worked fine). So I reached for Tauri's [onDragDropEvent](https://tauri.app/reference/javascript/api/namespacewebviewwindow/#ondragdropevent) to add native support for dragging files anywhere into the application.
 
-If you're building Svelte 5 apps and need file uploads, definitely check out shadcn-svelte-extras. It saved me hours of implementation time.
+You can see the [full implementation here](link) (note that the code is still somewhat messy by my standards; it is slated for cleanup!).
 
-**Whispering** is a large-scale production Svelte 5 + Tauri app with a lot of best practices baked in. If you're interested in seeing how these patterns work in a real application:
+Whispering is a large, open-source, production Svelte 5 + Tauri app: https://github.com/braden-w/whispering
 
-https://github.com/braden-w/whispering
+Feel free to check it out for more patterns! If you're building Svelte 5 apps and need file uploads, definitely check out shadcn-svelte-extras. Not affiliated, it just saved me hours of implementation time.
 
 Happy to answer any questions about the implementation!
 ```
