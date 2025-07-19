@@ -106,7 +106,7 @@ export const transformer = {
 			if (getRecordingError || !recording) {
 				return WhisperingErr({
 					title: '⚠️ Recording not found',
-					description: 'Could not find the selected recording.',
+					description: getRecordingError?.message ?? 'Could not find the selected recording.',
 				});
 			}
 
