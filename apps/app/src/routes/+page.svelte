@@ -31,7 +31,6 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import type { UnlistenFn } from '@tauri-apps/api/event';
 	import { Loader2Icon } from 'lucide-svelte';
-	import { nanoid } from 'nanoid/non-secure';
 	import { onDestroy, onMount } from 'svelte';
 	import TranscribedTextDialog from './(config)/recordings/TranscribedTextDialog.svelte';
 
@@ -160,7 +159,6 @@
 
 					if (validPaths.length === 0) {
 						rpc.notify.warning.execute({
-							id: nanoid(),
 							title: '⚠️ No valid files',
 							description: 'Please drop audio or video files',
 						});
@@ -182,7 +180,6 @@
 							files.push(file);
 						} catch (error) {
 							rpc.notify.error.execute({
-								id: nanoid(),
 								title: '❌ Failed to read file',
 								description: `${path}: ${error}`,
 							});
@@ -196,7 +193,6 @@
 			);
 		} catch (error) {
 			rpc.notify.error.execute({
-				id: nanoid(),
 				title: '❌ Failed to set up drag drop listener',
 				description: `${error}`,
 			});
@@ -357,7 +353,6 @@
 						}}
 						onFileRejected={({ file, reason }) => {
 							rpc.notify.error.execute({
-								id: nanoid(),
 								title: '❌ File rejected',
 								description: `${file.name}: ${reason}`,
 							});

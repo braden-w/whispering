@@ -1,3 +1,4 @@
+import { fromTaggedErr, fromTaggedError, WhisperingErr } from '$lib/result';
 import { DbServiceErr } from '$lib/services/db';
 import { settings } from '$lib/stores/settings.svelte';
 import { nanoid } from 'nanoid/non-secure';
@@ -13,7 +14,6 @@ import { transcription } from './transcription';
 import { transformations } from './transformations';
 import { transformer } from './transformer';
 import { vadRecorder } from './vad-recorder';
-import { WhisperingErr } from '$lib/result';
 
 // Internal mutations for manual recording
 const startManualRecording = defineMutation({
@@ -26,9 +26,7 @@ const startManualRecording = defineMutation({
 			description: 'Setting up your recording environment...',
 		});
 		const { data: deviceAcquisitionOutcome, error: startRecordingError } =
-			await manualRecorder.startRecording.execute({
-				toastId,
-			});
+			await manualRecorder.startRecording.execute({ toastId });
 
 		if (startRecordingError) {
 			notify.error.execute({ id: toastId, ...startRecordingError });
@@ -201,13 +199,12 @@ export const commands = {
 			const { data: recorderState, error: getRecorderStateError } =
 				await manualRecorder.getRecorderState.fetch();
 			if (getRecorderStateError) {
-				const { error: whisperingError } = WhisperingErr({
+				const whisperingError = fromTaggedError(getRecorderStateError, {
 					title:
 						'❌ Failed to get recorder state before toggling manual recording',
-					description: getRecorderStateError.message,
 					action: { type: 'more-details', error: getRecorderStateError },
 				});
-				notify.error.execute({ id: nanoid(), ...whisperingError });
+				notify.error.execute(whisperingError);
 				return Err(whisperingError);
 			}
 			if (recorderState === 'RECORDING') {
@@ -389,7 +386,7 @@ export const commands = {
 						const { data: recorderState, error: getRecorderStateError } =
 							await cpalRecorder.getRecorderState.fetch();
 						if (getRecorderStateError) {
-							notify.error.execute({ id: nanoid(), ...getRecorderStateError });
+							notify.error.execute(getRecorderStateError);
 							return Err(getRecorderStateError);
 						}
 						if (recorderState === 'RECORDING') {
@@ -469,7 +466,6 @@ export const commands = {
 
 			if (invalidFiles.length > 0) {
 				notify.warning.execute({
-					id: nanoid(),
 					title: '⚠️ Some files were skipped',
 					description: `${invalidFiles.length} file(s) were not audio or video files`,
 				});
@@ -596,17 +592,15 @@ async function processRecordingPipeline({
 			.getTransformationById(() => transformationId)
 			.fetch();
 
-	const couldNotRetrieveTransformation = getTransformationError;
 	const transformationNoLongerExists = !transformation;
 
-	if (couldNotRetrieveTransformation) {
-		notify.error.execute({
-			id: nanoid(),
-			title: '❌ Failed to get transformation',
-			description:
-				'Your transformation could not be retrieved. Please try again.',
-			action: { type: 'more-details', error: getTransformationError },
-		});
+	if (getTransformationError) {
+		notify.error.execute(
+			fromTaggedError(getTransformationError, {
+				title: '❌ Failed to get transformation',
+				action: { type: 'more-details', error: getTransformationError },
+			}),
+		);
 		return;
 	}
 
@@ -616,7 +610,6 @@ async function processRecordingPipeline({
 			'transformations.selectedTransformationId': null,
 		};
 		notify.warning.execute({
-			id: nanoid(),
 			title: '⚠️ No matching transformation found',
 			description:
 				'No matching transformation found. Please select a different transformation.',
