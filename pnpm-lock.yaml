@@ -189,6 +189,12 @@ importers:
       '@tanstack/svelte-query-devtools':
         specifier: https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter
         version: https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter(@tanstack/svelte-query@https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b(svelte@5.35.5))(svelte@5.35.5)
+      arktype:
+        specifier: ^2.1.20
+        version: 2.1.20
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       svelte-sonner:
         specifier: ^1.0.5
         version: 1.0.5(svelte@5.35.5)
@@ -208,6 +214,9 @@ importers:
       '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@repo/svelte-utils':
+        specifier: workspace:*
+        version: link:../../packages/svelte-utils
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -343,9 +352,15 @@ importers:
       '@tanstack/svelte-table':
         specifier: 9.0.0-alpha.10
         version: 9.0.0-alpha.10(svelte@5.35.5)
+      bits-ui:
+        specifier: '>=2.8.0'
+        version: 2.8.11(@internationalized/date@3.8.1)(svelte@5.35.5)
       paneforge:
         specifier: ^1.0.0-next.5
         version: 1.0.0-next.5(svelte@5.35.5)
+      svelte:
+        specifier: '>=5.0.0'
+        version: 5.35.5
     devDependencies:
       '@internationalized/date':
         specifier: ^3.8.1
@@ -359,9 +374,6 @@ importers:
       '@types/node':
         specifier: ^22.15.32
         version: 22.15.32
-      bits-ui:
-        specifier: ^2.8.10
-        version: 2.8.10(@internationalized/date@3.8.1)(svelte@5.35.5)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -374,9 +386,6 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
-      svelte:
-        specifier: ^5.35.5
-        version: 5.35.5
       svelte-sonner:
         specifier: ^1.0.5
         version: 1.0.5(svelte@5.35.5)
