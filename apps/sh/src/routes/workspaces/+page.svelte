@@ -98,7 +98,7 @@
 							</Table.Cell>
 							<Table.Cell>{config.port}</Table.Cell>
 							<Table.Cell>
-								{#if workspacesQuery.isLoading}
+								{#if workspacesQuery.isFetching}
 									<Badge variant="secondary">
 										<Loader2 class="mr-1 h-3 w-3 animate-spin" />
 										Checking
