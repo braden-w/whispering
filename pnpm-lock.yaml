@@ -41,9 +41,6 @@ importers:
       '@standard-schema/spec':
         specifier: ^1.0.0
         version: 1.0.0
-      '@tanstack/query-core':
-        specifier: https://pkg.pr.new/epicenterhq/query/@tanstack/query-core@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b
-        version: https://pkg.pr.new/epicenterhq/query/@tanstack/query-core@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b
       '@tanstack/svelte-query':
         specifier: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b
         version: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b(svelte@5.35.5)
@@ -182,6 +179,19 @@ importers:
         version: 6.3.5(@types/node@24.0.3)(jiti@2.4.2)(less@4.3.0)(lightningcss@1.30.1)(sass@1.89.2)(yaml@2.8.0)
 
   apps/sh:
+    dependencies:
+      '@tanstack/svelte-query':
+        specifier: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b
+        version: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b(svelte@5.35.5)
+      '@tanstack/svelte-query-devtools':
+        specifier: https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter
+        version: https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter(@tanstack/svelte-query@https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b(svelte@5.35.5))(svelte@5.35.5)
+      svelte-sonner:
+        specifier: ^1.0.5
+        version: 1.0.5(svelte@5.35.5)
+      wellcrafted:
+        specifier: ^0.20.0
+        version: 0.20.0
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.5
