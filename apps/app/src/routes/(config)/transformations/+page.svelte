@@ -11,7 +11,7 @@
 	import * as Table from '@repo/ui/table';
 	import { rpc } from '$lib/query';
 	import { type Transformation } from '$lib/services/db';
-	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { createPersistedState } from '@repo/svelte-utils';
 	import { createTransformationViewTransitionName } from '$lib/utils/createTransformationViewTransitionName';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import {

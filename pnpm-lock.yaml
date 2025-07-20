@@ -29,12 +29,9 @@ importers:
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
-      '@repo/config':
+      '@repo/svelte-utils':
         specifier: workspace:*
-        version: link:../../packages/config
-      '@repo/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../packages/svelte-utils
       '@ricky0123/vad-web':
         specifier: ^0.0.24
         version: 0.0.24
@@ -120,6 +117,12 @@ importers:
         specifier: ^3.25.67
         version: 3.25.67
     devDependencies:
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@sveltejs/adapter-static':
         specifier: ^3.0.8
         version: 3.0.8(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.5)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(less@4.3.0)(lightningcss@1.30.1)(sass@1.89.2)(yaml@2.8.0)))(svelte@5.35.5)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(less@4.3.0)(lightningcss@1.30.1)(sass@1.89.2)(yaml@2.8.0)))
@@ -202,6 +205,9 @@ importers:
       '@hey-api/openapi-ts':
         specifier: ^0.78.3
         version: 0.78.3(typescript@5.8.3)
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -217,6 +223,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.1.11(vite@7.0.5(@types/node@24.0.3)(jiti@2.4.2)(less@4.3.0)(lightningcss@1.30.1)(sass@1.89.2)(yaml@2.8.0))
+      bits-ui:
+        specifier: ^2.8.11
+        version: 2.8.11(@internationalized/date@3.8.1)(svelte@5.35.5)
       eslint:
         specifier: ^9.18.0
         version: 9.30.1(jiti@2.4.2)
@@ -306,6 +315,25 @@ importers:
       '@types/node':
         specifier: ^22.15.32
         version: 22.15.32
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/svelte-utils:
+    dependencies:
+      wellcrafted:
+        specifier: ^0.20.0
+        version: 0.20.0
+    devDependencies:
+      '@standard-schema/spec':
+        specifier: ^1.0.0-beta.3
+        version: 1.0.0
+      '@types/node':
+        specifier: ^22.15.32
+        version: 22.15.32
+      svelte:
+        specifier: 5.14.4
+        version: 5.14.4
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1329,6 +1357,11 @@ packages:
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
 
+  acorn-typescript@1.4.13:
+    resolution: {integrity: sha512-xsc9Xv0xlVfwp2o7sQ+GCQ1PgbkdcpWdTzrwXxO3xDMTAywVS3oXVOcOHuRjAPkS4P9b+yc/qNF15460v+jp4Q==}
+    peerDependencies:
+      acorn: '>=8.9.0'
+
   acorn@8.15.0:
     resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
     engines: {node: '>=0.4.0'}
@@ -1381,6 +1414,13 @@ packages:
 
   bits-ui@2.8.10:
     resolution: {integrity: sha512-MOobkqapDZNrpcNmeL2g664xFmH4tZBOKBTxFmsQYMZQuybSZHQnPXy+AjM5XZEXRmCFx5+XRmo6+fC3vHh1hQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@internationalized/date': ^3.8.1
+      svelte: ^5.33.0
+
+  bits-ui@2.8.11:
+    resolution: {integrity: sha512-lKN9rAk69my6j7H1D4B87r8LrHuEtfEsf1xCixBj9yViql2BdI3f04HyyyT7T1GOCpgb9+8b0B+nm3LN81Konw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@internationalized/date': ^3.8.1
@@ -1665,6 +1705,9 @@ packages:
   esquery@1.6.0:
     resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
     engines: {node: '>=0.10'}
+
+  esrap@1.4.9:
+    resolution: {integrity: sha512-3OMlcd0a03UGuZpPeUC1HxR3nA23l+HEyCiZw3b3FumJIN9KphoGzDJKMXI1S72jVS1dsenDyQC0kJlO1U9E1g==}
 
   esrap@2.1.0:
     resolution: {integrity: sha512-yzmPNpl7TBbMRC5Lj2JlJZNPml0tzqoqP5B1JXycNUwtqma9AKCO0M2wHrdgsHcy1WRW7S9rJknAMtByg3usgA==}
@@ -2627,6 +2670,10 @@ packages:
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.30.2
+
+  svelte@5.14.4:
+    resolution: {integrity: sha512-2iR/UHHA2Dsldo4JdXDcdqT+spueuh+uNYw1FoTKBbpnFEECVISeqSo0uubPS4AfBE0xI6u7DGHxcdq3DTDmoQ==}
+    engines: {node: '>=18'}
 
   svelte@5.35.5:
     resolution: {integrity: sha512-KuRvI82rhh0RMz1EKsUJD96gZyHJ+h2+8zrwO8iqE/p/CmcNKvIItDUAeUePhuCDgtegDJmF8IKThbHIfmTgTA==}
@@ -3774,6 +3821,10 @@ snapshots:
     dependencies:
       acorn: 8.15.0
 
+  acorn-typescript@1.4.13(acorn@8.15.0):
+    dependencies:
+      acorn: 8.15.0
+
   acorn@8.15.0: {}
 
   agentkeepalive@4.6.0:
@@ -3815,6 +3866,17 @@ snapshots:
   base64-js@1.5.1: {}
 
   bits-ui@2.8.10(@internationalized/date@3.8.1)(svelte@5.35.5):
+    dependencies:
+      '@floating-ui/core': 1.7.1
+      '@floating-ui/dom': 1.7.1
+      '@internationalized/date': 3.8.1
+      esm-env: 1.2.2
+      runed: 0.29.2(svelte@5.35.5)
+      svelte: 5.35.5
+      svelte-toolbelt: 0.9.3(svelte@5.35.5)
+      tabbable: 6.2.0
+
+  bits-ui@2.8.11(@internationalized/date@3.8.1)(svelte@5.35.5):
     dependencies:
       '@floating-ui/core': 1.7.1
       '@floating-ui/dom': 1.7.1
@@ -4155,6 +4217,10 @@ snapshots:
   esquery@1.6.0:
     dependencies:
       estraverse: 5.3.0
+
+  esrap@1.4.9:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   esrap@2.1.0:
     dependencies:
@@ -5014,6 +5080,22 @@ snapshots:
       runed: 0.29.2(svelte@5.35.5)
       style-to-object: 1.0.9
       svelte: 5.35.5
+
+  svelte@5.14.4:
+    dependencies:
+      '@ampproject/remapping': 2.3.0
+      '@jridgewell/sourcemap-codec': 1.5.0
+      '@types/estree': 1.0.8
+      acorn: 8.15.0
+      acorn-typescript: 1.4.13(acorn@8.15.0)
+      aria-query: 5.3.2
+      axobject-query: 4.1.0
+      esm-env: 1.2.2
+      esrap: 1.4.9
+      is-reference: 3.0.3
+      locate-character: 3.0.0
+      magic-string: 0.30.17
+      zimmerframe: 1.1.2
 
   svelte@5.35.5:
     dependencies:

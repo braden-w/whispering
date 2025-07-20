@@ -184,7 +184,6 @@ export function createPersistedState<TSchema extends StandardSchemaV1>({
 }
 
 const { ParseJsonError } = createTaggedError('ParseJsonError');
-type ParseJsonError = ReturnType<typeof ParseJsonError>;
 
 function parseJson(value: string) {
 	return trySync({
