@@ -23,8 +23,12 @@ import * as rpc from '$lib/query';
 const sessionsQuery = createQuery(rpc.sessions.getSessions.options);
 
 // For queries with parameters
-const sessionQuery = createQuery(rpc.sessions.getSessionById(sessionId).options);
-const messagesQuery = createQuery(rpc.messages.getMessagesBySessionId(sessionId).options);
+const sessionQuery = createQuery(
+	rpc.sessions.getSessionById(sessionId).options,
+);
+const messagesQuery = createQuery(
+	rpc.messages.getMessagesBySessionId(sessionId).options,
+);
 ```
 
 ## Mutation Usage
@@ -34,17 +38,18 @@ Mutations are accessed directly and use the `.execute()` method:
 ```typescript
 // Execute a mutation
 const result = await rpc.sessions.createSession.execute({
-  body: { title: 'New Session' }
+	body: { title: 'New Session' },
 });
 
-// Handle the result
-if (result.isErr()) {
-  toast.error(result.error.title, {
-    description: result.error.description
-  });
-} else {
-  toast.success('Session created successfully');
-  // Use result.value for the success data
+// Handle the result using destructuring
+const { data, error } = result;
+if (error) {
+	toast.error(error.title, {
+		description: error.description,
+	});
+} else if (data) {
+	toast.success('Session created successfully');
+	// Use data for the success response
 }
 ```
 
@@ -59,28 +64,33 @@ import * as rpc from '$lib/query';
 import { queryClient } from '$lib/query/_client';
 
 export const load: PageLoad = async ({ params }) => {
-  // Prefetch queries on the server
-  await queryClient.prefetchQuery(rpc.sessions.getSessions.options());
-  
-  // With parameters
-  await queryClient.prefetchQuery(rpc.sessions.getSessionById(params.id).options());
-  
-  return {};
+	// Prefetch queries on the server
+	await queryClient.prefetchQuery(rpc.sessions.getSessions.options());
+
+	// With parameters
+	await queryClient.prefetchQuery(
+		rpc.sessions.getSessionById(params.id).options(),
+	);
+
+	return {};
 };
 ```
 
 ## Available Queries
 
 ### Sessions
+
 - `rpc.sessions.getSessions` - Fetch all sessions
 - `rpc.sessions.getSessionById(id)` - Fetch a specific session
 
 ### Messages
+
 - `rpc.messages.getMessagesBySessionId(sessionId)` - Fetch messages for a session
 
 ## Available Mutations
 
 ### Sessions
+
 - `rpc.sessions.createSession` - Create a new session
 - `rpc.sessions.deleteSession` - Delete a session
 - `rpc.sessions.shareSession` - Share a session
@@ -90,11 +100,13 @@ export const load: PageLoad = async ({ params }) => {
 - `rpc.sessions.summarizeSession` - Summarize a session
 
 ### Messages
+
 - `rpc.messages.sendMessage` - Send a message to a session
 
 ## Helper Functions
 
 ### Message Processing Helpers
+
 - `rpc.messages.isMessageProcessing(message)` - Check if a message is still being processed
 - `rpc.messages.getLatestAssistantMessage(messages)` - Get the latest assistant message
 - `rpc.messages.isSessionProcessing(messages)` - Check if the session is currently processing
@@ -102,18 +114,23 @@ export const load: PageLoad = async ({ params }) => {
 
 ## Error Handling
 
-All queries and mutations use the Result pattern with `ShErr` for errors:
+All queries and mutations use the Result pattern with `ShErr` for errors. Use destructuring to access the data and error:
 
 ```typescript
 const result = await mutation.execute(params);
 
-if (result.isErr()) {
-  // Handle error
-  console.error(result.error.title, result.error.description);
-} else {
-  // Handle success
-  const data = result.value;
+// CORRECT: Use destructuring pattern
+const { data, error } = result;
+if (error) {
+	// Handle error - error is of type ShError
+	console.error(error.title, error.description);
+} else if (data) {
+	// Handle success - data is the typed response
+	console.log('Success:', data);
 }
+
+// INCORRECT: Don't use .isErr() or .isOk()
+// if (result.isErr()) { ... } // ❌ Don't do this
 ```
 
 ## Type Safety

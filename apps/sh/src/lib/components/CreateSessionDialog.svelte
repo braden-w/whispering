@@ -21,18 +21,17 @@
 		e.preventDefault();
 
 		isCreating = true;
-		const result = await createSession.execute({
-			body: title ? { title } : undefined,
-		});
+		const result = await createSession.execute();
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error creating session:', result.error);
-		} else if (result.value?.id) {
+			console.error('Error creating session:', error);
+		} else if (data?.id) {
 			toast.success('Session created successfully');
-			goto(`/session/${result.value.id}`);
+			goto(`/session/${data.id}`);
 			open = false;
 			title = '';
 		}

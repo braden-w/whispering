@@ -40,12 +40,13 @@
 			id: data.sessionId,
 		});
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error deleting session:', result.error);
-		} else {
+			console.error('Error deleting session:', error);
+		} else if (data) {
 			toast.success('Session deleted successfully');
 			goto('/');
 		}
@@ -56,12 +57,13 @@
 			id: data.sessionId,
 		});
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error sharing session:', result.error);
-		} else {
+			console.error('Error sharing session:', error);
+		} else if (data) {
 			toast.success('Session shared successfully');
 		}
 	}
@@ -71,12 +73,13 @@
 			id: data.sessionId,
 		});
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error unsharing session:', result.error);
-		} else {
+			console.error('Error unsharing session:', error);
+		} else if (data) {
 			toast.success('Session unshared successfully');
 		}
 	}
@@ -86,12 +89,13 @@
 			id: data.sessionId,
 		});
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error aborting session:', result.error);
-		} else {
+			console.error('Error aborting session:', error);
+		} else if (data) {
 			toast.success('Session aborted successfully');
 		}
 	}
@@ -105,14 +109,15 @@
 		isSending = true;
 		const result = await rpc.messages.sendMessage.execute({
 			sessionId: data.sessionId,
-			content,
+			parts: [{ type: 'text', text: content }],
 		});
 
-		if (result.isErr()) {
-			toast.error(result.error.title, {
-				description: result.error.description,
+		const { data, error } = result;
+		if (error) {
+			toast.error(error.title, {
+				description: error.description,
 			});
-			console.error('Error sending message:', result.error);
+			console.error('Error sending message:', error);
 			// Restore the message content on error
 			messageContent = content;
 		}

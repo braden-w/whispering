@@ -28,12 +28,15 @@ const sessionQuery = createQuery(rpc.sessions.getSessionById(id).options);
 await queryClient.prefetchQuery(rpc.sessions.getSessions.options());
 await queryClient.prefetchQuery(rpc.sessions.getSessionById(id).options());
 
-// Mutations - use .execute()
+// Mutations - use .execute() with destructuring
 const result = await rpc.sessions.createSession.execute({ body: { title } });
-if (result.isErr()) {
-	// Handle error
-} else {
-	// Handle success
+const { data, error } = result;
+if (error) {
+	// Handle error - error is of type ShError
+	toast.error(error.title, { description: error.description });
+} else if (data) {
+	// Handle success - data is the typed response
+	toast.success('Session created successfully');
 }
 ```
 
