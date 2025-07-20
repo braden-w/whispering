@@ -5,7 +5,7 @@
 	import { CheckCircle2, XCircle, Loader2 } from 'lucide-svelte';
 	import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 
-	let { workspace, refetchInterval = 2000 }: { workspace: WorkspaceConfig; refetchInterval?: number } = $props();
+	let { workspace, refetchInterval = 5000 }: { workspace: WorkspaceConfig; refetchInterval?: number } = $props();
 
 	const workspaceQuery = createQuery(
 		() => ({
