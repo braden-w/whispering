@@ -355,9 +355,6 @@ importers:
       '@tanstack/svelte-table':
         specifier: 9.0.0-alpha.10
         version: 9.0.0-alpha.10(svelte@5.35.5)
-      bits-ui:
-        specifier: '>=2.8.0'
-        version: 2.8.11(@internationalized/date@3.8.1)(svelte@5.35.5)
       paneforge:
         specifier: ^1.0.0-next.5
         version: 1.0.0-next.5(svelte@5.35.5)
@@ -369,14 +366,17 @@ importers:
         specifier: ^3.8.1
         version: 3.8.1
       '@lucide/svelte':
-        specifier: ^0.515.0
-        version: 0.515.0(svelte@5.35.5)
+        specifier: ^0.525.0
+        version: 0.525.0(svelte@5.35.5)
       '@repo/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
         specifier: ^22.15.32
         version: 22.15.32
+      bits-ui:
+        specifier: ^2.8.11
+        version: 2.8.11(@internationalized/date@3.8.1)(svelte@5.35.5)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -389,6 +389,9 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
+      runed:
+        specifier: ^0.29.2
+        version: 0.29.2(svelte@5.35.5)
       svelte-sonner:
         specifier: ^1.0.5
         version: 1.0.5(svelte@5.35.5)
@@ -407,6 +410,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.8.3
+      vaul-svelte:
+        specifier: 1.0.0-next.7
+        version: 1.0.0-next.7(svelte@5.35.5)
 
 packages:
 
@@ -754,8 +760,8 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
-  '@lucide/svelte@0.515.0':
-    resolution: {integrity: sha512-CEAyqcZmNBfYzVgaRmK2RFJP5tnbXxekRyDk0XX/eZQRfsJmkDvmQwXNX8C869BgNeryzmrRyjHhUL6g9ZOHNA==}
+  '@lucide/svelte@0.525.0':
+    resolution: {integrity: sha512-dyUxkXzepagLUzL8jHQNdeH286nC66ClLACsg+Neu/bjkRJWPWMzkT+H0DKlE70QdkicGCfs1ZGmXCc351hmZA==}
     peerDependencies:
       svelte: ^5
 
@@ -2831,6 +2837,12 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  vaul-svelte@1.0.0-next.7:
+    resolution: {integrity: sha512-7zN7Bi3dFQixvvbUJY9uGDe7Ws/dGZeBQR2pXdXmzQiakjrxBvWo0QrmsX3HK+VH+SZOltz378cmgmCS9f9rSg==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
+
   vite@6.3.5:
     resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -3246,7 +3258,7 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@lucide/svelte@0.515.0(svelte@5.35.5)':
+  '@lucide/svelte@0.525.0(svelte@5.35.5)':
     dependencies:
       svelte: 5.35.5
 
@@ -5246,6 +5258,12 @@ snapshots:
   url-join@4.0.1: {}
 
   util-deprecate@1.0.2: {}
+
+  vaul-svelte@1.0.0-next.7(svelte@5.35.5):
+    dependencies:
+      runed: 0.23.4(svelte@5.35.5)
+      svelte: 5.35.5
+      svelte-toolbelt: 0.7.1(svelte@5.35.5)
 
   vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(less@4.3.0)(lightningcss@1.30.1)(sass@1.89.2)(yaml@2.8.0):
     dependencies:
