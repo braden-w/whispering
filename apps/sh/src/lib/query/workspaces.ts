@@ -1,74 +1,73 @@
 import * as api from '$lib/client/sdk.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
-import { ShErr } from '$lib/result';
-import type { Workspace } from '$lib/stores/workspaces.svelte';
-import { extractErrorMessage } from 'wellcrafted/error';
+import { workspaces, type Workspace } from '$lib/stores/workspaces.svelte';
 import { Ok } from 'wellcrafted/result';
 import { defineQuery } from './_client';
+import type { Accessor } from '@tanstack/svelte-query';
+import type { App } from '$lib/client/types.gen';
 
-// Query for checking a single workspace connection status
-export const checkWorkspaceConnection = (workspace: Workspace) =>
+/**
+ * Workspace enhanced with connection metadata fetched from the opencode server.
+ * Uses a discriminated union to ensure type safety between connection states.
+ *
+ * When connected is true, appInfo will be present.
+ * When connected is false, appInfo will not exist.
+ */
+export type WorkspaceWithMetadata = Workspace &
+	({ connected: true; appInfo: App } | { connected: false });
+
+/**
+ * Query to enhance a single workspace with connection metadata.
+ * Returns the workspace with additional connection status and app info.
+ */
+export const getWorkspaceWithConnection = (workspace: Accessor<Workspace>) =>
 	defineQuery({
-		queryKey: ['workspace-connection', workspace.id],
-		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspace);
+		queryKey: ['workspace-enhanced', workspace().id],
+		resultQueryFn: async (): Promise<Ok<WorkspaceWithMetadata>> => {
+			const client = createWorkspaceClient(workspace());
 
-			try {
-				const { data, error } = await api.getApp({ client });
+			const { data, error } = await api.getApp({ client });
 
-				if (error) {
-					return Ok({ connected: false, workspace });
-				}
-
-				return Ok({ connected: true, workspace, appInfo: data });
-			} catch (err) {
-				// Network errors, timeouts, etc.
-				return Ok({ connected: false, workspace });
+			if (data && !error) {
+				return Ok({ ...workspace(), connected: true, appInfo: data });
 			}
+
+			return Ok({ ...workspace(), connected: false });
 		},
-		// Refetch every 30 seconds to keep status updated
-		refetchInterval: 30000,
-		// Refetch when window regains focus
-		refetchOnWindowFocus: true,
+		// Start with the workspace marked as disconnected
+		initialData: { ...workspace(), connected: false },
 	});
 
-// Query for checking all workspaces connection status at once
-export const checkAllWorkspaceConnections = (workspaces: Workspace[]) =>
+/**
+ * Query to enhance multiple workspaces with connection metadata.
+ * Returns an array of workspaces with additional connection status and app info.
+ */
+export const getWorkspacesWithConnections = () =>
 	defineQuery({
-		queryKey: ['workspace-connections', workspaces.map((w) => w.id).sort()],
-		resultQueryFn: async () => {
-			const connectionPromises = workspaces.map(async (workspace) => {
-				const client = createWorkspaceClient(workspace);
+		queryKey: ['workspaces-enhanced'],
+		resultQueryFn: async (): Promise<Ok<WorkspaceWithMetadata[]>> => {
+			const enhancedWorkspacePromises = workspaces.value.map(
+				async (workspace): Promise<WorkspaceWithMetadata> => {
+					const client = createWorkspaceClient(workspace);
 
-				const { data, error } = await api.getApp({ client });
+					const { data, error } = await api.getApp({ client });
 
-				return {
-					workspaceId: workspace.id,
-					connected: !!data && !error,
-					appInfo: data,
-				};
-			});
+					if (data && !error) {
+						return { ...workspace, connected: true, appInfo: data };
+					}
 
-			const results = await Promise.all(connectionPromises);
-
-			// Convert to a map for easy lookup
-			const connectionMap = results.reduce(
-				(acc, result) => {
-					acc[result.workspaceId] = {
-						connected: result.connected,
-						appInfo: result.appInfo,
-					};
-					return acc;
+					return { ...workspace, connected: false };
 				},
-				{} as Record<string, { connected: boolean; appInfo: any }>,
 			);
 
-			return Ok(connectionMap);
+			const enhancedWorkspaces = await Promise.all(enhancedWorkspacePromises);
+			return Ok(enhancedWorkspaces);
 		},
-		// Refetch every 30 seconds
-		refetchInterval: 30000,
-		// Refetch when window regains focus
-		refetchOnWindowFocus: true,
-		// Only refetch if workspaces have changed
-		enabled: workspaces.length > 0,
+		// Start with workspaces marked as disconnected
+		initialData: workspaces.value.map((w) => ({
+			...w,
+			connected: false,
+		})),
+		// Only refetch if workspaces exist
+		enabled: workspaces.value.length > 0,
 	});
