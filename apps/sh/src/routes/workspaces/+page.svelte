@@ -19,7 +19,7 @@
 	function handleConnect(workspace: typeof workspaces.value[0]) {
 		// Update last used timestamp
 		workspaces.value = workspaces.value.map(w => 
-			w.id === workspace.id ? { ...w, lastUsedAt: Date.now() } : w
+			w.id === workspace.id ? { ...w, lastAccessedAt: Date.now() } : w
 		);
 		
 		// Navigate to workspace sessions
@@ -95,7 +95,7 @@
 								<WorkspaceConnectionBadge workspace={config} />
 							</Table.Cell>
 							<Table.Cell>
-								{formatDistanceToNow(new Date(config.lastUsedAt))} ago
+								{formatDistanceToNow(new Date(config.lastAccessedAt))} ago
 							</Table.Cell>
 							<Table.Cell>
 								<div class="flex items-center justify-end gap-2">

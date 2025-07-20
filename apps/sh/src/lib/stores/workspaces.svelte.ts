@@ -16,14 +16,14 @@ const WorkspaceConfig = type({
 	username: 'string > 0',
 	password: 'string',
 	createdAt: 'number',
-	lastUsedAt: 'number',
+	lastAccessedAt: 'number',
 });
 
 export type WorkspaceConfig = typeof WorkspaceConfig.infer;
 
 export type WorkspaceCreateInput = Omit<
 	WorkspaceConfig,
-	'id' | 'createdAt' | 'lastUsedAt'
+	'id' | 'createdAt' | 'lastAccessedAt'
 >;
 export type WorkspaceUpdateInput = Partial<
 	Omit<WorkspaceConfig, 'id' | 'createdAt'>
@@ -84,7 +84,7 @@ export function createWorkspace(data: WorkspaceCreateInput): WorkspaceConfig {
 		...data,
 		id: nanoid(),
 		createdAt: Date.now(),
-		lastUsedAt: Date.now(),
+		lastAccessedAt: Date.now(),
 	};
 
 	workspaces.value = [...workspaces.value, newWorkspace];
@@ -99,7 +99,7 @@ export function updateWorkspace(
 	workspaces.value = workspaces.value.map((w) => {
 		if (w.id !== id) return w;
 
-		return { ...w, ...updates, lastUsedAt: Date.now() };
+		return { ...w, ...updates, lastAccessedAt: Date.now() };
 	});
 
 	toast.success('Workspace updated');

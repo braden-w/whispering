@@ -73,7 +73,7 @@
 				username,
 				password,
 				createdAt: 0,
-				lastUsedAt: 0
+				lastAccessedAt: 0
 			};
 
 			const client = createWorkspaceClient(testWorkspace);
