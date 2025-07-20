@@ -10,39 +10,20 @@
 	import { CheckCircle2, XCircle, Loader2, Edit, Trash2 } from 'lucide-svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
-	import { getProxiedBaseUrl } from '$lib/client/utils/proxy-url';
+	import { createQuery } from '@tanstack/svelte-query';
+	import * as rpc from '$lib/query';
 
 	let createDialogOpen = $state(false);
 	let editingWorkspace = $state<typeof workspaces.value[0] | null>(null);
 	let deletingWorkspace = $state<typeof workspaces.value[0] | null>(null);
-	let connectionStatuses = $state<Record<string, 'checking' | 'connected' | 'disconnected'>>({});
 
-	// Check connection status for a workspace
-	async function checkConnection(workspace: typeof workspaces.value[0]) {
-		connectionStatuses[workspace.id] = 'checking';
-		
-		try {
-			// Use proxied URL to bypass CORS
-			const proxiedUrl = getProxiedBaseUrl(workspace.url);
-			const response = await fetch(`${proxiedUrl}/app`, {
-				headers: {
-					'Authorization': `Basic ${btoa(`${workspace.username}:${workspace.password}`)}`
-				},
-				signal: AbortSignal.timeout(5000) // 5 second timeout
-			});
-			
-			connectionStatuses[workspace.id] = response.ok ? 'connected' : 'disconnected';
-		} catch {
-			connectionStatuses[workspace.id] = 'disconnected';
-		}
-	}
-
-	// Check all connections on mount
-	$effect(() => {
-		for (const workspace of workspaces.value) {
-			checkConnection(workspace);
-		}
-	});
+	// Create reactive query options that update when workspaces change
+	const connectionsQueryOptions = $derived(
+		rpc.workspaces.checkAllWorkspaceConnections(workspaces.value).options
+	);
+	
+	// Use query to check all workspace connections
+	const connectionsQuery = createQuery(connectionsQueryOptions);
 
 	function handleConnect(workspace: typeof workspaces.value[0]) {
 		// Update last used timestamp
@@ -120,12 +101,12 @@
 							</Table.Cell>
 							<Table.Cell>{workspace.port}</Table.Cell>
 							<Table.Cell>
-								{#if connectionStatuses[workspace.id] === 'checking'}
+								{#if connectionsQuery.isLoading}
 									<Badge variant="secondary">
 										<Loader2 class="mr-1 h-3 w-3 animate-spin" />
 										Checking
 									</Badge>
-								{:else if connectionStatuses[workspace.id] === 'connected'}
+								{:else if connectionsQuery.data?.[workspace.id]?.connected}
 									<Badge variant="default">
 										<CheckCircle2 class="mr-1 h-3 w-3" />
 										Connected
@@ -146,7 +127,7 @@
 										size="sm"
 										variant="default"
 										onclick={() => handleConnect(workspace)}
-										disabled={connectionStatuses[workspace.id] === 'disconnected'}
+										disabled={!connectionsQuery.data?.[workspace.id]?.connected}
 									>
 										Connect
 									</Button>
