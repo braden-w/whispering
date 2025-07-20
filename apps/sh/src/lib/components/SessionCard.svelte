@@ -124,6 +124,7 @@
 								{
 									onSuccess: () => {
 										toast.success('Session deleted successfully');
+										deleteDialogOpen = false;
 									},
 									onError: (error) => {
 										toast.error(error.title, {
