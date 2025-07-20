@@ -1,32 +1,43 @@
-import * as api from '$lib/client';
-import type { PostSessionData } from '$lib/client/types.gen';
-import { ShErr } from '$lib/result';
-import type { Accessor } from '@tanstack/svelte-query';
+import * as api from '$lib/client/sdk.gen';
+import type {
+	PostSessionByIdSummarizeData,
+	PostSessionData,
+	Session,
+} from '$lib/client/types.gen';
+import { createWorkspaceClient } from '$lib/client/workspace-client';
+import { ShErr, type ShError } from '$lib/result';
+import type { Workspace } from '$lib/stores/workspaces.svelte';
+import type { Accessor, QueryObserverOptions } from '@tanstack/svelte-query';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation, defineQuery, queryClient } from './_client';
 
-// Query for fetching all sessions
-export const getSessions = defineQuery({
-	queryKey: ['sessions'],
-	resultQueryFn: async () => {
-		const { data, error } = await api.getSession();
-		if (error) {
-			return ShErr({
-				title: 'Failed to fetch sessions',
-				description: extractErrorMessage(error),
-			});
-		}
+// Query for fetching all sessions in a workspace
+export const getSessions = (workspace: Accessor<Workspace>) =>
+	defineQuery({
+		queryKey: ['workspaces', workspace().id, 'sessions'],
+		resultQueryFn: async () => {
+			const client = createWorkspaceClient(workspace());
 
-		return Ok(data);
-	},
-});
+			const { data, error } = await api.getSession({ client });
+			if (error) {
+				return ShErr({
+					title: 'Failed to fetch sessions',
+					description: extractErrorMessage(error),
+				});
+			}
+
+			return Ok(data);
+		},
+	});
 
 // Mutation for creating a new session
 export const createSession = defineMutation({
 	mutationKey: ['createSession'],
-	resultMutationFn: async (data?: PostSessionData) => {
-		const { data: session, error } = await api.postSession(data);
+	resultMutationFn: async ({ workspace }: { workspace: Workspace }) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data: session, error } = await api.postSession({ client });
 		if (error) {
 			return ShErr({
 				title: 'Failed to create session',
@@ -35,17 +46,26 @@ export const createSession = defineMutation({
 		}
 		return Ok(session);
 	},
-	onSuccess: () => {
-		// Invalidate sessions list to refetch
-		queryClient.invalidateQueries({ queryKey: ['sessions'] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for deleting a session
 export const deleteSession = defineMutation({
 	mutationKey: ['deleteSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
-		const { data, error } = await api.deleteSessionById({ path: { id } });
+	resultMutationFn: async ({
+		workspace,
+		sessionId,
+	}: { workspace: Workspace; sessionId: string }) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data, error } = await api.deleteSessionById({
+			client,
+			path: { id: sessionId },
+		});
 		if (error) {
 			return ShErr({
 				title: 'Failed to delete session',
@@ -54,18 +74,26 @@ export const deleteSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { id }) => {
-		// Invalidate both the sessions list and the specific session
-		queryClient.invalidateQueries({ queryKey: ['sessions'] });
-		queryClient.invalidateQueries({ queryKey: ['messages', id] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for sharing a session
 export const shareSession = defineMutation({
 	mutationKey: ['shareSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
-		const { data, error } = await api.postSessionByIdShare({ path: { id } });
+	resultMutationFn: async ({
+		workspace,
+		id,
+	}: { workspace: Workspace; id: string }) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data, error } = await api.postSessionByIdShare({
+			client,
+			path: { id },
+		});
 		if (error) {
 			return ShErr({
 				title: 'Failed to share session',
@@ -74,17 +102,26 @@ export const shareSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: () => {
-		// Invalidate the session to refetch with share URL
-		queryClient.invalidateQueries({ queryKey: ['sessions'] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for unsharing a session
 export const unshareSession = defineMutation({
 	mutationKey: ['unshareSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
-		const { data, error } = await api.deleteSessionByIdShare({ path: { id } });
+	resultMutationFn: async ({
+		workspace,
+		id,
+	}: { workspace: Workspace; id: string }) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data, error } = await api.deleteSessionByIdShare({
+			client,
+			path: { id },
+		});
 		if (error) {
 			return ShErr({
 				title: 'Failed to unshare session',
@@ -93,17 +130,26 @@ export const unshareSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: () => {
-		// Invalidate the session to refetch without share URL
-		queryClient.invalidateQueries({ queryKey: ['sessions'] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for aborting a session
 export const abortSession = defineMutation({
 	mutationKey: ['abortSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
-		const { data, error } = await api.postSessionByIdAbort({ path: { id } });
+	resultMutationFn: async ({
+		workspace,
+		id,
+	}: { workspace: Workspace; id: string }) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data, error } = await api.postSessionByIdAbort({
+			client,
+			path: { id },
+		});
 		if (error) {
 			return ShErr({
 				title: 'Failed to abort session',
@@ -112,18 +158,32 @@ export const abortSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { id }) => {
-		// Invalidate the session and messages
-		queryClient.invalidateQueries({ queryKey: ['sessions'] });
-		queryClient.invalidateQueries({ queryKey: ['messages', id] });
+	onSuccess: (_, { workspace, id }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for initializing a session
 export const initializeSession = defineMutation({
 	mutationKey: ['initializeSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
-		const { data, error } = await api.postSessionByIdInit({ path: { id } });
+	resultMutationFn: async ({
+		workspace,
+		id,
+		body,
+	}: {
+		workspace: Workspace;
+		id: string;
+		body?: { providerID: string; modelID: string };
+	}) => {
+		const client = createWorkspaceClient(workspace);
+
+		const { data, error } = await api.postSessionByIdInit({
+			client,
+			path: { id },
+			body,
+		});
 		if (error) {
 			return ShErr({
 				title: 'Failed to initialize session',
@@ -132,17 +192,31 @@ export const initializeSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { id }) => {
-		queryClient.invalidateQueries({ queryKey: ['sessions', id] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Mutation for summarizing a session
 export const summarizeSession = defineMutation({
 	mutationKey: ['summarizeSession'],
-	resultMutationFn: async ({ id }: { id: string }) => {
+	resultMutationFn: async ({
+		workspace,
+		sessionId,
+		body,
+	}: {
+		workspace: Workspace;
+		sessionId: string;
+		body: PostSessionByIdSummarizeData['body'];
+	}) => {
+		const client = createWorkspaceClient(workspace);
+
 		const { data, error } = await api.postSessionByIdSummarize({
-			path: { id },
+			client,
+			path: { id: sessionId },
+			body,
 		});
 		if (error) {
 			return ShErr({
@@ -152,27 +226,39 @@ export const summarizeSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { id }) => {
-		queryClient.invalidateQueries({ queryKey: ['messages', id] });
+	onSuccess: (_, { workspace }) => {
+		queryClient.invalidateQueries({
+			queryKey: ['workspaces', workspace.id, 'sessions'],
+		});
 	},
 });
 
 // Query for fetching a single session by ID
-export const getSessionById = (sessionId: Accessor<string> | string) =>
+export const getSessionById = (
+	workspace: Accessor<Workspace>,
+	sessionId: Accessor<string>,
+) =>
 	defineQuery({
-		queryKey: () => [
-			'sessions',
-			typeof sessionId === 'function' ? sessionId() : sessionId,
-		],
+		queryKey: ['workspaces', workspace().id, 'sessions', sessionId()],
 		resultQueryFn: async () => {
-			const id = typeof sessionId === 'function' ? sessionId() : sessionId;
-			const { data, error } = await api.getSessionById({ path: { id } });
+			const client = createWorkspaceClient(workspace());
+
+			const { data: allSessions, error } = await api.getSession({ client });
 			if (error) {
 				return ShErr({
-					title: 'Failed to fetch session',
+					title: 'Failed to fetch sessions',
 					description: extractErrorMessage(error),
 				});
 			}
-			return Ok(data);
+
+			const session = allSessions?.find((s) => s.id === sessionId());
+			if (!session) {
+				return ShErr({
+					title: 'Session not found',
+					description: 'The requested session does not exist',
+				});
+			}
+
+			return Ok(session);
 		},
 	});
