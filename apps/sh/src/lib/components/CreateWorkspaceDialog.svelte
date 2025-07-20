@@ -4,18 +4,22 @@
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Card from '@repo/ui/card';
+	import * as Tabs from '@repo/ui/tabs';
 	import { createWorkspace, generateRandomPort } from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2 } from 'lucide-svelte';
 	import * as api from '$lib/client/sdk.gen';
 	import { createWorkspaceClient } from '$lib/client/workspace-client';
+	import type { Snippet } from 'svelte';
 
-	let { open = $bindable(false) } = $props();
+	let { children }: { children: Snippet } = $props();
+
+	let open = $state(false);
 
 	// Form state
 	let step = $state(1);
-	let username = $state('');
-	let password = $state('');
+	let username = $state('user');
+	let password = $state('password');
 	let port = $state(generateRandomPort());
 	let ngrokUrl = $state('');
 	let workspaceName = $state('');
@@ -26,8 +30,8 @@
 	$effect(() => {
 		if (open) {
 			step = 1;
-			username = '';
-			password = '';
+			username = 'user';
+			password = 'password';
 			port = generateRandomPort();
 			ngrokUrl = '';
 			workspaceName = '';
@@ -124,6 +128,10 @@
 			toast.error('Please enter username and password');
 			return;
 		}
+		if (step === 2 && !port) {
+			toast.error('Please enter a valid port number');
+			return;
+		}
 		step++;
 	}
 
@@ -133,6 +141,9 @@
 </script>
 
 <Dialog.Root bind:open>
+	<Dialog.Trigger>
+		{@render children?.()}
+	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-[600px]">
 		<Dialog.Header>
 			<Dialog.Title>Add New Workspace</Dialog.Title>
@@ -200,115 +211,111 @@
 				</Card.Root>
 			{:else if step === 3}
 				<!-- Step 3: Setup Instructions -->
-				<div class="space-y-4">
-					<Card.Root>
-						<Card.Header>
-							<Card.Title class="text-lg">Step 3: Run OpenCode Server</Card.Title>
-							<Card.Description>
-								In your project directory, run:
-							</Card.Description>
-						</Card.Header>
-						<Card.Content>
-							<div class="flex items-center gap-2">
-								<code class="flex-1 bg-muted p-2 rounded text-sm">
-									{opencodeCommand}
-								</code>
-								<Button
-									size="icon"
-									variant="ghost"
-									onclick={() => copyToClipboard(opencodeCommand)}
-								>
-									<Copy class="h-4 w-4" />
-								</Button>
-							</div>
-						</Card.Content>
-					</Card.Root>
-
-					<Card.Root>
-						<Card.Header>
-							<Card.Title class="text-lg">Step 4: Expose with ngrok</Card.Title>
-							<Card.Description>
-								In another terminal, run:
-							</Card.Description>
-						</Card.Header>
-						<Card.Content>
-							<div class="flex items-center gap-2">
-								<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
-									{ngrokCommand}
-								</code>
-								<Button
-									size="icon"
-									variant="ghost"
-									onclick={() => copyToClipboard(ngrokCommand)}
-								>
-									<Copy class="h-4 w-4" />
-								</Button>
-							</div>
-						</Card.Content>
-					</Card.Root>
-
-					<Card.Root>
-						<Card.Header>
-							<Card.Title class="text-lg">Step 5: Enter ngrok URL</Card.Title>
-							<Card.Description>
-								Copy the HTTPS URL from ngrok output
-							</Card.Description>
-						</Card.Header>
-						<Card.Content class="space-y-4">
-							<div class="space-y-2">
-								<Label for="ngrokUrl">ngrok URL</Label>
-								<Input
-									id="ngrokUrl"
-									bind:value={ngrokUrl}
-									placeholder="https://abc123.ngrok.io"
-								/>
-							</div>
-							<Button
-								onclick={testConnection}
-								disabled={isTesting || !ngrokUrl}
-								class="w-full"
-							>
-								{#if isTesting}
-									<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-									Testing Connection...
-								{:else if testSuccess}
-									<CheckCircle2 class="mr-2 h-4 w-4" />
-									Connection Successful
-								{:else}
-									Test Connection
-								{/if}
-							</Button>
-						</Card.Content>
-					</Card.Root>
-
-					<Card.Root class="border-dashed">
-						<Card.Header>
-							<Card.Title class="text-base">Quick Setup (Advanced)</Card.Title>
-							<Card.Description>
-								Run both commands in one line:
-							</Card.Description>
-						</Card.Header>
-						<Card.Content>
-							<div class="flex items-center gap-2">
-								<code class="flex-1 bg-muted p-2 rounded text-xs break-all">
-									{quickSetupCommand}
-								</code>
-								<Button
-									size="icon"
-									variant="ghost"
-									onclick={() => copyToClipboard(quickSetupCommand)}
-								>
-									<Copy class="h-4 w-4" />
-								</Button>
-							</div>
-						</Card.Content>
-					</Card.Root>
-				</div>
-			{:else if step === 4}
-				<!-- Step 4: Name Workspace -->
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-lg">Final Step: Name Your Workspace</Card.Title>
+						<Card.Title class="text-lg">Step 3: Start OpenCode Server</Card.Title>
+						<Card.Description>
+							Run the following commands to start your server
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="space-y-4">
+						<Tabs.Root value="separate" class="w-full">
+							<Tabs.List class="grid w-full grid-cols-2">
+								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
+								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger>
+							</Tabs.List>
+							<Tabs.Content value="separate" class="space-y-4">
+								<div class="space-y-4">
+									<div>
+										<p class="text-sm text-muted-foreground mb-2">In your project directory, run:</p>
+										<div class="flex items-center gap-2">
+											<code class="flex-1 bg-muted p-2 rounded text-sm">
+												{opencodeCommand}
+											</code>
+											<Button
+												size="icon"
+												variant="ghost"
+												onclick={() => copyToClipboard(opencodeCommand)}
+											>
+												<Copy class="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+									<div>
+										<p class="text-sm text-muted-foreground mb-2">In another terminal, run:</p>
+										<div class="flex items-center gap-2">
+											<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+												{ngrokCommand}
+											</code>
+											<Button
+												size="icon"
+												variant="ghost"
+												onclick={() => copyToClipboard(ngrokCommand)}
+											>
+												<Copy class="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+								</div>
+							</Tabs.Content>
+							<Tabs.Content value="combined" class="space-y-4">
+								<p class="text-sm text-muted-foreground">Run both commands in one line:</p>
+								<div class="flex items-center gap-2">
+									<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+										{quickSetupCommand}
+									</code>
+									<Button
+										size="icon"
+										variant="ghost"
+										onclick={() => copyToClipboard(quickSetupCommand)}
+									>
+										<Copy class="h-4 w-4" />
+									</Button>
+								</div>
+							</Tabs.Content>
+						</Tabs.Root>
+					</Card.Content>
+				</Card.Root>
+			{:else if step === 4}
+				<!-- Step 4: Enter ngrok URL -->
+				<Card.Root>
+					<Card.Header>
+						<Card.Title class="text-lg">Step 4: Enter ngrok URL</Card.Title>
+						<Card.Description>
+							Copy the HTTPS URL from ngrok output
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="space-y-4">
+						<div class="space-y-2">
+							<Label for="ngrokUrl">ngrok URL</Label>
+							<Input
+								id="ngrokUrl"
+								bind:value={ngrokUrl}
+								placeholder="https://abc123.ngrok.io"
+							/>
+						</div>
+						<Button
+							onclick={testConnection}
+							disabled={isTesting || !ngrokUrl}
+							class="w-full"
+						>
+							{#if isTesting}
+								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+								Testing Connection...
+							{:else if testSuccess}
+								<CheckCircle2 class="mr-2 h-4 w-4" />
+								Connection Successful
+							{:else}
+								Test Connection
+							{/if}
+						</Button>
+					</Card.Content>
+				</Card.Root>
+			{:else if step === 5}
+				<!-- Step 5: Name Workspace -->
+				<Card.Root>
+					<Card.Header>
+						<Card.Title class="text-lg">Step 5: Name Your Workspace</Card.Title>
 						<Card.Description>
 							Give this workspace a memorable name
 						</Card.Description>
@@ -346,7 +353,7 @@
 					<Dialog.Close>
 						<Button variant="outline">Cancel</Button>
 					</Dialog.Close>
-					{#if step < 4}
+					{#if step < 5}
 						<Button onclick={nextStep}>
 							Next
 						</Button>

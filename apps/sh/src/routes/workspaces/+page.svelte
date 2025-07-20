@@ -7,57 +7,44 @@
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
 	import EditWorkspaceDialog from '$lib/components/EditWorkspaceDialog.svelte';
 	import { goto } from '$app/navigation';
-	import { Edit, Trash2 } from 'lucide-svelte';
+	import { Edit, Trash2, Plus } from 'lucide-svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 
-	let createDialogOpen = $state(false);
-	let editingWorkspace = $state<typeof workspaces.value[0] | null>(null);
-	let deletingWorkspace = $state<typeof workspaces.value[0] | null>(null);
+	let editingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
+	let deletingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 
-	function handleConnect(workspace: typeof workspaces.value[0]) {
+	function handleConnect(workspace: (typeof workspaces.value)[0]) {
 		// Update last used timestamp
-		workspaces.value = workspaces.value.map(w => 
-			w.id === workspace.id ? { ...w, lastAccessedAt: Date.now() } : w
+		workspaces.value = workspaces.value.map((w) =>
+			w.id === workspace.id ? { ...w, lastAccessedAt: Date.now() } : w,
 		);
-		
+
 		// Navigate to workspace sessions
 		goto(`/workspaces/${workspace.id}`);
 	}
 
-	function handleDelete(workspace: typeof workspaces.value[0]) {
-		workspaces.value = workspaces.value.filter(w => w.id !== workspace.id);
+	function handleDelete(workspace: (typeof workspaces.value)[0]) {
+		workspaces.value = workspaces.value.filter((w) => w.id !== workspace.id);
 		deletingWorkspace = null;
 		toast.success(`Deleted workspace "${workspace.name}"`);
 	}
 </script>
 
-<div class="container mx-auto py-10">
-	<div class="flex items-center justify-between mb-8">
+<div class="container max-w-screen-2xl py-6 lg:py-8">
+	<div class="flex items-center justify-between mb-6">
 		<div>
 			<h1 class="text-3xl font-bold tracking-tight">Workspaces</h1>
 			<p class="text-muted-foreground mt-1">
 				Manage your OpenCode server connections
 			</p>
 		</div>
-		<Button onclick={() => createDialogOpen = true}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="mr-2"
-			>
-				<path d="M12 5v14M5 12h14" />
-			</svg>
-			Add Workspace
-		</Button>
+		<CreateWorkspaceDialog>
+			{#snippet triggerChild({ props })}
+				<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Workspace</Button>
+			{/snippet}
+		</CreateWorkspaceDialog>
 	</div>
 
 	{#if workspaces.value.length === 0}
@@ -66,9 +53,11 @@
 			<p class="text-muted-foreground mt-2">
 				Create your first workspace to connect to an OpenCode server
 			</p>
-			<Button onclick={() => createDialogOpen = true} class="mt-4">
-				Create Workspace
-			</Button>
+			<CreateWorkspaceDialog>
+				{#snippet triggerChild({ props })}
+					<Button {...props} class="mt-4">Create Workspace</Button>
+				{/snippet}
+			</CreateWorkspaceDialog>
 		</div>
 	{:else}
 		<div class="rounded-md border">
@@ -109,14 +98,14 @@
 									<Button
 										size="icon"
 										variant="ghost"
-										onclick={() => editingWorkspace = config}
+										onclick={() => (editingWorkspace = config)}
 									>
 										<Edit class="h-4 w-4" />
 									</Button>
 									<Button
 										size="icon"
 										variant="ghost"
-										onclick={() => deletingWorkspace = config}
+										onclick={() => (deletingWorkspace = config)}
 									>
 										<Trash2 class="h-4 w-4" />
 									</Button>
@@ -129,8 +118,6 @@
 		</div>
 	{/if}
 </div>
-
-<CreateWorkspaceDialog bind:open={createDialogOpen} />
 
 {#if editingWorkspace}
 	<EditWorkspaceDialog
@@ -152,7 +139,7 @@
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel onclick={() => deletingWorkspace = null}>
+			<AlertDialog.Cancel onclick={() => (deletingWorkspace = null)}>
 				Cancel
 			</AlertDialog.Cancel>
 			<AlertDialog.Action
