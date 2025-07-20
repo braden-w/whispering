@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.css';
+	import '@repo/ui/app.css';
 
 	let { children } = $props();
 </script>
