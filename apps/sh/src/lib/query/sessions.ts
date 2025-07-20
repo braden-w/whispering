@@ -20,7 +20,6 @@ export const getSessions = defineQuery({
 
 		return Ok(data);
 	},
-	staleTime: 30_000, // Consider data stale after 30 seconds
 });
 
 // Mutation for creating a new session
@@ -176,5 +175,4 @@ export const getSessionById = (sessionId: Accessor<string> | string) =>
 			}
 			return Ok(data);
 		},
-		staleTime: 30_000,
 	});
