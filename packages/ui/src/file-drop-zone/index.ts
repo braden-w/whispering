@@ -2,8 +2,9 @@
 	Installed from @ieedan/shadcn-svelte-extras
 */
 
-import FileDropZone from './file-drop-zone.svelte';
 import type { FileDropZoneProps, FileRejectedReason } from './types.js';
+
+import FileDropZone from './file-drop-zone.svelte';
 
 export const displaySize = (bytes: number): string => {
 	if (bytes < KILOBYTE) return `${bytes.toFixed(0)} B`;
