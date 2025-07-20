@@ -33,19 +33,19 @@ const sessions = await api.getSession();
 
 // Create a new session
 const newSession = await api.postSession({
-  body: {
-    provider: 'openai',
-    model: 'gpt-4o-mini',
-  },
+	body: {
+		provider: 'openai',
+		model: 'gpt-4o-mini',
+	},
 });
 
 // Send a message to a session
 const message = await api.postSessionByIdMessage({
-  path: { id: sessionId },
-  body: {
-    content: 'Hello!',
-    stream: true,
-  },
+	path: { id: sessionId },
+	body: {
+		content: 'Hello!',
+		stream: true,
+	},
 });
 ```
 
@@ -59,6 +59,7 @@ pnpm openapi-ts
 ```
 
 This will:
+
 1. Fetch the latest OpenAPI spec
 2. Regenerate all client files
 3. Update types automatically
