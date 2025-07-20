@@ -8,7 +8,7 @@
 	import { goto } from '$app/navigation';
 
 	let {
-		open = $bindable(false)
+		open = $bindable(false),
 	}: {
 		open?: boolean;
 	} = $props();
@@ -22,12 +22,12 @@
 
 		isCreating = true;
 		const result = await createSession.execute({
-			body: title ? { title } : undefined
+			body: title ? { title } : undefined,
 		});
 
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error creating session:', result.error);
 		} else if (result.value?.id) {
@@ -36,7 +36,7 @@
 			open = false;
 			title = '';
 		}
-		
+
 		isCreating = false;
 	}
 
@@ -77,10 +77,7 @@
 				>
 					Cancel
 				</Button>
-				<Button
-					type="submit"
-					disabled={isCreating}
-				>
+				<Button type="submit" disabled={isCreating}>
 					{#if isCreating}
 						Creating...
 					{:else}

@@ -1,5 +1,9 @@
 <script lang="ts">
-	import type { Message, UserMessage, AssistantMessage } from '$lib/client/types.gen';
+	import type {
+		Message,
+		UserMessage,
+		AssistantMessage,
+	} from '$lib/client/types.gen';
 	import * as Card from '@repo/ui/card';
 	import { Badge } from '@repo/ui/badge';
 	import { Skeleton } from '@repo/ui/skeleton';
@@ -8,7 +12,7 @@
 
 	let {
 		messages,
-		isLoading = false
+		isLoading = false,
 	}: {
 		messages: Message[];
 		isLoading?: boolean;
@@ -32,12 +36,12 @@
 	}
 
 	function getMessageText(message: Message): string {
-		const textParts = message.parts.filter(part => part.type === 'text');
-		return textParts.map(part => (part as any).text).join('\n');
+		const textParts = message.parts.filter((part) => part.type === 'text');
+		return textParts.map((part) => (part as any).text).join('\n');
 	}
 
 	function getToolUsage(message: AssistantMessage): number {
-		return message.parts.filter(part => part.type === 'tool').length;
+		return message.parts.filter((part) => part.type === 'tool').length;
 	}
 
 	function isMessageProcessing(message: AssistantMessage): boolean {
@@ -45,10 +49,7 @@
 	}
 </script>
 
-<div
-	class="flex-1 overflow-y-auto p-4 space-y-4"
-	bind:this={messagesContainer}
->
+<div class="flex-1 overflow-y-auto p-4 space-y-4" bind:this={messagesContainer}>
 	{#if isLoading}
 		<div class="space-y-4">
 			{#each Array(3) as _}
@@ -77,8 +78,14 @@
 		</div>
 	{:else}
 		{#each messages as message}
-			<div class="flex {isUserMessage(message) ? 'justify-end' : 'justify-start'}">
-				<Card.Root class="max-w-[80%] {isUserMessage(message) ? 'bg-primary text-primary-foreground' : ''}">
+			<div
+				class="flex {isUserMessage(message) ? 'justify-end' : 'justify-start'}"
+			>
+				<Card.Root
+					class="max-w-[80%] {isUserMessage(message)
+						? 'bg-primary text-primary-foreground'
+						: ''}"
+				>
 					<Card.Header class="pb-2">
 						<div class="flex items-center justify-between gap-4">
 							<span class="text-sm font-medium">
@@ -88,7 +95,9 @@
 								{#if isAssistantMessage(message)}
 									{#if getToolUsage(message) > 0}
 										<Badge variant="secondary" class="text-xs">
-											{getToolUsage(message)} tool{getToolUsage(message) > 1 ? 's' : ''}
+											{getToolUsage(message)} tool{getToolUsage(message) > 1
+												? 's'
+												: ''}
 										</Badge>
 									{/if}
 									{#if isMessageProcessing(message)}
@@ -109,15 +118,17 @@
 								<p class="whitespace-pre-wrap">{getMessageText(message)}</p>
 							{/if}
 							{#if isAssistantMessage(message) && message.error}
-								<div class="mt-2 p-2 bg-destructive/10 text-destructive rounded">
+								<div
+									class="mt-2 p-2 bg-destructive/10 text-destructive rounded"
+								>
 									Error: {message.error.name}
 								</div>
 							{/if}
 						</div>
 						{#if isAssistantMessage(message) && message.cost > 0}
 							<div class="mt-2 text-xs opacity-70">
-								Cost: ${message.cost.toFixed(4)} • 
-								Tokens: {message.tokens.input} in / {message.tokens.output} out
+								Cost: ${message.cost.toFixed(4)} • Tokens: {message.tokens
+									.input} in / {message.tokens.output} out
 							</div>
 						{/if}
 					</Card.Content>

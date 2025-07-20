@@ -6,7 +6,7 @@
 		value = $bindable(''),
 		onSubmit,
 		disabled = false,
-		placeholder = 'Type your message...'
+		placeholder = 'Type your message...',
 	}: {
 		value?: string;
 		onSubmit: () => void;

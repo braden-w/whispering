@@ -13,29 +13,36 @@
 
 	let { data } = $props<{ sessionId: string }>();
 
-	const sessionQuery = createQuery(rpc.sessions.getSessionById(data.sessionId).options);
-	const messagesQuery = createQuery(rpc.messages.getMessagesBySessionId(data.sessionId).options);
-
+	const sessionQuery = createQuery(
+		rpc.sessions.getSessionById(data.sessionId).options,
+	);
+	const messagesQuery = createQuery(
+		rpc.messages.getMessagesBySessionId(data.sessionId).options,
+	);
 
 	let deleteDialogOpen = $state(false);
 	let messageContent = $state('');
 
 	let isSending = $state(false);
-	
+
 	const isProcessing = $derived(
-		messagesQuery.data ? rpc.messages.isSessionProcessing(messagesQuery.data) : false
+		messagesQuery.data
+			? rpc.messages.isSessionProcessing(messagesQuery.data)
+			: false,
 	);
 
 	const canSendMessage = $derived(
-		messageContent.trim().length > 0 && !isProcessing && !isSending
+		messageContent.trim().length > 0 && !isProcessing && !isSending,
 	);
 
 	async function handleDelete() {
-		const result = await rpc.sessions.deleteSession.execute({ id: data.sessionId });
-		
+		const result = await rpc.sessions.deleteSession.execute({
+			id: data.sessionId,
+		});
+
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error deleting session:', result.error);
 		} else {
@@ -45,11 +52,13 @@
 	}
 
 	async function handleShare() {
-		const result = await rpc.sessions.shareSession.execute({ id: data.sessionId });
-		
+		const result = await rpc.sessions.shareSession.execute({
+			id: data.sessionId,
+		});
+
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error sharing session:', result.error);
 		} else {
@@ -58,11 +67,13 @@
 	}
 
 	async function handleUnshare() {
-		const result = await rpc.sessions.unshareSession.execute({ id: data.sessionId });
-		
+		const result = await rpc.sessions.unshareSession.execute({
+			id: data.sessionId,
+		});
+
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error unsharing session:', result.error);
 		} else {
@@ -71,11 +82,13 @@
 	}
 
 	async function handleAbort() {
-		const result = await rpc.sessions.abortSession.execute({ id: data.sessionId });
-		
+		const result = await rpc.sessions.abortSession.execute({
+			id: data.sessionId,
+		});
+
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error aborting session:', result.error);
 		} else {
@@ -90,17 +103,20 @@
 		messageContent = '';
 
 		isSending = true;
-		const result = await rpc.messages.sendMessage.execute({ sessionId: data.sessionId, content });
-		
+		const result = await rpc.messages.sendMessage.execute({
+			sessionId: data.sessionId,
+			content,
+		});
+
 		if (result.isErr()) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			console.error('Error sending message:', result.error);
 			// Restore the message content on error
 			messageContent = content;
 		}
-		
+
 		isSending = false;
 	}
 </script>
@@ -113,9 +129,17 @@
 					{sessionQuery.data.title || 'Untitled Session'}
 				</h1>
 				<div class="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-					<span>Created {formatDate(new Date(sessionQuery.data.time.created))}</span>
+					<span
+						>Created {formatDate(
+							new Date(sessionQuery.data.time.created),
+						)}</span
+					>
 					<span>•</span>
-					<span>Updated {formatDate(new Date(sessionQuery.data.time.updated))}</span>
+					<span
+						>Updated {formatDate(
+							new Date(sessionQuery.data.time.updated),
+						)}</span
+					>
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
@@ -123,28 +147,16 @@
 					<Badge variant="secondary">Shared</Badge>
 				{/if}
 				{#if isProcessing}
-					<Button
-						size="sm"
-						variant="destructive"
-						onclick={handleAbort}
-					>
+					<Button size="sm" variant="destructive" onclick={handleAbort}>
 						Abort
 					</Button>
 				{/if}
 				{#if sessionQuery.data.share?.url}
-					<Button
-						size="sm"
-						variant="outline"
-						onclick={handleUnshare}
-					>
+					<Button size="sm" variant="outline" onclick={handleUnshare}>
 						Unshare
 					</Button>
 				{:else}
-					<Button
-						size="sm"
-						variant="outline"
-						onclick={handleShare}
-					>
+					<Button size="sm" variant="outline" onclick={handleShare}>
 						Share
 					</Button>
 				{/if}
@@ -173,7 +185,9 @@
 			bind:value={messageContent}
 			onSubmit={handleSendMessage}
 			disabled={!canSendMessage}
-			placeholder={isProcessing ? "Waiting for response..." : "Type your message..."}
+			placeholder={isProcessing
+				? 'Waiting for response...'
+				: 'Type your message...'}
 		/>
 	</div>
 </div>
@@ -183,15 +197,13 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete the session
-				"{sessionQuery.data?.title || 'Untitled Session'}" and all its messages.
+				This action cannot be undone. This will permanently delete the session "{sessionQuery
+					.data?.title || 'Untitled Session'}" and all its messages.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={handleDelete}>
-				Delete
-			</AlertDialog.Action>
+			<AlertDialog.Action onclick={handleDelete}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

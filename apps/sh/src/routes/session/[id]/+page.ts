@@ -9,12 +9,14 @@ export const load: PageLoad = async ({ params }) => {
 	try {
 		// Prefetch session data
 		await queryClient.prefetchQuery(rpc.sessions.getSessionById(id).options());
-		
+
 		// Prefetch messages for the session
-		await queryClient.prefetchQuery(rpc.messages.getMessagesBySessionId(id).options());
+		await queryClient.prefetchQuery(
+			rpc.messages.getMessagesBySessionId(id).options(),
+		);
 
 		return {
-			sessionId: id
+			sessionId: id,
 		};
 	} catch (e) {
 		console.error('Error loading session:', e);

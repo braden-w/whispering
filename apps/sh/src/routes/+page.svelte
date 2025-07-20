@@ -21,7 +21,9 @@
 		<div class="flex items-center gap-4">
 			{#if sessionsQuery.data}
 				<Badge variant="secondary" class="text-sm">
-					{sessionsQuery.data.length} session{sessionsQuery.data.length !== 1 ? 's' : ''}
+					{sessionsQuery.data.length} session{sessionsQuery.data.length !== 1
+						? 's'
+						: ''}
 				</Badge>
 			{/if}
 			<Button onclick={() => (createDialogOpen = true)}>

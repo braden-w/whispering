@@ -3,9 +3,9 @@ export * as sessions from './sessions';
 export * as messages from './messages';
 
 // Re-export helper functions
-export { 
-	isMessageProcessing, 
-	getLatestAssistantMessage, 
+export {
+	isMessageProcessing,
+	getLatestAssistantMessage,
 	isSessionProcessing,
-	formatMessageTime 
+	formatMessageTime,
 } from './messages';
