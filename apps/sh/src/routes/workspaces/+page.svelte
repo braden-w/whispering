@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Button } from '@repo/ui/button';
 	import * as Table from '@repo/ui/table';
-	import { Badge } from '@repo/ui/badge';
 	import { workspaces } from '$lib/stores/workspaces.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
@@ -11,9 +10,21 @@
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import * as rpc from '$lib/query';
 
 	let editingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 	let deletingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
+
+	const workspacesQuery = createQuery(() => ({
+		...rpc.workspaces.getWorkspaces().options(),
+		refetchInterval: 5000, // Refresh every 5 seconds
+	}));
+
+	// Helper to find workspace data by id
+	function getWorkspaceData(configId: string) {
+		return workspacesQuery.data?.find((w) => w.id === configId);
+	}
 
 	function handleConnect(workspace: (typeof workspaces.value)[0]) {
 		// Update last used timestamp
@@ -32,7 +43,7 @@
 	}
 </script>
 
-<div class="container max-w-screen-2xl py-6 lg:py-8">
+<div class="container max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 	<div class="flex items-center justify-between mb-6">
 		<div>
 			<h1 class="text-3xl font-bold tracking-tight">Workspaces</h1>
@@ -67,6 +78,8 @@
 						<Table.Head>Name</Table.Head>
 						<Table.Head>URL</Table.Head>
 						<Table.Head>Port</Table.Head>
+						<Table.Head>Root Path</Table.Head>
+						<Table.Head>CWD</Table.Head>
 						<Table.Head>Status</Table.Head>
 						<Table.Head>Last Used</Table.Head>
 						<Table.Head class="text-right">Actions</Table.Head>
@@ -74,12 +87,27 @@
 				</Table.Header>
 				<Table.Body>
 					{#each workspaces.value as config}
+						{@const workspace = getWorkspaceData(config.id)}
 						<Table.Row>
 							<Table.Cell class="font-medium">{config.name}</Table.Cell>
 							<Table.Cell class="max-w-[200px] truncate">
 								<code class="text-xs">{config.url}</code>
 							</Table.Cell>
 							<Table.Cell>{config.port}</Table.Cell>
+							<Table.Cell class="max-w-[200px] truncate" title={workspace?.connected ? workspace.appInfo.path.root : ''}>
+								{#if workspace?.connected}
+									<code class="text-xs">{workspace.appInfo.path.root}</code>
+								{:else}
+									<span class="text-muted-foreground">—</span>
+								{/if}
+							</Table.Cell>
+							<Table.Cell class="max-w-[200px] truncate" title={workspace?.connected ? workspace.appInfo.path.cwd : ''}>
+								{#if workspace?.connected}
+									<code class="text-xs">{workspace.appInfo.path.cwd}</code>
+								{:else}
+									<span class="text-muted-foreground">—</span>
+								{/if}
+							</Table.Cell>
 							<Table.Cell>
 								<WorkspaceConnectionBadge workspace={config} />
 							</Table.Cell>
