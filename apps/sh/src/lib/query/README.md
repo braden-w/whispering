@@ -87,6 +87,11 @@ export const load: PageLoad = async ({ params }) => {
 
 - `rpc.messages.getMessagesBySessionId(sessionId)` - Fetch messages for a session
 
+### Workspaces
+
+- `rpc.workspaces.getWorkspaces` - Fetch all workspace configs and check their connection status
+- `rpc.workspaces.getWorkspace(config)` - Check connection status for a single workspace
+
 ## Available Mutations
 
 ### Sessions
@@ -136,3 +141,46 @@ if (error) {
 ## Type Safety
 
 All queries and mutations are fully typed. The TypeScript compiler will enforce correct parameter types and provide autocomplete for available options.
+
+## Workspace Connection Checking
+
+The workspace queries handle checking which OpenCode servers are online and available.
+
+### How it Works
+
+When you query workspaces, the system:
+1. Takes your saved workspace configurations
+2. Attempts to connect to each OpenCode server in parallel
+3. Merges the config with live app info if the connection succeeds
+4. Returns enhanced workspace objects with connection status
+
+### Workspace Type
+
+```typescript
+type Workspace = WorkspaceConfig & {
+  checkedAt: number; // Unix timestamp of last connection check
+} & (
+  | { connected: true; appInfo: App }  // Online workspace with full app info
+  | { connected: false }                // Offline/unreachable workspace
+);
+```
+
+### Usage Example
+
+```typescript
+// Check all workspaces
+const workspacesQuery = createQuery(rpc.workspaces.getWorkspaces.options);
+
+// In your component
+{#each $workspacesQuery.data as workspace}
+  {#if workspace.connected}
+    <div>✅ {workspace.name} - Online</div>
+    <div>Version: {workspace.appInfo.version}</div>
+  {:else}
+    <div>❌ {workspace.name} - Offline</div>
+    <div>Last checked: {new Date(workspace.checkedAt).toLocaleTimeString()}</div>
+  {/if}
+{/each}
+```
+
+This pattern is used throughout the UI to show users which workspaces are currently available for connection.
