@@ -37,12 +37,12 @@
 	});
 
 	// Commands for copy functionality
-	const opencodeCommand = $derived(`opencode serve -p ${port}`);
+	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
 	const ngrokCommand = $derived(
-		`ngrok http ${port} --basic-auth="${username}:${password}"`
+		`ngrok http ${port} --basic-auth="${username}:${password}"` as const
 	);
 	const quickSetupCommand = $derived(
-		`${opencodeCommand} & ${ngrokCommand}`
+		`${opencodeCommand} & ${ngrokCommand}; kill $!` as const
 	);
 
 	async function copyToClipboard(text: string) {
