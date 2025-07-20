@@ -6,14 +6,12 @@ import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation, defineQuery, queryClient } from './_client';
 
-// Query for fetching messages for a session
-export const getMessagesBySessionId = (sessionId: Accessor<string> | string) =>
+export const getMessagesBySessionId = (sessionId: Accessor<string>) =>
 	defineQuery({
-		queryKey: () => ['messages', typeof sessionId === 'function' ? sessionId() : sessionId],
+		queryKey: ['messages', sessionId],
 		resultQueryFn: async () => {
-			const id = typeof sessionId === 'function' ? sessionId() : sessionId;
 			const { data, error } = await api.getSessionByIdMessage({
-				path: { id },
+				path: { id: sessionId() },
 			});
 			if (error) {
 				return ShErr({
@@ -21,10 +19,9 @@ export const getMessagesBySessionId = (sessionId: Accessor<string> | string) =>
 					description: extractErrorMessage(error),
 				});
 			}
-			return Ok(data || []);
+			return Ok(data ?? []);
 		},
 		refetchInterval: 2000, // Poll every 2 seconds for real-time updates
-		staleTime: 0, // Always considered stale to ensure fresh data
 	});
 
 // Mutation for sending a message to a session
@@ -32,19 +29,13 @@ export const sendMessage = defineMutation({
 	mutationKey: ['sendMessage'],
 	resultMutationFn: async ({
 		sessionId,
-		content,
-	}: { sessionId: string; content: string | UserMessagePart[] }) => {
-		const parts: UserMessagePart[] =
-			typeof content === 'string' ? [{ type: 'text', text: content }] : content;
-
+		...body
+	}: {
+		sessionId: string;
+	} & api.PostSessionByIdMessageData['body']) => {
 		const { data, error } = await api.postSessionByIdMessage({
 			path: { id: sessionId },
-			body: {
-				providerID: 'openai',
-				modelID: 'gpt-4o',
-				mode: 'chat',
-				parts,
-			},
+			body,
 		});
 
 		if (error) {
@@ -55,11 +46,9 @@ export const sendMessage = defineMutation({
 		}
 		return Ok(data);
 	},
-	onMutate: async ({ sessionId, content }) => {
-		// Cancel any outgoing refetches
+	onMutate: async ({ sessionId, parts }) => {
 		await queryClient.cancelQueries({ queryKey: ['messages', sessionId] });
 
-		// Snapshot the previous value
 		const previousMessages = queryClient.getQueryData<Message[]>([
 			'messages',
 			sessionId,
@@ -70,10 +59,7 @@ export const sendMessage = defineMutation({
 			id: `temp-${Date.now()}`,
 			sessionID: sessionId,
 			role: 'user',
-			parts:
-				typeof content === 'string'
-					? [{ type: 'text', text: content, synthetic: false }]
-					: content,
+			parts,
 			time: {
 				created: Date.now(),
 			},
