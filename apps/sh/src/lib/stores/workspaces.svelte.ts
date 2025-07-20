@@ -3,7 +3,12 @@ import { type } from 'arktype';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 
-const Workspace = type({
+/**
+ * Configuration for connecting to an OpenCode server instance.
+ * This is what users define and we persist locally in the app.
+ * Contains all the necessary credentials and connection details.
+ */
+const WorkspaceConfig = type({
 	id: 'string',
 	name: 'string',
 	url: 'string.url',
@@ -14,18 +19,23 @@ const Workspace = type({
 	lastUsedAt: 'number',
 });
 
-export type Workspace = typeof Workspace.infer;
+export type WorkspaceConfig = typeof WorkspaceConfig.infer;
 
 export type WorkspaceCreateInput = Omit<
-	Workspace,
+	WorkspaceConfig,
 	'id' | 'createdAt' | 'lastUsedAt'
 >;
-export type WorkspaceUpdateInput = Partial<Omit<Workspace, 'id' | 'createdAt'>>;
+export type WorkspaceUpdateInput = Partial<Omit<WorkspaceConfig, 'id' | 'createdAt'>>;
 
-// Create the persisted state
-const workspaces = createPersistedState({
+/**
+ * The reactive store containing all your saved workspace connection profiles.
+ * Automatically synced with localStorage under the key 'opencode-workspaces'.
+ * 
+ * Use workspaces.value to access the array of saved connection settings.
+ */
+export const workspaces = createPersistedState({
 	key: 'opencode-workspaces',
-	schema: Workspace.array(),
+	schema: WorkspaceConfig.array(),
 	onParseError: (error) => {
 		if (error.type === 'storage_empty') {
 			return []; // First time user
@@ -44,7 +54,7 @@ const workspaces = createPersistedState({
 			// Try to recover valid workspaces
 			if (Array.isArray(error.value)) {
 				const valid = error.value.filter((w) => {
-					const result = Workspace(w);
+					const result = WorkspaceConfig(w);
 					if (result instanceof type.errors) return false;
 					return true;
 				});
@@ -69,8 +79,8 @@ export function generateRandomPort(): number {
 }
 
 // Helper functions for workspace operations
-export function createWorkspace(data: WorkspaceCreateInput): Workspace {
-	const newWorkspace: Workspace = {
+export function createWorkspace(data: WorkspaceCreateInput): WorkspaceConfig {
+	const newWorkspace: WorkspaceConfig = {
 		...data,
 		id: nanoid(),
 		createdAt: Date.now(),
@@ -106,6 +116,6 @@ export function deleteWorkspace(id: string): void {
 	toast.success(`Deleted workspace "${workspace.name}"`);
 }
 
-export function getWorkspace(id: string): Workspace | undefined {
+export function getWorkspace(id: string): WorkspaceConfig | undefined {
 	return workspaces.value.find((w) => w.id === id);
 }

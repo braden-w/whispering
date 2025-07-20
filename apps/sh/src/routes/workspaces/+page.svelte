@@ -17,13 +17,9 @@
 	let editingWorkspace = $state<typeof workspaces.value[0] | null>(null);
 	let deletingWorkspace = $state<typeof workspaces.value[0] | null>(null);
 
-	// Create reactive query options that update when workspaces change
-	const connectionsQueryOptions = $derived(
-		rpc.workspaces.checkAllWorkspaceConnections(workspaces.value).options
+	const workspacesQuery = createQuery(
+		rpc.workspaces.getWorkspaces().options
 	);
-	
-	// Use query to check all workspace connections
-	const connectionsQuery = createQuery(connectionsQueryOptions);
 
 	function handleConnect(workspace: typeof workspaces.value[0]) {
 		// Update last used timestamp
@@ -93,20 +89,21 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each workspaces.value as workspace}
+					{#each workspaces.value as config}
+						{@const workspace = workspacesQuery.data?.find(w => w.id === config.id)}
 						<Table.Row>
-							<Table.Cell class="font-medium">{workspace.name}</Table.Cell>
+							<Table.Cell class="font-medium">{config.name}</Table.Cell>
 							<Table.Cell class="max-w-[200px] truncate">
-								<code class="text-xs">{workspace.url}</code>
+								<code class="text-xs">{config.url}</code>
 							</Table.Cell>
-							<Table.Cell>{workspace.port}</Table.Cell>
+							<Table.Cell>{config.port}</Table.Cell>
 							<Table.Cell>
-								{#if connectionsQuery.isLoading}
+								{#if workspacesQuery.isLoading}
 									<Badge variant="secondary">
 										<Loader2 class="mr-1 h-3 w-3 animate-spin" />
 										Checking
 									</Badge>
-								{:else if connectionsQuery.data?.[workspace.id]?.connected}
+								{:else if workspace?.connected}
 									<Badge variant="default">
 										<CheckCircle2 class="mr-1 h-3 w-3" />
 										Connected
@@ -119,29 +116,29 @@
 								{/if}
 							</Table.Cell>
 							<Table.Cell>
-								{formatDistanceToNow(new Date(workspace.lastUsedAt))} ago
+								{formatDistanceToNow(new Date(config.lastUsedAt))} ago
 							</Table.Cell>
 							<Table.Cell>
 								<div class="flex items-center justify-end gap-2">
 									<Button
 										size="sm"
 										variant="default"
-										onclick={() => handleConnect(workspace)}
-										disabled={!connectionsQuery.data?.[workspace.id]?.connected}
+										onclick={() => handleConnect(config)}
+										disabled={!workspace?.connected}
 									>
 										Connect
 									</Button>
 									<Button
 										size="icon"
 										variant="ghost"
-										onclick={() => editingWorkspace = workspace}
+										onclick={() => editingWorkspace = config}
 									>
 										<Edit class="h-4 w-4" />
 									</Button>
 									<Button
 										size="icon"
 										variant="ghost"
-										onclick={() => deletingWorkspace = workspace}
+										onclick={() => deletingWorkspace = config}
 									>
 										<Trash2 class="h-4 w-4" />
 									</Button>

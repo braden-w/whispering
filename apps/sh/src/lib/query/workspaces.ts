@@ -1,66 +1,73 @@
 import * as api from '$lib/client/sdk.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
-import { workspaces, type Workspace } from '$lib/stores/workspaces.svelte';
+import { workspaces, type WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import { Ok } from 'wellcrafted/result';
 import { defineQuery } from './_client';
 import type { Accessor } from '@tanstack/svelte-query';
 import type { App } from '$lib/client/types.gen';
 
 /**
- * Workspace enhanced with connection metadata fetched from the opencode server.
- * Uses a discriminated union to ensure type safety between connection states.
- *
- * When connected is true, appInfo will be present.
- * When connected is false, appInfo will not exist.
+ * A workspace config merged with information fetched from the OpenCode server.
+ * 
+ * Combines:
+ * 1. Your saved connection settings (stored locally in the app)
+ * 2. Live connection status and OpenCode app info from the server
+ * 
+ * If connected=true, includes the app info. If connected=false, server is unreachable.
  */
-export type WorkspaceWithMetadata = Workspace &
+export type Workspace = WorkspaceConfig &
 	({ connected: true; appInfo: App } | { connected: false });
 
 /**
- * Query to enhance a single workspace with connection metadata.
- * Returns the workspace with additional connection status and app info.
+ * Gets a workspace by merging its config with OpenCode app info.
+ * 
+ * @param config - The workspace config to check
+ * @returns The workspace with connection status and app info if connected
  */
-export const getWorkspaceWithConnection = (workspace: Accessor<Workspace>) =>
+export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
-		queryKey: ['workspace-enhanced', workspace().id],
-		resultQueryFn: async (): Promise<Ok<WorkspaceWithMetadata>> => {
-			const client = createWorkspaceClient(workspace());
+		queryKey: ['workspace', config().id],
+		resultQueryFn: async (): Promise<Ok<Workspace>> => {
+			const client = createWorkspaceClient(config());
 
 			const { data, error } = await api.getApp({ client });
 
 			if (data && !error) {
-				return Ok({ ...workspace(), connected: true, appInfo: data });
+				return Ok({ ...config(), connected: true, appInfo: data });
 			}
 
-			return Ok({ ...workspace(), connected: false });
+			return Ok({ ...config(), connected: false });
 		},
 		// Start with the workspace marked as disconnected
-		initialData: { ...workspace(), connected: false },
+		initialData: { ...config(), connected: false },
 	});
 
 /**
- * Query to enhance multiple workspaces with connection metadata.
- * Returns an array of workspaces with additional connection status and app info.
+ * Gets all workspaces by merging their configs with OpenCode app info.
+ * 
+ * Checks all saved workspaces in parallel for speed.
+ * 
+ * @returns All workspaces with connection status and app info if connected
  */
-export const getWorkspacesWithConnections = () =>
+export const getWorkspaces = () =>
 	defineQuery({
-		queryKey: ['workspaces-enhanced'],
-		resultQueryFn: async (): Promise<Ok<WorkspaceWithMetadata[]>> => {
-			const enhancedWorkspacePromises = workspaces.value.map(
-				async (workspace): Promise<WorkspaceWithMetadata> => {
-					const client = createWorkspaceClient(workspace);
+		queryKey: ['workspaces'],
+		resultQueryFn: async (): Promise<Ok<Workspace[]>> => {
+			const workspacePromises = workspaces.value.map(
+				async (config): Promise<Workspace> => {
+					const client = createWorkspaceClient(config);
 
 					const { data, error } = await api.getApp({ client });
 
 					if (data && !error) {
-						return { ...workspace, connected: true, appInfo: data };
+						return { ...config, connected: true, appInfo: data };
 					}
 
-					return { ...workspace, connected: false };
+					return { ...config, connected: false };
 				},
 			);
 
-			const enhancedWorkspaces = await Promise.all(enhancedWorkspacePromises);
+			const enhancedWorkspaces = await Promise.all(workspacePromises);
 			return Ok(enhancedWorkspaces);
 		},
 		// Start with workspaces marked as disconnected

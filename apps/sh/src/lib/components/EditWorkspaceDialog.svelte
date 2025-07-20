@@ -3,7 +3,7 @@
 	import { Button } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
-	import { updateWorkspace, type Workspace } from '$lib/stores/workspaces.svelte';
+	import { updateWorkspace, type WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let {
@@ -11,7 +11,7 @@
 		open = $bindable(false),
 		onOpenChange
 	}: {
-		workspace: Workspace;
+		workspace: WorkspaceConfig;
 		open?: boolean;
 		onOpenChange?: (open: boolean) => void;
 	} = $props();
