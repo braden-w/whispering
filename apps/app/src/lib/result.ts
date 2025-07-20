@@ -12,11 +12,7 @@ export type WhisperingError = Omit<
 
 const WhisperingError = (
 	args: Omit<WhisperingError, 'name' | 'severity'>,
-): WhisperingError => ({
-	name: 'WhisperingError',
-	severity: 'error',
-	...args,
-});
+): WhisperingError => ({ name: 'WhisperingError', severity: 'error', ...args });
 
 export const WhisperingErr = (
 	args: Omit<WhisperingError, 'name' | 'severity'>,
