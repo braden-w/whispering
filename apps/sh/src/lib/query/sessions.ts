@@ -239,11 +239,11 @@ export const getSessionById = (
 	sessionId: Accessor<string>,
 ) =>
 	defineQuery({
-		queryKey: ['workspaces', workspace().id, 'sessions', sessionId()],
+		queryKey: ['workspaces', workspace().id, 'sessions'],
 		resultQueryFn: async () => {
 			const client = createWorkspaceClient(workspace());
 
-			const { data: allSessions, error } = await api.getSession({ client });
+			const { data, error } = await api.getSession({ client });
 			if (error) {
 				return ShErr({
 					title: 'Failed to fetch sessions',
@@ -251,14 +251,16 @@ export const getSessionById = (
 				});
 			}
 
-			const session = allSessions?.find((s) => s.id === sessionId());
+			return Ok(data);
+		},
+		select: (data) => {
+			const session = data?.find((s) => s.id === sessionId());
 			if (!session) {
 				return ShErr({
 					title: 'Session not found',
 					description: 'The requested session does not exist',
 				});
 			}
-
 			return Ok(session);
 		},
 	});
