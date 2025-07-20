@@ -1,16 +1,34 @@
-import * as api from '$lib/client';
-import type { Message, UserMessagePart } from '$lib/client/types.gen';
+import * as api from '$lib/client/sdk.gen';
+import type {
+	Message,
+	PostSessionByIdMessageData,
+	UserMessagePart,
+} from '$lib/client/types.gen';
+import { createWorkspaceClient } from '$lib/client/workspace-client';
 import { ShErr } from '$lib/result';
+import type { Workspace } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation, defineQuery, queryClient } from './_client';
 
-export const getMessagesBySessionId = (sessionId: Accessor<string>) =>
+export const getMessagesBySessionId = (
+	workspace: Accessor<Workspace>,
+	sessionId: Accessor<string>,
+) =>
 	defineQuery({
-		queryKey: ['messages', sessionId],
+		queryKey: [
+			'workspaces',
+			workspace().id,
+			'sessions',
+			sessionId(),
+			'messages',
+		],
 		resultQueryFn: async () => {
+			const client = createWorkspaceClient(workspace());
+
 			const { data, error } = await api.getSessionByIdMessage({
+				client,
 				path: { id: sessionId() },
 			});
 			if (error) {
@@ -28,12 +46,18 @@ export const getMessagesBySessionId = (sessionId: Accessor<string>) =>
 export const sendMessage = defineMutation({
 	mutationKey: ['sendMessage'],
 	resultMutationFn: async ({
+		workspace,
 		sessionId,
-		...body
+		body,
 	}: {
+		workspace: Workspace;
 		sessionId: string;
-	} & api.PostSessionByIdMessageData['body']) => {
+		body: PostSessionByIdMessageData['body'];
+	}) => {
+		const client = createWorkspaceClient(workspace);
+
 		const { data, error } = await api.postSessionByIdMessage({
+			client,
 			path: { id: sessionId },
 			body,
 		});
@@ -46,45 +70,16 @@ export const sendMessage = defineMutation({
 		}
 		return Ok(data);
 	},
-	onMutate: async ({ sessionId, parts }) => {
-		await queryClient.cancelQueries({ queryKey: ['messages', sessionId] });
-
-		const previousMessages = queryClient.getQueryData<Message[]>([
-			'messages',
-			sessionId,
-		]);
-
-		// Optimistically update to the new value
-		const optimisticMessage: Message = {
-			id: `temp-${Date.now()}`,
-			sessionID: sessionId,
-			role: 'user',
-			parts,
-			time: {
-				created: Date.now(),
-			},
-		};
-
-		queryClient.setQueryData<Message[]>(['messages', sessionId], (old) => [
-			...(old || []),
-			optimisticMessage,
-		]);
-
-		// Return a context object with the snapshotted value
-		return { previousMessages };
-	},
-	onError: (_, { sessionId }, context) => {
-		// If the mutation fails, use the context returned from onMutate to roll back
-		if (context?.previousMessages) {
-			queryClient.setQueryData(
-				['messages', sessionId],
-				context.previousMessages,
-			);
-		}
-	},
-	onSettled: ({ sessionId }) => {
-		// Always refetch after error or success
-		queryClient.invalidateQueries({ queryKey: ['messages', sessionId] });
+	onSettled: (_, __, { workspace, sessionId }) => {
+		queryClient.invalidateQueries({
+			queryKey: [
+				'workspaces',
+				workspace.id,
+				'sessions',
+				sessionId,
+				'messages',
+			],
+		});
 	},
 });
 
