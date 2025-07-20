@@ -43,6 +43,3 @@ export const fromTaggedErr = (
 	error: TaggedError<string>,
 	opts: Omit<Parameters<typeof WhisperingError>[0], 'description'>,
 ) => Err(fromTaggedError(error, opts));
-
-// Deprecated: Use fromTaggedError instead
-export const TaggedToWhisperingError = fromTaggedError;
