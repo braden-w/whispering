@@ -1,13 +1,20 @@
 <script lang="ts">
-	import * as rpc from '$lib/query';
 	import { Skeleton } from '@repo/ui/skeleton';
-	import { createQuery } from '@tanstack/svelte-query';
 	import SessionCard from './SessionCard.svelte';
+	import type { Session } from '$lib/client/types.gen';
 
-	const sessionsQuery = createQuery(rpc.sessions.getSessions.options);
+	let {
+		sessions,
+		isLoading = false,
+		workspaceId
+	}: {
+		sessions: Session[];
+		isLoading?: boolean;
+		workspaceId?: string;
+	} = $props();
 </script>
 
-{#if sessionsQuery.isPending}
+{#if isLoading}
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#each Array(6) as _}
 			<div class="space-y-3">
@@ -15,11 +22,7 @@
 			</div>
 		{/each}
 	</div>
-{:else if sessionsQuery.error}
-	<div class="text-red-500">
-		{sessionsQuery.error.description}
-	</div>
-{:else if sessionsQuery.data?.length === 0}
+{:else if sessions.length === 0}
 	<div class="flex flex-col items-center justify-center py-12 text-center">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -42,8 +45,8 @@
 	</div>
 {:else}
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each sessionsQuery.data ?? [] as session}
-			<SessionCard {session} />
+		{#each sessions as session}
+			<SessionCard {session} {workspaceId} />
 		{/each}
 	</div>
 {/if}

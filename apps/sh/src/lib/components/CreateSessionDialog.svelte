@@ -6,11 +6,14 @@
 	import * as rpc from '$lib/query';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import type { Workspace } from '$lib/stores/workspaces.svelte';
 
 	let {
 		open = $bindable(false),
+		workspace
 	}: {
 		open?: boolean;
+		workspace: Workspace;
 	} = $props();
 
 	let title = $state('');
@@ -20,8 +23,13 @@
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 
+		if (!workspace) {
+			toast.error('No workspace selected');
+			return;
+		}
+
 		isCreating = true;
-		const result = await createSession.execute();
+		const result = await createSession.execute({ workspace });
 
 		const { data, error } = result;
 		if (error) {
@@ -31,7 +39,7 @@
 			console.error('Error creating session:', error);
 		} else if (data?.id) {
 			toast.success('Session created successfully');
-			goto(`/session/${data.id}`);
+			goto(`/workspaces/${workspace.id}/sessions/${data.id}`);
 			open = false;
 			title = '';
 		}

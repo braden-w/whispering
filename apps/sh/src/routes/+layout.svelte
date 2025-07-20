@@ -31,14 +31,14 @@
 							Home
 						</a>
 						<a
-							href="/sessions"
+							href="/workspaces"
 							class="transition-colors hover:text-foreground/80 {$page.url.pathname.startsWith(
-								'/session',
+								'/workspaces',
 							)
 								? 'text-foreground'
 								: 'text-foreground/60'}"
 						>
-							Sessions
+							Workspaces
 						</a>
 					</nav>
 				</div>

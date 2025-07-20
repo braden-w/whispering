@@ -1,55 +1,26 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
-	import SessionList from '$lib/components/SessionList.svelte';
-	// import CreateSessionDialog from '$lib/components/CreateSessionDialog.svelte';
+	import { goto } from '$app/navigation';
+	import { workspaces } from '$lib/stores/workspaces.svelte';
 	import { Button } from '@repo/ui/button';
-	import { Badge } from '@repo/ui/badge';
+	import { onMount } from 'svelte';
 
-	const sessionsQuery = createQuery(rpc.sessions.getSessions.options);
-	let createDialogOpen = $state(false);
+	// If there's only one workspace, redirect to it
+	// Otherwise, redirect to the workspaces list
+	onMount(() => {
+		if (workspaces.value.length === 1) {
+			goto(`/workspaces/${workspaces.value[0].id}`);
+		} else {
+			goto('/workspaces');
+		}
+	});
 </script>
 
-<div class="space-y-6">
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Sessions</h1>
-			<p class="text-muted-foreground">
-				Manage your OpenCode conversation sessions
-			</p>
-		</div>
-		<div class="flex items-center gap-4">
-			{#if sessionsQuery.data}
-				<Badge variant="secondary" class="text-sm">
-					{sessionsQuery.data.length} session{sessionsQuery.data.length !== 1
-						? 's'
-						: ''}
-				</Badge>
-			{/if}
-			<Button onclick={() => (createDialogOpen = true)}>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="mr-2"
-				>
-					<path d="M12 5v14M5 12h14" />
-				</svg>
-				Create New Session
-			</Button>
-		</div>
-	</div>
-
-	<SessionList
-		sessions={sessionsQuery.data || []}
-		isLoading={sessionsQuery.isLoading}
-	/>
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+	<h1 class="text-4xl font-bold tracking-tight mb-4">Welcome to epicenter.sh</h1>
+	<p class="text-muted-foreground mb-8">
+		Connect to your OpenCode servers to start chatting
+	</p>
+	<Button href="/workspaces" size="lg">
+		Go to Workspaces
+	</Button>
 </div>
-
-<!-- <CreateSessionDialog bind:open={createDialogOpen} /> -->

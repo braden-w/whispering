@@ -9,7 +9,7 @@
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { createMutation } from '@tanstack/svelte-query';
 
-	let { session }: { session: Session } = $props();
+	let { session, workspaceId }: { session: Session; workspaceId?: string } = $props();
 	let deleteDialogOpen = $state(false);
 
 	const shareSessionMutation = createMutation(
@@ -28,7 +28,7 @@
 </script>
 
 <Card.Root class="hover:shadow-md transition-shadow cursor-pointer">
-	<a href="/session/{session.id}" class="block">
+	<a href="{workspaceId ? `/workspaces/${workspaceId}/sessions/${session.id}` : `/session/${session.id}`}" class="block">
 		<Card.Header>
 			<div class="flex items-start justify-between">
 				<div class="space-y-1">
