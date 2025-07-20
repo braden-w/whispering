@@ -7,19 +7,14 @@
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
 	import EditWorkspaceDialog from '$lib/components/EditWorkspaceDialog.svelte';
 	import { goto } from '$app/navigation';
-	import { CheckCircle2, XCircle, Loader2, Edit, Trash2 } from 'lucide-svelte';
+	import { Edit, Trash2 } from 'lucide-svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
+	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 
 	let createDialogOpen = $state(false);
 	let editingWorkspace = $state<typeof workspaces.value[0] | null>(null);
 	let deletingWorkspace = $state<typeof workspaces.value[0] | null>(null);
-
-	const workspacesQuery = createQuery(
-		rpc.workspaces.getWorkspaces().options
-	);
 
 	function handleConnect(workspace: typeof workspaces.value[0]) {
 		// Update last used timestamp
@@ -90,7 +85,6 @@
 				</Table.Header>
 				<Table.Body>
 					{#each workspaces.value as config}
-						{@const workspace = workspacesQuery.data?.find(w => w.id === config.id)}
 						<Table.Row>
 							<Table.Cell class="font-medium">{config.name}</Table.Cell>
 							<Table.Cell class="max-w-[200px] truncate">
@@ -98,22 +92,7 @@
 							</Table.Cell>
 							<Table.Cell>{config.port}</Table.Cell>
 							<Table.Cell>
-								{#if workspacesQuery.isPending}
-									<Badge variant="secondary">
-										<Loader2 class="mr-1 h-3 w-3 animate-spin" />
-										Checking
-									</Badge>
-								{:else if workspace?.connected}
-									<Badge variant="default">
-										<CheckCircle2 class="mr-1 h-3 w-3" />
-										Connected
-									</Badge>
-								{:else}
-									<Badge variant="destructive">
-										<XCircle class="mr-1 h-3 w-3" />
-										Disconnected
-									</Badge>
-								{/if}
+								<WorkspaceConnectionBadge workspace={config} />
 							</Table.Cell>
 							<Table.Cell>
 								{formatDistanceToNow(new Date(config.lastUsedAt))} ago
@@ -124,7 +103,6 @@
 										size="sm"
 										variant="default"
 										onclick={() => handleConnect(config)}
-										disabled={!workspace?.connected}
 									>
 										Connect
 									</Button>
