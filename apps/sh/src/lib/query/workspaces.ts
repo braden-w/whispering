@@ -10,23 +10,29 @@ import type { Accessor } from '@tanstack/svelte-query';
 import type { App } from '$lib/client/types.gen';
 
 /**
- * A workspace config merged with information fetched from the OpenCode server.
+ * A workspace configuration merged with live OpenCode app information.
  *
- * Combines:
- * 1. Your saved workspace config (stored locally in the app)
- * 2. Live connection status and OpenCode app info from the server
+ * This type represents the result of attempting to connect to a workspace's OpenCode server:
+ * - If the connection succeeds (connected=true): includes the full OpenCode app info
+ * - If the connection fails (connected=false): workspace is offline or unreachable
  *
- * If connected=true, includes the OpenCode app info. If connected=false, server is unreachable.
+ * Used in the UI to show users which workspaces are currently online and available.
  */
 export type Workspace = WorkspaceConfig &
 	({ connected: true; appInfo: App } | { connected: false });
 
 /**
- * Gets all workspaces by merging their configs with OpenCode app info.
+ * Fetches all workspace configs and attempts to merge them with live OpenCode app information.
  *
- * Checks all saved workspaces in parallel for speed.
+ * For each workspace config:
+ * - Attempts to connect to its OpenCode server using the workspace URL
+ * - If connection succeeds: marks connected=true and includes the OpenCode app info
+ * - If connection fails: marks connected=false (workspace offline/unreachable)
  *
- * @returns All workspaces with connection status and app info if connected
+ * Checks all workspaces in parallel for optimal performance.
+ * Used in the UI to display which workspaces are online vs offline.
+ *
+ * @returns Array of workspaces with their connection status and app info (if connected)
  */
 export const getWorkspaces = () =>
 	defineQuery({
@@ -59,10 +65,17 @@ export const getWorkspaces = () =>
 	});
 
 /**
- * Gets a workspace by merging its config with OpenCode app info.
+ * Fetches a single workspace config and attempts to merge it with live OpenCode app information.
  *
- * @param config - The workspace config to check
- * @returns The workspace with connection status and app info if connected
+ * Takes a workspace config and:
+ * - Attempts to connect to its OpenCode server using the workspace URL
+ * - If connection succeeds: marks connected=true and includes the OpenCode app info
+ * - If connection fails: marks connected=false (workspace offline/unreachable)
+ *
+ * Used in the UI to show whether a specific workspace is online and available.
+ *
+ * @param config - The workspace configuration to check connection status for
+ * @returns The workspace with connection status and app info (if connected)
  */
 export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
