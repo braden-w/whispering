@@ -10,9 +10,11 @@
 		generateRandomPort,
 	} from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
-	import { Copy, CheckCircle2, Loader2 } from 'lucide-svelte';
+	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
 	import * as api from '$lib/client/sdk.gen';
 	import { createWorkspaceClient } from '$lib/client/workspace-client';
+	import { getProxiedBaseUrl } from '$lib/client/utils/proxy-url';
+	import { type } from 'arktype';
 	import type { Snippet } from 'svelte';
 
 	let { triggerChild }: { triggerChild: Snippet<[{ props: ButtonProps }]> } =
@@ -29,6 +31,22 @@
 	let workspaceName = $state('');
 	let isTesting = $state(false);
 	let testSuccess = $state(false);
+	let isDetecting = $state(false);
+
+	// Define the ngrok API response schema using arktype
+	const parseNgrokTunnels = type("string.json.parse").to({
+		tunnels: [{
+			name: 'string',
+			uri: 'string',
+			public_url: 'string',
+			proto: '"http" | "https"',
+			config: {
+				addr: 'string',
+				inspect: 'boolean'
+			}
+		}],
+		uri: 'string'
+	});
 
 	// Reset form when dialog opens
 	$effect(() => {
@@ -101,6 +119,41 @@
 			});
 		} finally {
 			isTesting = false;
+		}
+	}
+
+	async function autoDetectNgrokUrl() {
+		isDetecting = true;
+		try {
+			const ngrokApiUrl = getProxiedBaseUrl('http://localhost:4040');
+			const response = await fetch(`${ngrokApiUrl}/api/tunnels`);
+			
+			if (!response.ok) {
+				throw new Error('ngrok API not accessible. Make sure ngrok is running.');
+			}
+			
+			const text = await response.text();
+			const parsed = parseNgrokTunnels(text);
+			
+			if (parsed instanceof type.errors) {
+				console.error('Invalid ngrok response:', parsed.summary);
+				throw new Error('Invalid response from ngrok');
+			}
+			
+			// Find HTTPS tunnel
+			const httpsTunnel = parsed.tunnels.find(t => t.proto === 'https');
+			if (httpsTunnel) {
+				ngrokUrl = httpsTunnel.public_url;
+				toast.success('ngrok URL detected successfully!');
+			} else {
+				toast.error('No HTTPS tunnel found. Make sure ngrok is running with the correct port.');
+			}
+		} catch (error) {
+			toast.error('Could not detect ngrok URL', {
+				description: error instanceof Error ? error.message : 'Please enter manually'
+			});
+		} finally {
+			isDetecting = false;
 		}
 	}
 
@@ -305,12 +358,40 @@
 					<Card.Content class="space-y-4">
 						<div class="space-y-2">
 							<Label for="ngrokUrl">ngrok URL</Label>
-							<Input
-								id="ngrokUrl"
-								bind:value={ngrokUrl}
-								placeholder="https://abc123.ngrok.io"
-							/>
+							<div class="flex gap-2">
+								<Input
+									id="ngrokUrl"
+									bind:value={ngrokUrl}
+									placeholder="https://abc123.ngrok.io"
+									class="flex-1"
+								/>
+								<Button
+									variant="outline"
+									size="icon"
+									onclick={autoDetectNgrokUrl}
+									disabled={isDetecting}
+									title="Auto-detect ngrok URL"
+								>
+									{#if isDetecting}
+										<Loader2 class="h-4 w-4 animate-spin" />
+									{:else}
+										<Sparkles class="h-4 w-4" />
+									{/if}
+								</Button>
+							</div>
+							<p class="text-sm text-muted-foreground">
+								Make sure ngrok is running on the default port (4040)
+							</p>
 						</div>
+						
+						<!-- Visual guide -->
+						<div class="rounded-md bg-muted p-3">
+							<p class="text-sm font-medium mb-2">Look for this in your ngrok output:</p>
+							<code class="text-xs block">
+								Forwarding  https://abc123.ngrok.io → http://localhost:{port}
+							</code>
+						</div>
+						
 						<Button
 							onclick={testConnection}
 							disabled={isTesting || !ngrokUrl}
