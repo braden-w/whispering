@@ -7,6 +7,7 @@ import {
 	createClient,
 	createConfig,
 } from './client';
+import { browser } from '$app/environment';
 
 /**
  * The `createClientConfig()` function will be called on client initialization
@@ -23,6 +24,6 @@ export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
 
 export const client = createClient(
 	createConfig<ClientOptions>({
-		baseUrl: 'http://localhost:4096',
+		baseUrl: browser ? '/api' : 'http://localhost:4096',
 	}),
 );
