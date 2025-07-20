@@ -35,51 +35,21 @@
 	let appInfo = $state<api.App | null>(null);
 
 	// Define the ngrok API response schema using arktype
-	const NgrokTunnelsResponse = type("string.json.parse").to({
-		tunnels: [{
-			name: 'string',
-			uri: 'string',
-			public_url: 'string',
-			proto: '"http" | "https"',
-			config: {
-				addr: 'string',
-				inspect: 'boolean'
-			}
-		}],
-		uri: 'string'
+	const NgrokTunnelsResponse = type('string.json.parse').to({
+		tunnels: [
+			{
+				name: 'string',
+				uri: 'string',
+				public_url: 'string',
+				proto: '"http" | "https"',
+				config: {
+					addr: 'string',
+					inspect: 'boolean',
+				},
+			},
+		],
+		uri: 'string',
 	});
-
-	// Extract a human-readable name from the project path
-	function extractProjectName(cwd: string, root: string): string {
-		// Normalize paths by removing trailing slashes
-		const normalizedCwd = cwd.replace(/\/$/, '');
-		const normalizedRoot = root.replace(/\/$/, '');
-		
-		// Get the relative path from root to cwd
-		let relativePath = normalizedCwd;
-		if (normalizedCwd.startsWith(normalizedRoot)) {
-			relativePath = normalizedCwd.slice(normalizedRoot.length);
-			// Remove leading slash if present
-			relativePath = relativePath.replace(/^\//, '');
-		}
-		
-		// If we have a relative path, use it; otherwise use the last 2-3 segments of cwd
-		if (relativePath && relativePath !== '') {
-			// Use relative path, but limit to last 3 segments
-			const segments = relativePath.split('/').filter(Boolean);
-			if (segments.length > 3) {
-				return '...' + segments.slice(-3).join('/');
-			}
-			return relativePath;
-		} else {
-			// Use last 2 segments of the cwd
-			const segments = normalizedCwd.split('/').filter(Boolean);
-			if (segments.length >= 2) {
-				return segments.slice(-2).join('/');
-			}
-			return segments[segments.length - 1] || 'workspace';
-		}
-	}
 
 	// Reset form when dialog opens
 	$effect(() => {
@@ -99,7 +69,7 @@
 	// Pre-populate workspace name when reaching step 5
 	$effect(() => {
 		if (step === 5 && !workspaceName && appInfo?.path) {
-			workspaceName = extractProjectName(appInfo.path.cwd, appInfo.path.root);
+			workspaceName = appInfo.path.cwd;
 		}
 	});
 
@@ -153,12 +123,12 @@
 			} else if (data) {
 				testSuccess = true;
 				appInfo = data;
-				
-				// Pre-populate workspace name if empty
+
+				// Pre-populate workspace name with current working directory
 				if (!workspaceName && data.path) {
-					workspaceName = extractProjectName(data.path.cwd, data.path.root);
+					workspaceName = data.path.cwd;
 				}
-				
+
 				toast.success('Connection successful!');
 			}
 		} catch (err) {
@@ -175,40 +145,48 @@
 		try {
 			const ngrokApiUrl = getProxiedBaseUrl('http://localhost:4040');
 			const response = await fetch(`${ngrokApiUrl}/api/tunnels`);
-			
+
 			if (!response.ok) {
-				throw new Error('ngrok API not accessible. Make sure ngrok is running.');
+				throw new Error(
+					'ngrok API not accessible. Make sure ngrok is running.',
+				);
 			}
-			
+
 			const text = await response.text();
 			const parsed = NgrokTunnelsResponse(text);
-			
+
 			if (parsed instanceof type.errors) {
 				console.error('Invalid ngrok response:', parsed.summary);
 				throw new Error('Invalid response from ngrok');
 			}
-			
+
 			// Find HTTPS tunnel that matches our port
-			const httpsTunnel = parsed.tunnels.find(t => 
-				t.proto === 'https' && 
-				t.config.addr.includes(`:${port}`)
+			const httpsTunnel = parsed.tunnels.find(
+				(t) => t.proto === 'https' && t.config.addr.includes(`:${port}`),
 			);
-			
+
 			if (httpsTunnel) {
 				ngrokUrl = httpsTunnel.public_url;
 				toast.success('ngrok URL detected successfully!');
 			} else {
 				// Check if there's any tunnel for our port
-				const anyTunnel = parsed.tunnels.find(t => t.config.addr.includes(`:${port}`));
+				const anyTunnel = parsed.tunnels.find((t) =>
+					t.config.addr.includes(`:${port}`),
+				);
 				if (anyTunnel) {
-					toast.error(`Found tunnel but it's not HTTPS. Make sure to run: ${ngrokCommand}`);
+					toast.error(
+						`Found tunnel but it's not HTTPS. Make sure to run: ${ngrokCommand}`,
+					);
 				} else {
-					toast.error(`No tunnel found for port ${port}. Make sure ngrok is running with the correct port.`);
+					toast.error(
+						`No tunnel found for port ${port}. Make sure ngrok is running with the correct port.`,
+					);
 				}
 			}
 		} catch (error) {
 			toast.error('Could not detect ngrok URL', {
-				description: error instanceof Error ? error.message : 'Please enter manually'
+				description:
+					error instanceof Error ? error.message : 'Please enter manually',
 			});
 		} finally {
 			isDetecting = false;
@@ -441,15 +419,17 @@
 								Make sure ngrok is running on the default port (4040)
 							</p>
 						</div>
-						
+
 						<!-- Visual guide -->
 						<div class="rounded-md bg-muted p-3">
-							<p class="text-sm font-medium mb-2">Look for this in your ngrok output:</p>
+							<p class="text-sm font-medium mb-2">
+								Look for this in your ngrok output:
+							</p>
 							<code class="text-xs block">
-								Forwarding  https://abc123.ngrok.io → http://localhost:{port}
+								Forwarding https://abc123.ngrok.io → http://localhost:{port}
 							</code>
 						</div>
-						
+
 						<Button
 							onclick={testConnection}
 							disabled={isTesting || !ngrokUrl}
@@ -486,7 +466,7 @@
 							/>
 							{#if appInfo?.path}
 								<p class="text-sm text-muted-foreground">
-									Based on project path: {appInfo.path.cwd}
+									Using current working directory as default name
 								</p>
 							{/if}
 						</div>
