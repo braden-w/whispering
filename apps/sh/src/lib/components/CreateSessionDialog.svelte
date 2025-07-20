@@ -10,7 +10,7 @@
 
 	let {
 		open = $bindable(false),
-		workspace
+		workspace,
 	}: {
 		open?: boolean;
 		workspace: Workspace;

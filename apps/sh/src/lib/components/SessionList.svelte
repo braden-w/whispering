@@ -6,7 +6,7 @@
 	let {
 		sessions,
 		isLoading = false,
-		workspaceId
+		workspaceId,
 	}: {
 		sessions: Session[];
 		isLoading?: boolean;

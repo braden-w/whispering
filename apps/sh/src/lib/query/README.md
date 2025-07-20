@@ -149,6 +149,7 @@ The workspace queries handle checking which OpenCode servers are online and avai
 ### How it Works
 
 When you query workspaces, the system:
+
 1. Takes your saved workspace configurations
 2. Attempts to connect to each OpenCode server in parallel
 3. Merges the config with live app info if the connection succeeds
@@ -158,11 +159,11 @@ When you query workspaces, the system:
 
 ```typescript
 type Workspace = WorkspaceConfig & {
-  checkedAt: number; // Unix timestamp of last connection check
+	checkedAt: number; // Unix timestamp of last connection check
 } & (
-  | { connected: true; appInfo: App }  // Online workspace with full app info
-  | { connected: false }                // Offline/unreachable workspace
-);
+		| { connected: true; appInfo: App } // Online workspace with full app info
+		| { connected: false } // Offline/unreachable workspace
+	);
 ```
 
 ### Usage Example

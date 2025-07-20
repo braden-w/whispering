@@ -3,13 +3,16 @@
 	import { Button } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
-	import { updateWorkspace, type WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+	import {
+		updateWorkspace,
+		type WorkspaceConfig,
+	} from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let {
 		workspace,
 		open = $bindable(false),
-		onOpenChange
+		onOpenChange,
 	}: {
 		workspace: WorkspaceConfig;
 		open?: boolean;
@@ -58,11 +61,11 @@
 			url: url.trim(),
 			port,
 			username,
-			password
+			password,
 		});
 
 		toast.success('Workspace updated successfully');
-		
+
 		if (onOpenChange) {
 			onOpenChange(false);
 		} else {
@@ -91,11 +94,7 @@
 		<div class="space-y-4">
 			<div class="space-y-2">
 				<Label for="edit-name">Workspace Name</Label>
-				<Input
-					id="edit-name"
-					bind:value={name}
-					placeholder="My Project"
-				/>
+				<Input id="edit-name" bind:value={name} placeholder="My Project" />
 			</div>
 
 			<div class="space-y-2">

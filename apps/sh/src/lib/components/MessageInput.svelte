@@ -3,7 +3,12 @@
 	import { Button } from '@repo/ui/button';
 	import * as Select from '@repo/ui/select';
 	import { Badge } from '@repo/ui/badge';
-	import { FileDropZone, ACCEPT_AUDIO, ACCEPT_VIDEO, MEGABYTE } from '@repo/ui/file-drop-zone';
+	import {
+		FileDropZone,
+		ACCEPT_AUDIO,
+		ACCEPT_VIDEO,
+		MEGABYTE,
+	} from '@repo/ui/file-drop-zone';
 	import { PaperclipIcon, X } from 'lucide-svelte';
 
 	let {
@@ -45,7 +50,7 @@
 	}
 
 	function removeFile(file: File) {
-		uploadedFiles = uploadedFiles.filter(f => f !== file);
+		uploadedFiles = uploadedFiles.filter((f) => f !== file);
 		if (uploadedFiles.length === 0) {
 			showFileUpload = false;
 		}
@@ -74,17 +79,17 @@
 				<Select.Item value="refactor">Refactor</Select.Item>
 			</Select.Content>
 		</Select.Root>
-		
+
 		<Button
 			variant="ghost"
 			size="icon"
-			onclick={() => showFileUpload = !showFileUpload}
+			onclick={() => (showFileUpload = !showFileUpload)}
 			{disabled}
 		>
 			<PaperclipIcon class="h-4 w-4" />
 		</Button>
 	</div>
-	
+
 	{#if showFileUpload}
 		<FileDropZone
 			accept="{ACCEPT_AUDIO}, {ACCEPT_VIDEO}"
@@ -94,7 +99,7 @@
 			class="h-24"
 		/>
 	{/if}
-	
+
 	{#if uploadedFiles.length > 0}
 		<div class="flex flex-wrap gap-1">
 			{#each uploadedFiles as file}
@@ -112,7 +117,7 @@
 			{/each}
 		</div>
 	{/if}
-	
+
 	<div class="flex gap-2">
 		<Textarea
 			bind:value

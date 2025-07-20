@@ -59,7 +59,10 @@ export const deleteSession = defineMutation({
 	resultMutationFn: async ({
 		workspace,
 		sessionId,
-	}: { workspace: Workspace; sessionId: string }) => {
+	}: {
+		workspace: Workspace;
+		sessionId: string;
+	}) => {
 		const client = createWorkspaceClient(workspace);
 
 		const { data, error } = await api.deleteSessionById({
@@ -87,7 +90,10 @@ export const shareSession = defineMutation({
 	resultMutationFn: async ({
 		workspace,
 		id,
-	}: { workspace: Workspace; id: string }) => {
+	}: {
+		workspace: Workspace;
+		id: string;
+	}) => {
 		const client = createWorkspaceClient(workspace);
 
 		const { data, error } = await api.postSessionByIdShare({
@@ -115,7 +121,10 @@ export const unshareSession = defineMutation({
 	resultMutationFn: async ({
 		workspace,
 		id,
-	}: { workspace: Workspace; id: string }) => {
+	}: {
+		workspace: Workspace;
+		id: string;
+	}) => {
 		const client = createWorkspaceClient(workspace);
 
 		const { data, error } = await api.deleteSessionByIdShare({
@@ -143,7 +152,10 @@ export const abortSession = defineMutation({
 	resultMutationFn: async ({
 		workspace,
 		id,
-	}: { workspace: Workspace; id: string }) => {
+	}: {
+		workspace: Workspace;
+		id: string;
+	}) => {
 		const client = createWorkspaceClient(workspace);
 
 		const { data, error } = await api.postSessionByIdAbort({
