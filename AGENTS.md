@@ -97,12 +97,40 @@ import { Input } from '$lib/components/ui/input';
 
 # Documentation & README Writing Guidelines
 
+## Technical Writing Voice
+
+### Core Principles
+- **Start with the problem or decision**: "I was building X and hit this decision" not "When building applications..."
+- **Show the insight first**: Lead with what you realized, then explain why
+- **Use concrete examples**: Show actual code or scenarios, not abstract concepts
+- **Make it conversational**: Write like you're explaining to a colleague at lunch
+
+### Sentence Structure
+- **Short, punchy observations**: "That's it. No Result types. No error handling dance."
+- **Build rhythm**: Mix short sentences with longer explanations
+- **Use fragments for emphasis**: "Every. Single. Operation."
+- **Ask the reader's unspoken question**: "But why all this complexity for localStorage?"
+
+### Technical Explanations
+- **Explain the 'why' before the 'how'**: "localStorage is synchronous. Why am I adding async complexity?"
+- **Call out the obvious**: "Here's the thing that took me too long to realize"
+- **Use comparisons**: "I was treating localStorage like a remote database. But it's not."
+- **End with the lesson**: Not generic advice, but what YOU learned
+
+### Avoiding Academic/Corporate Tone
+- Don't: "This article explores two architectural approaches..."
+- Do: "I hit an interesting architectural decision"
+- Don't: "Let's examine the implications"
+- Do: "Here's what I mean"
+- Don't: "In conclusion, both patterns have merit"
+- Do: "The lesson: Not every data access needs a service"
+
 ## Authentic Communication Style
 - Avoid emojis in headings and formal content unless explicitly requested
 - Use direct, factual language over marketing speak or hyperbole
 - Lead with genuine value propositions, not sales tactics
 - Mirror the straightforward tone of established sections when editing
-- Prefer "We built this because..." over "Revolutionary new..."
+- Prefer "I built this because..." over "Revolutionary new..."
 
 ## Open Source Mindset
 - Emphasize user control and data ownership
@@ -127,6 +155,12 @@ import { Input } from '$lib/components/ui/input';
 - **Personal voice**: "I built this because..." not "This was built to..."
 - **Conversational flow**: Ideas connect naturally, not in rigid sections
 - **Concrete examples**: "I use it 3-4 hours daily" not "heavy usage"
+
+### Code Examples in Articles
+- **Trim to essentials**: Show the pattern, not every implementation detail
+- **Add inline observations**: "Notice how every operation returns a Result type"
+- **Compare approaches side-by-side**: Keep code minimal but complete enough to understand
+- **Comment on the experience**: "That's a lot of ceremony for localStorage"
 
 ### The OpenAI Post Pattern (What Works)
 ```
