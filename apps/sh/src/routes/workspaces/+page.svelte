@@ -10,6 +10,7 @@
 	import { CheckCircle2, XCircle, Loader2, Edit, Trash2 } from 'lucide-svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
+	import { getProxiedBaseUrl } from '$lib/client/utils/proxy-url';
 
 	let createDialogOpen = $state(false);
 	let editingWorkspace = $state<typeof workspaces.value[0] | null>(null);
@@ -21,8 +22,9 @@
 		connectionStatuses[workspace.id] = 'checking';
 		
 		try {
-			// Try to fetch the app info to test connection
-			const response = await fetch(`${workspace.url}/app`, {
+			// Use proxied URL to bypass CORS
+			const proxiedUrl = getProxiedBaseUrl(workspace.url);
+			const response = await fetch(`${proxiedUrl}/app`, {
 				headers: {
 					'Authorization': `Basic ${btoa(`${workspace.username}:${workspace.password}`)}`
 				},
