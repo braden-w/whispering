@@ -14,12 +14,14 @@ import type { App } from '$lib/client/types.gen';
  *
  * This type represents the result of attempting to connect to a workspace's OpenCode server:
  * - If the connection succeeds (connected=true): includes the full OpenCode app info
- * - If the connection fails (connected=false): workspace is offline or unreachable
+ * - If the connection fails (connected=false): workspace is unreachable
+ * - Always includes checkedAt: timestamp of when we last checked the connection
  *
  * Used in the UI to show users which workspaces are currently online and available.
  */
-export type Workspace = WorkspaceConfig &
-	({ connected: true; appInfo: App } | { connected: false });
+export type Workspace = WorkspaceConfig & {
+	checkedAt: number; // Unix timestamp of last connection check
+} & ({ connected: true; appInfo: App } | { connected: false });
 
 /**
  * Fetches all workspace configs and attempts to merge them with live OpenCode app information.
@@ -27,7 +29,7 @@ export type Workspace = WorkspaceConfig &
  * For each workspace config:
  * - Attempts to connect to its OpenCode server using the workspace URL
  * - If connection succeeds: marks connected=true and includes the OpenCode app info
- * - If connection fails: marks connected=false (workspace offline/unreachable)
+ * - If connection fails: marks connected=false (workspace unreachable)
  *
  * Checks all workspaces in parallel for optimal performance.
  * Used in the UI to display which workspaces are online vs offline.
@@ -45,21 +47,25 @@ export const getWorkspaces = () =>
 					const { data, error } = await api.getApp({ client });
 
 					if (data && !error) {
-						return { ...config, connected: true, appInfo: data };
+						return {
+							...config,
+							checkedAt: Date.now(),
+							connected: true,
+							appInfo: data,
+						};
 					}
 
-					return { ...config, connected: false };
+					return {
+						...config,
+						checkedAt: Date.now(),
+						connected: false,
+					};
 				},
 			);
 
 			const enhancedWorkspaces = await Promise.all(workspacePromises);
 			return Ok(enhancedWorkspaces);
 		},
-		// Start with workspaces marked as disconnected
-		initialData: workspaces.value.map((w) => ({
-			...w,
-			connected: false,
-		})),
 		// Only refetch if workspaces exist
 		enabled: workspaces.value.length > 0,
 	});
@@ -70,7 +76,7 @@ export const getWorkspaces = () =>
  * Takes a workspace config and:
  * - Attempts to connect to its OpenCode server using the workspace URL
  * - If connection succeeds: marks connected=true and includes the OpenCode app info
- * - If connection fails: marks connected=false (workspace offline/unreachable)
+ * - If connection fails: marks connected=false (workspace unreachable)
  *
  * Used in the UI to show whether a specific workspace is online and available.
  *
@@ -86,10 +92,19 @@ export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 			const { data, error } = await api.getApp({ client });
 
 			if (data && !error) {
-				return Ok({ ...config(), connected: true, appInfo: data });
+				return Ok({
+					...config(),
+					checkedAt: Date.now(),
+					connected: true,
+					appInfo: data,
+				});
 			}
 
-			return Ok({ ...config(), connected: false });
+			return Ok({
+				...config(),
+				checkedAt: Date.now(),
+				connected: false,
+			});
 		},
 		initialData: queryClient
 			.getQueryData<Workspace[]>(['workspaces'])
