@@ -24,7 +24,7 @@ export type WorkspaceCreateInput = Omit<
 export type WorkspaceUpdateInput = Partial<Omit<Workspace, 'id' | 'createdAt'>>;
 
 // Create the persisted state
-export const workspaces = createPersistedState({
+const workspaces = createPersistedState({
 	key: 'opencode-workspaces',
 	schema: Workspace.array(),
 	onParseError: (error) => {
@@ -131,12 +131,3 @@ export function getWorkspaceWithPassword(
 		password: decrypt(workspace.password),
 	};
 }
-
-// Derived values
-export const workspaceCount = $derived(workspaces.value.length);
-
-export const sortedWorkspaces = $derived(
-	[...workspaces.value].sort((a, b) => b.lastUsedAt - a.lastUsedAt),
-);
-
-export const hasWorkspaces = $derived(workspaces.value.length > 0);
