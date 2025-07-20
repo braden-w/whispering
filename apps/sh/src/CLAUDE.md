@@ -1,4 +1,5 @@
 The auto-generated API client is located at:
+
 ```
 src/lib/client/
 ```
@@ -30,9 +31,9 @@ await queryClient.prefetchQuery(rpc.sessions.getSessionById(id).options());
 // Mutations - use .execute()
 const result = await rpc.sessions.createSession.execute({ body: { title } });
 if (result.isErr()) {
-  // Handle error
+	// Handle error
 } else {
-  // Handle success
+	// Handle success
 }
 ```
 

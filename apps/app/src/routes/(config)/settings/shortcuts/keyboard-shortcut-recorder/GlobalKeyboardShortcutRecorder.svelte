@@ -104,10 +104,9 @@
 
 			if (unregisterError) {
 				rpc.notify.error.execute(
-					fromTaggedError(
-						unregisterError,
-						{ title: 'Error clearing global shortcut' },
-					),
+					fromTaggedError(unregisterError, {
+						title: 'Error clearing global shortcut',
+					}),
 				);
 			}
 

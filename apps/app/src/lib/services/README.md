@@ -112,10 +112,11 @@ async function transcribe(
 ): Promise<Result<string, TranscriptionError>> {
 	return tryAsync({
 		try: () => apiCall(blob),
-		mapError: (error) => TranscriptionError({
-			message: 'Failed to transcribe audio',
-			cause: error,
-		}),
+		mapError: (error) =>
+			TranscriptionError({
+				message: 'Failed to transcribe audio',
+				cause: error,
+			}),
 	});
 }
 ```
@@ -185,11 +186,12 @@ This pattern ensures consistent error handling and avoids double-wrapping errors
    ```typescript
    return tryAsync({
    	try: () => navigator.mediaDevices.getUserMedia(constraints),
-   	mapError: (error) => DeviceStreamServiceError({
-   		message: 'Unable to access microphone. Please check permissions.',
-   		context: { constraints, hasPermission },
-   		cause: error,
-   	}),
+   	mapError: (error) =>
+   		DeviceStreamServiceError({
+   			message: 'Unable to access microphone. Please check permissions.',
+   			context: { constraints, hasPermission },
+   			cause: error,
+   		}),
    });
    ```
 
@@ -267,13 +269,15 @@ Never wrap an already-wrapped error. The query layer handles the single transfor
 ```typescript
 // ❌ BAD: Service returns tagged error, query wraps it, then UI wraps again
 if (error) {
-    const whisperingError = WhisperingErr({ /* ... */ });
-    notify.error.execute({ ...whisperingError.error }); // Double wrapping!
+	const whisperingError = WhisperingErr({
+		/* ... */
+	});
+	notify.error.execute({ ...whisperingError.error }); // Double wrapping!
 }
 
 // ✅ GOOD: Service returns tagged error, query wraps it, UI uses directly
 if (error) {
-    notify.error.execute(error); // Already a WhisperingError from query layer
+	notify.error.execute(error); // Already a WhisperingError from query layer
 }
 ```
 

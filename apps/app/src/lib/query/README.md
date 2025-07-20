@@ -230,49 +230,54 @@ getRecorderState: defineQuery({
 ### Anti-Patterns to Avoid
 
 #### ❌ Double Wrapping
+
 ```typescript
 // BAD: Don't wrap an already-wrapped WhisperingError
 if (getRecorderStateError) {
-    const whisperingError = WhisperingErr({
-        title: '❌ Failed to get recorder state',
-        description: getRecorderStateError.message,
-        action: { type: 'more-details', error: getRecorderStateError },
-    });
-    notify.error.execute({ id: nanoid(), ...whisperingError.error });
-    return whisperingError;
+	const whisperingError = WhisperingErr({
+		title: '❌ Failed to get recorder state',
+		description: getRecorderStateError.message,
+		action: { type: 'more-details', error: getRecorderStateError },
+	});
+	notify.error.execute({ id: nanoid(), ...whisperingError.error });
+	return whisperingError;
 }
 ```
 
 #### ❌ Inconsistent Query Layer
+
 ```typescript
 // BAD: Query layer should wrap errors, not return raw service errors
 getRecorderState: defineQuery({
-    queryKey: recorderKeys.state,
-    resultQueryFn: () => services.manualRecorder.getRecorderState(), // Missing error wrapping!
-    initialData: 'IDLE' as WhisperingRecordingState,
-})
+	queryKey: recorderKeys.state,
+	resultQueryFn: () => services.manualRecorder.getRecorderState(), // Missing error wrapping!
+	initialData: 'IDLE' as WhisperingRecordingState,
+});
 ```
 
 #### ✅ Correct Pattern
+
 ```typescript
 // GOOD: Query wraps service errors, UI uses them directly
 getRecorderState: defineQuery({
-    resultQueryFn: async () => {
-        const { data, error } = await services.manualRecorder.getRecorderState();
-        if (error) {
-            return Err(WhisperingError({
-                title: '❌ Failed to get recorder state',
-                description: error.message,
-                action: { type: 'more-details', error },
-            }));
-        }
-        return Ok(data);
-    },
-})
+	resultQueryFn: async () => {
+		const { data, error } = await services.manualRecorder.getRecorderState();
+		if (error) {
+			return Err(
+				WhisperingError({
+					title: '❌ Failed to get recorder state',
+					description: error.message,
+					action: { type: 'more-details', error },
+				}),
+			);
+		}
+		return Ok(data);
+	},
+});
 
 // In UI/command layer - use WhisperingError directly
 if (error) {
-    notify.error.execute(error); // No re-wrapping!
+	notify.error.execute(error); // No re-wrapping!
 }
 ```
 
