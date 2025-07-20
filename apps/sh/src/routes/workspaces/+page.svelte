@@ -7,17 +7,15 @@
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
 	import EditWorkspaceDialog from '$lib/components/EditWorkspaceDialog.svelte';
 	import { goto } from '$app/navigation';
-	import { Edit, Trash2, Plus, ChevronDown, GitBranch } from 'lucide-svelte';
-	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import { Edit, Plus, ChevronDown, GitBranch } from 'lucide-svelte';
 	import * as Tooltip from '@repo/ui/tooltip';
-	import { toast } from 'svelte-sonner';
+	import DeleteWorkspaceButton from '$lib/components/DeleteWorkspaceButton.svelte';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import { cn } from '@repo/ui/utils';
 
 	let editingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
-	let deletingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 
 	// Helper function to extract folder name from path (cross-platform)
 	function getFolderName(path: string): string {
@@ -72,11 +70,6 @@
 		goto(`/workspaces/${workspace.id}`);
 	}
 
-	function handleDelete(workspace: (typeof workspaces.value)[0]) {
-		workspaces.value = workspaces.value.filter((w) => w.id !== workspace.id);
-		deletingWorkspace = null;
-		toast.success('Deleted workspace');
-	}
 </script>
 
 <div class="container max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
@@ -258,13 +251,7 @@
 										>
 											<Edit class="h-4 w-4" />
 										</Button>
-										<Button
-											size="icon"
-											variant="ghost"
-											onclick={() => (deletingWorkspace = config)}
-										>
-											<Trash2 class="h-4 w-4" />
-										</Button>
+										<DeleteWorkspaceButton workspace={config} />
 									</div>
 								</Table.Cell>
 							{/if}
@@ -285,25 +272,3 @@
 		}}
 	/>
 {/if}
-
-<AlertDialog.Root open={!!deletingWorkspace}>
-	<AlertDialog.Content>
-		<AlertDialog.Header>
-			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-			<AlertDialog.Description>
-				This will permanently delete the workspace.
-				This action cannot be undone.
-			</AlertDialog.Description>
-		</AlertDialog.Header>
-		<AlertDialog.Footer>
-			<AlertDialog.Cancel onclick={() => (deletingWorkspace = null)}>
-				Cancel
-			</AlertDialog.Cancel>
-			<AlertDialog.Action
-				onclick={() => deletingWorkspace && handleDelete(deletingWorkspace)}
-			>
-				Delete
-			</AlertDialog.Action>
-		</AlertDialog.Footer>
-	</AlertDialog.Content>
-</AlertDialog.Root>
