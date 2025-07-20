@@ -25,13 +25,13 @@ export type WorkspaceCreateInput = Omit<
 	WorkspaceConfig,
 	'id' | 'createdAt' | 'lastUsedAt'
 >;
-export type WorkspaceUpdateInput = Partial<Omit<WorkspaceConfig, 'id' | 'createdAt'>>;
+export type WorkspaceUpdateInput = Partial<
+	Omit<WorkspaceConfig, 'id' | 'createdAt'>
+>;
 
 /**
- * The reactive store containing all your saved workspace connection profiles.
+ * The reactive store containing all of the user's saved workspace configurations.
  * Automatically synced with localStorage under the key 'opencode-workspaces'.
- * 
- * Use workspaces.value to access the array of saved connection settings.
  */
 export const workspaces = createPersistedState({
 	key: 'opencode-workspaces',

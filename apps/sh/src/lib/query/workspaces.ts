@@ -10,10 +10,10 @@ import type { App } from '$lib/client/types.gen';
  * A workspace config merged with information fetched from the OpenCode server.
  * 
  * Combines:
- * 1. Your saved connection settings (stored locally in the app)
+ * 1. Your saved workspace config (stored locally in the app)
  * 2. Live connection status and OpenCode app info from the server
  * 
- * If connected=true, includes the app info. If connected=false, server is unreachable.
+ * If connected=true, includes the OpenCode app info. If connected=false, server is unreachable.
  */
 export type Workspace = WorkspaceConfig &
 	({ connected: true; appInfo: App } | { connected: false });
