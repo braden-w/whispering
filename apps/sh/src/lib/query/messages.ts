@@ -2,7 +2,6 @@ import * as api from '$lib/client/sdk.gen';
 import type {
 	Message,
 	PostSessionByIdMessageData,
-	UserMessagePart,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
 import { ShErr } from '$lib/result';
@@ -72,13 +71,7 @@ export const sendMessage = defineMutation({
 	},
 	onSettled: (_, __, { workspace, sessionId }) => {
 		queryClient.invalidateQueries({
-			queryKey: [
-				'workspaces',
-				workspace.id,
-				'sessions',
-				sessionId,
-				'messages',
-			],
+			queryKey: ['workspaces', workspace.id, 'sessions', sessionId, 'messages'],
 		});
 	},
 });
