@@ -1,5 +1,4 @@
 {
-	"model": "opus",
 	"permissions": {
 		"allow": [
 			"WebFetch",
@@ -128,7 +127,9 @@
 			"Bash(gh:cache*list*)",
 			"Bash(gh:help*)",
 			"Bash(gh:version*)",
-			"Bash(gh:--version*)"
+			"Bash(gh:--version*)",
+			"Bash(mkdir:*)"
 		]
-	}
+	},
+	"model": "opus"
 }
