@@ -1,11 +1,10 @@
 import * as api from '$lib/client/sdk.gen';
 import type {
-	Message,
 	AssistantMessage,
-	EventMessageUpdated,
 	EventMessagePartUpdated,
 	EventMessageRemoved,
-	Event,
+	EventMessageUpdated,
+	Message,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
 import type { Workspace } from '$lib/stores/workspaces.svelte';
@@ -184,18 +183,8 @@ export function createMessageSubscriber(
 		}
 	}
 
-	/**
-	 * Establishes an SSE connection to receive real-time message updates
-	 *
-	 * @remarks
-	 * Creates an EventSource connection with:
-	 * - Basic auth credentials embedded in URL (EventSource limitation)
-	 * - Event listeners for message updates, streaming parts, and deletions
-	 * - Automatic cleanup of previous connections
-	 *
-	 * TODO: Add exponential backoff reconnection on errors
-	 */
-	function establishSSEConnection() {
+	// Subscribe to reactive updates
+	const subscribe = createSubscriber((update) => {
 		if (eventSource) {
 			eventSource.close();
 		}
@@ -213,6 +202,7 @@ export function createMessageSubscriber(
 			const data = parseEventData<EventMessageUpdated>(event);
 			if (data && data.properties.info.sessionID === sessionId()) {
 				upsertMessage(data.properties.info);
+				update();
 			}
 		});
 
@@ -221,6 +211,7 @@ export function createMessageSubscriber(
 			const data = parseEventData<EventMessagePartUpdated>(event);
 			if (data && data.properties.sessionID === sessionId()) {
 				mergeStreamingPart(data.properties.messageID, data.properties.part);
+				update();
 			}
 		});
 
@@ -229,6 +220,7 @@ export function createMessageSubscriber(
 			const data = parseEventData<EventMessageRemoved>(event);
 			if (data && data.properties.sessionID === sessionId()) {
 				deleteMessageById(data.properties.messageID);
+				update();
 			}
 		});
 
@@ -237,26 +229,6 @@ export function createMessageSubscriber(
 			console.error('SSE connection error:', error);
 			// TODO: Implement exponential backoff reconnection
 		};
-	}
-
-	// Subscribe to reactive updates
-	const subscribe = createSubscriber((update) => {
-		// Initial fetch
-		loadInitialMessages();
-
-		// Set up SSE
-		establishSSEConnection();
-
-		// Re-fetch and re-subscribe when dependencies change
-		$effect(() => {
-			workspace(); // Track workspace changes
-			sessionId(); // Track session changes
-
-			// Re-fetch and re-subscribe
-			loadInitialMessages();
-			establishSSEConnection();
-			update();
-		});
 
 		// Cleanup
 		return () => {
@@ -272,6 +244,7 @@ export function createMessageSubscriber(
 			subscribe();
 			return messages;
 		},
+		loadInitialMessages,
 	};
 }
 

@@ -1,4 +1,3 @@
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { createPersistedState } from '@repo/svelte-utils';
 import { type } from 'arktype';
 import { nanoid } from 'nanoid';
@@ -74,7 +73,6 @@ export function createWorkspace(data: WorkspaceCreateInput): Workspace {
 	const newWorkspace: Workspace = {
 		...data,
 		id: nanoid(),
-		password: encrypt(data.password), // Encrypt the password
 		createdAt: Date.now(),
 		lastUsedAt: Date.now(),
 	};
@@ -91,14 +89,7 @@ export function updateWorkspace(
 	workspaces.value = workspaces.value.map((w) => {
 		if (w.id !== id) return w;
 
-		const updated = { ...w, ...updates, lastUsedAt: Date.now() };
-
-		// If password is being updated, encrypt it
-		if (updates.password) {
-			updated.password = encrypt(updates.password);
-		}
-
-		return updated;
+		return { ...w, ...updates, lastUsedAt: Date.now() };
 	});
 
 	toast.success('Workspace updated');
@@ -117,17 +108,4 @@ export function deleteWorkspace(id: string): void {
 
 export function getWorkspace(id: string): Workspace | undefined {
 	return workspaces.value.find((w) => w.id === id);
-}
-
-// Get workspace with decrypted password
-export function getWorkspaceWithPassword(
-	id: string,
-): (Workspace & { password: string }) | undefined {
-	const workspace = getWorkspace(id);
-	if (!workspace) return undefined;
-
-	return {
-		...workspace,
-		password: decrypt(workspace.password),
-	};
 }
