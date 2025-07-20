@@ -10,6 +10,8 @@
 			variant: {
 				default:
 					'bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent',
+				success:
+					'bg-success [a&]:hover:bg-success/90 focus-visible:ring-success/20 dark:focus-visible:ring-success/40 dark:bg-success/80 border-transparent text-white',
 				destructive:
 					'bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white',
 				id: 'px-1.5 bg-muted text-muted-foreground [a&]:hover:bg-muted/90 border-transparent font-mono text-xs rounded-md font-normal',

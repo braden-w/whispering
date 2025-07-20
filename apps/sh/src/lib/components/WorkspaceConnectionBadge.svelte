@@ -5,7 +5,7 @@
 	import { CheckCircle2, XCircle, Loader2 } from 'lucide-svelte';
 	import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 
-	let { workspace, refetchInterval = 5000 }: { workspace: WorkspaceConfig; refetchInterval?: number } = $props();
+	let { workspace, refetchInterval = 2000 }: { workspace: WorkspaceConfig; refetchInterval?: number } = $props();
 
 	const workspaceQuery = createQuery(
 		() => ({
@@ -21,7 +21,7 @@
 		Checking
 	</Badge>
 {:else if workspaceQuery.data?.connected}
-	<Badge variant="default">
+	<Badge variant="success">
 		<CheckCircle2 class="mr-1 h-3 w-3" />
 		Connected
 	</Badge>
