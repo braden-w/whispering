@@ -30,15 +30,23 @@
 	// Create session query with workspace accessor
 	const sessionQuery = $derived(
 		workspace
-			? createQuery(rpc.sessions.getSessionById(() => workspace, () => sessionId).options)
-			: null
+			? createQuery(
+					rpc.sessions.getSessionById(
+						() => workspace,
+						() => sessionId,
+					).options,
+				)
+			: null,
 	);
 
 	// Create message subscriber
 	const messages = $derived(
 		workspace
-			? createMessageSubscriber(() => workspace, () => sessionId)
-			: null
+			? createMessageSubscriber(
+					() => workspace,
+					() => sessionId,
+				)
+			: null,
 	);
 
 	// Load initial messages when component mounts
@@ -54,13 +62,11 @@
 	let isSending = $state(false);
 
 	const isProcessing = $derived(
-		messages?.value
-			? rpc.messages.isSessionProcessing(messages.value)
-			: false
+		messages?.value ? rpc.messages.isSessionProcessing(messages.value) : false,
 	);
 
 	const canSendMessage = $derived(
-		messageContent.trim().length > 0 && !isProcessing && !isSending
+		messageContent.trim().length > 0 && !isProcessing && !isSending,
 	);
 
 	async function handleDelete() {
@@ -68,12 +74,12 @@
 
 		const result = await rpc.sessions.deleteSession.execute({
 			workspace,
-			sessionId
+			sessionId,
 		});
 
 		if (result.error) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 		} else if (result.data) {
 			toast.success('Session deleted successfully');
@@ -86,12 +92,12 @@
 
 		const result = await rpc.sessions.shareSession.execute({
 			workspace,
-			id: sessionId
+			id: sessionId,
 		});
 
 		if (result.error) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 		} else if (result.data) {
 			toast.success('Session shared successfully');
@@ -103,12 +109,12 @@
 
 		const result = await rpc.sessions.unshareSession.execute({
 			workspace,
-			id: sessionId
+			id: sessionId,
 		});
 
 		if (result.error) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 		} else if (result.data) {
 			toast.success('Session unshared successfully');
@@ -120,12 +126,12 @@
 
 		const result = await rpc.sessions.abortSession.execute({
 			workspace,
-			id: sessionId
+			id: sessionId,
 		});
 
 		if (result.error) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 		} else if (result.data) {
 			toast.success('Session aborted successfully');
@@ -143,12 +149,12 @@
 			workspace,
 			sessionId,
 			mode: messageMode,
-			parts: [{ type: 'text', text: content }]
+			parts: [{ type: 'text', text: content }],
 		});
 
 		if (result.error) {
 			toast.error(result.error.title, {
-				description: result.error.description
+				description: result.error.description,
 			});
 			// Restore the message content on error
 			messageContent = content;
@@ -162,7 +168,7 @@
 
 		// For now, just show a toast that file upload is not yet implemented
 		toast.info('File upload coming soon!', {
-			description: 'This feature is still being implemented.'
+			description: 'This feature is still being implemented.',
 		});
 	}
 </script>
@@ -200,10 +206,20 @@
 					<h1 class="text-2xl font-bold">
 						{sessionQuery.data.title || 'Untitled Session'}
 					</h1>
-					<div class="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-						<span>Created {formatDate(new Date(sessionQuery.data.time.created))}</span>
+					<div
+						class="flex items-center gap-4 mt-1 text-sm text-muted-foreground"
+					>
+						<span
+							>Created {formatDate(
+								new Date(sessionQuery.data.time.created),
+							)}</span
+						>
 						<span>•</span>
-						<span>Updated {formatDate(new Date(sessionQuery.data.time.updated))}</span>
+						<span
+							>Updated {formatDate(
+								new Date(sessionQuery.data.time.updated),
+							)}</span
+						>
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
@@ -239,7 +255,7 @@
 			{#if messages}
 				<MessageList
 					messages={messages.value}
-					isLoading={sessionQuery.isLoading}
+					isLoading={sessionQuery.isPending}
 				/>
 			{/if}
 		</div>
@@ -265,8 +281,9 @@
 			<AlertDialog.Header>
 				<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 				<AlertDialog.Description>
-					This action cannot be undone. This will permanently delete the session "{sessionQuery
-						?.data?.title || 'Untitled Session'}" and all its messages.
+					This action cannot be undone. This will permanently delete the session
+					"{sessionQuery?.data?.title || 'Untitled Session'}" and all its
+					messages.
 				</AlertDialog.Description>
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
