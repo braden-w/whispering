@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getWorkspace } from '$lib/stores/workspaces.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import MessageList from '$lib/components/MessageList.svelte';
@@ -15,45 +13,29 @@
 	import { toast } from 'svelte-sonner';
 	import { formatDate } from '$lib/utils/date';
 	import { ChevronRight } from 'lucide-svelte';
+	import type { PageData } from './$types';
 
-	const workspaceId = $derived($page.params.id);
-	const sessionId = $derived($page.params.sessionId);
-	const workspace = $derived(getWorkspace(workspaceId));
-
-	// Redirect if workspace not found
-	$effect(() => {
-		if (!workspace) {
-			goto('/workspaces');
-		}
-	});
+	let { data }: { data: PageData } = $props();
+	const workspace = $derived(data.workspace);
+	const sessionId = $derived(data.sessionId);
 
 	// Create session query with workspace accessor
-	const sessionQuery = $derived(
-		workspace
-			? createQuery(
-					rpc.sessions.getSessionById(
-						() => workspace,
-						() => sessionId,
-					).options,
-				)
-			: null,
+	const sessionQuery = createQuery(
+		rpc.sessions.getSessionById(
+			() => workspace,
+			() => sessionId,
+		).options,
 	);
 
 	// Create message subscriber
-	const messages = $derived(
-		workspace
-			? createMessageSubscriber(
-					() => workspace,
-					() => sessionId,
-				)
-			: null,
+	const messages = createMessageSubscriber(
+		() => workspace,
+		() => sessionId,
 	);
 
 	// Load initial messages when component mounts
 	$effect(() => {
-		if (messages) {
-			messages.loadInitialMessages();
-		}
+		messages.loadInitialMessages();
 	});
 
 	let deleteDialogOpen = $state(false);
@@ -62,7 +44,7 @@
 	let isSending = $state(false);
 
 	const isProcessing = $derived(
-		messages?.value ? rpc.messages.isSessionProcessing(messages.value) : false,
+		rpc.messages.isSessionProcessing(messages.value),
 	);
 
 	const canSendMessage = $derived(
@@ -70,7 +52,7 @@
 	);
 
 	async function handleDelete() {
-		if (!workspace || !sessionQuery?.data) return;
+		if (!sessionQuery.data) return;
 
 		const result = await rpc.sessions.deleteSession.execute({
 			workspace,
@@ -88,8 +70,6 @@
 	}
 
 	async function handleShare() {
-		if (!workspace) return;
-
 		const result = await rpc.sessions.shareSession.execute({
 			workspace,
 			id: sessionId,
@@ -105,8 +85,6 @@
 	}
 
 	async function handleUnshare() {
-		if (!workspace) return;
-
 		const result = await rpc.sessions.unshareSession.execute({
 			workspace,
 			id: sessionId,
@@ -122,8 +100,6 @@
 	}
 
 	async function handleAbort() {
-		if (!workspace) return;
-
 		const result = await rpc.sessions.abortSession.execute({
 			workspace,
 			id: sessionId,
@@ -139,7 +115,7 @@
 	}
 
 	async function handleSendMessage() {
-		if (!canSendMessage || !workspace) return;
+		if (!canSendMessage) return;
 
 		const content = messageContent.trim();
 		messageContent = '';
@@ -164,8 +140,6 @@
 	}
 
 	async function handleFileUpload(files: File[]) {
-		if (!workspace) return;
-
 		// For now, just show a toast that file upload is not yet implemented
 		toast.info('File upload coming soon!', {
 			description: 'This feature is still being implemented.',
@@ -173,7 +147,7 @@
 	}
 </script>
 
-{#if workspace && sessionQuery}
+{#if sessionQuery}
 	<div class="container mx-auto py-6 flex flex-col h-[calc(100vh-5rem)]">
 		<!-- Breadcrumb Navigation -->
 		<Breadcrumb.Root class="mb-4">
@@ -185,7 +159,7 @@
 					<ChevronRight class="h-4 w-4" />
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces/{workspaceId}">
+					<Breadcrumb.Link href="/workspaces/{workspace.id}">
 						{workspace.name}
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>
@@ -252,12 +226,10 @@
 		{/if}
 
 		<div class="flex-1 overflow-hidden">
-			{#if messages}
-				<MessageList
-					messages={messages.value}
-					isLoading={sessionQuery.isPending}
-				/>
-			{/if}
+			<MessageList
+				messages={messages.value}
+				isLoading={sessionQuery.isPending}
+			/>
 		</div>
 
 		<Separator />
@@ -282,7 +254,7 @@
 				<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 				<AlertDialog.Description>
 					This action cannot be undone. This will permanently delete the session
-					"{sessionQuery?.data?.title || 'Untitled Session'}" and all its
+					"{sessionQuery.data?.title || 'Untitled Session'}" and all its
 					messages.
 				</AlertDialog.Description>
 			</AlertDialog.Header>
