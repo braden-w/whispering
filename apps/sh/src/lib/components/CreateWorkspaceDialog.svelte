@@ -1,18 +1,22 @@
 <script lang="ts">
 	import * as Dialog from '@repo/ui/dialog';
-	import { Button } from '@repo/ui/button';
+	import { Button, type Props as ButtonProps } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Card from '@repo/ui/card';
 	import * as Tabs from '@repo/ui/tabs';
-	import { createWorkspace, generateRandomPort } from '$lib/stores/workspaces.svelte';
+	import {
+		createWorkspace,
+		generateRandomPort,
+	} from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2 } from 'lucide-svelte';
 	import * as api from '$lib/client/sdk.gen';
 	import { createWorkspaceClient } from '$lib/client/workspace-client';
 	import type { Snippet } from 'svelte';
 
-	let { children }: { children: Snippet } = $props();
+	let { triggerChild }: { triggerChild: Snippet<[{ props: ButtonProps }]> } =
+		$props();
 
 	let open = $state(false);
 
@@ -43,10 +47,10 @@
 	// Commands for copy functionality
 	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
 	const ngrokCommand = $derived(
-		`ngrok http ${port} --basic-auth="${username}:${password}"` as const
+		`ngrok http ${port} --basic-auth="${username}:${password}"` as const,
 	);
 	const quickSetupCommand = $derived(
-		`${opencodeCommand} & ${ngrokCommand}; kill $!` as const
+		`${opencodeCommand} & ${ngrokCommand}; kill $!` as const,
 	);
 
 	async function copyToClipboard(text: string) {
@@ -77,7 +81,7 @@
 				username,
 				password,
 				createdAt: 0,
-				lastAccessedAt: 0
+				lastAccessedAt: 0,
 			};
 
 			const client = createWorkspaceClient(testWorkspace);
@@ -85,7 +89,7 @@
 
 			if (error) {
 				toast.error('Connection failed', {
-					description: 'Please check your URL and credentials'
+					description: 'Please check your URL and credentials',
 				});
 			} else {
 				testSuccess = true;
@@ -93,7 +97,7 @@
 			}
 		} catch (err) {
 			toast.error('Connection failed', {
-				description: err instanceof Error ? err.message : 'Unknown error'
+				description: err instanceof Error ? err.message : 'Unknown error',
 			});
 		} finally {
 			isTesting = false;
@@ -116,7 +120,7 @@
 			url: ngrokUrl,
 			port,
 			username,
-			password
+			password,
 		});
 
 		toast.success(`Created workspace "${workspaceName}"`);
@@ -142,7 +146,9 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Trigger>
-		{@render children?.()}
+		{#snippet child({ props })}
+			{@render triggerChild({ props })}
+		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-[600px]">
 		<Dialog.Header>
@@ -213,7 +219,9 @@
 				<!-- Step 3: Setup Instructions -->
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-lg">Step 3: Start OpenCode Server</Card.Title>
+						<Card.Title class="text-lg"
+							>Step 3: Start OpenCode Server</Card.Title
+						>
 						<Card.Description>
 							Run the following commands to start your server
 						</Card.Description>
@@ -222,12 +230,15 @@
 						<Tabs.Root value="separate" class="w-full">
 							<Tabs.List class="grid w-full grid-cols-2">
 								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
-								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger>
+								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger
+								>
 							</Tabs.List>
 							<Tabs.Content value="separate" class="space-y-4">
 								<div class="space-y-4">
 									<div>
-										<p class="text-sm text-muted-foreground mb-2">In your project directory, run:</p>
+										<p class="text-sm text-muted-foreground mb-2">
+											In your project directory, run:
+										</p>
 										<div class="flex items-center gap-2">
 											<code class="flex-1 bg-muted p-2 rounded text-sm">
 												{opencodeCommand}
@@ -242,9 +253,13 @@
 										</div>
 									</div>
 									<div>
-										<p class="text-sm text-muted-foreground mb-2">In another terminal, run:</p>
+										<p class="text-sm text-muted-foreground mb-2">
+											In another terminal, run:
+										</p>
 										<div class="flex items-center gap-2">
-											<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+											<code
+												class="flex-1 bg-muted p-2 rounded text-sm break-all"
+											>
 												{ngrokCommand}
 											</code>
 											<Button
@@ -259,7 +274,9 @@
 								</div>
 							</Tabs.Content>
 							<Tabs.Content value="combined" class="space-y-4">
-								<p class="text-sm text-muted-foreground">Run both commands in one line:</p>
+								<p class="text-sm text-muted-foreground">
+									Run both commands in one line:
+								</p>
 								<div class="flex items-center gap-2">
 									<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
 										{quickSetupCommand}
@@ -344,9 +361,7 @@
 			<div class="flex items-center justify-between w-full">
 				<div>
 					{#if step > 1}
-						<Button variant="outline" onclick={previousStep}>
-							Previous
-						</Button>
+						<Button variant="outline" onclick={previousStep}>Previous</Button>
 					{/if}
 				</div>
 				<div class="flex gap-2">
@@ -354,9 +369,7 @@
 						<Button variant="outline">Cancel</Button>
 					</Dialog.Close>
 					{#if step < 5}
-						<Button onclick={nextStep}>
-							Next
-						</Button>
+						<Button onclick={nextStep}>Next</Button>
 					{:else}
 						<Button
 							onclick={handleCreate}
