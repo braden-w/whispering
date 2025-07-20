@@ -3,7 +3,11 @@
 	"version": "0.0.1",
 	"type": "module",
 	"imports": {
-		"#*": ["./src/*", "./src/*.ts", "./src/*/index.ts"]
+		"#*": [
+			"./src/*",
+			"./src/*.ts",
+			"./src/*/index.ts"
+		]
 	},
 	"exports": {
 		"./*": "./src/*/index.ts",
@@ -24,7 +28,7 @@
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.8.1",
-		"@lucide/svelte": "^0.525.0",
+		"@lucide/svelte": "^0.515.0",
 		"@repo/config": "workspace:*",
 		"@types/node": "^22.15.32",
 		"clsx": "^2.1.1",
