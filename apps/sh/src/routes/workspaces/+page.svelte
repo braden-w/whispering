@@ -7,8 +7,9 @@
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
 	import EditWorkspaceDialog from '$lib/components/EditWorkspaceDialog.svelte';
 	import { goto } from '$app/navigation';
-	import { Edit, Trash2, Plus, ChevronDown } from 'lucide-svelte';
+	import { Edit, Trash2, Plus, ChevronDown, GitBranch } from 'lucide-svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import * as Tooltip from '@repo/ui/tooltip';
 	import { toast } from 'svelte-sonner';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
@@ -18,9 +19,17 @@
 	let editingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 	let deletingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 
+	// Helper function to extract folder name from path (cross-platform)
+	function getFolderName(path: string): string {
+		// Split by both forward and back slashes, filter out empty strings
+		const segments = path.split(/[/\\]/).filter(Boolean);
+		return segments[segments.length - 1] || 'workspace';
+	}
+
 	// Define available columns
 	const columns = [
-		{ id: 'name', label: 'Name', hideable: false },
+		{ id: 'folderName', label: '', hideable: false }, // Empty label for folder name
+		{ id: 'git', label: 'Git', hideable: true },
 		{ id: 'url', label: 'URL', hideable: true },
 		{ id: 'port', label: 'Port', hideable: true },
 		{ id: 'rootPath', label: 'Root Path', hideable: true },
@@ -32,7 +41,8 @@
 
 	// Persisted column visibility state
 	let columnVisibility = $state({
-		name: true,
+		folderName: true,
+		git: true,
 		url: true,
 		port: true,
 		rootPath: false, // Hidden by default
@@ -65,7 +75,7 @@
 	function handleDelete(workspace: (typeof workspaces.value)[0]) {
 		workspaces.value = workspaces.value.filter((w) => w.id !== workspace.id);
 		deletingWorkspace = null;
-		toast.success(`Deleted workspace "${workspace.name}"`);
+		toast.success('Deleted workspace');
 	}
 </script>
 
@@ -134,7 +144,9 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						{#if columnVisibility.name !== false}<Table.Head>Name</Table.Head
+						{#if columnVisibility.folderName !== false}<Table.Head></Table.Head
+							>{/if}
+						{#if columnVisibility.git !== false}<Table.Head>Git</Table.Head
 							>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}
@@ -160,8 +172,30 @@
 					{#each workspaces.value as config}
 						{@const workspace = getWorkspaceData(config.id)}
 						<Table.Row>
-							{#if columnVisibility.name !== false}
-								<Table.Cell class="font-medium">{config.name}</Table.Cell>
+							{#if columnVisibility.folderName !== false}
+								<Table.Cell class="font-medium">
+									{#if workspace?.connected}
+										{getFolderName(workspace.appInfo.path.cwd)}
+									{:else}
+										<span class="text-muted-foreground">—</span>
+									{/if}
+								</Table.Cell>
+							{/if}
+							{#if columnVisibility.git !== false}
+								<Table.Cell>
+									{#if workspace?.connected && workspace.appInfo.git?.enabled}
+										<Tooltip.Root>
+											<Tooltip.Trigger class="inline-flex">
+												<GitBranch class="h-4 w-4 text-foreground" />
+											</Tooltip.Trigger>
+											<Tooltip.Content>
+												<p>Git is enabled for this repository</p>
+											</Tooltip.Content>
+										</Tooltip.Root>
+									{:else}
+										<span class="text-muted-foreground">—</span>
+									{/if}
+								</Table.Cell>
 							{/if}
 							{#if columnVisibility.url !== false}
 								<Table.Cell class="max-w-[200px] truncate">
@@ -257,7 +291,7 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete the workspace "{deletingWorkspace?.name}".
+				This will permanently delete the workspace.
 				This action cannot be undone.
 			</AlertDialog.Description>
 		</AlertDialog.Header>

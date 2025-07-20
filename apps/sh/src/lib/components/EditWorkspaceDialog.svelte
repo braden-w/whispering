@@ -20,7 +20,6 @@
 	} = $props();
 
 	// Form state - initialize with workspace values
-	let name = $state(workspace.name);
 	let url = $state(workspace.url);
 	let port = $state(workspace.port);
 	let username = $state(workspace.username);
@@ -28,7 +27,6 @@
 
 	// Reset form when workspace changes
 	$effect(() => {
-		name = workspace.name;
 		url = workspace.url;
 		port = workspace.port;
 		username = workspace.username;
@@ -36,11 +34,6 @@
 	});
 
 	function handleSave() {
-		if (!name.trim()) {
-			toast.error('Workspace name is required');
-			return;
-		}
-
 		if (!url.trim()) {
 			toast.error('URL is required');
 			return;
@@ -57,7 +50,7 @@
 		}
 
 		updateWorkspace(workspace.id, {
-			name: name.trim(),
+			name: workspace.name, // Keep existing name
 			url: url.trim(),
 			port,
 			username,
@@ -92,11 +85,6 @@
 		</Dialog.Header>
 
 		<div class="space-y-4">
-			<div class="space-y-2">
-				<Label for="edit-name">Workspace Name</Label>
-				<Input id="edit-name" bind:value={name} placeholder="My Project" />
-			</div>
-
 			<div class="space-y-2">
 				<Label for="edit-url">ngrok URL</Label>
 				<Input
