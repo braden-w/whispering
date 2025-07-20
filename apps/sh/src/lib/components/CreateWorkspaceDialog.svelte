@@ -32,9 +32,10 @@
 	let isTesting = $state(false);
 	let testSuccess = $state(false);
 	let isDetecting = $state(false);
+	let appInfo = $state<api.App | null>(null);
 
 	// Define the ngrok API response schema using arktype
-	const parseNgrokTunnels = type("string.json.parse").to({
+	const NgrokTunnelsResponse = type("string.json.parse").to({
 		tunnels: [{
 			name: 'string',
 			uri: 'string',
@@ -48,6 +49,38 @@
 		uri: 'string'
 	});
 
+	// Extract a human-readable name from the project path
+	function extractProjectName(cwd: string, root: string): string {
+		// Normalize paths by removing trailing slashes
+		const normalizedCwd = cwd.replace(/\/$/, '');
+		const normalizedRoot = root.replace(/\/$/, '');
+		
+		// Get the relative path from root to cwd
+		let relativePath = normalizedCwd;
+		if (normalizedCwd.startsWith(normalizedRoot)) {
+			relativePath = normalizedCwd.slice(normalizedRoot.length);
+			// Remove leading slash if present
+			relativePath = relativePath.replace(/^\//, '');
+		}
+		
+		// If we have a relative path, use it; otherwise use the last 2-3 segments of cwd
+		if (relativePath && relativePath !== '') {
+			// Use relative path, but limit to last 3 segments
+			const segments = relativePath.split('/').filter(Boolean);
+			if (segments.length > 3) {
+				return '...' + segments.slice(-3).join('/');
+			}
+			return relativePath;
+		} else {
+			// Use last 2 segments of the cwd
+			const segments = normalizedCwd.split('/').filter(Boolean);
+			if (segments.length >= 2) {
+				return segments.slice(-2).join('/');
+			}
+			return segments[segments.length - 1] || 'workspace';
+		}
+	}
+
 	// Reset form when dialog opens
 	$effect(() => {
 		if (open) {
@@ -59,6 +92,14 @@
 			workspaceName = '';
 			isTesting = false;
 			testSuccess = false;
+			appInfo = null;
+		}
+	});
+
+	// Pre-populate workspace name when reaching step 5
+	$effect(() => {
+		if (step === 5 && !workspaceName && appInfo?.path) {
+			workspaceName = extractProjectName(appInfo.path.cwd, appInfo.path.root);
 		}
 	});
 
@@ -103,14 +144,21 @@
 			};
 
 			const client = createWorkspaceClient(testWorkspace);
-			const { error } = await api.getApp({ client });
+			const { data, error } = await api.getApp({ client });
 
 			if (error) {
 				toast.error('Connection failed', {
 					description: 'Please check your URL and credentials',
 				});
-			} else {
+			} else if (data) {
 				testSuccess = true;
+				appInfo = data;
+				
+				// Pre-populate workspace name if empty
+				if (!workspaceName && data.path) {
+					workspaceName = extractProjectName(data.path.cwd, data.path.root);
+				}
+				
 				toast.success('Connection successful!');
 			}
 		} catch (err) {
@@ -133,20 +181,30 @@
 			}
 			
 			const text = await response.text();
-			const parsed = parseNgrokTunnels(text);
+			const parsed = NgrokTunnelsResponse(text);
 			
 			if (parsed instanceof type.errors) {
 				console.error('Invalid ngrok response:', parsed.summary);
 				throw new Error('Invalid response from ngrok');
 			}
 			
-			// Find HTTPS tunnel
-			const httpsTunnel = parsed.tunnels.find(t => t.proto === 'https');
+			// Find HTTPS tunnel that matches our port
+			const httpsTunnel = parsed.tunnels.find(t => 
+				t.proto === 'https' && 
+				t.config.addr.includes(`:${port}`)
+			);
+			
 			if (httpsTunnel) {
 				ngrokUrl = httpsTunnel.public_url;
 				toast.success('ngrok URL detected successfully!');
 			} else {
-				toast.error('No HTTPS tunnel found. Make sure ngrok is running with the correct port.');
+				// Check if there's any tunnel for our port
+				const anyTunnel = parsed.tunnels.find(t => t.config.addr.includes(`:${port}`));
+				if (anyTunnel) {
+					toast.error(`Found tunnel but it's not HTTPS. Make sure to run: ${ngrokCommand}`);
+				} else {
+					toast.error(`No tunnel found for port ${port}. Make sure ngrok is running with the correct port.`);
+				}
 			}
 		} catch (error) {
 			toast.error('Could not detect ngrok URL', {
@@ -426,6 +484,11 @@
 								bind:value={workspaceName}
 								placeholder="My Project"
 							/>
+							{#if appInfo?.path}
+								<p class="text-sm text-muted-foreground">
+									Based on project path: {appInfo.path.cwd}
+								</p>
+							{/if}
 						</div>
 						{#if testSuccess}
 							<div class="flex items-center gap-2 text-sm text-green-600">
