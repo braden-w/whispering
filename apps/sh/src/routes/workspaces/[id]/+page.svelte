@@ -6,11 +6,14 @@
 	import { ChevronRight } from 'lucide-svelte';
 	import CreateSessionModal from './_components/CreateSessionModal.svelte';
 	import SessionList from './_components/SessionList.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import * as rpc from '$lib/query';
 
 	const { data } = $props();
 
 	const workspaceConfig = $derived(data.workspaceConfig);
-	const sessions = $derived(data.sessions);
+
+	const sessionsQuery = createQuery(() => ({... rpc.sessions.getSessions(() => workspaceConfig).options(), initialData: data.sessions}));
 
 	let createDialogOpen = $state(false);
 </script>
@@ -46,7 +49,7 @@
 				<div class="flex items-center gap-4">
 					<WorkspaceConnectionBadge workspaceConfig={workspaceConfig} />
 						<Badge variant="secondary" class="text-sm">
-							{sessions.length} session{sessions.length !== 1 ? 's' : ''}
+							{sessionsQuery.data?.length} session{sessionsQuery.data?.length !== 1 ? 's' : ''}
 						</Badge>
 					<Button onclick={() => (createDialogOpen = true)}>
 						<svg
@@ -69,7 +72,7 @@
 			</div>
 
 				<SessionList
-					sessions={sessions}
+					sessions={sessionsQuery.data ?? []}
 					workspaceConfig={workspaceConfig}
 				/>
 		</div>
