@@ -8,7 +8,7 @@
 		workspaceConfig,
 	}: {
 		sessions: Session[];
-		workspaceConfig?: WorkspaceConfig;
+		workspaceConfig: WorkspaceConfig;
 	} = $props();
 </script>
 
