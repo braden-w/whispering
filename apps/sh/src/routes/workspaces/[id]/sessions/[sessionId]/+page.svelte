@@ -3,6 +3,7 @@
 	import MessageInput from '$lib/components/MessageInput.svelte';
 	import MessageList from '$lib/components/MessageList.svelte';
 	import SessionControls from '$lib/components/SessionControls.svelte';
+	import ModelSelector from '$lib/components/ModelSelector.svelte';
 	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
@@ -40,13 +41,14 @@
 	let messageContent = $state('');
 	let messageMode = $state('chat');
 	let isSending = $state(false);
+	let selectedModel = $state<{ providerId: string; modelId: string } | null>(null);
 
 	const isProcessing = $derived(
 		rpc.messages.isSessionProcessing(messages.value),
 	);
 
 	const canSendMessage = $derived(
-		messageContent.trim().length > 0 && !isProcessing && !isSending,
+		messageContent.trim().length > 0 && !isProcessing && !isSending && selectedModel !== null,
 	);
 
 	async function handleDelete() {
@@ -113,7 +115,7 @@
 	}
 
 	async function handleSendMessage() {
-		if (!canSendMessage) return;
+		if (!canSendMessage || !selectedModel) return;
 
 		const content = messageContent.trim();
 		messageContent = '';
@@ -123,8 +125,8 @@
 			workspaceConfig,
 			sessionId,
 			body: {
-				providerID: 'openai',  // TODO: Get from workspace settings
-				modelID: 'gpt-4o',      // TODO: Get from workspace settings
+				providerID: selectedModel.providerId,
+				modelID: selectedModel.modelId,
 				mode: messageMode,
 				parts: [{ type: 'text', text: content }],
 			},
@@ -233,11 +235,18 @@
 		{/if}
 
 		<!-- Session Controls -->
-		<SessionControls
-			currentMode={messageMode}
-			onModeChange={handleModeChange}
-			isProcessing={isProcessing}
-		/>
+		<div class="flex items-center gap-2">
+			<SessionControls
+				currentMode={messageMode}
+				onModeChange={handleModeChange}
+				isProcessing={isProcessing}
+			/>
+			<ModelSelector
+				{workspaceConfig}
+				bind:value={selectedModel}
+				class="w-[200px]"
+			/>
+		</div>
 
 		<div class="flex-1 overflow-y-auto">
 			<MessageList
@@ -257,6 +266,8 @@
 				disabled={!canSendMessage}
 				placeholder={isProcessing
 					? 'Waiting for response...'
+					: !selectedModel
+					? 'Select a model to start chatting...'
 					: 'Type your message...'}
 			/>
 		</div>

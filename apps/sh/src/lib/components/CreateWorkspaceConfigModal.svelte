@@ -8,7 +8,7 @@
 	import * as Accordion from '@repo/ui/accordion';
 	import {
 		createWorkspaceConfig,
-		generateRandomPort,
+		generateRandomPorts,
 	} from '$lib/stores/workspace-configs.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
@@ -23,12 +23,15 @@
 		$props();
 
 	let open = $state(false);
+	let isCheckingPorts = $state(false);
 
 	// Form state
 	let step = $state(1);
 	let username = $state(settings.value.defaultUsername);
 	let password = $state(settings.value.defaultPassword);
-	let port = $state(generateRandomPort());
+	const { privatePort, publicPort } = generateRandomPorts();
+	let privatePortState = $state(privatePort);
+	let publicPortState = $state(publicPort);
 	let ngrokUrl = $state('');
 	let workspaceName = $state('');
 	let isTesting = $state(false);
@@ -59,12 +62,17 @@
 			step = 1;
 			username = settings.value.defaultUsername;
 			password = settings.value.defaultPassword;
-			port = generateRandomPort();
 			ngrokUrl = '';
 			workspaceName = '';
 			isTesting = false;
 			testSuccess = false;
 			appInfo = null;
+			
+			// Generate available ports asynchronously
+			generateAvailablePorts().then(ports => {
+				privatePortState = ports.privatePort;
+				publicPortState = ports.publicPort;
+			});
 		}
 	});
 
@@ -76,12 +84,26 @@
 	});
 
 	// Commands for copy functionality
-	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
-	const ngrokCommand = $derived(
-		`ngrok http ${port} --basic-auth="${username}:${password}"` as const,
+	const opencodeCommand = $derived(`opencode serve -p ${privatePortState}` as const);
+	const caddyCommand = $derived(
+		`caddy run --config - --adapter caddyfile << 'EOF'
+:${publicPortState} {
+    header Access-Control-Allow-Origin "*"
+    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers "*"
+    header Access-Control-Allow-Credentials "true"
+    
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+    
+    reverse_proxy localhost:${privatePortState}
+}
+EOF` as const,
 	);
-	const quickSetupCommand = $derived(
-		`${opencodeCommand} & ${ngrokCommand}; kill $!` as const,
+	const ngrokCommand = $derived(
+		`ngrok http ${publicPortState} --basic-auth="${username}:${password}"` as const,
 	);
 
 	async function copyToClipboard(text: string) {
@@ -90,6 +112,60 @@
 			toast.success('Copied to clipboard');
 		} catch {
 			toast.error('Failed to copy to clipboard');
+		}
+	}
+
+	// Check if a port is available by attempting to connect to it
+	async function isPortAvailable(port: number): Promise<boolean> {
+		try {
+			// Try to fetch from localhost on the given port
+			// If it fails with network error, the port is likely available
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+			
+			await fetch(`http://localhost:${port}`, { 
+				signal: controller.signal,
+				mode: 'no-cors' // Avoid CORS issues
+			});
+			clearTimeout(timeoutId);
+			
+			// If we get here, something is running on this port
+			return false;
+		} catch (error) {
+			// Network error means port is likely available
+			return true;
+		}
+	}
+
+	// Generate available ports
+	async function generateAvailablePorts(): Promise<{ privatePort: number; publicPort: number }> {
+		isCheckingPorts = true;
+		try {
+			let attempts = 0;
+			const maxAttempts = 50;
+			
+			while (attempts < maxAttempts) {
+				const ports = generateRandomPorts();
+				
+				// Check both ports in parallel
+				const [privateAvailable, publicAvailable] = await Promise.all([
+					isPortAvailable(ports.privatePort),
+					isPortAvailable(ports.publicPort)
+				]);
+				
+				if (privateAvailable && publicAvailable) {
+					toast.success('Found available ports');
+					return ports;
+				}
+				
+				attempts++;
+			}
+			
+			// Fallback if we couldn't find available ports
+			toast.warning('Could not verify port availability. Please ensure the generated ports are free.');
+			return generateRandomPorts();
+		} finally {
+			isCheckingPorts = false;
 		}
 	}
 
@@ -108,7 +184,8 @@
 				id: 'test',
 				name: 'test',
 				url: ngrokUrl,
-				port,
+				privatePort: privatePortState,
+				publicPort: publicPortState,
 				username,
 				password,
 				createdAt: 0,
@@ -162,18 +239,18 @@
 				throw new Error('Invalid response from ngrok');
 			}
 
-			// Find HTTPS tunnel that matches our port
+			// Find HTTPS tunnel that matches our public port
 			const httpsTunnel = parsed.tunnels.find(
-				(t) => t.proto === 'https' && t.config.addr.includes(`:${port}`),
+				(t) => t.proto === 'https' && t.config.addr.includes(`:${publicPortState}`),
 			);
 
 			if (httpsTunnel) {
 				ngrokUrl = httpsTunnel.public_url;
 				toast.success('ngrok URL detected successfully!');
 			} else {
-				// Check if there's any tunnel for our port
+				// Check if there's any tunnel for our public port
 				const anyTunnel = parsed.tunnels.find((t) =>
-					t.config.addr.includes(`:${port}`),
+					t.config.addr.includes(`:${publicPortState}`),
 				);
 				if (anyTunnel) {
 					toast.error(
@@ -181,7 +258,7 @@
 					);
 				} else {
 					toast.error(
-						`No tunnel found for port ${port}. Make sure ngrok is running with the correct port.`,
+						`No tunnel found for port ${publicPortState}. Make sure ngrok is running with the correct port.`,
 					);
 				}
 			}
@@ -209,7 +286,8 @@
 		createWorkspaceConfig({
 			name: workspaceName.trim(),
 			url: ngrokUrl,
-			port,
+			privatePort: privatePortState,
+			publicPort: publicPortState,
 			username,
 			password,
 		});
@@ -243,107 +321,103 @@
 
 		<div class="space-y-4">
 			{#if step === 1}
-				<!-- Step 1: Start OpenCode Server -->
+				<!-- Step 1: Setup Commands -->
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-lg"
-							>Step 1: Start OpenCode Server</Card.Title
-						>
+						<Card.Title class="text-lg">Step 1: Setup Commands</Card.Title>
 						<Card.Description>
-							Run the following command to start your server
+							Run these commands in separate terminals to set up your server
 						</Card.Description>
 					</Card.Header>
 					<Card.Content class="space-y-4">
-						<Tabs.Root value="combined" class="w-full">
-							<Tabs.List class="grid w-full grid-cols-2">
-								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger>
-								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
-							</Tabs.List>
-							<Tabs.Content value="combined" class="space-y-4">
-								<div class="space-y-2">
-									<div class="flex items-center gap-2">
-										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
-											{quickSetupCommand}
-										</code>
-										<Button
-											size="icon"
-											variant="ghost"
-											onclick={() => copyToClipboard(quickSetupCommand)}
-										>
-											<Copy class="h-4 w-4" />
-										</Button>
+						<!-- Three commands displayed by default -->
+						<div class="space-y-6">
+							<!-- Command 1: OpenCode -->
+							<div class="space-y-2">
+								<div class="flex items-center gap-2">
+									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+										1
 									</div>
-									
-									<!-- What does this do? -->
-									<Accordion.Root type="single" >
-										<Accordion.Item value="explanation">
-											<Accordion.Trigger class="text-sm">What does this do?</Accordion.Trigger>
-											<Accordion.Content>
-												<div class="space-y-3 pt-2">
-													<p class="text-sm text-muted-foreground">
-														This combined one-liner is equivalent to running these two commands in separate terminals:
-													</p>
-													<div class="space-y-2">
-														<code class="block bg-muted p-2 rounded text-sm">
-															{opencodeCommand}
-														</code>
-														<code class="block bg-muted p-2 rounded text-sm break-all">
-															{ngrokCommand}
-														</code>
-													</div>
-													<p class="text-sm text-muted-foreground">
-														The <code class="text-xs bg-muted px-1 py-0.5 rounded">&</code> runs both commands in parallel, 
-														and the <code class="text-xs bg-muted px-1 py-0.5 rounded">kill $!</code> ensures that 
-														when you press Ctrl+C, both processes are terminated together. This prevents background 
-														processes from continuing to run after you exit.
-													</p>
-												</div>
-											</Accordion.Content>
-										</Accordion.Item>
-									</Accordion.Root>
+									<p class="text-sm font-medium">Start OpenCode server (private port)</p>
 								</div>
-							</Tabs.Content>
-							<Tabs.Content value="separate" class="space-y-4">
-								<div class="space-y-4">
-									<div>
-										<p class="text-sm text-muted-foreground mb-2">
-											In your project directory, run:
-										</p>
-										<div class="flex items-center gap-2">
-											<code class="flex-1 bg-muted p-2 rounded text-sm">
-												{opencodeCommand}
-											</code>
-											<Button
-												size="icon"
-												variant="ghost"
-												onclick={() => copyToClipboard(opencodeCommand)}
-											>
-												<Copy class="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
-									<div>
-										<p class="text-sm text-muted-foreground mb-2">
-											In another terminal, run:
-										</p>
-										<div class="flex items-center gap-2">
-											<code
-												class="flex-1 bg-muted p-2 rounded text-sm break-all"
-											>
-												{ngrokCommand}
-											</code>
-											<Button
-												size="icon"
-												variant="ghost"
-												onclick={() => copyToClipboard(ngrokCommand)}
-											>
-												<Copy class="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
+								<div class="flex items-center gap-2 ml-10">
+									<code class="flex-1 bg-muted p-2 rounded text-sm">
+										{opencodeCommand}
+									</code>
+									<Button
+										size="icon"
+										variant="ghost"
+										onclick={() => copyToClipboard(opencodeCommand)}
+									>
+										<Copy class="h-4 w-4" />
+									</Button>
 								</div>
-							</Tabs.Content>
-						</Tabs.Root>
+							</div>
+
+							<!-- Command 2: Caddy -->
+							<div class="space-y-2">
+								<div class="flex items-center gap-2">
+									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+										2
+									</div>
+									<p class="text-sm font-medium">Start Caddy proxy (public port with CORS)</p>
+								</div>
+								<div class="flex items-start gap-2 ml-10">
+									<code class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre">{caddyCommand}</code>
+									<Button
+										size="icon"
+										variant="ghost"
+										onclick={() => copyToClipboard(caddyCommand)}
+									>
+										<Copy class="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+
+							<!-- Command 3: ngrok -->
+							<div class="space-y-2">
+								<div class="flex items-center gap-2">
+									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+										3
+									</div>
+									<p class="text-sm font-medium">Expose to internet with ngrok</p>
+								</div>
+								<div class="flex items-center gap-2 ml-10">
+									<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+										{ngrokCommand}
+									</code>
+									<Button
+										size="icon"
+										variant="ghost"
+										onclick={() => copyToClipboard(ngrokCommand)}
+									>
+										<Copy class="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Explanation -->
+						<Accordion.Root type="single" collapsible>
+							<Accordion.Item value="explanation">
+								<Accordion.Trigger>How does this setup work?</Accordion.Trigger>
+								<Accordion.Content>
+									<div class="space-y-3 pt-2">
+										<p class="text-sm text-muted-foreground">
+											This setup uses a three-layer architecture:
+										</p>
+										<ol class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4">
+											<li><strong>OpenCode</strong>: Runs on the private port ({privatePortState}) - this is your actual development server</li>
+											<li><strong>Caddy</strong>: Acts as a proxy on the public port ({publicPortState}) and adds CORS headers for browser compatibility</li>
+											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your public port to the internet with authentication</li>
+										</ol>
+										<p class="text-sm text-muted-foreground">
+											The Caddy proxy is necessary because OpenCode doesn't include CORS headers, which are required for browser-based access.
+										</p>
+									</div>
+								</Accordion.Content>
+							</Accordion.Item>
+						</Accordion.Root>
 
 						<!-- Configuration Accordion -->
 						<Accordion.Root type="single" collapsible>
@@ -351,19 +425,31 @@
 								<Accordion.Trigger>Configure Server Settings</Accordion.Trigger>
 								<Accordion.Content>
 									<div class="space-y-4 pt-4">
-										<div class="space-y-2">
-											<Label for="port">Port Number</Label>
-											<Input
-												id="port"
-												type="number"
-												bind:value={port}
-												min="1024"
-												max="65535"
-											/>
-											<p class="text-sm text-muted-foreground">
-												A random port has been generated for you
-											</p>
+										<div class="grid grid-cols-2 gap-4">
+											<div class="space-y-2">
+												<Label for="privatePort">Private Port (OpenCode)</Label>
+												<Input
+													id="privatePort"
+													type="number"
+													bind:value={privatePortState}
+													min="1024"
+													max="65535"
+												/>
+											</div>
+											<div class="space-y-2">
+												<Label for="publicPort">Public Port (Caddy)</Label>
+												<Input
+													id="publicPort"
+													type="number"
+													bind:value={publicPortState}
+													min="1024"
+													max="65535"
+												/>
+											</div>
 										</div>
+										<p class="text-sm text-muted-foreground">
+											Random ports have been generated for you. Make sure they don't conflict with existing services.
+										</p>
 										<div class="space-y-2">
 											<Label for="username">Username</Label>
 											<Input
@@ -437,7 +523,7 @@
 								Look for this in your ngrok output:
 							</p>
 							<code class="text-xs block">
-								Forwarding https://abc123.ngrok.io → http://localhost:{port}
+								Forwarding https://abc123.ngrok.io → http://localhost:{publicPortState}
 							</code>
 						</div>
 

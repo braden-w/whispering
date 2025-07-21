@@ -29,7 +29,7 @@
 		{ id: 'folderName', label: '', hideable: false }, // Empty label for folder name
 		{ id: 'git', label: 'Git', hideable: true },
 		{ id: 'url', label: 'URL', hideable: true },
-		{ id: 'port', label: 'Port', hideable: true },
+		{ id: 'ports', label: 'Ports', hideable: true },
 		{ id: 'username', label: 'Username', hideable: true },
 		{ id: 'rootPath', label: 'Root Path', hideable: true },
 		{ id: 'cwd', label: 'CWD', hideable: true },
@@ -43,7 +43,7 @@
 		folderName: true,
 		git: true,
 		url: true,
-		port: true,
+		ports: true,
 		username: true,
 		rootPath: false, // Hidden by default
 		cwd: false, // Hidden by default
@@ -145,7 +145,7 @@
 							>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}
-						{#if columnVisibility.port !== false}<Table.Head>Port</Table.Head
+						{#if columnVisibility.ports !== false}<Table.Head>Ports</Table.Head
 							>{/if}
 						{#if columnVisibility.username !== false}<Table.Head>Username</Table.Head
 							>{/if}
@@ -199,8 +199,17 @@
 									<code class="text-xs">{config.url}</code>
 								</Table.Cell>
 							{/if}
-							{#if columnVisibility.port !== false}
-								<Table.Cell>{config.port}</Table.Cell>
+							{#if columnVisibility.ports !== false}
+								<Table.Cell>
+									<div class="space-y-1">
+										<div class="text-xs">
+											<span class="text-muted-foreground">Private:</span> {config.privatePort}
+										</div>
+										<div class="text-xs">
+											<span class="text-muted-foreground">Public:</span> {config.publicPort}
+										</div>
+									</div>
+								</Table.Cell>
 							{/if}
 							{#if columnVisibility.username !== false}
 								<Table.Cell>{config.username}</Table.Cell>

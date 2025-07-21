@@ -17,7 +17,8 @@
 
 	// Form state - initialize with workspace values
 	let url = $derived(workspaceConfig.url);
-	let port = $derived(workspaceConfig.port);
+	let privatePort = $derived(workspaceConfig.privatePort);
+	let publicPort = $derived(workspaceConfig.publicPort);
 	let username = $derived(workspaceConfig.username);
 	let password = $derived(workspaceConfig.password);
 
@@ -32,15 +33,21 @@
 			return;
 		}
 
-		if (port < 1024 || port > 65535) {
-			toast.error('Port must be between 1024 and 65535');
+		if (privatePort < 1024 || privatePort > 65535 || publicPort < 1024 || publicPort > 65535) {
+			toast.error('Ports must be between 1024 and 65535');
+			return;
+		}
+
+		if (privatePort === publicPort) {
+			toast.error('Private and public ports must be different');
 			return;
 		}
 
 		updateWorkspaceConfig(workspaceConfig.id, {
 			name: workspaceConfig.name,
 			url: url.trim(),
-			port,
+			privatePort,
+			publicPort,
 			username,
 			password,
 		});
@@ -72,15 +79,27 @@
 				/>
 			</div>
 
-			<div class="space-y-2">
-				<Label for="edit-port">Port</Label>
-				<Input
-					id="edit-port"
-					type="number"
-					bind:value={port}
-					min="1024"
-					max="65535"
-				/>
+			<div class="grid grid-cols-2 gap-4">
+				<div class="space-y-2">
+					<Label for="edit-private-port">Private Port (OpenCode)</Label>
+					<Input
+						id="edit-private-port"
+						type="number"
+						bind:value={privatePort}
+						min="1024"
+						max="65535"
+					/>
+				</div>
+				<div class="space-y-2">
+					<Label for="edit-public-port">Public Port (Caddy)</Label>
+					<Input
+						id="edit-public-port"
+						type="number"
+						bind:value={publicPort}
+						min="1024"
+						max="65535"
+					/>
+				</div>
 			</div>
 
 			<div class="space-y-2">
