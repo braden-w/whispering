@@ -31,6 +31,55 @@
 		rpc.messages.sendMessage.options,
 	);
 
+	const deleteSessionMutation = createMutation({
+		...rpc.sessions.deleteSession.options,
+		onSuccess: () => {
+			toast.success('Session deleted successfully');
+			goto(`/workspaces/${workspaceConfig.id}`);
+		},
+		onError: (error) => {
+			toast.error(error.title, {
+				description: error.description,
+			});
+		},
+	});
+
+	const shareSessionMutation = createMutation({
+		...rpc.sessions.shareSession.options,
+		onSuccess: () => {
+			toast.success('Session shared successfully');
+		},
+		onError: (error) => {
+			toast.error(error.title, {
+				description: error.description,
+			});
+		},
+	});
+
+	const unshareSessionMutation = createMutation({
+		...rpc.sessions.unshareSession.options,
+		onSuccess: () => {
+			toast.success('Session unshared successfully');
+		},
+		onError: (error) => {
+			toast.error(error.title, {
+				description: error.description,
+			});
+		},
+	});
+
+	const abortSessionMutation = createMutation({
+		...rpc.sessions.abortSession.options,
+		onSuccess: () => {
+			toast.success('Session aborted successfully');
+		},
+		onError: (error) => {
+			toast.error(error.title, {
+				description: error.description,
+			});
+		},
+	});
+
 	// Create message subscriber
 	const messages = createMessageSubscriber(
 		() => workspaceConfig,
@@ -60,70 +109,37 @@
 		messageContent.trim().length > 0 && !isProcessing && !sendMessageMutation.isPending && selectedModel !== null,
 	);
 
-	async function handleDelete() {
+	function handleDelete() {
 		if (!sessionQuery.data) return;
 
-		const result = await rpc.sessions.deleteSession.execute({
+		deleteSessionMutation.mutate({
 			workspaceConfig,
 			sessionId,
 		});
-
-		if (result.error) {
-			toast.error(result.error.title, {
-				description: result.error.description,
-			});
-		} else if (result.data) {
-			toast.success('Session deleted successfully');
-			goto(`/workspaces/${workspaceConfig.id}`);
-		}
 	}
 
-	async function handleShare() {
-		const result = await rpc.sessions.shareSession.execute({
+	function handleShare() {
+		shareSessionMutation.mutate({
 			workspaceConfig,
 			sessionId,
 		});
-
-		if (result.error) {
-			toast.error(result.error.title, {
-				description: result.error.description,
-			});
-		} else if (result.data) {
-			toast.success('Session shared successfully');
-		}
 	}
 
-	async function handleUnshare() {
-		const result = await rpc.sessions.unshareSession.execute({
+	function handleUnshare() {
+		unshareSessionMutation.mutate({
 			workspaceConfig,
 			sessionId,
 		});
-
-		if (result.error) {
-			toast.error(result.error.title, {
-				description: result.error.description,
-			});
-		} else if (result.data) {
-			toast.success('Session unshared successfully');
-		}
 	}
 
-	async function handleAbort() {
-		const result = await rpc.sessions.abortSession.execute({
+	function handleAbort() {
+		abortSessionMutation.mutate({
 			workspaceConfig,
 			sessionId,
 		});
-
-		if (result.error) {
-			toast.error(result.error.title, {
-				description: result.error.description,
-			});
-		} else if (result.data) {
-			toast.success('Session aborted successfully');
-		}
 	}
 
-	async function handleSendMessage() {
+	function handleSendMessage() {
 		if (!canSendMessage || !selectedModel) return;
 
 		const content = messageContent.trim();
@@ -143,6 +159,8 @@
 				toast.error(error.title, {
 					description: error.description,
 				});
+				// Restore the message content on error
+				messageContent = content;
 			},
 		});
 	}
