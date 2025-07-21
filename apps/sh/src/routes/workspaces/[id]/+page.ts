@@ -15,8 +15,5 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (!sessions) redirect(302, '/workspaces');
 
-	return {
-		workspaceConfig,
-		sessions,
-	};
+	return { workspaceConfig, sessions };
 };
