@@ -12,6 +12,8 @@
 	let { message, parts }: { message: AssistantMessage; parts: Part[] } = $props();
 
 	const isProcessing = $derived(!message.time.completed);
+	const hasTextContent = $derived(parts.some(part => part.type === 'text' && part.text.trim().length > 0));
+	const showTyping = $derived(isProcessing && !hasTextContent);
 	const toolParts = $derived(parts.filter(part => part.type === 'tool'));
 	const hasError = $derived(!!message.error);
 
@@ -62,7 +64,7 @@
 			{getAssistantInitials()}
 		</Chat.BubbleAvatarFallback>
 	</Chat.BubbleAvatar>
-	<Chat.BubbleMessage class="flex flex-col gap-2 prose" typing={isProcessing}>
+	<Chat.BubbleMessage class="flex flex-col gap-2 prose" typing={showTyping}>
 		<!-- Message Header with Status -->
 		<div class="flex items-center justify-between mb-1">
 			<div class="flex items-center gap-3">
