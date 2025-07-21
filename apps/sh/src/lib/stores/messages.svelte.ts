@@ -113,8 +113,7 @@ export function createMessageSubscriber({
 	 */
 	function mergeStreamingPart(messageId: string, part: Part) {
 		messages = messages.map((msg) => {
-			if (msg.info.id !== messageId || msg.info.role !== 'assistant')
-				return msg;
+			if (msg.info.id !== messageId) return msg;
 
 			// Handle different part types
 			if (part.type === 'text') {
