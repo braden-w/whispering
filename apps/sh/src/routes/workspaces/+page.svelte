@@ -5,9 +5,9 @@
 	import { workspaces } from '$lib/stores/workspaces.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
-	import EditWorkspaceDialog from '$lib/components/EditWorkspaceDialog.svelte';
+	import EditWorkspaceButton from '$lib/components/EditWorkspaceButton.svelte';
 	import { goto } from '$app/navigation';
-	import { Edit, Plus, ChevronDown, GitBranch } from 'lucide-svelte';
+	import { Plus, ChevronDown, GitBranch } from 'lucide-svelte';
 	import * as Tooltip from '@repo/ui/tooltip';
 	import DeleteWorkspaceButton from '$lib/components/DeleteWorkspaceButton.svelte';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
@@ -15,7 +15,6 @@
 	import * as rpc from '$lib/query';
 	import { cn } from '@repo/ui/utils';
 
-	let editingWorkspace = $state<(typeof workspaces.value)[0] | null>(null);
 
 	// Helper function to extract folder name from path (cross-platform)
 	function getFolderName(path: string): string {
@@ -251,14 +250,8 @@
 										>
 											Connect
 										</Button>
-										<Button
-											size="icon"
-											variant="ghost"
-											onclick={() => (editingWorkspace = config)}
-										>
-											<Edit class="h-4 w-4" />
-										</Button>
-										<DeleteWorkspaceButton workspace={config} />
+										<EditWorkspaceButton workspaceConfig={config} />
+										<DeleteWorkspaceButton workspaceConfig={config} />
 									</div>
 								</Table.Cell>
 							{/if}
@@ -270,12 +263,4 @@
 	{/if}
 </div>
 
-{#if editingWorkspace}
-	<EditWorkspaceDialog
-		workspace={editingWorkspace}
-		open={!!editingWorkspace}
-		onOpenChange={(open) => {
-			if (!open) editingWorkspace = null;
-		}}
-	/>
-{/if}
+

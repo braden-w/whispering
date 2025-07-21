@@ -4,16 +4,10 @@
 	import { Trash2 } from 'lucide-svelte';
 	import { workspaces } from '$lib/stores/workspaces.svelte';
 	import { toast } from 'svelte-sonner';
-	import type { Workspace } from '$lib/query/workspaces';
+	import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 
-	let { workspace }: { workspace: Workspace } = $props();
+	let { workspaceConfig }: { workspaceConfig: WorkspaceConfig } = $props();
 	let open = $state(false);
-
-	function handleDelete() {
-		workspaces.value = workspaces.value.filter((w) => w.id !== workspace.id);
-		open = false;
-		toast.success('Deleted workspace');
-	}
 </script>
 
 <AlertDialog.Root bind:open>
@@ -28,13 +22,17 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete the workspace "{workspace.name}".
+				This will permanently delete the workspace "{workspaceConfig.name}".
 				This action cannot be undone.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={handleDelete}>Delete</AlertDialog.Action>
+			<AlertDialog.Action onclick={() => {
+				workspaces.value = workspaces.value.filter((w) => w.id !== workspaceConfig.id);
+				open = false;
+				toast.success('Deleted workspace');
+			}}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
