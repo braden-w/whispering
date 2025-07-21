@@ -6,44 +6,46 @@
 	import * as rpc from '$lib/query';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
-	import type { Workspace } from '$lib/query/workspaces';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import { createMutation } from '@tanstack/svelte-query';
 
 	let {
 		open = $bindable(false),
-		workspace,
+		workspaceConfig,
 	}: {
 		open?: boolean;
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 	} = $props();
 
 	let title = $state('');
-	let isCreating = $state(false);
 
-	async function handleSubmit(e: Event) {
-		e.preventDefault();
-
-		if (!workspace) {
-			toast.error('No workspace selected');
-			return;
-		}
-
-		isCreating = true;
-		const result = await rpc.sessions.createSession.execute({ workspace });
-
-		const { data, error } = result;
-		if (error) {
+	const createSessionMutation = createMutation(() => ({
+		...rpc.sessions.createSession.options(),
+		onSuccess: (data) => {
+			toast.success('Session created successfully');
+			if (data?.id) {
+				goto(`/workspaces/${workspaceConfig.id}/sessions/${data.id}`);
+				open = false;
+				title = '';
+			}
+		},
+		onError: (error) => {
 			toast.error(error.title, {
 				description: error.description,
 			});
 			console.error('Error creating session:', error);
-		} else if (data?.id) {
-			toast.success('Session created successfully');
-			goto(`/workspaces/${workspace.id}/sessions/${data.id}`);
-			open = false;
-			title = '';
+		},
+	}));
+
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
+
+		if (!workspaceConfig) {
+			toast.error('No workspace selected');
+			return;
 		}
 
-		isCreating = false;
+		createSessionMutation.mutate({ workspaceConfig });
 	}
 
 	function handleOpenChange(value: boolean) {
@@ -70,7 +72,7 @@
 						id="title"
 						bind:value={title}
 						placeholder="e.g., Debugging authentication issue"
-						disabled={isCreating}
+						disabled={createSessionMutation.isPending}
 					/>
 				</div>
 			</div>
@@ -79,12 +81,12 @@
 					type="button"
 					variant="outline"
 					onclick={() => (open = false)}
-					disabled={isCreating}
+					disabled={createSessionMutation.isPending}
 				>
 					Cancel
 				</Button>
-				<Button type="submit" disabled={isCreating}>
-					{#if isCreating}
+				<Button type="submit" disabled={createSessionMutation.isPending}>
+					{#if createSessionMutation.isPending}
 						Creating...
 					{:else}
 						Create Session

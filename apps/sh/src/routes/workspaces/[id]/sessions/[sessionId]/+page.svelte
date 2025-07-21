@@ -31,8 +31,8 @@
 		rpc.messages.sendMessage.options,
 	);
 
-	const deleteSessionMutation = createMutation({
-		...rpc.sessions.deleteSession.options,
+	const deleteSessionMutation = createMutation(() => ({
+		...rpc.sessions.deleteSession.options(),
 		onSuccess: () => {
 			toast.success('Session deleted successfully');
 			goto(`/workspaces/${workspaceConfig.id}`);
@@ -42,10 +42,10 @@
 				description: error.description,
 			});
 		},
-	});
+	}));
 
-	const shareSessionMutation = createMutation({
-		...rpc.sessions.shareSession.options,
+	const shareSessionMutation = createMutation(() => ({
+		...rpc.sessions.shareSession.options(),
 		onSuccess: () => {
 			toast.success('Session shared successfully');
 		},
@@ -54,10 +54,10 @@
 				description: error.description,
 			});
 		},
-	});
+	}));
 
-	const unshareSessionMutation = createMutation({
-		...rpc.sessions.unshareSession.options,
+	const unshareSessionMutation = createMutation(() => ({
+		...rpc.sessions.unshareSession.options(),
 		onSuccess: () => {
 			toast.success('Session unshared successfully');
 		},
@@ -66,10 +66,10 @@
 				description: error.description,
 			});
 		},
-	});
+	}));
 
-	const abortSessionMutation = createMutation({
-		...rpc.sessions.abortSession.options,
+	const abortSessionMutation = createMutation(() => ({
+		...rpc.sessions.abortSession.options(),
 		onSuccess: () => {
 			toast.success('Session aborted successfully');
 		},
@@ -78,7 +78,7 @@
 				description: error.description,
 			});
 		},
-	});
+	}));
 
 	// Create message subscriber
 	const messages = createMessageSubscriber(
@@ -179,26 +179,26 @@
 </script>
 
 {#if sessionQuery}
-	<div class="container mx-auto py-6 flex flex-col h-[calc(100vh-5rem)]">
+	<div class="flex flex-col h-[calc(100vh-3.5rem)] w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
 		<!-- Breadcrumb Navigation -->
-		<Breadcrumb.Root class="mb-4">
+		<Breadcrumb.Root class="mb-3 sm:mb-4">
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces">Workspaces</Breadcrumb.Link>
+					<Breadcrumb.Link href="/workspaces" class="text-xs sm:text-sm">Workspaces</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator>
-					<ChevronRight class="h-4 w-4" />
+					<ChevronRight class="h-3 w-3 sm:h-4 sm:w-4" />
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces/{workspaceConfig.id}">
+					<Breadcrumb.Link href="/workspaces/{workspaceConfig.id}" class="text-xs sm:text-sm">
 						{workspaceConfig.name}
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator>
-					<ChevronRight class="h-4 w-4" />
+					<ChevronRight class="h-3 w-3 sm:h-4 sm:w-4" />
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
-					<Breadcrumb.Page>
+					<Breadcrumb.Page class="text-xs sm:text-sm">
 						{sessionQuery.data?.title || 'Untitled Session'}
 					</Breadcrumb.Page>
 				</Breadcrumb.Item>
