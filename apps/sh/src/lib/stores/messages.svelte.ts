@@ -269,8 +269,7 @@ export function createMessageSubscriber(
  */
 export function isMessageProcessing(message: Message): boolean {
 	if (message.role !== 'assistant') return false;
-	const assistantMsg = message as AssistantMessage;
-	return !assistantMsg.time?.completed;
+	return !message.time?.completed;
 }
 
 /**
