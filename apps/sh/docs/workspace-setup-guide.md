@@ -1,127 +1,179 @@
 # Workspace Setup Guide
 
-This guide explains how to set up an OpenCode workspace with the three-layer architecture that enables secure remote access with proper CORS handling.
+This guide explains how to set up and connect to an OpenCode workspace using the simplified architecture with built-in CORS support.
 
 ## Architecture Overview
 
-The setup uses three layers:
+The new setup uses a simplified architecture:
 
-1. **OpenCode Server** (Private Port): Your actual development server running locally
-2. **Caddy Proxy** (Public Port): Adds CORS headers for browser compatibility
-3. **ngrok Tunnel**: Provides secure internet access with authentication
+1. **OpenCode Server**: Your development server with built-in CORS headers
+2. **Caddy Proxy** (Optional): Only for ngrok API access to enable auto-detection
+3. **ngrok Tunnel** (Optional): Provides secure internet access with authentication
 
 ```
-Internet → ngrok (HTTPS) → Caddy (Public Port) → OpenCode (Private Port)
+For local development:
+Browser → OpenCode (Direct connection with CORS)
+
+For internet access:
+Internet → ngrok (HTTPS) → OpenCode (Direct connection)
 ```
 
 ## Why This Architecture?
 
-- **OpenCode** doesn't include CORS headers, which browsers require for cross-origin requests
-- **Caddy** acts as a reverse proxy, adding the necessary CORS headers
-- **ngrok** provides secure internet access with basic authentication
+- **OpenCode** now includes built-in CORS headers, eliminating the need for proxy layers
+- **Direct connections** improve performance and reduce complexity
+- **Caddy** is only needed for the ngrok auto-detection feature (optional)
+- **ngrok** still provides secure internet access with authentication when needed
 
 ## Step-by-Step Setup
 
 ### Step 1: Start OpenCode Server
 
-Run OpenCode on the private port (automatically generated, e.g., 50123):
+Run OpenCode on your desired port (e.g., 4096):
 
 ```bash
-opencode serve -p 50123
+opencode serve -p 4096
 ```
 
-This starts your development server locally. The port is randomly generated to avoid conflicts.
+This starts your development server with CORS headers enabled. The server can now accept direct browser connections without proxy issues.
 
-### Step 2: Start Caddy Proxy
+### Step 2: (Optional) Enable ngrok Auto-Detection
 
-Run Caddy on the public port (e.g., 51234) to add CORS headers:
+**Note**: This step is completely optional and only needed if you want the "Auto-detect" button to work in the UI.
+
+If you want the "Auto-detect" button to work in the UI, run Caddy to proxy the ngrok API:
 
 ```bash
-caddy run --config - --adapter caddyfile << 'EOF'
-:51234 {
-    header Access-Control-Allow-Origin "*"
+caddy run --config - --adapter caddyfile << EOF
+:4080 {
+    # Add CORS headers to all responses
+    header Access-Control-Allow-Origin "http://localhost:5173"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "*"
     header Access-Control-Allow-Credentials "true"
-    
+
+    # Handle preflight OPTIONS requests
     @options {
         method OPTIONS
     }
     respond @options 204
-    
-    reverse_proxy localhost:50123
+
+    # Proxy all other requests to ngrok API
+    reverse_proxy localhost:4040
 }
 EOF
 ```
 
-This command:
-- Listens on the public port (51234)
-- Adds CORS headers to all responses
-- Handles preflight OPTIONS requests
-- Proxies all other requests to OpenCode on the private port
+**Note**: This is completely optional. You can skip this step and manually copy the ngrok URL instead.
 
-### Step 3: Expose with ngrok
+### Step 3: (Optional) Expose with ngrok
 
-Finally, expose the public port to the internet with authentication:
+To access your workspace from the internet:
 
+You have two options:
+
+**Option 1: Separate commands** (run in different terminals)
 ```bash
-ngrok http 51234 --basic-auth="username:password"
+opencode serve -p 4096
+ngrok http 4096
 ```
 
-This creates a secure HTTPS tunnel with basic authentication.
+**Option 2: Combined command** (runs both and stops together)
+```bash
+opencode serve -p 4096 & ngrok http 4096; kill $!
+```
+
+This creates a secure HTTPS tunnel directly to your OpenCode server. Authentication is now handled at the OpenCode level.
 
 ## Port Configuration
 
-The system automatically generates two different random ports:
+The simplified setup uses a single port:
 
-- **Private Port**: Used by OpenCode (49152-65535 range)
-- **Public Port**: Used by Caddy (49152-65535 range)
+- **OpenCode Port**: Main server port (default: 4096, configurable)
+- **ngrok API Port**: Always 4040 (ngrok's default API port)
+- **Caddy Proxy Port**: Always 4080 (only for optional ngrok API access)
 
-The modal includes port availability checking to ensure the generated ports are free.
+The system automatically checks port availability starting from 4096 and suggests alternatives if needed.
+
+## Connection Flows
+
+### Local Development
+```
+Browser → http://localhost:4096
+```
+Direct connection to OpenCode with CORS headers included.
+
+### Internet Access via ngrok
+```
+Browser → https://abc123.ngrok.io → localhost:4096
+```
+ngrok provides HTTPS tunnel, OpenCode handles the requests with CORS and authentication.
+
+### ngrok Auto-Detection (Optional)
+```
+Browser → localhost:4080 → localhost:4040 (ngrok API)
+```
+Only used by the "Auto-detect" button in the UI.
+
+## Benefits Over Previous Architecture
+
+1. **Simpler Setup**: Only need to run OpenCode (and optionally ngrok)
+2. **Better Performance**: No proxy overhead for every API request
+3. **Fewer Dependencies**: Don't need complex proxy configurations
+4. **Direct URLs**: Workspace URLs work directly without transformation
+5. **Less Resource Usage**: Fewer processes running on your system
 
 ## Troubleshooting
 
-### Port Already in Use
+### Connection Failed
 
-The system automatically checks if ports are available. If you see a warning:
-1. Click "Regenerate Available Ports" in the configuration section
-2. Or manually change the port numbers
+1. Ensure OpenCode is running on the configured port
+2. Check that the URL format is correct
+3. Verify no firewall is blocking the connection
+4. For ngrok URLs, ensure credentials match
+
+### ngrok Auto-Detection Not Working
+
+If the "Auto-detect" button doesn't work:
+1. Verify Caddy is running on port 4080 (optional step 2)
+2. Check ngrok is running and accessible on port 4040
+3. Or simply copy the ngrok URL manually from the ngrok output
 
 ### CORS Errors
 
-If you still see CORS errors:
-1. Ensure Caddy is running and properly configured
-2. Check that you're connecting to the ngrok URL, not directly to localhost
-3. Verify the proxy chain is working: ngrok → Caddy → OpenCode
-
-### Connection Failed
-
-1. Verify all three services are running
-2. Check the ngrok URL is correct (look for `Forwarding https://...`)
-3. Ensure credentials match what you provided to ngrok
-4. Test the connection using the "Test Connection" button
+You should not see CORS errors with the new setup. If you do:
+1. Ensure you're using an OpenCode build with CORS support
+2. Check that you're connecting to the correct port
+3. Verify the browser isn't caching old responses
 
 ## Security Considerations
 
-- Always use strong passwords for ngrok basic authentication
-- The setup uses HTTPS via ngrok for encrypted connections
+- Authentication is handled at the OpenCode level
+- ngrok provides HTTPS encryption for internet connections
 - Consider IP whitelisting in ngrok for additional security
-- Regularly rotate credentials
+- Regularly rotate passwords
+- For local-only development, you can skip ngrok entirely
 
-## Alternative Setups
+## Migration from Previous Setup
 
-### Development Only (No Internet Access)
+If you were using the previous architecture:
 
-If you only need local access, you can skip ngrok:
-1. Run OpenCode on any port
-2. Access directly at `http://localhost:PORT`
+1. **Update OpenCode**: Ensure you have a version with built-in CORS support
+2. **Remove Complex Proxies**: You no longer need the Hono proxy or complex Caddy setups
+3. **Update Workspace URLs**: URLs can now be used directly without proxy transformation
+4. **Single Port**: The system will automatically migrate from private/public ports to a single port
+5. **Authentication**: Username is no longer required; authentication is handled at the OpenCode level
 
-### Direct ngrok (No CORS Support)
+### What Changed:
 
-If your client doesn't need CORS headers:
-```bash
-opencode serve -p 50123
-ngrok http 50123 --basic-auth="username:password"
+**Before** (Complex proxy chain):
+```
+Browser → Proxy (8787) → Caddy (8080) → OpenCode (4096)
 ```
 
-Note: This won't work with browser-based clients due to CORS restrictions.
+**Now** (Direct connection):
+```
+Browser → OpenCode (4096)
+```
+
+The only proxy remaining is the optional Caddy instance for ngrok API access, which is only needed for the auto-detection feature.

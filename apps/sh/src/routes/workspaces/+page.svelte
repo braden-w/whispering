@@ -2,6 +2,7 @@
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as Table from '@repo/ui/table';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
+	import { Badge } from '@repo/ui/badge';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
@@ -27,10 +28,8 @@
 	// Define available columns
 	const columns = [
 		{ id: 'folderName', label: '', hideable: false }, // Empty label for folder name
-		{ id: 'git', label: 'Git', hideable: true },
+		{ id: 'gitPort', label: '', hideable: false }, // Empty label for Git/Port info
 		{ id: 'url', label: 'URL', hideable: true },
-		{ id: 'ports', label: 'Ports', hideable: true },
-		{ id: 'username', label: 'Username', hideable: true },
 		{ id: 'rootPath', label: 'Root Path', hideable: true },
 		{ id: 'cwd', label: 'CWD', hideable: true },
 		{ id: 'status', label: 'Status', hideable: false },
@@ -41,10 +40,8 @@
 	// Persisted column visibility state
 	let columnVisibility = $state({
 		folderName: true,
-		git: true,
+		gitPort: true,
 		url: true,
-		ports: true,
-		username: true,
 		rootPath: false, // Hidden by default
 		cwd: false, // Hidden by default
 		status: true,
@@ -141,13 +138,9 @@
 					<Table.Row>
 						{#if columnVisibility.folderName !== false}<Table.Head></Table.Head
 							>{/if}
-						{#if columnVisibility.git !== false}<Table.Head>Git</Table.Head
+						{#if columnVisibility.gitPort !== false}<Table.Head></Table.Head
 							>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
-							>{/if}
-						{#if columnVisibility.ports !== false}<Table.Head>Ports</Table.Head
-							>{/if}
-						{#if columnVisibility.username !== false}<Table.Head>Username</Table.Head
 							>{/if}
 						{#if columnVisibility.rootPath !== false}<Table.Head
 								>Root Path</Table.Head
@@ -178,41 +171,29 @@
 									{/if}
 								</Table.Cell>
 							{/if}
-							{#if columnVisibility.git !== false}
+							{#if columnVisibility.gitPort !== false}
 								<Table.Cell>
-									{#if workspace?.connected && workspace.appInfo.git?.enabled}
-										<Tooltip.Root>
-											<Tooltip.Trigger class="inline-flex">
-												<GitBranch class="h-4 w-4 text-foreground" />
-											</Tooltip.Trigger>
-											<Tooltip.Content>
-												<p>Git is enabled for this repository</p>
-											</Tooltip.Content>
-										</Tooltip.Root>
-									{:else}
-										<span class="text-muted-foreground">—</span>
-									{/if}
+									<div class="flex items-center gap-2">
+										{#if workspace?.connected && workspace.appInfo.git?.enabled}
+											<Tooltip.Root>
+												<Tooltip.Trigger class="inline-flex">
+													<GitBranch class="h-4 w-4 text-foreground" />
+												</Tooltip.Trigger>
+												<Tooltip.Content>
+													<p>Git is enabled for this repository</p>
+												</Tooltip.Content>
+											</Tooltip.Root>
+										{/if}
+										<Badge variant="secondary" class="text-xs">
+											{config.port || config.privatePort || 4096}
+										</Badge>
+									</div>
 								</Table.Cell>
 							{/if}
 							{#if columnVisibility.url !== false}
 								<Table.Cell class="max-w-[200px] truncate">
 									<code class="text-xs">{config.url}</code>
 								</Table.Cell>
-							{/if}
-							{#if columnVisibility.ports !== false}
-								<Table.Cell>
-									<div class="space-y-1">
-										<div class="text-xs">
-											<span class="text-muted-foreground">Private:</span> {config.privatePort}
-										</div>
-										<div class="text-xs">
-											<span class="text-muted-foreground">Public:</span> {config.publicPort}
-										</div>
-									</div>
-								</Table.Cell>
-							{/if}
-							{#if columnVisibility.username !== false}
-								<Table.Cell>{config.username}</Table.Cell>
 							{/if}
 							{#if columnVisibility.rootPath !== false}
 								<Table.Cell

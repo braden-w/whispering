@@ -8,17 +8,16 @@ import { toast } from 'svelte-sonner';
  * This is what users define and we persist locally in the app.
  * Contains all the necessary credentials and connection details.
  *
- * With the proxy setup:
- * - privatePort: The port OpenCode runs on internally
- * - publicPort: The port Caddy proxy exposes publicly
+ * Simplified architecture:
+ * - port: The single port OpenCode runs on (with built-in CORS support)
+ * - No more Caddy proxy needed for CORS
+ * - Authentication handled at OpenCode level
  */
 const WorkspaceConfig = type({
 	id: 'string',
 	name: 'string',
 	url: 'string.url',
-	privatePort: '1 <= number.integer <= 65535',
-	publicPort: '1 <= number.integer <= 65535',
-	username: 'string > 0',
+	port: '1 <= number.integer <= 65535',
 	password: 'string',
 	createdAt: 'number',
 	lastAccessedAt: 'number',
@@ -55,16 +54,28 @@ export const workspaceConfigs = createPersistedState({
 		}
 
 		if (error.type === 'schema_validation_failed') {
-			console.warn('Invalid workspace data, attempting recovery');
-			// Try to recover valid workspaces
+			console.warn('Invalid workspace data, attempting recovery and migration');
+			// Try to recover and migrate valid workspaces
 			if (Array.isArray(error.value)) {
-				const valid = error.value.filter((w) => {
+				const migrated = error.value.map((w: any) => {
+					// Migrate from old format if needed
+					if ('privatePort' in w) {
+						const { privatePort, publicPort, username, ...rest } = w;
+						return {
+							...rest,
+							port: privatePort || 4096,
+						};
+					}
+					return w;
+				});
+				
+				const valid = migrated.filter((w) => {
 					const result = WorkspaceConfig(w);
 					if (result instanceof type.errors) return false;
 					return true;
 				});
 				if (valid.length > 0) {
-					toast.warning('Some workspaces could not be loaded');
+					toast.warning('Workspaces have been migrated to the new format');
 					return valid;
 				}
 			}
@@ -78,22 +89,42 @@ export const workspaceConfigs = createPersistedState({
 	},
 });
 
-// Helper function to generate a random port in the safe range
-export function generateRandomPort(): number {
-	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+// Check if a port is available by attempting to connect to it
+export async function isPortAvailable(port: number): Promise<boolean> {
+	try {
+		// Try to fetch from localhost on the given port
+		// If it fails with network error, the port is likely available
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+
+		await fetch(`http://localhost:${port}`, {
+			signal: controller.signal,
+			mode: 'no-cors', // Avoid CORS issues
+		});
+		clearTimeout(timeoutId);
+
+		// If we get here, something is running on this port
+		return false;
+	} catch (error) {
+		// Network error means port is likely available
+		return true;
+	}
 }
 
-// Helper function to generate two different random ports
-export function generateRandomPorts(): { privatePort: number; publicPort: number } {
-	const privatePort = generateRandomPort();
-	let publicPort = generateRandomPort();
-	
-	// Ensure ports are different
-	while (publicPort === privatePort) {
-		publicPort = generateRandomPort();
+// Generate an available port starting from 4096
+export async function generateAvailablePort(): Promise<number> {
+	let port = 4096;
+	const maxPort = 65535;
+
+	while (port <= maxPort) {
+		if (await isPortAvailable(port)) {
+			return port;
+		}
+		port++;
 	}
-	
-	return { privatePort, publicPort };
+
+	// Fallback to random if no ports available in range
+	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
 }
 
 // Helper functions for workspace operations

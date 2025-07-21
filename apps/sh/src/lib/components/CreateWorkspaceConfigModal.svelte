@@ -8,7 +8,7 @@
 	import * as Accordion from '@repo/ui/accordion';
 	import {
 		createWorkspaceConfig,
-		generateRandomPorts,
+		generateAvailablePort,
 	} from '$lib/stores/workspace-configs.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
@@ -27,11 +27,8 @@
 
 	// Form state
 	let step = $state(1);
-	let username = $state(settings.value.defaultUsername);
 	let password = $state(settings.value.defaultPassword);
-	const { privatePort, publicPort } = generateRandomPorts();
-	let privatePortState = $state(privatePort);
-	let publicPortState = $state(publicPort);
+	let port = $state(4096); // Default port
 	let ngrokUrl = $state('');
 	let workspaceName = $state('');
 	let isTesting = $state(false);
@@ -60,7 +57,6 @@
 	$effect(() => {
 		if (open) {
 			step = 1;
-			username = settings.value.defaultUsername;
 			password = settings.value.defaultPassword;
 			ngrokUrl = '';
 			workspaceName = '';
@@ -68,10 +64,9 @@
 			testSuccess = false;
 			appInfo = null;
 			
-			// Generate available ports asynchronously
-			generateAvailablePorts().then(ports => {
-				privatePortState = ports.privatePort;
-				publicPortState = ports.publicPort;
+			// Generate available port asynchronously
+			generateAvailablePort().then(availablePort => {
+				port = availablePort;
 			});
 		}
 	});
@@ -88,7 +83,10 @@
 	const NGROK_PROXY_PORT = 4080; // Caddy proxy port for ngrok API
 
 	// Commands for copy functionality
-	const opencodeCommand = $derived(`opencode serve -p ${privatePortState}` as const);
+	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
+	const ngrokCommand = $derived(`ngrok http ${port}` as const);
+	const combinedCommand = $derived(`opencode serve -p ${port} & ngrok http ${port}; kill $!` as const);
+	// Optional Caddy command for ngrok API auto-detection only
 	const caddyCommand = $derived(
 		`caddy run --config - --adapter caddyfile << EOF
 :${NGROK_PROXY_PORT} {
@@ -109,9 +107,6 @@
 }
 EOF` as const
 	);
-	const ngrokCommand = $derived(
-		`ngrok http ${privatePortState} --basic-auth="${username}:${password}"` as const,
-	);
 
 	async function copyToClipboard(text: string) {
 		try {
@@ -122,91 +117,9 @@ EOF` as const
 		}
 	}
 
-	// Check if a port is available by attempting to connect to it
-	async function isPortAvailable(port: number): Promise<boolean> {
-		try {
-			// Try to fetch from localhost on the given port
-			// If it fails with network error, the port is likely available
-			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
-			
-			await fetch(`http://localhost:${port}`, { 
-				signal: controller.signal,
-				mode: 'no-cors' // Avoid CORS issues
-			});
-			clearTimeout(timeoutId);
-			
-			// If we get here, something is running on this port
-			return false;
-		} catch (error) {
-			// Network error means port is likely available
-			return true;
-		}
-	}
-
-	// Generate available ports using sequential checking
-	async function generateAvailablePorts(): Promise<{ privatePort: number; publicPort: number }> {
-		isCheckingPorts = true;
-		try {
-			// Start at 4096 for private port and 8080 for public port
-			let privatePort = 4096;
-			let publicPort = 8080;
-			const maxPort = 65535;
-			const minPort = 1024;
-			
-			// Find available private port starting from 4096
-			while (privatePort <= maxPort) {
-				if (await isPortAvailable(privatePort)) {
-					break;
-				}
-				privatePort++;
-			}
-			
-			// If we couldn't find a port in the range, wrap around
-			if (privatePort > maxPort) {
-				privatePort = minPort;
-				while (privatePort < 4096) {
-					if (await isPortAvailable(privatePort)) {
-						break;
-					}
-					privatePort++;
-				}
-			}
-			
-			// Find available public port starting from 8080
-			while (publicPort <= maxPort) {
-				if (publicPort !== privatePort && await isPortAvailable(publicPort)) {
-					break;
-				}
-				publicPort++;
-			}
-			
-			// If we couldn't find a port in the range, wrap around
-			if (publicPort > maxPort) {
-				publicPort = minPort;
-				while (publicPort < 8080) {
-					if (publicPort !== privatePort && await isPortAvailable(publicPort)) {
-						break;
-					}
-					publicPort++;
-				}
-			}
-			
-			if (privatePort <= maxPort && publicPort <= maxPort) {
-				toast.success('Found available ports');
-				return { privatePort, publicPort };
-			}
-			
-			// Fallback if we couldn't find available ports
-			toast.warning('Could not verify port availability. Please ensure the generated ports are free.');
-			return generateRandomPorts();
-		} finally {
-			isCheckingPorts = false;
-		}
-	}
 
 	async function testConnection() {
-		if (!ngrokUrl || !username || !password) {
+		if (!ngrokUrl || !password) {
 			toast.error('Please fill in all fields');
 			return;
 		}
@@ -220,9 +133,7 @@ EOF` as const
 				id: 'test',
 				name: 'test',
 				url: ngrokUrl,
-				privatePort: privatePortState,
-				publicPort: publicPortState,
-				username,
+				port,
 				password,
 				createdAt: 0,
 				lastAccessedAt: 0,
@@ -277,7 +188,7 @@ EOF` as const
 
 			// Find HTTPS tunnel that matches our OpenCode port
 			const httpsTunnel = parsed.tunnels.find(
-				(t) => t.proto === 'https' && t.config.addr.includes(`:${privatePortState}`),
+				(t) => t.proto === 'https' && t.config.addr.includes(`:${port}`),
 			);
 
 			if (httpsTunnel) {
@@ -286,7 +197,7 @@ EOF` as const
 			} else {
 				// Check if there's any tunnel for our OpenCode port
 				const anyTunnel = parsed.tunnels.find((t) =>
-					t.config.addr.includes(`:${privatePortState}`),
+					t.config.addr.includes(`:${port}`),
 				);
 				if (anyTunnel) {
 					toast.error(
@@ -294,7 +205,7 @@ EOF` as const
 					);
 				} else {
 					toast.error(
-						`No tunnel found for port ${privatePortState}. Make sure ngrok is running with the correct port.`,
+						`No tunnel found for port ${port}. Make sure ngrok is running with the correct port.`,
 					);
 				}
 			}
@@ -322,9 +233,7 @@ EOF` as const
 		createWorkspaceConfig({
 			name: workspaceName.trim(),
 			url: ngrokUrl,
-			privatePort: privatePortState,
-			publicPort: publicPortState,
-			username,
+			port,
 			password,
 		});
 
@@ -366,72 +275,80 @@ EOF` as const
 						</Card.Description>
 					</Card.Header>
 					<Card.Content class="space-y-4">
-						<!-- Three commands displayed by default -->
-						<div class="space-y-6">
-							<!-- Command 1: OpenCode -->
-							<div class="space-y-2">
-								<div class="flex items-center gap-2">
-									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-										1
+						<!-- Command Options Tabs -->
+						<Tabs.Root value="separate">
+							<Tabs.List class="grid w-full grid-cols-2">
+								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
+								<Tabs.Trigger value="combined">Combined Command</Tabs.Trigger>
+							</Tabs.List>
+							
+							<Tabs.Content value="separate" class="space-y-6 mt-4">
+								<!-- Command 1: OpenCode -->
+								<div class="space-y-2">
+									<div class="flex items-center gap-2">
+										<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+											1
+										</div>
+										<p class="text-sm font-medium">Start OpenCode server</p>
 									</div>
-									<p class="text-sm font-medium">Start OpenCode server</p>
+									<div class="flex items-center gap-2 ml-10">
+										<code class="flex-1 bg-muted p-2 rounded text-sm">
+											{opencodeCommand}
+										</code>
+										<Button
+											size="icon"
+											variant="ghost"
+											onclick={() => copyToClipboard(opencodeCommand)}
+										>
+											<Copy class="h-4 w-4" />
+										</Button>
+									</div>
 								</div>
-								<div class="flex items-center gap-2 ml-10">
-									<code class="flex-1 bg-muted p-2 rounded text-sm">
-										{opencodeCommand}
-									</code>
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => copyToClipboard(opencodeCommand)}
-									>
-										<Copy class="h-4 w-4" />
-									</Button>
-								</div>
-							</div>
 
-							<!-- Command 2: Caddy -->
-							<div class="space-y-2">
-								<div class="flex items-center gap-2">
-									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-										2
+								<!-- Command 2: ngrok -->
+								<div class="space-y-2">
+									<div class="flex items-center gap-2">
+										<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+											2
+										</div>
+										<p class="text-sm font-medium">Expose to internet with ngrok (optional)</p>
 									</div>
-									<p class="text-sm font-medium">Start Caddy proxy for ngrok API (optional)</p>
-								</div>
-								<div class="flex items-start gap-2 ml-10">
-									<code class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre">{caddyCommand}</code>
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => copyToClipboard(caddyCommand)}
-									>
-										<Copy class="h-4 w-4" />
-									</Button>
-								</div>
-							</div>
-
-							<!-- Command 3: ngrok -->
-							<div class="space-y-2">
-								<div class="flex items-center gap-2">
-									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-										3
+									<div class="flex items-center gap-2 ml-10">
+										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+											{ngrokCommand}
+										</code>
+										<Button
+											size="icon"
+											variant="ghost"
+											onclick={() => copyToClipboard(ngrokCommand)}
+										>
+											<Copy class="h-4 w-4" />
+										</Button>
 									</div>
-									<p class="text-sm font-medium">Expose to internet with ngrok</p>
 								</div>
-								<div class="flex items-center gap-2 ml-10">
-									<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
-										{ngrokCommand}
-									</code>
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => copyToClipboard(ngrokCommand)}
-									>
-										<Copy class="h-4 w-4" />
-									</Button>
+							</Tabs.Content>
+							
+							<Tabs.Content value="combined" class="space-y-6 mt-4">
+								<div class="space-y-2">
+									<p class="text-sm font-medium">Run both OpenCode and ngrok in one command</p>
+									<div class="flex items-center gap-2">
+										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+											{combinedCommand}
+										</code>
+										<Button
+											size="icon"
+											variant="ghost"
+											onclick={() => copyToClipboard(combinedCommand)}
+										>
+											<Copy class="h-4 w-4" />
+										</Button>
+									</div>
+									<p class="text-sm text-muted-foreground">
+										This command runs both servers and kills them together when you stop
+									</p>
 								</div>
-							</div>
-						</div>
+							</Tabs.Content>
+						</Tabs.Root>
 
 						<!-- Explanation -->
 						<Accordion.Root type="single" collapsible>
@@ -443,12 +360,11 @@ EOF` as const
 											This setup uses a simplified architecture:
 										</p>
 										<ol class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4">
-											<li><strong>OpenCode</strong>: Runs on port {privatePortState} with built-in CORS support</li>
-											<li><strong>Caddy proxy (optional)</strong>: Only needed for ngrok auto-detection. Proxies localhost:{NGROK_PROXY_PORT} → localhost:{NGROK_API_PORT}</li>
-											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your OpenCode server to the internet with authentication</li>
+											<li><strong>OpenCode</strong>: Runs on port {port} with built-in CORS support</li>
+											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your OpenCode server to the internet</li>
 										</ol>
 										<p class="text-sm text-muted-foreground">
-											The Caddy proxy is only needed if you want automatic ngrok URL detection. Without it, you can manually copy the ngrok URL.
+											Authentication is now handled at the OpenCode level. ngrok provides the secure tunnel without requiring basic auth.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -462,11 +378,11 @@ EOF` as const
 								<Accordion.Content>
 									<div class="space-y-4 pt-4">
 										<div class="space-y-2">
-											<Label for="privatePort">OpenCode Port</Label>
+											<Label for="port">OpenCode Port</Label>
 											<Input
-												id="privatePort"
+												id="port"
 												type="number"
-												bind:value={privatePortState}
+												bind:value={port}
 												min="1024"
 												max="65535"
 											/>
@@ -474,15 +390,6 @@ EOF` as const
 										<p class="text-sm text-muted-foreground">
 											A port has been generated for you. Make sure it doesn't conflict with existing services.
 										</p>
-										<div class="space-y-2">
-											<Label for="username">Username</Label>
-											<Input
-												id="username"
-												bind:value={username}
-												placeholder="Enter username"
-												autocomplete="off"
-											/>
-										</div>
 										<div class="space-y-2">
 											<Label for="password">Password</Label>
 											<Input
@@ -494,8 +401,35 @@ EOF` as const
 											/>
 										</div>
 										<p class="text-sm text-muted-foreground">
-											These credentials are pre-filled from your settings.
+											This password is pre-filled from your settings.
 											Changes here only affect this workspace.
+										</p>
+									</div>
+								</Accordion.Content>
+							</Accordion.Item>
+						</Accordion.Root>
+
+						<!-- Optional Caddy for ngrok auto-detection -->
+						<Accordion.Root type="single" collapsible>
+							<Accordion.Item value="caddy">
+								<Accordion.Trigger>Optional: Enable ngrok Auto-Detection</Accordion.Trigger>
+								<Accordion.Content>
+									<div class="space-y-3 pt-2">
+										<p class="text-sm text-muted-foreground">
+											If you want the "Auto-detect" button to work for ngrok URLs, run this Caddy proxy:
+										</p>
+										<div class="flex items-start gap-2">
+											<code class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre">{caddyCommand}</code>
+											<Button
+												size="icon"
+												variant="ghost"
+												onclick={() => copyToClipboard(caddyCommand)}
+											>
+												<Copy class="h-4 w-4" />
+											</Button>
+										</div>
+										<p class="text-sm text-muted-foreground">
+											This proxies localhost:{NGROK_PROXY_PORT} → localhost:{NGROK_API_PORT} to work around CORS restrictions when detecting ngrok URLs.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -547,7 +481,7 @@ EOF` as const
 								Look for this in your ngrok output:
 							</p>
 							<code class="text-xs block">
-								Forwarding https://abc123.ngrok.io → http://localhost:{privatePortState}
+								Forwarding https://abc123.ngrok.io → http://localhost:{port}
 							</code>
 						</div>
 

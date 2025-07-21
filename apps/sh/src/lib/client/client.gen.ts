@@ -33,16 +33,13 @@ export const client = createClient(
  * Create an API client configured for a specific workspace
  */
 export function createWorkspaceClient(workspace: WorkspaceConfig) {
-	// Create basic auth header
-	const auth = btoa(`${workspace.username}:${workspace.password}`);
-
 	// Create a new client with workspace-specific configuration
+	// TODO: Implement password authentication when OpenCode supports it
 	return createClient(
 		createConfig<ClientOptions>({
 			baseUrl: workspace.url,
-			headers: {
-				Authorization: `Basic ${auth}`,
-			},
+			// Authentication will be handled at OpenCode level
+			// For now, no auth headers are sent
 		}),
 	);
 }

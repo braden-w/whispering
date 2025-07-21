@@ -17,9 +17,7 @@
 
 	// Form state - initialize with workspace values
 	let url = $derived(workspaceConfig.url);
-	let privatePort = $derived(workspaceConfig.privatePort);
-	let publicPort = $derived(workspaceConfig.publicPort);
-	let username = $derived(workspaceConfig.username);
+	let port = $derived(workspaceConfig.port);
 	let password = $derived(workspaceConfig.password);
 
 	function handleSave() {
@@ -28,27 +26,20 @@
 			return;
 		}
 
-		if (!username.trim() || !password.trim()) {
-			toast.error('Username and password are required');
+		if (!password.trim()) {
+			toast.error('Password is required');
 			return;
 		}
 
-		if (privatePort < 1024 || privatePort > 65535 || publicPort < 1024 || publicPort > 65535) {
-			toast.error('Ports must be between 1024 and 65535');
-			return;
-		}
-
-		if (privatePort === publicPort) {
-			toast.error('Private and public ports must be different');
+		if (port < 1024 || port > 65535) {
+			toast.error('Port must be between 1024 and 65535');
 			return;
 		}
 
 		updateWorkspaceConfig(workspaceConfig.id, {
 			name: workspaceConfig.name,
 			url: url.trim(),
-			privatePort,
-			publicPort,
-			username,
+			port,
 			password,
 		});
 
@@ -79,36 +70,14 @@
 				/>
 			</div>
 
-			<div class="grid grid-cols-2 gap-4">
-				<div class="space-y-2">
-					<Label for="edit-private-port">Private Port (OpenCode)</Label>
-					<Input
-						id="edit-private-port"
-						type="number"
-						bind:value={privatePort}
-						min="1024"
-						max="65535"
-					/>
-				</div>
-				<div class="space-y-2">
-					<Label for="edit-public-port">Public Port (Caddy)</Label>
-					<Input
-						id="edit-public-port"
-						type="number"
-						bind:value={publicPort}
-						min="1024"
-						max="65535"
-					/>
-				</div>
-			</div>
-
 			<div class="space-y-2">
-				<Label for="edit-username">Username</Label>
+				<Label for="edit-port">OpenCode Port</Label>
 				<Input
-					id="edit-username"
-					bind:value={username}
-					placeholder="Username for basic auth"
-					autocomplete="off"
+					id="edit-port"
+					type="number"
+					bind:value={port}
+					min="1024"
+					max="65535"
 				/>
 			</div>
 
