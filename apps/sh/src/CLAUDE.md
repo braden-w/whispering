@@ -18,9 +18,9 @@ The query layer wraps the API client with TanStack Query following wellcrafted p
 
 ```typescript
 import * as rpc from '$lib/query';
-import { createQuery } from '@tanstack/svelte-query';
+import { createQuery, createMutation } from '@tanstack/svelte-query';
 
-// In components - use .options
+// Queries in components - use .options
 const sessionsQuery = createQuery(rpc.sessions.getSessions.options);
 const sessionQuery = createQuery(rpc.sessions.getSessionById(id).options);
 
@@ -28,7 +28,24 @@ const sessionQuery = createQuery(rpc.sessions.getSessionById(id).options);
 await queryClient.prefetchQuery(rpc.sessions.getSessions.options());
 await queryClient.prefetchQuery(rpc.sessions.getSessionById(id).options());
 
-// Mutations - use .execute() with destructuring
+// Mutations in Svelte components - use createMutation
+const createSessionMutation = createMutation(rpc.sessions.createSession.options);
+
+// Use the mutation with callbacks in .mutate()
+createSessionMutation.mutate(
+	{ body: { title } },
+	{
+		onSuccess: (data) => {
+			toast.success('Session created successfully');
+			// Navigate to new session, etc.
+		},
+		onError: (error) => {
+			toast.error(error.title, { description: error.description });
+		},
+	}
+);
+
+// Mutations in .ts files - use .execute() with destructuring
 const result = await rpc.sessions.createSession.execute({ body: { title } });
 const { data, error } = result;
 if (error) {
