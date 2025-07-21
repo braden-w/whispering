@@ -2,7 +2,7 @@
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import * as Command from '@repo/ui/command';
 	import * as Popover from '@repo/ui/popover';
-	import { useCombobox } from '$lib/components/useCombobox.svelte';
+	import { useCombobox } from '@repo/ui/hooks';
 	import { rpc } from '$lib/query';
 	import type { DeviceEnumerationStrategy } from '$lib/query/device';
 	import { settings } from '$lib/stores/settings.svelte';
