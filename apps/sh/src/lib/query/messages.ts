@@ -1,5 +1,8 @@
 import * as api from '$lib/client/sdk.gen';
-import type { UserMessagePart } from '$lib/client/types.gen';
+import type {
+	PostSessionByIdMessageData,
+	UserMessagePart,
+} from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
 import { ShErr } from '$lib/result';
 import type { Workspace } from '$lib/stores/workspaces.svelte';
@@ -13,13 +16,11 @@ export const sendMessage = defineMutation({
 	resultMutationFn: async ({
 		workspace,
 		sessionId,
-		mode = 'chat',
-		parts,
+		body,
 	}: {
 		workspace: Workspace;
 		sessionId: string;
-		mode?: string;
-		parts: UserMessagePart[];
+		body: PostSessionByIdMessageData['body'];
 	}) => {
 		const client = createWorkspaceClient(workspace);
 
@@ -28,12 +29,7 @@ export const sendMessage = defineMutation({
 		const { data, error } = await api.postSessionByIdMessage({
 			client,
 			path: { id: sessionId },
-			body: {
-				providerID: 'openai',
-				modelID: 'gpt-4o-mini',
-				mode,
-				parts,
-			},
+			body,
 		});
 
 		if (error) {

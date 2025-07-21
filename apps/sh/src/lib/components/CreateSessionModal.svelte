@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Dialog from '@repo/ui/dialog';
+	import * as Modal from '@repo/ui/modal';
 	import { Button } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
@@ -17,7 +17,6 @@
 	} = $props();
 
 	let title = $state('');
-	const createSession = rpc.sessions.createSession;
 	let isCreating = $state(false);
 
 	async function handleSubmit(e: Event) {
@@ -29,7 +28,7 @@
 		}
 
 		isCreating = true;
-		const result = await createSession.execute({ workspace });
+		const result = await rpc.sessions.createSession.execute({ workspace });
 
 		const { data, error } = result;
 		if (error) {
@@ -55,14 +54,14 @@
 	}
 </script>
 
-<Dialog.Root bind:open onOpenChange={handleOpenChange}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>Create New Session</Dialog.Title>
-			<Dialog.Description>
+<Modal.Root bind:open onOpenChange={handleOpenChange}>
+	<Modal.Content class="sm:max-w-[425px]">
+		<Modal.Header>
+			<Modal.Title>Create New Session</Modal.Title>
+			<Modal.Description>
 				Start a new conversation session. You can optionally provide a title.
-			</Dialog.Description>
-		</Dialog.Header>
+			</Modal.Description>
+		</Modal.Header>
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid gap-2">
@@ -75,7 +74,7 @@
 					/>
 				</div>
 			</div>
-			<Dialog.Footer>
+			<Modal.Footer>
 				<Button
 					type="button"
 					variant="outline"
@@ -91,7 +90,7 @@
 						Create Session
 					{/if}
 				</Button>
-			</Dialog.Footer>
+			</Modal.Footer>
 		</form>
-	</Dialog.Content>
-</Dialog.Root>
+	</Modal.Content>
+</Modal.Root>

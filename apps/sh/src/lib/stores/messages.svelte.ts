@@ -7,7 +7,7 @@ import type {
 	Message,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
-import type { Workspace } from '$lib/stores/workspaces.svelte';
+import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
 
@@ -32,7 +32,7 @@ import { createSubscriber } from 'svelte/reactivity';
  * ```
  */
 export function createMessageSubscriber(
-	workspace: Accessor<Workspace>,
+	workspace: Accessor<WorkspaceConfig>,
 	sessionId: Accessor<string>,
 ) {
 	let messages = $state<Message[]>([]);

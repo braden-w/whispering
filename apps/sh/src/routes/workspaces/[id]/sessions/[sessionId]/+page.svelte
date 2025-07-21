@@ -4,6 +4,7 @@
 	import * as rpc from '$lib/query';
 	import MessageList from '$lib/components/MessageList.svelte';
 	import MessageInput from '$lib/components/MessageInput.svelte';
+	import SessionControls from '$lib/components/SessionControls.svelte';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 	import { Button } from '@repo/ui/button';
 	import { Badge } from '@repo/ui/badge';
@@ -145,6 +146,11 @@
 			description: 'This feature is still being implemented.',
 		});
 	}
+
+	function handleModeChange(mode: string) {
+		messageMode = mode;
+		toast.success(`Switched to ${mode} mode`);
+	}
 </script>
 
 {#if sessionQuery}
@@ -224,6 +230,13 @@
 				</div>
 			</div>
 		{/if}
+
+		<!-- Session Controls -->
+		<SessionControls
+			currentMode={messageMode}
+			onModeChange={handleModeChange}
+			isProcessing={isProcessing}
+		/>
 
 		<div class="flex-1 overflow-hidden">
 			<MessageList

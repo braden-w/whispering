@@ -5,7 +5,7 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import SessionList from '$lib/components/SessionList.svelte';
-	import CreateSessionDialog from '$lib/components/CreateSessionDialog.svelte';
+	import CreateSessionModal from '$lib/components/CreateSessionModal.svelte';
 	import { Button } from '@repo/ui/button';
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
@@ -26,29 +26,36 @@
 	const sessionsQuery = $derived(
 		workspace
 			? createQuery(rpc.sessions.getSessions(() => workspace).options)
-			: null
+			: null,
 	);
 
 	let createDialogOpen = $state(false);
 </script>
 
 {#if workspace}
-	<div class="container mx-auto py-6">
-		<!-- Breadcrumb Navigation -->
-		<Breadcrumb.Root class="mb-6">
-			<Breadcrumb.List>
-				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces">Workspaces</Breadcrumb.Link>
-				</Breadcrumb.Item>
-				<Breadcrumb.Separator>
-					<ChevronRight class="h-4 w-4" />
-				</Breadcrumb.Separator>
-				<Breadcrumb.Item>
-					<Breadcrumb.Page>{workspace.name}</Breadcrumb.Page>
-				</Breadcrumb.Item>
-			</Breadcrumb.List>
-		</Breadcrumb.Root>
+	<!-- Breadcrumb Section -->
+	<div class="border-b">
+		<div
+			class="container flex h-14 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8"
+		>
+			<Breadcrumb.Root>
+				<Breadcrumb.List>
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href="/workspaces">Workspaces</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					<Breadcrumb.Separator>
+						<ChevronRight class="h-4 w-4" />
+					</Breadcrumb.Separator>
+					<Breadcrumb.Item>
+						<Breadcrumb.Page>{workspace.name}</Breadcrumb.Page>
+					</Breadcrumb.Item>
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
+		</div>
+	</div>
 
+	<!-- Page Content -->
+	<div class="container max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 		<div class="space-y-6">
 			<div class="flex items-center justify-between">
 				<div>
@@ -61,7 +68,8 @@
 					<WorkspaceConnectionBadge {workspace} />
 					{#if sessionsQuery && sessionsQuery.data}
 						<Badge variant="secondary" class="text-sm">
-							{sessionsQuery.data.length} session{sessionsQuery.data.length !== 1
+							{sessionsQuery.data.length} session{sessionsQuery.data.length !==
+							1
 								? 's'
 								: ''}
 						</Badge>
@@ -97,9 +105,6 @@
 	</div>
 
 	{#if workspace}
-		<CreateSessionDialog 
-			bind:open={createDialogOpen} 
-			{workspace}
-		/>
+		<CreateSessionModal bind:open={createDialogOpen} {workspace} />
 	{/if}
 {/if}

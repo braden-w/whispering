@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Dialog from '@repo/ui/dialog';
+	import * as Modal from '@repo/ui/modal';
 	import { Button, type Props as ButtonProps } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
@@ -228,19 +228,19 @@
 	}
 </script>
 
-<Dialog.Root bind:open>
-	<Dialog.Trigger>
+<Modal.Root bind:open>
+	<Modal.Trigger>
 		{#snippet child({ props })}
 			{@render triggerChild({ props })}
 		{/snippet}
-	</Dialog.Trigger>
-	<Dialog.Content class="sm:max-w-[600px]">
-		<Dialog.Header>
-			<Dialog.Title>Add New Workspace</Dialog.Title>
-			<Dialog.Description>
+	</Modal.Trigger>
+	<Modal.Content class="sm:max-w-[600px]">
+		<Modal.Header>
+			<Modal.Title>Add New Workspace</Modal.Title>
+			<Modal.Description>
 				Connect to an OpenCode server in a few easy steps
-			</Dialog.Description>
-		</Dialog.Header>
+			</Modal.Description>
+		</Modal.Header>
 
 		<div class="space-y-4">
 			{#if step === 1}
@@ -466,7 +466,7 @@
 			{/if}
 		</div>
 
-		<Dialog.Footer>
+		<Modal.Footer>
 			<div class="flex items-center justify-between w-full">
 				<div>
 					{#if step > 1}
@@ -474,9 +474,7 @@
 					{/if}
 				</div>
 				<div class="flex gap-2">
-					<Dialog.Close>
-						<Button variant="outline">Cancel</Button>
-					</Dialog.Close>
+					<Button variant="outline" onclick={() => open = false}>Cancel</Button>
 					{#if step < 3}
 						<Button onclick={nextStep}>Next</Button>
 					{:else}
@@ -489,6 +487,6 @@
 					{/if}
 				</div>
 			</div>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+		</Modal.Footer>
+	</Modal.Content>
+</Modal.Root>
