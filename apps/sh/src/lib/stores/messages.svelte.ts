@@ -52,6 +52,13 @@ export function createMessageSubscriber({
 }) {
 	// Initialize with pre-fetched messages
 	let messages = $state<Message[]>(initialMessages());
+
+	// Debug logging
+	console.log(
+		'MessageSubscriber initialized with:',
+		messages.length,
+		'initial messages',
+	);
 	let eventSource: EventSource | null = null;
 
 	/**
@@ -66,11 +73,21 @@ export function createMessageSubscriber({
 	 * appended to the end of the array with empty parts.
 	 */
 	function upsertMessage(updatedMessage: MessageInfo) {
+		console.log(
+			`🔄 upsertMessage called for: ${updatedMessage.id} (role: ${updatedMessage.role})`,
+		);
+		console.log('Current messages count:', messages.length);
+		console.log(
+			'Current message IDs:',
+			messages.map((m) => m.info.id),
+		);
+
 		const existingIndex = messages.findIndex(
 			(msg) => msg.info.id === updatedMessage.id,
 		);
 
 		if (existingIndex >= 0) {
+			console.log(`📝 Updating existing message at index ${existingIndex}`);
 			// Preserve existing parts when updating message info
 			messages = [
 				...messages.slice(0, existingIndex),
@@ -81,6 +98,7 @@ export function createMessageSubscriber({
 				...messages.slice(existingIndex + 1),
 			];
 		} else {
+			console.log(`➕ Adding new message: ${updatedMessage.id}`);
 			// Add new message with empty parts array
 			messages = [
 				...messages,
@@ -90,6 +108,12 @@ export function createMessageSubscriber({
 				},
 			];
 		}
+
+		console.log('After upsert - messages count:', messages.length);
+		console.log(
+			'After upsert - message IDs:',
+			messages.map((m) => m.info.id),
+		);
 	}
 
 	/**
@@ -188,7 +212,10 @@ export function createMessageSubscriber({
 
 	// Subscribe to reactive updates
 	const subscribe = createSubscriber((update) => {
+		console.log('🔌 createSubscriber called - setting up EventSource');
+
 		if (eventSource) {
+			console.log('🔄 Closing existing EventSource connection');
 			eventSource.close();
 		}
 
@@ -207,8 +234,10 @@ export function createMessageSubscriber({
 		// Handle all SSE events (server sends everything as 'message' events)
 		eventSource.onmessage = (event) => {
 			console.log('Received SSE message:', event.data);
-			
-			const eventData = parseEventData<any>(event);
+
+			const eventData = parseEventData<{ type: string; properties: any }>(
+				event,
+			);
 			if (!eventData) {
 				console.log('Failed to parse event data');
 				return;
@@ -235,7 +264,12 @@ export function createMessageSubscriber({
 					console.log('Processing message.part.updated event');
 					const data = eventData as EventMessagePartUpdated;
 					if (data.properties.part.sessionID === sessionId()) {
-						console.log('Processing part update for session:', sessionId(), 'message:', data.properties.part.messageID);
+						console.log(
+							'Processing part update for session:',
+							sessionId(),
+							'message:',
+							data.properties.part.messageID,
+						);
 						mergeStreamingPart(
 							data.properties.part.messageID,
 							data.properties.part,
@@ -259,6 +293,19 @@ export function createMessageSubscriber({
 					}
 					break;
 				}
+
+				case 'session.idle':
+					// Session became inactive after predetermined idle time
+					// Payload: { sessionID: string }
+					// Used to update UI status or perform cleanup tasks
+					console.log('Session went idle - ignoring');
+					break;
+
+				case 'storage.write':
+					// Data was successfully written to persistent storage
+					// Payload: { key: string, content: any }
+					// Notification that data has been saved - ignore for UI updates
+					break;
 
 				default:
 					console.log('Unhandled event type:', eventData.type);
@@ -292,6 +339,12 @@ export function createMessageSubscriber({
 	return {
 		get value() {
 			subscribe();
+			console.log(
+				'📊 messages.value accessed - returning',
+				messages.length,
+				'messages - called from:',
+				new Error().stack?.split('\n')[2]?.trim()
+			);
 			return messages;
 		},
 	};
