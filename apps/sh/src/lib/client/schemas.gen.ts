@@ -220,12 +220,6 @@ export const UserMessageSchema = {
 			type: 'string',
 			const: 'user',
 		},
-		parts: {
-			type: 'array',
-			items: {
-				$ref: '#/components/schemas/UserMessagePart',
-			},
-		},
 		time: {
 			type: 'object',
 			properties: {
@@ -236,62 +230,7 @@ export const UserMessageSchema = {
 			required: ['created'],
 		},
 	},
-	required: ['id', 'sessionID', 'role', 'parts', 'time'],
-} as const;
-
-export const UserMessagePartSchema = {
-	oneOf: [
-		{
-			$ref: '#/components/schemas/TextPart',
-		},
-		{
-			$ref: '#/components/schemas/FilePart',
-		},
-	],
-	discriminator: {
-		propertyName: 'type',
-		mapping: {
-			text: '#/components/schemas/TextPart',
-			file: '#/components/schemas/FilePart',
-		},
-	},
-} as const;
-
-export const TextPartSchema = {
-	type: 'object',
-	properties: {
-		type: {
-			type: 'string',
-			const: 'text',
-		},
-		text: {
-			type: 'string',
-		},
-		synthetic: {
-			type: 'boolean',
-		},
-	},
-	required: ['type', 'text'],
-} as const;
-
-export const FilePartSchema = {
-	type: 'object',
-	properties: {
-		type: {
-			type: 'string',
-			const: 'file',
-		},
-		mime: {
-			type: 'string',
-		},
-		filename: {
-			type: 'string',
-		},
-		url: {
-			type: 'string',
-		},
-	},
-	required: ['type', 'mime', 'url'],
+	required: ['id', 'sessionID', 'role', 'time'],
 } as const;
 
 export const AssistantMessageSchema = {
@@ -306,12 +245,6 @@ export const AssistantMessageSchema = {
 		role: {
 			type: 'string',
 			const: 'assistant',
-		},
-		parts: {
-			type: 'array',
-			items: {
-				$ref: '#/components/schemas/AssistantMessagePart',
-			},
 		},
 		time: {
 			type: 'object',
@@ -413,7 +346,6 @@ export const AssistantMessageSchema = {
 		'id',
 		'sessionID',
 		'role',
-		'parts',
 		'time',
 		'system',
 		'modelID',
@@ -424,10 +356,127 @@ export const AssistantMessageSchema = {
 	],
 } as const;
 
-export const AssistantMessagePartSchema = {
+export const ProviderAuthErrorSchema = {
+	type: 'object',
+	properties: {
+		name: {
+			type: 'string',
+			const: 'ProviderAuthError',
+		},
+		data: {
+			type: 'object',
+			properties: {
+				providerID: {
+					type: 'string',
+				},
+				message: {
+					type: 'string',
+				},
+			},
+			required: ['providerID', 'message'],
+		},
+	},
+	required: ['name', 'data'],
+} as const;
+
+export const UnknownErrorSchema = {
+	type: 'object',
+	properties: {
+		name: {
+			type: 'string',
+			const: 'UnknownError',
+		},
+		data: {
+			type: 'object',
+			properties: {
+				message: {
+					type: 'string',
+				},
+			},
+			required: ['message'],
+		},
+	},
+	required: ['name', 'data'],
+} as const;
+
+export const MessageOutputLengthErrorSchema = {
+	type: 'object',
+	properties: {
+		name: {
+			type: 'string',
+			const: 'MessageOutputLengthError',
+		},
+		data: {
+			type: 'object',
+		},
+	},
+	required: ['name', 'data'],
+} as const;
+
+export const MessageAbortedErrorSchema = {
+	type: 'object',
+	properties: {
+		name: {
+			type: 'string',
+			const: 'MessageAbortedError',
+		},
+		data: {
+			type: 'object',
+		},
+	},
+	required: ['name', 'data'],
+} as const;
+
+export const Event_message_removedSchema = {
+	type: 'object',
+	properties: {
+		type: {
+			type: 'string',
+			const: 'message.removed',
+		},
+		properties: {
+			type: 'object',
+			properties: {
+				sessionID: {
+					type: 'string',
+				},
+				messageID: {
+					type: 'string',
+				},
+			},
+			required: ['sessionID', 'messageID'],
+		},
+	},
+	required: ['type', 'properties'],
+} as const;
+
+export const Event_message_part_updatedSchema = {
+	type: 'object',
+	properties: {
+		type: {
+			type: 'string',
+			const: 'message.part.updated',
+		},
+		properties: {
+			type: 'object',
+			properties: {
+				part: {
+					$ref: '#/components/schemas/Part',
+				},
+			},
+			required: ['part'],
+		},
+	},
+	required: ['type', 'properties'],
+} as const;
+
+export const PartSchema = {
 	oneOf: [
 		{
 			$ref: '#/components/schemas/TextPart',
+		},
+		{
+			$ref: '#/components/schemas/FilePart',
 		},
 		{
 			$ref: '#/components/schemas/ToolPart',
@@ -438,26 +487,218 @@ export const AssistantMessagePartSchema = {
 		{
 			$ref: '#/components/schemas/StepFinishPart',
 		},
+		{
+			$ref: '#/components/schemas/SnapshotPart',
+		},
 	],
 	discriminator: {
 		propertyName: 'type',
 		mapping: {
 			text: '#/components/schemas/TextPart',
+			file: '#/components/schemas/FilePart',
 			tool: '#/components/schemas/ToolPart',
 			'step-start': '#/components/schemas/StepStartPart',
 			'step-finish': '#/components/schemas/StepFinishPart',
+			snapshot: '#/components/schemas/SnapshotPart',
 		},
 	},
+} as const;
+
+export const TextPartSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		sessionID: {
+			type: 'string',
+		},
+		messageID: {
+			type: 'string',
+		},
+		type: {
+			type: 'string',
+			const: 'text',
+		},
+		text: {
+			type: 'string',
+		},
+		synthetic: {
+			type: 'boolean',
+		},
+		time: {
+			type: 'object',
+			properties: {
+				start: {
+					type: 'number',
+				},
+				end: {
+					type: 'number',
+				},
+			},
+			required: ['start'],
+		},
+	},
+	required: ['id', 'sessionID', 'messageID', 'type', 'text'],
+} as const;
+
+export const FilePartSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		sessionID: {
+			type: 'string',
+		},
+		messageID: {
+			type: 'string',
+		},
+		type: {
+			type: 'string',
+			const: 'file',
+		},
+		mime: {
+			type: 'string',
+		},
+		filename: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+		},
+		source: {
+			$ref: '#/components/schemas/FilePartSource',
+		},
+	},
+	required: ['id', 'sessionID', 'messageID', 'type', 'mime', 'url'],
+} as const;
+
+export const FilePartSourceSchema = {
+	oneOf: [
+		{
+			$ref: '#/components/schemas/FileSource',
+		},
+		{
+			$ref: '#/components/schemas/SymbolSource',
+		},
+	],
+	discriminator: {
+		propertyName: 'type',
+		mapping: {
+			file: '#/components/schemas/FileSource',
+			symbol: '#/components/schemas/SymbolSource',
+		},
+	},
+} as const;
+
+export const FileSourceSchema = {
+	type: 'object',
+	properties: {
+		text: {
+			$ref: '#/components/schemas/FilePartSourceText',
+		},
+		type: {
+			type: 'string',
+			const: 'file',
+		},
+		path: {
+			type: 'string',
+		},
+	},
+	required: ['text', 'type', 'path'],
+} as const;
+
+export const FilePartSourceTextSchema = {
+	type: 'object',
+	properties: {
+		value: {
+			type: 'string',
+		},
+		start: {
+			type: 'integer',
+		},
+		end: {
+			type: 'integer',
+		},
+	},
+	required: ['value', 'start', 'end'],
+} as const;
+
+export const SymbolSourceSchema = {
+	type: 'object',
+	properties: {
+		text: {
+			$ref: '#/components/schemas/FilePartSourceText',
+		},
+		type: {
+			type: 'string',
+			const: 'symbol',
+		},
+		path: {
+			type: 'string',
+		},
+		range: {
+			$ref: '#/components/schemas/Range',
+		},
+		name: {
+			type: 'string',
+		},
+		kind: {
+			type: 'integer',
+		},
+	},
+	required: ['text', 'type', 'path', 'range', 'name', 'kind'],
+} as const;
+
+export const RangeSchema = {
+	type: 'object',
+	properties: {
+		start: {
+			type: 'object',
+			properties: {
+				line: {
+					type: 'number',
+				},
+				character: {
+					type: 'number',
+				},
+			},
+			required: ['line', 'character'],
+		},
+		end: {
+			type: 'object',
+			properties: {
+				line: {
+					type: 'number',
+				},
+				character: {
+					type: 'number',
+				},
+			},
+			required: ['line', 'character'],
+		},
+	},
+	required: ['start', 'end'],
 } as const;
 
 export const ToolPartSchema = {
 	type: 'object',
 	properties: {
+		id: {
+			type: 'string',
+		},
+		sessionID: {
+			type: 'string',
+		},
+		messageID: {
+			type: 'string',
+		},
 		type: {
 			type: 'string',
 			const: 'tool',
 		},
-		id: {
+		callID: {
 			type: 'string',
 		},
 		tool: {
@@ -467,7 +708,7 @@ export const ToolPartSchema = {
 			$ref: '#/components/schemas/ToolState',
 		},
 	},
-	required: ['type', 'id', 'tool', 'state'],
+	required: ['id', 'sessionID', 'messageID', 'type', 'callID', 'tool', 'state'],
 } as const;
 
 export const ToolStateSchema = {
@@ -605,17 +846,35 @@ export const ToolStateErrorSchema = {
 export const StepStartPartSchema = {
 	type: 'object',
 	properties: {
+		id: {
+			type: 'string',
+		},
+		sessionID: {
+			type: 'string',
+		},
+		messageID: {
+			type: 'string',
+		},
 		type: {
 			type: 'string',
 			const: 'step-start',
 		},
 	},
-	required: ['type'],
+	required: ['id', 'sessionID', 'messageID', 'type'],
 } as const;
 
 export const StepFinishPartSchema = {
 	type: 'object',
 	properties: {
+		id: {
+			type: 'string',
+		},
+		sessionID: {
+			type: 'string',
+		},
+		messageID: {
+			type: 'string',
+		},
 		type: {
 			type: 'string',
 			const: 'step-finish',
@@ -651,127 +910,30 @@ export const StepFinishPartSchema = {
 			required: ['input', 'output', 'reasoning', 'cache'],
 		},
 	},
-	required: ['type', 'cost', 'tokens'],
+	required: ['id', 'sessionID', 'messageID', 'type', 'cost', 'tokens'],
 } as const;
 
-export const ProviderAuthErrorSchema = {
+export const SnapshotPartSchema = {
 	type: 'object',
 	properties: {
-		name: {
+		id: {
 			type: 'string',
-			const: 'ProviderAuthError',
 		},
-		data: {
-			type: 'object',
-			properties: {
-				providerID: {
-					type: 'string',
-				},
-				message: {
-					type: 'string',
-				},
-			},
-			required: ['providerID', 'message'],
-		},
-	},
-	required: ['name', 'data'],
-} as const;
-
-export const UnknownErrorSchema = {
-	type: 'object',
-	properties: {
-		name: {
+		sessionID: {
 			type: 'string',
-			const: 'UnknownError',
 		},
-		data: {
-			type: 'object',
-			properties: {
-				message: {
-					type: 'string',
-				},
-			},
-			required: ['message'],
-		},
-	},
-	required: ['name', 'data'],
-} as const;
-
-export const MessageOutputLengthErrorSchema = {
-	type: 'object',
-	properties: {
-		name: {
+		messageID: {
 			type: 'string',
-			const: 'MessageOutputLengthError',
 		},
-		data: {
-			type: 'object',
-		},
-	},
-	required: ['name', 'data'],
-} as const;
-
-export const MessageAbortedErrorSchema = {
-	type: 'object',
-	properties: {
-		name: {
-			type: 'string',
-			const: 'MessageAbortedError',
-		},
-		data: {
-			type: 'object',
-		},
-	},
-	required: ['name', 'data'],
-} as const;
-
-export const Event_message_removedSchema = {
-	type: 'object',
-	properties: {
 		type: {
 			type: 'string',
-			const: 'message.removed',
+			const: 'snapshot',
 		},
-		properties: {
-			type: 'object',
-			properties: {
-				sessionID: {
-					type: 'string',
-				},
-				messageID: {
-					type: 'string',
-				},
-			},
-			required: ['sessionID', 'messageID'],
-		},
-	},
-	required: ['type', 'properties'],
-} as const;
-
-export const Event_message_part_updatedSchema = {
-	type: 'object',
-	properties: {
-		type: {
+		snapshot: {
 			type: 'string',
-			const: 'message.part.updated',
-		},
-		properties: {
-			type: 'object',
-			properties: {
-				part: {
-					$ref: '#/components/schemas/AssistantMessagePart',
-				},
-				sessionID: {
-					type: 'string',
-				},
-				messageID: {
-					type: 'string',
-				},
-			},
-			required: ['part', 'sessionID', 'messageID'],
 		},
 	},
-	required: ['type', 'properties'],
+	required: ['id', 'sessionID', 'messageID', 'type', 'snapshot'],
 } as const;
 
 export const Event_storage_writeSchema = {
@@ -992,9 +1154,6 @@ export const Event_file_watcher_updatedSchema = {
 export const AppSchema = {
 	type: 'object',
 	properties: {
-		user: {
-			type: 'string',
-		},
 		hostname: {
 			type: 'string',
 		},
@@ -1031,7 +1190,7 @@ export const AppSchema = {
 			},
 		},
 	},
-	required: ['user', 'hostname', 'git', 'path', 'time'],
+	required: ['hostname', 'git', 'path', 'time'],
 } as const;
 
 export const ConfigSchema = {
@@ -1049,9 +1208,16 @@ export const ConfigSchema = {
 			$ref: '#/components/schemas/KeybindsConfig',
 			description: 'Custom keybind configurations',
 		},
+		share: {
+			type: 'string',
+			enum: ['manual', 'auto', 'disabled'],
+			description:
+				"Control sharing behavior:'manual' allows manual sharing via commands, 'auto' enables automatic sharing, 'disabled' disables all sharing",
+		},
 		autoshare: {
 			type: 'boolean',
-			description: 'Share newly created sessions automatically',
+			description:
+				"@deprecated Use 'share' field instead. Share newly created sessions automatically",
 		},
 		autoupdate: {
 			type: 'boolean',
@@ -1069,6 +1235,16 @@ export const ConfigSchema = {
 			description:
 				'Model to use in the format of provider/model, eg anthropic/claude-2',
 		},
+		small_model: {
+			type: 'string',
+			description:
+				'Small model to use for tasks like summarization and title generation in the format of provider/model',
+		},
+		username: {
+			type: 'string',
+			description:
+				'Custom username to display in conversations instead of system username',
+		},
 		mode: {
 			type: 'object',
 			properties: {
@@ -1082,10 +1258,7 @@ export const ConfigSchema = {
 			additionalProperties: {
 				$ref: '#/components/schemas/ModeConfig',
 			},
-		},
-		log_level: {
-			$ref: '#/components/schemas/LogLevel',
-			description: 'Minimum log level to write to log files',
+			description: 'Modes configuration, see https://opencode.ai/docs/modes',
 		},
 		provider: {
 			type: 'object',
@@ -1210,6 +1383,10 @@ export const ConfigSchema = {
 			},
 			description: 'Additional instruction files or patterns to include',
 		},
+		layout: {
+			$ref: '#/components/schemas/LayoutConfig',
+			description: '@deprecated Always uses stretch layout.',
+		},
 		experimental: {
 			type: 'object',
 			properties: {
@@ -1285,12 +1462,22 @@ export const KeybindsConfigSchema = {
 		switch_mode: {
 			type: 'string',
 			default: 'tab',
-			description: 'Switch mode',
+			description: 'Next mode',
+		},
+		switch_mode_reverse: {
+			type: 'string',
+			default: 'shift+tab',
+			description: 'Previous Mode',
 		},
 		editor_open: {
 			type: 'string',
 			default: '<leader>e',
 			description: 'Open external editor',
+		},
+		session_export: {
+			type: 'string',
+			default: '<leader>x',
+			description: 'Export session to editor',
 		},
 		session_new: {
 			type: 'string',
@@ -1447,7 +1634,9 @@ export const KeybindsConfigSchema = {
 		'leader',
 		'app_help',
 		'switch_mode',
+		'switch_mode_reverse',
 		'editor_open',
+		'session_export',
 		'session_new',
 		'session_list',
 		'session_share',
@@ -1498,12 +1687,6 @@ export const ModeConfigSchema = {
 			},
 		},
 	},
-} as const;
-
-export const LogLevelSchema = {
-	type: 'string',
-	enum: ['DEBUG', 'INFO', 'WARN', 'ERROR'],
-	description: 'Log level',
 } as const;
 
 export const ProviderSchema = {
@@ -1657,9 +1840,21 @@ export const McpRemoteConfigSchema = {
 			type: 'boolean',
 			description: 'Enable or disable the MCP server on startup',
 		},
+		headers: {
+			type: 'object',
+			additionalProperties: {
+				type: 'string',
+			},
+			description: 'Headers to send with the request',
+		},
 	},
 	required: ['type', 'url'],
 	additionalProperties: false,
+} as const;
+
+export const LayoutConfigSchema = {
+	type: 'string',
+	enum: ['auto', 'stretch'],
 } as const;
 
 export const ErrorSchema = {
@@ -1671,6 +1866,64 @@ export const ErrorSchema = {
 		},
 	},
 	required: ['data'],
+} as const;
+
+export const TextPartInputSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		type: {
+			type: 'string',
+			const: 'text',
+		},
+		text: {
+			type: 'string',
+		},
+		synthetic: {
+			type: 'boolean',
+		},
+		time: {
+			type: 'object',
+			properties: {
+				start: {
+					type: 'number',
+				},
+				end: {
+					type: 'number',
+				},
+			},
+			required: ['start'],
+		},
+	},
+	required: ['type', 'text'],
+} as const;
+
+export const FilePartInputSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		type: {
+			type: 'string',
+			const: 'file',
+		},
+		mime: {
+			type: 'string',
+		},
+		filename: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+		},
+		source: {
+			$ref: '#/components/schemas/FilePartSource',
+		},
+	},
+	required: ['type', 'mime', 'url'],
 } as const;
 
 export const MatchSchema = {
@@ -1751,37 +2004,6 @@ export const SymbolSchema = {
 		},
 	},
 	required: ['name', 'kind', 'location'],
-} as const;
-
-export const RangeSchema = {
-	type: 'object',
-	properties: {
-		start: {
-			type: 'object',
-			properties: {
-				line: {
-					type: 'number',
-				},
-				character: {
-					type: 'number',
-				},
-			},
-			required: ['line', 'character'],
-		},
-		end: {
-			type: 'object',
-			properties: {
-				line: {
-					type: 'number',
-				},
-				character: {
-					type: 'number',
-				},
-			},
-			required: ['line', 'character'],
-		},
-	},
-	required: ['start', 'end'],
 } as const;
 
 export const FileSchema = {

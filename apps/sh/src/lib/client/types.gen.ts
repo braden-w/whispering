@@ -99,38 +99,15 @@ export type UserMessage = {
 	id: string;
 	sessionID: string;
 	role: string;
-	parts: Array<UserMessagePart>;
 	time: {
 		created: number;
 	};
-};
-
-export type UserMessagePart =
-	| ({
-			type: 'text';
-	  } & TextPart)
-	| ({
-			type: 'file';
-	  } & FilePart);
-
-export type TextPart = {
-	type: string;
-	text: string;
-	synthetic?: boolean;
-};
-
-export type FilePart = {
-	type: string;
-	mime: string;
-	filename?: string;
-	url: string;
 };
 
 export type AssistantMessage = {
 	id: string;
 	sessionID: string;
 	role: string;
-	parts: Array<AssistantMessagePart>;
 	time: {
 		created: number;
 		completed?: number;
@@ -168,10 +145,57 @@ export type AssistantMessage = {
 	};
 };
 
-export type AssistantMessagePart =
+export type ProviderAuthError = {
+	name: string;
+	data: {
+		providerID: string;
+		message: string;
+	};
+};
+
+export type UnknownError = {
+	name: string;
+	data: {
+		message: string;
+	};
+};
+
+export type MessageOutputLengthError = {
+	name: string;
+	data: {
+		[key: string]: unknown;
+	};
+};
+
+export type MessageAbortedError = {
+	name: string;
+	data: {
+		[key: string]: unknown;
+	};
+};
+
+export type EventMessageRemoved = {
+	type: string;
+	properties: {
+		sessionID: string;
+		messageID: string;
+	};
+};
+
+export type EventMessagePartUpdated = {
+	type: string;
+	properties: {
+		part: Part;
+	};
+};
+
+export type Part =
 	| ({
 			type: 'text';
 	  } & TextPart)
+	| ({
+			type: 'file';
+	  } & FilePart)
 	| ({
 			type: 'tool';
 	  } & ToolPart)
@@ -180,11 +204,81 @@ export type AssistantMessagePart =
 	  } & StepStartPart)
 	| ({
 			type: 'step-finish';
-	  } & StepFinishPart);
+	  } & StepFinishPart)
+	| ({
+			type: 'snapshot';
+	  } & SnapshotPart);
+
+export type TextPart = {
+	id: string;
+	sessionID: string;
+	messageID: string;
+	type: string;
+	text: string;
+	synthetic?: boolean;
+	time?: {
+		start: number;
+		end?: number;
+	};
+};
+
+export type FilePart = {
+	id: string;
+	sessionID: string;
+	messageID: string;
+	type: string;
+	mime: string;
+	filename?: string;
+	url: string;
+	source?: FilePartSource;
+};
+
+export type FilePartSource =
+	| ({
+			type: 'file';
+	  } & FileSource)
+	| ({
+			type: 'symbol';
+	  } & SymbolSource);
+
+export type FileSource = {
+	text: FilePartSourceText;
+	type: string;
+	path: string;
+};
+
+export type FilePartSourceText = {
+	value: string;
+	start: number;
+	end: number;
+};
+
+export type SymbolSource = {
+	text: FilePartSourceText;
+	type: string;
+	path: string;
+	range: Range;
+	name: string;
+	kind: number;
+};
+
+export type Range = {
+	start: {
+		line: number;
+		character: number;
+	};
+	end: {
+		line: number;
+		character: number;
+	};
+};
 
 export type ToolPart = {
-	type: string;
 	id: string;
+	sessionID: string;
+	messageID: string;
+	type: string;
+	callID: string;
 	tool: string;
 	state: ToolState;
 };
@@ -248,10 +342,16 @@ export type ToolStateError = {
 };
 
 export type StepStartPart = {
+	id: string;
+	sessionID: string;
+	messageID: string;
 	type: string;
 };
 
 export type StepFinishPart = {
+	id: string;
+	sessionID: string;
+	messageID: string;
 	type: string;
 	cost: number;
 	tokens: {
@@ -265,50 +365,12 @@ export type StepFinishPart = {
 	};
 };
 
-export type ProviderAuthError = {
-	name: string;
-	data: {
-		providerID: string;
-		message: string;
-	};
-};
-
-export type UnknownError = {
-	name: string;
-	data: {
-		message: string;
-	};
-};
-
-export type MessageOutputLengthError = {
-	name: string;
-	data: {
-		[key: string]: unknown;
-	};
-};
-
-export type MessageAbortedError = {
-	name: string;
-	data: {
-		[key: string]: unknown;
-	};
-};
-
-export type EventMessageRemoved = {
+export type SnapshotPart = {
+	id: string;
+	sessionID: string;
+	messageID: string;
 	type: string;
-	properties: {
-		sessionID: string;
-		messageID: string;
-	};
-};
-
-export type EventMessagePartUpdated = {
-	type: string;
-	properties: {
-		part: AssistantMessagePart;
-		sessionID: string;
-		messageID: string;
-	};
+	snapshot: string;
 };
 
 export type EventStorageWrite = {
@@ -388,7 +450,6 @@ export type EventFileWatcherUpdated = {
 };
 
 export type App = {
-	user: string;
 	hostname: string;
 	git: boolean;
 	path: {
@@ -414,7 +475,11 @@ export type Config = {
 	theme?: string;
 	keybinds?: KeybindsConfig;
 	/**
-	 * Share newly created sessions automatically
+	 * Control sharing behavior:'manual' allows manual sharing via commands, 'auto' enables automatic sharing, 'disabled' disables all sharing
+	 */
+	share?: 'manual' | 'auto' | 'disabled';
+	/**
+	 * @deprecated Use 'share' field instead. Share newly created sessions automatically
 	 */
 	autoshare?: boolean;
 	/**
@@ -429,12 +494,22 @@ export type Config = {
 	 * Model to use in the format of provider/model, eg anthropic/claude-2
 	 */
 	model?: string;
+	/**
+	 * Small model to use for tasks like summarization and title generation in the format of provider/model
+	 */
+	small_model?: string;
+	/**
+	 * Custom username to display in conversations instead of system username
+	 */
+	username?: string;
+	/**
+	 * Modes configuration, see https://opencode.ai/docs/modes
+	 */
 	mode?: {
 		build?: ModeConfig;
 		plan?: ModeConfig;
 		[key: string]: ModeConfig | undefined;
 	};
-	log_level?: LogLevel;
 	/**
 	 * Custom provider configurations and model overrides
 	 */
@@ -490,6 +565,7 @@ export type Config = {
 	 * Additional instruction files or patterns to include
 	 */
 	instructions?: Array<string>;
+	layout?: LayoutConfig;
 	experimental?: {
 		hook?: {
 			file_edited?: {
@@ -520,13 +596,21 @@ export type KeybindsConfig = {
 	 */
 	app_help: string;
 	/**
-	 * Switch mode
+	 * Next mode
 	 */
 	switch_mode: string;
+	/**
+	 * Previous Mode
+	 */
+	switch_mode_reverse: string;
 	/**
 	 * Open external editor
 	 */
 	editor_open: string;
+	/**
+	 * Export session to editor
+	 */
+	session_export: string;
 	/**
 	 * Create a new session
 	 */
@@ -657,11 +741,6 @@ export type ModeConfig = {
 	};
 };
 
-/**
- * Log level
- */
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
-
 export type Provider = {
 	api?: string;
 	name: string;
@@ -730,12 +809,40 @@ export type McpRemoteConfig = {
 	 * Enable or disable the MCP server on startup
 	 */
 	enabled?: boolean;
+	/**
+	 * Headers to send with the request
+	 */
+	headers?: {
+		[key: string]: string;
+	};
 };
+
+export type LayoutConfig = 'auto' | 'stretch';
 
 export type _Error = {
 	data: {
 		[key: string]: unknown;
 	};
+};
+
+export type TextPartInput = {
+	id?: string;
+	type: string;
+	text: string;
+	synthetic?: boolean;
+	time?: {
+		start: number;
+		end?: number;
+	};
+};
+
+export type FilePartInput = {
+	id?: string;
+	type: string;
+	mime: string;
+	filename?: string;
+	url: string;
+	source?: FilePartSource;
 };
 
 export type Match = {
@@ -762,17 +869,6 @@ export type Symbol = {
 	location: {
 		uri: string;
 		range: Range;
-	};
-};
-
-export type Range = {
-	start: {
-		line: number;
-		character: number;
-	};
-	end: {
-		line: number;
-		character: number;
 	};
 };
 
@@ -923,6 +1019,7 @@ export type DeleteSessionByIdResponse =
 
 export type PostSessionByIdInitData = {
 	body?: {
+		messageID: string;
 		providerID: string;
 		modelID: string;
 	};
@@ -1044,7 +1141,10 @@ export type GetSessionByIdMessageResponses = {
 	/**
 	 * List of messages
 	 */
-	200: Array<Message>;
+	200: Array<{
+		info: Message;
+		parts: Array<Part>;
+	}>;
 };
 
 export type GetSessionByIdMessageResponse =
@@ -1052,10 +1152,21 @@ export type GetSessionByIdMessageResponse =
 
 export type PostSessionByIdMessageData = {
 	body?: {
+		messageID?: string;
 		providerID: string;
 		modelID: string;
-		mode: string;
-		parts: Array<UserMessagePart>;
+		mode?: string;
+		tools?: {
+			[key: string]: boolean;
+		};
+		parts: Array<
+			| ({
+					type: 'text';
+			  } & TextPartInput)
+			| ({
+					type: 'file';
+			  } & FilePartInput)
+		>;
 	};
 	path: {
 		/**
