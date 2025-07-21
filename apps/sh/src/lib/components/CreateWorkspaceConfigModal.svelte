@@ -137,28 +137,57 @@ EOF` as const,
 		}
 	}
 
-	// Generate available ports
+	// Generate available ports using sequential checking
 	async function generateAvailablePorts(): Promise<{ privatePort: number; publicPort: number }> {
 		isCheckingPorts = true;
 		try {
-			let attempts = 0;
-			const maxAttempts = 50;
+			// Start at 4096 for private port and 8080 for public port
+			let privatePort = 4096;
+			let publicPort = 8080;
+			const maxPort = 65535;
+			const minPort = 1024;
 			
-			while (attempts < maxAttempts) {
-				const ports = generateRandomPorts();
-				
-				// Check both ports in parallel
-				const [privateAvailable, publicAvailable] = await Promise.all([
-					isPortAvailable(ports.privatePort),
-					isPortAvailable(ports.publicPort)
-				]);
-				
-				if (privateAvailable && publicAvailable) {
-					toast.success('Found available ports');
-					return ports;
+			// Find available private port starting from 4096
+			while (privatePort <= maxPort) {
+				if (await isPortAvailable(privatePort)) {
+					break;
 				}
-				
-				attempts++;
+				privatePort++;
+			}
+			
+			// If we couldn't find a port in the range, wrap around
+			if (privatePort > maxPort) {
+				privatePort = minPort;
+				while (privatePort < 4096) {
+					if (await isPortAvailable(privatePort)) {
+						break;
+					}
+					privatePort++;
+				}
+			}
+			
+			// Find available public port starting from 8080
+			while (publicPort <= maxPort) {
+				if (publicPort !== privatePort && await isPortAvailable(publicPort)) {
+					break;
+				}
+				publicPort++;
+			}
+			
+			// If we couldn't find a port in the range, wrap around
+			if (publicPort > maxPort) {
+				publicPort = minPort;
+				while (publicPort < 8080) {
+					if (publicPort !== privatePort && await isPortAvailable(publicPort)) {
+						break;
+					}
+					publicPort++;
+				}
+			}
+			
+			if (privatePort <= maxPort && publicPort <= maxPort) {
+				toast.success('Found available ports');
+				return { privatePort, publicPort };
 			}
 			
 			// Fallback if we couldn't find available ports
