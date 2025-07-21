@@ -34,8 +34,6 @@
 		() => sessionId,
 	);
 
-	$inspect(messages.value);
-
 	// Load initial messages when component mounts
 	$effect(() => {
 		messages.loadInitialMessages();
@@ -273,7 +271,7 @@
 				<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 				<AlertDialog.Description>
 					This action cannot be undone. This will permanently delete the session
-					"{sessionQuery.data?.title || 'Untitled Session'}" and all its
+					"{sessionQuery.data?.title ?? 'Untitled Session'}" and all its
 					messages.
 				</AlertDialog.Description>
 			</AlertDialog.Header>
