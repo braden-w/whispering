@@ -1,23 +1,19 @@
 import * as api from '$lib/client/sdk.gen';
-import type {
-	PostSessionByIdSummarizeData,
-	PostSessionData,
-	Session,
-} from '$lib/client/types.gen';
+import type { PostSessionByIdSummarizeData } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
-import { ShErr, type ShError } from '$lib/result';
-import type { Workspace } from '$lib/stores/workspaces.svelte';
-import type { Accessor, QueryObserverOptions } from '@tanstack/svelte-query';
+import { ShErr } from '$lib/result';
+import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+import type { Accessor } from '@tanstack/svelte-query';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation, defineQuery, queryClient } from './_client';
 
 // Query for fetching all sessions in a workspace
-export const getSessions = (workspace: Accessor<Workspace>) =>
+export const getSessions = (workspaceConfig: Accessor<WorkspaceConfig>) =>
 	defineQuery({
-		queryKey: ['workspaces', workspace().id, 'sessions'],
+		queryKey: ['workspaces', workspaceConfig().id, 'sessions'],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspace());
+			const client = createWorkspaceClient(workspaceConfig());
 
 			const { data, error } = await api.getSession({ client });
 			if (error) {
@@ -34,8 +30,10 @@ export const getSessions = (workspace: Accessor<Workspace>) =>
 // Mutation for creating a new session
 export const createSession = defineMutation({
 	mutationKey: ['createSession'],
-	resultMutationFn: async ({ workspace }: { workspace: Workspace }) => {
-		const client = createWorkspaceClient(workspace);
+	resultMutationFn: async ({
+		workspaceConfig,
+	}: { workspaceConfig: WorkspaceConfig }) => {
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data: session, error } = await api.postSession({ client });
 		if (error) {
@@ -46,9 +44,9 @@ export const createSession = defineMutation({
 		}
 		return Ok(session);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -57,13 +55,13 @@ export const createSession = defineMutation({
 export const deleteSession = defineMutation({
 	mutationKey: ['deleteSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		sessionId,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		sessionId: string;
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.deleteSessionById({
 			client,
@@ -77,9 +75,9 @@ export const deleteSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -88,13 +86,13 @@ export const deleteSession = defineMutation({
 export const shareSession = defineMutation({
 	mutationKey: ['shareSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		id,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		id: string;
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdShare({
 			client,
@@ -108,9 +106,9 @@ export const shareSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -119,13 +117,13 @@ export const shareSession = defineMutation({
 export const unshareSession = defineMutation({
 	mutationKey: ['unshareSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		id,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		id: string;
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.deleteSessionByIdShare({
 			client,
@@ -139,9 +137,9 @@ export const unshareSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -150,13 +148,13 @@ export const unshareSession = defineMutation({
 export const abortSession = defineMutation({
 	mutationKey: ['abortSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		id,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		id: string;
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdAbort({
 			client,
@@ -170,9 +168,9 @@ export const abortSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace, id }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -181,15 +179,15 @@ export const abortSession = defineMutation({
 export const initializeSession = defineMutation({
 	mutationKey: ['initializeSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		id,
 		body,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		id: string;
-		body?: { providerID: string; modelID: string };
+		body?: { providerID: string; modelID: string; messageID: string };
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdInit({
 			client,
@@ -204,9 +202,9 @@ export const initializeSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
@@ -215,15 +213,15 @@ export const initializeSession = defineMutation({
 export const summarizeSession = defineMutation({
 	mutationKey: ['summarizeSession'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		sessionId,
 		body,
 	}: {
-		workspace: Workspace;
+		workspaceConfig: WorkspaceConfig;
 		sessionId: string;
 		body: PostSessionByIdSummarizeData['body'];
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdSummarize({
 			client,
@@ -238,22 +236,22 @@ export const summarizeSession = defineMutation({
 		}
 		return Ok(data);
 	},
-	onSuccess: (_, { workspace }) => {
+	onSuccess: (_, { workspaceConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspace.id, 'sessions'],
+			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
 		});
 	},
 });
 
 // Query for fetching a single session by ID
 export const getSessionById = (
-	workspace: Accessor<Workspace>,
+	workspaceConfig: Accessor<WorkspaceConfig>,
 	sessionId: Accessor<string>,
 ) =>
 	defineQuery({
-		queryKey: ['workspaces', workspace().id, 'sessions'],
+		queryKey: ['workspaces', workspaceConfig().id, 'sessions'],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspace());
+			const client = createWorkspaceClient(workspaceConfig());
 
 			const { data, error } = await api.getSession({ client });
 			if (error) {
@@ -265,14 +263,5 @@ export const getSessionById = (
 
 			return Ok(data);
 		},
-		select: (data) => {
-			const session = data?.find((s) => s.id === sessionId());
-			if (!session) {
-				return ShErr({
-					title: 'Session not found',
-					description: 'The requested session does not exist',
-				});
-			}
-			return Ok(session);
-		},
+		select: (sessions) => sessions?.find((s) => s.id === sessionId()),
 	});
