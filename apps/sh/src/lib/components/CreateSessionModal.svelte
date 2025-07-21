@@ -19,44 +19,15 @@
 
 	let title = $state('');
 
-	const createSessionMutation = createMutation(() => ({
-		...rpc.sessions.createSession.options(),
-		onSuccess: (data) => {
-			toast.success('Session created successfully');
-			if (data?.id) {
-				goto(`/workspaces/${workspaceConfig.id}/sessions/${data.id}`);
-				open = false;
-				title = '';
-			}
-		},
-		onError: (error) => {
-			toast.error(error.title, {
-				description: error.description,
-			});
-			console.error('Error creating session:', error);
-		},
-	}));
-
-	async function handleSubmit(e: Event) {
-		e.preventDefault();
-
-		if (!workspaceConfig) {
-			toast.error('No workspace selected');
-			return;
-		}
-
-		createSessionMutation.mutate({ workspaceConfig });
-	}
-
-	function handleOpenChange(value: boolean) {
-		open = value;
-		if (!value) {
-			title = '';
-		}
-	}
+	const createSessionMutation = createMutation(rpc.sessions.createSession.options);
 </script>
 
-<Modal.Root bind:open onOpenChange={handleOpenChange}>
+<Modal.Root bind:open onOpenChange={(value) => {
+	open = value;
+	if (!value) {
+		title = '';
+	}
+}}>
 	<Modal.Content class="sm:max-w-[425px]">
 		<Modal.Header>
 			<Modal.Title>Create New Session</Modal.Title>
@@ -64,7 +35,31 @@
 				Start a new conversation session. You can optionally provide a title.
 			</Modal.Description>
 		</Modal.Header>
-		<form onsubmit={handleSubmit}>
+		<form onsubmit={(e) => {
+		e.preventDefault();
+
+		if (!workspaceConfig) {
+			toast.error('No workspace selected');
+			return;
+		}
+
+		createSessionMutation.mutate({ workspaceConfig }, {
+			onSuccess: (data) => {
+				toast.success('Session created successfully');
+				if (data?.id) {
+					goto(`/workspaces/${workspaceConfig.id}/sessions/${data.id}`);
+					open = false;
+					title = '';
+				}
+			},
+			onError: (error) => {
+				toast.error(error.title, {
+					description: error.description,
+				});
+				console.error('Error creating session:', error);
+			},
+		});
+	}}>
 			<div class="grid gap-4 py-4">
 				<div class="grid gap-2">
 					<Label for="title">Session Title (optional)</Label>
