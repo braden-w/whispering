@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import MessageInput from '$lib/components/messages/MessageInput.svelte';
-	import MessageList from '$lib/components/messages/MessageList.svelte';
-	import ModeSelector from '$lib/components/session-controls/ModeSelector.svelte';
-	import ModelSelector from '$lib/components/session-controls/ModelSelector.svelte';
+	import MessageInput from './_components/messages/MessageInput.svelte';
+	import MessageList from './_components/messages/MessageList.svelte';
+	import ModeSelector from './_components/session-controls/ModeSelector.svelte';
+	import ModelSelector from './_components/session-controls/ModelSelector.svelte';
 	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 	import { formatDate } from '$lib/utils/date';

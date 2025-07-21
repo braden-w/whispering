@@ -4,8 +4,8 @@
 	import { getWorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
-	import SessionList from '$lib/components/sessions/SessionList.svelte';
-	import CreateSessionModal from '$lib/components/sessions/CreateSessionModal.svelte';
+	import SessionList from './_components/SessionList.svelte';
+	import CreateSessionModal from './_components/CreateSessionModal.svelte';
 	import { Button } from '@repo/ui/button';
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
