@@ -234,20 +234,6 @@
 			</div> -->
 		{/if}
 
-		<!-- Session Controls -->
-		<div class="flex items-center gap-2 pb-2">
-			<ModeSelector
-				{workspaceConfig}
-				bind:value={messageMode}
-				onModeChange={handleModeChange}
-			/>
-			<ModelSelector
-				{workspaceConfig}
-				bind:value={selectedModel}
-				class="w-[200px]"
-			/>
-		</div>
-
 		<div class="flex-1 overflow-y-auto">
 			<MessageList
 				messages={messages.value}
@@ -257,10 +243,23 @@
 
 		<Separator />
 
-		<div class="pt-4">
+		<div class="pt-4 space-y-2">
+			<!-- Session Controls -->
+			<div class="flex items-center gap-2">
+				<ModeSelector
+					{workspaceConfig}
+					bind:value={messageMode}
+					onModeChange={handleModeChange}
+				/>
+				<ModelSelector
+					{workspaceConfig}
+					bind:value={selectedModel}
+					class="w-[200px]"
+				/>
+			</div>
+			
 			<MessageInput
 				bind:value={messageContent}
-				bind:mode={messageMode}
 				onSubmit={handleSendMessage}
 				onFileUpload={handleFileUpload}
 				disabled={!canSendMessage}

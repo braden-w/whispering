@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Textarea } from '@repo/ui/textarea';
 	import { Button } from '@repo/ui/button';
-	import * as Select from '@repo/ui/select';
 	import { Badge } from '@repo/ui/badge';
 	import {
 		FileDropZone,
@@ -13,14 +12,12 @@
 
 	let {
 		value = $bindable(''),
-		mode = $bindable('chat'),
 		onSubmit,
 		onFileUpload,
 		disabled = false,
 		placeholder = 'Type your message...',
 	}: {
 		value?: string;
-		mode?: string;
 		onSubmit: () => void;
 		onFileUpload?: (files: File[]) => void;
 		disabled?: boolean;
@@ -65,30 +62,6 @@
 </script>
 
 <div class="space-y-2">
-	<div class="flex items-center gap-2">
-		<Select.Root bind:value={mode}>
-			<Select.Trigger class="w-32">
-				<Select.Value placeholder="Mode" />
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Item value="chat">Chat</Select.Item>
-				<Select.Item value="code">Code</Select.Item>
-				<Select.Item value="explain">Explain</Select.Item>
-				<Select.Item value="summarize">Summarize</Select.Item>
-				<Select.Item value="fix">Fix</Select.Item>
-				<Select.Item value="refactor">Refactor</Select.Item>
-			</Select.Content>
-		</Select.Root>
-
-		<Button
-			variant="ghost"
-			size="icon"
-			onclick={() => (showFileUpload = !showFileUpload)}
-			{disabled}
-		>
-			<PaperclipIcon class="h-4 w-4" />
-		</Button>
-	</div>
 
 	{#if showFileUpload}
 		<FileDropZone
@@ -119,20 +92,32 @@
 	{/if}
 
 	<div class="flex gap-2">
-		<Textarea
-			bind:value
-			{placeholder}
-			{disabled}
-			onkeydown={handleKeyDown}
-			class="min-h-[80px] resize-none"
-			rows={3}
-		/>
-		<Button
-			onclick={handleSubmit}
-			{disabled}
-			size="icon"
-			class="h-[80px] w-[80px]"
-		>
+		<div class="flex-1">
+			<Textarea
+				bind:value
+				{placeholder}
+				{disabled}
+				onkeydown={handleKeyDown}
+				class="min-h-[80px] resize-none"
+				rows={3}
+			/>
+		</div>
+		<div class="flex flex-col gap-2">
+			<Button
+				variant="ghost"
+				size="icon"
+				onclick={() => (showFileUpload = !showFileUpload)}
+				{disabled}
+				class="h-9 w-9"
+			>
+				<PaperclipIcon class="h-4 w-4" />
+			</Button>
+			<Button
+				onclick={handleSubmit}
+				{disabled}
+				size="icon"
+				class="h-[41px] w-9"
+			>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
@@ -147,6 +132,7 @@
 				<path d="M22 2L11 13" />
 				<path d="M22 2L15 22L11 13L2 9L22 2Z" />
 			</svg>
-		</Button>
+			</Button>
+		</div>
 	</div>
 </div>
