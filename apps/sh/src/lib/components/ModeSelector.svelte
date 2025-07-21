@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { Button } from '@repo/ui/button';
-	import { cn } from '@repo/ui/utils';
+	import * as ToggleGroup from '@repo/ui/toggle-group';
 	import { Skeleton } from '@repo/ui/skeleton';
-	import { Settings as SettingsIcon } from 'lucide-svelte';
+	import { MessageSquare, Lightbulb, Code } from 'lucide-svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 	let {
 		workspaceConfig,
-		value = $bindable<string>('chat'),
+		value = $bindable(),
 		onModeChange,
 		class: className,
 	}: {
@@ -26,41 +25,45 @@
 
 	const modes = $derived(modesQuery.data ?? []);
 
-	// Check if a mode needs configuration (plan or build)
-	function needsConfiguration(modeName: string): boolean {
-		return modeName === 'plan' || modeName === 'build';
-	}
-
-	function handleModeSelect(modeName: string) {
-		value = modeName;
-		onModeChange?.(modeName);
+	// Get icon for mode
+	function getModeIcon(modeName: string) {
+		switch (modeName) {
+			case 'plan':
+				return Lightbulb;
+			case 'build':
+				return Code;
+			default:
+				return MessageSquare;
+		}
 	}
 </script>
 
-<div class={cn('flex items-center gap-1', className)}>
-	{#if modesQuery.isPending}
-		<div class="flex items-center gap-1">
-			<Skeleton class="h-9 w-16" />
-			<Skeleton class="h-9 w-16" />
-			<Skeleton class="h-9 w-16" />
-		</div>
-	{:else if modesQuery.isError}
-		<div class="text-sm text-destructive">
-			Failed to load modes
-		</div>
-	{:else}
+{#if modesQuery.isPending}
+	<div class="flex items-center gap-1">
+		<Skeleton class="h-9 w-[200px]" />
+	</div>
+{:else if modesQuery.isError}
+	<div class="text-sm text-destructive">
+		Failed to load modes
+	</div>
+{:else}
+	<ToggleGroup.Root
+		type="single"
+		{value}
+		onValueChange={(newValue) => {
+			if (newValue) {
+				value = newValue;
+				onModeChange?.(newValue);
+			}
+		}}
+		class={className}
+	>
 		{#each modes as mode (mode.name)}
-			<Button
-				variant={value === mode.name ? 'default' : 'outline'}
-				size="sm"
-				onclick={() => handleModeSelect(mode.name)}
-				class="relative"
-			>
+			{@const Icon = getModeIcon(mode.name)}
+			<ToggleGroup.Item value={mode.name} aria-label="{mode.name} mode">
+				<Icon class="size-4 mr-2" />
 				{mode.name}
-				{#if needsConfiguration(mode.name)}
-					<SettingsIcon class="size-3 ml-1" />
-				{/if}
-			</Button>
+			</ToggleGroup.Item>
 		{/each}
-	{/if}
-</div>
+	</ToggleGroup.Root>
+{/if}
