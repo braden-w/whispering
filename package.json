@@ -3,7 +3,9 @@
 	"private": true,
 	"version": "7.1.1",
 	"description": "",
-	"keywords": [],
+	"keywords": [
+		
+	],
 	"license": "ISC",
 	"author": "",
 	"scripts": {
@@ -22,6 +24,8 @@
 		"turbo": "latest"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": ["esbuild"]
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	}
 }
