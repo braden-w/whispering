@@ -1,6 +1,6 @@
 import * as api from '$lib/client/sdk.gen';
 import type { PostSessionByIdSummarizeData } from '$lib/client/types.gen';
-import { createWorkspaceClient } from '$lib/client/workspace-client';
+import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
 import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';

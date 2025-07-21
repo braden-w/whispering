@@ -7,7 +7,7 @@ import type {
 	Message as MessageInfo,
 	Part,
 } from '$lib/client/types.gen';
-import { createWorkspaceClient } from '$lib/client/workspace-client';
+import { createWorkspaceClient } from '$lib/client/client.gen';
 import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
@@ -209,7 +209,7 @@ export function createMessageSubscriber(
 		// const sseUrl = new URL('/event', workspace().url);
 		// sseUrl.username = workspace().username;
 		// sseUrl.password = workspace().password;
-		const sseUrl = new URL('/event', 'http://localhost:4096');
+		const sseUrl = new URL('/event', 'http://localhost:8080');
 
 		eventSource = new EventSource(sseUrl.toString());
 

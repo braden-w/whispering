@@ -1,5 +1,5 @@
 import * as api from '$lib/client/sdk.gen';
-import { createWorkspaceClient } from '$lib/client/workspace-client';
+import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
 import type { Workspace } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';

@@ -13,8 +13,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
 	import * as api from '$lib/client/sdk.gen';
-	import { createWorkspaceClient } from '$lib/client/workspace-client';
-	import { getProxiedBaseUrl } from '$lib/client/utils/proxy-url';
+	import { createWorkspaceClient } from '$lib/client/client.gen';
 	import { type } from 'arktype';
 	import type { Snippet } from 'svelte';
 	import { settings } from '$lib/stores/settings.svelte';
@@ -146,8 +145,8 @@
 	async function autoDetectNgrokUrl() {
 		isDetecting = true;
 		try {
-			const ngrokApiUrl = getProxiedBaseUrl('http://localhost:4040');
-			const response = await fetch(`${ngrokApiUrl}/api/tunnels`);
+			// Use the proxy API route for ngrok detection
+			const response = await fetch('/api/proxy/http://localhost:4040/api/tunnels');
 
 			if (!response.ok) {
 				throw new Error(
@@ -251,12 +250,103 @@
 							>Step 1: Start OpenCode Server</Card.Title
 						>
 						<Card.Description>
-							Run the following commands to start your server
+							Run the following command to start your server
 						</Card.Description>
 					</Card.Header>
 					<Card.Content class="space-y-4">
+						<Tabs.Root value="combined" class="w-full">
+							<Tabs.List class="grid w-full grid-cols-2">
+								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger>
+								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
+							</Tabs.List>
+							<Tabs.Content value="combined" class="space-y-4">
+								<div class="space-y-2">
+									<div class="flex items-center gap-2">
+										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
+											{quickSetupCommand}
+										</code>
+										<Button
+											size="icon"
+											variant="ghost"
+											onclick={() => copyToClipboard(quickSetupCommand)}
+										>
+											<Copy class="h-4 w-4" />
+										</Button>
+									</div>
+									
+									<!-- What does this do? -->
+									<Accordion.Root type="single" >
+										<Accordion.Item value="explanation">
+											<Accordion.Trigger class="text-sm">What does this do?</Accordion.Trigger>
+											<Accordion.Content>
+												<div class="space-y-3 pt-2">
+													<p class="text-sm text-muted-foreground">
+														This combined one-liner is equivalent to running these two commands in separate terminals:
+													</p>
+													<div class="space-y-2">
+														<code class="block bg-muted p-2 rounded text-sm">
+															{opencodeCommand}
+														</code>
+														<code class="block bg-muted p-2 rounded text-sm break-all">
+															{ngrokCommand}
+														</code>
+													</div>
+													<p class="text-sm text-muted-foreground">
+														The <code class="text-xs bg-muted px-1 py-0.5 rounded">&</code> runs both commands in parallel, 
+														and the <code class="text-xs bg-muted px-1 py-0.5 rounded">kill $!</code> ensures that 
+														when you press Ctrl+C, both processes are terminated together. This prevents background 
+														processes from continuing to run after you exit.
+													</p>
+												</div>
+											</Accordion.Content>
+										</Accordion.Item>
+									</Accordion.Root>
+								</div>
+							</Tabs.Content>
+							<Tabs.Content value="separate" class="space-y-4">
+								<div class="space-y-4">
+									<div>
+										<p class="text-sm text-muted-foreground mb-2">
+											In your project directory, run:
+										</p>
+										<div class="flex items-center gap-2">
+											<code class="flex-1 bg-muted p-2 rounded text-sm">
+												{opencodeCommand}
+											</code>
+											<Button
+												size="icon"
+												variant="ghost"
+												onclick={() => copyToClipboard(opencodeCommand)}
+											>
+												<Copy class="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+									<div>
+										<p class="text-sm text-muted-foreground mb-2">
+											In another terminal, run:
+										</p>
+										<div class="flex items-center gap-2">
+											<code
+												class="flex-1 bg-muted p-2 rounded text-sm break-all"
+											>
+												{ngrokCommand}
+											</code>
+											<Button
+												size="icon"
+												variant="ghost"
+												onclick={() => copyToClipboard(ngrokCommand)}
+											>
+												<Copy class="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+								</div>
+							</Tabs.Content>
+						</Tabs.Root>
+
 						<!-- Configuration Accordion -->
-						<Accordion.Root>
+						<Accordion.Root type="single" collapsible>
 							<Accordion.Item value="config">
 								<Accordion.Trigger>Configure Server Settings</Accordion.Trigger>
 								<Accordion.Content>
@@ -301,70 +391,6 @@
 								</Accordion.Content>
 							</Accordion.Item>
 						</Accordion.Root>
-						<Tabs.Root value="separate" class="w-full">
-							<Tabs.List class="grid w-full grid-cols-2">
-								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
-								<Tabs.Trigger value="combined">Combined (One Line)</Tabs.Trigger
-								>
-							</Tabs.List>
-							<Tabs.Content value="separate" class="space-y-4">
-								<div class="space-y-4">
-									<div>
-										<p class="text-sm text-muted-foreground mb-2">
-											In your project directory, run:
-										</p>
-										<div class="flex items-center gap-2">
-											<code class="flex-1 bg-muted p-2 rounded text-sm">
-												{opencodeCommand}
-											</code>
-											<Button
-												size="icon"
-												variant="ghost"
-												onclick={() => copyToClipboard(opencodeCommand)}
-											>
-												<Copy class="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
-									<div>
-										<p class="text-sm text-muted-foreground mb-2">
-											In another terminal, run:
-										</p>
-										<div class="flex items-center gap-2">
-											<code
-												class="flex-1 bg-muted p-2 rounded text-sm break-all"
-											>
-												{ngrokCommand}
-											</code>
-											<Button
-												size="icon"
-												variant="ghost"
-												onclick={() => copyToClipboard(ngrokCommand)}
-											>
-												<Copy class="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
-								</div>
-							</Tabs.Content>
-							<Tabs.Content value="combined" class="space-y-4">
-								<p class="text-sm text-muted-foreground">
-									Run both commands in one line:
-								</p>
-								<div class="flex items-center gap-2">
-									<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
-										{quickSetupCommand}
-									</code>
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => copyToClipboard(quickSetupCommand)}
-									>
-										<Copy class="h-4 w-4" />
-									</Button>
-								</div>
-							</Tabs.Content>
-						</Tabs.Root>
 					</Card.Content>
 				</Card.Root>
 			{:else if step === 2}

@@ -2,7 +2,7 @@ import * as api from '$lib/client/sdk.gen';
 import type {
 	PostSessionByIdMessageData,
 } from '$lib/client/types.gen';
-import { createWorkspaceClient } from '$lib/client/workspace-client';
+import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
 import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import { extractErrorMessage } from 'wellcrafted/error';
@@ -13,15 +13,15 @@ import { defineMutation } from './_client';
 export const sendMessage = defineMutation({
 	mutationKey: ['sendMessage'],
 	resultMutationFn: async ({
-		workspace,
+		workspaceConfig,
 		sessionId,
 		body,
 	}: {
-		workspace: WorkspaceConfig;
+		workspaceConfig: WorkspaceConfig;
 		sessionId: string;
 		body: PostSessionByIdMessageData['body'];
 	}) => {
-		const client = createWorkspaceClient(workspace);
+		const client = createWorkspaceClient(workspaceConfig);
 
 		// TODO: Provider and model should come from workspace settings or user preferences
 		// For now, we'll use default values
