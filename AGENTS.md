@@ -140,6 +140,29 @@ Be brutally honest, don't be a yes man.
 If I am wrong, point it out bluntly. 
 I need honest feedback on my code.
 
+# Styling Best Practices
+
+## Minimize Wrapper Elements
+When applying styles, avoid creating unnecessary wrapper divs. If classes can be applied directly to an existing semantic element with the same outcome, prefer that approach:
+
+### Good (Direct Application)
+```svelte
+<main class="flex-1 mx-auto max-w-7xl">
+  {@render children()}
+</main>
+```
+
+### Avoid (Unnecessary Wrapper)
+```svelte
+<main class="flex-1">
+  <div class="mx-auto max-w-7xl">
+    {@render children()}
+  </div>
+</main>
+```
+
+This principle applies to all elements where the styling doesn't conflict with the element's semantic purpose or create layout issues.
+
 # Shadcn-svelte Best Practices
 
 ## Component Organization
