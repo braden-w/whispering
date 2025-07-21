@@ -7,10 +7,8 @@
 
 	let {
 		messages,
-		isLoading = false,
 	}: {
 		messages: Message[];
-		isLoading?: boolean;
 	} = $props();
 
 	const hasProcessingMessage = $derived(
@@ -20,15 +18,7 @@
 	);
 </script>
 
-{#if isLoading}
-	<div class="flex-1 overflow-y-auto p-4">
-		<div class="space-y-4">
-			{#each Array(3) as _}
-				<Skeleton class="h-20 w-full" />
-			{/each}
-		</div>
-	</div>
-{:else if messages.length === 0}
+{#if messages.length === 0}
 	<div class="flex-1 flex items-center justify-center text-muted-foreground">
 		<div class="text-center">
 			<svg

@@ -206,10 +206,7 @@
 		{/if}
 
 		<div class="flex-1 overflow-y-auto">
-			<MessageList
-				messages={messages.value}
-				isLoading={false}
-			/>
+			<MessageList messages={messages.value} />
 		</div>
 
 		<Separator />
