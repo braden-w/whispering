@@ -19,11 +19,9 @@
 		</Chat.BubbleAvatarFallback>
 	</Chat.BubbleAvatar>
 	<Chat.BubbleMessage class="flex flex-col gap-1">
-		<div class="prose prose-sm dark:prose-invert max-w-none space-y-2">
 			{#each parts as part}
 				<MessagePartRenderer {part} />
 			{/each}
-		</div>
 		<div class="w-full text-xs opacity-70 text-end">
 			{formatDate(new Date(message.time.created))}
 		</div>

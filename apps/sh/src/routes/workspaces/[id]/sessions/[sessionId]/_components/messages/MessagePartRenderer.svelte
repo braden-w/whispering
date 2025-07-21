@@ -36,7 +36,7 @@
 	<div class="break-words">
 		{@html parseMarkdown(part.text)}
 		{#if part.synthetic}
-			<Badge variant="outline" class="ml-2 text-xs">Synthetic</Badge>
+			<Badge variant="secondary" class="ml-2 text-xs">Synthetic</Badge>
 		{/if}
 	</div>
 {:else if part.type === 'file'}
