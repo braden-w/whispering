@@ -84,13 +84,30 @@
 	});
 
 	// Port configuration constants
-	const HONO_PROXY_PORT = 8787; // Hono proxy server port
 	const NGROK_API_PORT = 4040; // Default ngrok API port
+	const NGROK_PROXY_PORT = 4080; // Caddy proxy port for ngrok API
 
 	// Commands for copy functionality
 	const opencodeCommand = $derived(`opencode serve -p ${privatePortState}` as const);
-	const honoProxyCommand = $derived(
-		'cd apps/sh-proxy && npm run dev' as const
+	const caddyCommand = $derived(
+		`caddy run --config - --adapter caddyfile << EOF
+:${NGROK_PROXY_PORT} {
+    # Add CORS headers to all responses
+    header Access-Control-Allow-Origin "http://localhost:5173"
+    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers "*"
+    header Access-Control-Allow-Credentials "true"
+
+    # Handle preflight OPTIONS requests and respond immediately
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+
+    # Proxy all other requests to ngrok API
+    reverse_proxy localhost:${NGROK_API_PORT}
+}
+EOF` as const
 	);
 	const ngrokCommand = $derived(
 		`ngrok http ${privatePortState} --basic-auth="${username}:${password}"` as const,
@@ -258,18 +275,18 @@
 				throw new Error('Invalid response from ngrok');
 			}
 
-			// Find HTTPS tunnel that matches our public port
+			// Find HTTPS tunnel that matches our OpenCode port
 			const httpsTunnel = parsed.tunnels.find(
-				(t) => t.proto === 'https' && t.config.addr.includes(`:${publicPortState}`),
+				(t) => t.proto === 'https' && t.config.addr.includes(`:${privatePortState}`),
 			);
 
 			if (httpsTunnel) {
 				ngrokUrl = httpsTunnel.public_url;
 				toast.success('ngrok URL detected successfully!');
 			} else {
-				// Check if there's any tunnel for our public port
+				// Check if there's any tunnel for our OpenCode port
 				const anyTunnel = parsed.tunnels.find((t) =>
-					t.config.addr.includes(`:${publicPortState}`),
+					t.config.addr.includes(`:${privatePortState}`),
 				);
 				if (anyTunnel) {
 					toast.error(
@@ -277,7 +294,7 @@
 					);
 				} else {
 					toast.error(
-						`No tunnel found for port ${publicPortState}. Make sure ngrok is running with the correct port.`,
+						`No tunnel found for port ${privatePortState}. Make sure ngrok is running with the correct port.`,
 					);
 				}
 			}
@@ -357,7 +374,7 @@
 									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
 										1
 									</div>
-									<p class="text-sm font-medium">Start OpenCode server (private port)</p>
+									<p class="text-sm font-medium">Start OpenCode server</p>
 								</div>
 								<div class="flex items-center gap-2 ml-10">
 									<code class="flex-1 bg-muted p-2 rounded text-sm">
@@ -379,7 +396,7 @@
 									<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
 										2
 									</div>
-									<p class="text-sm font-medium">Start Caddy proxy (public port with CORS)</p>
+									<p class="text-sm font-medium">Start Caddy proxy for ngrok API (optional)</p>
 								</div>
 								<div class="flex items-start gap-2 ml-10">
 									<code class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre">{caddyCommand}</code>
@@ -423,20 +440,15 @@
 								<Accordion.Content>
 									<div class="space-y-3 pt-2">
 										<p class="text-sm text-muted-foreground">
-											This setup uses a three-layer architecture with dual proxy configuration:
+											This setup uses a simplified architecture:
 										</p>
 										<ol class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4">
-											<li><strong>OpenCode</strong>: Runs on the private port ({privatePortState}) - this is your actual development server</li>
-											<li><strong>Caddy (dual proxy)</strong>: 
-												<ul class="list-disc list-inside ml-4 mt-1">
-													<li>Proxies :${publicPortState} → localhost:{privatePortState} with CORS headers for browser compatibility</li>
-													<li>Proxies localhost:${NGROK_PROXY_PORT} → localhost:${NGROK_API_PORT} for ngrok tunnel auto-detection</li>
-												</ul>
-											</li>
-											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your public port ({publicPortState}) to the internet with authentication</li>
+											<li><strong>OpenCode</strong>: Runs on port {privatePortState} with built-in CORS support</li>
+											<li><strong>Caddy proxy (optional)</strong>: Only needed for ngrok auto-detection. Proxies localhost:{NGROK_PROXY_PORT} → localhost:{NGROK_API_PORT}</li>
+											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your OpenCode server to the internet with authentication</li>
 										</ol>
 										<p class="text-sm text-muted-foreground">
-											The Caddy proxy is necessary because OpenCode doesn't include CORS headers, which are required for browser-based access. The second proxy enables automatic ngrok URL detection.
+											The Caddy proxy is only needed if you want automatic ngrok URL detection. Without it, you can manually copy the ngrok URL.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -449,30 +461,18 @@
 								<Accordion.Trigger>Configure Server Settings</Accordion.Trigger>
 								<Accordion.Content>
 									<div class="space-y-4 pt-4">
-										<div class="grid grid-cols-2 gap-4">
-											<div class="space-y-2">
-												<Label for="privatePort">Private Port (OpenCode)</Label>
-												<Input
-													id="privatePort"
-													type="number"
-													bind:value={privatePortState}
-													min="1024"
-													max="65535"
-												/>
-											</div>
-											<div class="space-y-2">
-												<Label for="publicPort">Public Port (Caddy)</Label>
-												<Input
-													id="publicPort"
-													type="number"
-													bind:value={publicPortState}
-													min="1024"
-													max="65535"
-												/>
-											</div>
+										<div class="space-y-2">
+											<Label for="privatePort">OpenCode Port</Label>
+											<Input
+												id="privatePort"
+												type="number"
+												bind:value={privatePortState}
+												min="1024"
+												max="65535"
+											/>
 										</div>
 										<p class="text-sm text-muted-foreground">
-											Random ports have been generated for you. Make sure they don't conflict with existing services.
+											A port has been generated for you. Make sure it doesn't conflict with existing services.
 										</p>
 										<div class="space-y-2">
 											<Label for="username">Username</Label>
@@ -547,7 +547,7 @@
 								Look for this in your ngrok output:
 							</p>
 							<code class="text-xs block">
-								Forwarding https://abc123.ngrok.io → http://localhost:{publicPortState}
+								Forwarding https://abc123.ngrok.io → http://localhost:{privatePortState}
 							</code>
 						</div>
 
