@@ -10,8 +10,10 @@
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { createMutation } from '@tanstack/svelte-query';
 
-	let { session, workspaceConfig }: { session: Session; workspaceConfig: WorkspaceConfig } =
-		$props();
+	let {
+		session,
+		workspaceConfig,
+	}: { session: Session; workspaceConfig: WorkspaceConfig } = $props();
 	let deleteDialogOpen = $state(false);
 
 	const shareSessionMutation = createMutation(

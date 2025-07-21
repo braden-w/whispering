@@ -47,7 +47,11 @@
 					</nav>
 				</div>
 				<nav class="flex flex-1 items-center justify-end gap-1">
-					<Button variant="ghost" size="icon" onclick={() => settingsOpen = true}>
+					<Button
+						variant="ghost"
+						size="icon"
+						onclick={() => (settingsOpen = true)}
+					>
 						<Settings class="h-4 w-4" />
 						<span class="sr-only">Settings</span>
 					</Button>

@@ -73,12 +73,14 @@ To access your workspace from the internet:
 You have two options:
 
 **Option 1: Separate commands** (run in different terminals)
+
 ```bash
 opencode serve -p 4096
 ngrok http 4096
 ```
 
 **Option 2: Combined command** (runs both and stops together)
+
 ```bash
 opencode serve -p 4096 & ngrok http 4096; kill $!
 ```
@@ -98,21 +100,27 @@ The system automatically checks port availability starting from 4096 and suggest
 ## Connection Flows
 
 ### Local Development
+
 ```
 Browser → http://localhost:4096
 ```
+
 Direct connection to OpenCode with CORS headers included.
 
 ### Internet Access via ngrok
+
 ```
 Browser → https://abc123.ngrok.io → localhost:4096
 ```
+
 ngrok provides HTTPS tunnel, OpenCode handles the requests with CORS and authentication.
 
 ### ngrok Auto-Detection (Optional)
+
 ```
 Browser → localhost:4080 → localhost:4040 (ngrok API)
 ```
+
 Only used by the "Auto-detect" button in the UI.
 
 ## Benefits Over Previous Architecture
@@ -135,6 +143,7 @@ Only used by the "Auto-detect" button in the UI.
 ### ngrok Auto-Detection Not Working
 
 If the "Auto-detect" button doesn't work:
+
 1. Verify Caddy is running on port 4080 (optional step 2)
 2. Check ngrok is running and accessible on port 4040
 3. Or simply copy the ngrok URL manually from the ngrok output
@@ -142,6 +151,7 @@ If the "Auto-detect" button doesn't work:
 ### CORS Errors
 
 You should not see CORS errors with the new setup. If you do:
+
 1. Ensure you're using an OpenCode build with CORS support
 2. Check that you're connecting to the correct port
 3. Verify the browser isn't caching old responses
@@ -167,11 +177,13 @@ If you were using the previous architecture:
 ### What Changed:
 
 **Before** (Complex proxy chain):
+
 ```
 Browser → Proxy (8787) → Caddy (8080) → OpenCode (4096)
 ```
 
 **Now** (Direct connection):
+
 ```
 Browser → OpenCode (4096)
 ```

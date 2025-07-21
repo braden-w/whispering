@@ -29,7 +29,9 @@ await queryClient.prefetchQuery(rpc.sessions.getSessions.options());
 await queryClient.prefetchQuery(rpc.sessions.getSessionById(id).options());
 
 // Mutations in Svelte components - use createMutation
-const createSessionMutation = createMutation(rpc.sessions.createSession.options);
+const createSessionMutation = createMutation(
+	rpc.sessions.createSession.options,
+);
 
 // Use the mutation with callbacks in .mutate()
 createSessionMutation.mutate(
@@ -42,7 +44,7 @@ createSessionMutation.mutate(
 		onError: (error) => {
 			toast.error(error.title, { description: error.description });
 		},
-	}
+	},
 );
 
 // Mutations in .ts files - use .execute() with destructuring

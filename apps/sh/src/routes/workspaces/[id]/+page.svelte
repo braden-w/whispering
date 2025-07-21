@@ -13,7 +13,10 @@
 
 	const workspaceConfig = $derived(data.workspaceConfig);
 
-	const sessionsQuery = createQuery(() => ({... rpc.sessions.getSessions(() => workspaceConfig).options(), initialData: data.sessions}));
+	const sessionsQuery = createQuery(() => ({
+		...rpc.sessions.getSessions(() => workspaceConfig).options(),
+		initialData: data.sessions,
+	}));
 
 	let createDialogOpen = $state(false);
 </script>
@@ -41,16 +44,21 @@
 		<div class="space-y-6">
 			<div class="flex items-center justify-between">
 				<div>
-					<h1 class="text-3xl font-bold tracking-tight">{workspaceConfig.name}</h1>
+					<h1 class="text-3xl font-bold tracking-tight">
+						{workspaceConfig.name}
+					</h1>
 					<p class="text-muted-foreground">
 						Manage sessions for this workspace
 					</p>
 				</div>
 				<div class="flex items-center gap-4">
-					<WorkspaceConnectionBadge workspaceConfig={workspaceConfig} />
-						<Badge variant="secondary" class="text-sm">
-							{sessionsQuery.data?.length} session{sessionsQuery.data?.length !== 1 ? 's' : ''}
-						</Badge>
+					<WorkspaceConnectionBadge {workspaceConfig} />
+					<Badge variant="secondary" class="text-sm">
+						{sessionsQuery.data?.length} session{sessionsQuery.data?.length !==
+						1
+							? 's'
+							: ''}
+					</Badge>
 					<Button onclick={() => (createDialogOpen = true)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -71,10 +79,7 @@
 				</div>
 			</div>
 
-				<SessionList
-					sessions={sessionsQuery.data ?? []}
-					workspaceConfig={workspaceConfig}
-				/>
+			<SessionList sessions={sessionsQuery.data ?? []} {workspaceConfig} />
 		</div>
 	</div>
 

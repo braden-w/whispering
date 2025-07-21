@@ -20,7 +20,7 @@
 
 	// Create query for modes
 	const modesQuery = createQuery(
-		rpc.modes.getModes(() => workspaceConfig).options
+		rpc.modes.getModes(() => workspaceConfig).options,
 	);
 
 	const modes = $derived(modesQuery.data ?? []);
@@ -43,9 +43,7 @@
 		<Skeleton class="h-9 w-[200px]" />
 	</div>
 {:else if modesQuery.isError}
-	<div class="text-sm text-destructive">
-		Failed to load modes
-	</div>
+	<div class="text-sm text-destructive">Failed to load modes</div>
 {:else}
 	<ToggleGroup.Root
 		type="single"

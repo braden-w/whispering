@@ -28,11 +28,15 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={() => {
-				workspaceConfigs.value = workspaceConfigs.value.filter((w) => w.id !== workspaceConfig.id);
-				open = false;
-				toast.success('Deleted workspace');
-			}}>Delete</AlertDialog.Action>
+			<AlertDialog.Action
+				onclick={() => {
+					workspaceConfigs.value = workspaceConfigs.value.filter(
+						(w) => w.id !== workspaceConfig.id,
+					);
+					open = false;
+					toast.success('Deleted workspace');
+				}}>Delete</AlertDialog.Action
+			>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

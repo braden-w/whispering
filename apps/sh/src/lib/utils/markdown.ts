@@ -15,10 +15,32 @@ export function parseMarkdown(text: string): string {
 		const rawHtml = marked.parse(text);
 		return DOMPurify.sanitize(rawHtml, {
 			ALLOWED_TAGS: [
-				'p', 'br', 'strong', 'em', 'u', 's', 'code', 'pre',
-				'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-				'ul', 'ol', 'li', 'blockquote',
-				'a', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th'
+				'p',
+				'br',
+				'strong',
+				'em',
+				'u',
+				's',
+				'code',
+				'pre',
+				'h1',
+				'h2',
+				'h3',
+				'h4',
+				'h5',
+				'h6',
+				'ul',
+				'ol',
+				'li',
+				'blockquote',
+				'a',
+				'img',
+				'table',
+				'thead',
+				'tbody',
+				'tr',
+				'td',
+				'th',
 			],
 			ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class'],
 		});
@@ -48,5 +70,5 @@ export function isMarkdownContent(text: string): boolean {
 		/\[([^\]]+)\]\(([^)]+)\)/g, // Links
 	];
 
-	return markdownPatterns.some(pattern => pattern.test(text));
+	return markdownPatterns.some((pattern) => pattern.test(text));
 }

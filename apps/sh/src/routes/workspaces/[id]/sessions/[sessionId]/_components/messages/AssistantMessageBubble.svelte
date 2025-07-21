@@ -9,12 +9,15 @@
 	import { toast } from 'svelte-sonner';
 	import { buttonVariants } from '@repo/ui/button';
 
-	let { message, parts }: { message: AssistantMessage; parts: Part[] } = $props();
+	let { message, parts }: { message: AssistantMessage; parts: Part[] } =
+		$props();
 
 	const isProcessing = $derived(!message.time.completed);
-	const hasTextContent = $derived(parts.some(part => part.type === 'text' && part.text.trim().length > 0));
+	const hasTextContent = $derived(
+		parts.some((part) => part.type === 'text' && part.text.trim().length > 0),
+	);
 	const showTyping = $derived(isProcessing && !hasTextContent);
-	const toolParts = $derived(parts.filter(part => part.type === 'tool'));
+	const toolParts = $derived(parts.filter((part) => part.type === 'tool'));
 	const hasError = $derived(!!message.error);
 
 	function getAssistantInitials(): string {
@@ -30,8 +33,8 @@
 	}
 
 	function getMessageText(): string {
-		const textParts = parts.filter(part => part.type === 'text');
-		return textParts.map(part => part.text).join('\n');
+		const textParts = parts.filter((part) => part.type === 'text');
+		return textParts.map((part) => part.text).join('\n');
 	}
 
 	async function copyMessage() {
@@ -71,13 +74,9 @@
 				<div class="flex items-center gap-2">
 					<span class="text-sm font-medium">Assistant</span>
 					{#if hasError}
-						<Badge variant="destructive" class="text-xs">
-							Error
-						</Badge>
+						<Badge variant="destructive" class="text-xs">Error</Badge>
 					{:else if isProcessing}
-						<Badge variant="secondary" class="text-xs">
-							Processing...
-						</Badge>
+						<Badge variant="secondary" class="text-xs">Processing...</Badge>
 					{/if}
 				</div>
 				{#if toolParts.length > 0}
@@ -86,12 +85,14 @@
 					</Badge>
 				{/if}
 			</div>
-			
+
 			<!-- Message Actions -->
 			{#if !isProcessing}
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger class={buttonVariants({variant: 'ghost', size: 'icon'})}>
-							<MoreHorizontal />
+					<DropdownMenu.Trigger
+						class={buttonVariants({ variant: 'ghost', size: 'icon' })}
+					>
+						<MoreHorizontal />
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content align="end">
 						<DropdownMenu.Item onclick={copyMessage}>
@@ -113,7 +114,7 @@
 
 		<!-- Message Content -->
 		<div class="space-y-2">
-			{#each parts.filter(p => p.type !== 'tool') as part}
+			{#each parts.filter((p) => p.type !== 'tool') as part}
 				<MessagePartRenderer {part} />
 			{/each}
 		</div>
@@ -130,7 +131,9 @@
 
 		<!-- Error Display -->
 		{#if hasError && message.error}
-			<div class="mt-2 p-3 bg-destructive/10 text-destructive rounded-md border border-destructive/20">
+			<div
+				class="mt-2 p-3 bg-destructive/10 text-destructive rounded-md border border-destructive/20"
+			>
 				<div class="font-medium text-sm">{message.error.name}</div>
 				{#if message.error.name === 'ProviderAuthError'}
 					<div class="text-xs mt-1 opacity-90">
@@ -148,7 +151,9 @@
 		{/if}
 
 		<!-- Message Footer with Metadata -->
-		<div class="flex items-center justify-between text-xs text-muted-foreground mt-2 pt-1 border-t border-border/50">
+		<div
+			class="flex items-center justify-between text-xs text-muted-foreground mt-2 pt-1 border-t border-border/50"
+		>
 			<div class="flex items-center gap-1">
 				<span>{formatDate(new Date(message.time.created))}</span>
 				{#if message.time.completed}
@@ -161,7 +166,9 @@
 					<span class="font-mono">{formatCost(message.cost)}</span>
 					<span class="opacity-50">•</span>
 				{/if}
-				<span class="font-mono text-xs">Total: {formatTokens(message.tokens)}</span>
+				<span class="font-mono text-xs"
+					>Total: {formatTokens(message.tokens)}</span
+				>
 			</div>
 		</div>
 	</Chat.BubbleMessage>

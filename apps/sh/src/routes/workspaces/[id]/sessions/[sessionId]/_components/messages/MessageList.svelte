@@ -12,7 +12,9 @@
 </script>
 
 {#if messages.length === 0}
-	<div class="flex-1 overflow-y-auto flex items-center justify-center text-muted-foreground">
+	<div
+		class="flex-1 overflow-y-auto flex items-center justify-center text-muted-foreground"
+	>
 		<div class="text-center">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +40,10 @@
 				{#if message.info.role === 'user'}
 					<UserMessageBubble message={message.info} parts={message.parts} />
 				{:else if message.info.role === 'assistant'}
-					<AssistantMessageBubble message={message.info} parts={message.parts} />
+					<AssistantMessageBubble
+						message={message.info}
+						parts={message.parts}
+					/>
 				{/if}
 			{/each}
 		</Chat.List>

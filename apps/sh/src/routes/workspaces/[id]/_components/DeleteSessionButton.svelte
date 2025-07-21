@@ -8,15 +8,19 @@
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Trash2 } from 'lucide-svelte';
 
-	let { session, workspaceConfig }: { 
-		session: Session; 
+	let {
+		session,
+		workspaceConfig,
+	}: {
+		session: Session;
 		workspaceConfig: WorkspaceConfig;
 	} = $props();
 
 	let open = $state(false);
 
-	const deleteSessionMutation = createMutation(rpc.sessions.deleteSession.options);
-
+	const deleteSessionMutation = createMutation(
+		rpc.sessions.deleteSession.options,
+	);
 </script>
 
 <AlertDialog.Root bind:open>
@@ -29,28 +33,28 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete the
-				session "{session.title || 'Untitled Session'}" and all its
-				messages.
+				This action cannot be undone. This will permanently delete the session "{session.title ||
+					'Untitled Session'}" and all its messages.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action
-				onclick={() => deleteSessionMutation.mutate(
-					{ workspaceConfig, sessionId: session.id },
-					{
-						onSuccess: () => {
-							toast.success('Session deleted successfully');
-							open = false;
+				onclick={() =>
+					deleteSessionMutation.mutate(
+						{ workspaceConfig, sessionId: session.id },
+						{
+							onSuccess: () => {
+								toast.success('Session deleted successfully');
+								open = false;
+							},
+							onError: (error) => {
+								toast.error(error.title, {
+									description: error.description,
+								});
+							},
 						},
-						onError: (error) => {
-							toast.error(error.title, {
-								description: error.description,
-							});
-						},
-					},
-				)}
+					)}
 				disabled={deleteSessionMutation.isPending}
 			>
 				{#if deleteSessionMutation.isPending}

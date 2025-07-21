@@ -63,9 +63,9 @@
 			isTesting = false;
 			testSuccess = false;
 			appInfo = null;
-			
+
 			// Generate available port asynchronously
-			generateAvailablePort().then(availablePort => {
+			generateAvailablePort().then((availablePort) => {
 				port = availablePort;
 			});
 		}
@@ -85,7 +85,9 @@
 	// Commands for copy functionality
 	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
 	const ngrokCommand = $derived(`ngrok http ${port}` as const);
-	const combinedCommand = $derived(`opencode serve -p ${port} & ngrok http ${port}; kill $!` as const);
+	const combinedCommand = $derived(
+		`opencode serve -p ${port} & ngrok http ${port}; kill $!` as const,
+	);
 	// Optional Caddy command for ngrok API auto-detection only
 	const caddyCommand = $derived(
 		`caddy run --config - --adapter caddyfile << EOF
@@ -105,7 +107,7 @@
     # Proxy all other requests to ngrok API
     reverse_proxy localhost:${NGROK_API_PORT}
 }
-EOF` as const
+EOF` as const,
 	);
 
 	async function copyToClipboard(text: string) {
@@ -116,7 +118,6 @@ EOF` as const
 			toast.error('Failed to copy to clipboard');
 		}
 	}
-
 
 	async function testConnection() {
 		if (!ngrokUrl || !password) {
@@ -170,7 +171,9 @@ EOF` as const
 		isDetecting = true;
 		try {
 			// Use the proxy API route for ngrok detection
-			const response = await fetch(`http://localhost:${NGROK_PROXY_PORT}/api/tunnels`);
+			const response = await fetch(
+				`http://localhost:${NGROK_PROXY_PORT}/api/tunnels`,
+			);
 
 			if (!response.ok) {
 				throw new Error(
@@ -281,12 +284,14 @@ EOF` as const
 								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
 								<Tabs.Trigger value="combined">Combined Command</Tabs.Trigger>
 							</Tabs.List>
-							
+
 							<Tabs.Content value="separate" class="space-y-6 mt-4">
 								<!-- Command 1: OpenCode -->
 								<div class="space-y-2">
 									<div class="flex items-center gap-2">
-										<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+										<div
+											class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium"
+										>
 											1
 										</div>
 										<p class="text-sm font-medium">Start OpenCode server</p>
@@ -308,10 +313,14 @@ EOF` as const
 								<!-- Command 2: ngrok -->
 								<div class="space-y-2">
 									<div class="flex items-center gap-2">
-										<div class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+										<div
+											class="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium"
+										>
 											2
 										</div>
-										<p class="text-sm font-medium">Expose to internet with ngrok (optional)</p>
+										<p class="text-sm font-medium">
+											Expose to internet with ngrok (optional)
+										</p>
 									</div>
 									<div class="flex items-center gap-2 ml-10">
 										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
@@ -327,10 +336,12 @@ EOF` as const
 									</div>
 								</div>
 							</Tabs.Content>
-							
+
 							<Tabs.Content value="combined" class="space-y-6 mt-4">
 								<div class="space-y-2">
-									<p class="text-sm font-medium">Run both OpenCode and ngrok in one command</p>
+									<p class="text-sm font-medium">
+										Run both OpenCode and ngrok in one command
+									</p>
 									<div class="flex items-center gap-2">
 										<code class="flex-1 bg-muted p-2 rounded text-sm break-all">
 											{combinedCommand}
@@ -344,7 +355,8 @@ EOF` as const
 										</Button>
 									</div>
 									<p class="text-sm text-muted-foreground">
-										This command runs both servers and kills them together when you stop
+										This command runs both servers and kills them together when
+										you stop
 									</p>
 								</div>
 							</Tabs.Content>
@@ -359,12 +371,21 @@ EOF` as const
 										<p class="text-sm text-muted-foreground">
 											This setup uses a simplified architecture:
 										</p>
-										<ol class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4">
-											<li><strong>OpenCode</strong>: Runs on port {port} with built-in CORS support</li>
-											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your OpenCode server to the internet</li>
+										<ol
+											class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4"
+										>
+											<li>
+												<strong>OpenCode</strong>: Runs on port {port} with built-in
+												CORS support
+											</li>
+											<li>
+												<strong>ngrok</strong>: Creates a secure tunnel to
+												expose your OpenCode server to the internet
+											</li>
 										</ol>
 										<p class="text-sm text-muted-foreground">
-											Authentication is now handled at the OpenCode level. ngrok provides the secure tunnel without requiring basic auth.
+											Authentication is now handled at the OpenCode level. ngrok
+											provides the secure tunnel without requiring basic auth.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -388,7 +409,8 @@ EOF` as const
 											/>
 										</div>
 										<p class="text-sm text-muted-foreground">
-											A port has been generated for you. Make sure it doesn't conflict with existing services.
+											A port has been generated for you. Make sure it doesn't
+											conflict with existing services.
 										</p>
 										<div class="space-y-2">
 											<Label for="password">Password</Label>
@@ -401,8 +423,8 @@ EOF` as const
 											/>
 										</div>
 										<p class="text-sm text-muted-foreground">
-											This password is pre-filled from your settings.
-											Changes here only affect this workspace.
+											This password is pre-filled from your settings. Changes
+											here only affect this workspace.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -412,14 +434,20 @@ EOF` as const
 						<!-- Optional Caddy for ngrok auto-detection -->
 						<Accordion.Root type="single" collapsible>
 							<Accordion.Item value="caddy">
-								<Accordion.Trigger>Optional: Enable ngrok Auto-Detection</Accordion.Trigger>
+								<Accordion.Trigger
+									>Optional: Enable ngrok Auto-Detection</Accordion.Trigger
+								>
 								<Accordion.Content>
 									<div class="space-y-3 pt-2">
 										<p class="text-sm text-muted-foreground">
-											If you want the "Auto-detect" button to work for ngrok URLs, run this Caddy proxy:
+											If you want the "Auto-detect" button to work for ngrok
+											URLs, run this Caddy proxy:
 										</p>
 										<div class="flex items-start gap-2">
-											<code class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre">{caddyCommand}</code>
+											<code
+												class="flex-1 bg-muted p-2 rounded text-sm whitespace-pre"
+												>{caddyCommand}</code
+											>
 											<Button
 												size="icon"
 												variant="ghost"
@@ -429,7 +457,8 @@ EOF` as const
 											</Button>
 										</div>
 										<p class="text-sm text-muted-foreground">
-											This proxies localhost:{NGROK_PROXY_PORT} → localhost:{NGROK_API_PORT} to work around CORS restrictions when detecting ngrok URLs.
+											This proxies localhost:{NGROK_PROXY_PORT} → localhost:{NGROK_API_PORT}
+											to work around CORS restrictions when detecting ngrok URLs.
 										</p>
 									</div>
 								</Accordion.Content>
@@ -544,7 +573,9 @@ EOF` as const
 					{/if}
 				</div>
 				<div class="flex gap-2">
-					<Button variant="outline" onclick={() => open = false}>Cancel</Button>
+					<Button variant="outline" onclick={() => (open = false)}
+						>Cancel</Button
+					>
 					{#if step < 3}
 						<Button onclick={nextStep}>Next</Button>
 					{:else}

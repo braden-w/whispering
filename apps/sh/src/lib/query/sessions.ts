@@ -32,7 +32,9 @@ export const createSession = defineMutation({
 	mutationKey: ['createSession'],
 	resultMutationFn: async ({
 		workspaceConfig,
-	}: { workspaceConfig: WorkspaceConfig }) => {
+	}: {
+		workspaceConfig: WorkspaceConfig;
+	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data: session, error } = await api.postSession({ client });

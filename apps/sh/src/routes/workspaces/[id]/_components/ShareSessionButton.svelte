@@ -7,35 +7,42 @@
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Share, Link } from 'lucide-svelte';
 
-	let { session, workspaceConfig }: { 
-		session: Session; 
+	let {
+		session,
+		workspaceConfig,
+	}: {
+		session: Session;
 		workspaceConfig: WorkspaceConfig;
 	} = $props();
 
 	const isShared = $derived(!!session.share?.url);
 
-	const shareSessionMutation = createMutation(rpc.sessions.shareSession.options);
-	const unshareSessionMutation = createMutation(rpc.sessions.unshareSession.options);
-
+	const shareSessionMutation = createMutation(
+		rpc.sessions.shareSession.options,
+	);
+	const unshareSessionMutation = createMutation(
+		rpc.sessions.unshareSession.options,
+	);
 </script>
 
 {#if isShared}
 	<Button
 		size="icon"
 		variant="ghost"
-		onclick={() => unshareSessionMutation.mutate(
-			{ workspaceConfig, sessionId: session.id },
-			{
-				onSuccess: () => {
-					toast.success('Session unshared successfully');
+		onclick={() =>
+			unshareSessionMutation.mutate(
+				{ workspaceConfig, sessionId: session.id },
+				{
+					onSuccess: () => {
+						toast.success('Session unshared successfully');
+					},
+					onError: (error) => {
+						toast.error(error.title, {
+							description: error.description,
+						});
+					},
 				},
-				onError: (error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-				},
-			},
-		)}
+			)}
 		disabled={unshareSessionMutation.isPending}
 		title="Unshare session"
 	>
@@ -45,19 +52,20 @@
 	<Button
 		size="icon"
 		variant="ghost"
-		onclick={() => shareSessionMutation.mutate(
-			{ workspaceConfig, sessionId: session.id },
-			{
-				onSuccess: () => {
-					toast.success('Session shared successfully');
+		onclick={() =>
+			shareSessionMutation.mutate(
+				{ workspaceConfig, sessionId: session.id },
+				{
+					onSuccess: () => {
+						toast.success('Session shared successfully');
+					},
+					onError: (error) => {
+						toast.error(error.title, {
+							description: error.description,
+						});
+					},
 				},
-				onError: (error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-				},
-			},
-		)}
+			)}
 		disabled={shareSessionMutation.isPending}
 		title="Share session"
 	>

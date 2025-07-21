@@ -17,7 +17,6 @@
 	import { cn } from '@repo/ui/utils';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
-
 	// Helper function to extract folder name from path (cross-platform)
 	function getFolderName(path: string): string {
 		// Split by both forward and back slashes, filter out empty strings
@@ -68,7 +67,6 @@
 		// Navigate to workspace sessions
 		goto(`/workspaces/${workspace.id}`);
 	}
-
 </script>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
@@ -136,10 +134,10 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						{#if columnVisibility.folderName !== false}<Table.Head></Table.Head
-							>{/if}
-						{#if columnVisibility.gitPort !== false}<Table.Head></Table.Head
-							>{/if}
+						{#if columnVisibility.folderName !== false}<Table.Head
+							></Table.Head>{/if}
+						{#if columnVisibility.gitPort !== false}<Table.Head
+							></Table.Head>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}
 						{#if columnVisibility.rootPath !== false}<Table.Head
@@ -253,5 +251,3 @@
 		</div>
 	{/if}
 </div>
-
-

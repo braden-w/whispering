@@ -55,9 +55,7 @@
 	<Modal.Content class="sm:max-w-[500px]">
 		<Modal.Header>
 			<Modal.Title>Edit Workspace</Modal.Title>
-			<Modal.Description>
-				Update the workspace configuration
-			</Modal.Description>
+			<Modal.Description>Update the workspace configuration</Modal.Description>
 		</Modal.Header>
 
 		<div class="space-y-4">
@@ -94,7 +92,7 @@
 		</div>
 
 		<Modal.Footer>
-			<Button variant="outline" onclick={() => open = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
 			<Button onclick={handleSave}>Save Changes</Button>
 		</Modal.Footer>
 	</Modal.Content>

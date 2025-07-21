@@ -66,12 +66,16 @@
 		</Button>
 	</div>
 {:else if part.type === 'step-start'}
-	<div class="flex items-center gap-2 text-sm text-muted-foreground border-l-2 border-primary pl-3 py-1">
+	<div
+		class="flex items-center gap-2 text-sm text-muted-foreground border-l-2 border-primary pl-3 py-1"
+	>
 		<div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 		<span>Starting step...</span>
 	</div>
 {:else if part.type === 'step-finish'}
-	<div class="flex items-center justify-between text-sm text-muted-foreground border-l-2 border-green-500 pl-3 py-1">
+	<div
+		class="flex items-center justify-between text-sm text-muted-foreground border-l-2 border-green-500 pl-3 py-1"
+	>
 		<div class="flex items-center gap-2">
 			<div class="w-2 h-2 bg-green-500 rounded-full"></div>
 			<span>Step completed</span>
@@ -81,7 +85,9 @@
 				<span>${part.cost.toFixed(4)}</span>
 				<span>•</span>
 			{/if}
-			<span class="font-mono">Step: {part.tokens.input}→{part.tokens.output}</span>
+			<span class="font-mono"
+				>Step: {part.tokens.input}→{part.tokens.output}</span
+			>
 		</div>
 	</div>
 {/if}
