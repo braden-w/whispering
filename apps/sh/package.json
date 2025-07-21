@@ -12,7 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "eslint --fix .",
-		"openapi-ts": "openapi-ts"
+		"openapi-ts": "openapi-ts",
+		"deploy": "pnpm build && wrangler pages deploy"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
