@@ -9,12 +9,6 @@
 	}: {
 		messages: Message[];
 	} = $props();
-
-	const hasProcessingMessage = $derived(
-		messages.some((msg) => 
-			msg.info.role === 'assistant' && !msg.info.time.completed
-		)
-	);
 </script>
 
 {#if messages.length === 0}
@@ -46,16 +40,5 @@
 				<AssistantMessageBubble message={message.info} parts={message.parts} />
 			{/if}
 		{/each}
-		
-		<!-- Show typing indicator if there's a processing message -->
-		{#if hasProcessingMessage}
-			<Chat.Bubble variant="received">
-				<Chat.BubbleAvatar>
-					<Chat.BubbleAvatarImage src="" alt="Assistant" />
-					<Chat.BubbleAvatarFallback>AI</Chat.BubbleAvatarFallback>
-				</Chat.BubbleAvatar>
-				<Chat.BubbleMessage typing />
-			</Chat.Bubble>
-		{/if}
 	</Chat.List>
 {/if}

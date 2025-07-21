@@ -118,19 +118,31 @@ export function createMessageSubscriber({
 
 			// Handle different part types
 			if (part.type === 'text') {
-				// For text parts, check if we should append or add new
-				const lastPart = msg.parts[msg.parts.length - 1];
+				console.log('Processing text part:', {
+					partId: part.id,
+					partText: part.text,
+					synthetic: part.synthetic,
+					currentParts: msg.parts.map((p) => ({
+						type: p.type,
+						id: p.id,
+						text: p.type === 'text' ? p.text : undefined,
+					})),
+				});
 
-				if (lastPart?.type === 'text' && !part.synthetic) {
-					// Append to the last text part if it exists and the new part is not synthetic
+				// Check if this part already exists (streaming update)
+				const existingIndex = msg.parts.findIndex(
+					(p) => p.type === 'text' && p.id === part.id,
+				);
+
+				if (existingIndex >= 0) {
+					// This is an update to an existing part, replace it entirely
+					console.log('Updating existing text part at index', existingIndex);
 					const updatedParts = [...msg.parts];
-					updatedParts[updatedParts.length - 1] = {
-						...lastPart,
-						text: lastPart.text + part.text,
-					};
+					updatedParts[existingIndex] = part;
 					return { ...msg, parts: updatedParts };
 				}
-				// Add as new part
+				// This is a new text part, add it
+				console.log('Adding new text part');
 				return { ...msg, parts: [...msg.parts, part] };
 			}
 
