@@ -833,13 +833,17 @@ Each feature file typically exports an object with:
 ## Best Practices
 
 1. Always use Result types - Never throw errors in query/mutation functions
-2. Choose the right interface for the job:
-   - Use `.execute()` for event handlers, workflows, and performance-critical operations
+2. **Mutation Pattern Preference**:
+   - **In `.svelte` files**: Always prefer `createMutation` unless you have a specific reason not to (e.g., you don't need pending states)
+   - **In `.ts` files**: Always use `.execute()` since createMutation requires component context
+   - This gives you consistent loading states, error handling, and better UX in components
+3. Choose the right interface for the job:
+   - Use `.execute()` in `.ts` files and when you don't need pending state
    - Use `createMutation()` when you need reactive state for UI feedback
-3. Keep queries simple - Complex logic belongs in services or orchestration mutations
-4. Update cache optimistically - Better UX for mutations
-5. Use proper query keys - Hierarchical and consistent
-6. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
+4. Keep queries simple - Complex logic belongs in services or orchestration mutations
+5. Update cache optimistically - Better UX for mutations
+6. Use proper query keys - Hierarchical and consistent
+7. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
 
 ## Quick Reference: Common RPC Patterns
 
