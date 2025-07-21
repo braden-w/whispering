@@ -1,5 +1,5 @@
 {
-	"name": "sh",
+	"name": "@repo/sh",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
