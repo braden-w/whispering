@@ -5,15 +5,5 @@
 	"pages_build_output_dir": ".svelte-kit/cloudflare",
 	"observability": {
 		"enabled": true
-	},
-	"routes": [
-		{
-			"pattern": "epicenter.sh",
-			"custom_domain": true
-		},
-		{
-			"pattern": "*.epicenter.sh",
-			"custom_domain": true
-		}
-	]
+	}
 }
