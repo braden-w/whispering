@@ -1,7 +1,7 @@
 import * as api from '$lib/client/sdk.gen';
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
-import type { Workspace } from '$lib/stores/workspaces.svelte';
+import type { Workspace } from './workspaces';
 import type { Accessor } from '@tanstack/svelte-query';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';

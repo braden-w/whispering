@@ -4,9 +4,9 @@
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import {
-		updateWorkspace,
+		updateWorkspaceConfig,
 		type WorkspaceConfig,
-	} from '$lib/stores/workspaces.svelte';
+	} from '$lib/stores/workspace-configs.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Edit } from 'lucide-svelte';
 	import { buttonVariants } from '@repo/ui/button';
@@ -37,7 +37,7 @@
 			return;
 		}
 
-		updateWorkspace(workspaceConfig.id, {
+		updateWorkspaceConfig(workspaceConfig.id, {
 			name: workspaceConfig.name,
 			url: url.trim(),
 			port,

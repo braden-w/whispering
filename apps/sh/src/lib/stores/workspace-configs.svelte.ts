@@ -31,10 +31,10 @@ export type WorkspaceUpdateInput = Partial<
 
 /**
  * The reactive store containing all of the user's saved workspace configurations.
- * Automatically synced with localStorage under the key 'opencode-workspaces'.
+ * Automatically synced with localStorage under the key 'opencode-workspace-configs'.
  */
-export const workspaces = createPersistedState({
-	key: 'opencode-workspaces',
+export const workspaceConfigs = createPersistedState({
+	key: 'opencode-workspace-configs',
 	schema: WorkspaceConfig.array(),
 	onParseError: (error) => {
 		if (error.type === 'storage_empty') {
@@ -79,7 +79,7 @@ export function generateRandomPort(): number {
 }
 
 // Helper functions for workspace operations
-export function createWorkspace(data: WorkspaceCreateInput): WorkspaceConfig {
+export function createWorkspaceConfig(data: WorkspaceCreateInput): WorkspaceConfig {
 	const newWorkspace: WorkspaceConfig = {
 		...data,
 		id: nanoid(),
@@ -87,16 +87,16 @@ export function createWorkspace(data: WorkspaceCreateInput): WorkspaceConfig {
 		lastAccessedAt: Date.now(),
 	};
 
-	workspaces.value = [...workspaces.value, newWorkspace];
+	workspaceConfigs.value = [...workspaceConfigs.value, newWorkspace];
 	toast.success('Workspace created successfully');
 	return newWorkspace;
 }
 
-export function updateWorkspace(
+export function updateWorkspaceConfig(
 	id: string,
 	updates: WorkspaceUpdateInput,
 ): void {
-	workspaces.value = workspaces.value.map((w) => {
+	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
 		if (w.id !== id) return w;
 
 		return { ...w, ...updates, lastAccessedAt: Date.now() };
@@ -105,17 +105,17 @@ export function updateWorkspace(
 	toast.success('Workspace updated');
 }
 
-export function deleteWorkspace(id: string): void {
-	const workspace = getWorkspace(id);
+export function deleteWorkspaceConfig(id: string): void {
+	const workspace = getWorkspaceConfig(id);
 	if (!workspace) {
 		toast.error('Workspace not found');
 		return;
 	}
 
-	workspaces.value = workspaces.value.filter((w) => w.id !== id);
+	workspaceConfigs.value = workspaceConfigs.value.filter((w) => w.id !== id);
 	toast.success(`Deleted workspace "${workspace.name}"`);
 }
 
-export function getWorkspace(id: string): WorkspaceConfig | undefined {
-	return workspaces.value.find((w) => w.id === id);
+export function getWorkspaceConfig(id: string): WorkspaceConfig | undefined {
+	return workspaceConfigs.value.find((w) => w.id === id);
 }

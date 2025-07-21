@@ -4,7 +4,7 @@ import type {
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
-import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation } from './_client';

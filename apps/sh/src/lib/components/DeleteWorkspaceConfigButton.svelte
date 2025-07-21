@@ -2,9 +2,9 @@
 	import { Button } from '@repo/ui/button';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { Trash2 } from 'lucide-svelte';
-	import { workspaces } from '$lib/stores/workspaces.svelte';
+	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 	import { toast } from 'svelte-sonner';
-	import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 	let { workspaceConfig }: { workspaceConfig: WorkspaceConfig } = $props();
 	let open = $state(false);
@@ -29,7 +29,7 @@
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action onclick={() => {
-				workspaces.value = workspaces.value.filter((w) => w.id !== workspaceConfig.id);
+				workspaceConfigs.value = workspaceConfigs.value.filter((w) => w.id !== workspaceConfig.id);
 				open = false;
 				toast.success('Deleted workspace');
 			}}>Delete</AlertDialog.Action>

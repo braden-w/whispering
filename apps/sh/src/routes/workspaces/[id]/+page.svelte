@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getWorkspace } from '$lib/stores/workspaces.svelte';
+	import { getWorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import SessionList from '$lib/components/SessionList.svelte';
@@ -10,29 +10,29 @@
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
 	import { ChevronRight } from 'lucide-svelte';
-	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
+	import WorkspaceConfigConnectionBadge from '$lib/components/WorkspaceConfigConnectionBadge.svelte';
 
 	const workspaceId = $derived($page.params.id);
-	const workspace = $derived(getWorkspace(workspaceId));
+	const workspaceConfig = $derived(getWorkspaceConfig(workspaceId));
 
 	// Redirect if workspace not found
 	$effect(() => {
-		if (!workspace) {
+		if (!workspaceConfig) {
 			goto('/workspaces');
 		}
 	});
 
 	// Create sessions query with workspace accessor
 	const sessionsQuery = $derived(
-		workspace
-			? createQuery(rpc.sessions.getSessions(() => workspace).options)
+		workspaceConfig
+			? createQuery(rpc.sessions.getSessions(() => workspaceConfig).options)
 			: null,
 	);
 
 	let createDialogOpen = $state(false);
 </script>
 
-{#if workspace}
+{#if workspaceConfig}
 	<!-- Breadcrumb Section -->
 	<div class="border-b">
 		<div
@@ -47,7 +47,7 @@
 						<ChevronRight class="h-4 w-4" />
 					</Breadcrumb.Separator>
 					<Breadcrumb.Item>
-						<Breadcrumb.Page>{workspace.name}</Breadcrumb.Page>
+						<Breadcrumb.Page>{workspaceConfig.name}</Breadcrumb.Page>
 					</Breadcrumb.Item>
 				</Breadcrumb.List>
 			</Breadcrumb.Root>
@@ -59,13 +59,13 @@
 		<div class="space-y-6">
 			<div class="flex items-center justify-between">
 				<div>
-					<h1 class="text-3xl font-bold tracking-tight">{workspace.name}</h1>
+					<h1 class="text-3xl font-bold tracking-tight">{workspaceConfig.name}</h1>
 					<p class="text-muted-foreground">
 						Manage sessions for this workspace
 					</p>
 				</div>
 				<div class="flex items-center gap-4">
-					<WorkspaceConnectionBadge {workspace} />
+					<WorkspaceConfigConnectionBadge workspaceConfig={workspaceConfig} />
 					{#if sessionsQuery && sessionsQuery.data}
 						<Badge variant="secondary" class="text-sm">
 							{sessionsQuery.data.length} session{sessionsQuery.data.length !==
@@ -98,13 +98,13 @@
 				<SessionList
 					sessions={sessionsQuery.data || []}
 					isLoading={sessionsQuery.isPending}
-					workspaceId={workspace.id}
+					workspaceConfig={workspaceConfig}
 				/>
 			{/if}
 		</div>
 	</div>
 
-	{#if workspace}
-		<CreateSessionModal bind:open={createDialogOpen} {workspace} />
+	{#if workspaceConfig}
+		<CreateSessionModal bind:open={createDialogOpen} {workspaceConfig} />
 	{/if}
 {/if}

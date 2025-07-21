@@ -1,9 +1,9 @@
 import * as api from '$lib/client/sdk.gen';
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import {
-	workspaces,
+	workspaceConfigs,
 	type WorkspaceConfig,
-} from '$lib/stores/workspaces.svelte';
+} from '$lib/stores/workspace-configs.svelte';
 import { Ok } from 'wellcrafted/result';
 import { defineQuery, queryClient } from './_client';
 import type { Accessor } from '@tanstack/svelte-query';
@@ -40,7 +40,7 @@ export const getWorkspaces = () =>
 	defineQuery({
 		queryKey: ['workspaces'],
 		resultQueryFn: async (): Promise<Ok<Workspace[]>> => {
-			const workspacePromises = workspaces.value.map(
+			const workspacePromises = workspaceConfigs.value.map(
 				async (config): Promise<Workspace> => {
 					const client = createWorkspaceClient(config);
 
@@ -67,7 +67,7 @@ export const getWorkspaces = () =>
 			return Ok(enhancedWorkspaces);
 		},
 		// Only refetch if workspaces exist
-		enabled: workspaces.value.length > 0,
+		enabled: workspaceConfigs.value.length > 0,
 	});
 
 /**

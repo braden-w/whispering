@@ -7,9 +7,9 @@
 	import * as Tabs from '@repo/ui/tabs';
 	import * as Accordion from '@repo/ui/accordion';
 	import {
-		createWorkspace,
+		createWorkspaceConfig,
 		generateRandomPort,
-	} from '$lib/stores/workspaces.svelte';
+	} from '$lib/stores/workspace-configs.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
 	import * as api from '$lib/client/sdk.gen';
@@ -206,7 +206,7 @@
 			return;
 		}
 
-		createWorkspace({
+		createWorkspaceConfig({
 			name: workspaceName.trim(),
 			url: ngrokUrl,
 			port,

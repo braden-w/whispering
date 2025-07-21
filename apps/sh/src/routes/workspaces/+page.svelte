@@ -2,18 +2,19 @@
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as Table from '@repo/ui/table';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
-	import { workspaces } from '$lib/stores/workspaces.svelte';
+	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
-	import CreateWorkspaceDialog from '$lib/components/CreateWorkspaceDialog.svelte';
-	import EditWorkspaceButton from '$lib/components/EditWorkspaceButton.svelte';
+	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
+	import EditWorkspaceConfigButton from '$lib/components/EditWorkspaceConfigButton.svelte';
 	import { goto } from '$app/navigation';
 	import { Plus, ChevronDown, GitBranch } from 'lucide-svelte';
 	import * as Tooltip from '@repo/ui/tooltip';
-	import DeleteWorkspaceButton from '$lib/components/DeleteWorkspaceButton.svelte';
+	import DeleteWorkspaceConfigButton from '$lib/components/DeleteWorkspaceConfigButton.svelte';
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import * as rpc from '$lib/query';
 	import { cn } from '@repo/ui/utils';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 
 	// Helper function to extract folder name from path (cross-platform)
@@ -61,9 +62,9 @@
 		return workspacesQuery.data?.find((w) => w.id === configId);
 	}
 
-	function handleConnect(workspace: (typeof workspaces.value)[0]) {
+	function handleConnect(workspace: WorkspaceConfig) {
 		// Update last used timestamp
-		workspaces.value = workspaces.value.map((w) =>
+		workspaceConfigs.value = workspaceConfigs.value.map((w) =>
 			w.id === workspace.id ? { ...w, lastAccessedAt: Date.now() } : w,
 		);
 
@@ -112,26 +113,26 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 
-			<CreateWorkspaceDialog>
+			<CreateWorkspaceConfigModal>
 				{#snippet triggerChild({ props })}
 					<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Workspace</Button
 					>
 				{/snippet}
-			</CreateWorkspaceDialog>
+			</CreateWorkspaceConfigModal>
 		</div>
 	</div>
 
-	{#if workspaces.value.length === 0}
+	{#if workspaceConfigs.value.length === 0}
 		<div class="rounded-lg border border-dashed p-8 text-center">
 			<h3 class="text-lg font-semibold">No workspaces yet</h3>
 			<p class="text-muted-foreground mt-2">
 				Create your first workspace to connect to an OpenCode server
 			</p>
-			<CreateWorkspaceDialog>
+			<CreateWorkspaceConfigModal>
 				{#snippet triggerChild({ props })}
 					<Button {...props} class="mt-4">Create Workspace</Button>
 				{/snippet}
-			</CreateWorkspaceDialog>
+			</CreateWorkspaceConfigModal>
 		</div>
 	{:else}
 		<div class="rounded-md border">
@@ -165,7 +166,7 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each workspaces.value as config}
+					{#each workspaceConfigs.value as config}
 						{@const workspace = getWorkspaceData(config.id)}
 						<Table.Row>
 							{#if columnVisibility.folderName !== false}
@@ -232,7 +233,7 @@
 							{/if}
 							{#if columnVisibility.status !== false}
 								<Table.Cell>
-									<WorkspaceConnectionBadge workspace={config} />
+									<WorkspaceConnectionBadge workspaceConfig={config} />
 								</Table.Cell>
 							{/if}
 							{#if columnVisibility.lastUsed !== false}
@@ -250,8 +251,8 @@
 										>
 											Connect
 										</Button>
-										<EditWorkspaceButton workspaceConfig={config} />
-										<DeleteWorkspaceButton workspaceConfig={config} />
+										<EditWorkspaceConfigButton workspaceConfig={config} />
+										<DeleteWorkspaceConfigButton workspaceConfig={config} />
 									</div>
 								</Table.Cell>
 							{/if}

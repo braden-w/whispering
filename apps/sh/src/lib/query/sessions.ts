@@ -2,7 +2,7 @@ import * as api from '$lib/client/sdk.gen';
 import type { PostSessionByIdSummarizeData } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import { ShErr } from '$lib/result';
-import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
@@ -87,16 +87,16 @@ export const shareSession = defineMutation({
 	mutationKey: ['shareSession'],
 	resultMutationFn: async ({
 		workspaceConfig,
-		id,
+		sessionId,
 	}: {
 		workspaceConfig: WorkspaceConfig;
-		id: string;
+		sessionId: string;
 	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdShare({
 			client,
-			path: { id },
+			path: { id: sessionId },
 		});
 		if (error) {
 			return ShErr({
@@ -118,16 +118,16 @@ export const unshareSession = defineMutation({
 	mutationKey: ['unshareSession'],
 	resultMutationFn: async ({
 		workspaceConfig,
-		id,
+		sessionId,
 	}: {
 		workspaceConfig: WorkspaceConfig;
-		id: string;
+		sessionId: string;
 	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.deleteSessionByIdShare({
 			client,
-			path: { id },
+			path: { id: sessionId },
 		});
 		if (error) {
 			return ShErr({
@@ -149,16 +149,16 @@ export const abortSession = defineMutation({
 	mutationKey: ['abortSession'],
 	resultMutationFn: async ({
 		workspaceConfig,
-		id,
+		sessionId,
 	}: {
 		workspaceConfig: WorkspaceConfig;
-		id: string;
+		sessionId: string;
 	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdAbort({
 			client,
-			path: { id },
+			path: { id: sessionId },
 		});
 		if (error) {
 			return ShErr({
@@ -180,18 +180,18 @@ export const initializeSession = defineMutation({
 	mutationKey: ['initializeSession'],
 	resultMutationFn: async ({
 		workspaceConfig,
-		id,
+		sessionId,
 		body,
 	}: {
 		workspaceConfig: WorkspaceConfig;
-		id: string;
+		sessionId: string;
 		body?: { providerID: string; modelID: string; messageID: string };
 	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		const { data, error } = await api.postSessionByIdInit({
 			client,
-			path: { id },
+			path: { id: sessionId },
 			body,
 		});
 		if (error) {

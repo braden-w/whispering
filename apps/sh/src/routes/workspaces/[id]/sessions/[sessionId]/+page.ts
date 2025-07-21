@@ -1,14 +1,13 @@
-import { getWorkspace } from '$lib/stores/workspaces.svelte';
+import { getWorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import { redirect } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ params }) => {
-	const workspace = getWorkspace(params.id);
+export const load = async ({ params }) => {
+	const workspaceConfig = getWorkspaceConfig(params.id);
 
-	if (!workspace) redirect(302, '/workspaces');
+	if (!workspaceConfig) redirect(302, '/workspaces');
 
 	return {
-		workspace,
+		workspaceConfig,
 		sessionId: params.sessionId,
 	};
 };

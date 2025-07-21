@@ -6,7 +6,7 @@
 	import * as rpc from '$lib/query';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
-	import type { Workspace } from '$lib/stores/workspaces.svelte';
+	import type { Workspace } from '$lib/query/workspaces';
 
 	let {
 		open = $bindable(false),

@@ -8,7 +8,7 @@ import type {
 	Part,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/client.gen';
-import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 	import * as Card from '@repo/ui/card';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import { Badge } from '@repo/ui/badge';
@@ -9,7 +10,7 @@
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { createMutation } from '@tanstack/svelte-query';
 
-	let { session, workspaceId }: { session: Session; workspaceId?: string } =
+	let { session, workspaceConfig }: { session: Session; workspaceConfig?: WorkspaceConfig } =
 		$props();
 	let deleteDialogOpen = $state(false);
 
@@ -30,8 +31,8 @@
 
 <Card.Root class="hover:shadow-md transition-shadow cursor-pointer">
 	<a
-		href={workspaceId
-			? `/workspaces/${workspaceId}/sessions/${session.id}`
+		href={workspaceConfig
+			? `/workspaces/${workspaceConfig.id}/sessions/${session.id}`
 			: `/session/${session.id}`}
 		class="block"
 	>
@@ -65,7 +66,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						unshareSessionMutation.mutate(
-							{ id: session.id },
+							{ workspaceConfig, sessionId: session.id },
 							{
 								onSuccess: () => {
 									toast.success('Session unshared successfully');
@@ -88,7 +89,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						shareSessionMutation.mutate(
-							{ id: session.id },
+							{ workspaceConfig, sessionId: session.id },
 							{
 								onSuccess: () => {
 									toast.success('Session shared successfully');
@@ -126,7 +127,7 @@
 					<AlertDialog.Action
 						onclick={() =>
 							deleteSessionMutation.mutate(
-								{ id: session.id },
+								{ workspaceConfig, sessionId: session.id },
 								{
 									onSuccess: () => {
 										toast.success('Session deleted successfully');

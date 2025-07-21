@@ -1,36 +1,33 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
-	import MessageList from '$lib/components/MessageList.svelte';
 	import MessageInput from '$lib/components/MessageInput.svelte';
+	import MessageList from '$lib/components/MessageList.svelte';
 	import SessionControls from '$lib/components/SessionControls.svelte';
+	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
-	import { Button } from '@repo/ui/button';
-	import { Badge } from '@repo/ui/badge';
-	import { Separator } from '@repo/ui/separator';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
-	import { toast } from 'svelte-sonner';
-	import { formatDate } from '$lib/utils/date';
+	import { Separator } from '@repo/ui/separator';
+	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronRight } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-	const workspace = $derived(data.workspace);
+	const workspaceConfig = $derived(data.workspaceConfig);
 	const sessionId = $derived(data.sessionId);
 
 	// Create session query with workspace accessor
 	const sessionQuery = createQuery(
 		rpc.sessions.getSessionById(
-			() => workspace,
+			() => workspaceConfig,
 			() => sessionId,
 		).options,
 	);
 
 	// Create message subscriber
 	const messages = createMessageSubscriber(
-		() => workspace,
+		() => workspaceConfig,
 		() => sessionId,
 	);
 
@@ -56,7 +53,7 @@
 		if (!sessionQuery.data) return;
 
 		const result = await rpc.sessions.deleteSession.execute({
-			workspace,
+			workspaceConfig,
 			sessionId,
 		});
 
@@ -66,14 +63,14 @@
 			});
 		} else if (result.data) {
 			toast.success('Session deleted successfully');
-			goto(`/workspaces/${workspace.id}`);
+			goto(`/workspaces/${workspaceConfig.id}`);
 		}
 	}
 
 	async function handleShare() {
 		const result = await rpc.sessions.shareSession.execute({
-			workspace,
-			id: sessionId,
+			workspaceConfig,
+			sessionId,
 		});
 
 		if (result.error) {
@@ -87,8 +84,8 @@
 
 	async function handleUnshare() {
 		const result = await rpc.sessions.unshareSession.execute({
-			workspace,
-			id: sessionId,
+			workspaceConfig,
+			sessionId,
 		});
 
 		if (result.error) {
@@ -102,8 +99,8 @@
 
 	async function handleAbort() {
 		const result = await rpc.sessions.abortSession.execute({
-			workspace,
-			id: sessionId,
+			workspaceConfig,
+			sessionId,
 		});
 
 		if (result.error) {
@@ -123,7 +120,7 @@
 
 		isSending = true;
 		const result = await rpc.messages.sendMessage.execute({
-			workspace,
+			workspaceConfig,
 			sessionId,
 			body: {
 				providerID: 'openai',  // TODO: Get from workspace settings
@@ -169,8 +166,8 @@
 					<ChevronRight class="h-4 w-4" />
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces/{workspace.id}">
-						{workspace.name}
+					<Breadcrumb.Link href="/workspaces/{workspaceConfig.id}">
+						{workspaceConfig.name}
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator>

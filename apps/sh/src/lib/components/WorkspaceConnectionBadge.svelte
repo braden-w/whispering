@@ -3,15 +3,15 @@
 	import * as rpc from '$lib/query';
 	import { Badge } from '@repo/ui/badge';
 	import { CheckCircle2, XCircle, Loader2 } from 'lucide-svelte';
-	import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 	let {
-		workspace,
+		workspaceConfig,
 		refetchInterval = 2000,
-	}: { workspace: WorkspaceConfig; refetchInterval?: number } = $props();
+	}: { workspaceConfig: WorkspaceConfig; refetchInterval?: number } = $props();
 
 	const workspaceQuery = createQuery(() => ({
-		...rpc.workspaces.getWorkspace(() => workspace).options(),
+		...rpc.workspaces.getWorkspace(() => workspaceConfig).options(),
 		refetchInterval,
 	}));
 </script>

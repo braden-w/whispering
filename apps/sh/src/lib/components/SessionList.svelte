@@ -2,15 +2,16 @@
 	import { Skeleton } from '@repo/ui/skeleton';
 	import SessionCard from './SessionCard.svelte';
 	import type { Session } from '$lib/client/types.gen';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 	let {
 		sessions,
 		isLoading = false,
-		workspaceId,
+		workspaceConfig,
 	}: {
 		sessions: Session[];
 		isLoading?: boolean;
-		workspaceId?: string;
+		workspaceConfig?: WorkspaceConfig;
 	} = $props();
 </script>
 
@@ -46,7 +47,7 @@
 {:else}
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#each sessions as session}
-			<SessionCard {session} {workspaceId} />
+			<SessionCard {session} {workspaceConfig} />
 		{/each}
 	</div>
 {/if}
