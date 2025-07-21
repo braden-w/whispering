@@ -7,12 +7,17 @@ import { toast } from 'svelte-sonner';
  * Configuration for connecting to an OpenCode server instance.
  * This is what users define and we persist locally in the app.
  * Contains all the necessary credentials and connection details.
+ * 
+ * With the proxy setup:
+ * - privatePort: The port OpenCode runs on internally
+ * - publicPort: The port Caddy proxy exposes publicly
  */
 const WorkspaceConfig = type({
 	id: 'string',
 	name: 'string',
 	url: 'string.url',
-	port: '1 <= number.integer <= 65535',
+	privatePort: '1 <= number.integer <= 65535',
+	publicPort: '1 <= number.integer <= 65535',
 	username: 'string > 0',
 	password: 'string',
 	createdAt: 'number',
@@ -76,6 +81,19 @@ export const workspaceConfigs = createPersistedState({
 // Helper function to generate a random port in the safe range
 export function generateRandomPort(): number {
 	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+}
+
+// Helper function to generate two different random ports
+export function generateRandomPorts(): { privatePort: number; publicPort: number } {
+	const privatePort = generateRandomPort();
+	let publicPort = generateRandomPort();
+	
+	// Ensure ports are different
+	while (publicPort === privatePort) {
+		publicPort = generateRandomPort();
+	}
+	
+	return { privatePort, publicPort };
 }
 
 // Helper functions for workspace operations

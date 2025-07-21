@@ -18,6 +18,8 @@
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
 		"@hey-api/openapi-ts": "^0.78.3",
+		"@repo/config": "workspace:*",
+		"@repo/svelte-utils": "workspace:*",
 		"@repo/ui": "workspace:*",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.22.0",
@@ -27,6 +29,7 @@
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
 		"globals": "^16.0.0",
+		"lucide-svelte": "^0.468.0",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
@@ -40,6 +43,8 @@
 	"dependencies": {
 		"@tanstack/svelte-query": "https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b",
 		"@tanstack/svelte-query-devtools": "https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter",
+		"arktype": "^2.1.20",
+		"nanoid": "^5.1.5",
 		"svelte-sonner": "^1.0.5",
 		"wellcrafted": "^0.20.0"
 	}
