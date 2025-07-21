@@ -17,24 +17,13 @@
 	const shareSessionMutation = createMutation(rpc.sessions.shareSession.options);
 	const unshareSessionMutation = createMutation(rpc.sessions.unshareSession.options);
 
-	function handleShare() {
-		shareSessionMutation.mutate(
-			{ workspaceConfig, sessionId: session.id },
-			{
-				onSuccess: () => {
-					toast.success('Session shared successfully');
-				},
-				onError: (error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-				},
-			},
-		);
-	}
+</script>
 
-	function handleUnshare() {
-		unshareSessionMutation.mutate(
+{#if isShared}
+	<Button
+		size="icon"
+		variant="ghost"
+		onclick={() => unshareSessionMutation.mutate(
 			{ workspaceConfig, sessionId: session.id },
 			{
 				onSuccess: () => {
@@ -46,15 +35,7 @@
 					});
 				},
 			},
-		);
-	}
-</script>
-
-{#if isShared}
-	<Button
-		size="icon"
-		variant="ghost"
-		onclick={handleUnshare}
+		)}
 		disabled={unshareSessionMutation.isPending}
 		title="Unshare session"
 	>
@@ -64,7 +45,19 @@
 	<Button
 		size="icon"
 		variant="ghost"
-		onclick={handleShare}
+		onclick={() => shareSessionMutation.mutate(
+			{ workspaceConfig, sessionId: session.id },
+			{
+				onSuccess: () => {
+					toast.success('Session shared successfully');
+				},
+				onError: (error) => {
+					toast.error(error.title, {
+						description: error.description,
+					});
+				},
+			},
+		)}
 		disabled={shareSessionMutation.isPending}
 		title="Share session"
 	>

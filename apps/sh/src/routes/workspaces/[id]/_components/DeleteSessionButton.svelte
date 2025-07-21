@@ -17,22 +17,6 @@
 
 	const deleteSessionMutation = createMutation(rpc.sessions.deleteSession.options);
 
-	function handleDelete() {
-		deleteSessionMutation.mutate(
-			{ workspaceConfig, sessionId: session.id },
-			{
-				onSuccess: () => {
-					toast.success('Session deleted successfully');
-					open = false;
-				},
-				onError: (error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-				},
-			},
-		);
-	}
 </script>
 
 <AlertDialog.Root bind:open>
@@ -53,7 +37,20 @@
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action
-				onclick={handleDelete}
+				onclick={() => deleteSessionMutation.mutate(
+					{ workspaceConfig, sessionId: session.id },
+					{
+						onSuccess: () => {
+							toast.success('Session deleted successfully');
+							open = false;
+						},
+						onError: (error) => {
+							toast.error(error.title, {
+								description: error.description,
+							});
+						},
+					},
+				)}
 				disabled={deleteSessionMutation.isPending}
 			>
 				{#if deleteSessionMutation.isPending}
