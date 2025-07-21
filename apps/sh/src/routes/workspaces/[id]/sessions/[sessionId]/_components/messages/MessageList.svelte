@@ -39,7 +39,7 @@
 	</div>
 {:else}
 	<Chat.List class="flex-1">
-		{#each messages as message}
+		{#each messages as message (message.info.id)}
 			{#if message.info.role === 'user'}
 				<UserMessageBubble message={message.info} parts={message.parts} />
 			{:else if message.info.role === 'assistant'}
