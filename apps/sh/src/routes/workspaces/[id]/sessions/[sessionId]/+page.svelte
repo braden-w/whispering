@@ -177,7 +177,7 @@
 		</Breadcrumb.Root>
 
 		{#if sessionQuery.data}
-			<div class="flex items-center justify-between pb-4 border-b">
+			<!-- <div class="flex items-center justify-between pb-4 border-b">
 				<div>
 					<h1 class="text-2xl font-bold">
 						{sessionQuery.data.title || 'Untitled Session'}
@@ -224,7 +224,7 @@
 						Delete
 					</Button>
 				</div>
-			</div>
+			</div> -->
 		{/if}
 
 		<div class="flex-1 overflow-y-auto">
