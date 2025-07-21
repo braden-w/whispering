@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SessionCard from './SessionCard.svelte';
+	import SessionTable from './SessionTable.svelte';
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
@@ -34,9 +34,5 @@
 		</p>
 	</div>
 {:else}
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each sessions as session}
-			<SessionCard {session} {workspaceConfig} />
-		{/each}
-	</div>
+	<SessionTable {sessions} {workspaceConfig} />
 {/if}
