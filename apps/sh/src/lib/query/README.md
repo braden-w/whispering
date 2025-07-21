@@ -35,28 +35,39 @@ const messagesQuery = createQuery(
 
 ### In Svelte Components
 
-When using mutations in Svelte components, prefer `createMutation` from TanStack Query. This provides pending states and better integration with the component lifecycle:
+When using mutations in Svelte components, prefer `createMutation` from TanStack Query. This provides pending states and better integration with the component lifecycle.
+
+**Important**: Pass `onSuccess` and `onError` as the second argument to `.mutate()` for maximum context:
 
 ```typescript
 // In a Svelte component
 import { createMutation } from '@tanstack/svelte-query';
 import * as rpc from '$lib/query';
 
-const createSessionMutation = createMutation({
-	...rpc.sessions.createSession.options,
-	onSuccess: (data) => {
-		toast.success('Session created successfully');
-		// Handle success, e.g., navigate to the new session
-	},
-	onError: (error) => {
-		toast.error(error.title, {
-			description: error.description,
-		});
-	},
-});
+// Create mutation with just .options (no parentheses!)
+const createSessionMutation = createMutation(rpc.sessions.createSession.options);
 
-// Use the mutation
-createSessionMutation.mutate({ body: { title: 'New Session' } });
+// Local state accessible in callbacks
+let isModalOpen = $state(false);
+
+// Use the mutation with callbacks in .mutate()
+createSessionMutation.mutate(
+	{ body: { title: 'New Session' } },
+	{
+		onSuccess: (data) => {
+			// Access local state and context
+			isModalOpen = false;
+			toast.success('Session created successfully');
+			// Navigate to the new session
+			goto(`/sessions/${data.id}`);
+		},
+		onError: (error) => {
+			toast.error(error.title, {
+				description: error.description,
+			});
+		},
+	}
+);
 
 // Access loading state
 {#if createSessionMutation.isPending}

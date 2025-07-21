@@ -25,25 +25,36 @@ Always prefer `createMutation` from TanStack Query for mutations. This provides:
 - Success states (`isSuccess`)
 - Better UX with automatic state management
 
+### The Preferred Pattern
+Pass `onSuccess` and `onError` as the second argument to `.mutate()` to get maximum context:
+
 ```svelte
 <script lang="ts">
   import { createMutation } from '@tanstack/svelte-query';
   import * as rpc from '$lib/query';
 
-  const deleteSessionMutation = createMutation({
-    ...rpc.sessions.deleteSession.options,
-    onSuccess: () => {
-      toast.success('Session deleted');
-      goto('/sessions');
-    },
-    onError: (error) => {
-      toast.error(error.title, { description: error.description });
-    },
-  });
+  // Create mutation with just .options (no parentheses!)
+  const deleteSessionMutation = createMutation(rpc.sessions.deleteSession.options);
+  
+  // Local state that we can access in callbacks
+  let isDialogOpen = $state(false);
 </script>
 
 <Button 
-  onclick={() => deleteSessionMutation.mutate({ sessionId })}
+  onclick={() => {
+    // Pass callbacks as second argument to .mutate()
+    deleteSessionMutation.mutate({ sessionId }, {
+      onSuccess: () => {
+        // Access local state and context
+        isDialogOpen = false;
+        toast.success('Session deleted');
+        goto('/sessions');
+      },
+      onError: (error) => {
+        toast.error(error.title, { description: error.description });
+      },
+    });
+  }}
   disabled={deleteSessionMutation.isPending}
 >
   {#if deleteSessionMutation.isPending}
@@ -53,6 +64,11 @@ Always prefer `createMutation` from TanStack Query for mutations. This provides:
   {/if}
 </Button>
 ```
+
+### Why This Pattern?
+- **More context**: Access to local variables and state at the call site
+- **Better organization**: Success/error handling is co-located with the action
+- **Flexibility**: Different calls can have different success/error behaviors
 
 ## In TypeScript Files (.ts)
 Always use `.execute()` since createMutation requires component context:

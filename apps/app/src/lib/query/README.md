@@ -359,15 +359,18 @@ When you call `createMutation()`, you're creating a _mutation observer_ that sub
 
 ```typescript
 // ❌ createMutation() approach - Creates subscriber
-const mutation = createMutation(rpc.recordings.createRecording.options());
+const mutation = createMutation(rpc.recordings.createRecording.options);
 // This creates a mutation observer that:
 // - Subscribes to state changes
 // - Triggers component re-renders
 // - Manages reactive state (isPending, isError, etc.)
 // - Adds memory overhead
 
-// Then you call it:
-mutation.mutate(recording);
+// Then you call it with callbacks:
+mutation.mutate(recording, {
+	onSuccess: () => { /* ... */ },
+	onError: (error) => { /* ... */ }
+});
 ```
 
 ```typescript
@@ -577,18 +580,41 @@ if (rpc.transcription.isCurrentlyTranscribing()) {
 ```svelte
 <!-- From: /routes/(config)/recordings/+page.svelte -->
 <script lang="ts">
+	// Create mutations with just .options (no parentheses!)
 	const transcribeRecordings = createMutation(
-		rpc.transcription.transcribeRecordings.options,
+		rpc.transcription.transcribeRecordings.options
 	);
 	const deleteRecordings = createMutation(
-		rpc.recordings.deleteRecordings.options,
+		rpc.recordings.deleteRecordings.options
 	);
 
-	async function handleBulkAction(selectedIds: string[]) {
+	async function handleBulkAction(selectedIds: string[], recordings: Recording[]) {
 		if (action === 'transcribe') {
-			$transcribeRecordings.mutate(selectedIds);
+			transcribeRecordings.mutate(selectedIds, {
+				onSuccess: ({ oks, errs }) => {
+					if (errs.length === 0) {
+						toast.success(`Transcribed ${oks.length} recordings!`);
+					} else {
+						toast.warning(`Transcribed ${oks.length} of ${selectedIds.length} recordings`);
+					}
+				},
+				onError: (error) => {
+					toast.error('Failed to transcribe recordings', { 
+						description: error.message 
+					});
+				}
+			});
 		} else if (action === 'delete') {
-			$deleteRecordings.mutate(selectedIds);
+			deleteRecordings.mutate(selectedIds, {
+				onSuccess: () => {
+					toast.success('Deleted recordings!');
+				},
+				onError: (error) => {
+					toast.error('Failed to delete recordings', { 
+						description: error.message 
+					});
+				}
+			});
 		}
 	}
 </script>
@@ -837,13 +863,14 @@ Each feature file typically exports an object with:
    - **In `.svelte` files**: Always prefer `createMutation` unless you have a specific reason not to (e.g., you don't need pending states)
    - **In `.ts` files**: Always use `.execute()` since createMutation requires component context
    - This gives you consistent loading states, error handling, and better UX in components
-3. Choose the right interface for the job:
+3. **Mutation callback pattern**: When using `createMutation`, pass callbacks as the second argument to `.mutate()` for maximum context
+4. Choose the right interface for the job:
    - Use `.execute()` in `.ts` files and when you don't need pending state
    - Use `createMutation()` when you need reactive state for UI feedback
-4. Keep queries simple - Complex logic belongs in services or orchestration mutations
-5. Update cache optimistically - Better UX for mutations
-6. Use proper query keys - Hierarchical and consistent
-7. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
+5. Keep queries simple - Complex logic belongs in services or orchestration mutations
+6. Update cache optimistically - Better UX for mutations
+7. Use proper query keys - Hierarchical and consistent
+8. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
 
 ## Quick Reference: Common RPC Patterns
 
@@ -871,12 +898,21 @@ const recordingQuery = createQuery(
 ### Basic Mutation (Reactive)
 
 ```typescript
+// Create mutation with just .options (no parentheses!)
 const deleteRecordingMutation = createMutation(
-	rpc.recordings.deleteRecording.options,
+	rpc.recordings.deleteRecording.options
 );
 
-// Trigger mutation
-deleteRecordingMutation.mutate(recordingId);
+// Trigger mutation with callbacks as second argument
+deleteRecordingMutation.mutate(recordingId, {
+	onSuccess: () => {
+		toast.success('Recording deleted');
+		// Navigate away, close modal, etc.
+	},
+	onError: (error) => {
+		toast.error(error.title, { description: error.description });
+	}
+});
 ```
 
 ### Imperative Execute - Performance Optimized
