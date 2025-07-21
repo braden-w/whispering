@@ -18,7 +18,7 @@
 		RepeatIcon,
 	} from 'lucide-svelte';
 	import { nanoid } from 'nanoid/non-secure';
-	import EditRecordingDialog from './EditRecordingDialog.svelte';
+	import EditRecordingModal from './EditRecordingModal.svelte';
 	import TransformationPicker from './TransformationPicker.svelte';
 	import ViewTransformationRunsDialog from './ViewTransformationRunsDialog.svelte';
 
@@ -151,7 +151,7 @@
 			}}
 		/>
 
-		<EditRecordingDialog {recording} />
+		<EditRecordingModal {recording} />
 
 		<CopyToClipboardButton
 			contentDescription="transcribed text"

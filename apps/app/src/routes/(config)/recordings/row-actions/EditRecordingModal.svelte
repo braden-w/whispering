@@ -2,7 +2,7 @@
 	import { confirmationDialog } from '$lib/components/ConfirmationDialog.svelte';
 	import WhisperingButton from '$lib/components/WhisperingButton.svelte';
 	import { Button } from '@repo/ui/button';
-	import * as Dialog from '@repo/ui/dialog';
+	import * as Modal from '@repo/ui/modal';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import { Textarea } from '@repo/ui/textarea';
@@ -99,8 +99,8 @@
 	});
 </script>
 
-<Dialog.Root bind:open={isDialogOpen}>
-	<Dialog.Trigger>
+<Modal.Root bind:open={isDialogOpen}>
+	<Modal.Trigger>
 		{#snippet child({ props })}
 			<WhisperingButton
 				tooltipContent="Edit recording"
@@ -111,8 +111,8 @@
 				<EditIcon class="size-4" />
 			</WhisperingButton>
 		{/snippet}
-	</Dialog.Trigger>
-	<Dialog.Content
+	</Modal.Trigger>
+	<Modal.Content
 		onEscapeKeydown={(e) => {
 			e.preventDefault();
 			if (isDialogOpen) {
@@ -126,12 +126,12 @@
 			}
 		}}
 	>
-		<Dialog.Header>
-			<Dialog.Title>Edit recording</Dialog.Title>
-			<Dialog.Description>
+		<Modal.Header>
+			<Modal.Title>Edit recording</Modal.Title>
+			<Modal.Description>
 				Make changes to your recording and click save when you're done.
-			</Dialog.Description>
-		</Dialog.Header>
+			</Modal.Description>
+		</Modal.Header>
 		<div class="space-y-4 py-4">
 			<div class="grid grid-cols-4 items-center gap-4">
 				<Label for="title" class="text-right">Title</Label>
@@ -191,7 +191,7 @@
 				</div>
 			{/if}
 		</div>
-		<Dialog.Footer>
+		<Modal.Footer>
 			<Button
 				onclick={() => {
 					confirmationDialog.open({
@@ -256,6 +256,6 @@
 				{/if}
 				Save
 			</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+		</Modal.Footer>
+	</Modal.Content>
+</Modal.Root>

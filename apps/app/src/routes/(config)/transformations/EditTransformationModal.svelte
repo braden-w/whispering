@@ -4,7 +4,7 @@
 	import { PencilIcon as EditIcon } from '$lib/components/icons';
 	import { Editor } from '$lib/components/transformations-editor';
 	import { Button } from '@repo/ui/button';
-	import * as Dialog from '@repo/ui/dialog';
+	import * as Modal from '@repo/ui/modal';
 	import { Separator } from '@repo/ui/separator';
 	import { rpc } from '$lib/query';
 	import type { Transformation } from '$lib/services/db';
@@ -90,8 +90,8 @@
 	}
 </script>
 
-<Dialog.Root bind:open={isDialogOpen}>
-	<Dialog.Trigger>
+<Modal.Root bind:open={isDialogOpen}>
+	<Modal.Trigger>
 		{#snippet child({ props })}
 			<WhisperingButton
 				{...props}
@@ -104,9 +104,9 @@
 				<HistoryIcon class="size-4" />
 			</WhisperingButton>
 		{/snippet}
-	</Dialog.Trigger>
+	</Modal.Trigger>
 
-	<Dialog.Content
+	<Modal.Content
 		class="max-h-[80vh] sm:max-w-7xl"
 		onEscapeKeydown={(e) => {
 			e.preventDefault();
@@ -121,10 +121,10 @@
 			}
 		}}
 	>
-		<Dialog.Header>
-			<Dialog.Title>Transformation Settings</Dialog.Title>
+		<Modal.Header>
+			<Modal.Title>Transformation Settings</Modal.Title>
 			<Separator />
-		</Dialog.Header>
+		</Modal.Header>
 
 		<Editor
 			bind:transformation={
@@ -136,7 +136,7 @@
 			}
 		/>
 
-		<Dialog.Footer>
+		<Modal.Footer>
 			<Button
 				onclick={() => {
 					confirmationDialog.open({
@@ -207,6 +207,6 @@
 					Save
 				</Button>
 			</div>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+		</Modal.Footer>
+	</Modal.Content>
+</Modal.Root>

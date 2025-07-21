@@ -5,7 +5,7 @@
 	import { Skeleton } from '@repo/ui/skeleton';
 	import { rpc } from '$lib/query';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import EditTransformationDialog from './EditTransformationDialog.svelte';
+	import EditTransformationModal from './EditTransformationModal.svelte';
 
 	let { transformationId }: { transformationId: string } = $props();
 
@@ -25,7 +25,7 @@
 		<Skeleton class="size-8 md:hidden" />
 		<Skeleton class="size-8" />
 	{:else}
-		<EditTransformationDialog {transformation} />
+		<EditTransformationModal {transformation} />
 
 		<WhisperingButton
 			tooltipContent="Delete transformation"
