@@ -34,25 +34,21 @@
 
 {#if workspaceConfig}
 	<!-- Breadcrumb Section -->
-	<div class="border-b">
-		<div
-			class="flex h-14 items-center px-4 sm:px-6"
-		>
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					<Breadcrumb.Item>
-						<Breadcrumb.Link href="/workspaces">Workspaces</Breadcrumb.Link>
-					</Breadcrumb.Item>
-					<Breadcrumb.Separator>
-						<ChevronRight class="h-4 w-4" />
-					</Breadcrumb.Separator>
-					<Breadcrumb.Item>
-						<Breadcrumb.Page>{workspaceConfig.name}</Breadcrumb.Page>
-					</Breadcrumb.Item>
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
-		</div>
-	</div>
+	<header class="border-b flex h-14 items-center px-4 sm:px-6">
+		<Breadcrumb.Root>
+			<Breadcrumb.List>
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href="/workspaces">Workspaces</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				<Breadcrumb.Separator>
+					<ChevronRight class="h-4 w-4" />
+				</Breadcrumb.Separator>
+				<Breadcrumb.Item>
+					<Breadcrumb.Page>{workspaceConfig.name}</Breadcrumb.Page>
+				</Breadcrumb.Item>
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
+	</header>
 
 	<!-- Page Content -->
 	<div class="px-4 sm:px-6 py-6 sm:py-8">
