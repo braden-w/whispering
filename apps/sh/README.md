@@ -1,38 +1,82 @@
-# sv
+# epicenter.sh
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A web interface for managing and connecting to OpenCode servers. Connect to multiple workspaces, manage sessions, and chat with AI assistants directly from your browser.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Workspace Management**: Connect to multiple OpenCode servers with custom configurations
+- **Session Management**: Create, manage, and navigate between chat sessions
+- **Real-time Status**: Live connection status and workspace information
+- **Secure Authentication**: Username/password authentication with configurable defaults
+- **Responsive Design**: Works seamlessly across desktop and mobile devices
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Access to one or more OpenCode servers
+
+### Development
+
+1. Install dependencies:
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+pnpm install
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+2. Start the development server:
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm dev
 ```
 
-## Building
+3. Open [http://localhost:5173](http://localhost:5173) in your browser
 
-To create a production version of your app:
+### Building for Production
 
 ```bash
-npm run build
+pnpm build
 ```
 
-You can preview the production build with `npm run preview`.
+Preview the production build:
+```bash
+pnpm preview
+```
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Deployment
+
+This project is configured for Cloudflare Pages deployment:
+
+```bash
+pnpm deploy
+```
+
+## Usage
+
+1. **Add a Workspace**: Click "Add Workspace" to configure a connection to your OpenCode server
+2. **Connect**: Use the "Connect" button to establish a connection and view workspace details
+3. **Start Chatting**: Navigate to a workspace to create sessions and start conversations
+4. **Manage Settings**: Configure default credentials in the settings modal
+
+## Tech Stack
+
+- **Framework**: SvelteKit 2 with Svelte 5
+- **Styling**: Tailwind CSS 4
+- **UI Components**: Custom component library with shadcn-svelte patterns
+- **State Management**: TanStack Query for server state, Svelte stores for client state
+- **Deployment**: Cloudflare Pages
+- **Type Safety**: TypeScript with OpenAPI code generation
+
+## Project Structure
+
+```
+src/
+├── lib/
+│   ├── components/     # Reusable UI components
+│   ├── query/         # API client and query definitions
+│   ├── stores/        # Client-side state management
+│   └── utils/         # Utility functions
+├── routes/            # SvelteKit routes
+│   ├── workspaces/    # Workspace and session management
+│   └── +layout.svelte # App shell and navigation
+└── app.html          # HTML template
+```
