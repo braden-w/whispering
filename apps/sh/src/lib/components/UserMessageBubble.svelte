@@ -19,7 +19,7 @@
 		</Chat.BubbleAvatarFallback>
 	</Chat.BubbleAvatar>
 	<Chat.BubbleMessage class="flex flex-col gap-1">
-		<div class="prose prose-sm dark:prose-invert max-w-none">
+		<div class="prose prose-sm dark:prose-invert max-w-none space-y-2">
 			{#each parts as part}
 				<MessagePartRenderer {part} />
 			{/each}

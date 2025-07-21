@@ -34,6 +34,8 @@
 		() => sessionId,
 	);
 
+	$inspect(messages.value);
+
 	// Load initial messages when component mounts
 	$effect(() => {
 		messages.loadInitialMessages();
@@ -125,8 +127,12 @@
 		const result = await rpc.messages.sendMessage.execute({
 			workspace,
 			sessionId,
-			mode: messageMode,
-			parts: [{ type: 'text', text: content }],
+			body: {
+				providerID: 'openai',  // TODO: Get from workspace settings
+				modelID: 'gpt-4o',      // TODO: Get from workspace settings
+				mode: messageMode,
+				parts: [{ type: 'text', text: content }],
+			},
 		});
 
 		if (result.error) {
@@ -140,7 +146,7 @@
 		isSending = false;
 	}
 
-	async function handleFileUpload(files: File[]) {
+	async function handleFileUpload(_files: File[]) {
 		// For now, just show a toast that file upload is not yet implemented
 		toast.info('File upload coming soon!', {
 			description: 'This feature is still being implemented.',
@@ -181,7 +187,7 @@
 		</Breadcrumb.Root>
 
 		{#if sessionQuery.data}
-			<div class="flex items-center justify-between pb-4 border-b">
+			<!-- <div class="flex items-center justify-between pb-4 border-b">
 				<div>
 					<h1 class="text-2xl font-bold">
 						{sessionQuery.data.title || 'Untitled Session'}
@@ -228,7 +234,7 @@
 						Delete
 					</Button>
 				</div>
-			</div>
+			</div> -->
 		{/if}
 
 		<!-- Session Controls -->
@@ -238,7 +244,7 @@
 			isProcessing={isProcessing}
 		/>
 
-		<div class="flex-1 overflow-hidden">
+		<div class="flex-1 overflow-y-auto">
 			<MessageList
 				messages={messages.value}
 				isLoading={sessionQuery.isPending}

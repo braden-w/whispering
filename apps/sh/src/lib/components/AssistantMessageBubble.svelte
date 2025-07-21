@@ -110,7 +110,11 @@
 		</div>
 
 		<!-- Message Content -->
-		<div class="prose prose-sm dark:prose-invert max-w-none">
+		<div class="prose prose-sm dark:prose-invert max-w-none space-y-2 
+			prose-pre:bg-slate-900 prose-pre:text-slate-50 
+			dark:prose-pre:bg-slate-950 dark:prose-pre:text-slate-50
+			prose-pre:overflow-x-auto prose-pre:max-w-full
+			prose-code:text-xs prose-code:leading-relaxed">
 			{#each parts as part}
 				<MessagePartRenderer {part} />
 			{/each}

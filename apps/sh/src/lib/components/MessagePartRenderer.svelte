@@ -32,7 +32,7 @@
 </script>
 
 {#if part.type === 'text'}
-	<div class="whitespace-pre-wrap">
+	<div class="whitespace-pre-wrap break-words">
 		{part.text}
 		{#if part.synthetic}
 			<Badge variant="outline" class="ml-2 text-xs">Synthetic</Badge>
