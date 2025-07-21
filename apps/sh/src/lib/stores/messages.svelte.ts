@@ -15,18 +15,25 @@ import { createSubscriber } from 'svelte/reactivity';
 export type Message = { info: MessageInfo; parts: Part[] };
 
 /**
- * Creates a reactive message subscriber that combines initial fetch with SSE updates
+ * Creates a reactive message subscriber for real-time SSE updates
  *
- * @param workspace - Accessor to the workspace configuration
- * @param sessionId - Accessor to the session ID
+ * @param params - Configuration object containing workspace, sessionId, and initial messages
+ * @param params.workspace - Accessor to the workspace configuration
+ * @param params.sessionId - Accessor to the session ID
+ * @param params.initialMessages - Accessor to pre-fetched messages from the load function
  * @returns A reactive value containing the messages with their parts
+ *
+ * @remarks
+ * This subscriber is responsible for keeping messages in sync after the initial load.
+ * The initial messages must be fetched separately in the load function using the query layer.
  *
  * @example
  * ```ts
- * const messages = createMessageSubscriber(
- *   () => currentWorkspace,
- *   () => sessionId
- * );
+ * const messages = createMessageSubscriber({
+ *   workspace: () => workspaceConfig,
+ *   sessionId: () => session.id,
+ *   initialMessages: () => data.messages
+ * });
  *
  * // Use in component
  * $effect(() => {
@@ -34,12 +41,17 @@ export type Message = { info: MessageInfo; parts: Part[] };
  * });
  * ```
  */
-export function createMessageSubscriber(
-	workspace: Accessor<WorkspaceConfig>,
-	sessionId: Accessor<string>,
-) {
-	// Using the exact type returned by the API: Array<{ info: Message; parts: Array<Part> }>
-	let messages = $state<Message[]>([]);
+export function createMessageSubscriber({
+	workspace,
+	sessionId,
+	initialMessages,
+}: {
+	workspace: Accessor<WorkspaceConfig>;
+	sessionId: Accessor<string>;
+	initialMessages: Accessor<Message[]>;
+}) {
+	// Initialize with pre-fetched messages
+	let messages = $state<Message[]>(initialMessages());
 	let eventSource: EventSource | null = null;
 
 	/**
@@ -156,30 +168,6 @@ export function createMessageSubscriber(
 	}
 
 	/**
-	 * Fetches all messages for the current session from the server
-	 *
-	 * @remarks
-	 * This provides the initial state when:
-	 * - First loading a session
-	 * - Reconnecting after connection loss
-	 * - Workspace or session ID changes
-	 *
-	 * @returns Promise that resolves when messages are loaded
-	 */
-	async function loadInitialMessages() {
-		const client = createWorkspaceClient(workspace());
-		const { data, error } = await api.getSessionByIdMessage({
-			client,
-			path: { id: sessionId() },
-		});
-
-		if (!error && data) {
-			// data is already Array<{ info: Message; parts: Part[] }>
-			messages = data;
-		}
-	}
-
-	/**
 	 * Safely parses JSON data from an SSE event
 	 *
 	 * @param event - The MessageEvent from EventSource
@@ -263,7 +251,6 @@ export function createMessageSubscriber(
 			subscribe();
 			return messages;
 		},
-		loadInitialMessages,
 	};
 }
 

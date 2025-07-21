@@ -29,14 +29,10 @@
 	const abortSessionMutation = createMutation(rpc.sessions.abortSession.options);
 
 	// Create message subscriber
-	const messages = createMessageSubscriber(
-		() => workspaceConfig,
-		() => sessionId,
-	);
-
-	// Load initial messages when component mounts
-	$effect(() => {
-		messages.loadInitialMessages();
+	const messages = createMessageSubscriber({
+		workspace: () => workspaceConfig,
+		sessionId: () => sessionId,
+		initialMessages: () => data.messages ?? [],
 	});
 
 	let deleteDialogOpen = $state(false);

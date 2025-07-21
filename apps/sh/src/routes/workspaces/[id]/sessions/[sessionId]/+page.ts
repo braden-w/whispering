@@ -21,9 +21,20 @@ export const load = async ({ params }) => {
 
 	if (!session) redirect(302, `/workspaces/${params.id}`);
 
+	// Fetch initial messages
+	const messages = await queryClient.ensureQueryData(
+		rpc.messages
+			.getMessagesBySessionId(
+				() => workspaceConfig,
+				() => params.sessionId,
+			)
+			.options(),
+	);
+
 	return {
 		workspaceConfig,
 		sessionId: params.sessionId,
 		session,
+		messages,
 	};
 };
