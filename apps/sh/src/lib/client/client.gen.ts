@@ -39,8 +39,7 @@ export function createWorkspaceClient(workspace: WorkspaceConfig) {
 	// Create a new client with workspace-specific configuration
 	return createClient(
 		createConfig<ClientOptions>({
-			baseUrl: 'http://localhost:8080',
-			// baseUrl: getProxiedBaseUrl(workspace.url),
+			baseUrl: workspace.url,
 			headers: {
 				Authorization: `Basic ${auth}`,
 			},
