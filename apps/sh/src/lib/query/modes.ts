@@ -1,20 +1,27 @@
-import * as api from '$lib/client';
-import type { Mode } from '$lib/client/types.gen';
+import * as api from '$lib/client/sdk.gen';
+import { createWorkspaceClient } from '$lib/client/client.gen';
+import { ShErr } from '$lib/result';
+import type { Workspace } from './workspaces';
+import type { Accessor } from '@tanstack/svelte-query';
+import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineQuery } from './_client';
 
-const initialModes: Mode[] = [
-	{ name: 'build', tools: {} },
-	{ name: 'plan', tools: { write: false, edit: false, patch: false } },
-];
-
-export const modes = {
-	getModes: defineQuery({
-		queryKey: ['modes'],
+// Query for fetching available modes
+export const getModes = (workspace: Accessor<Workspace>) =>
+	defineQuery({
+		queryKey: ['workspaces', workspace().id, 'modes'],
 		resultQueryFn: async () => {
-			const response = await api.getMode();
-			return Ok(response.data ?? initialModes);
+			const client = createWorkspaceClient(workspace());
+
+			const { data, error } = await api.getMode({ client });
+			if (error) {
+				return ShErr({
+					title: 'Failed to fetch modes',
+					description: extractErrorMessage(error),
+				});
+			}
+
+			return Ok(data);
 		},
-		initialData: initialModes,
-	}),
-};
+	});

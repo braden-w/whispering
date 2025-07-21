@@ -791,7 +791,7 @@ transcribeRecording: defineMutation({
 	const recordings = createQuery(rpc.recordings.getAllRecordings.options());
 </script>
 
-{#if recordings.isLoading}
+{#if recordings.isPending}
 	<p>Loading...</p>
 {:else if recordings.error}
 	<p>Error: {recordings.error.message}</p>

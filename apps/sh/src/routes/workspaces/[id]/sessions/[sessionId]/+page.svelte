@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import MessageInput from '$lib/components/MessageInput.svelte';
 	import MessageList from '$lib/components/MessageList.svelte';
-	import SessionControls from '$lib/components/SessionControls.svelte';
+	import ModeSelector from '$lib/components/ModeSelector.svelte';
 	import ModelSelector from '$lib/components/ModelSelector.svelte';
 	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
@@ -235,11 +235,11 @@
 		{/if}
 
 		<!-- Session Controls -->
-		<div class="flex items-center gap-2">
-			<SessionControls
-				currentMode={messageMode}
+		<div class="flex items-center gap-2 pb-2">
+			<ModeSelector
+				{workspaceConfig}
+				bind:value={messageMode}
 				onModeChange={handleModeChange}
-				isProcessing={isProcessing}
 			/>
 			<ModelSelector
 				{workspaceConfig}

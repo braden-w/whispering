@@ -65,7 +65,7 @@
 			<Command.List class="max-h-[400px] overflow-y-auto">
 				<Command.Empty>No models found.</Command.Empty>
 				
-				{#if providersQuery.isLoading}
+				{#if providersQuery.isPending}
 					<div class="p-4 text-center text-sm text-muted-foreground">
 						Loading models...
 					</div>
