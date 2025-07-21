@@ -33,10 +33,43 @@ const messagesQuery = createQuery(
 
 ## Mutation Usage
 
-Mutations are accessed directly and use the `.execute()` method:
+### In Svelte Components
+
+When using mutations in Svelte components, prefer `createMutation` from TanStack Query. This provides pending states and better integration with the component lifecycle:
 
 ```typescript
-// Execute a mutation
+// In a Svelte component
+import { createMutation } from '@tanstack/svelte-query';
+import * as rpc from '$lib/query';
+
+const createSessionMutation = createMutation({
+	...rpc.sessions.createSession.options,
+	onSuccess: (data) => {
+		toast.success('Session created successfully');
+		// Handle success, e.g., navigate to the new session
+	},
+	onError: (error) => {
+		toast.error(error.title, {
+			description: error.description,
+		});
+	},
+});
+
+// Use the mutation
+createSessionMutation.mutate({ body: { title: 'New Session' } });
+
+// Access loading state
+{#if createSessionMutation.isPending}
+	<Spinner />
+{/if}
+```
+
+### In TypeScript Files
+
+In `.ts` files (load functions, utilities, etc.), use the `.execute()` method:
+
+```typescript
+// In a .ts file
 const result = await rpc.sessions.createSession.execute({
 	body: { title: 'New Session' },
 });
@@ -52,6 +85,21 @@ if (error) {
 	// Use data for the success response
 }
 ```
+
+### When to Use Each Pattern
+
+- **Use `createMutation` in `.svelte` files** when you need:
+  - Loading/pending states (`isPending`, `isSuccess`, `isError`)
+  - Automatic component lifecycle integration
+  - Built-in error and success callbacks
+  - Mutation state management
+
+- **Use `.execute()` in `.svelte` files** only when:
+  - You don't need loading states
+  - You're performing one-off operations
+  - You need fine-grained control over the async flow
+
+- **Always use `.execute()` in `.ts` files** since createMutation requires component context
 
 ## Prefetching in Load Functions
 
