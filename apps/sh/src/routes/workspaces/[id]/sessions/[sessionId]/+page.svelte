@@ -6,16 +6,16 @@
 	import ModelSelector from '$lib/components/ModelSelector.svelte';
 	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
+	import { formatDate } from '$lib/utils/date';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
+	import { Button } from '@repo/ui/button';
 	import { Separator } from '@repo/ui/separator';
+	import { createMutation } from '@tanstack/svelte-query';
 		import { ChevronRight } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
-	import { createMutation } from '@tanstack/svelte-query';
-	import { formatDate } from '$lib/utils/date';
-	import { Badge } from '@repo/ui/badge';
-	import { Button } from '@repo/ui/button';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
@@ -37,7 +37,7 @@
 
 	let deleteDialogOpen = $state(false);
 	let messageContent = $state('');
-	let messageMode = $state('chat');
+	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
 	let selectedModel = $state<{ providerId: string; modelId: string } | null>({
 		providerId: 'anthropic',
 		modelId: 'claude-sonnet-4-20250514'
