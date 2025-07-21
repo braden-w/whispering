@@ -11,6 +11,7 @@ import { createWorkspaceClient } from '$lib/client/client.gen';
 import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
+import { type } from 'arktype';
 
 export type Message = { info: MessageInfo; parts: Part[] };
 
@@ -52,13 +53,6 @@ export function createMessageSubscriber({
 }) {
 	// Initialize with pre-fetched messages
 	let messages = $state<Message[]>(initialMessages());
-
-	// Debug logging
-	console.log(
-		'MessageSubscriber initialized with:',
-		messages.length,
-		'initial messages',
-	);
 	let eventSource: EventSource | null = null;
 
 	/**
@@ -73,21 +67,11 @@ export function createMessageSubscriber({
 	 * appended to the end of the array with empty parts.
 	 */
 	function upsertMessage(updatedMessage: MessageInfo) {
-		console.log(
-			`🔄 upsertMessage called for: ${updatedMessage.id} (role: ${updatedMessage.role})`,
-		);
-		console.log('Current messages count:', messages.length);
-		console.log(
-			'Current message IDs:',
-			messages.map((m) => m.info.id),
-		);
-
 		const existingIndex = messages.findIndex(
 			(msg) => msg.info.id === updatedMessage.id,
 		);
 
 		if (existingIndex >= 0) {
-			console.log(`📝 Updating existing message at index ${existingIndex}`);
 			// Preserve existing parts when updating message info
 			messages = [
 				...messages.slice(0, existingIndex),
@@ -98,7 +82,6 @@ export function createMessageSubscriber({
 				...messages.slice(existingIndex + 1),
 			];
 		} else {
-			console.log(`➕ Adding new message: ${updatedMessage.id}`);
 			// Add new message with empty parts array
 			messages = [
 				...messages,
@@ -108,12 +91,6 @@ export function createMessageSubscriber({
 				},
 			];
 		}
-
-		console.log('After upsert - messages count:', messages.length);
-		console.log(
-			'After upsert - message IDs:',
-			messages.map((m) => m.info.id),
-		);
 	}
 
 	/**
@@ -192,104 +169,284 @@ export function createMessageSubscriber({
 	}
 
 	/**
-	 * Safely parses JSON data from an SSE event
+	 * Safely parses JSON data from an SSE event using ArkType validation
 	 *
 	 * @param event - The MessageEvent from EventSource
-	 * @returns Parsed data or null if parsing fails
-	 *
-	 * @remarks
-	 * We don't constrain the type parameter since the generated event types
-	 * have generic string types rather than literal types
+	 * @returns Parsed and validated event data or null if parsing/validation fails
 	 */
-	function parseEventData<T>(event: MessageEvent): T | null {
-		try {
-			return JSON.parse(event.data) as T;
-		} catch (err) {
-			console.error('Failed to parse SSE event:', err);
+	function parseEventData(event: MessageEvent) {
+		// Define error discriminated union
+		const errorType = type({
+			name: '"ProviderAuthError"',
+			data: {
+				providerID: 'string',
+				message: 'string',
+			},
+		})
+			.or({
+				name: '"UnknownError"',
+				data: {
+					message: 'string',
+				},
+			})
+			.or({
+				name: '"MessageOutputLengthError"',
+				data: 'Record<string, unknown>',
+			})
+			.or({
+				name: '"MessageAbortedError"',
+				data: 'Record<string, unknown>',
+			});
+
+		// Define file part source discriminated union
+		const filePartSourceType = type({
+			type: '"file"',
+			text: {
+				value: 'string',
+				start: 'number',
+				end: 'number',
+			},
+			path: 'string',
+		}).or({
+			type: '"symbol"',
+			text: {
+				value: 'string',
+				start: 'number',
+				end: 'number',
+			},
+			path: 'string',
+			range: {
+				start: {
+					line: 'number',
+					character: 'number',
+				},
+				end: {
+					line: 'number',
+					character: 'number',
+				},
+			},
+			name: 'string',
+			kind: 'number',
+		});
+
+		// Define message type discriminated union
+		const messageType = type({
+			role: '"user"',
+			id: 'string',
+			sessionID: 'string',
+			time: {
+				created: 'number',
+			},
+		}).or({
+			role: '"assistant"',
+			id: 'string',
+			sessionID: 'string',
+			time: {
+				created: 'number',
+				'completed?': 'number',
+			},
+			'error?': errorType,
+			system: 'string[]',
+			modelID: 'string',
+			providerID: 'string',
+			path: {
+				cwd: 'string',
+				root: 'string',
+			},
+			'summary?': 'boolean',
+			cost: 'number',
+			tokens: {
+				input: 'number',
+				output: 'number',
+				reasoning: 'number',
+				cache: {
+					read: 'number',
+					write: 'number',
+				},
+			},
+		});
+
+		// Define part type discriminated union
+		const partType = type({
+			type: '"text"',
+			id: 'string',
+			sessionID: 'string',
+			messageID: 'string',
+			text: 'string',
+			'synthetic?': 'boolean',
+			'time?': {
+				start: 'number',
+				'end?': 'number',
+			},
+		})
+			.or({
+				type: '"file"',
+				id: 'string',
+				sessionID: 'string',
+				messageID: 'string',
+				mime: 'string',
+				'filename?': 'string',
+				url: 'string',
+				'source?': filePartSourceType,
+			})
+			.or({
+				type: '"tool"',
+				id: 'string',
+				sessionID: 'string',
+				messageID: 'string',
+				callID: 'string',
+				tool: 'string',
+				state: type({
+					status: '"pending"',
+				})
+					.or({
+						status: '"running"',
+						'input?': 'unknown',
+						'title?': 'string',
+						'metadata?': 'Record<string, unknown>',
+						time: {
+							start: 'number',
+						},
+					})
+					.or({
+						status: '"completed"',
+						input: 'Record<string, unknown>',
+						output: 'string',
+						title: 'string',
+						metadata: 'Record<string, unknown>',
+						time: {
+							start: 'number',
+							end: 'number',
+						},
+					})
+					.or({
+						status: '"error"',
+						input: 'Record<string, unknown>',
+						error: 'string',
+						time: {
+							start: 'number',
+							end: 'number',
+						},
+					}),
+			})
+			.or({
+				type: '"step-start"',
+				id: 'string',
+				sessionID: 'string',
+				messageID: 'string',
+			})
+			.or({
+				type: '"step-finish"',
+				id: 'string',
+				sessionID: 'string',
+				messageID: 'string',
+				cost: 'number',
+				tokens: {
+					input: 'number',
+					output: 'number',
+					reasoning: 'number',
+					cache: {
+						read: 'number',
+						write: 'number',
+					},
+				},
+			})
+			.or({
+				type: '"snapshot"',
+				id: 'string',
+				sessionID: 'string',
+				messageID: 'string',
+				snapshot: 'string',
+			});
+
+		// Define the comprehensive event type as a discriminated union
+		const sseEventType = type('string.json.parse').to(
+			type({
+				type: '"message.updated"',
+				properties: {
+					info: messageType,
+				},
+			})
+				.or({
+					type: '"message.part.updated"',
+					properties: {
+						part: partType,
+					},
+				})
+				.or({
+					type: '"message.removed"',
+					properties: {
+						sessionID: 'string',
+						messageID: 'string',
+					},
+				})
+				.or({
+					type: '"session.idle"',
+					properties: {
+						sessionID: 'string',
+					},
+				})
+				.or({
+					type: '"storage.write"',
+					properties: {
+						key: 'string',
+						content: 'unknown',
+					},
+				}),
+		);
+
+		const result = sseEventType(event.data);
+		if (result instanceof type.errors) {
+			console.error('Failed to parse/validate SSE event:', result.summary);
 			return null;
 		}
+
+		return result;
 	}
 
 	// Subscribe to reactive updates
 	const subscribe = createSubscriber((update) => {
-		console.log('🔌 createSubscriber called - setting up EventSource');
-
 		if (eventSource) {
-			console.log('🔄 Closing existing EventSource connection');
 			eventSource.close();
 		}
 
 		// Construct SSE URL with authentication
 		const sseUrl = new URL('/event', workspace().url);
-
-		console.log('Creating EventSource connection to:', sseUrl.toString());
-
 		eventSource = new EventSource(sseUrl.toString());
-
-		// Handle connection open
-		eventSource.onopen = () => {
-			console.log('SSE connection opened successfully');
-		};
 
 		// Handle all SSE events (server sends everything as 'message' events)
 		eventSource.onmessage = (event) => {
-			console.log('Received SSE message:', event.data);
-
-			const eventData = parseEventData<{ type: string; properties: any }>(
-				event,
-			);
-			if (!eventData) {
-				console.log('Failed to parse event data');
-				return;
-			}
-
-			console.log('Event type:', eventData.type);
+			const eventData = parseEventData(event);
+			if (!eventData) return;
 
 			// Route events based on type
 			switch (eventData.type) {
 				case 'message.updated': {
-					console.log('Processing message.updated event');
-					const data = eventData as EventMessageUpdated;
+					const data = eventData satisfies EventMessageUpdated;
 					if (data.properties.info.sessionID === sessionId()) {
-						console.log('Processing message update for session:', sessionId());
 						upsertMessage(data.properties.info);
 						update();
-					} else {
-						console.log('Ignoring message update - session mismatch');
 					}
 					break;
 				}
 
 				case 'message.part.updated': {
-					console.log('Processing message.part.updated event');
-					const data = eventData as EventMessagePartUpdated;
+					const data = eventData satisfies EventMessagePartUpdated;
 					if (data.properties.part.sessionID === sessionId()) {
-						console.log(
-							'Processing part update for session:',
-							sessionId(),
-							'message:',
-							data.properties.part.messageID,
-						);
 						mergeStreamingPart(
 							data.properties.part.messageID,
 							data.properties.part,
 						);
 						update();
-					} else {
-						console.log('Ignoring part update - session mismatch');
 					}
 					break;
 				}
 
 				case 'message.removed': {
-					console.log('Processing message.removed event');
-					const data = eventData as EventMessageRemoved;
+					const data = eventData satisfies EventMessageRemoved;
 					if (data.properties.sessionID === sessionId()) {
-						console.log('Processing message removal for session:', sessionId());
 						deleteMessageById(data.properties.messageID);
 						update();
-					} else {
-						console.log('Ignoring message removal - session mismatch');
 					}
 					break;
 				}
@@ -298,7 +455,6 @@ export function createMessageSubscriber({
 					// Session became inactive after predetermined idle time
 					// Payload: { sessionID: string }
 					// Used to update UI status or perform cleanup tasks
-					console.log('Session went idle - ignoring');
 					break;
 
 				case 'storage.write':
@@ -308,7 +464,7 @@ export function createMessageSubscriber({
 					break;
 
 				default:
-					console.log('Unhandled event type:', eventData.type);
+					console.warn('Unhandled event type:', eventData.type);
 					break;
 			}
 		};
@@ -339,12 +495,6 @@ export function createMessageSubscriber({
 	return {
 		get value() {
 			subscribe();
-			console.log(
-				'📊 messages.value accessed - returning',
-				messages.length,
-				'messages - called from:',
-				new Error().stack?.split('\n')[2]?.trim()
-			);
 			return messages;
 		},
 	};
