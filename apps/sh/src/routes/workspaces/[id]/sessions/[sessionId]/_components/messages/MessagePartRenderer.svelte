@@ -40,13 +40,14 @@
 		{/if}
 	</div>
 {:else if part.type === 'file'}
+	{@const FileIcon = getFileIcon(part.mime)}
 	<div class="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
 		<div class="flex-shrink-0">
-			<svelte:component this={getFileIcon(part.mime)} class="h-5 w-5 text-muted-foreground" />
+			<FileIcon class="h-5 w-5 text-muted-foreground" />
 		</div>
 		<div class="flex-1 min-w-0">
 			<div class="font-medium text-sm truncate">
-				{part.filename || 'Untitled file'}
+				{part.filename ?? 'Untitled file'}
 			</div>
 			<div class="text-xs text-muted-foreground">
 				{part.mime}
