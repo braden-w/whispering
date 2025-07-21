@@ -3,11 +3,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"imports": {
-		"#*": [
-			"./src/*",
-			"./src/*.ts",
-			"./src/*/index.ts"
-		]
+		"#*": ["./src/*", "./src/*.ts", "./src/*/index.ts"]
 	},
 	"exports": {
 		"./*": "./src/*/index.ts",
@@ -23,7 +19,6 @@
 		"paneforge": "^1.0.0-next.5"
 	},
 	"peerDependencies": {
-		"bits-ui": ">=2.8.0",
 		"svelte": ">=5.0.0"
 	},
 	"devDependencies": {
@@ -32,6 +27,7 @@
 		"@repo/config": "workspace:*",
 		"@tailwindcss/typography": "^0.5.16",
 		"@types/node": "^22.15.32",
+		"bits-ui": "^2.8.11",
 		"clsx": "^2.1.1",
 		"eslint": "^9.30.1",
 		"mode-watcher": "^1.0.8",
