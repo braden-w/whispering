@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Chat from '@repo/ui/chat';
-	import { Skeleton } from '@repo/ui/skeleton';
 	import type { Message } from '$lib/stores/messages.svelte';
 	import UserMessageBubble from './UserMessageBubble.svelte';
 	import AssistantMessageBubble from './AssistantMessageBubble.svelte';
