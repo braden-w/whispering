@@ -95,6 +95,74 @@ import { Input } from '$lib/components/ui/input';
 - Ensure custom components follow the same organizational patterns
 - Consider semantic appropriateness (e.g., use section headers instead of cards for page sections)
 
+# Self-Contained Component Pattern
+
+## Prefer Component Composition Over Parent State Management
+When building interactive components (especially with dialogs/modals), create self-contained components rather than managing state at the parent level.
+
+### The Anti-Pattern (Parent State Management)
+```svelte
+<!-- Parent component -->
+<script>
+  let deletingItem = $state(null);
+  
+  function handleDelete(item) {
+    // delete logic
+    deletingItem = null;
+  }
+</script>
+
+{#each items as item}
+  <Button onclick={() => deletingItem = item}>Delete</Button>
+{/each}
+
+<AlertDialog open={!!deletingItem}>
+  <!-- Single dialog for all items -->
+</AlertDialog>
+```
+
+### The Pattern (Self-Contained Components)
+```svelte
+<!-- DeleteItemButton.svelte -->
+<script>
+  let { item } = $props();
+  let open = $state(false);
+  
+  function handleDelete() {
+    // delete logic directly in component
+  }
+</script>
+
+<AlertDialog.Root bind:open>
+  <AlertDialog.Trigger>
+    <Button>Delete</Button>
+  </AlertDialog.Trigger>
+  <AlertDialog.Content>
+    <!-- Dialog content -->
+  </AlertDialog.Content>
+</AlertDialog.Root>
+
+<!-- Parent component -->
+{#each items as item}
+  <DeleteItemButton {item} />
+{/each}
+```
+
+### Why This Pattern Works
+- **No parent state pollution**: Parent doesn't need to track which item is being deleted
+- **Better encapsulation**: All delete logic lives in one place
+- **Simpler mental model**: Each row has its own delete button with its own dialog
+- **No callbacks needed**: Component handles everything internally
+- **Scales better**: Adding new actions doesn't complicate the parent
+
+### When to Apply This Pattern
+- Action buttons in table rows (delete, edit, etc.)
+- Confirmation dialogs for list items
+- Any repeating UI element that needs modal interactions
+- When you find yourself passing callbacks just to update parent state
+
+The key insight: It's perfectly fine to instantiate multiple dialogs (one per row) rather than managing a single shared dialog with complex state. Modern frameworks handle this efficiently, and the code clarity is worth it.
+
 # Documentation & README Writing Guidelines
 
 ## Technical Writing Voice
