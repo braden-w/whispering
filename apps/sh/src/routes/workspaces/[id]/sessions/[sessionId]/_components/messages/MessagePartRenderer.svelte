@@ -81,7 +81,7 @@
 				<span>${part.cost.toFixed(4)}</span>
 				<span>•</span>
 			{/if}
-			<span>{part.tokens.input}→{part.tokens.output}</span>
+			<span class="font-mono">Step: {part.tokens.input}→{part.tokens.output}</span>
 		</div>
 	</div>
 {/if}

@@ -159,7 +159,7 @@
 					<span class="font-mono">{formatCost(message.cost)}</span>
 					<span class="opacity-50">•</span>
 				{/if}
-				<span class="font-mono text-xs">{formatTokens(message.tokens)}</span>
+				<span class="font-mono text-xs">Total: {formatTokens(message.tokens)}</span>
 			</div>
 		</div>
 	</Chat.BubbleMessage>
