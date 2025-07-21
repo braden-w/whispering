@@ -27,58 +27,11 @@
 		).options,
 	);
 
-	const sendMessageMutation = createMutation(
-		rpc.messages.sendMessage.options,
-	);
-
-	const deleteSessionMutation = createMutation(() => ({
-		...rpc.sessions.deleteSession.options(),
-		onSuccess: () => {
-			toast.success('Session deleted successfully');
-			goto(`/workspaces/${workspaceConfig.id}`);
-		},
-		onError: (error) => {
-			toast.error(error.title, {
-				description: error.description,
-			});
-		},
-	}));
-
-	const shareSessionMutation = createMutation(() => ({
-		...rpc.sessions.shareSession.options(),
-		onSuccess: () => {
-			toast.success('Session shared successfully');
-		},
-		onError: (error) => {
-			toast.error(error.title, {
-				description: error.description,
-			});
-		},
-	}));
-
-	const unshareSessionMutation = createMutation(() => ({
-		...rpc.sessions.unshareSession.options(),
-		onSuccess: () => {
-			toast.success('Session unshared successfully');
-		},
-		onError: (error) => {
-			toast.error(error.title, {
-				description: error.description,
-			});
-		},
-	}));
-
-	const abortSessionMutation = createMutation(() => ({
-		...rpc.sessions.abortSession.options(),
-		onSuccess: () => {
-			toast.success('Session aborted successfully');
-		},
-		onError: (error) => {
-			toast.error(error.title, {
-				description: error.description,
-			});
-		},
-	}));
+	const sendMessageMutation = createMutation(rpc.messages.sendMessage.options);
+	const deleteSessionMutation = createMutation(rpc.sessions.deleteSession.options);
+	const shareSessionMutation = createMutation(rpc.sessions.shareSession.options);
+	const unshareSessionMutation = createMutation(rpc.sessions.unshareSession.options);
+	const abortSessionMutation = createMutation(rpc.sessions.abortSession.options);
 
 	// Create message subscriber
 	const messages = createMessageSubscriber(
@@ -203,16 +156,49 @@
 						<Badge variant="secondary">Shared</Badge>
 					{/if}
 					{#if isProcessing}
-						<Button size="sm" variant="destructive" onclick={() => abortSessionMutation.mutate({ workspaceConfig, sessionId })}>
+						<Button size="sm" variant="destructive" onclick={() => {
+							abortSessionMutation.mutate({ workspaceConfig, sessionId }, {
+								onSuccess: () => {
+									toast.success('Session aborted successfully');
+								},
+								onError: (error) => {
+									toast.error(error.title, {
+										description: error.description,
+									});
+								},
+							});
+						}}>
 							Abort
 						</Button>
 					{/if}
 					{#if sessionQuery.data.share?.url}
-						<Button size="sm" variant="outline" onclick={() => unshareSessionMutation.mutate({ workspaceConfig, sessionId })}>
+						<Button size="sm" variant="outline" onclick={() => {
+							unshareSessionMutation.mutate({ workspaceConfig, sessionId }, {
+								onSuccess: () => {
+									toast.success('Session unshared successfully');
+								},
+								onError: (error) => {
+									toast.error(error.title, {
+										description: error.description,
+									});
+								},
+							});
+						}}>
 							Unshare
 						</Button>
 					{:else}
-						<Button size="sm" variant="outline" onclick={() => shareSessionMutation.mutate({ workspaceConfig, sessionId })}>
+						<Button size="sm" variant="outline" onclick={() => {
+							shareSessionMutation.mutate({ workspaceConfig, sessionId }, {
+								onSuccess: () => {
+									toast.success('Session shared successfully');
+								},
+								onError: (error) => {
+									toast.error(error.title, {
+										description: error.description,
+									});
+								},
+							});
+						}}>
 							Share
 						</Button>
 					{/if}
@@ -277,7 +263,22 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action onclick={() => sessionQuery.data && deleteSessionMutation.mutate({ workspaceConfig, sessionId })}>Delete</AlertDialog.Action>
+				<AlertDialog.Action onclick={() => {
+					if (sessionQuery.data) {
+						deleteSessionMutation.mutate({ workspaceConfig, sessionId }, {
+							onSuccess: () => {
+								deleteDialogOpen = false;
+								toast.success('Session deleted successfully');
+								goto(`/workspaces/${workspaceConfig.id}`);
+							},
+							onError: (error) => {
+								toast.error(error.title, {
+									description: error.description,
+								});
+							},
+						});
+					}
+				}}>Delete</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
 	</AlertDialog.Root>
