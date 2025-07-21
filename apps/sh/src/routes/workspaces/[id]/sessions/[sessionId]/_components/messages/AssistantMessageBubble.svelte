@@ -65,21 +65,22 @@
 	<Chat.BubbleMessage class="flex flex-col gap-2" typing={isProcessing}>
 		<!-- Message Header with Status -->
 		<div class="flex items-center justify-between mb-1">
-			<div class="flex items-center gap-2">
-				<span class="text-sm font-medium">Assistant</span>
+			<div class="flex items-center gap-3">
+				<div class="flex items-center gap-2">
+					<span class="text-sm font-medium">Assistant</span>
+					{#if hasError}
+						<Badge variant="destructive" class="text-xs">
+							Error
+						</Badge>
+					{:else if isProcessing}
+						<Badge variant="secondary" class="text-xs">
+							Processing...
+						</Badge>
+					{/if}
+				</div>
 				{#if toolParts.length > 0}
 					<Badge variant="secondary" class="text-xs">
 						{toolParts.length} tool{toolParts.length > 1 ? 's' : ''}
-					</Badge>
-				{/if}
-				{#if isProcessing}
-					<Badge variant="outline" class="text-xs">
-						Processing...
-					</Badge>
-				{/if}
-				{#if hasError}
-					<Badge variant="destructive" class="text-xs">
-						Error
 					</Badge>
 				{/if}
 			</div>
@@ -149,20 +150,20 @@
 		{/if}
 
 		<!-- Message Footer with Metadata -->
-		<div class="flex items-center justify-between text-xs opacity-70 mt-1">
-			<div class="flex items-center gap-2">
+		<div class="flex items-center justify-between text-xs text-muted-foreground mt-2 pt-1 border-t border-border/50">
+			<div class="flex items-center gap-1">
 				<span>{formatDate(new Date(message.time.created))}</span>
 				{#if message.time.completed}
-					<span>•</span>
+					<span class="opacity-50">•</span>
 					<span>Completed {formatDate(new Date(message.time.completed))}</span>
 				{/if}
 			</div>
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-1">
 				{#if message.cost > 0}
-					<span>{formatCost(message.cost)}</span>
-					<span>•</span>
+					<span class="font-mono">{formatCost(message.cost)}</span>
+					<span class="opacity-50">•</span>
 				{/if}
-				<span>{formatTokens(message.tokens)}</span>
+				<span class="font-mono text-xs">{formatTokens(message.tokens)}</span>
 			</div>
 		</div>
 	</Chat.BubbleMessage>
