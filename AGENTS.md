@@ -16,6 +16,87 @@
   }
   ```
 
+# Mutation Pattern Preference
+
+## In Svelte Files (.svelte)
+Always prefer `createMutation` from TanStack Query for mutations. This provides:
+- Loading states (`isPending`)
+- Error states (`isError`)
+- Success states (`isSuccess`)
+- Better UX with automatic state management
+
+```svelte
+<script lang="ts">
+  import { createMutation } from '@tanstack/svelte-query';
+  import * as rpc from '$lib/query';
+
+  const deleteSessionMutation = createMutation({
+    ...rpc.sessions.deleteSession.options,
+    onSuccess: () => {
+      toast.success('Session deleted');
+      goto('/sessions');
+    },
+    onError: (error) => {
+      toast.error(error.title, { description: error.description });
+    },
+  });
+</script>
+
+<Button 
+  onclick={() => deleteSessionMutation.mutate({ sessionId })}
+  disabled={deleteSessionMutation.isPending}
+>
+  {#if deleteSessionMutation.isPending}
+    Deleting...
+  {:else}
+    Delete
+  {/if}
+</Button>
+```
+
+## In TypeScript Files (.ts)
+Always use `.execute()` since createMutation requires component context:
+
+```typescript
+// In a .ts file (e.g., load function, utility)
+const result = await rpc.sessions.createSession.execute({ 
+  body: { title: 'New Session' } 
+});
+
+const { data, error } = result;
+if (error) {
+  // Handle error
+} else if (data) {
+  // Handle success
+}
+```
+
+## Exception: When to Use .execute() in Svelte Files
+Only use `.execute()` in Svelte files when:
+1. You don't need loading states
+2. You're performing a one-off operation
+3. You need fine-grained control over async flow
+
+## Inline Simple Handler Functions
+When a handler function only calls `.mutate()`, inline it directly:
+
+```svelte
+<!-- Good: Inline simple handlers -->
+<Button onclick={() => shareMutation.mutate({ id })}>
+  Share
+</Button>
+
+<!-- Avoid: Unnecessary wrapper function -->
+<script>
+  function handleShare() {
+    shareMutation.mutate({ id });
+  }
+</script>
+<Button onclick={handleShare}>
+  Share
+</Button>
+```
+
 # Standard Workflow
 1. First think through the problem, read the codebase for relevant files, and write a plan to docs/specs/[timestamp] [feature-name].md where [timestamp] is the timestamp in YYYYMMDDThhmmss format and [feature-name] is the name of the feature.
 2. The plan should have a list of todo items that you can check off as you complete them
