@@ -41,8 +41,3 @@ export const sendMessage = defineMutation({
 	},
 });
 
-// Re-export the helper functions from messages.svelte.ts
-export {
-	isMessageProcessing,
-	isSessionProcessing,
-} from '$lib/stores/messages.svelte';

@@ -13,6 +13,7 @@
 	import { ChevronRight } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
+	import { createMutation } from '@tanstack/svelte-query';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
@@ -24,6 +25,10 @@
 			() => workspaceConfig,
 			() => sessionId,
 		).options,
+	);
+
+	const sendMessageMutation = createMutation(
+		rpc.messages.sendMessage.options,
 	);
 
 	// Create message subscriber
@@ -40,15 +45,19 @@
 	let deleteDialogOpen = $state(false);
 	let messageContent = $state('');
 	let messageMode = $state('chat');
-	let isSending = $state(false);
-	let selectedModel = $state<{ providerId: string; modelId: string } | null>(null);
+	let selectedModel = $state<{ providerId: string; modelId: string } | null>({
+		providerId: 'anthropic',
+		modelId: 'claude-sonnet-4-20250514'
+	});
 
 	const isProcessing = $derived(
-		rpc.messages.isSessionProcessing(messages.value),
+		messages.value.some((msg) => 
+			msg.info.role === 'assistant' && !msg.info.time.completed
+		),
 	);
 
 	const canSendMessage = $derived(
-		messageContent.trim().length > 0 && !isProcessing && !isSending && selectedModel !== null,
+		messageContent.trim().length > 0 && !isProcessing && !sendMessageMutation.isPending && selectedModel !== null,
 	);
 
 	async function handleDelete() {
@@ -120,8 +129,7 @@
 		const content = messageContent.trim();
 		messageContent = '';
 
-		isSending = true;
-		const result = await rpc.messages.sendMessage.execute({
+		sendMessageMutation.mutate({
 			workspaceConfig,
 			sessionId,
 			body: {
@@ -130,17 +138,13 @@
 				mode: messageMode,
 				parts: [{ type: 'text', text: content }],
 			},
+		}, {
+			onError: (error) => {
+				toast.error(error.title, {
+					description: error.description,
+				});
+			},
 		});
-
-		if (result.error) {
-			toast.error(result.error.title, {
-				description: result.error.description,
-			});
-			// Restore the message content on error
-			messageContent = content;
-		}
-
-		isSending = false;
 	}
 
 	async function handleFileUpload(_files: File[]) {
@@ -262,7 +266,7 @@
 				bind:value={messageContent}
 				onSubmit={handleSendMessage}
 				onFileUpload={handleFileUpload}
-				disabled={!canSendMessage}
+				disabled={sendMessageMutation.isPending || !selectedModel}
 				placeholder={isProcessing
 					? 'Waiting for response...'
 					: !selectedModel

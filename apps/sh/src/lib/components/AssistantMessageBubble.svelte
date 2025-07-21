@@ -4,7 +4,6 @@
 	import { Badge } from '@repo/ui/badge';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { formatDate } from '$lib/utils/date';
-	import { isMessageProcessing } from '$lib/stores/messages.svelte';
 	import MessagePartRenderer from './MessagePartRenderer.svelte';
 	import { Copy, MoreHorizontal, RotateCcw, Edit } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
@@ -12,7 +11,7 @@
 
 	let { message, parts }: { message: AssistantMessage; parts: Part[] } = $props();
 
-	const isProcessing = $derived(isMessageProcessing(message));
+	const isProcessing = $derived(!message.time.completed);
 	const toolParts = $derived(parts.filter(part => part.type === 'tool'));
 	const hasError = $derived(!!message.error);
 

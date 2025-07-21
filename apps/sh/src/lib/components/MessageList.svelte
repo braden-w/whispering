@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Chat from '@repo/ui/chat';
 	import { Skeleton } from '@repo/ui/skeleton';
-	import { isSessionProcessing, type Message } from '$lib/stores/messages.svelte';
+	import type { Message } from '$lib/stores/messages.svelte';
 	import UserMessageBubble from './UserMessageBubble.svelte';
 	import AssistantMessageBubble from './AssistantMessageBubble.svelte';
 
@@ -13,7 +13,11 @@
 		isLoading?: boolean;
 	} = $props();
 
-	const hasProcessingMessage = $derived(isSessionProcessing(messages));
+	const hasProcessingMessage = $derived(
+		messages.some((msg) => 
+			msg.info.role === 'assistant' && !msg.info.time.completed
+		)
+	);
 </script>
 
 {#if isLoading}
