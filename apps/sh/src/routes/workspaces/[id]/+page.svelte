@@ -10,7 +10,7 @@
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
 	import { ChevronRight } from 'lucide-svelte';
-	import WorkspaceConfigConnectionBadge from '$lib/components/WorkspaceConfigConnectionBadge.svelte';
+	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 
 	const workspaceId = $derived($page.params.id);
 	const workspaceConfig = $derived(getWorkspaceConfig(workspaceId));
@@ -65,7 +65,7 @@
 					</p>
 				</div>
 				<div class="flex items-center gap-4">
-					<WorkspaceConfigConnectionBadge workspaceConfig={workspaceConfig} />
+					<WorkspaceConnectionBadge workspaceConfig={workspaceConfig} />
 					{#if sessionsQuery && sessionsQuery.data}
 						<Badge variant="secondary" class="text-sm">
 							{sessionsQuery.data.length} session{sessionsQuery.data.length !==
