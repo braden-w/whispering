@@ -31,6 +31,10 @@ export const load = async ({ params }) => {
 			.options(),
 	);
 
+	const providers = await queryClient.ensureQueryData(
+		rpc.models.getProviders(() => workspaceConfig).options(),
+	);
+
 	const modes = await queryClient.ensureQueryData(
 		rpc.modes.getModes(() => workspaceConfig).options(),
 	);
@@ -41,5 +45,6 @@ export const load = async ({ params }) => {
 		session,
 		messages,
 		modes,
+		providers,
 	};
 };

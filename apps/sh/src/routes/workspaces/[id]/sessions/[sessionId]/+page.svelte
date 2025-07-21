@@ -229,9 +229,7 @@
 			</div>
 		{/if}
 
-		<div class="flex-1 overflow-y-auto">
-			<MessageList messages={messages.value} />
-		</div>
+		<MessageList messages={messages.value} />
 
 		<Separator />
 
