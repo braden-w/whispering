@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { ToolPart } from '$lib/client/types.gen';
 	import { Badge } from '@repo/ui/badge';
-	import { Button } from '@repo/ui/button';
 	import * as Collapsible from '@repo/ui/collapsible';
 	import { ChevronDown, ChevronRight, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-svelte';
+	import { cn } from '@repo/ui/utils';
+	import { buttonVariants } from '@repo/ui/button';
 
 	let { toolPart }: { toolPart: ToolPart } = $props();
 
@@ -64,8 +65,8 @@
 
 <div class="border rounded-lg p-3 bg-muted/30">
 	<Collapsible.Root bind:open={isOpen}>
-		<Collapsible.Trigger asChild let:builder>
-			<Button builders={[builder]} variant="ghost" class="w-full justify-between p-0 h-auto">
+		<Collapsible.Trigger class={cn(buttonVariants({variant: 'ghost'}), 'w-full justify-between p-0 h-auto')}>
+			
 				<div class="flex items-center gap-2">
 					<svelte:component 
 						this={statusConfig.icon} 
@@ -97,7 +98,7 @@
 						<ChevronRight class="h-4 w-4" />
 					{/if}
 				</div>
-			</Button>
+			
 		</Collapsible.Trigger>
 		
 		<Collapsible.Content class="mt-3">
