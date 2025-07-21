@@ -3,6 +3,7 @@
 	import { Badge } from '@repo/ui/badge';
 	import { Button } from '@repo/ui/button';
 	import { Download, File, Image, Video, Music } from 'lucide-svelte';
+	import { parseMarkdown } from '$lib/utils/markdown';
 
 	let { part }: { part: Part } = $props();
 
@@ -32,8 +33,8 @@
 </script>
 
 {#if part.type === 'text'}
-	<div class="whitespace-pre-wrap break-words">
-		{part.text}
+	<div class="break-words">
+		{@html parseMarkdown(part.text)}
 		{#if part.synthetic}
 			<Badge variant="outline" class="ml-2 text-xs">Synthetic</Badge>
 		{/if}
