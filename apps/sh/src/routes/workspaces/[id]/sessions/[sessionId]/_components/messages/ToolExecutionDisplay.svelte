@@ -10,19 +10,19 @@
 
 	let isOpen = $state(false);
 
-	const statusConfig = $derived(() => {
+	const statusConfig = $derived.by(() => {
 		switch (toolPart.state.status) {
 			case 'pending':
 				return {
 					icon: Clock,
-					variant: 'outline' as const,
+					variant: 'secondary' as const,
 					label: 'Pending',
 					color: 'text-muted-foreground'
 				};
 			case 'running':
 				return {
 					icon: Loader2,
-					variant: 'outline' as const,
+					variant: 'secondary' as const,
 					label: 'Running',
 					color: 'text-blue-500',
 					animate: true
@@ -44,12 +44,14 @@
 			default:
 				return {
 					icon: Clock,
-					variant: 'outline' as const,
+					variant: 'secondary' as const,
 					label: 'Unknown',
 					color: 'text-muted-foreground'
 				};
 		}
 	});
+
+	const StatusIcon = $derived(statusConfig.icon);
 
 	function formatDuration(start: number, end?: number): string {
 		const duration = (end || Date.now()) - start;
@@ -68,8 +70,7 @@
 		<Collapsible.Trigger class={cn(buttonVariants({variant: 'ghost'}), 'w-full justify-between p-0 h-auto')}>
 			
 				<div class="flex items-center gap-2">
-					<svelte:component 
-						this={statusConfig.icon} 
+					<StatusIcon 
 						class="h-4 w-4 {statusConfig.color} {statusConfig.animate ? 'animate-spin' : ''}" 
 					/>
 					<span class="font-medium text-sm">{toolPart.tool}</span>
