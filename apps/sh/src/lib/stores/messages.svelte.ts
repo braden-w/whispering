@@ -117,17 +117,6 @@ export function createMessageSubscriber({
 
 			// Handle different part types
 			if (part.type === 'text') {
-				console.log('Processing text part:', {
-					partId: part.id,
-					partText: part.text,
-					synthetic: part.synthetic,
-					currentParts: msg.parts.map((p) => ({
-						type: p.type,
-						id: p.id,
-						text: p.type === 'text' ? p.text : undefined,
-					})),
-				});
-
 				// Check if this part already exists (streaming update)
 				const existingIndex = msg.parts.findIndex(
 					(p) => p.type === 'text' && p.id === part.id,
