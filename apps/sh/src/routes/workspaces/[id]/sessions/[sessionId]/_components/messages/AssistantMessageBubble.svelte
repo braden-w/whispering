@@ -62,7 +62,7 @@
 			{getAssistantInitials()}
 		</Chat.BubbleAvatarFallback>
 	</Chat.BubbleAvatar>
-	<Chat.BubbleMessage class="flex flex-col gap-2" typing={isProcessing}>
+	<Chat.BubbleMessage class="flex flex-col gap-2 prose" typing={isProcessing}>
 		<!-- Message Header with Status -->
 		<div class="flex items-center justify-between mb-1">
 			<div class="flex items-center gap-3">
