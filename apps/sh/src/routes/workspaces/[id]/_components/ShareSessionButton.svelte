@@ -52,28 +52,22 @@
 
 {#if isShared}
 	<Button
-		size="sm"
-		variant="outline"
+		size="icon"
+		variant="ghost"
 		onclick={handleUnshare}
 		disabled={unshareSessionMutation.isPending}
+		title="Unshare session"
 	>
-		{#if unshareSessionMutation.isPending}
-			Unsharing...
-		{:else}
-			Unshare
-		{/if}
+		<Link class="h-4 w-4" />
 	</Button>
 {:else}
 	<Button
-		size="sm"
-		variant="outline"
+		size="icon"
+		variant="ghost"
 		onclick={handleShare}
 		disabled={shareSessionMutation.isPending}
+		title="Share session"
 	>
-		{#if shareSessionMutation.isPending}
-			Sharing...
-		{:else}
-			Share
-		{/if}
+		<Share class="h-4 w-4" />
 	</Button>
 {/if}

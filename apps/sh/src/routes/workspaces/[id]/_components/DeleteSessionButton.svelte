@@ -6,6 +6,7 @@
 	import * as rpc from '$lib/query';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { createMutation } from '@tanstack/svelte-query';
+	import { Trash2 } from 'lucide-svelte';
 
 	let { session, workspaceConfig }: { 
 		session: Session; 
@@ -36,7 +37,9 @@
 
 <AlertDialog.Root bind:open>
 	<AlertDialog.Trigger>
-		<Button size="sm" variant="destructive">Delete</Button>
+		<Button size="icon" variant="ghost" title="Delete session">
+			<Trash2 class="h-4 w-4" />
+		</Button>
 	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
