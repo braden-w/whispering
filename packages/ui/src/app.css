@@ -2,6 +2,8 @@
 
 @import 'tw-animate-css';
 
+@import './prose.css';
+
 @source "./**/*.{svelte,ts}";
 
 @plugin '@tailwindcss/typography';
