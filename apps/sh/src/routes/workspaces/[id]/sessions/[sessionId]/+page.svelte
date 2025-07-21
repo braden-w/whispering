@@ -9,23 +9,15 @@
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
 	import { Separator } from '@repo/ui/separator';
-	import { createQuery } from '@tanstack/svelte-query';
-	import { ChevronRight } from 'lucide-svelte';
+		import { ChevronRight } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 	import { createMutation } from '@tanstack/svelte-query';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
-	const sessionId = $derived(data.sessionId);
-
-	// Create session query with workspace accessor
-	const sessionQuery = createQuery(
-		rpc.sessions.getSessionById(
-			() => workspaceConfig,
-			() => sessionId,
-		).options,
-	);
+	const session = $derived(data.session);
+	const sessionId = $derived(session.id);
 
 	const sendMessageMutation = createMutation(rpc.messages.sendMessage.options);
 	const deleteSessionMutation = createMutation(rpc.sessions.deleteSession.options);
@@ -102,7 +94,7 @@
 	}
 </script>
 
-{#if sessionQuery}
+{#if session}
 	<div class="flex flex-col h-[calc(100vh-3.5rem)] px-4 sm:px-6 py-4">
 		<!-- Breadcrumb Navigation -->
 		<Breadcrumb.Root class="mb-3 sm:mb-4">
@@ -123,36 +115,36 @@
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
 					<Breadcrumb.Page class="text-xs sm:text-sm">
-						{sessionQuery.data?.title || 'Untitled Session'}
+						{session?.title || 'Untitled Session'}
 					</Breadcrumb.Page>
 				</Breadcrumb.Item>
 			</Breadcrumb.List>
 		</Breadcrumb.Root>
 
-		{#if sessionQuery.data}
+		{#if session}
 			<!-- <div class="flex items-center justify-between pb-4 border-b">
 				<div>
 					<h1 class="text-2xl font-bold">
-						{sessionQuery.data.title || 'Untitled Session'}
+						{session.title || 'Untitled Session'}
 					</h1>
 					<div
 						class="flex items-center gap-4 mt-1 text-sm text-muted-foreground"
 					>
 						<span
 							>Created {formatDate(
-								new Date(sessionQuery.data.time.created),
+								new Date(session.time.created),
 							)}</span
 						>
 						<span>•</span>
 						<span
 							>Updated {formatDate(
-								new Date(sessionQuery.data.time.updated),
+								new Date(session.time.updated),
 							)}</span
 						>
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
-					{#if sessionQuery.data.share?.url}
+					{#if session.share?.url}
 						<Badge variant="secondary">Shared</Badge>
 					{/if}
 					{#if isProcessing}
@@ -171,7 +163,7 @@
 							Abort
 						</Button>
 					{/if}
-					{#if sessionQuery.data.share?.url}
+					{#if session.share?.url}
 						<Button size="sm" variant="outline" onclick={() => {
 							unshareSessionMutation.mutate({ workspaceConfig, sessionId }, {
 								onSuccess: () => {
@@ -216,7 +208,7 @@
 		<div class="flex-1 overflow-y-auto">
 			<MessageList
 				messages={messages.value}
-				isLoading={sessionQuery.isPending}
+				isLoading={false}
 			/>
 		</div>
 
@@ -257,27 +249,25 @@
 				<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 				<AlertDialog.Description>
 					This action cannot be undone. This will permanently delete the session
-					"{sessionQuery.data?.title ?? 'Untitled Session'}" and all its
+					"{session?.title ?? 'Untitled Session'}" and all its
 					messages.
 				</AlertDialog.Description>
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 				<AlertDialog.Action onclick={() => {
-					if (sessionQuery.data) {
-						deleteSessionMutation.mutate({ workspaceConfig, sessionId }, {
-							onSuccess: () => {
-								deleteDialogOpen = false;
-								toast.success('Session deleted successfully');
-								goto(`/workspaces/${workspaceConfig.id}`);
-							},
-							onError: (error) => {
-								toast.error(error.title, {
-									description: error.description,
-								});
-							},
-						});
-					}
+					deleteSessionMutation.mutate({ workspaceConfig, sessionId }, {
+						onSuccess: () => {
+							deleteDialogOpen = false;
+							toast.success('Session deleted successfully');
+							goto(`/workspaces/${workspaceConfig.id}`);
+						},
+						onError: (error) => {
+							toast.error(error.title, {
+								description: error.description,
+							});
+						},
+					});
 				}}>Delete</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
