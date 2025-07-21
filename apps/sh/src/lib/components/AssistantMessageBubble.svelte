@@ -1,21 +1,19 @@
 <script lang="ts">
-	import type { AssistantMessage } from '$lib/client/types.gen';
+	import type { AssistantMessage, Part } from '$lib/client/types.gen';
 	import * as Chat from '@repo/ui/chat';
-	import * as Avatar from '@repo/ui/avatar';
 	import { Badge } from '@repo/ui/badge';
-	import { Button } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { formatDate } from '$lib/utils/date';
 	import { isMessageProcessing } from '$lib/stores/messages.svelte';
 	import MessagePartRenderer from './MessagePartRenderer.svelte';
-	import ToolExecutionDisplay from './ToolExecutionDisplay.svelte';
 	import { Copy, MoreHorizontal, RotateCcw, Edit } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import { buttonVariants } from '@repo/ui/button';
 
-	let { message }: { message: AssistantMessage } = $props();
+	let { message, parts }: { message: AssistantMessage; parts: Part[] } = $props();
 
 	const isProcessing = $derived(isMessageProcessing(message));
-	const toolParts = $derived(message.parts.filter(part => part.type === 'tool'));
+	const toolParts = $derived(parts.filter(part => part.type === 'tool'));
 	const hasError = $derived(!!message.error);
 
 	function getAssistantInitials(): string {
@@ -31,7 +29,7 @@
 	}
 
 	function getMessageText(): string {
-		const textParts = message.parts.filter(part => part.type === 'text');
+		const textParts = parts.filter(part => part.type === 'text');
 		return textParts.map(part => part.text).join('\n');
 	}
 
@@ -90,10 +88,8 @@
 			<!-- Message Actions -->
 			{#if !isProcessing}
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder>
-						<Button builders={[builder]} variant="ghost" size="sm" class="h-6 w-6 p-0">
-							<MoreHorizontal class="h-3 w-3" />
-						</Button>
+					<DropdownMenu.Trigger class={buttonVariants({variant: 'ghost', size: 'icon'})}>
+							<MoreHorizontal />
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content align="end">
 						<DropdownMenu.Item onclick={copyMessage}>
@@ -115,7 +111,7 @@
 
 		<!-- Message Content -->
 		<div class="prose prose-sm dark:prose-invert max-w-none">
-			{#each message.parts as part}
+			{#each parts as part}
 				<MessagePartRenderer {part} />
 			{/each}
 		</div>
@@ -124,7 +120,8 @@
 		{#if toolParts.length > 0}
 			<div class="mt-2 space-y-2">
 				{#each toolParts as toolPart}
-					<ToolExecutionDisplay {toolPart} />
+					<!-- <ToolExecutionDisplay {toolPart} /> -->
+					<MessagePartRenderer part={toolPart} />
 				{/each}
 			</div>
 		{/if}
@@ -151,10 +148,10 @@
 		<!-- Message Footer with Metadata -->
 		<div class="flex items-center justify-between text-xs opacity-70 mt-1">
 			<div class="flex items-center gap-2">
-				<span>{formatDate(message.time.created)}</span>
+				<span>{formatDate(new Date(message.time.created))}</span>
 				{#if message.time.completed}
 					<span>•</span>
-					<span>Completed {formatDate(message.time.completed)}</span>
+					<span>Completed {formatDate(new Date(message.time.completed))}</span>
 				{/if}
 			</div>
 			<div class="flex items-center gap-2">

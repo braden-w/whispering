@@ -1,12 +1,7 @@
 <script lang="ts">
-	import type {
-		Message,
-		UserMessage,
-		AssistantMessage,
-	} from '$lib/client/types.gen';
 	import * as Chat from '@repo/ui/chat';
 	import { Skeleton } from '@repo/ui/skeleton';
-	import { isSessionProcessing } from '$lib/stores/messages.svelte';
+	import { isSessionProcessing, type Message } from '$lib/stores/messages.svelte';
 	import UserMessageBubble from './UserMessageBubble.svelte';
 	import AssistantMessageBubble from './AssistantMessageBubble.svelte';
 
@@ -19,14 +14,6 @@
 	} = $props();
 
 	const hasProcessingMessage = $derived(isSessionProcessing(messages));
-
-	function isUserMessage(message: Message): message is UserMessage {
-		return message.role === 'user';
-	}
-
-	function isAssistantMessage(message: Message): message is AssistantMessage {
-		return message.role === 'assistant';
-	}
 </script>
 
 {#if isLoading}
@@ -59,11 +46,11 @@
 	</div>
 {:else}
 	<Chat.List class="flex-1">
-		{#each messages as message (message.id)}
-			{#if isUserMessage(message)}
-				<UserMessageBubble {message} />
-			{:else if isAssistantMessage(message)}
-				<AssistantMessageBubble {message} />
+		{#each messages as message}
+			{#if message.info.role === 'user'}
+				<UserMessageBubble message={message.info} parts={message.parts} />
+			{:else if message.info.role === 'assistant'}
+				<AssistantMessageBubble message={message.info} parts={message.parts} />
 			{/if}
 		{/each}
 		

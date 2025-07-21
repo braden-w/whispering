@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { UserMessagePart, AssistantMessagePart } from '$lib/client/types.gen';
+	import type { Part } from '$lib/client/types.gen';
 	import { Badge } from '@repo/ui/badge';
 	import { Button } from '@repo/ui/button';
 	import { Download, File, Image, Video, Music } from 'lucide-svelte';
 
-	let { part }: { part: UserMessagePart | AssistantMessagePart } = $props();
+	let { part }: { part: Part } = $props();
 
 	function getFileIcon(mimeType: string) {
 		if (mimeType.startsWith('image/')) return Image;

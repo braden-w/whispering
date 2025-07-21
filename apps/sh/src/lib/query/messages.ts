@@ -1,11 +1,10 @@
 import * as api from '$lib/client/sdk.gen';
 import type {
 	PostSessionByIdMessageData,
-	UserMessagePart,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
 import { ShErr } from '$lib/result';
-import type { Workspace } from '$lib/stores/workspaces.svelte';
+import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
 import { defineMutation } from './_client';
@@ -18,7 +17,7 @@ export const sendMessage = defineMutation({
 		sessionId,
 		body,
 	}: {
-		workspace: Workspace;
+		workspace: WorkspaceConfig;
 		sessionId: string;
 		body: PostSessionByIdMessageData['body'];
 	}) => {

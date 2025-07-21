@@ -4,19 +4,22 @@ import type {
 	EventMessagePartUpdated,
 	EventMessageRemoved,
 	EventMessageUpdated,
-	Message,
+	Message as MessageInfo,
+	Part,
 } from '$lib/client/types.gen';
 import { createWorkspaceClient } from '$lib/client/workspace-client';
 import type { WorkspaceConfig } from '$lib/stores/workspaces.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 import { createSubscriber } from 'svelte/reactivity';
 
+export type Message = { info: MessageInfo; parts: Part[] };
+
 /**
  * Creates a reactive message subscriber that combines initial fetch with SSE updates
  *
  * @param workspace - Accessor to the workspace configuration
  * @param sessionId - Accessor to the session ID
- * @returns A reactive value containing the messages array
+ * @returns A reactive value containing the messages with their parts
  *
  * @example
  * ```ts
@@ -35,6 +38,7 @@ export function createMessageSubscriber(
 	workspace: Accessor<WorkspaceConfig>,
 	sessionId: Accessor<string>,
 ) {
+	// Using the exact type returned by the API: Array<{ info: Message; parts: Array<Part> }>
 	let messages = $state<Message[]>([]);
 	let eventSource: EventSource | null = null;
 
@@ -46,26 +50,38 @@ export function createMessageSubscriber(
 	 * @remarks
 	 * This is typically used when receiving a `message.updated` event which contains
 	 * the full message state. If a message with the same ID exists, it will be
-	 * replaced entirely. Otherwise, the message is appended to the end of the array.
+	 * replaced entirely while preserving its parts. Otherwise, the message is
+	 * appended to the end of the array with empty parts.
 	 */
-	function upsertMessage(updatedMessage: Message) {
+	function upsertMessage(updatedMessage: MessageInfo) {
 		const existingIndex = messages.findIndex(
-			(msg) => msg.id === updatedMessage.id,
+			(msg) => msg.info.id === updatedMessage.id,
 		);
 
 		if (existingIndex >= 0) {
+			// Preserve existing parts when updating message info
 			messages = [
 				...messages.slice(0, existingIndex),
-				updatedMessage,
+				{
+					info: updatedMessage,
+					parts: messages[existingIndex].parts,
+				},
 				...messages.slice(existingIndex + 1),
 			];
 		} else {
-			messages = [...messages, updatedMessage];
+			// Add new message with empty parts array
+			messages = [
+				...messages,
+				{
+					info: updatedMessage,
+					parts: [],
+				},
+			];
 		}
 	}
 
 	/**
-	 * Merges a streaming message part into an existing assistant message
+	 * Merges a streaming message part into an existing message's parts array
 	 *
 	 * @param messageId - The ID of the message to update
 	 * @param part - The message part to merge (text, tool, or step marker)
@@ -82,20 +98,18 @@ export function createMessageSubscriber(
 	 * // Part 2: { type: 'text', text: ' world' }
 	 * // Result: [{ type: 'text', text: 'Hello world' }]
 	 */
-	function mergeStreamingPart(
-		messageId: string,
-		part: EventMessagePartUpdated['properties']['part'],
-	) {
+	function mergeStreamingPart(messageId: string, part: Part) {
 		messages = messages.map((msg) => {
-			if (msg.id !== messageId || msg.role !== 'assistant') return msg;
+			if (msg.info.id !== messageId || msg.info.role !== 'assistant')
+				return msg;
 
 			// Handle different part types
 			if (part.type === 'text') {
 				// For text parts, check if we should append or add new
 				const lastPart = msg.parts[msg.parts.length - 1];
 
-				if (lastPart?.type === 'text' && !('id' in lastPart)) {
-					// Append to the last text part if it exists
+				if (lastPart?.type === 'text' && !part.synthetic) {
+					// Append to the last text part if it exists and the new part is not synthetic
 					const updatedParts = [...msg.parts];
 					updatedParts[updatedParts.length - 1] = {
 						...lastPart,
@@ -121,7 +135,7 @@ export function createMessageSubscriber(
 				return { ...msg, parts: [...msg.parts, part] };
 			}
 
-			// For step-start and step-finish, just append
+			// For other part types (step-start, step-finish, snapshot, file), just append
 			return { ...msg, parts: [...msg.parts, part] };
 		});
 	}
@@ -138,7 +152,7 @@ export function createMessageSubscriber(
 	 * - A message is reverted/regenerated
 	 */
 	function deleteMessageById(messageId: string) {
-		messages = messages.filter((m) => m.id !== messageId);
+		messages = messages.filter((m) => m.info.id !== messageId);
 	}
 
 	/**
@@ -160,6 +174,7 @@ export function createMessageSubscriber(
 		});
 
 		if (!error && data) {
+			// data is already Array<{ info: Message; parts: Part[] }>
 			messages = data;
 		}
 	}
@@ -210,8 +225,12 @@ export function createMessageSubscriber(
 		// Handle message part updates (streaming)
 		eventSource.addEventListener('message.part.updated', (event) => {
 			const data = parseEventData<EventMessagePartUpdated>(event);
-			if (data && data.properties.sessionID === sessionId()) {
-				mergeStreamingPart(data.properties.messageID, data.properties.part);
+			// Parts have their own sessionID and messageID
+			if (data && data.properties.part.sessionID === sessionId()) {
+				mergeStreamingPart(
+					data.properties.part.messageID,
+					data.properties.part,
+				);
 				update();
 			}
 		});
@@ -267,9 +286,9 @@ export function createMessageSubscriber(
  * }
  * ```
  */
-export function isMessageProcessing(message: Message): boolean {
+export function isMessageProcessing(message: MessageInfo | AssistantMessage): boolean {
 	if (message.role !== 'assistant') return false;
-	return !message.time?.completed;
+	return !('completed' in message.time && message.time.completed);
 }
 
 /**
@@ -291,5 +310,5 @@ export function isMessageProcessing(message: Message): boolean {
  * ```
  */
 export function isSessionProcessing(messages: Message[]): boolean {
-	return messages.some(isMessageProcessing);
+	return messages.some((msg) => isMessageProcessing(msg.info));
 }
