@@ -16,6 +16,7 @@
 		import { ChevronRight } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
+	import { buttonVariants } from '@repo/ui/button';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
@@ -34,8 +35,6 @@
 		sessionId: () => sessionId,
 		initialMessages: () => data.messages ?? [],
 	});
-
-	let deleteDialogOpen = $state(false);
 	let messageContent = $state('');
 	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
 	let selectedModel = $state<{ providerId: string; modelId: string } | null>({
@@ -193,13 +192,39 @@
 							Share
 						</Button>
 					{/if}
-					<Button
-						size="sm"
-						variant="destructive"
-						onclick={() => (deleteDialogOpen = true)}
-					>
-						Delete
-					</Button>
+					<AlertDialog.Root>
+						<AlertDialog.Trigger class={buttonVariants({ size: 'sm', variant: 'destructive' })}>
+							
+								Delete
+							
+						</AlertDialog.Trigger>
+						<AlertDialog.Content>
+							<AlertDialog.Header>
+								<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+								<AlertDialog.Description>
+									This action cannot be undone. This will permanently delete the session
+									"{session?.title ?? 'Untitled Session'}" and all its
+									messages.
+								</AlertDialog.Description>
+							</AlertDialog.Header>
+							<AlertDialog.Footer>
+								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+								<AlertDialog.Action onclick={() => {
+									deleteSessionMutation.mutate({ workspaceConfig, sessionId }, {
+										onSuccess: () => {
+											toast.success('Session deleted successfully');
+											goto(`/workspaces/${workspaceConfig.id}`);
+										},
+										onError: (error) => {
+											toast.error(error.title, {
+												description: error.description,
+											});
+										},
+									});
+								}}>Delete</AlertDialog.Action>
+							</AlertDialog.Footer>
+						</AlertDialog.Content>
+					</AlertDialog.Root>
 				</div>
 			</div>
 		{/if}
@@ -238,34 +263,4 @@
 			/>
 		</div>
 	</div>
-
-	<AlertDialog.Root bind:open={deleteDialogOpen}>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-				<AlertDialog.Description>
-					This action cannot be undone. This will permanently delete the session
-					"{session?.title ?? 'Untitled Session'}" and all its
-					messages.
-				</AlertDialog.Description>
-			</AlertDialog.Header>
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action onclick={() => {
-					deleteSessionMutation.mutate({ workspaceConfig, sessionId }, {
-						onSuccess: () => {
-							deleteDialogOpen = false;
-							toast.success('Session deleted successfully');
-							goto(`/workspaces/${workspaceConfig.id}`);
-						},
-						onError: (error) => {
-							toast.error(error.title, {
-								description: error.description,
-							});
-						},
-					});
-				}}>Delete</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
 {/if}
