@@ -3,7 +3,7 @@
 </script>
 
 <div
-	class="container max-w-screen-2xl flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] px-4 sm:px-6 lg:px-8"
+	class="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] px-4 sm:px-6"
 >
 	<h1 class="text-4xl font-bold tracking-tight mb-4">
 		Welcome to epicenter.sh

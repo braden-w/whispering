@@ -19,7 +19,7 @@
 		<header
 			class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 		>
-			<div class="container max-w-screen-2xl px-4 sm:px-6 lg:px-8">
+			<div class="px-4 sm:px-6">
 				<div class="flex h-14 items-center">
 					<div class="mr-4 flex">
 						<a href="/" class="mr-4 flex items-center space-x-2 lg:mr-6">

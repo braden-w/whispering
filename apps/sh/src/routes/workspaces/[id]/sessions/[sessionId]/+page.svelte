@@ -150,7 +150,7 @@
 </script>
 
 {#if sessionQuery}
-	<div class="flex flex-col h-[calc(100vh-3.5rem)] w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+	<div class="flex flex-col h-[calc(100vh-3.5rem)] px-4 sm:px-6 py-4">
 		<!-- Breadcrumb Navigation -->
 		<Breadcrumb.Root class="mb-3 sm:mb-4">
 			<Breadcrumb.List>

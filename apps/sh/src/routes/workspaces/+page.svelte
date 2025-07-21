@@ -74,7 +74,7 @@
 
 </script>
 
-<div class="container max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+<div class="px-4 sm:px-6 py-6 sm:py-8">
 	<div class="flex items-center justify-between mb-6">
 		<div>
 			<h1 class="text-3xl font-bold tracking-tight">Workspaces</h1>

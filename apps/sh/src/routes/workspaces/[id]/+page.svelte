@@ -36,7 +36,7 @@
 	<!-- Breadcrumb Section -->
 	<div class="border-b">
 		<div
-			class="container flex h-14 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8"
+			class="flex h-14 items-center px-4 sm:px-6"
 		>
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
@@ -55,7 +55,7 @@
 	</div>
 
 	<!-- Page Content -->
-	<div class="container max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+	<div class="px-4 sm:px-6 py-6 sm:py-8">
 		<div class="space-y-6">
 			<div class="flex items-center justify-between">
 				<div>
