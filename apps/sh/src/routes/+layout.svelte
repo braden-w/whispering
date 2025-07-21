@@ -1,13 +1,13 @@
 <script lang="ts">
 	import '@repo/ui/app.css';
-	import { QueryClientProvider } from '@tanstack/svelte-query';
-	import { queryClient } from '$lib/query/_client';
-	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
-	import { Button } from '@repo/ui/button';
 	import { page } from '$app/stores';
-	import { Toaster } from 'svelte-sonner';
-	import { User, Settings } from 'lucide-svelte';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
+	import { queryClient } from '$lib/query/_client';
+	import { Button } from '@repo/ui/button';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
+	import { Settings, User } from 'lucide-svelte';
+	import { Toaster } from 'svelte-sonner';
 
 	let { children } = $props();
 	let settingsOpen = $state(false);

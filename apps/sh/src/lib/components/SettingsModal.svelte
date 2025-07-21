@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as Modal from '@repo/ui/modal';
+	import { settings } from '$lib/stores/settings.svelte';
 	import { Button } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
-	import { settings } from '$lib/stores/settings.svelte';
+	import * as Modal from '@repo/ui/modal';
 	import { toast } from 'svelte-sonner';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
@@ -27,8 +27,8 @@
 		}
 
 		settings.value = {
-			defaultUsername: username,
 			defaultPassword: password,
+			defaultUsername: username,
 		};
 
 		toast.success('Settings saved successfully');

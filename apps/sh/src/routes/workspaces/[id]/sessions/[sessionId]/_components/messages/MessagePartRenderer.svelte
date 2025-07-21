@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { Part } from '$lib/client/types.gen';
+
+	import { parseMarkdown } from '$lib/utils/markdown';
 	import { Badge } from '@repo/ui/badge';
 	import { Button } from '@repo/ui/button';
-	import { Download, File, Image, Video, Music } from 'lucide-svelte';
-	import { parseMarkdown } from '$lib/utils/markdown';
+	import { Download, File, Image, Music, Video } from 'lucide-svelte';
 
 	let { part }: { part: Part } = $props();
 

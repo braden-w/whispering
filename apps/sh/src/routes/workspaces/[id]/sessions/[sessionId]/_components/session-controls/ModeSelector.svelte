@@ -1,21 +1,22 @@
 <script lang="ts">
-	import * as ToggleGroup from '@repo/ui/toggle-group';
-	import { Skeleton } from '@repo/ui/skeleton';
-	import { MessageSquare, Lightbulb, Code } from 'lucide-svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
+	import * as rpc from '$lib/query';
+	import { Skeleton } from '@repo/ui/skeleton';
+	import * as ToggleGroup from '@repo/ui/toggle-group';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { Code, Lightbulb, MessageSquare } from 'lucide-svelte';
+
 	let {
-		workspaceConfig,
-		value = $bindable(),
-		onModeChange,
 		class: className,
+		onModeChange,
+		value = $bindable(),
+		workspaceConfig,
 	}: {
-		workspaceConfig: WorkspaceConfig;
-		value?: string;
-		onModeChange?: (mode: string) => void;
 		class?: string;
+		onModeChange?: (mode: string) => void;
+		value?: string;
+		workspaceConfig: WorkspaceConfig;
 	} = $props();
 
 	// Create query for modes
@@ -28,10 +29,10 @@
 	// Get icon for mode
 	function getModeIcon(modeName: string) {
 		switch (modeName) {
-			case 'plan':
-				return Lightbulb;
 			case 'build':
 				return Code;
+			case 'plan':
+				return Lightbulb;
 			default:
 				return MessageSquare;
 		}

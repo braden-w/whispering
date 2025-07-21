@@ -1,9 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import MessageInput from './_components/messages/MessageInput.svelte';
-	import MessageList from './_components/messages/MessageList.svelte';
-	import ModeSelector from './_components/session-controls/ModeSelector.svelte';
-	import ModelSelector from './_components/session-controls/ModelSelector.svelte';
 	import * as rpc from '$lib/query';
 	import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 	import { formatDate } from '$lib/utils/date';
@@ -11,12 +7,18 @@
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
 	import { Button } from '@repo/ui/button';
+	import { buttonVariants } from '@repo/ui/button';
 	import { Separator } from '@repo/ui/separator';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { ChevronRight } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+
 	import type { PageData } from './$types';
-	import { buttonVariants } from '@repo/ui/button';
+
+	import MessageInput from './_components/messages/MessageInput.svelte';
+	import MessageList from './_components/messages/MessageList.svelte';
+	import ModelSelector from './_components/session-controls/ModelSelector.svelte';
+	import ModeSelector from './_components/session-controls/ModeSelector.svelte';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
@@ -39,15 +41,15 @@
 
 	// Create message subscriber
 	const messages = createMessageSubscriber({
-		workspace: () => workspaceConfig,
-		sessionId: () => sessionId,
 		initialMessages: () => data.messages ?? [],
+		sessionId: () => sessionId,
+		workspace: () => workspaceConfig,
 	});
 	let messageContent = $state('');
 	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
-	let selectedModel = $state<{ providerId: string; modelId: string } | null>({
-		providerId: 'anthropic',
+	let selectedModel = $state<null | { modelId: string; providerId: string; }>({
 		modelId: 'claude-sonnet-4-20250514',
+		providerId: 'anthropic',
 	});
 
 	const isProcessing = $derived(
@@ -71,14 +73,14 @@
 
 		sendMessageMutation.mutate(
 			{
-				workspaceConfig,
-				sessionId,
 				body: {
-					providerID: selectedModel.providerId,
-					modelID: selectedModel.modelId,
 					mode: messageMode,
-					parts: [{ type: 'text', text: content }],
+					modelID: selectedModel.modelId,
+					parts: [{ text: content, type: 'text' }],
+					providerID: selectedModel.providerId,
 				},
+				sessionId,
+				workspaceConfig,
 			},
 			{
 				onError: (error) => {
@@ -161,15 +163,15 @@
 							variant="destructive"
 							onclick={() => {
 								abortSessionMutation.mutate(
-									{ workspaceConfig, sessionId },
+									{ sessionId, workspaceConfig },
 									{
-										onSuccess: () => {
-											toast.success('Session aborted successfully');
-										},
 										onError: (error) => {
 											toast.error(error.title, {
 												description: error.description,
 											});
+										},
+										onSuccess: () => {
+											toast.success('Session aborted successfully');
 										},
 									},
 								);
@@ -184,15 +186,15 @@
 							variant="outline"
 							onclick={() => {
 								unshareSessionMutation.mutate(
-									{ workspaceConfig, sessionId },
+									{ sessionId, workspaceConfig },
 									{
-										onSuccess: () => {
-											toast.success('Session unshared successfully');
-										},
 										onError: (error) => {
 											toast.error(error.title, {
 												description: error.description,
 											});
+										},
+										onSuccess: () => {
+											toast.success('Session unshared successfully');
 										},
 									},
 								);
@@ -206,15 +208,15 @@
 							variant="outline"
 							onclick={() => {
 								shareSessionMutation.mutate(
-									{ workspaceConfig, sessionId },
+									{ sessionId, workspaceConfig },
 									{
-										onSuccess: () => {
-											toast.success('Session shared successfully');
-										},
 										onError: (error) => {
 											toast.error(error.title, {
 												description: error.description,
 											});
+										},
+										onSuccess: () => {
+											toast.success('Session shared successfully');
 										},
 									},
 								);
@@ -243,16 +245,16 @@
 								<AlertDialog.Action
 									onclick={() => {
 										deleteSessionMutation.mutate(
-											{ workspaceConfig, sessionId },
+											{ sessionId, workspaceConfig },
 											{
-												onSuccess: () => {
-													toast.success('Session deleted successfully');
-													goto(`/workspaces/${workspaceConfig.id}`);
-												},
 												onError: (error) => {
 													toast.error(error.title, {
 														description: error.description,
 													});
+												},
+												onSuccess: () => {
+													toast.success('Session deleted successfully');
+													goto(`/workspaces/${workspaceConfig.id}`);
 												},
 											},
 										);

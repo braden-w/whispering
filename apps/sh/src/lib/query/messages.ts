@@ -1,12 +1,14 @@
-import * as api from '$lib/client/sdk.gen';
 import type { PostSessionByIdMessageData } from '$lib/client/types.gen';
-import { createWorkspaceClient } from '$lib/client/client.gen';
-import { ShErr } from '$lib/result';
 import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
+
+import { createWorkspaceClient } from '$lib/client/client.gen';
+import * as api from '$lib/client/sdk.gen';
+import { ShErr } from '$lib/result';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
-import { defineQuery, defineMutation } from './_client';
+
+import { defineMutation, defineQuery } from './_client';
 
 // Query for fetching messages by session ID
 export const getMessagesBySessionId = (
@@ -31,8 +33,8 @@ export const getMessagesBySessionId = (
 
 			if (error) {
 				return ShErr({
-					title: 'Failed to fetch messages',
 					description: extractErrorMessage(error),
+					title: 'Failed to fetch messages',
 				});
 			}
 
@@ -44,28 +46,28 @@ export const getMessagesBySessionId = (
 export const sendMessage = defineMutation({
 	mutationKey: ['sendMessage'],
 	resultMutationFn: async ({
-		workspaceConfig,
-		sessionId,
 		body,
+		sessionId,
+		workspaceConfig,
 	}: {
-		workspaceConfig: WorkspaceConfig;
-		sessionId: string;
 		body: PostSessionByIdMessageData['body'];
+		sessionId: string;
+		workspaceConfig: WorkspaceConfig;
 	}) => {
 		const client = createWorkspaceClient(workspaceConfig);
 
 		// TODO: Provider and model should come from workspace settings or user preferences
 		// For now, we'll use default values
 		const { data, error } = await api.postSessionByIdMessage({
+			body,
 			client,
 			path: { id: sessionId },
-			body,
 		});
 
 		if (error) {
 			return ShErr({
-				title: 'Failed to send message',
 				description: extractErrorMessage(error),
+				title: 'Failed to send message',
 			});
 		}
 		return Ok(data);

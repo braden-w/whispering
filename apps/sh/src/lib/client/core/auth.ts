@@ -1,12 +1,10 @@
-export type AuthToken = string | undefined;
-
 export interface Auth {
 	/**
 	 * Which part of the request do we use to send the auth?
 	 *
 	 * @default 'header'
 	 */
-	in?: 'header' | 'query' | 'cookie';
+	in?: 'cookie' | 'header' | 'query';
 	/**
 	 * Header or query parameter name.
 	 *
@@ -17,9 +15,11 @@ export interface Auth {
 	type: 'apiKey' | 'http';
 }
 
+export type AuthToken = string | undefined;
+
 export const getAuthToken = async (
 	auth: Auth,
-	callback: ((auth: Auth) => Promise<AuthToken> | AuthToken) | AuthToken,
+	callback: ((auth: Auth) => AuthToken | Promise<AuthToken>) | AuthToken,
 ): Promise<string | undefined> => {
 	const token =
 		typeof callback === 'function' ? await callback(auth) : callback;

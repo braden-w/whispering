@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { UserMessage, Part } from '$lib/client/types.gen';
-	import * as Chat from '@repo/ui/chat';
+	import type { Part, UserMessage } from '$lib/client/types.gen';
+
 	import { formatDate } from '$lib/utils/date';
+	import * as Chat from '@repo/ui/chat';
+
 	import MessagePartRenderer from './MessagePartRenderer.svelte';
 
 	let { message, parts }: { message: UserMessage; parts: Part[] } = $props();

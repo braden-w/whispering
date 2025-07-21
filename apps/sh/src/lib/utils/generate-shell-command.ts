@@ -1,8 +1,8 @@
 import type { Brand } from 'wellcrafted/brand';
 
-type Port = number & Brand<'Port'>;
-type UserName = string & Brand<'UserName'>;
-type Password = string & Brand<'Password'>;
+type Password = Brand<'Password'> & string;
+type Port = Brand<'Port'> & number;
+type UserName = Brand<'UserName'> & string;
 
 export const generateShellCommand = (
 	port: Port,

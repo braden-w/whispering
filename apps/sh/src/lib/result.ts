@@ -1,10 +1,11 @@
 import type { TaggedError } from 'wellcrafted/error';
+
 import { Err, type Ok } from 'wellcrafted/result';
 
 export type ShError = {
+	description: string;
 	name: 'ShError';
 	title: string;
-	description: string;
 };
 
 const ShError = (args: Omit<ShError, 'name'>): ShError => ({
@@ -14,7 +15,7 @@ const ShError = (args: Omit<ShError, 'name'>): ShError => ({
 
 export const ShErr = (args: Omit<ShError, 'name'>) => Err(ShError(args));
 
-export type ShResult<T> = Ok<T> | Err<ShError>;
+export type ShResult<T> = Err<ShError> | Ok<T>;
 
 export const fromTaggedError = (
 	error: TaggedError<string>,

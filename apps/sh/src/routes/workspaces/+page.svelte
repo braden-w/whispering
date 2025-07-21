@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { Button, buttonVariants } from '@repo/ui/button';
-	import * as Table from '@repo/ui/table';
-	import * as DropdownMenu from '@repo/ui/dropdown-menu';
-	import { Badge } from '@repo/ui/badge';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+
+	import { goto } from '$app/navigation';
+	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
+	import DeleteWorkspaceConfigButton from '$lib/components/DeleteWorkspaceConfigButton.svelte';
+	import EditWorkspaceConfigButton from '$lib/components/EditWorkspaceConfigButton.svelte';
+	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
+	import * as rpc from '$lib/query';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
-	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
-	import EditWorkspaceConfigButton from '$lib/components/EditWorkspaceConfigButton.svelte';
-	import { goto } from '$app/navigation';
-	import { Plus, ChevronDown, GitBranch } from 'lucide-svelte';
+	import { Badge } from '@repo/ui/badge';
+	import { Button, buttonVariants } from '@repo/ui/button';
+	import * as DropdownMenu from '@repo/ui/dropdown-menu';
+	import * as Table from '@repo/ui/table';
 	import * as Tooltip from '@repo/ui/tooltip';
-	import DeleteWorkspaceConfigButton from '$lib/components/DeleteWorkspaceConfigButton.svelte';
-	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
 	import { cn } from '@repo/ui/utils';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { ChevronDown, GitBranch, Plus } from 'lucide-svelte';
 
 	// Helper function to extract folder name from path (cross-platform)
 	function getFolderName(path: string): string {
@@ -26,26 +27,26 @@
 
 	// Define available columns
 	const columns = [
-		{ id: 'folderName', label: '', hideable: false }, // Empty label for folder name
-		{ id: 'gitPort', label: '', hideable: false }, // Empty label for Git/Port info
-		{ id: 'url', label: 'URL', hideable: true },
-		{ id: 'rootPath', label: 'Root Path', hideable: true },
-		{ id: 'cwd', label: 'CWD', hideable: true },
-		{ id: 'status', label: 'Status', hideable: false },
-		{ id: 'lastUsed', label: 'Last Used', hideable: true },
-		{ id: 'actions', label: 'Actions', hideable: false },
+		{ hideable: false, id: 'folderName', label: '' }, // Empty label for folder name
+		{ hideable: false, id: 'gitPort', label: '' }, // Empty label for Git/Port info
+		{ hideable: true, id: 'url', label: 'URL' },
+		{ hideable: true, id: 'rootPath', label: 'Root Path' },
+		{ hideable: true, id: 'cwd', label: 'CWD' },
+		{ hideable: false, id: 'status', label: 'Status' },
+		{ hideable: true, id: 'lastUsed', label: 'Last Used' },
+		{ hideable: false, id: 'actions', label: 'Actions' },
 	];
 
 	// Persisted column visibility state
 	let columnVisibility = $state({
+		actions: true,
+		cwd: false, // Hidden by default
 		folderName: true,
 		gitPort: true,
-		url: true,
-		rootPath: false, // Hidden by default
-		cwd: false, // Hidden by default
-		status: true,
 		lastUsed: true,
-		actions: true,
+		rootPath: false, // Hidden by default
+		status: true,
+		url: true,
 	});
 
 	const workspacesQuery = createQuery(() => ({

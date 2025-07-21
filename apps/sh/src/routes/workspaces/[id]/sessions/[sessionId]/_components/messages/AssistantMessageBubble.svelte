@@ -1,13 +1,15 @@
 <script lang="ts">
 	import type { AssistantMessage, Part } from '$lib/client/types.gen';
-	import * as Chat from '@repo/ui/chat';
-	import { Badge } from '@repo/ui/badge';
-	import * as DropdownMenu from '@repo/ui/dropdown-menu';
+
 	import { formatDate } from '$lib/utils/date';
-	import MessagePartRenderer from './MessagePartRenderer.svelte';
-	import { Copy, MoreHorizontal, RotateCcw, Edit } from 'lucide-svelte';
-	import { toast } from 'svelte-sonner';
+	import { Badge } from '@repo/ui/badge';
 	import { buttonVariants } from '@repo/ui/button';
+	import * as Chat from '@repo/ui/chat';
+	import * as DropdownMenu from '@repo/ui/dropdown-menu';
+	import { Copy, Edit, MoreHorizontal, RotateCcw } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
+
+	import MessagePartRenderer from './MessagePartRenderer.svelte';
 
 	let { message, parts }: { message: AssistantMessage; parts: Part[] } =
 		$props();
@@ -90,7 +92,7 @@
 			{#if !isProcessing}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger
-						class={buttonVariants({ variant: 'ghost', size: 'icon' })}
+						class={buttonVariants({ size: 'icon', variant: 'ghost' })}
 					>
 						<MoreHorizontal />
 					</DropdownMenu.Trigger>

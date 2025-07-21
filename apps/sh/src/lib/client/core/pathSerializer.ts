@@ -1,11 +1,8 @@
-interface SerializeOptions<T>
-	extends SerializePrimitiveOptions,
-		SerializerOptions<T> {}
+export type ArraySeparatorStyle = ArrayStyle | MatrixStyle;
 
-interface SerializePrimitiveOptions {
-	allowReserved?: boolean;
-	name: string;
-}
+export type ArrayStyle = 'form' | 'pipeDelimited' | 'spaceDelimited';
+
+export type ObjectStyle = 'deepObject' | 'form';
 
 export interface SerializerOptions<T> {
 	/**
@@ -14,12 +11,15 @@ export interface SerializerOptions<T> {
 	explode: boolean;
 	style: T;
 }
-
-export type ArrayStyle = 'form' | 'spaceDelimited' | 'pipeDelimited';
-export type ArraySeparatorStyle = ArrayStyle | MatrixStyle;
 type MatrixStyle = 'label' | 'matrix' | 'simple';
-export type ObjectStyle = 'form' | 'deepObject';
-type ObjectSeparatorStyle = ObjectStyle | MatrixStyle;
+type ObjectSeparatorStyle = MatrixStyle | ObjectStyle;
+interface SerializeOptions<T>
+	extends SerializePrimitiveOptions,
+		SerializerOptions<T> {}
+interface SerializePrimitiveOptions {
+	allowReserved?: boolean;
+	name: string;
+}
 
 interface SerializePrimitiveParam extends SerializePrimitiveOptions {
 	value: string;
@@ -134,7 +134,7 @@ export const serializeObjectParam = ({
 	value,
 	valueOnly,
 }: SerializeOptions<ObjectSeparatorStyle> & {
-	value: Record<string, unknown> | Date;
+	value: Date | Record<string, unknown>;
 	valueOnly?: boolean;
 }) => {
 	if (value instanceof Date) {

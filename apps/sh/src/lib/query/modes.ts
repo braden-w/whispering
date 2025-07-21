@@ -1,10 +1,12 @@
-import * as api from '$lib/client/sdk.gen';
-import { createWorkspaceClient } from '$lib/client/client.gen';
-import { ShErr } from '$lib/result';
 import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
+
+import { createWorkspaceClient } from '$lib/client/client.gen';
+import * as api from '$lib/client/sdk.gen';
+import { ShErr } from '$lib/result';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { Ok } from 'wellcrafted/result';
+
 import { defineQuery } from './_client';
 
 // Query for fetching available modes
@@ -17,8 +19,8 @@ export const getModes = (workspace: Accessor<WorkspaceConfig>) =>
 			const { data, error } = await api.getMode({ client });
 			if (error) {
 				return ShErr({
-					title: 'Failed to fetch modes',
 					description: extractErrorMessage(error),
+					title: 'Failed to fetch modes',
 				});
 			}
 

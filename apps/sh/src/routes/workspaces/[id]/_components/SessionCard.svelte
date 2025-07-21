@@ -1,14 +1,15 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	import * as Card from '@repo/ui/card';
-	import { Button, buttonVariants } from '@repo/ui/button';
-	import { Badge } from '@repo/ui/badge';
-	import { formatDistanceToNow } from '$lib/utils/date';
-	import { toast } from 'svelte-sonner';
+
 	import * as rpc from '$lib/query';
+	import { formatDistanceToNow } from '$lib/utils/date';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import { Badge } from '@repo/ui/badge';
+	import { Button, buttonVariants } from '@repo/ui/button';
+	import * as Card from '@repo/ui/card';
 	import { createMutation } from '@tanstack/svelte-query';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		session,
@@ -68,15 +69,15 @@
 					onclick={(e) => {
 						e.preventDefault();
 						unshareSessionMutation.mutate(
-							{ workspaceConfig, sessionId: session.id },
+							{ sessionId: session.id, workspaceConfig },
 							{
-								onSuccess: () => {
-									toast.success('Session unshared successfully');
-								},
 								onError: (error) => {
 									toast.error(error.title, {
 										description: error.description,
 									});
+								},
+								onSuccess: () => {
+									toast.success('Session unshared successfully');
 								},
 							},
 						);
@@ -91,15 +92,15 @@
 					onclick={(e) => {
 						e.preventDefault();
 						shareSessionMutation.mutate(
-							{ workspaceConfig, sessionId: session.id },
+							{ sessionId: session.id, workspaceConfig },
 							{
-								onSuccess: () => {
-									toast.success('Session shared successfully');
-								},
 								onError: (error) => {
 									toast.error(error.title, {
 										description: error.description,
 									});
+								},
+								onSuccess: () => {
+									toast.success('Session shared successfully');
 								},
 							},
 						);
@@ -129,16 +130,16 @@
 					<AlertDialog.Action
 						onclick={() =>
 							deleteSessionMutation.mutate(
-								{ workspaceConfig, sessionId: session.id },
+								{ sessionId: session.id, workspaceConfig },
 								{
-									onSuccess: () => {
-										toast.success('Session deleted successfully');
-										deleteDialogOpen = false;
-									},
 									onError: (error) => {
 										toast.error(error.title, {
 											description: error.description,
 										});
+									},
+									onSuccess: () => {
+										toast.success('Session deleted successfully');
+										deleteDialogOpen = false;
 									},
 								},
 							)}

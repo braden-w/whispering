@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	import { Button } from '@repo/ui/button';
-	import { toast } from 'svelte-sonner';
+
 	import * as rpc from '$lib/query';
+	import { Button } from '@repo/ui/button';
 	import { createMutation } from '@tanstack/svelte-query';
-	import { Share, Link } from 'lucide-svelte';
+	import { Link, Share } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		session,
@@ -31,15 +32,15 @@
 		variant="ghost"
 		onclick={() =>
 			unshareSessionMutation.mutate(
-				{ workspaceConfig, sessionId: session.id },
+				{ sessionId: session.id, workspaceConfig },
 				{
-					onSuccess: () => {
-						toast.success('Session unshared successfully');
-					},
 					onError: (error) => {
 						toast.error(error.title, {
 							description: error.description,
 						});
+					},
+					onSuccess: () => {
+						toast.success('Session unshared successfully');
 					},
 				},
 			)}
@@ -54,15 +55,15 @@
 		variant="ghost"
 		onclick={() =>
 			shareSessionMutation.mutate(
-				{ workspaceConfig, sessionId: session.id },
+				{ sessionId: session.id, workspaceConfig },
 				{
-					onSuccess: () => {
-						toast.success('Session shared successfully');
-					},
 					onError: (error) => {
 						toast.error(error.title, {
 							description: error.description,
 						});
+					},
+					onSuccess: () => {
+						toast.success('Session shared successfully');
 					},
 				},
 			)}

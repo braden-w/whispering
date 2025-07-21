@@ -1,15 +1,16 @@
-import { getAuthToken } from '../core/auth';
 import type {
 	QuerySerializer,
 	QuerySerializerOptions,
 } from '../core/bodySerializer';
+import type { Client, ClientOptions, Config, RequestOptions } from './types';
+
+import { getAuthToken } from '../core/auth';
 import { jsonBodySerializer } from '../core/bodySerializer';
 import {
 	serializeArrayParam,
 	serializeObjectParam,
 	serializePrimitiveParam,
 } from '../core/pathSerializer';
-import type { Client, ClientOptions, Config, RequestOptions } from './types';
 
 interface PathSerializer {
 	path: Record<string, unknown>;
@@ -18,9 +19,9 @@ interface PathSerializer {
 
 const PATH_PARAM_RE = /\{[^{}]+\}/g;
 
-type ArrayStyle = 'form' | 'spaceDelimited' | 'pipeDelimited';
-type MatrixStyle = 'label' | 'matrix' | 'simple';
 type ArraySeparatorStyle = ArrayStyle | MatrixStyle;
+type ArrayStyle = 'form' | 'pipeDelimited' | 'spaceDelimited';
+type MatrixStyle = 'label' | 'matrix' | 'simple';
 
 const defaultPathSerializer = ({ path, url: _url }: PathSerializer) => {
 	let url = _url;
@@ -146,7 +147,7 @@ export const createQuerySerializer = <T = unknown>({
  * Infers parseAs value from provided Content-Type header.
  */
 export const getParseAs = (
-	contentType: string | null,
+	contentType: null | string,
 ): Exclude<Config['parseAs'], 'auto'> => {
 	if (!contentType) {
 		// If no Content-Type header is provided, the best we can do is return the raw response body,
@@ -189,8 +190,8 @@ export const getParseAs = (
 export const setAuthParams = async ({
 	security,
 	...options
-}: Pick<Required<RequestOptions>, 'security'> &
-	Pick<RequestOptions, 'auth' | 'query'> & {
+}: Pick<RequestOptions, 'auth' | 'query'> &
+	Pick<Required<RequestOptions>, 'security'> & {
 		headers: Headers;
 	}) => {
 	for (const auth of security) {
@@ -203,14 +204,14 @@ export const setAuthParams = async ({
 		const name = auth.name ?? 'Authorization';
 
 		switch (auth.in) {
+			case 'cookie':
+				options.headers.append('Cookie', `${name}=${token}`);
+				break;
 			case 'query':
 				if (!options.query) {
 					options.query = {};
 				}
 				options.query[name] = token;
-				break;
-			case 'cookie':
-				options.headers.append('Cookie', `${name}=${token}`);
 				break;
 			case 'header':
 			default:
@@ -305,6 +306,20 @@ export const mergeHeaders = (
 	return mergedHeaders;
 };
 
+// `createInterceptors()` response, meant for external use as it does not
+// expose internals
+export interface Middleware<Req, Res, Err, Options> {
+	error: Pick<
+		Interceptors<ErrInterceptor<Err, Res, Req, Options>>,
+		'eject' | 'use'
+	>;
+	request: Pick<Interceptors<ReqInterceptor<Req, Options>>, 'eject' | 'use'>;
+	response: Pick<
+		Interceptors<ResInterceptor<Res, Req, Options>>,
+		'eject' | 'use'
+	>;
+}
+
 type ErrInterceptor<Err, Res, Req, Options> = (
 	error: Err,
 	response: Res,
@@ -315,13 +330,13 @@ type ErrInterceptor<Err, Res, Req, Options> = (
 type ReqInterceptor<Req, Options> = (
 	request: Req,
 	options: Options,
-) => Req | Promise<Req>;
+) => Promise<Req> | Req;
 
 type ResInterceptor<Res, Req, Options> = (
 	response: Res,
 	request: Req,
 	options: Options,
-) => Res | Promise<Res>;
+) => Promise<Res> | Res;
 
 class Interceptors<Interceptor> {
 	_fns: (Interceptor | null)[];
@@ -334,26 +349,26 @@ class Interceptors<Interceptor> {
 		this._fns = [];
 	}
 
-	getInterceptorIndex(id: number | Interceptor): number {
+	eject(id: Interceptor | number) {
+		const index = this.getInterceptorIndex(id);
+		if (this._fns[index]) {
+			this._fns[index] = null;
+		}
+	}
+	exists(id: Interceptor | number) {
+		const index = this.getInterceptorIndex(id);
+		return !!this._fns[index];
+	}
+
+	getInterceptorIndex(id: Interceptor | number): number {
 		if (typeof id === 'number') {
 			return this._fns[id] ? id : -1;
 		} else {
 			return this._fns.indexOf(id);
 		}
 	}
-	exists(id: number | Interceptor) {
-		const index = this.getInterceptorIndex(id);
-		return !!this._fns[index];
-	}
 
-	eject(id: number | Interceptor) {
-		const index = this.getInterceptorIndex(id);
-		if (this._fns[index]) {
-			this._fns[index] = null;
-		}
-	}
-
-	update(id: number | Interceptor, fn: Interceptor) {
+	update(id: Interceptor | number, fn: Interceptor) {
 		const index = this.getInterceptorIndex(id);
 		if (this._fns[index]) {
 			this._fns[index] = fn;
@@ -367,20 +382,6 @@ class Interceptors<Interceptor> {
 		this._fns = [...this._fns, fn];
 		return this._fns.length - 1;
 	}
-}
-
-// `createInterceptors()` response, meant for external use as it does not
-// expose internals
-export interface Middleware<Req, Res, Err, Options> {
-	error: Pick<
-		Interceptors<ErrInterceptor<Err, Res, Req, Options>>,
-		'eject' | 'use'
-	>;
-	request: Pick<Interceptors<ReqInterceptor<Req, Options>>, 'eject' | 'use'>;
-	response: Pick<
-		Interceptors<ResInterceptor<Res, Req, Options>>,
-		'eject' | 'use'
-	>;
 }
 
 // do not add `Middleware` as return type so we can use _fns internally

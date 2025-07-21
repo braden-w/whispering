@@ -2,11 +2,19 @@ import type { Auth } from '../core/auth';
 import type { Client as CoreClient, Config as CoreConfig } from '../core/types';
 import type { Middleware } from './utils';
 
-export type ResponseStyle = 'data' | 'fields';
+export type Client = CoreClient<RequestFn, Config, MethodFn, BuildUrlFn> & {
+	interceptors: Middleware<Request, Response, unknown, RequestOptions>;
+};
+
+export interface ClientOptions {
+	baseUrl?: string;
+	responseStyle?: ResponseStyle;
+	throwOnError?: boolean;
+}
 
 export interface Config<T extends ClientOptions = ClientOptions>
-	extends Omit<RequestInit, 'body' | 'headers' | 'method'>,
-		CoreConfig {
+	extends CoreConfig,
+		Omit<RequestInit, 'body' | 'headers' | 'method'> {
 	/**
 	 * Base URL for all requests made by this client.
 	 */
@@ -54,6 +62,51 @@ export interface Config<T extends ClientOptions = ClientOptions>
 	 */
 	throwOnError?: T['throwOnError'];
 }
+
+/**
+ * The `createClientConfig()` function will be called on client initialization
+ * and the returned object will become the client's initial configuration.
+ *
+ * You may want to initialize your client this way instead of calling
+ * `setConfig()`. This is useful for example if you're using Next.js
+ * to ensure your client always has the correct values.
+ */
+export type CreateClientConfig<T extends ClientOptions = ClientOptions> = (
+	override?: Config<ClientOptions & T>,
+) => Config<Required<ClientOptions> & T>;
+
+export type Options<
+	TData extends TDataShape = TDataShape,
+	ThrowOnError extends boolean = boolean,
+	TResponseStyle extends ResponseStyle = 'fields',
+> = Omit<TData, 'url'> &
+	OmitKeys<
+	RequestOptions<TResponseStyle, ThrowOnError>,
+	'body' | 'path' | 'query' | 'url'
+>;
+
+export type OptionsLegacyParser<
+	TData = unknown,
+	ThrowOnError extends boolean = boolean,
+	TResponseStyle extends ResponseStyle = 'fields',
+> = TData extends { body?: any }
+	? TData extends { headers?: any }
+		? OmitKeys<
+				RequestOptions<TResponseStyle, ThrowOnError>,
+				'body' | 'headers' | 'url'
+			> &
+				TData
+		: OmitKeys<RequestOptions<TResponseStyle, ThrowOnError>, 'body' | 'url'> &
+				Pick<RequestOptions<TResponseStyle, ThrowOnError>, 'headers'> &
+				TData
+	: TData extends { headers?: any }
+		? OmitKeys<
+				RequestOptions<TResponseStyle, ThrowOnError>,
+				'headers' | 'url'
+			> &
+				Pick<RequestOptions<TResponseStyle, ThrowOnError>, 'body'> &
+				TData
+		: OmitKeys<RequestOptions<TResponseStyle, ThrowOnError>, 'url'> & TData;
 
 export interface RequestOptions<
 	TResponseStyle extends ResponseStyle = 'fields',
@@ -104,7 +157,10 @@ export type RequestResult<
 								? TData[keyof TData]
 								: TData)
 						| undefined
-				: (
+				: {
+						request: Request;
+						response: Response;
+					} & (
 						| {
 								data: TData extends Record<string, unknown>
 									? TData[keyof TData]
@@ -117,17 +173,29 @@ export type RequestResult<
 									? TError[keyof TError]
 									: TError;
 						  }
-					) & {
-						request: Request;
-						response: Response;
-					}
+					)
 		>;
 
-export interface ClientOptions {
-	baseUrl?: string;
-	responseStyle?: ResponseStyle;
-	throwOnError?: boolean;
+export type ResponseStyle = 'data' | 'fields';
+
+export interface TDataShape {
+	body?: unknown;
+	headers?: unknown;
+	path?: unknown;
+	query?: unknown;
+	url: string;
 }
+
+type BuildUrlFn = <
+	TData extends {
+		body?: unknown;
+		path?: Record<string, unknown>;
+		query?: Record<string, unknown>;
+		url: string;
+	},
+>(
+	options: Options<TData> & Pick<TData, 'url'>,
+) => string;
 
 type MethodFn = <
 	TData = unknown,
@@ -138,6 +206,8 @@ type MethodFn = <
 	options: Omit<RequestOptions<TResponseStyle, ThrowOnError>, 'method'>,
 ) => RequestResult<TData, TError, ThrowOnError, TResponseStyle>;
 
+type OmitKeys<T, K> = Pick<T, Exclude<keyof T, K>>;
+
 type RequestFn = <
 	TData = unknown,
 	TError = unknown,
@@ -147,73 +217,3 @@ type RequestFn = <
 	options: Omit<RequestOptions<TResponseStyle, ThrowOnError>, 'method'> &
 		Pick<Required<RequestOptions<TResponseStyle, ThrowOnError>>, 'method'>,
 ) => RequestResult<TData, TError, ThrowOnError, TResponseStyle>;
-
-type BuildUrlFn = <
-	TData extends {
-		body?: unknown;
-		path?: Record<string, unknown>;
-		query?: Record<string, unknown>;
-		url: string;
-	},
->(
-	options: Pick<TData, 'url'> & Options<TData>,
-) => string;
-
-export type Client = CoreClient<RequestFn, Config, MethodFn, BuildUrlFn> & {
-	interceptors: Middleware<Request, Response, unknown, RequestOptions>;
-};
-
-/**
- * The `createClientConfig()` function will be called on client initialization
- * and the returned object will become the client's initial configuration.
- *
- * You may want to initialize your client this way instead of calling
- * `setConfig()`. This is useful for example if you're using Next.js
- * to ensure your client always has the correct values.
- */
-export type CreateClientConfig<T extends ClientOptions = ClientOptions> = (
-	override?: Config<ClientOptions & T>,
-) => Config<Required<ClientOptions> & T>;
-
-export interface TDataShape {
-	body?: unknown;
-	headers?: unknown;
-	path?: unknown;
-	query?: unknown;
-	url: string;
-}
-
-type OmitKeys<T, K> = Pick<T, Exclude<keyof T, K>>;
-
-export type Options<
-	TData extends TDataShape = TDataShape,
-	ThrowOnError extends boolean = boolean,
-	TResponseStyle extends ResponseStyle = 'fields',
-> = OmitKeys<
-	RequestOptions<TResponseStyle, ThrowOnError>,
-	'body' | 'path' | 'query' | 'url'
-> &
-	Omit<TData, 'url'>;
-
-export type OptionsLegacyParser<
-	TData = unknown,
-	ThrowOnError extends boolean = boolean,
-	TResponseStyle extends ResponseStyle = 'fields',
-> = TData extends { body?: any }
-	? TData extends { headers?: any }
-		? OmitKeys<
-				RequestOptions<TResponseStyle, ThrowOnError>,
-				'body' | 'headers' | 'url'
-			> &
-				TData
-		: OmitKeys<RequestOptions<TResponseStyle, ThrowOnError>, 'body' | 'url'> &
-				TData &
-				Pick<RequestOptions<TResponseStyle, ThrowOnError>, 'headers'>
-	: TData extends { headers?: any }
-		? OmitKeys<
-				RequestOptions<TResponseStyle, ThrowOnError>,
-				'headers' | 'url'
-			> &
-				TData &
-				Pick<RequestOptions<TResponseStyle, ThrowOnError>, 'body'>
-		: OmitKeys<RequestOptions<TResponseStyle, ThrowOnError>, 'url'> & TData;

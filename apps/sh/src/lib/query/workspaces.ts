@@ -1,13 +1,15 @@
-import * as api from '$lib/client/sdk.gen';
+import type { App } from '$lib/client/types.gen';
+import type { Accessor } from '@tanstack/svelte-query';
+
 import { createWorkspaceClient } from '$lib/client/client.gen';
+import * as api from '$lib/client/sdk.gen';
 import {
-	workspaceConfigs,
 	type WorkspaceConfig,
+	workspaceConfigs,
 } from '$lib/stores/workspace-configs.svelte';
 import { Ok } from 'wellcrafted/result';
+
 import { defineQuery, queryClient } from './_client';
-import type { Accessor } from '@tanstack/svelte-query';
-import type { App } from '$lib/client/types.gen';
 
 /**
  * A workspace configuration merged with live OpenCode app information.
@@ -19,9 +21,9 @@ import type { App } from '$lib/client/types.gen';
  *
  * Used in the UI to show users which workspaces are currently online and available.
  */
-export type Workspace = WorkspaceConfig & {
+export type Workspace = WorkspaceConfig & ({ appInfo: App; connected: true; } | { connected: false }) & {
 	checkedAt: number; // Unix timestamp of last connection check
-} & ({ connected: true; appInfo: App } | { connected: false });
+};
 
 /**
  * Fetches all workspace configs and attempts to merge them with live OpenCode app information.
@@ -38,6 +40,8 @@ export type Workspace = WorkspaceConfig & {
  */
 export const getWorkspaces = () =>
 	defineQuery({
+		// Only refetch if workspaces exist
+		enabled: workspaceConfigs.value.length > 0,
 		queryKey: ['workspaces'],
 		resultQueryFn: async (): Promise<Ok<Workspace[]>> => {
 			const workspacePromises = workspaceConfigs.value.map(
@@ -49,9 +53,9 @@ export const getWorkspaces = () =>
 					if (data && !error) {
 						return {
 							...config,
+							appInfo: data,
 							checkedAt: Date.now(),
 							connected: true,
-							appInfo: data,
 						};
 					}
 
@@ -66,8 +70,6 @@ export const getWorkspaces = () =>
 			const enhancedWorkspaces = await Promise.all(workspacePromises);
 			return Ok(enhancedWorkspaces);
 		},
-		// Only refetch if workspaces exist
-		enabled: workspaceConfigs.value.length > 0,
 	});
 
 /**
@@ -85,6 +87,11 @@ export const getWorkspaces = () =>
  */
 export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
+		initialData: queryClient
+			.getQueryData<Workspace[]>(['workspaces'])
+			?.find((w) => w.id === config().id),
+		initialDataUpdatedAt: () =>
+			queryClient.getQueryState<Workspace[]>(['workspaces'])?.dataUpdatedAt,
 		queryKey: ['workspace', config().id],
 		resultQueryFn: async (): Promise<Ok<Workspace>> => {
 			const client = createWorkspaceClient(config());
@@ -94,9 +101,9 @@ export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 			if (data && !error) {
 				return Ok({
 					...config(),
+					appInfo: data,
 					checkedAt: Date.now(),
 					connected: true,
-					appInfo: data,
 				});
 			}
 
@@ -106,9 +113,4 @@ export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 				connected: false,
 			});
 		},
-		initialData: queryClient
-			.getQueryData<Workspace[]>(['workspaces'])
-			?.find((w) => w.id === config().id),
-		initialDataUpdatedAt: () =>
-			queryClient.getQueryState<Workspace[]>(['workspaces'])?.dataUpdatedAt,
 	});

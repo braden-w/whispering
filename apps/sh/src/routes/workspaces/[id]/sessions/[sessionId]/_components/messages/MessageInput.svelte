@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { Textarea } from '@repo/ui/textarea';
-	import { Button } from '@repo/ui/button';
 	import { Badge } from '@repo/ui/badge';
+	import { Button } from '@repo/ui/button';
 	import {
-		FileDropZone,
 		ACCEPT_AUDIO,
 		ACCEPT_VIDEO,
+		FileDropZone,
 		MEGABYTE,
 	} from '@repo/ui/file-drop-zone';
+	import { Textarea } from '@repo/ui/textarea';
 	import { PaperclipIcon, X } from 'lucide-svelte';
 
 	let {
-		value = $bindable(''),
-		onSubmit,
-		onFileUpload,
 		disabled = false,
+		onFileUpload,
+		onSubmit,
 		placeholder = 'Type your message...',
+		value = $bindable(''),
 	}: {
-		value?: string;
-		onSubmit: () => void;
-		onFileUpload?: (files: File[]) => void;
 		disabled?: boolean;
+		onFileUpload?: (files: File[]) => void;
+		onSubmit: () => void;
 		placeholder?: string;
+		value?: string;
 	} = $props();
 
 	let showFileUpload = $state(false);

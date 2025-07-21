@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { Button } from '@repo/ui/button';
-	import * as AlertDialog from '@repo/ui/alert-dialog';
-	import { Trash2 } from 'lucide-svelte';
-	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-	import { toast } from 'svelte-sonner';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+
+	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
+	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import { Button } from '@repo/ui/button';
+	import { Trash2 } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { workspaceConfig }: { workspaceConfig: WorkspaceConfig } = $props();
 	let open = $state(false);

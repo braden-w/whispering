@@ -40,11 +40,11 @@ export const load = async ({ params }) => {
 	);
 
 	return {
-		workspaceConfig,
-		sessionId: params.sessionId,
-		session,
 		messages,
 		modes,
 		providers,
+		session,
+		sessionId: params.sessionId,
+		workspaceConfig,
 	};
 };

@@ -1,17 +1,18 @@
 <script lang="ts">
 	import type { ToolPart } from '$lib/client/types.gen';
+
 	import { Badge } from '@repo/ui/badge';
+	import { buttonVariants } from '@repo/ui/button';
 	import * as Collapsible from '@repo/ui/collapsible';
+	import { cn } from '@repo/ui/utils';
 	import {
+		CheckCircle,
 		ChevronDown,
 		ChevronRight,
 		Clock,
-		CheckCircle,
-		XCircle,
 		Loader2,
+		XCircle,
 	} from 'lucide-svelte';
-	import { cn } from '@repo/ui/utils';
-	import { buttonVariants } from '@repo/ui/button';
 
 	let { toolPart }: { toolPart: ToolPart } = $props();
 
@@ -19,41 +20,41 @@
 
 	const statusConfig = $derived.by(() => {
 		switch (toolPart.state.status) {
-			case 'pending':
-				return {
-					icon: Clock,
-					variant: 'secondary' as const,
-					label: 'Pending',
-					color: 'text-muted-foreground',
-				};
-			case 'running':
-				return {
-					icon: Loader2,
-					variant: 'secondary' as const,
-					label: 'Running',
-					color: 'text-blue-500',
-					animate: true,
-				};
 			case 'completed':
 				return {
-					icon: CheckCircle,
-					variant: 'secondary' as const,
-					label: 'Completed',
 					color: 'text-green-500',
+					icon: CheckCircle,
+					label: 'Completed',
+					variant: 'secondary' as const,
 				};
 			case 'error':
 				return {
-					icon: XCircle,
-					variant: 'destructive' as const,
-					label: 'Error',
 					color: 'text-red-500',
+					icon: XCircle,
+					label: 'Error',
+					variant: 'destructive' as const,
+				};
+			case 'pending':
+				return {
+					color: 'text-muted-foreground',
+					icon: Clock,
+					label: 'Pending',
+					variant: 'secondary' as const,
+				};
+			case 'running':
+				return {
+					animate: true,
+					color: 'text-blue-500',
+					icon: Loader2,
+					label: 'Running',
+					variant: 'secondary' as const,
 				};
 			default:
 				return {
-					icon: Clock,
-					variant: 'secondary' as const,
-					label: 'Unknown',
 					color: 'text-muted-foreground',
+					icon: Clock,
+					label: 'Unknown',
+					variant: 'secondary' as const,
 				};
 		}
 	});

@@ -1,5 +1,3 @@
-type Slot = 'body' | 'headers' | 'path' | 'query';
-
 export type Field =
 	| {
 			in: Exclude<Slot, 'body'>;
@@ -18,6 +16,8 @@ export interface Fields {
 }
 
 export type FieldsConfig = ReadonlyArray<Field | Fields>;
+
+type Slot = 'body' | 'headers' | 'path' | 'query';
 
 const extraPrefixesMap: Record<string, Slot> = {
 	$body_: 'body',

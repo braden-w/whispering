@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	import { Button } from '@repo/ui/button';
-	import { toast } from 'svelte-sonner';
+
 	import * as rpc from '$lib/query';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
+	import { Button } from '@repo/ui/button';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { Trash2 } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		session,
@@ -42,16 +43,16 @@
 			<AlertDialog.Action
 				onclick={() =>
 					deleteSessionMutation.mutate(
-						{ workspaceConfig, sessionId: session.id },
+						{ sessionId: session.id, workspaceConfig },
 						{
-							onSuccess: () => {
-								toast.success('Session deleted successfully');
-								open = false;
-							},
 							onError: (error) => {
 								toast.error(error.title, {
 									description: error.description,
 								});
+							},
+							onSuccess: () => {
+								toast.success('Session deleted successfully');
+								open = false;
 							},
 						},
 					)}

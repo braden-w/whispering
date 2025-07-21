@@ -1,3 +1,13 @@
+export function formatDate(date: Date): string {
+	return date.toLocaleDateString('en-US', {
+		day: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+		month: 'short',
+		year: 'numeric',
+	});
+}
+
 export function formatDistanceToNow(date: Date): string {
 	const now = new Date();
 	const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -28,14 +38,4 @@ export function formatDistanceToNow(date: Date): string {
 
 	const diffInYears = Math.floor(diffInMonths / 12);
 	return `${diffInYears} year${diffInYears !== 1 ? 's' : ''}`;
-}
-
-export function formatDate(date: Date): string {
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	});
 }

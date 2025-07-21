@@ -1,4 +1,5 @@
 import type { Client, Config, RequestOptions } from './types';
+
 import {
 	buildUrl,
 	createConfig,

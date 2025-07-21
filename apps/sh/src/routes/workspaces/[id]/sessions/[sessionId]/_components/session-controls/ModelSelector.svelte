@@ -1,24 +1,25 @@
 <script lang="ts">
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+
+	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
 	import * as Command from '@repo/ui/command';
 	import { useCombobox } from '@repo/ui/hooks';
 	import * as Popover from '@repo/ui/popover';
 	import { cn } from '@repo/ui/utils';
-	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
 	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
 
 	let {
-		workspaceConfig,
-		value = $bindable<{ providerId: string; modelId: string } | null>(null),
-		placeholder = 'Select a model...',
 		class: className,
+		placeholder = 'Select a model...',
+		value = $bindable<null | { modelId: string; providerId: string; }>(null),
+		workspaceConfig,
 	}: {
-		workspaceConfig: WorkspaceConfig;
-		value?: { providerId: string; modelId: string } | null;
-		placeholder?: string;
 		class?: string;
+		placeholder?: string;
+		value?: null | { modelId: string; providerId: string; };
+		workspaceConfig: WorkspaceConfig;
 	} = $props();
 
 	const combobox = useCombobox();
@@ -83,7 +84,7 @@
 								<Command.Item
 									value={`${provider.id}:${modelId}`}
 									onSelect={() => {
-										value = { providerId: provider.id, modelId };
+										value = { modelId, providerId: provider.id };
 										combobox.closeAndFocusTrigger();
 									}}
 									class="flex items-center gap-2"

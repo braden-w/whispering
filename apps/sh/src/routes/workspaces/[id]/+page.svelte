@@ -1,13 +1,14 @@
 <script lang="ts">
 	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
+	import * as rpc from '$lib/query';
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
 	import { Button } from '@repo/ui/button';
+	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronRight } from 'lucide-svelte';
+
 	import CreateSessionModal from './_components/CreateSessionModal.svelte';
 	import SessionList from './_components/SessionList.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
 
 	const { data } = $props();
 

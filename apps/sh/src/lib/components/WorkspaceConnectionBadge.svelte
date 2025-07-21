@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
-	import { Badge } from '@repo/ui/badge';
-	import { CheckCircle2, XCircle, Loader2 } from 'lucide-svelte';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
+	import * as rpc from '$lib/query';
+	import { Badge } from '@repo/ui/badge';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { CheckCircle2, Loader2, XCircle } from 'lucide-svelte';
+
 	let {
-		workspaceConfig,
 		refetchInterval = 2000,
-	}: { workspaceConfig: WorkspaceConfig; refetchInterval?: number } = $props();
+		workspaceConfig,
+	}: { refetchInterval?: number; workspaceConfig: WorkspaceConfig; } = $props();
 
 	const workspaceQuery = createQuery(() => ({
 		...rpc.workspaces.getWorkspace(() => workspaceConfig).options(),

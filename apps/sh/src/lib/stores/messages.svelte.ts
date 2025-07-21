@@ -1,4 +1,3 @@
-import * as api from '$lib/client/sdk.gen';
 import type {
 	AssistantMessage,
 	EventMessagePartUpdated,
@@ -7,11 +6,13 @@ import type {
 	Message as MessageInfo,
 	Part,
 } from '$lib/client/types.gen';
-import { createWorkspaceClient } from '$lib/client/client.gen';
 import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
-import { createSubscriber } from 'svelte/reactivity';
+
+import { createWorkspaceClient } from '$lib/client/client.gen';
+import * as api from '$lib/client/sdk.gen';
 import { type } from 'arktype';
+import { createSubscriber } from 'svelte/reactivity';
 
 export type Message = { info: MessageInfo; parts: Part[] };
 
@@ -43,13 +44,13 @@ export type Message = { info: MessageInfo; parts: Part[] };
  * ```
  */
 export function createMessageSubscriber({
-	workspace,
-	sessionId,
 	initialMessages,
+	sessionId,
+	workspace,
 }: {
-	workspace: Accessor<WorkspaceConfig>;
-	sessionId: Accessor<string>;
 	initialMessages: Accessor<Message[]>;
+	sessionId: Accessor<string>;
+	workspace: Accessor<WorkspaceConfig>;
 }) {
 	// Initialize with pre-fetched messages
 	let messages = $state<Message[]>(initialMessages());
@@ -177,221 +178,221 @@ export function createMessageSubscriber({
 	function parseEventData(event: MessageEvent) {
 		// Define error discriminated union
 		const errorType = type({
-			name: '"ProviderAuthError"',
 			data: {
-				providerID: 'string',
 				message: 'string',
+				providerID: 'string',
 			},
+			name: '"ProviderAuthError"',
 		})
 			.or({
-				name: '"UnknownError"',
 				data: {
 					message: 'string',
 				},
+				name: '"UnknownError"',
 			})
 			.or({
+				data: 'Record<string, unknown>',
 				name: '"MessageOutputLengthError"',
-				data: 'Record<string, unknown>',
 			})
 			.or({
-				name: '"MessageAbortedError"',
 				data: 'Record<string, unknown>',
+				name: '"MessageAbortedError"',
 			});
 
 		// Define file part source discriminated union
 		const filePartSourceType = type({
-			type: '"file"',
-			text: {
-				value: 'string',
-				start: 'number',
-				end: 'number',
-			},
 			path: 'string',
-		}).or({
-			type: '"symbol"',
 			text: {
-				value: 'string',
-				start: 'number',
 				end: 'number',
+				start: 'number',
+				value: 'string',
 			},
+			type: '"file"',
+		}).or({
+			kind: 'number',
+			name: 'string',
 			path: 'string',
 			range: {
-				start: {
-					line: 'number',
-					character: 'number',
-				},
 				end: {
-					line: 'number',
 					character: 'number',
+					line: 'number',
+				},
+				start: {
+					character: 'number',
+					line: 'number',
 				},
 			},
-			name: 'string',
-			kind: 'number',
+			text: {
+				end: 'number',
+				start: 'number',
+				value: 'string',
+			},
+			type: '"symbol"',
 		});
 
 		// Define message type discriminated union
 		const messageType = type({
-			role: '"user"',
 			id: 'string',
+			role: '"user"',
 			sessionID: 'string',
 			time: {
 				created: 'number',
 			},
 		}).or({
-			role: '"assistant"',
-			id: 'string',
-			sessionID: 'string',
-			time: {
-				created: 'number',
-				'completed?': 'number',
-			},
+			cost: 'number',
 			'error?': errorType,
-			system: 'string[]',
+			id: 'string',
 			modelID: 'string',
-			providerID: 'string',
 			path: {
 				cwd: 'string',
 				root: 'string',
 			},
+			providerID: 'string',
+			role: '"assistant"',
+			sessionID: 'string',
 			'summary?': 'boolean',
-			cost: 'number',
+			system: 'string[]',
+			time: {
+				'completed?': 'number',
+				created: 'number',
+			},
 			tokens: {
-				input: 'number',
-				output: 'number',
-				reasoning: 'number',
 				cache: {
 					read: 'number',
 					write: 'number',
 				},
+				input: 'number',
+				output: 'number',
+				reasoning: 'number',
 			},
 		});
 
 		// Define part type discriminated union
 		const partType = type({
-			type: '"text"',
 			id: 'string',
-			sessionID: 'string',
 			messageID: 'string',
-			text: 'string',
+			sessionID: 'string',
 			'synthetic?': 'boolean',
+			text: 'string',
 			'time?': {
-				start: 'number',
 				'end?': 'number',
+				start: 'number',
 			},
+			type: '"text"',
 		})
 			.or({
-				type: '"file"',
+				'filename?': 'string',
 				id: 'string',
-				sessionID: 'string',
 				messageID: 'string',
 				mime: 'string',
-				'filename?': 'string',
-				url: 'string',
+				sessionID: 'string',
 				'source?': filePartSourceType,
+				type: '"file"',
+				url: 'string',
 			})
 			.or({
-				type: '"tool"',
-				id: 'string',
-				sessionID: 'string',
-				messageID: 'string',
 				callID: 'string',
-				tool: 'string',
+				id: 'string',
+				messageID: 'string',
+				sessionID: 'string',
 				state: type({
 					status: '"pending"',
 				})
 					.or({
-						status: '"running"',
 						'input?': 'unknown',
-						'title?': 'string',
 						'metadata?': 'Record<string, unknown>',
+						status: '"running"',
 						time: {
 							start: 'number',
 						},
+						'title?': 'string',
 					})
 					.or({
-						status: '"completed"',
 						input: 'Record<string, unknown>',
-						output: 'string',
-						title: 'string',
 						metadata: 'Record<string, unknown>',
+						output: 'string',
+						status: '"completed"',
 						time: {
-							start: 'number',
 							end: 'number',
+							start: 'number',
 						},
+						title: 'string',
 					})
 					.or({
-						status: '"error"',
-						input: 'Record<string, unknown>',
 						error: 'string',
+						input: 'Record<string, unknown>',
+						status: '"error"',
 						time: {
-							start: 'number',
 							end: 'number',
+							start: 'number',
 						},
 					}),
+				tool: 'string',
+				type: '"tool"',
 			})
 			.or({
+				id: 'string',
+				messageID: 'string',
+				sessionID: 'string',
 				type: '"step-start"',
-				id: 'string',
-				sessionID: 'string',
-				messageID: 'string',
 			})
 			.or({
-				type: '"step-finish"',
-				id: 'string',
-				sessionID: 'string',
-				messageID: 'string',
 				cost: 'number',
+				id: 'string',
+				messageID: 'string',
+				sessionID: 'string',
 				tokens: {
-					input: 'number',
-					output: 'number',
-					reasoning: 'number',
 					cache: {
 						read: 'number',
 						write: 'number',
 					},
+					input: 'number',
+					output: 'number',
+					reasoning: 'number',
 				},
+				type: '"step-finish"',
 			})
 			.or({
-				type: '"snapshot"',
 				id: 'string',
-				sessionID: 'string',
 				messageID: 'string',
+				sessionID: 'string',
 				snapshot: 'string',
+				type: '"snapshot"',
 			});
 
 		// Define the comprehensive event type as a discriminated union
 		const sseEventType = type('string.json.parse').to(
 			type({
-				type: '"message.updated"',
 				properties: {
 					info: messageType,
 				},
+				type: '"message.updated"',
 			})
 				.or({
-					type: '"message.part.updated"',
 					properties: {
 						part: partType,
 					},
+					type: '"message.part.updated"',
 				})
 				.or({
-					type: '"message.removed"',
 					properties: {
-						sessionID: 'string',
 						messageID: 'string',
+						sessionID: 'string',
 					},
+					type: '"message.removed"',
 				})
 				.or({
-					type: '"session.idle"',
 					properties: {
 						sessionID: 'string',
 					},
+					type: '"session.idle"',
 				})
 				.or({
-					type: '"storage.write"',
 					properties: {
-						key: 'string',
 						content: 'unknown',
+						key: 'string',
 					},
+					type: '"storage.write"',
 				}),
 		);
 
@@ -421,15 +422,6 @@ export function createMessageSubscriber({
 
 			// Route events based on type
 			switch (eventData.type) {
-				case 'message.updated': {
-					const data = eventData satisfies EventMessageUpdated;
-					if (data.properties.info.sessionID === sessionId()) {
-						upsertMessage(data.properties.info);
-						update();
-					}
-					break;
-				}
-
 				case 'message.part.updated': {
 					const data = eventData satisfies EventMessagePartUpdated;
 					if (data.properties.part.sessionID === sessionId()) {
@@ -446,6 +438,15 @@ export function createMessageSubscriber({
 					const data = eventData satisfies EventMessageRemoved;
 					if (data.properties.sessionID === sessionId()) {
 						deleteMessageById(data.properties.messageID);
+						update();
+					}
+					break;
+				}
+
+				case 'message.updated': {
+					const data = eventData satisfies EventMessageUpdated;
+					if (data.properties.info.sessionID === sessionId()) {
+						upsertMessage(data.properties.info);
 						update();
 					}
 					break;
@@ -519,7 +520,7 @@ export function createMessageSubscriber({
  * ```
  */
 export function isMessageProcessing(
-	message: MessageInfo | AssistantMessage,
+	message: AssistantMessage | MessageInfo,
 ): boolean {
 	if (message.role !== 'assistant') return false;
 	return !('completed' in message.time && message.time.completed);

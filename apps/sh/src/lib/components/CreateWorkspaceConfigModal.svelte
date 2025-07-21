@@ -1,23 +1,24 @@
 <script lang="ts">
-	import * as Modal from '@repo/ui/modal';
-	import { Button, type Props as ButtonProps } from '@repo/ui/button';
-	import { Input } from '@repo/ui/input';
-	import { Label } from '@repo/ui/label';
-	import * as Card from '@repo/ui/card';
-	import * as Tabs from '@repo/ui/tabs';
-	import * as Accordion from '@repo/ui/accordion';
+	import type { App } from '$lib/client/types.gen';
+	import type { Snippet } from 'svelte';
+
+	import { createWorkspaceClient } from '$lib/client/client.gen';
+	import * as api from '$lib/client/sdk.gen';
+	import { settings } from '$lib/stores/settings.svelte';
 	import {
 		createWorkspaceConfig,
 		generateAvailablePort,
 	} from '$lib/stores/workspace-configs.svelte';
-	import { toast } from 'svelte-sonner';
-	import { Copy, CheckCircle2, Loader2, Sparkles } from 'lucide-svelte';
-	import * as api from '$lib/client/sdk.gen';
-	import { createWorkspaceClient } from '$lib/client/client.gen';
+	import * as Accordion from '@repo/ui/accordion';
+	import { Button, type Props as ButtonProps } from '@repo/ui/button';
+	import * as Card from '@repo/ui/card';
+	import { Input } from '@repo/ui/input';
+	import { Label } from '@repo/ui/label';
+	import * as Modal from '@repo/ui/modal';
+	import * as Tabs from '@repo/ui/tabs';
 	import { type } from 'arktype';
-	import type { Snippet } from 'svelte';
-	import { settings } from '$lib/stores/settings.svelte';
-	import type { App } from '$lib/client/types.gen';
+	import { CheckCircle2, Copy, Loader2, Sparkles } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { triggerChild }: { triggerChild: Snippet<[{ props: ButtonProps }]> } =
 		$props();
@@ -40,14 +41,14 @@
 	const NgrokTunnelsResponse = type('string.json.parse').to({
 		tunnels: [
 			{
-				name: 'string',
-				uri: 'string',
-				public_url: 'string',
-				proto: '"http" | "https"',
 				config: {
 					addr: 'string',
 					inspect: 'boolean',
 				},
+				name: 'string',
+				proto: '"http" | "https"',
+				public_url: 'string',
+				uri: 'string',
 			},
 		],
 		uri: 'string',
@@ -131,13 +132,13 @@ EOF` as const,
 		try {
 			// Test the connection using the API client
 			const testWorkspace = {
-				id: 'test',
-				name: 'test',
-				url: ngrokUrl,
-				port,
-				password,
 				createdAt: 0,
+				id: 'test',
 				lastAccessedAt: 0,
+				name: 'test',
+				password,
+				port,
+				url: ngrokUrl,
 			};
 
 			const client = createWorkspaceClient(testWorkspace);
@@ -235,9 +236,9 @@ EOF` as const,
 
 		createWorkspaceConfig({
 			name: workspaceName.trim(),
-			url: ngrokUrl,
-			port,
 			password,
+			port,
+			url: ngrokUrl,
 		});
 
 		toast.success(`Created workspace "${workspaceName}"`);

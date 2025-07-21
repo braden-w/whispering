@@ -1,7 +1,8 @@
 <script lang="ts">
-	import SessionTable from './SessionTable.svelte';
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+
+	import SessionTable from './SessionTable.svelte';
 
 	let {
 		sessions,

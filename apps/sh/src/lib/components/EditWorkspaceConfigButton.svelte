@@ -1,15 +1,15 @@
 <script lang="ts">
-	import * as Modal from '@repo/ui/modal';
-	import { Button } from '@repo/ui/button';
-	import { Input } from '@repo/ui/input';
-	import { Label } from '@repo/ui/label';
 	import {
 		updateWorkspaceConfig,
 		type WorkspaceConfig,
 	} from '$lib/stores/workspace-configs.svelte';
-	import { toast } from 'svelte-sonner';
-	import { Edit } from 'lucide-svelte';
+	import { Button } from '@repo/ui/button';
 	import { buttonVariants } from '@repo/ui/button';
+	import { Input } from '@repo/ui/input';
+	import { Label } from '@repo/ui/label';
+	import * as Modal from '@repo/ui/modal';
+	import { Edit } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { workspaceConfig }: { workspaceConfig: WorkspaceConfig } = $props();
 
@@ -38,9 +38,9 @@
 
 		updateWorkspaceConfig(workspaceConfig.id, {
 			name: workspaceConfig.name,
-			url: url.trim(),
-			port,
 			password,
+			port,
+			url: url.trim(),
 		});
 
 		toast.success('Workspace updated successfully');

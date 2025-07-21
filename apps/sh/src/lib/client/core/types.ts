@@ -34,7 +34,7 @@ export interface Config {
 	 * Auth token or a function returning auth token. The resolved value will be
 	 * added to the request payload as defined by its `security` array.
 	 */
-	auth?: ((auth: Auth) => Promise<AuthToken> | AuthToken) | AuthToken;
+	auth?: ((auth: Auth) => AuthToken | Promise<AuthToken>) | AuthToken;
 	/**
 	 * A function for serializing request body parameter. By default,
 	 * {@link JSON.stringify()} will be used.
@@ -47,17 +47,17 @@ export interface Config {
 	 * {@link https://developer.mozilla.org/docs/Web/API/Headers/Headers#init See more}
 	 */
 	headers?:
-		| RequestInit['headers']
 		| Record<
 				string,
-				| string
-				| number
+				| (boolean | number | string)[]
 				| boolean
-				| (string | number | boolean)[]
 				| null
+				| number
+				| string
 				| undefined
 				| unknown
-		  >;
+		  >
+		| RequestInit['headers'];
 	/**
 	 * The request method.
 	 *

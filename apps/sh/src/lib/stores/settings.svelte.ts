@@ -7,15 +7,15 @@ import { type } from 'arktype';
  */
 const AppSettings = type({
 	/**
-	 * Default username for new workspace connections.
-	 * This value is pre-populated when creating new workspaces.
-	 */
-	defaultUsername: 'string > 0',
-	/**
 	 * Default password for new workspace connections.
 	 * This value is pre-populated when creating new workspaces.
 	 */
 	defaultPassword: 'string',
+	/**
+	 * Default username for new workspace connections.
+	 * This value is pre-populated when creating new workspaces.
+	 */
+	defaultUsername: 'string > 0',
 });
 
 export type AppSettings = typeof AppSettings.infer;
@@ -26,16 +26,16 @@ export type AppSettings = typeof AppSettings.infer;
  */
 export const settings = createPersistedState({
 	key: 'opencode-settings',
-	schema: AppSettings,
 	onParseError: (error) => {
 		// Return default settings if anything goes wrong
 		console.warn('Failed to load settings:', error);
 		return {
-			defaultUsername: 'user',
 			defaultPassword: 'password',
+			defaultUsername: 'user',
 		};
 	},
 	onUpdateError: (error) => {
 		console.error('Failed to save settings:', error);
 	},
+	schema: AppSettings,
 });

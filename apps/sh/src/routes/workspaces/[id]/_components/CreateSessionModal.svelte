@@ -1,13 +1,14 @@
 <script lang="ts">
-	import * as Modal from '@repo/ui/modal';
+	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+
+	import { goto } from '$app/navigation';
+	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
-	import * as rpc from '$lib/query';
-	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import * as Modal from '@repo/ui/modal';
 	import { createMutation } from '@tanstack/svelte-query';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		open = $bindable(false),
@@ -52,6 +53,12 @@
 				createSessionMutation.mutate(
 					{ workspaceConfig },
 					{
+						onError: (error) => {
+							toast.error(error.title, {
+								description: error.description,
+							});
+							console.error('Error creating session:', error);
+						},
 						onSuccess: (data) => {
 							toast.success('Session created successfully');
 							if (data?.id) {
@@ -59,12 +66,6 @@
 								open = false;
 								title = '';
 							}
-						},
-						onError: (error) => {
-							toast.error(error.title, {
-								description: error.description,
-							});
-							console.error('Error creating session:', error);
 						},
 					},
 				);

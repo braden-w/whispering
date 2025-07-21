@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	import * as Table from '@repo/ui/table';
-	import { Badge } from '@repo/ui/badge';
+
 	import { formatDistanceToNow } from '$lib/utils/date';
-	import ShareSessionButton from './ShareSessionButton.svelte';
+	import { Badge } from '@repo/ui/badge';
+	import * as Table from '@repo/ui/table';
+
 	import DeleteSessionButton from './DeleteSessionButton.svelte';
+	import ShareSessionButton from './ShareSessionButton.svelte';
 
 	let {
 		sessions,
