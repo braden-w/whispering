@@ -10,9 +10,9 @@
 	<title>Download Desktop App - Whispering</title>
 </svelte:head>
 
-<main class="flex flex-1 items-center justify-center p-4">
-	<section class="container max-w-4xl">
-		<div class="text-center space-y-4 mb-8">
+<main class="flex flex-1 items-center justify-center p-4 container max-w-4xl mx-auto">
+	<div class="w-full">
+		<header class="text-center space-y-4 mb-8">
 			<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
 				Whispering Desktop
 			</h1>
@@ -20,7 +20,7 @@
 				Experience the full power of Whispering with native performance and
 				system-wide integration.
 			</p>
-		</div>
+		</header>
 
 		<div class="grid gap-6 mb-8 lg:grid-cols-3">
 			<Card class="p-6">
@@ -87,5 +87,5 @@
 				Go back
 			</Button>
 		</div>
-	</section>
+	</div>
 </main>
