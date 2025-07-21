@@ -109,35 +109,6 @@
 		messageContent.trim().length > 0 && !isProcessing && !sendMessageMutation.isPending && selectedModel !== null,
 	);
 
-	function handleDelete() {
-		if (!sessionQuery.data) return;
-
-		deleteSessionMutation.mutate({
-			workspaceConfig,
-			sessionId,
-		});
-	}
-
-	function handleShare() {
-		shareSessionMutation.mutate({
-			workspaceConfig,
-			sessionId,
-		});
-	}
-
-	function handleUnshare() {
-		unshareSessionMutation.mutate({
-			workspaceConfig,
-			sessionId,
-		});
-	}
-
-	function handleAbort() {
-		abortSessionMutation.mutate({
-			workspaceConfig,
-			sessionId,
-		});
-	}
 
 	function handleSendMessage() {
 		if (!canSendMessage || !selectedModel) return;
@@ -206,7 +177,7 @@
 		</Breadcrumb.Root>
 
 		{#if sessionQuery.data}
-			<!-- <div class="flex items-center justify-between pb-4 border-b">
+			<div class="flex items-center justify-between pb-4 border-b">
 				<div>
 					<h1 class="text-2xl font-bold">
 						{sessionQuery.data.title || 'Untitled Session'}
@@ -232,16 +203,16 @@
 						<Badge variant="secondary">Shared</Badge>
 					{/if}
 					{#if isProcessing}
-						<Button size="sm" variant="destructive" onclick={handleAbort}>
+						<Button size="sm" variant="destructive" onclick={() => abortSessionMutation.mutate({ workspaceConfig, sessionId })}>
 							Abort
 						</Button>
 					{/if}
 					{#if sessionQuery.data.share?.url}
-						<Button size="sm" variant="outline" onclick={handleUnshare}>
+						<Button size="sm" variant="outline" onclick={() => unshareSessionMutation.mutate({ workspaceConfig, sessionId })}>
 							Unshare
 						</Button>
 					{:else}
-						<Button size="sm" variant="outline" onclick={handleShare}>
+						<Button size="sm" variant="outline" onclick={() => shareSessionMutation.mutate({ workspaceConfig, sessionId })}>
 							Share
 						</Button>
 					{/if}
@@ -253,7 +224,7 @@
 						Delete
 					</Button>
 				</div>
-			</div> -->
+			</div>
 		{/if}
 
 		<div class="flex-1 overflow-y-auto">
@@ -306,7 +277,7 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action onclick={handleDelete}>Delete</AlertDialog.Action>
+				<AlertDialog.Action onclick={() => sessionQuery.data && deleteSessionMutation.mutate({ workspaceConfig, sessionId })}>Delete</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
 	</AlertDialog.Root>
