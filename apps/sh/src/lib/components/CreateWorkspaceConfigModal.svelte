@@ -84,61 +84,16 @@
 	});
 
 	// Port configuration constants
+	const HONO_PROXY_PORT = 8787; // Hono proxy server port
 	const NGROK_API_PORT = 4040; // Default ngrok API port
-	const NGROK_PROXY_PORT = 4080; // Port we'll expose ngrok API through
 
 	// Commands for copy functionality
 	const opencodeCommand = $derived(`opencode serve -p ${privatePortState}` as const);
-	const caddyCommand = $derived(
-		`caddy run --config - --adapter caddyfile << 'EOF'
-# Caddyfile with two proxy configurations
-# This setup enables:
-# 1. Access to ngrok's API (for auto-detection) via localhost:${NGROK_PROXY_PORT}
-# 2. Access to your OpenCode server with CORS headers via :${publicPortState}
-
-# Proxy 1: ngrok API proxy
-# This proxies localhost:${NGROK_PROXY_PORT} → localhost:${NGROK_API_PORT} (ngrok's API)
-# Purpose: Allows the web app to detect ngrok tunnels automatically
-localhost:${NGROK_PROXY_PORT} {
-    # Add CORS headers for browser access to ngrok API
-    header Access-Control-Allow-Origin "*"
-    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    header Access-Control-Allow-Headers "*"
-    header Access-Control-Allow-Credentials "true"
-    
-    # Handle preflight OPTIONS requests
-    @options {
-        method OPTIONS
-    }
-    respond @options 204
-    
-    # Proxy all requests to ngrok's API
-    reverse_proxy localhost:${NGROK_API_PORT}
-}
-
-# Proxy 2: OpenCode server with CORS support
-# This proxies :${publicPortState} → localhost:${privatePortState} (your OpenCode server)
-# Purpose: Adds CORS headers that OpenCode doesn't provide natively
-:${publicPortState} {
-    # Add CORS headers to all responses for browser compatibility
-    header Access-Control-Allow-Origin "*"
-    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    header Access-Control-Allow-Headers "*"
-    header Access-Control-Allow-Credentials "true"
-    
-    # Handle preflight OPTIONS requests
-    @options {
-        method OPTIONS
-    }
-    respond @options 204
-    
-    # Proxy all requests to your OpenCode server
-    reverse_proxy localhost:${privatePortState}
-}
-EOF` as const
+	const honoProxyCommand = $derived(
+		'cd apps/sh-proxy && npm run dev' as const
 	);
 	const ngrokCommand = $derived(
-		`ngrok http ${publicPortState} --basic-auth="${username}:${password}"` as const,
+		`ngrok http ${privatePortState} --basic-auth="${username}:${password}"` as const,
 	);
 
 	async function copyToClipboard(text: string) {
