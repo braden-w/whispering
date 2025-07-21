@@ -5,6 +5,7 @@
 	import { Label } from '@repo/ui/label';
 	import * as Card from '@repo/ui/card';
 	import * as Tabs from '@repo/ui/tabs';
+	import * as Accordion from '@repo/ui/accordion';
 	import {
 		createWorkspace,
 		generateRandomPort,
@@ -16,6 +17,8 @@
 	import { getProxiedBaseUrl } from '$lib/client/utils/proxy-url';
 	import { type } from 'arktype';
 	import type { Snippet } from 'svelte';
+	import { settings } from '$lib/stores/settings.svelte';
+	import type { App } from '$lib/client/types.gen';
 
 	let { triggerChild }: { triggerChild: Snippet<[{ props: ButtonProps }]> } =
 		$props();
@@ -24,15 +27,15 @@
 
 	// Form state
 	let step = $state(1);
-	let username = $state('user');
-	let password = $state('password');
+	let username = $state(settings.value.defaultUsername);
+	let password = $state(settings.value.defaultPassword);
 	let port = $state(generateRandomPort());
 	let ngrokUrl = $state('');
 	let workspaceName = $state('');
 	let isTesting = $state(false);
 	let testSuccess = $state(false);
 	let isDetecting = $state(false);
-	let appInfo = $state<api.App | null>(null);
+	let appInfo = $state<App | null>(null);
 
 	// Define the ngrok API response schema using arktype
 	const NgrokTunnelsResponse = type('string.json.parse').to({
@@ -55,8 +58,8 @@
 	$effect(() => {
 		if (open) {
 			step = 1;
-			username = 'user';
-			password = 'password';
+			username = settings.value.defaultUsername;
+			password = settings.value.defaultPassword;
 			port = generateRandomPort();
 			ngrokUrl = '';
 			workspaceName = '';
@@ -66,9 +69,9 @@
 		}
 	});
 
-	// Pre-populate workspace name when reaching step 5
+	// Pre-populate workspace name when reaching step 3
 	$effect(() => {
-		if (step === 5 && !workspaceName && appInfo?.path) {
+		if (step === 3 && !workspaceName && appInfo?.path) {
 			workspaceName = appInfo.path.cwd;
 		}
 	});
@@ -217,14 +220,6 @@
 	}
 
 	function nextStep() {
-		if (step === 1 && (!username || !password)) {
-			toast.error('Please enter username and password');
-			return;
-		}
-		if (step === 2 && !port) {
-			toast.error('Please enter a valid port number');
-			return;
-		}
 		step++;
 	}
 
@@ -243,79 +238,69 @@
 		<Dialog.Header>
 			<Dialog.Title>Add New Workspace</Dialog.Title>
 			<Dialog.Description>
-				Connect to an OpenCode server in {step === 1 ? 'a few' : step - 1} easy steps
+				Connect to an OpenCode server in a few easy steps
 			</Dialog.Description>
 		</Dialog.Header>
 
 		<div class="space-y-4">
 			{#if step === 1}
-				<!-- Step 1: Credentials -->
-				<Card.Root>
-					<Card.Header>
-						<Card.Title class="text-lg">Step 1: Set Credentials</Card.Title>
-						<Card.Description>
-							These will be used for basic authentication
-						</Card.Description>
-					</Card.Header>
-					<Card.Content class="space-y-4">
-						<div class="space-y-2">
-							<Label for="username">Username</Label>
-							<Input
-								id="username"
-								bind:value={username}
-								placeholder="Enter username"
-								autocomplete="off"
-							/>
-						</div>
-						<div class="space-y-2">
-							<Label for="password">Password</Label>
-							<Input
-								id="password"
-								type="password"
-								bind:value={password}
-								placeholder="Enter password"
-								autocomplete="new-password"
-							/>
-						</div>
-					</Card.Content>
-				</Card.Root>
-			{:else if step === 2}
-				<!-- Step 2: Port Selection -->
-				<Card.Root>
-					<Card.Header>
-						<Card.Title class="text-lg">Step 2: Select Port</Card.Title>
-						<Card.Description>
-							Choose a port for your OpenCode server
-						</Card.Description>
-					</Card.Header>
-					<Card.Content class="space-y-4">
-						<div class="space-y-2">
-							<Label for="port">Port Number</Label>
-							<Input
-								id="port"
-								type="number"
-								bind:value={port}
-								min="1024"
-								max="65535"
-							/>
-							<p class="text-sm text-muted-foreground">
-								A random port has been generated for you
-							</p>
-						</div>
-					</Card.Content>
-				</Card.Root>
-			{:else if step === 3}
-				<!-- Step 3: Setup Instructions -->
+				<!-- Step 1: Start OpenCode Server -->
 				<Card.Root>
 					<Card.Header>
 						<Card.Title class="text-lg"
-							>Step 3: Start OpenCode Server</Card.Title
+							>Step 1: Start OpenCode Server</Card.Title
 						>
 						<Card.Description>
 							Run the following commands to start your server
 						</Card.Description>
 					</Card.Header>
 					<Card.Content class="space-y-4">
+						<!-- Configuration Accordion -->
+						<Accordion.Root>
+							<Accordion.Item value="config">
+								<Accordion.Trigger>Configure Server Settings</Accordion.Trigger>
+								<Accordion.Content>
+									<div class="space-y-4 pt-4">
+										<div class="space-y-2">
+											<Label for="port">Port Number</Label>
+											<Input
+												id="port"
+												type="number"
+												bind:value={port}
+												min="1024"
+												max="65535"
+											/>
+											<p class="text-sm text-muted-foreground">
+												A random port has been generated for you
+											</p>
+										</div>
+										<div class="space-y-2">
+											<Label for="username">Username</Label>
+											<Input
+												id="username"
+												bind:value={username}
+												placeholder="Enter username"
+												autocomplete="off"
+											/>
+										</div>
+										<div class="space-y-2">
+											<Label for="password">Password</Label>
+											<Input
+												id="password"
+												type="password"
+												bind:value={password}
+												placeholder="Enter password"
+												autocomplete="new-password"
+											/>
+										</div>
+										<p class="text-sm text-muted-foreground">
+											These credentials are pre-filled from your settings.
+											Changes here only affect this workspace.
+										</p>
+									</div>
+								</Accordion.Content>
+							</Accordion.Item>
+						</Accordion.Root>
 						<Tabs.Root value="separate" class="w-full">
 							<Tabs.List class="grid w-full grid-cols-2">
 								<Tabs.Trigger value="separate">Separate Commands</Tabs.Trigger>
@@ -382,11 +367,11 @@
 						</Tabs.Root>
 					</Card.Content>
 				</Card.Root>
-			{:else if step === 4}
-				<!-- Step 4: Enter ngrok URL -->
+			{:else if step === 2}
+				<!-- Step 2: Enter ngrok URL -->
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-lg">Step 4: Enter ngrok URL</Card.Title>
+						<Card.Title class="text-lg">Step 2: Enter ngrok URL</Card.Title>
 						<Card.Description>
 							Copy the HTTPS URL from ngrok output
 						</Card.Description>
@@ -447,11 +432,11 @@
 						</Button>
 					</Card.Content>
 				</Card.Root>
-			{:else if step === 5}
-				<!-- Step 5: Name Workspace -->
+			{:else if step === 3}
+				<!-- Step 3: Name Workspace -->
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-lg">Step 5: Name Your Workspace</Card.Title>
+						<Card.Title class="text-lg">Step 3: Name Your Workspace</Card.Title>
 						<Card.Description>
 							Give this workspace a memorable name
 						</Card.Description>
@@ -492,7 +477,7 @@
 					<Dialog.Close>
 						<Button variant="outline">Cancel</Button>
 					</Dialog.Close>
-					{#if step < 5}
+					{#if step < 3}
 						<Button onclick={nextStep}>Next</Button>
 					{:else}
 						<Button

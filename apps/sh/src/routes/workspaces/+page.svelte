@@ -30,6 +30,7 @@
 		{ id: 'git', label: 'Git', hideable: true },
 		{ id: 'url', label: 'URL', hideable: true },
 		{ id: 'port', label: 'Port', hideable: true },
+		{ id: 'username', label: 'Username', hideable: true },
 		{ id: 'rootPath', label: 'Root Path', hideable: true },
 		{ id: 'cwd', label: 'CWD', hideable: true },
 		{ id: 'status', label: 'Status', hideable: false },
@@ -43,6 +44,7 @@
 		git: true,
 		url: true,
 		port: true,
+		username: true,
 		rootPath: false, // Hidden by default
 		cwd: false, // Hidden by default
 		status: true,
@@ -145,6 +147,8 @@
 							>{/if}
 						{#if columnVisibility.port !== false}<Table.Head>Port</Table.Head
 							>{/if}
+						{#if columnVisibility.username !== false}<Table.Head>Username</Table.Head
+							>{/if}
 						{#if columnVisibility.rootPath !== false}<Table.Head
 								>Root Path</Table.Head
 							>{/if}
@@ -197,6 +201,9 @@
 							{/if}
 							{#if columnVisibility.port !== false}
 								<Table.Cell>{config.port}</Table.Cell>
+							{/if}
+							{#if columnVisibility.username !== false}
+								<Table.Cell>{config.username}</Table.Cell>
 							{/if}
 							{#if columnVisibility.rootPath !== false}
 								<Table.Cell
