@@ -13,6 +13,9 @@
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 	import { createMutation } from '@tanstack/svelte-query';
+	import { formatDate } from '$lib/utils/date';
+	import { Badge } from '@repo/ui/badge';
+	import { Button } from '@repo/ui/button';
 
 	let { data }: { data: PageData } = $props();
 	const workspaceConfig = $derived(data.workspaceConfig);
@@ -122,18 +125,18 @@
 		</Breadcrumb.Root>
 
 		{#if session}
-			<!-- <div class="flex items-center justify-between pb-4 border-b">
+			<div class="flex items-center justify-between pb-4 border-b">
 				<div>
 					<h1 class="text-2xl font-bold">
-						{session.title || 'Untitled Session'}
+						{session.title ?? 'Untitled Session'}
 					</h1>
 					<div
 						class="flex items-center gap-4 mt-1 text-sm text-muted-foreground"
 					>
-						<span
-							>Created {formatDate(
+						<span >Created {formatDate(
 								new Date(session.time.created),
-							)}</span
+							)}
+							</span
 						>
 						<span>•</span>
 						<span
@@ -202,7 +205,7 @@
 						Delete
 					</Button>
 				</div>
-			</div> -->
+			</div>
 		{/if}
 
 		<div class="flex-1 overflow-y-auto">
