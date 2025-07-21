@@ -206,10 +206,9 @@ export function createMessageSubscriber(
 
 		// Construct SSE URL with authentication
 		// Since EventSource doesn't support headers, we need to use Basic Auth in URL
-		// const sseUrl = new URL('/event', workspace().url);
+		const sseUrl = new URL('/event', workspace().url);
 		// sseUrl.username = workspace().username;
 		// sseUrl.password = workspace().password;
-		const sseUrl = new URL('/event', 'http://localhost:8080');
 
 		eventSource = new EventSource(sseUrl.toString());
 
@@ -286,7 +285,9 @@ export function createMessageSubscriber(
  * }
  * ```
  */
-export function isMessageProcessing(message: MessageInfo | AssistantMessage): boolean {
+export function isMessageProcessing(
+	message: MessageInfo | AssistantMessage,
+): boolean {
 	if (message.role !== 'assistant') return false;
 	return !('completed' in message.time && message.time.completed);
 }
