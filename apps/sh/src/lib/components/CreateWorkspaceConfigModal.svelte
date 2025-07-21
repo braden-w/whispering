@@ -83,24 +83,59 @@
 		}
 	});
 
+	// Port configuration constants
+	const NGROK_API_PORT = 4040; // Default ngrok API port
+	const NGROK_PROXY_PORT = 4080; // Port we'll expose ngrok API through
+
 	// Commands for copy functionality
 	const opencodeCommand = $derived(`opencode serve -p ${privatePortState}` as const);
 	const caddyCommand = $derived(
 		`caddy run --config - --adapter caddyfile << 'EOF'
-:${publicPortState} {
+# Caddyfile with two proxy configurations
+# This setup enables:
+# 1. Access to ngrok's API (for auto-detection) via localhost:${NGROK_PROXY_PORT}
+# 2. Access to your OpenCode server with CORS headers via :${publicPortState}
+
+# Proxy 1: ngrok API proxy
+# This proxies localhost:${NGROK_PROXY_PORT} → localhost:${NGROK_API_PORT} (ngrok's API)
+# Purpose: Allows the web app to detect ngrok tunnels automatically
+localhost:${NGROK_PROXY_PORT} {
+    # Add CORS headers for browser access to ngrok API
     header Access-Control-Allow-Origin "*"
     header Access-Control-Allow-Methods "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers "*"
     header Access-Control-Allow-Credentials "true"
     
+    # Handle preflight OPTIONS requests
     @options {
         method OPTIONS
     }
     respond @options 204
     
+    # Proxy all requests to ngrok's API
+    reverse_proxy localhost:${NGROK_API_PORT}
+}
+
+# Proxy 2: OpenCode server with CORS support
+# This proxies :${publicPortState} → localhost:${privatePortState} (your OpenCode server)
+# Purpose: Adds CORS headers that OpenCode doesn't provide natively
+:${publicPortState} {
+    # Add CORS headers to all responses for browser compatibility
+    header Access-Control-Allow-Origin "*"
+    header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers "*"
+    header Access-Control-Allow-Credentials "true"
+    
+    # Handle preflight OPTIONS requests
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+    
+    # Proxy all requests to your OpenCode server
     reverse_proxy localhost:${privatePortState}
 }
-EOF` as const,
+EOF` as const
 	);
 	const ngrokCommand = $derived(
 		`ngrok http ${publicPortState} --basic-auth="${username}:${password}"` as const,
@@ -252,7 +287,7 @@ EOF` as const,
 		isDetecting = true;
 		try {
 			// Use the proxy API route for ngrok detection
-			const response = await fetch('/api/proxy/http://localhost:4040/api/tunnels');
+			const response = await fetch(`http://localhost:${NGROK_PROXY_PORT}/api/tunnels`);
 
 			if (!response.ok) {
 				throw new Error(
@@ -433,15 +468,20 @@ EOF` as const,
 								<Accordion.Content>
 									<div class="space-y-3 pt-2">
 										<p class="text-sm text-muted-foreground">
-											This setup uses a three-layer architecture:
+											This setup uses a three-layer architecture with dual proxy configuration:
 										</p>
 										<ol class="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-4">
 											<li><strong>OpenCode</strong>: Runs on the private port ({privatePortState}) - this is your actual development server</li>
-											<li><strong>Caddy</strong>: Acts as a proxy on the public port ({publicPortState}) and adds CORS headers for browser compatibility</li>
-											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your public port to the internet with authentication</li>
+											<li><strong>Caddy (dual proxy)</strong>: 
+												<ul class="list-disc list-inside ml-4 mt-1">
+													<li>Proxies :${publicPortState} → localhost:{privatePortState} with CORS headers for browser compatibility</li>
+													<li>Proxies localhost:${NGROK_PROXY_PORT} → localhost:${NGROK_API_PORT} for ngrok tunnel auto-detection</li>
+												</ul>
+											</li>
+											<li><strong>ngrok</strong>: Creates a secure tunnel to expose your public port ({publicPortState}) to the internet with authentication</li>
 										</ol>
 										<p class="text-sm text-muted-foreground">
-											The Caddy proxy is necessary because OpenCode doesn't include CORS headers, which are required for browser-based access.
+											The Caddy proxy is necessary because OpenCode doesn't include CORS headers, which are required for browser-based access. The second proxy enables automatic ngrok URL detection.
 										</p>
 									</div>
 								</Accordion.Content>
