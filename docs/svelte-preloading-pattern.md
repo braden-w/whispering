@@ -72,10 +72,7 @@ Now in the component:
 </script>
 
 <!-- No conditional rendering needed -->
-<MessageList
-  messages={messages.value}
-  isLoading={sessionQuery.isPending}
-/>
+<MessageList messages={messages.value} />
 ```
 
 That's it. No conditional logic. No null checks. No effects watching for redirects.

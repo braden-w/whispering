@@ -1,33 +1,16 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-	import { getWorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
-	import * as rpc from '$lib/query';
-	import SessionList from './_components/SessionList.svelte';
-	import CreateSessionModal from './_components/CreateSessionModal.svelte';
-	import { Button } from '@repo/ui/button';
+	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
 	import { Badge } from '@repo/ui/badge';
 	import * as Breadcrumb from '@repo/ui/breadcrumb';
+	import { Button } from '@repo/ui/button';
 	import { ChevronRight } from 'lucide-svelte';
-	import WorkspaceConnectionBadge from '$lib/components/WorkspaceConnectionBadge.svelte';
+	import CreateSessionModal from './_components/CreateSessionModal.svelte';
+	import SessionList from './_components/SessionList.svelte';
 
-	const workspaceId = $derived($page.params.id);
-	const workspaceConfig = $derived(getWorkspaceConfig(workspaceId));
+	const { data } = $props();
 
-	// Redirect if workspace not found
-	$effect(() => {
-		if (!workspaceConfig) {
-			goto('/workspaces');
-		}
-	});
-
-	// Create sessions query with workspace accessor
-	const sessionsQuery = $derived(
-		workspaceConfig
-			? createQuery(rpc.sessions.getSessions(() => workspaceConfig).options)
-			: null,
-	);
+	const workspaceConfig = $derived(data.workspaceConfig);
+	const sessions = $derived(data.sessions);
 
 	let createDialogOpen = $state(false);
 </script>
@@ -62,14 +45,9 @@
 				</div>
 				<div class="flex items-center gap-4">
 					<WorkspaceConnectionBadge workspaceConfig={workspaceConfig} />
-					{#if sessionsQuery && sessionsQuery.data}
 						<Badge variant="secondary" class="text-sm">
-							{sessionsQuery.data.length} session{sessionsQuery.data.length !==
-							1
-								? 's'
-								: ''}
+							{sessions.length} session{sessions.length !== 1 ? 's' : ''}
 						</Badge>
-					{/if}
 					<Button onclick={() => (createDialogOpen = true)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -90,13 +68,10 @@
 				</div>
 			</div>
 
-			{#if sessionsQuery}
 				<SessionList
-					sessions={sessionsQuery.data || []}
-					isLoading={sessionsQuery.isPending}
+					sessions={sessions}
 					workspaceConfig={workspaceConfig}
 				/>
-			{/if}
 		</div>
 	</div>
 

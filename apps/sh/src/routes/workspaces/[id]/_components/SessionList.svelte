@@ -1,29 +1,18 @@
 <script lang="ts">
-	import { Skeleton } from '@repo/ui/skeleton';
 	import SessionCard from './SessionCard.svelte';
 	import type { Session } from '$lib/client/types.gen';
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
 	let {
 		sessions,
-		isLoading = false,
 		workspaceConfig,
 	}: {
 		sessions: Session[];
-		isLoading?: boolean;
 		workspaceConfig?: WorkspaceConfig;
 	} = $props();
 </script>
 
-{#if isLoading}
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each Array(6) as _}
-			<div class="space-y-3">
-				<Skeleton class="h-[125px] w-full rounded-xl" />
-			</div>
-		{/each}
-	</div>
-{:else if sessions.length === 0}
+{#if sessions.length === 0}
 	<div class="flex flex-col items-center justify-center py-12 text-center">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
