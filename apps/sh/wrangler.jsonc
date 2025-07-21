@@ -4,6 +4,16 @@
 	"compatibility_date": "2025-07-19",
 	"pages_build_output_dir": ".svelte-kit/cloudflare",
 	"observability": {
-		"enabled": true,
+		"enabled": true
 	},
+	"routes": [
+		{
+			"pattern": "epicenter.sh",
+			"custom_domain": true
+		},
+		{
+			"pattern": "*.epicenter.sh",
+			"custom_domain": true
+		}
+	]
 }
