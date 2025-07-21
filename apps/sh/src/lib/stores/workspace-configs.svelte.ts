@@ -14,23 +14,23 @@ import { toast } from 'svelte-sonner';
  * - Authentication handled at OpenCode level
  */
 const WorkspaceConfig = type({
-	id: 'string',
-	name: 'string',
-	url: 'string.url',
-	port: '1 <= number.integer <= 65535',
-	password: 'string',
 	createdAt: 'number',
+	id: 'string',
 	lastAccessedAt: 'number',
+	name: 'string',
+	password: 'string',
+	port: '1 <= number.integer <= 65535',
+	url: 'string.url',
 });
 
 export type WorkspaceConfig = typeof WorkspaceConfig.infer;
 
 export type WorkspaceCreateInput = Omit<
 	WorkspaceConfig,
-	'id' | 'createdAt' | 'lastAccessedAt'
+	'createdAt' | 'id' | 'lastAccessedAt'
 >;
 export type WorkspaceUpdateInput = Partial<
-	Omit<WorkspaceConfig, 'id' | 'createdAt'>
+	Omit<WorkspaceConfig, 'createdAt' | 'id'>
 >;
 
 /**
@@ -39,7 +39,6 @@ export type WorkspaceUpdateInput = Partial<
  */
 export const workspaceConfigs = createPersistedState({
 	key: 'opencode-workspace-configs',
-	schema: WorkspaceConfig.array(),
 	onParseError: (error) => {
 		if (error.type === 'storage_empty') {
 			return []; // First time user
@@ -68,7 +67,7 @@ export const workspaceConfigs = createPersistedState({
 					}
 					return w;
 				});
-				
+
 				const valid = migrated.filter((w) => {
 					const result = WorkspaceConfig(w);
 					if (result instanceof type.errors) return false;
@@ -87,45 +86,8 @@ export const workspaceConfigs = createPersistedState({
 		console.error('Failed to save workspaces:', error);
 		toast.error('Failed to save changes');
 	},
+	schema: WorkspaceConfig.array(),
 });
-
-// Check if a port is available by attempting to connect to it
-export async function isPortAvailable(port: number): Promise<boolean> {
-	try {
-		// Try to fetch from localhost on the given port
-		// If it fails with network error, the port is likely available
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
-
-		await fetch(`http://localhost:${port}`, {
-			signal: controller.signal,
-			mode: 'no-cors', // Avoid CORS issues
-		});
-		clearTimeout(timeoutId);
-
-		// If we get here, something is running on this port
-		return false;
-	} catch (error) {
-		// Network error means port is likely available
-		return true;
-	}
-}
-
-// Generate an available port starting from 4096
-export async function generateAvailablePort(): Promise<number> {
-	let port = 4096;
-	const maxPort = 65535;
-
-	while (port <= maxPort) {
-		if (await isPortAvailable(port)) {
-			return port;
-		}
-		port++;
-	}
-
-	// Fallback to random if no ports available in range
-	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
-}
 
 // Helper functions for workspace operations
 export function createWorkspaceConfig(
@@ -133,27 +95,14 @@ export function createWorkspaceConfig(
 ): WorkspaceConfig {
 	const newWorkspace: WorkspaceConfig = {
 		...data,
-		id: nanoid(),
 		createdAt: Date.now(),
+		id: nanoid(),
 		lastAccessedAt: Date.now(),
 	};
 
 	workspaceConfigs.value = [...workspaceConfigs.value, newWorkspace];
 	toast.success('Workspace created successfully');
 	return newWorkspace;
-}
-
-export function updateWorkspaceConfig(
-	id: string,
-	updates: WorkspaceUpdateInput,
-): void {
-	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
-		if (w.id !== id) return w;
-
-		return { ...w, ...updates, lastAccessedAt: Date.now() };
-	});
-
-	toast.success('Workspace updated');
 }
 
 export function deleteWorkspaceConfig(id: string): void {
@@ -167,6 +116,58 @@ export function deleteWorkspaceConfig(id: string): void {
 	toast.success(`Deleted workspace "${workspace.name}"`);
 }
 
-export function getWorkspaceConfig(id: string): WorkspaceConfig | undefined {
+// Generate an available port starting from 4096
+export async function generateAvailablePort(): Promise<number> {
+	let port = 4096;
+	return port;
+	const maxPort = 65535;
+
+	while (port <= maxPort) {
+		if (await isPortAvailable(port)) {
+			return port;
+		}
+		port++;
+	}
+
+	// Fallback to random if no ports available in range
+	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+}
+
+export function getWorkspaceConfig(id: string): undefined | WorkspaceConfig {
 	return workspaceConfigs.value.find((w) => w.id === id);
+}
+
+// Check if a port is available by attempting to connect to it
+export async function isPortAvailable(port: number): Promise<boolean> {
+	try {
+		// Try to fetch from localhost on the given port
+		// If it fails with network error, the port is likely available
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 second timeout
+
+		await fetch(`http://localhost:${port}`, {
+			mode: 'no-cors', // Avoid CORS issues
+			signal: controller.signal,
+		});
+		clearTimeout(timeoutId);
+
+		// If we get here, something is running on this port
+		return false;
+	} catch (error) {
+		// Network error means port is likely available
+		return true;
+	}
+}
+
+export function updateWorkspaceConfig(
+	id: string,
+	updates: WorkspaceUpdateInput,
+): void {
+	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
+		if (w.id !== id) return w;
+
+		return { ...w, ...updates, lastAccessedAt: Date.now() };
+	});
+
+	toast.success('Workspace updated');
 }
