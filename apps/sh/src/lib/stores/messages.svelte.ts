@@ -193,47 +193,90 @@ export function createMessageSubscriber({
 		}
 
 		// Construct SSE URL with authentication
-		// Since EventSource doesn't support headers, we need to use Basic Auth in URL
 		const sseUrl = new URL('/event', workspace().url);
-		// sseUrl.username = workspace().username;
-		// sseUrl.password = workspace().password;
+
+		console.log('Creating EventSource connection to:', sseUrl.toString());
 
 		eventSource = new EventSource(sseUrl.toString());
 
-		// Handle message updates
-		eventSource.addEventListener('message.updated', (event) => {
-			const data = parseEventData<EventMessageUpdated>(event);
-			if (data && data.properties.info.sessionID === sessionId()) {
-				upsertMessage(data.properties.info);
-				update();
-			}
-		});
+		// Handle connection open
+		eventSource.onopen = () => {
+			console.log('SSE connection opened successfully');
+		};
 
-		// Handle message part updates (streaming)
-		eventSource.addEventListener('message.part.updated', (event) => {
-			const data = parseEventData<EventMessagePartUpdated>(event);
-			// Parts have their own sessionID and messageID
-			if (data && data.properties.part.sessionID === sessionId()) {
-				mergeStreamingPart(
-					data.properties.part.messageID,
-					data.properties.part,
-				);
-				update();
+		// Handle all SSE events (server sends everything as 'message' events)
+		eventSource.onmessage = (event) => {
+			console.log('Received SSE message:', event.data);
+			
+			const eventData = parseEventData<any>(event);
+			if (!eventData) {
+				console.log('Failed to parse event data');
+				return;
 			}
-		});
 
-		// Handle message removal
-		eventSource.addEventListener('message.removed', (event) => {
-			const data = parseEventData<EventMessageRemoved>(event);
-			if (data && data.properties.sessionID === sessionId()) {
-				deleteMessageById(data.properties.messageID);
-				update();
+			console.log('Event type:', eventData.type);
+
+			// Route events based on type
+			switch (eventData.type) {
+				case 'message.updated': {
+					console.log('Processing message.updated event');
+					const data = eventData as EventMessageUpdated;
+					if (data.properties.info.sessionID === sessionId()) {
+						console.log('Processing message update for session:', sessionId());
+						upsertMessage(data.properties.info);
+						update();
+					} else {
+						console.log('Ignoring message update - session mismatch');
+					}
+					break;
+				}
+
+				case 'message.part.updated': {
+					console.log('Processing message.part.updated event');
+					const data = eventData as EventMessagePartUpdated;
+					if (data.properties.part.sessionID === sessionId()) {
+						console.log('Processing part update for session:', sessionId(), 'message:', data.properties.part.messageID);
+						mergeStreamingPart(
+							data.properties.part.messageID,
+							data.properties.part,
+						);
+						update();
+					} else {
+						console.log('Ignoring part update - session mismatch');
+					}
+					break;
+				}
+
+				case 'message.removed': {
+					console.log('Processing message.removed event');
+					const data = eventData as EventMessageRemoved;
+					if (data.properties.sessionID === sessionId()) {
+						console.log('Processing message removal for session:', sessionId());
+						deleteMessageById(data.properties.messageID);
+						update();
+					} else {
+						console.log('Ignoring message removal - session mismatch');
+					}
+					break;
+				}
+
+				default:
+					console.log('Unhandled event type:', eventData.type);
+					break;
 			}
-		});
+		};
 
 		// Handle connection errors
 		eventSource.onerror = (error) => {
-			console.error('SSE connection error:', error);
+			console.error(
+				'SSE connection error:',
+				error,
+				'ReadyState:',
+				eventSource?.readyState,
+			);
+			if (eventSource?.readyState === EventSource.CLOSED) {
+				console.error('SSE connection closed unexpectedly');
+			}
 			// TODO: Implement exponential backoff reconnection
 		};
 
