@@ -33,7 +33,7 @@ export type Message = {
 ## How It Works
 
 ### Initial Load
-When a session loads, the store fetches all messages with their parts from the API.
+Messages are fetched in the SvelteKit load function using the query layer, then passed to the message subscriber.
 
 ### Real-time Updates
 The store listens to Server-Sent Events (SSE) for live updates:
@@ -54,21 +54,36 @@ Result: "Hello world"
 ## Usage
 
 ```typescript
+// In your +page.ts load function
+import * as rpc from '$lib/query';
+import { queryClient } from '$lib/query/_client';
+
+export const load = async ({ params }) => {
+  // Fetch initial messages
+  const messages = await queryClient.ensureQueryData(
+    rpc.messages.getMessagesBySessionId(
+      () => workspaceConfig,
+      () => params.sessionId
+    ).options()
+  );
+
+  return {
+    messages,
+    // ... other data
+  };
+};
+
+// In your +page.svelte component
 import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 
-// Create a reactive message subscriber
-const messages = createMessageSubscriber(
-  () => workspace,
-  () => sessionId
-);
-
-// Access messages in your component
-$effect(() => {
-  console.log('Messages:', messages.value);
+const messages = createMessageSubscriber({
+  workspace: () => workspaceConfig,
+  sessionId: () => session.id,
+  initialMessages: () => data.messages ?? []
 });
 
-// Load initial messages
-await messages.loadInitialMessages();
+// Access messages in your component
+$inspect(messages.value);
 ```
 
 ## Helper Functions
