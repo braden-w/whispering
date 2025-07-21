@@ -244,7 +244,6 @@
 				<ModelSelector
 					{workspaceConfig}
 					bind:value={selectedModel}
-					class="w-[200px]"
 				/>
 			</div>
 			
