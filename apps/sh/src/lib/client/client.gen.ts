@@ -35,7 +35,7 @@ export const client = createClient(
 /**
  * Create an API client configured for a specific workspace
  */
-export function createWorkspaceClient(workspace: WorkspaceConfig) {
+export function createWorkspaceClient(workspace: Pick<WorkspaceConfig, 'url'>) {
 	// Create a new client with workspace-specific configuration
 	// TODO: Implement password authentication when OpenCode supports it
 	return createClient(
