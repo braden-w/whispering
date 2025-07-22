@@ -1,7 +1,3 @@
-<!--
-	Installed from @ieedan/shadcn-svelte-extras
--->
-
 <script lang="ts">
 	import { cn } from '#/utils/utils.js';
 	import { Drawer as DrawerPrimitive } from 'vaul-svelte';

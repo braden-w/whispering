@@ -1,7 +1,3 @@
-<!--
-	Installed from @ieedan/shadcn-svelte-extras
--->
-
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 
@@ -18,7 +14,7 @@
 <div
 	bind:this={ref}
 	data-slot="drawer-header"
-	class={cn('flex flex-col gap-1.5', className)}
+	class={cn('flex flex-col gap-1.5 p-4', className)}
 	{...restProps}
 >
 	{@render children?.()}

@@ -1,7 +1,3 @@
-/*
-	Installed from @ieedan/shadcn-svelte-extras
-*/
-
 import { Drawer as DrawerPrimitive } from 'vaul-svelte';
 
 import Close from './drawer-close.svelte';
@@ -30,6 +26,7 @@ export {
 	Header as DrawerHeader,
 	NestedRoot as DrawerNestedRoot,
 	Overlay as DrawerOverlay,
+
 	Portal as DrawerPortal,
 	Title as DrawerTitle,
 	Trigger as DrawerTrigger,
