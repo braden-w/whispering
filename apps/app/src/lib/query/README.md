@@ -368,8 +368,12 @@ const mutation = createMutation(rpc.recordings.createRecording.options);
 
 // Then you call it with callbacks:
 mutation.mutate(recording, {
-	onSuccess: () => { /* ... */ },
-	onError: (error) => { /* ... */ }
+	onSuccess: () => {
+		/* ... */
+	},
+	onError: (error) => {
+		/* ... */
+	},
 });
 ```
 
@@ -582,27 +586,32 @@ if (rpc.transcription.isCurrentlyTranscribing()) {
 <script lang="ts">
 	// Create mutations with just .options (no parentheses!)
 	const transcribeRecordings = createMutation(
-		rpc.transcription.transcribeRecordings.options
+		rpc.transcription.transcribeRecordings.options,
 	);
 	const deleteRecordings = createMutation(
-		rpc.recordings.deleteRecordings.options
+		rpc.recordings.deleteRecordings.options,
 	);
 
-	async function handleBulkAction(selectedIds: string[], recordings: Recording[]) {
+	async function handleBulkAction(
+		selectedIds: string[],
+		recordings: Recording[],
+	) {
 		if (action === 'transcribe') {
 			transcribeRecordings.mutate(selectedIds, {
 				onSuccess: ({ oks, errs }) => {
 					if (errs.length === 0) {
 						toast.success(`Transcribed ${oks.length} recordings!`);
 					} else {
-						toast.warning(`Transcribed ${oks.length} of ${selectedIds.length} recordings`);
+						toast.warning(
+							`Transcribed ${oks.length} of ${selectedIds.length} recordings`,
+						);
 					}
 				},
 				onError: (error) => {
-					toast.error('Failed to transcribe recordings', { 
-						description: error.message 
+					toast.error('Failed to transcribe recordings', {
+						description: error.message,
 					});
-				}
+				},
 			});
 		} else if (action === 'delete') {
 			deleteRecordings.mutate(selectedIds, {
@@ -610,10 +619,10 @@ if (rpc.transcription.isCurrentlyTranscribing()) {
 					toast.success('Deleted recordings!');
 				},
 				onError: (error) => {
-					toast.error('Failed to delete recordings', { 
-						description: error.message 
+					toast.error('Failed to delete recordings', {
+						description: error.message,
 					});
-				}
+				},
 			});
 		}
 	}
@@ -900,7 +909,7 @@ const recordingQuery = createQuery(
 ```typescript
 // Create mutation with just .options (no parentheses!)
 const deleteRecordingMutation = createMutation(
-	rpc.recordings.deleteRecording.options
+	rpc.recordings.deleteRecording.options,
 );
 
 // Trigger mutation with callbacks as second argument
@@ -911,7 +920,7 @@ deleteRecordingMutation.mutate(recordingId, {
 	},
 	onError: (error) => {
 		toast.error(error.title, { description: error.description });
-	}
+	},
 });
 ```
 
