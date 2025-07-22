@@ -571,6 +571,31 @@ So I built Whispering to cut out the middleman. You bring your own API key, your
 - Include any breaking changes prominently
 - Link to relevant issues
 
+### Pull Request Body Format
+Use clean paragraph format instead of bullet points or structured sections:
+
+**First Paragraph**: Explain what the change does and what problem it solves.
+- Focus on the user-facing benefit or technical improvement
+- Use clear, descriptive language about the behavior change
+
+**Subsequent Paragraphs**: Explain how the implementation works.
+- Describe the technical approach taken
+- Explain key classes, methods, or patterns used
+- Include reasoning for technical decisions (e.g., why `flex-1` is needed)
+
+**Example**:
+```
+This change enables proper vertical scrolling for drawer components when content exceeds the available drawer height. Previously, drawers with long content could overflow without proper scrolling behavior, making it difficult for users to access all content and resulting in poor mobile UX.
+
+To accomplish this, I wrapped the `{@render children?.()}` in a `<div class="flex-1 overflow-y-auto">` container. The `flex-1` class ensures the content area takes up all remaining space after the fixed drag handle at the top, while `overflow-y-auto` enables vertical scrolling when the content height exceeds the available space. This maintains the drag handle as a fixed element while allowing the content to scroll independently, preserving the expected drawer interaction pattern.
+```
+
+**Avoid**:
+- Bullet points or structured lists
+- Section headers like "## Summary" or "## Changes Made"
+- Test plans or checklists (unless specifically requested)
+- Marketing language or excessive formatting
+
 ## What NOT to Include:
 - `🤖 Generated with [Claude Code](https://claude.ai/code)`
 - `Co-Authored-By: Claude <noreply@anthropic.com>`
