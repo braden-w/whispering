@@ -7,7 +7,7 @@ import {
 	type WorkspaceConfig,
 	workspaceConfigs,
 } from '$lib/stores/workspace-configs.svelte';
-import { Ok } from 'wellcrafted/result';
+import { Err, Ok } from 'wellcrafted/result';
 
 import { defineQuery, queryClient } from './_client';
 
@@ -70,6 +70,31 @@ export const getWorkspaces = () =>
 
 			const enhancedWorkspaces = await Promise.all(workspacePromises);
 			return Ok(enhancedWorkspaces);
+		},
+	});
+
+/**
+ * Tests a workspace connection by attempting to connect to an OpenCode server.
+ *
+ * This is used for validating workspace credentials before creating a workspace config.
+ * Takes connection parameters and attempts to fetch the app info.
+ *
+ * @param params - The workspace connection parameters (port, url, password)
+ * @returns The app info if connection succeeds, or throws an error
+ */
+export const testWorkspaceConnection = (params: {
+	port: number;
+	url: string;
+	password: string | null;
+}) =>
+	defineQuery({
+		queryKey: ['test-workspace', params],
+		resultQueryFn: async (): Promise<Ok<boolean>> => {
+			const client = createWorkspaceClient({ url: params.url });
+			const { data, error } = await api.getApp({ client });
+
+			if (error || !data) return Ok(false);
+			return Ok(true);
 		},
 	});
 
