@@ -10,7 +10,9 @@
 	<title>Download Desktop App - Whispering</title>
 </svelte:head>
 
-<main class="flex flex-1 items-center justify-center p-4 container max-w-4xl mx-auto">
+<main
+	class="flex flex-1 items-center justify-center p-4 container max-w-4xl mx-auto"
+>
 	<div class="w-full">
 		<header class="text-center space-y-4 mb-8">
 			<h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">
