@@ -1,10 +1,9 @@
-name: Sync AGENTS.md and CLAUDE.md
+name: Sync AGENTS.md to CLAUDE.md
 
 on:
   push:
     paths:
       - 'AGENTS.md'
-      - 'CLAUDE.md'
     branches:
       - main
   workflow_dispatch:
@@ -25,58 +24,28 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0  # Full history for better diff analysis
       
-      - name: Determine which file changed
+      - name: Check if sync is needed
         id: check_changes
         run: |
-          # For manual triggers, check which file was modified most recently
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            AGENTS_TIME=$(git log -1 --format="%at" -- AGENTS.md 2>/dev/null || echo "0")
-            CLAUDE_TIME=$(git log -1 --format="%at" -- CLAUDE.md 2>/dev/null || echo "0")
-            
-            if [ "$AGENTS_TIME" -gt "$CLAUDE_TIME" ]; then
-              echo "source=AGENTS.md" >> $GITHUB_OUTPUT
-              echo "target=CLAUDE.md" >> $GITHUB_OUTPUT
-              echo "sync_needed=true" >> $GITHUB_OUTPUT
-            elif [ "$CLAUDE_TIME" -gt "$AGENTS_TIME" ]; then
-              echo "source=CLAUDE.md" >> $GITHUB_OUTPUT
-              echo "target=AGENTS.md" >> $GITHUB_OUTPUT
-              echo "sync_needed=true" >> $GITHUB_OUTPUT
-            else
-              echo "sync_needed=false" >> $GITHUB_OUTPUT
-            fi
+          # Always sync from AGENTS.md to CLAUDE.md
+          echo "source=AGENTS.md" >> $GITHUB_OUTPUT
+          echo "target=CLAUDE.md" >> $GITHUB_OUTPUT
+          
+          # Check if files are different
+          if ! diff -q AGENTS.md CLAUDE.md >/dev/null 2>&1; then
+            echo "sync_needed=true" >> $GITHUB_OUTPUT
           else
-            # For push events, use the before/after comparison
-            if [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
-              # Normal push with history
-              AGENTS_CHANGED=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -c "^AGENTS.md$" || true)
-              CLAUDE_CHANGED=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -c "^CLAUDE.md$" || true)
-            else
-              # New branch or force push - check against parent
-              AGENTS_CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -c "^AGENTS.md$" || true)
-              CLAUDE_CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -c "^CLAUDE.md$" || true)
-            fi
-            
-            if [ "$AGENTS_CHANGED" -gt 0 ] && [ "$CLAUDE_CHANGED" -eq 0 ]; then
-              echo "source=AGENTS.md" >> $GITHUB_OUTPUT
-              echo "target=CLAUDE.md" >> $GITHUB_OUTPUT
-              echo "sync_needed=true" >> $GITHUB_OUTPUT
-            elif [ "$CLAUDE_CHANGED" -gt 0 ] && [ "$AGENTS_CHANGED" -eq 0 ]; then
-              echo "source=CLAUDE.md" >> $GITHUB_OUTPUT
-              echo "target=AGENTS.md" >> $GITHUB_OUTPUT
-              echo "sync_needed=true" >> $GITHUB_OUTPUT
-            else
-              echo "sync_needed=false" >> $GITHUB_OUTPUT
-            fi
+            echo "sync_needed=false" >> $GITHUB_OUTPUT
           fi
       
-      - name: Sync files
+      - name: Sync AGENTS.md to CLAUDE.md
         if: steps.check_changes.outputs.sync_needed == 'true'
         run: |
-          # Ensure both files exist
-          if [ -f "${{ steps.check_changes.outputs.source }}" ]; then
-            cp "${{ steps.check_changes.outputs.source }}" "${{ steps.check_changes.outputs.target }}"
+          # Copy AGENTS.md to CLAUDE.md
+          if [ -f "AGENTS.md" ]; then
+            cp "AGENTS.md" "CLAUDE.md"
           else
-            echo "Source file ${{ steps.check_changes.outputs.source }} not found!"
+            echo "Source file AGENTS.md not found!"
             exit 1
           fi
       
@@ -84,7 +53,7 @@ jobs:
         id: check_diff
         if: steps.check_changes.outputs.sync_needed == 'true'
         run: |
-          if git diff --quiet HEAD -- "${{ steps.check_changes.outputs.target }}"; then
+          if git diff --quiet HEAD -- "CLAUDE.md"; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -95,6 +64,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add "${{ steps.check_changes.outputs.target }}"
-          git commit -m "chore: sync ${{ steps.check_changes.outputs.target }} with ${{ steps.check_changes.outputs.source }}"
+          git add "CLAUDE.md"
+          git commit -m "chore: sync CLAUDE.md with AGENTS.md"
           git push
