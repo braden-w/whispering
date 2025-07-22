@@ -1,211 +1,223 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 .prose {
-  @apply max-w-[65ch] text-foreground;
+	@apply max-w-[65ch] text-foreground;
 
-  & h1:not(.not-prose h1) {
-    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
-  }
+	& h1:not(.not-prose h1) {
+		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+	}
 
-  & h2:not(.not-prose h2) {
-    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight mt-12 first:mt-0;
-  }
+	& h2:not(.not-prose h2) {
+		@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight mt-12 first:mt-0;
+	}
 
-  & h3:not(.not-prose h3) {
-    @apply scroll-m-20 text-2xl font-semibold mt-12 tracking-tight first:mt-0;
-  }
+	& h3:not(.not-prose h3) {
+		@apply scroll-m-20 text-2xl font-semibold mt-12 tracking-tight first:mt-0;
+	}
 
-  & h4:not(.not-prose h4) {
-    @apply scroll-m-20 text-xl font-semibold mt-12 tracking-tight first:mt-0;
-  }
+	& h4:not(.not-prose h4) {
+		@apply scroll-m-20 text-xl font-semibold mt-12 tracking-tight first:mt-0;
+	}
 
-  & h5:not(.not-prose h5) {
-    @apply scroll-m-20 text-lg font-semibold mt-12 tracking-tight first:mt-0;
-  }
+	& h5:not(.not-prose h5) {
+		@apply scroll-m-20 text-lg font-semibold mt-12 tracking-tight first:mt-0;
+	}
 
-  & h6:not(.not-prose h6) {
-    @apply scroll-m-20 text-base font-semibold mt-12 tracking-tight first:mt-0;
-  }
+	& h6:not(.not-prose h6) {
+		@apply scroll-m-20 text-base font-semibold mt-12 tracking-tight first:mt-0;
+	}
 
-  & h1:not(.not-prose h1), & h2:not(.not-prose h2), & h3:not(.not-prose h3), & h4:not(.not-prose h4), & h5:not(.not-prose h5), & h6:not(.not-prose h6) {
-    & + p {
-      @apply mt-0;
-    }
-  }
+	& h1:not(.not-prose h1),
+	& h2:not(.not-prose h2),
+	& h3:not(.not-prose h3),
+	& h4:not(.not-prose h4),
+	& h5:not(.not-prose h5),
+	& h6:not(.not-prose h6) {
+		& + p {
+			@apply mt-0;
+		}
+	}
 
-  & p:not(.not-prose p) {
-    @apply leading-[175%] [&:not(:first-child)]:mt-6;
-  }
+	& p:not(.not-prose p) {
+		@apply leading-[175%] [&:not(:first-child)]:mt-6;
+	}
 
-  & li:not(.not-prose li) {
-    @apply leading-[175%];
-  }
+	& li:not(.not-prose li) {
+		@apply leading-[175%];
+	}
 
-  & a:not(.not-prose a) {
-    @apply font-medium text-primary underline underline-offset-4;
-  }
+	& a:not(.not-prose a) {
+		@apply font-medium text-primary underline underline-offset-4;
+	}
 
-  & blockquote:not(.not-prose blockquote) {
-    @apply mt-6 border-l-2 pl-6 italic;
-  }
+	& blockquote:not(.not-prose blockquote) {
+		@apply mt-6 border-l-2 pl-6 italic;
+	}
 
-  & table:not(.not-prose table) {
-    @apply my-6 w-full overflow-y-auto;
+	& table:not(.not-prose table) {
+		@apply my-6 w-full overflow-y-auto;
 
-    & thead tr {
-      @apply m-0 border-t p-0 even:bg-muted;
-    }
+		& thead tr {
+			@apply m-0 border-t p-0 even:bg-muted;
+		}
 
-    & th {
-      @apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
-    }
+		& th {
+			@apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+		}
 
-    & tbody tr {
-      @apply m-0 border-t p-0 even:bg-muted;
-    }
+		& tbody tr {
+			@apply m-0 border-t p-0 even:bg-muted;
+		}
 
-    & td {
-      @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
-    }
-  }
+		& td {
+			@apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+		}
+	}
 
-  & ul:not(.not-prose ul) {
-    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+	& ul:not(.not-prose ul) {
+		@apply my-6 ml-6 list-disc [&>li]:mt-2;
 
-    & p {
-      @apply my-0 inline;
-    }
-  }
+		& p {
+			@apply my-0 inline;
+		}
+	}
 
-  & ol:not(.not-prose ol) {
-    @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+	& ol:not(.not-prose ol) {
+		@apply my-6 ml-6 list-decimal [&>li]:mt-2;
 
-    & p {
-      @apply my-0 inline;
-    }
-  }
+		& p {
+			@apply my-0 inline;
+		}
+	}
 
-  & pre:not(.not-prose pre) {
-    @apply bg-muted rounded-md p-4 my-6 text-sm overflow-y-auto;
-  }
+	& pre:not(.not-prose pre) {
+		@apply bg-muted rounded-md p-4 my-6 text-sm overflow-y-auto;
+	}
 
-  & code:not(pre code):not(.not-prose code) {
-    @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
-  }
+	& code:not(pre code):not(.not-prose code) {
+		@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+	}
 
-  & .lead:not(.not-prose .lead) {
-    @apply text-xl text-muted-foreground
-  }
+	& .lead:not(.not-prose .lead) {
+		@apply text-xl text-muted-foreground;
+	}
 
-  & .large:not(.not-prose .large) {
-    @apply text-lg font-semibold;
-  }
+	& .large:not(.not-prose .large) {
+		@apply text-lg font-semibold;
+	}
 
-  & .small:not(.not-prose .small) {
-    @apply text-sm font-medium leading-none;
-  }
+	& .small:not(.not-prose .small) {
+		@apply text-sm font-medium leading-none;
+	}
 
-  & .muted:not(.not-prose .muted) {
-    @apply text-sm text-muted-foreground;
-  }
+	& .muted:not(.not-prose .muted) {
+		@apply text-sm text-muted-foreground;
+	}
 
-  & img:not(.not-prose img), & picture:not(.not-prose picture), & video:not(.not-prose video) {
-    @apply my-6;
-  }
+	& img:not(.not-prose img),
+	& picture:not(.not-prose picture),
+	& video:not(.not-prose video) {
+		@apply my-6;
+	}
 
-  & picture > img:not(.not-prose picture > img) {
-    @apply my-0;
-  }
+	& picture > img:not(.not-prose picture > img) {
+		@apply my-0;
+	}
 
-  & kbd:not(.not-prose kbd) {
-    @apply rounded-md bg-muted px-1.5 py-0.5 text-xs font-semibold;
-  }
+	& kbd:not(.not-prose kbd) {
+		@apply rounded-md bg-muted px-1.5 py-0.5 text-xs font-semibold;
+	}
 
-  & hr {
-    @apply my-10;
-  }
+	& hr {
+		@apply my-10;
+	}
 
-  & dl:not(.not-prose dl) {
-    @apply my-6;
+	& dl:not(.not-prose dl) {
+		@apply my-6;
 
-    & dt {
-      @apply font-semibold mt-6 tracking-tight first:mt-0;
-    }
-  }
+		& dt {
+			@apply font-semibold mt-6 tracking-tight first:mt-0;
+		}
+	}
 
-  & details:not(.not-prose details) {
-    @apply mt-6;
+	& details:not(.not-prose details) {
+		@apply mt-6;
 
-    & summary {
-      @apply cursor-pointer font-semibold mt-6 tracking-tight;
-    }
+		& summary {
+			@apply cursor-pointer font-semibold mt-6 tracking-tight;
+		}
 
-    & p {
-      @apply [&:first-of-type]:mt-2;
-    }
-  }
+		& p {
+			@apply [&:first-of-type]:mt-2;
+		}
+	}
 
-  & mark:not(.not-prose mark) {
-    @apply bg-yellow-300;
-  }
+	& mark:not(.not-prose mark) {
+		@apply bg-yellow-300;
+	}
 
-  & small:not(.not-prose small) {
-    @apply text-xs leading-none;
-  }
+	& small:not(.not-prose small) {
+		@apply text-xs leading-none;
+	}
 }
 
 .prose-invert {
-  @apply text-primary-foreground;
+	@apply text-primary-foreground;
 
-  & h1:not(.not-prose h1), & h2:not(.not-prose h2), & h3:not(.not-prose h3), & h4:not(.not-prose h4), & h5:not(.not-prose h5), & h6:not(.not-prose h6) {
-    @apply text-primary-foreground;
-  }
+	& h1:not(.not-prose h1),
+	& h2:not(.not-prose h2),
+	& h3:not(.not-prose h3),
+	& h4:not(.not-prose h4),
+	& h5:not(.not-prose h5),
+	& h6:not(.not-prose h6) {
+		@apply text-primary-foreground;
+	}
 
-  & p:not(.not-prose p) {
-    @apply text-primary-foreground;
-  }
+	& p:not(.not-prose p) {
+		@apply text-primary-foreground;
+	}
 
-  & a:not(.not-prose a) {
-    @apply text-primary-foreground underline;
-  }
+	& a:not(.not-prose a) {
+		@apply text-primary-foreground underline;
+	}
 
-  & blockquote:not(.not-prose blockquote) {
-    @apply border-primary-foreground/30 text-primary-foreground/90;
-  }
+	& blockquote:not(.not-prose blockquote) {
+		@apply border-primary-foreground/30 text-primary-foreground/90;
+	}
 
-  & pre:not(.not-prose pre) {
-    @apply bg-primary-foreground/10 text-primary-foreground;
-  }
+	& pre:not(.not-prose pre) {
+		@apply bg-primary-foreground/10 text-primary-foreground;
+	}
 
-  & code:not(pre code):not(.not-prose code) {
-    @apply bg-primary-foreground/10 text-primary-foreground;
-  }
+	& code:not(pre code):not(.not-prose code) {
+		@apply bg-primary-foreground/10 text-primary-foreground;
+	}
 
-  & .lead:not(.not-prose .lead) {
-    @apply text-primary-foreground/80;
-  }
+	& .lead:not(.not-prose .lead) {
+		@apply text-primary-foreground/80;
+	}
 
-  & .muted:not(.not-prose .muted) {
-    @apply text-primary-foreground/70;
-  }
+	& .muted:not(.not-prose .muted) {
+		@apply text-primary-foreground/70;
+	}
 
-  & mark:not(.not-prose mark) {
-    @apply bg-yellow-400/20 text-primary-foreground;
-  }
+	& mark:not(.not-prose mark) {
+		@apply bg-yellow-400/20 text-primary-foreground;
+	}
 
-  & th {
-    @apply text-primary-foreground border-primary-foreground/20;
-  }
+	& th {
+		@apply text-primary-foreground border-primary-foreground/20;
+	}
 
-  & td {
-    @apply text-primary-foreground border-primary-foreground/20;
-  }
+	& td {
+		@apply text-primary-foreground border-primary-foreground/20;
+	}
 
-  & thead tr {
-    @apply border-primary-foreground/20;
-  }
+	& thead tr {
+		@apply border-primary-foreground/20;
+	}
 
-  & tbody tr {
-    @apply border-primary-foreground/20 even:bg-primary-foreground/5;
-  }
+	& tbody tr {
+		@apply border-primary-foreground/20 even:bg-primary-foreground/5;
+	}
 }
