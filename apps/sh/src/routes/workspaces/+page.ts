@@ -19,7 +19,7 @@ export const load: PageLoad = ({ url }) => {
 		name,
 	});
 
-	if (validated instanceof type.errors) return;
+	if (validated instanceof type.errors) return { createWorkspaceParams: null };
 
-	createWorkspaceConfig(validated);
+	return { createWorkspaceParams: validated };
 };
