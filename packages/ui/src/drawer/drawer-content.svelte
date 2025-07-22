@@ -32,6 +32,10 @@
 			'data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm',
 			// Override to z-40 to ensure that alert-dialogs (which are at z-50) are always on top of drawers
 			'z-40',
+			// Override gap-4 p-4 to gap-0 p-0: This removes spacing from the outer container so the scrollable 
+			// content can extend to the drawer edges for better mobile UX. The original gap-4 p-4 behavior 
+			// is restored within the inner scrollable div to maintain proper content spacing.
+			'gap-0 p-0',
 			className,
 		)}
 		{...restProps}
@@ -39,6 +43,10 @@
 		<div
 			class="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block"
 		></div>
-		{@render children?.()}
+		<!-- Scrollable content area: flex-1 takes remaining space after drag handle, overflow-y-auto enables 
+		     vertical scrolling when content exceeds height, flex flex-col gap-4 p-4 restores original spacing -->
+		<div class="flex flex-col flex-1 overflow-y-auto gap-4 p-4">
+			{@render children?.()}
+		</div>
 	</DrawerPrimitive.Content>
 </DrawerPrimitive.Portal>
