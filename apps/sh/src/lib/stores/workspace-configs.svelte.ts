@@ -18,17 +18,22 @@ const WorkspaceConfig = type({
 	id: 'string',
 	lastAccessedAt: 'number',
 	name: 'string',
-	password: 'string',
+	password: 'string | null',
 	port: '1 <= number.integer <= 65535',
 	url: 'string.url',
 });
 
 export type WorkspaceConfig = typeof WorkspaceConfig.infer;
 
-export type WorkspaceCreateInput = Omit<
-	WorkspaceConfig,
-	'createdAt' | 'id' | 'lastAccessedAt'
->;
+export const CreateWorkspaceParams = WorkspaceConfig.pick(
+	'password',
+	'port',
+	'url',
+	'name',
+);
+
+export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
+
 export type WorkspaceUpdateInput = Partial<
 	Omit<WorkspaceConfig, 'createdAt' | 'id'>
 >;
@@ -91,7 +96,7 @@ export const workspaceConfigs = createPersistedState({
 
 // Helper functions for workspace operations
 export function createWorkspaceConfig(
-	data: WorkspaceCreateInput,
+	data: CreateWorkspaceParams,
 ): WorkspaceConfig {
 	const newWorkspace: WorkspaceConfig = {
 		...data,
