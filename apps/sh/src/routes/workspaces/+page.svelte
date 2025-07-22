@@ -71,7 +71,9 @@
 </script>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
-	<div class="flex items-center justify-between mb-6">
+	<div
+		class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
+	>
 		<div>
 			<h1 class="text-3xl font-bold tracking-tight">Workspaces</h1>
 			<p class="text-muted-foreground mt-1">
@@ -131,7 +133,7 @@
 			</CreateWorkspaceConfigModal>
 		</div>
 	{:else}
-		<div class="rounded-md border">
+		<div class="rounded border">
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
