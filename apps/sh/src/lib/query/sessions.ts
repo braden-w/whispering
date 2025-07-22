@@ -192,7 +192,7 @@ export const initializeSession = defineMutation({
 		sessionId,
 		workspaceConfig,
 	}: {
-		body?: { messageID: string; modelID: string; providerID: string; };
+		body?: { messageID: string; modelID: string; providerID: string };
 		sessionId: string;
 		workspaceConfig: WorkspaceConfig;
 	}) => {

@@ -20,11 +20,13 @@ A web interface for managing and connecting to OpenCode servers. Connect to mult
 ### Development
 
 1. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 2. Start the development server:
+
 ```bash
 pnpm dev
 ```
@@ -38,6 +40,7 @@ pnpm build
 ```
 
 Preview the production build:
+
 ```bash
 pnpm preview
 ```

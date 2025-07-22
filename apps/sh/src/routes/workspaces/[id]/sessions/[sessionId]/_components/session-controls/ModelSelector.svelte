@@ -13,12 +13,12 @@
 	let {
 		class: className,
 		placeholder = 'Select a model...',
-		value = $bindable<null | { modelId: string; providerId: string; }>(null),
+		value = $bindable<null | { modelId: string; providerId: string }>(null),
 		workspaceConfig,
 	}: {
 		class?: string;
 		placeholder?: string;
-		value?: null | { modelId: string; providerId: string; };
+		value?: null | { modelId: string; providerId: string };
 		workspaceConfig: WorkspaceConfig;
 	} = $props();
 

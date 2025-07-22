@@ -9,7 +9,7 @@
 	let {
 		refetchInterval = 2000,
 		workspaceConfig,
-	}: { refetchInterval?: number; workspaceConfig: WorkspaceConfig; } = $props();
+	}: { refetchInterval?: number; workspaceConfig: WorkspaceConfig } = $props();
 
 	const workspaceQuery = createQuery(() => ({
 		...rpc.workspaces.getWorkspace(() => workspaceConfig).options(),

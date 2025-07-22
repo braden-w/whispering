@@ -21,9 +21,10 @@ import { defineQuery, queryClient } from './_client';
  *
  * Used in the UI to show users which workspaces are currently online and available.
  */
-export type Workspace = WorkspaceConfig & ({ appInfo: App; connected: true; } | { connected: false }) & {
-	checkedAt: number; // Unix timestamp of last connection check
-};
+export type Workspace = WorkspaceConfig &
+	({ appInfo: App; connected: true } | { connected: false }) & {
+		checkedAt: number; // Unix timestamp of last connection check
+	};
 
 /**
  * Fetches all workspace configs and attempts to merge them with live OpenCode app information.

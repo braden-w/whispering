@@ -47,7 +47,7 @@
 	});
 	let messageContent = $state('');
 	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
-	let selectedModel = $state<null | { modelId: string; providerId: string; }>({
+	let selectedModel = $state<null | { modelId: string; providerId: string }>({
 		modelId: 'claude-sonnet-4-20250514',
 		providerId: 'anthropic',
 	});

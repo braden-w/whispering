@@ -81,9 +81,9 @@ export type Options<
 	TResponseStyle extends ResponseStyle = 'fields',
 > = Omit<TData, 'url'> &
 	OmitKeys<
-	RequestOptions<TResponseStyle, ThrowOnError>,
-	'body' | 'path' | 'query' | 'url'
->;
+		RequestOptions<TResponseStyle, ThrowOnError>,
+		'body' | 'path' | 'query' | 'url'
+	>;
 
 export type OptionsLegacyParser<
 	TData = unknown,
