@@ -5,6 +5,8 @@ import { createWorkspaceClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import {
 	type Password,
+	type Port,
+	type URL,
 	type WorkspaceConfig,
 	workspaceConfigs,
 } from '$lib/stores/workspace-configs.svelte';
@@ -84,8 +86,8 @@ export const getWorkspaces = () =>
  * @returns The app info if connection succeeds, or throws an error
  */
 export const testWorkspaceConnection = (params: {
-	port: number;
-	url: string;
+	port: Port;
+	url: URL;
 	password: Password | null;
 }) =>
 	defineQuery({

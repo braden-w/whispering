@@ -6,6 +6,12 @@ import { toast } from 'svelte-sonner';
 export const Password = type('string > 0#Password');
 export type Password = typeof Password.infer;
 
+export const Port = type('1024 <= number.integer <= 65535#Port');
+export type Port = typeof Port.infer;
+
+export const URL = type('string.url#URL');
+export type URL = typeof URL.infer;
+
 /**
  * Configuration for connecting to an OpenCode server instance.
  * This is what users define and we persist locally in the app.
@@ -22,8 +28,8 @@ const WorkspaceConfig = type({
 	lastAccessedAt: 'number',
 	name: 'string',
 	password: [Password, '|', 'null'],
-	port: '1 <= number.integer <= 65535',
-	url: 'string.url',
+	port: Port,
+	url: URL,
 });
 
 export type WorkspaceConfig = typeof WorkspaceConfig.infer;
@@ -125,20 +131,27 @@ export function deleteWorkspaceConfig(id: string): void {
 }
 
 // Generate an available port starting from 4096
-export async function generateAvailablePort(): Promise<number> {
-	let port = 4096;
-	return port;
-	const maxPort = 65535;
+export async function generateAvailablePort(): Promise<Port> {
+	const MIN_PORT = 1024;
+	const MAX_PORT = 65535;
+	const PREFERRED_START = 4096;
 
-	while (port <= maxPort) {
-		if (await isPortAvailable(port)) {
-			return port;
+	// First, try ports from 4096 upwards to 65535
+	for (let port = PREFERRED_START; port <= MAX_PORT; port++) {
+		if (await isPortAvailable(port as Port)) {
+			return port as Port;
 		}
-		port++;
 	}
 
-	// Fallback to random if no ports available in range
-	return Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+	// If no ports found in preferred range, try lower ports from 1024 to 4095
+	for (let port = MIN_PORT; port < PREFERRED_START; port++) {
+		if (await isPortAvailable(port as Port)) {
+			return port as Port;
+		}
+	}
+
+	// Fallback to preferred start if no ports are available (unlikely)
+	return PREFERRED_START as Port;
 }
 
 export function getWorkspaceConfig(id: string): undefined | WorkspaceConfig {
@@ -146,7 +159,7 @@ export function getWorkspaceConfig(id: string): undefined | WorkspaceConfig {
 }
 
 // Check if a port is available by attempting to connect to it
-export async function isPortAvailable(port: number): Promise<boolean> {
+export async function isPortAvailable(port: Port): Promise<boolean> {
 	try {
 		// Try to fetch from localhost on the given port
 		// If it fails with network error, the port is likely available
