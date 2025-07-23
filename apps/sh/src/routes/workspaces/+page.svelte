@@ -17,13 +17,14 @@
 	import { cn } from '@repo/ui/utils';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronDown, GitBranch, Plus } from 'lucide-svelte';
+	import { badgeVariants } from '@repo/ui/badge';
 	
 	let { data }: { data: PageData } = $props();
 
 	// Define available columns
 	const columns = [
 		{ hideable: false, id: 'name', label: 'Name' },
-		{ hideable: false, id: 'gitPort', label: '' }, // Empty label for Git/Port info
+		{ hideable: false, id: 'port', label: 'Port' },
 		{ hideable: true, id: 'url', label: 'URL' },
 		{ hideable: true, id: 'rootPath', label: 'Root Path' },
 		{ hideable: true, id: 'cwd', label: 'CWD' },
@@ -39,7 +40,7 @@
 		actions: true,
 		cwd: false, // Hidden by default
 		name: true,
-		gitPort: true,
+		port: true,
 		lastUsed: true,
 		rootPath: false, // Hidden by default
 		status: true,
@@ -142,8 +143,8 @@
 					<Table.Row>
 						{#if columnVisibility.name !== false}<Table.Head
 							>Name</Table.Head>{/if}
-						{#if columnVisibility.gitPort !== false}<Table.Head
-							></Table.Head>{/if}
+						{#if columnVisibility.port !== false}<Table.Head
+							>Port</Table.Head>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}
 						{#if columnVisibility.rootPath !== false}<Table.Head
@@ -168,26 +169,28 @@
 						<Table.Row>
 							{#if columnVisibility.name !== false}
 								<Table.Cell class="font-medium">
-									{config.name}
+									<div class="flex items-center gap-2">
+										{config.name}
+										{#if workspace?.connected && workspace.appInfo.git}
+											<Tooltip.Provider>
+												<Tooltip.Root>
+													<Tooltip.Trigger class={badgeVariants({ variant: 'secondary' })}>
+														<GitBranch class="size-4" />
+													</Tooltip.Trigger>
+													<Tooltip.Content>
+														<p>Git repository detected</p>
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</Tooltip.Provider>
+										{/if}
+									</div>
 								</Table.Cell>
 							{/if}
-							{#if columnVisibility.gitPort !== false}
+							{#if columnVisibility.port !== false}
 								<Table.Cell>
-									<div class="flex items-center gap-2">
-										{#if workspace?.connected && workspace.appInfo.git}
-											<Tooltip.Root>
-												<Tooltip.Trigger class="inline-flex">
-													<GitBranch class="h-4 w-4 text-foreground" />
-												</Tooltip.Trigger>
-												<Tooltip.Content>
-													<p>Git is enabled for this repository</p>
-												</Tooltip.Content>
-											</Tooltip.Root>
-										{/if}
-										<Badge variant="secondary" class="text-xs">
-											{config.port}
-										</Badge>
-									</div>
+									<Badge variant="secondary" class="text-xs font-mono">
+										{config.port}
+									</Badge>
 								</Table.Cell>
 							{/if}
 							{#if columnVisibility.url !== false}
