@@ -18,7 +18,6 @@ export const ShCommand = cmd({
 				describe: 'port to listen on (auto-discovered if not specified)',
 			})
 			.option('hostname', {
-				alias: ['h'],
 				type: 'string',
 				describe: 'hostname to listen on',
 				default: '127.0.0.1',
