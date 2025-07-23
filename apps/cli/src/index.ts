@@ -3,7 +3,6 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Log } from '@epicenter/opencode/util/log.ts';
 import { ShCommand } from './commands/sh.js';
-import { Installation } from '@epicenter/opencode/installation/index.js';
 
 const cli = yargs(hideBin(process.argv))
 	.scriptName('epicenter')
@@ -24,7 +23,7 @@ const cli = yargs(hideBin(process.argv))
 	.middleware(async (opts) => {
 		await Log.init({
 			print: process.argv.includes('--print-logs'),
-			dev: Installation.isDev(),
+			dev: process.env.NODE_ENV === 'development',
 			level: (() => {
 				if (opts.logLevel) return opts.logLevel as Log.Level;
 				if (process.env.NODE_ENV === 'development') return 'DEBUG';
@@ -33,7 +32,6 @@ const cli = yargs(hideBin(process.argv))
 		});
 
 		Log.Default.info('epicenter', {
-			version: Installation.VERSION,
 			args: process.argv.slice(2),
 		});
 	})
