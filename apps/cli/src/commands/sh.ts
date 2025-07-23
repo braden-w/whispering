@@ -1,4 +1,4 @@
-import { ServeCommand } from '@epicenter/opencode/serve';
+import { ServeCommand } from '@epicenter/opencode/serve' with { type: "macro" };
 import getPort from 'get-port';
 import { cmd } from '../utils/cmd.js';
 
