@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-
-	import { goto } from '$app/navigation';
+	import type { PageData } from './$types';
+	import { goto} from '$app/navigation';
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import DeleteWorkspaceConfigButton from '$lib/components/DeleteWorkspaceConfigButton.svelte';
 	import EditWorkspaceConfigButton from '$lib/components/EditWorkspaceConfigButton.svelte';
@@ -17,6 +17,8 @@
 	import { cn } from '@repo/ui/utils';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronDown, GitBranch, Plus } from 'lucide-svelte';
+	
+	let { data }: { data: PageData } = $props();
 
 	// Helper function to extract folder name from path (cross-platform)
 	function getFolderName(path: string): string {
@@ -35,10 +37,12 @@
 		{ hideable: false, id: 'status', label: 'Status' },
 		{ hideable: true, id: 'lastUsed', label: 'Last Used' },
 		{ hideable: false, id: 'actions', label: 'Actions' },
-	];
+	] as const
+
+	type ColumnId = (typeof columns)[number]['id'];
 
 	// Persisted column visibility state
-	let columnVisibility = $state({
+	let columnVisibility = $state<Record<ColumnId, boolean>>({
 		actions: true,
 		cwd: false, // Hidden by default
 		folderName: true,
@@ -111,7 +115,10 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 
-			<CreateWorkspaceConfigModal>
+			<CreateWorkspaceConfigModal 
+				initialParams={data.createWorkspaceParams}
+				autoOpen={!!data.createWorkspaceParams}
+			>
 				{#snippet triggerChild({ props })}
 					<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Workspace</Button
 					>
@@ -126,7 +133,10 @@
 			<p class="text-muted-foreground mt-2">
 				Create your first workspace to connect to an OpenCode server
 			</p>
-			<CreateWorkspaceConfigModal>
+			<CreateWorkspaceConfigModal
+				initialParams={data.createWorkspaceParams}
+				autoOpen={!!data.createWorkspaceParams}
+			>
 				{#snippet triggerChild({ props })}
 					<Button {...props} class="mt-4">Create Workspace</Button>
 				{/snippet}
@@ -175,7 +185,7 @@
 							{#if columnVisibility.gitPort !== false}
 								<Table.Cell>
 									<div class="flex items-center gap-2">
-										{#if workspace?.connected && workspace.appInfo.git?.enabled}
+										{#if workspace?.connected && workspace.appInfo.git}
 											<Tooltip.Root>
 												<Tooltip.Trigger class="inline-flex">
 													<GitBranch class="h-4 w-4 text-foreground" />
@@ -186,7 +196,7 @@
 											</Tooltip.Root>
 										{/if}
 										<Badge variant="secondary" class="text-xs">
-											{config.port || config.privatePort || 4096}
+											{config.port}
 										</Badge>
 									</div>
 								</Table.Cell>
