@@ -3,6 +3,9 @@ import { type } from 'arktype';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 
+const Password = type('string > 0#Password');
+type Password = typeof Password.infer;
+
 /**
  * Configuration for connecting to an OpenCode server instance.
  * This is what users define and we persist locally in the app.
@@ -18,7 +21,7 @@ const WorkspaceConfig = type({
 	id: 'string',
 	lastAccessedAt: 'number',
 	name: 'string',
-	password: 'string | null',
+	password: [Password, '|', 'null'],
 	port: '1 <= number.integer <= 65535',
 	url: 'string.url',
 });
