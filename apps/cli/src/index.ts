@@ -13,7 +13,6 @@ const cli = yargs(hideBin(process.argv))
   .demandCommand(1, "You need to specify a command")
   .command(ShCommand)
   .example("epicenter sh", "Start opencode server with smart defaults")
-  .example("epicenter sh --port 8080", "Start server on specific port")
   .example("epicenter sh --tunnel=false --open=false", "Start without cloudflare tunnel or opening the browser")
   .strict()
   .fail((msg, err, yargs) => {
