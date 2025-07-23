@@ -92,9 +92,11 @@
 		>
 			<div class="flex items-center gap-2">
 				<StatusIcon
-					class="h-4 w-4 {statusConfig.color} {statusConfig.animate
-						? 'animate-spin'
-						: ''}"
+					class={cn(
+						'h-4 w-4',
+						statusConfig.color,
+						statusConfig.animate && 'animate-spin'
+					)}
 				/>
 				<span class="font-medium text-sm text-foreground">{toolPart.tool}</span>
 				<Badge variant={statusConfig.variant} class="text-xs">
