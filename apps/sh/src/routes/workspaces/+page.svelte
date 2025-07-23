@@ -20,16 +20,9 @@
 	
 	let { data }: { data: PageData } = $props();
 
-	// Helper function to extract folder name from path (cross-platform)
-	function getFolderName(path: string): string {
-		// Split by both forward and back slashes, filter out empty strings
-		const segments = path.split(/[/\\]/).filter(Boolean);
-		return segments[segments.length - 1] || 'workspace';
-	}
-
 	// Define available columns
 	const columns = [
-		{ hideable: false, id: 'folderName', label: '' }, // Empty label for folder name
+		{ hideable: false, id: 'name', label: 'Name' },
 		{ hideable: false, id: 'gitPort', label: '' }, // Empty label for Git/Port info
 		{ hideable: true, id: 'url', label: 'URL' },
 		{ hideable: true, id: 'rootPath', label: 'Root Path' },
@@ -45,7 +38,7 @@
 	let columnVisibility = $state<Record<ColumnId, boolean>>({
 		actions: true,
 		cwd: false, // Hidden by default
-		folderName: true,
+		name: true,
 		gitPort: true,
 		lastUsed: true,
 		rootPath: false, // Hidden by default
@@ -147,8 +140,8 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						{#if columnVisibility.folderName !== false}<Table.Head
-							></Table.Head>{/if}
+						{#if columnVisibility.name !== false}<Table.Head
+							>Name</Table.Head>{/if}
 						{#if columnVisibility.gitPort !== false}<Table.Head
 							></Table.Head>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
@@ -173,13 +166,9 @@
 					{#each workspaceConfigs.value as config}
 						{@const workspace = getWorkspaceData(config.id)}
 						<Table.Row>
-							{#if columnVisibility.folderName !== false}
+							{#if columnVisibility.name !== false}
 								<Table.Cell class="font-medium">
-									{#if workspace?.connected}
-										{getFolderName(workspace.appInfo.path.cwd)}
-									{:else}
-										<span class="text-muted-foreground">—</span>
-									{/if}
+									{config.name}
 								</Table.Cell>
 							{/if}
 							{#if columnVisibility.gitPort !== false}
