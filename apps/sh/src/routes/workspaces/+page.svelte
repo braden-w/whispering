@@ -18,6 +18,8 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronDown, GitBranch, Plus } from 'lucide-svelte';
 	import { badgeVariants } from '@repo/ui/badge';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	
 	let { data }: { data: PageData } = $props();
 
@@ -64,6 +66,14 @@
 		// Navigate to workspace sessions
 		goto(`/workspaces/${workspace.id}`);
 	}
+
+	// Create workspace from URL params on mount
+	onMount(() => {
+		if (data.createWorkspaceParams) {
+			workspaceConfigs.create(data.createWorkspaceParams);
+			toast.success(`Workspace "${data.createWorkspaceParams.name}" added successfully`);
+		}
+	});
 </script>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
