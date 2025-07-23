@@ -31,9 +31,7 @@
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action
 				onclick={() => {
-					workspaceConfigs.value = workspaceConfigs.value.filter(
-						(w) => w.id !== workspaceConfig.id,
-					);
+					workspaceConfigs.delete(workspaceConfig.id);
 					open = false;
 					toast.success('Deleted workspace');
 				}}>Delete</AlertDialog.Action
