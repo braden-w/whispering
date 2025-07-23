@@ -1,12 +1,36 @@
 {
-  "name": "cli",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "@epicenter/cli",
+	"version": "0.0.1",
+	"description": "Epicenter CLI designed for seamless integration with opencode and epicenter.sh",
+	"type": "module",
+	"author": "Braden Wong <braden@epicenter.sh>",
+	"homepage": "https://epicenter.sh",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/getepicenter/cli"
+	},
+	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],
+	"bin": {
+		"epicenter": "./bin/epicenter"
+	},
+	"scripts": {
+		"dev": "bun run src/index.ts",
+		"build": "bun build --target=bun --outdir=dist src/index.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"@epicenter/opencode": "latest",
+		"yargs": "^17.7.2",
+		"get-port": "^7.1.0"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/yargs": "^17.0.33"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }

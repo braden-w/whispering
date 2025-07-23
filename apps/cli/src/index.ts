@@ -1,0 +1,32 @@
+#!/usr/bin/env bun
+import yargs from "yargs"
+import { hideBin } from "yargs/helpers"
+import * as shCommand from "./commands/sh.js"
+
+const cli = yargs(hideBin(process.argv))
+  .scriptName("epicenter")
+  .usage("$0 <command> [options]")
+  .help("help", "show help")
+  .alias("help", "h")
+  .version("version", "show version number")
+  .alias("version", "v")
+  .demandCommand(1, "You need to specify a command")
+  .command(shCommand)
+  .example("epicenter sh", "Start opencode server with smart defaults")
+  .example("epicenter sh --port 8080", "Start server on specific port")
+  .example("epicenter sh --no-tunnel", "Start without cloudflare tunnel")
+  .strict()
+  .fail((msg, err, yargs) => {
+    if (err) throw err
+    console.error("❌", msg)
+    console.error()
+    yargs.showHelp()
+    process.exit(1)
+  })
+
+try {
+  await cli.parse()
+} catch (error) {
+  console.error("❌ Unexpected error:", error)
+  process.exit(1)
+}
