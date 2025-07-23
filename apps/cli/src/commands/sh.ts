@@ -1,6 +1,12 @@
-import { ServeCommand } from '@epicenter/opencode/serve' with { type: "macro" };
+import { Provider } from '@epicenter/opencode/provider/provider.ts';
+import { Server } from '@epicenter/opencode/server/server.ts';
+import { Share } from '@epicenter/opencode/share/share.ts';
+import { bootstrap } from '@epicenter/opencode/cli/bootstrap.ts';
+import { Cloudflared } from '@epicenter/opencode/util/cloudflared.ts';
+import { Browser } from '@epicenter/opencode/util/browser.ts';
+import { basename } from 'node:path';
+import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
-import { cmd } from '../utils/cmd.js';
 
 export const ShCommand = cmd({
 	command: 'sh',
@@ -32,31 +38,67 @@ export const ShCommand = cmd({
 			.option('open', {
 				alias: ['o'],
 				type: 'boolean',
-				describe: 'open tunnel URL in browser',
+				describe: 'open tunnel URL in browser (requires --tunnel)',
 				default: true,
 			}),
 	describe: 'starts opencode server with epicenter.sh integration',
 	handler: async (args) => {
-		console.log('🚀 Starting opencode with epicenter.sh integration...');
+		const cwd = process.cwd();
+		await bootstrap({ cwd }, async () => {
+			const providers = await Provider.list();
+			if (Object.keys(providers).length === 0) {
+				return 'needs_provider';
+			}
 
-		const port = await getPort({ port: args.port });
+			const hostname = args.hostname;
+			const port = await getPort({ port: args.port });
+			const corsOrigins = (args['cors-origins'] ?? []).map(String);
+			const tunnel = args.tunnel;
 
-		// Prepare arguments with our defaults
-		const serveArgs = {
-			...args,
-			port,
-			hostname: args.hostname || '127.0.0.1',
-			'cors-origins': args['cors-origins'] || ['https://epicenter.sh'],
-			tunnel: args.tunnel !== false, // Default to true
-			open: args.open !== false, // Default to true
-		};
+			Share.init();
+			const server = Server.listen({
+				port,
+				hostname,
+				corsOrigins,
+			});
 
-		console.log(`📍 Using port: ${port}`);
-		console.log(`🌐 CORS origins: ${serveArgs['cors-origins'].join(', ')}`);
-		console.log(`🚇 Tunnel: ${serveArgs.tunnel ? 'enabled' : 'disabled'}`);
-		console.log(`🌍 Auto-open: ${serveArgs.open ? 'enabled' : 'disabled'}`);
+			let tunnelProcess: Cloudflared.TunnelProcess | null = null;
+			if (tunnel) {
+				await Cloudflared.ensureInstalled();
+				tunnelProcess = await Cloudflared.startTunnel(port);
+			}
 
-		// Delegate to the existing serve command
-		await ServeCommand.handler(serveArgs);
+			// Display server information
+			console.log(`Local server: http://${server.hostname}:${server.port}`);
+			if (tunnelProcess?.url) {
+				console.log(`Tunnel URL:   ${tunnelProcess.url}`);
+				if (args.open) {
+					console.log('Opening workspace on epicenter.sh...');
+					const EPICENTER_WORKSPACE_URL =
+						'https://epicenter.sh/workspaces/create' as const;
+					const currentDirName = basename(cwd);
+					const params = new URLSearchParams({
+						url: tunnelProcess.url,
+						port: port.toString(),
+						name: currentDirName,
+					});
+					await Browser.openUrl(`${EPICENTER_WORKSPACE_URL}?${params}`);
+				}
+			}
+
+			// Handle graceful shutdown
+			const cleanup = () => {
+				console.log('\nShutting down...');
+				server.stop();
+				if (tunnelProcess) {
+					Cloudflared.stopTunnel(tunnelProcess);
+				}
+				process.exit(0);
+			};
+
+			process.on('SIGINT', cleanup);
+
+			await new Promise(() => {});
+		});
 	},
 });
