@@ -43,9 +43,11 @@ export const CreateWorkspaceParams = WorkspaceConfig.pick(
 
 export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
 
-export type UpdateWorkspaceParams = Partial<
-	Omit<WorkspaceConfig, 'createdAt' | 'id'>
->;
+export const UpdateWorkspaceParams = WorkspaceConfig.omit(
+	'createdAt',
+	'lastAccessedAt',
+);
+export type UpdateWorkspaceParams = typeof UpdateWorkspaceParams.infer;
 
 /**
  * The reactive store containing all of the user's saved workspace configurations.
@@ -169,10 +171,10 @@ export async function isPortAvailable(port: Port): Promise<boolean> {
 	}
 }
 
-export function updateWorkspaceConfig(
-	id: string,
-	updates: UpdateWorkspaceParams,
-): void {
+export function updateWorkspaceConfig({
+	id,
+	...updates
+}: UpdateWorkspaceParams): void {
 	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
 		if (w.id !== id) return w;
 
