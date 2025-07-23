@@ -107,10 +107,7 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 
-			<CreateWorkspaceConfigModal 
-				initialParams={data.createWorkspaceParams}
-				autoOpen={!!data.createWorkspaceParams}
-			>
+			<CreateWorkspaceConfigModal>
 				{#snippet triggerChild({ props })}
 					<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Workspace</Button
 					>
@@ -125,10 +122,7 @@
 			<p class="text-muted-foreground mt-2">
 				Create your first workspace to connect to an OpenCode server
 			</p>
-			<CreateWorkspaceConfigModal
-				initialParams={data.createWorkspaceParams}
-				autoOpen={!!data.createWorkspaceParams}
-			>
+			<CreateWorkspaceConfigModal>
 				{#snippet triggerChild({ props })}
 					<Button {...props} class="mt-4">Create Workspace</Button>
 				{/snippet}
