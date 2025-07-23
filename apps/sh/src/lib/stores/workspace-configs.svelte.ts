@@ -37,7 +37,7 @@ export const CreateWorkspaceParams = WorkspaceConfig.pick(
 
 export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
 
-export type WorkspaceUpdateInput = Partial<
+export type UpdateWorkspaceParams = Partial<
 	Omit<WorkspaceConfig, 'createdAt' | 'id'>
 >;
 
@@ -169,7 +169,7 @@ export async function isPortAvailable(port: number): Promise<boolean> {
 
 export function updateWorkspaceConfig(
 	id: string,
-	updates: WorkspaceUpdateInput,
+	updates: UpdateWorkspaceParams,
 ): void {
 	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
 		if (w.id !== id) return w;
