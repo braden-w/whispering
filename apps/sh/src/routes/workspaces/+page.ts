@@ -1,7 +1,4 @@
-import {
-	CreateWorkspaceParams,
-	createWorkspaceConfig,
-} from '$lib/stores/workspace-configs.svelte';
+import { CreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
 import type { PageLoad } from './$types';
 
 import { type } from 'arktype';

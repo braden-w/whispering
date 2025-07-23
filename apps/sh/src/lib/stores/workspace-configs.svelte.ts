@@ -44,82 +44,104 @@ export const CreateWorkspaceParams = WorkspaceConfig.pick(
 export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
 
 export const UpdateWorkspaceParams = WorkspaceConfig.omit(
+	'id',
 	'createdAt',
 	'lastAccessedAt',
-);
+).partial();
 export type UpdateWorkspaceParams = typeof UpdateWorkspaceParams.infer;
 
 /**
  * The reactive store containing all of the user's saved workspace configurations.
  * Automatically synced with localStorage under the key 'opencode-workspace-configs'.
  */
-export const workspaceConfigs = createPersistedState({
-	key: 'opencode-workspace-configs',
-	onParseError: (error) => {
-		if (error.type === 'storage_empty') {
-			return []; // First time user
-		}
+export const workspaceConfigs = (() => {
+	const workspaceConfigs = createPersistedState({
+		key: 'opencode-workspace-configs',
+		onParseError: (error) => {
+			if (error.type === 'storage_empty') {
+				return []; // First time user
+			}
 
-		if (error.type === 'json_parse_error') {
-			console.error('Corrupted workspace data:', error);
-			toast.error('Failed to load workspaces', {
-				description: 'Your workspace data appears to be corrupted',
-			});
-			return [];
-		}
+			if (error.type === 'json_parse_error') {
+				console.error('Corrupted workspace data:', error);
+				toast.error('Failed to load workspaces', {
+					description: 'Your workspace data appears to be corrupted',
+				});
+				return [];
+			}
 
-		if (error.type === 'schema_validation_failed') {
-			console.warn('Invalid workspace data, attempting recovery and migration');
-			// Try to recover and migrate valid workspaces
-			if (Array.isArray(error.value)) {
-				const migrated = error.value.map((w: any) => {
-					// Migrate from old format if needed
-					if ('privatePort' in w) {
-						const { privatePort, publicPort, username, ...rest } = w;
-						return {
-							...rest,
-							port: privatePort || 4096,
-						};
+			if (error.type === 'schema_validation_failed') {
+				console.warn(
+					'Invalid workspace data, attempting recovery and migration',
+				);
+				// Try to recover and migrate valid workspaces
+				if (Array.isArray(error.value)) {
+					const migrated = error.value.map((w) => {
+						// Migrate from old format if needed
+						if ('privatePort' in w) {
+							const { privatePort, publicPort, username, ...rest } = w;
+							return {
+								...rest,
+								port: privatePort || 4096,
+							};
+						}
+						return w;
+					});
+
+					const valid = migrated.filter((w) => {
+						const result = WorkspaceConfig(w);
+						if (result instanceof type.errors) return false;
+						return true;
+					});
+					if (valid.length > 0) {
+						toast.warning('Workspaces have been migrated to the new format');
+						return valid;
 					}
-					return w;
-				});
-
-				const valid = migrated.filter((w) => {
-					const result = WorkspaceConfig(w);
-					if (result instanceof type.errors) return false;
-					return true;
-				});
-				if (valid.length > 0) {
-					toast.warning('Workspaces have been migrated to the new format');
-					return valid;
 				}
 			}
-		}
 
-		return [];
-	},
-	onUpdateError: (error) => {
-		console.error('Failed to save workspaces:', error);
-		toast.error('Failed to save changes');
-	},
-	schema: WorkspaceConfig.array(),
-});
+			return [];
+		},
+		onUpdateError: (error) => {
+			console.error('Failed to save workspaces:', error);
+			toast.error('Failed to save changes');
+		},
+		schema: WorkspaceConfig.array(),
+	});
 
-// Helper functions for workspace operations
-export function createWorkspaceConfig(
-	data: CreateWorkspaceParams,
-): WorkspaceConfig {
-	const newWorkspace: WorkspaceConfig = {
-		...data,
-		createdAt: Date.now(),
-		id: nanoid(),
-		lastAccessedAt: Date.now(),
+	return {
+		get value() {
+			return workspaceConfigs.value;
+		},
+		getById: (id: string) => {
+			return workspaceConfigs.value.find((w) => w.id === id);
+		},
+		create: (data: CreateWorkspaceParams) => {
+			const newWorkspace: WorkspaceConfig = {
+				...data,
+				createdAt: Date.now(),
+				id: nanoid(),
+				lastAccessedAt: Date.now(),
+			};
+
+			workspaceConfigs.value = [...workspaceConfigs.value, newWorkspace];
+			toast.success('Workspace created successfully');
+			return newWorkspace;
+		},
+		update: (id: string, data: UpdateWorkspaceParams) => {
+			workspaceConfigs.value = workspaceConfigs.value.map((w) =>
+				w.id === id ? { ...w, ...data, lastAccessedAt: Date.now() } : w,
+			);
+			toast.success('Workspace updated successfully');
+		},
+		delete: (id: string) => {
+			workspaceConfigs.value = workspaceConfigs.value.filter(
+				(w) => w.id !== id,
+			);
+			toast.success('Workspace deleted successfully');
+		},
 	};
-
-	workspaceConfigs.value = [...workspaceConfigs.value, newWorkspace];
-	toast.success('Workspace created successfully');
-	return newWorkspace;
-}
+})();
 
 // Generate an available port starting from 4096
 export async function generateAvailablePort(): Promise<Port> {
@@ -145,10 +167,6 @@ export async function generateAvailablePort(): Promise<Port> {
 	return PREFERRED_START as Port;
 }
 
-export function getWorkspaceConfig(id: string): undefined | WorkspaceConfig {
-	return workspaceConfigs.value.find((w) => w.id === id);
-}
-
 // Check if a port is available by attempting to connect to it
 export async function isPortAvailable(port: Port): Promise<boolean> {
 	try {
@@ -169,17 +187,4 @@ export async function isPortAvailable(port: Port): Promise<boolean> {
 		// Network error means port is likely available
 		return true;
 	}
-}
-
-export function updateWorkspaceConfig({
-	id,
-	...updates
-}: UpdateWorkspaceParams): void {
-	workspaceConfigs.value = workspaceConfigs.value.map((w) => {
-		if (w.id !== id) return w;
-
-		return { ...w, ...updates, lastAccessedAt: Date.now() };
-	});
-
-	toast.success('Workspace updated');
 }

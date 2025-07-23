@@ -1,10 +1,10 @@
 import * as rpc from '$lib/query';
 import { queryClient } from '$lib/query/_client.js';
-import { getWorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ params }) => {
-	const workspaceConfig = getWorkspaceConfig(params.id);
+	const workspaceConfig = workspaceConfigs.getById(params.id);
 
 	if (!workspaceConfig) redirect(302, '/workspaces');
 

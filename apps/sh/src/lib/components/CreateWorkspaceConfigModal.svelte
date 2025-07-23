@@ -6,7 +6,7 @@
 	import * as api from '$lib/client/sdk.gen';
 	import { settings } from '$lib/stores/settings.svelte';
 	import {
-		createWorkspaceConfig,
+		workspaceConfigs,
 		generateAvailablePort,
 	} from '$lib/stores/workspace-configs.svelte';
 	import * as Accordion from '@repo/ui/accordion';
@@ -129,7 +129,7 @@
 			return;
 		}
 
-		createWorkspaceConfig({
+		workspaceConfigs.create({
 			name: workspaceName.trim(),
 			password,
 			port,

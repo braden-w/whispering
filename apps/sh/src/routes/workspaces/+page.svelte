@@ -59,9 +59,7 @@
 
 	function handleConnect(workspace: WorkspaceConfig) {
 		// Update last used timestamp
-		workspaceConfigs.value = workspaceConfigs.value.map((w) =>
-			w.id === workspace.id ? { ...w, lastAccessedAt: Date.now() } : w,
-		);
+		workspaceConfigs.update(workspace.id, {});
 
 		// Navigate to workspace sessions
 		goto(`/workspaces/${workspace.id}`);

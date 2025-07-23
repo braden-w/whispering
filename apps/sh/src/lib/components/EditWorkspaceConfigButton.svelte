@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {
-		updateWorkspaceConfig,
+		workspaceConfigs,
 		UpdateWorkspaceParams,
 		type WorkspaceConfig,
 	} from '$lib/stores/workspace-configs.svelte';
@@ -25,7 +25,6 @@
 
 	function handleSave() {
 		const validationResult = UpdateWorkspaceParams({
-			id: workspaceConfig.id,
 			name: name.trim(),
 			password,
 			port,
@@ -37,7 +36,7 @@
 			return;
 		}
 
-		updateWorkspaceConfig(validationResult);
+		workspaceConfigs.update(workspaceConfig.id, validationResult);
 		open = false;
 	}
 </script>
