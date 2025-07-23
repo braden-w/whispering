@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
-import * as shCommand from "./commands/sh.js"
+import { ShCommand } from "./commands/sh.js"
 
 const cli = yargs(hideBin(process.argv))
   .scriptName("epicenter")
@@ -11,7 +11,7 @@ const cli = yargs(hideBin(process.argv))
   .version("version", "show version number")
   .alias("version", "v")
   .demandCommand(1, "You need to specify a command")
-  .command(shCommand)
+  .command(ShCommand)
   .example("epicenter sh", "Start opencode server with smart defaults")
   .example("epicenter sh --port 8080", "Start server on specific port")
   .example("epicenter sh --no-tunnel", "Start without cloudflare tunnel")
