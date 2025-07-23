@@ -3,8 +3,8 @@ import { type } from 'arktype';
 import { nanoid } from 'nanoid';
 import { toast } from 'svelte-sonner';
 
-const Password = type('string > 0#Password');
-type Password = typeof Password.infer;
+export const Password = type('string > 0#Password');
+export type Password = typeof Password.infer;
 
 /**
  * Configuration for connecting to an OpenCode server instance.

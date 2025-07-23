@@ -4,6 +4,7 @@ import type { Accessor } from '@tanstack/svelte-query';
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import {
+	type Password,
 	type WorkspaceConfig,
 	workspaceConfigs,
 } from '$lib/stores/workspace-configs.svelte';
@@ -85,7 +86,7 @@ export const getWorkspaces = () =>
 export const testWorkspaceConnection = (params: {
 	port: number;
 	url: string;
-	password: string | null;
+	password: Password | null;
 }) =>
 	defineQuery({
 		queryKey: ['test-workspace', params],

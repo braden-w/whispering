@@ -1,6 +1,6 @@
 import type { Brand } from 'wellcrafted/brand';
+import type { Password } from '$lib/stores/workspace-configs.svelte';
 
-type Password = Brand<'Password'> & string;
 type Port = Brand<'Port'> & number;
 type UserName = Brand<'UserName'> & string;
 
