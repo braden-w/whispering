@@ -11,10 +11,10 @@
 	} from '$lib/stores/workspace-configs.svelte';
 	import * as Accordion from '@repo/ui/accordion';
 	import { Button, type Props as ButtonProps } from '@repo/ui/button';
-	import * as Card from '@repo/ui/card';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Modal from '@repo/ui/modal';
+	import { PMCommand } from '@repo/ui/pm-command';
 	import * as Tabs from '@repo/ui/tabs';
 	import { type } from 'arktype';
 	import { CheckCircle2, Copy, Loader2 } from 'lucide-svelte';
@@ -27,7 +27,6 @@
 	let isCheckingPorts = $state(false);
 
 	// Form state
-	let step = $state(1);
 	let password = $state(settings.value.defaultPassword);
 	let port = $state(4096); // Default port
 	let ngrokUrl = $state('');
@@ -40,7 +39,6 @@
 	// Reset form when dialog opens
 	$effect(() => {
 		if (open) {
-			step = 1;
 			password = settings.value.defaultPassword;
 			ngrokUrl = '';
 			workspaceName = '';
@@ -57,12 +55,7 @@
 
 
 
-	// Commands for copy functionality
-	const npmCommand = $derived(`npx @getepicenter/opencode serve --tunnel --cors-origins https://epicenter.sh` as const);
-	const pnpmCommand = $derived(`pnpm dlx @getepicenter/opencode serve --tunnel --cors-origins https://epicenter.sh` as const);
-	const bunxCommand = $derived(`bunx @getepicenter/opencode serve --tunnel --cors-origins https://epicenter.sh` as const);
-	
-	// Manual setup commands
+	// Manual setup commands (non-PM commands)
 	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
 	const ngrokCommand = $derived(`ngrok http ${port}` as const);
 	const cloudflaredCommand = $derived(`cloudflared tunnel --url http://localhost:${port}` as const);
@@ -146,14 +139,6 @@
 		toast.success(`Created workspace "${workspaceName}"`);
 		open = false;
 	}
-
-	function nextStep() {
-		step++;
-	}
-
-	function previousStep() {
-		step--;
-	}
 </script>
 
 <Modal.Root bind:open>
@@ -162,118 +147,111 @@
 			{@render triggerChild({ props })}
 		{/snippet}
 	</Modal.Trigger>
-	<Modal.Content class="sm:max-w-[600px]">
+	<Modal.Content class="sm:max-w-[600px] max-h-[70vh] overflow-y-auto">
 		<Modal.Header>
 			<Modal.Title>Add New Workspace</Modal.Title>
 			<Modal.Description>
-				Connect to an OpenCode server in a few easy steps
+				Connect to an OpenCode server from your CLI
 			</Modal.Description>
 		</Modal.Header>
 
-		<div class="space-y-4">
-			{#if step === 1}
-				<!-- Step 1: Setup Method -->
-				<Card.Root>
-					<Card.Header>
-						<Card.Title class="text-lg">Choose Setup Method</Card.Title>
-						<Card.Description>
-							Select how you want to connect to OpenCode
-						</Card.Description>
-					</Card.Header>
-					<Card.Content class="space-y-4">
-						<Tabs.Root value="quick">
-							<Tabs.List class="grid w-full grid-cols-2">
-								<Tabs.Trigger value="quick">Quick Setup (Recommended)</Tabs.Trigger>
-								<Tabs.Trigger value="manual">Manual Setup</Tabs.Trigger>
-							</Tabs.List>
+		<Tabs.Root value="quick" class="space-y-4">
+			<Tabs.List class="grid w-full grid-cols-2">
+				<Tabs.Trigger value="quick">Quick Setup</Tabs.Trigger>
+				<Tabs.Trigger value="manual">Manual Setup</Tabs.Trigger>
+			</Tabs.List>
 
-							<Tabs.Content value="quick" class="space-y-4 mt-4">
-								<div class="rounded-lg bg-muted p-4">
-									<p class="text-sm font-medium mb-3">
-										Run one of these commands to automatically set up your workspace:
+			<!-- Quick Setup Tab -->
+			<Tabs.Content value="quick" class="space-y-4 mt-4">
+				<div class="space-y-4">
+					<div class="space-y-2">
+						<p class="text-sm text-muted-foreground">
+							Run this command to start your server and add the workspace automatically:
+						</p>
+					</div>
+					
+					<PMCommand 
+						command="execute" 
+						args={['@getepicenter/opencode', 'serve', '--tunnel', '--open']} 
+					/>
+					
+					<div class="space-y-2">
+						<p class="text-sm font-medium">What this does:</p>
+						<ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+							<li>Starts your OpenCode server</li>
+							<li>Creates a secure tunnel automatically</li>
+							<li>Opens a new tab with your workspace pre-configured</li>
+							<li>No manual URL copying or setup needed</li>
+						</ul>
+					</div>
+				</div>
+			</Tabs.Content>
+
+			<!-- Manual Setup Tab -->
+			<Tabs.Content value="manual" class="space-y-6 mt-4">
+				<!-- URL Input -->
+				<div class="space-y-4">
+					<div class="space-y-2">
+						<Label for="ngrokUrl">Server URL</Label>
+						<Input
+							id="ngrokUrl"
+							bind:value={ngrokUrl}
+							placeholder="https://your-tunnel-url.example.com"
+						/>
+						<p class="text-sm text-muted-foreground">
+							Paste your tunnel URL here if you already have a server running
+						</p>
+					</div>
+
+					<Button
+						onclick={testConnection}
+						disabled={isTesting || !ngrokUrl}
+						class="w-full"
+					>
+						{#if isTesting}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							Testing Connection...
+						{:else if testSuccess}
+							<CheckCircle2 class="mr-2 h-4 w-4" />
+							Connection Successful
+						{:else}
+							Test Connection
+						{/if}
+					</Button>
+					
+					{#if testSuccess && appInfo}
+						<div class="space-y-4 pt-4 border-t">
+							<div class="space-y-2">
+								<Label for="workspaceName">Workspace Name</Label>
+								<Input
+									id="workspaceName"
+									bind:value={workspaceName}
+									placeholder="My Project"
+								/>
+								{#if appInfo.path}
+									<p class="text-sm text-muted-foreground">
+										Auto-filled from current working directory
 									</p>
-									
-									<!-- npm command -->
-									<div class="space-y-3">
-										<div class="space-y-1">
-											<p class="text-xs text-muted-foreground font-medium">npm</p>
-											<div class="flex items-center gap-2">
-												<code class="flex-1 bg-background p-2 rounded text-sm">
-													{npmCommand}
-												</code>
-												<Button
-													size="icon"
-													variant="ghost"
-													onclick={() => copyToClipboard(npmCommand)}
-												>
-													<Copy class="h-4 w-4" />
-												</Button>
-											</div>
-										</div>
-										
-										<!-- pnpm command -->
-										<div class="space-y-1">
-											<p class="text-xs text-muted-foreground font-medium">pnpm</p>
-											<div class="flex items-center gap-2">
-												<code class="flex-1 bg-background p-2 rounded text-sm">
-													{pnpmCommand}
-												</code>
-												<Button
-													size="icon"
-													variant="ghost"
-													onclick={() => copyToClipboard(pnpmCommand)}
-												>
-													<Copy class="h-4 w-4" />
-												</Button>
-											</div>
-										</div>
-										
-										<!-- bun command -->
-										<div class="space-y-1">
-											<p class="text-xs text-muted-foreground font-medium">bun</p>
-											<div class="flex items-center gap-2">
-												<code class="flex-1 bg-background p-2 rounded text-sm">
-													{bunxCommand}
-												</code>
-												<Button
-													size="icon"
-													variant="ghost"
-													onclick={() => copyToClipboard(bunxCommand)}
-												>
-													<Copy class="h-4 w-4" />
-												</Button>
-											</div>
-										</div>
-									</div>
-								</div>
-								
-								<div class="space-y-2">
-									<p class="text-sm font-medium">What this command does:</p>
-									<ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
-										<li>Starts the OpenCode server</li>
-										<li>Sets up a secure tunnel automatically</li>
-										<li>Opens this page with everything pre-filled</li>
-										<li>You just click "Create" to confirm</li>
-									</ul>
-								</div>
-							</Tabs.Content>
+								{/if}
+							</div>
+						</div>
+					{/if}
+				</div>
 
-							<Tabs.Content value="manual" class="space-y-4 mt-4">
+				<!-- Manual Setup Commands -->
+				<Accordion.Root type="single">
+					<Accordion.Item value="manual-commands">
+						<Accordion.Trigger>Need to start your server manually?</Accordion.Trigger>
+						<Accordion.Content>
+							<div class="space-y-6 pt-4">
 								<p class="text-sm text-muted-foreground">
-									Manually set up your server and tunnel in separate steps
+									Run these commands separately and paste the tunnel URL above
 								</p>
 								
-								<!-- Step 1: Start OpenCode -->
+								<!-- Start OpenCode -->
 								<div class="space-y-2">
+									<p class="text-sm font-medium">Start OpenCode server:</p>
 									<div class="flex items-center gap-2">
-										<div
-											class="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium"
-										>
-											1
-										</div>
-										<p class="text-sm font-medium">Start OpenCode server</p>
-									</div>
-									<div class="flex items-center gap-2 ml-8">
 										<code class="flex-1 bg-muted p-2 rounded text-sm">
 											{opencodeCommand}
 										</code>
@@ -287,20 +265,13 @@
 									</div>
 								</div>
 								
-								<!-- Step 2: Choose tunnel -->
-								<div class="space-y-2">
-									<div class="flex items-center gap-2">
-										<div
-											class="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium"
-										>
-											2
-										</div>
-										<p class="text-sm font-medium">Create a tunnel (choose one)</p>
-									</div>
+								<!-- Create tunnel -->
+								<div class="space-y-3">
+									<p class="text-sm font-medium">Create tunnel:</p>
 									
-									<Accordion.Root type="single" class="ml-8">
+									<Accordion.Root type="single" class="w-full">
 										<Accordion.Item value="cloudflared">
-											<Accordion.Trigger class="text-sm">Cloudflared (Recommended)</Accordion.Trigger>
+											<Accordion.Trigger class="text-sm">Cloudflared</Accordion.Trigger>
 											<Accordion.Content>
 												<div class="space-y-2 pt-2">
 													<div class="flex items-center gap-2">
@@ -316,7 +287,7 @@
 														</Button>
 													</div>
 													<p class="text-sm text-muted-foreground">
-														No account required. Copy the generated URL from the output.
+														Copy the generated URL from the output.
 													</p>
 												</div>
 											</Accordion.Content>
@@ -339,142 +310,68 @@
 														</Button>
 													</div>
 													<p class="text-sm text-muted-foreground">
-														Requires ngrok account. Copy the HTTPS URL from the output.
+														Copy the HTTPS URL from the output.
 													</p>
 												</div>
 											</Accordion.Content>
 										</Accordion.Item>
 									</Accordion.Root>
 								</div>
-							</Tabs.Content>
-						</Tabs.Root>
-
-						<!-- Advanced Settings (only in manual tab) -->
-						{#if step === 1}
-							<Accordion.Root type="single">
-								<Accordion.Item value="config">
-									<Accordion.Trigger>Advanced Settings</Accordion.Trigger>
-									<Accordion.Content>
-										<div class="space-y-4 pt-4">
-											<div class="space-y-2">
-												<Label for="port">OpenCode Port</Label>
-												<Input
-													id="port"
-													type="number"
-													bind:value={port}
-													min="1024"
-													max="65535"
-												/>
-											</div>
-											<p class="text-sm text-muted-foreground">
-												Change this if the default port conflicts with other services.
-											</p>
-											<div class="space-y-2">
-												<Label for="password">Password</Label>
-												<Input
-													id="password"
-													type="password"
-													bind:value={password}
-													placeholder="Enter password"
-													autocomplete="new-password"
-												/>
-											</div>
-											<p class="text-sm text-muted-foreground">
-												Pre-filled from your settings. Changes here only affect this workspace.
-											</p>
-										</div>
-									</Accordion.Content>
-								</Accordion.Item>
-							</Accordion.Root>
-						{/if}
-
-					</Card.Content>
-				</Card.Root>
-			{:else if step === 2}
-				<!-- Step 2: Enter URL & Name -->
-				<Card.Root>
-					<Card.Header>
-						<Card.Title class="text-lg">Step 2: Connect to Your Server</Card.Title>
-						<Card.Description>
-							Enter the URL from your tunnel provider
-						</Card.Description>
-					</Card.Header>
-					<Card.Content class="space-y-4">
-						<div class="space-y-2">
-							<Label for="ngrokUrl">Server URL</Label>
-							<div class="flex gap-2">
-								<Input
-									id="ngrokUrl"
-									bind:value={ngrokUrl}
-									placeholder="https://your-tunnel-url.example.com"
-									class="flex-1"
-								/>
 							</div>
-							<p class="text-sm text-muted-foreground">
-								Paste the URL from cloudflared, ngrok, or your tunnel provider
-							</p>
-						</div>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
 
-						<Button
-							onclick={testConnection}
-							disabled={isTesting || !ngrokUrl}
-							class="w-full"
-						>
-							{#if isTesting}
-								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-								Testing Connection...
-							{:else if testSuccess}
-								<CheckCircle2 class="mr-2 h-4 w-4" />
-								Connection Successful
-							{:else}
-								Test Connection
-							{/if}
-						</Button>
-						
-						{#if testSuccess && appInfo}
-							<div class="space-y-4 pt-4 border-t">
+				<!-- Advanced Settings -->
+				<Accordion.Root type="single">
+					<Accordion.Item value="config">
+						<Accordion.Trigger>Advanced Settings</Accordion.Trigger>
+						<Accordion.Content>
+							<div class="space-y-4 pt-4">
 								<div class="space-y-2">
-									<Label for="workspaceName">Workspace Name</Label>
+									<Label for="port">OpenCode Port</Label>
 									<Input
-										id="workspaceName"
-										bind:value={workspaceName}
-										placeholder="My Project"
+										id="port"
+										type="number"
+										bind:value={port}
+										min="1024"
+										max="65535"
 									/>
-									{#if appInfo.path}
-										<p class="text-sm text-muted-foreground">
-											Auto-filled from current working directory
-										</p>
-									{/if}
 								</div>
+								<p class="text-sm text-muted-foreground">
+									Change if default port conflicts with other services.
+								</p>
+								<div class="space-y-2">
+									<Label for="password">Password</Label>
+									<Input
+										id="password"
+										type="password"
+										bind:value={password}
+										placeholder="Enter password"
+										autocomplete="new-password"
+									/>
+								</div>
+								<p class="text-sm text-muted-foreground">
+									Pre-filled from settings. Changes only affect this workspace.
+								</p>
 							</div>
-						{/if}
-					</Card.Content>
-				</Card.Root>
-			{/if}
-		</div>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
+			</Tabs.Content>
+		</Tabs.Root>
 
 		<Modal.Footer>
-			<div class="flex items-center justify-between w-full">
-				<div>
-					{#if step > 1}
-						<Button variant="outline" onclick={previousStep}>Previous</Button>
-					{/if}
-				</div>
-				<div class="flex gap-2">
-					<Button variant="outline" onclick={() => (open = false)}
-						>Cancel</Button
-					>
-					{#if step === 1}
-						<Button onclick={nextStep}>Next</Button>
-					{:else}
-						<Button
-							onclick={handleCreate}
-							disabled={!testSuccess || !workspaceName.trim()}
-						>
-							Create Workspace
-						</Button>
-					{/if}
-				</div>
+			<div class="flex items-center justify-end gap-2">
+				<Button variant="outline" onclick={() => (open = false)}>
+					Cancel
+				</Button>
+				<Button
+					onclick={handleCreate}
+					disabled={!testSuccess || !workspaceName.trim()}
+				>
+					Create Workspace
+				</Button>
 			</div>
 		</Modal.Footer>
 	</Modal.Content>
