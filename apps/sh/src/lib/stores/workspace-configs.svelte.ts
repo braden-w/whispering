@@ -119,17 +119,6 @@ export function createWorkspaceConfig(
 	return newWorkspace;
 }
 
-export function deleteWorkspaceConfig(id: string): void {
-	const workspace = getWorkspaceConfig(id);
-	if (!workspace) {
-		toast.error('Workspace not found');
-		return;
-	}
-
-	workspaceConfigs.value = workspaceConfigs.value.filter((w) => w.id !== id);
-	toast.success(`Deleted workspace "${workspace.name}"`);
-}
-
 // Generate an available port starting from 4096
 export async function generateAvailablePort(): Promise<Port> {
 	const MIN_PORT = 1024;
