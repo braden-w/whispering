@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		updateWorkspaceConfig,
+		UpdateWorkspaceParams,
 		type WorkspaceConfig,
 	} from '$lib/stores/workspace-configs.svelte';
 	import { Button } from '@repo/ui/button';
@@ -8,6 +9,7 @@
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Modal from '@repo/ui/modal';
+	import { type } from 'arktype';
 	import { Edit } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -16,34 +18,26 @@
 	let open = $state(false);
 
 	// Form state - initialize with workspace values
+	let name = $derived(workspaceConfig.name);
 	let url = $derived(workspaceConfig.url);
 	let port = $derived(workspaceConfig.port);
 	let password = $derived(workspaceConfig.password);
 
 	function handleSave() {
-		if (!url.trim()) {
-			toast.error('URL is required');
-			return;
-		}
-
-		if (!password.trim()) {
-			toast.error('Password is required');
-			return;
-		}
-
-		if (port < 1024 || port > 65535) {
-			toast.error('Port must be between 1024 and 65535');
-			return;
-		}
-
-		updateWorkspaceConfig(workspaceConfig.id, {
-			name: workspaceConfig.name,
+		const validationResult = UpdateWorkspaceParams({
+			id: workspaceConfig.id,
+			name: name.trim(),
 			password,
 			port,
-			url: url.trim(),
-		});
+			url,
+		} satisfies UpdateWorkspaceParams);
+		
+		if (validationResult instanceof type.errors) {
+			toast.error('Validation failed', { description: validationResult.summary });
+			return;
+		}
 
-		toast.success('Workspace updated successfully');
+		updateWorkspaceConfig(validationResult);
 		open = false;
 	}
 </script>
@@ -60,11 +54,20 @@
 
 		<div class="space-y-4">
 			<div class="space-y-2">
-				<Label for="edit-url">ngrok URL</Label>
+				<Label for="edit-name">Workspace Name</Label>
+				<Input
+					id="edit-name"
+					bind:value={name}
+					placeholder="My Project"
+				/>
+			</div>
+
+			<div class="space-y-2">
+				<Label for="edit-url">Server URL</Label>
 				<Input
 					id="edit-url"
 					bind:value={url}
-					placeholder="https://abc123.ngrok.io"
+					placeholder="https://your-tunnel-url.example.com"
 				/>
 			</div>
 
