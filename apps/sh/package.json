@@ -48,6 +48,7 @@
 		"arktype": "^2.1.20",
 		"isomorphic-dompurify": "^2.26.0",
 		"marked": "^16.1.1",
+		"mode-watcher": "^1.1.0",
 		"nanoid": "^5.1.5",
 		"svelte-sonner": "^1.0.5",
 		"wellcrafted": "^0.20.0"

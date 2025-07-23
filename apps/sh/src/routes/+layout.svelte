@@ -1,9 +1,11 @@
 <script lang="ts">
 	import '@repo/ui/app.css';
-	import { page } from '$app/stores';
+	import { ModeWatcher } from "mode-watcher";
+	import { page } from '$app/state';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
 	import { queryClient } from '$lib/query/_client';
 	import { Button } from '@repo/ui/button';
+	import { LightSwitch } from '@repo/ui/light-switch';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import { Settings, User } from 'lucide-svelte';
@@ -27,8 +29,7 @@
 					<nav class="flex items-center gap-4 text-sm lg:gap-6">
 						<a
 							href="/"
-							class="transition-colors hover:text-foreground/80 {$page.url
-								.pathname === '/'
+							class="transition-colors hover:text-foreground/80 {page.url.pathname === '/'
 								? 'text-foreground'
 								: 'text-foreground/60'}"
 						>
@@ -36,7 +37,7 @@
 						</a>
 						<a
 							href="/workspaces"
-							class="transition-colors hover:text-foreground/80 {$page.url.pathname.startsWith(
+							class="transition-colors hover:text-foreground/80 {page.url.pathname.startsWith(
 								'/workspaces',
 							)
 								? 'text-foreground'
@@ -47,6 +48,7 @@
 					</nav>
 				</div>
 				<nav class="flex flex-1 items-center justify-end gap-1">
+					<LightSwitch variant="ghost" />
 					<Button
 						variant="ghost"
 						size="icon"
@@ -72,3 +74,5 @@
 	<SvelteQueryDevtools buttonPosition="bottom-right" />
 	<SettingsModal bind:open={settingsOpen} />
 </QueryClientProvider>
+
+<ModeWatcher />
