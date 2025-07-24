@@ -50,6 +50,7 @@
 		"marked": "^16.1.1",
 		"mode-watcher": "^1.1.0",
 		"nanoid": "^5.1.5",
+		"simple-icons": "^15.7.0",
 		"svelte-sonner": "^1.0.5",
 		"wellcrafted": "^0.20.0"
 	}
