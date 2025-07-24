@@ -64,17 +64,20 @@ export const ShCommand = cmd({
 				corsOrigins,
 			});
 
+			const localUrl = `http://${server.hostname}:${server.port}`;
+
+			// Display server information
+			console.log('\n✓ Server running\n');
+			console.log(`  Local:      ${localUrl}`);
+
 			let tunnelProcess: Cloudflared.TunnelProcess | null = null;
 			if (tunnel) {
 				await Cloudflared.ensureInstalled();
 				tunnelProcess = await Cloudflared.startTunnel(port);
 			}
 
-			// Display server information
-			console.log(`Local server:	http://${server.hostname}:${server.port}`);
-
 			if (tunnelProcess?.url) {
-				console.log(`Tunnel URL:	   ${tunnelProcess.url}`);
+				console.log(`  Tunnel:     ${tunnelProcess.url}`);
 				if (args.open) {
 					const EPICENTER_WORKSPACE_URL =
 						'https://epicenter.sh/workspaces' as const;
@@ -85,10 +88,12 @@ export const ShCommand = cmd({
 						name: currentDirName,
 					});
 					const url = `${EPICENTER_WORKSPACE_URL}?${params}` as const;
+					console.log(`  Epicenter:  ${url}`);
+					console.log();
+					console.log('  Opening browser...');
 					await Browser.openUrl(url);
 				}
 			}
-
 			// Handle graceful shutdown
 			const cleanup = () => {
 				console.log('\nShutting down...');
