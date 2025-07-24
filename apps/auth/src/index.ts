@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { APP_URLS } from '@repo/constants';
 import { auth } from './lib/auth';
-import type { Env } from './lib/env-schema';
+import type { Env } from '@repo/constants/env';
 
 const app = new Hono<{ Bindings: Env }>();
 

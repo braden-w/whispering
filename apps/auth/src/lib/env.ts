@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { envSchema } from './env-schema';
+import { envSchema } from '@repo/constants/env';
 import { type } from 'arktype';
 
 config({ path: '.env' });
