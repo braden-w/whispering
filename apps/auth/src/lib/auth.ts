@@ -11,4 +11,9 @@ export const auth = betterAuth({
 			clientSecret: env.GITHUB_CLIENT_SECRET,
 		},
 	},
+	advanced: {
+		crossSubDomainCookies: {
+			enabled: true,
+		},
+	},
 });
