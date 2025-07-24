@@ -74,7 +74,7 @@ export const ShCommand = cmd({
 				if (args.open) {
 					console.log('Opening workspace on epicenter.sh...');
 					const EPICENTER_WORKSPACE_URL =
-						'https://epicenter.sh/workspaces/create' as const;
+						'https://epicenter.sh/workspaces' as const;
 					const currentDirName = basename(cwd);
 					const params = new URLSearchParams({
 						url: tunnelProcess.url,
