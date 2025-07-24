@@ -1,8 +1,8 @@
 import { type } from 'arktype';
 
 export const envSchema = type({
-	// Common
-	NODE_ENV: "'development' | 'production' | undefined",
+	// Environment (not NODE_ENV because it's not available in Workers. We manually set it per environment)
+	ENVIRONMENT: "'development' | 'production'",
 
 	// Auth service
 	DATABASE_URL: 'string.url',
