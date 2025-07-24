@@ -9,4 +9,8 @@ const envSchema = type({
 	DATABASE_URL: 'string.url',
 });
 
-export const env = envSchema(process.env);
+export const result = envSchema(process.env);
+
+if (result instanceof type.errors) throw new Error(result.summary);
+
+export const env = result;
