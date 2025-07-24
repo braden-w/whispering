@@ -31,13 +31,13 @@ export const ShCommand = cmd({
 			.option('tunnel', {
 				alias: ['t'],
 				type: 'boolean',
-				describe: 'expose via Cloudflare tunnel',
+				describe: 'expose via Cloudflare tunnel (use --no-tunnel to disable)',
 				default: true,
 			})
 			.option('open', {
 				alias: ['o'],
 				type: 'boolean',
-				describe: 'open tunnel URL in browser (requires --tunnel)',
+				describe: 'open tunnel URL in browser (use --no-open to disable)',
 				default: true,
 			}),
 	describe: 'starts opencode server with epicenter.sh integration',
