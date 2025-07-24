@@ -7,4 +7,6 @@ app.on(['POST', 'GET'], '/api/auth/*', (c) => {
 	return auth.handler(c.req.raw);
 });
 
+export type AppType = typeof app;
+
 export default app;

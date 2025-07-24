@@ -22,5 +22,8 @@
 		"eslint": "^9.31.0",
 		"prettier": "^3.6.2",
 		"wrangler": "^4.4.0"
+	},
+	"exports": {
+		".": "./src/index.ts"
 	}
 }
