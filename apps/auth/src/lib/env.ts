@@ -7,6 +7,8 @@ const envSchema = type({
 	BETTER_AUTH_SECRET: 'string',
 	BETTER_AUTH_URL: 'string.url',
 	DATABASE_URL: 'string.url',
+	GITHUB_CLIENT_ID: 'string',
+	GITHUB_CLIENT_SECRET: 'string',
 });
 
 export const result = envSchema(process.env);
