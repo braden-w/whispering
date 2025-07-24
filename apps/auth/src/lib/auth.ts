@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from './db';
-import type { Env } from '@repo/constants/env';
+import type { Env } from '@repo/constants/env-schema';
 import { APP_URLS } from '@repo/constants';
 
 export const auth = (env: Env) =>
