@@ -6,9 +6,12 @@
 	import { queryClient } from '$lib/query/_client';
 	import { Button } from '@repo/ui/button';
 	import { LightSwitch } from '@repo/ui/light-switch';
+	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
-	import { Settings, User } from 'lucide-svelte';
+	import { Settings, User, } from 'lucide-svelte';
+	import { siGithub as Github } from 'simple-icons';
+
 	import { Toaster } from 'svelte-sonner';
 
 	let { children } = $props();
@@ -57,10 +60,27 @@
 						<Settings class="h-4 w-4" />
 						<span class="sr-only">Settings</span>
 					</Button>
-					<Button variant="ghost" size="icon">
-						<User class="h-4 w-4" />
-						<span class="sr-only">User account</span>
-					</Button>
+					
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger>
+							<Button variant="ghost" size="icon">
+								<User class="h-4 w-4" />
+								<span class="sr-only">User account</span>
+							</Button>
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content align="end" class="w-56">
+							<DropdownMenu.Label>Account</DropdownMenu.Label>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Item 
+								class="cursor-pointer"
+								onclick={() => {
+								}}
+							>
+								{@html Github.svg}
+								Sign in with GitHub
+							</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 				</nav>
 			</div>
 		</header>
