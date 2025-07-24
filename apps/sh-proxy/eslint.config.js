@@ -1,3 +1,3 @@
-import { base, svelteConfig } from '@repo/config/eslint';
+import { base } from '@repo/config/eslint';
 
-export default [...base, ...svelteConfig];
+export default [...base];
