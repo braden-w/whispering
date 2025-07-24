@@ -1,11 +1,12 @@
 import { Hono } from 'hono';
 import { auth } from './lib/auth';
 import { cors } from 'hono/cors';
+import type { Env } from './lib/env';
 
-const app = new Hono();
+const app = new Hono<{ Bindings: Env }>();
 
 app.on(['POST', 'GET'], '/api/auth/*', (c) => {
-	return auth.handler(c.req.raw);
+	return auth(c.env).handler(c.req.raw);
 });
 
 app.use(

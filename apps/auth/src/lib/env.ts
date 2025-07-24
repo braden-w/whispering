@@ -16,3 +16,5 @@ export const result = envSchema(process.env);
 if (result instanceof type.errors) throw new Error(result.summary);
 
 export const env = result;
+
+export type Env = typeof env;
