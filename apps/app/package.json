@@ -43,6 +43,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@repo/constants": "workspace:*",
 		"@anthropic-ai/sdk": "^0.55.0",
 		"@repo/svelte-utils": "workspace:*",
 		"@google/generative-ai": "^0.24.1",
