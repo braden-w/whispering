@@ -72,6 +72,8 @@
 		if (data.createWorkspaceParams) {
 			workspaceConfigs.create(data.createWorkspaceParams);
 			toast.success(`Workspace "${data.createWorkspaceParams.name}" added successfully`);
+			// Erase the URL params
+			goto('/workspaces', { replaceState: true });
 		}
 	});
 </script>

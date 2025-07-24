@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from './db';
 import type { Env } from '@repo/constants/env-schema';
-import { APP_URLS } from '@repo/constants';
+import { APP_URLS, APPS } from '@repo/constants';
 
 export const auth = (env: Env) =>
 	betterAuth({
@@ -14,7 +14,7 @@ export const auth = (env: Env) =>
 			},
 		},
 		trustedOrigins: APP_URLS,
-		baseURL: env.BETTER_AUTH_URL,
+		baseURL: APPS(env).AUTH.URL,
 		advanced: {
 			crossSubDomainCookies: {
 				enabled: true,

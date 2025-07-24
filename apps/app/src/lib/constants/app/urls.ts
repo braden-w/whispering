@@ -3,7 +3,8 @@ import { APPS } from '@repo/constants';
 /**
  * URL and pathname constants for the Whispering application
  */
-export const WHISPERING_URL = APPS.AUDIO.URL;
+export const WHISPERING_URL = APPS({ ENVIRONMENT: import.meta.env.MODE }).AUDIO
+	.URL;
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 
