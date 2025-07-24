@@ -1,55 +1,55 @@
-const environment =
-	process.env.NODE_ENV === 'production' ? 'production' : 'development';
+import type { Env } from './env-schema.js';
 
 /**
  * Configuration for all application URLs across the ecosystem.
  *
- * URLs are environment-aware and automatically swap between production and development
- * based on the NODE_ENV environment variable:
- * - In production (NODE_ENV='production'): Uses production domains
- * - In development (any other NODE_ENV value): Uses localhost URLs
+ * URLs are environment-aware and swap between production and development based on the
+ * `ENVIRONMENT` environment variable:
+ * - In production (ENVIRONMENT='production'): Uses production domains
+ * - In development (any other ENVIRONMENT value): Uses localhost URLs
  *
  * @example
  * // In production:
- * APPS.AUTH.URL // 'https://auth.epicenter.sh'
+ * APPS(env).AUTH.URL // 'https://auth.epicenter.sh'
  *
  * // In development:
- * APPS.AUTH.URL // 'http://localhost:8787'
+ * APPS(env).AUTH.URL // 'http://localhost:8787'
  */
-export const APPS = {
-	/**
-	 * Authentication service for the application ecosystem
-	 */
-	AUTH: {
-		URL:
-			environment === 'production'
-				? 'https://auth.epicenter.sh'
-				: 'http://localhost:8787',
-	},
-	/**
-	 * Main epicenter.sh web application
-	 */
-	SH: {
-		URL:
-			environment === 'production'
-				? 'https://epicenter.sh'
-				: 'http://localhost:5173',
-	},
-	/**
-	 * Whispering audio transcription application
-	 */
-	AUDIO: {
-		URL:
-			environment === 'production'
-				? 'https://whispering.bradenwong.com'
-				: 'http://localhost:1420',
-	},
-} as const;
+export const APPS = ({ ENVIRONMENT }: Pick<Env, 'ENVIRONMENT'>) =>
+	({
+		/**
+		 * Authentication service for the application ecosystem
+		 */
+		AUTH: {
+			URL:
+				ENVIRONMENT === 'production'
+					? 'https://auth.epicenter.sh'
+					: 'http://localhost:8787',
+		},
+		/**
+		 * Main epicenter.sh web application
+		 */
+		SH: {
+			URL:
+				ENVIRONMENT === 'production'
+					? 'https://epicenter.sh'
+					: 'http://localhost:5173',
+		},
+		/**
+		 * Whispering audio transcription application
+		 */
+		AUDIO: {
+			URL:
+				ENVIRONMENT === 'production'
+					? 'https://whispering.bradenwong.com'
+					: 'http://localhost:1420',
+		},
+	}) as const;
 
 /**
  * Type representing the available application keys: 'AUTH' | 'SH' | 'AUDIO'
  */
-export type App = keyof typeof APPS;
+export type App = keyof ReturnType<typeof APPS>;
 
 /**
  * A list of all application URLs extracted from the APPS configuration.
