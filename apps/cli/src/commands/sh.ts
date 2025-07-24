@@ -4,9 +4,12 @@ import { Share } from '@epicenter/opencode/share/share.ts';
 import { bootstrap } from '@epicenter/opencode/cli/bootstrap.ts';
 import { Cloudflared } from '@epicenter/opencode/util/cloudflared.ts';
 import { Browser } from '@epicenter/opencode/util/browser.ts';
+import { Log } from '@epicenter/opencode/util/log.ts';
 import { basename } from 'node:path';
 import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
+
+const log = Log.create({ service: 'sh' });
 
 export const ShCommand = cmd({
 	command: 'sh',
@@ -68,11 +71,11 @@ export const ShCommand = cmd({
 			}
 
 			// Display server information
-			console.log(`Local server: http://${server.hostname}:${server.port}`);
+			console.log(`Local server:	http://${server.hostname}:${server.port}`);
+
 			if (tunnelProcess?.url) {
-				console.log(`Tunnel URL:   ${tunnelProcess.url}`);
+				console.log(`Tunnel URL:	   ${tunnelProcess.url}`);
 				if (args.open) {
-					console.log('Opening workspace on epicenter.sh...');
 					const EPICENTER_WORKSPACE_URL =
 						'https://epicenter.sh/workspaces' as const;
 					const currentDirName = basename(cwd);
@@ -81,7 +84,8 @@ export const ShCommand = cmd({
 						port: port.toString(),
 						name: currentDirName,
 					});
-					await Browser.openUrl(`${EPICENTER_WORKSPACE_URL}?${params}`);
+					const url = `${EPICENTER_WORKSPACE_URL}?${params}` as const;
+					await Browser.openUrl(url);
 				}
 			}
 
