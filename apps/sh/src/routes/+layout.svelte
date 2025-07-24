@@ -1,4 +1,6 @@
 <script lang="ts">
+  import SignInWithGithubButton from './SignInWithGithubButton.svelte';
+
 	import '@repo/ui/app.css';
 	import { ModeWatcher } from "mode-watcher";
 	import { page } from '$app/state';
@@ -10,12 +12,13 @@
 	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 	import { Settings, User, } from 'lucide-svelte';
-	import { siGithub as Github } from 'simple-icons';
-
 	import { Toaster } from 'svelte-sonner';
+	import * as rpc from '$lib/query';
+	import { createMutation } from '@tanstack/svelte-query';
 
 	let { children } = $props();
 	let settingsOpen = $state(false);
+
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -71,14 +74,7 @@
 						<DropdownMenu.Content align="end" class="w-56">
 							<DropdownMenu.Label>Account</DropdownMenu.Label>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item 
-								class="cursor-pointer"
-								onclick={() => {
-								}}
-							>
-								{@html Github.svg}
-								Sign in with GitHub
-							</DropdownMenu.Item>
+							<SignInWithGithubButton></SignInWithGithubButton>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				</nav>
