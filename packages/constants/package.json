@@ -3,8 +3,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./env": "./src/env.ts"
+		".": "./src/index.ts"
 	},
 	"dependencies": {
 		"arktype": "^2.1.20"

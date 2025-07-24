@@ -17,6 +17,7 @@
 		"hono": "^4.8.5"
 	},
 	"devDependencies": {
+		"@repo/constants": "workspace:*",
 		"@repo/config": "workspace:*",
 		"drizzle-kit": "^0.31.4",
 		"eslint": "^9.31.0",

@@ -23,3 +23,5 @@ export const APPS = {
 } as const;
 
 export type App = keyof typeof APPS;
+
+export const APP_URLS = Object.values(APPS).map((app) => app.URL);
