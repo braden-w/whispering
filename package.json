@@ -6,19 +6,49 @@
 	"keywords": [],
 	"license": "ISC",
 	"author": "",
+	"workspaces": {
+		"packages": ["apps/*", "packages/*"],
+		"catalog": {
+			"@types/node": "^22.15.32",
+			"typescript": "^5.8.3",
+			"eslint": "^9.30.1",
+			"prettier": "^3.6.2",
+			"svelte": "^5.35.5",
+			"@sveltejs/kit": "^2.22.0",
+			"@sveltejs/vite-plugin-svelte": "^5.1.0",
+			"svelte-check": "^4.2.1",
+			"vite": "^7.0.5",
+			"tailwindcss": "^4.1.11",
+			"clsx": "^2.1.1",
+			"tailwind-merge": "^3.3.1",
+			"tailwind-variants": "^1.0.0",
+			"bits-ui": "2.8.10",
+			"mode-watcher": "^1.0.8",
+			"svelte-sonner": "^1.0.5",
+			"lucide-svelte": "^0.525.0",
+			"@tanstack/svelte-table": "9.0.0-alpha.10",
+			"arktype": "^2.1.20",
+			"zod": "^3.25.67",
+			"nanoid": "^5.1.5",
+			"wellcrafted": "^0.21.0",
+			"date-fns": "^4.1.0",
+			"@biomejs/biome": "^1.9.4",
+			"turbo": "^2.3.3",
+			"concurrently": "^9.1.2"
+		}
+	},
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
 		"format": "concurrently \"biome format --write .\" \"turbo run format\"",
 		"lint": "concurrently \"biome lint --write --unsafe .\" \"turbo run lint\"",
-		"format-and-lint": "concurrently \"pnpm format\" \"pnpm lint\"",
+		"format-and-lint": "concurrently \"bun run format\" \"bun run lint\"",
 		"bump-version": "bun run scripts/bump-version.ts"
 	},
-	"packageManager": "pnpm@10.11.0",
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"@types/node": "^22.15.32",
-		"concurrently": "latest",
-		"turbo": "latest"
+		"@biomejs/biome": "catalog:",
+		"@types/node": "catalog:",
+		"concurrently": "catalog:",
+		"turbo": "catalog:"
 	}
 }
