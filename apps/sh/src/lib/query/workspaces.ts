@@ -45,10 +45,20 @@ export type Workspace = WorkspaceConfig &
 export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
 		queryKey: ['workspace', config().id],
-		// By default, Tanstack Query will retry 3 times if there's an error
-		// Connection checks shouldn't retry if there's an error: DNS failures are instant and definitive
+		// TanStack Query default behavior:
+		// - retry: 3 (retries failed queries 3 times with exponential backoff)
+		// - retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
+		//   This means: 1s, 2s, 4s, 8s... up to 30s between retries
+		//
+		// Why we override to retry: 0:
+		// - Retrying won't fix a non-existent domain or closed tunnel
+		// - Each retry generates console errors, creating noise
 		retry: 0,
+		// TanStack Query default: retryOnMount: true
+		// This means when a component remounts, it retries failed queries
+		// We set retryOnMount: false to prevent retry spam when navigating between pages
 		retryOnMount: false,
+
 		resultQueryFn: async (): Promise<Ok<Workspace>> => {
 			const client = createWorkspaceClient(config());
 
