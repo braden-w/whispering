@@ -8,12 +8,12 @@
 		".": "./src/index.ts"
 	},
 	"devDependencies": {
-		"@types/node": "catalog:",
-		"typescript": "catalog:"
+		"@types/node": "catalog:default",
+		"typescript": "catalog:default"
 	},
 	"dependencies": {
-		"arktype": "catalog:",
-		"lucide-svelte": "catalog:",
-		"zod": "catalog:"
+		"arktype": "catalog:default",
+		"lucide-svelte": "catalog:default",
+		"zod": "catalog:default"
 	}
 }

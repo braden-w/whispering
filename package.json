@@ -39,7 +39,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@types/node": "catalog:",
+		"@types/node": "catalog:default",
 		"concurrently": "latest",
 		"turbo": "latest"
 	}
