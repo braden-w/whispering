@@ -45,6 +45,10 @@ export type Workspace = WorkspaceConfig &
 export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
 		queryKey: ['workspace', config().id],
+		// By default, Tanstack Query will retry 3 times if there's an error
+		// Connection checks shouldn't retry if there's an error: DNS failures are instant and definitive
+		retry: 0,
+		retryOnMount: false,
 		resultQueryFn: async (): Promise<Ok<Workspace>> => {
 			const client = createWorkspaceClient(config());
 
