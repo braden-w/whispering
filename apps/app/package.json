@@ -20,8 +20,8 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.8",
-		"@sveltejs/kit": "^2.22.0",
-		"@sveltejs/vite-plugin-svelte": "^5.1.0",
+		"@sveltejs/kit": "catalog:",
+		"@sveltejs/vite-plugin-svelte": "catalog:",
 		"@tailwindcss/vite": "^4.1.11",
 		"@tauri-apps/cli": "^2.5.0",
 		"bits-ui": "catalog:",
@@ -31,13 +31,13 @@
 		"mode-watcher": "catalog:",
 		"prettier": "catalog:",
 		"svelte": "catalog:",
-		"svelte-check": "^4.2.1",
+		"svelte-check": "catalog:",
 		"svelte-sonner": "catalog:",
 		"tailwind-merge": "catalog:",
 		"tailwind-variants": "catalog:",
 		"tailwindcss": "catalog:",
 		"typescript": "catalog:",
-		"vite": "^6.3.5"
+		"vite": "catalog:"
 	},
 	"type": "module",
 	"dependencies": {
@@ -66,13 +66,13 @@
 		"@tauri-apps/plugin-updater": "~2.8.1",
 		"arktype": "catalog:",
 		"audio-recorder-polyfill": "^0.4.1",
-		"date-fns": "^4.1.0",
+		"date-fns": "catalog:",
 		"dexie": "^4.0.11",
 		"elevenlabs": "^1.59.0",
 		"groq-sdk": "^0.25.0",
-		"nanoid": "^5.1.5",
+		"nanoid": "catalog:",
 		"openai": "^5.7.0",
-		"wellcrafted": "^0.21.0",
+		"wellcrafted": "catalog:",
 		"zod": "catalog:"
 	}
 }
