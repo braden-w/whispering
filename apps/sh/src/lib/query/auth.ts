@@ -1,6 +1,26 @@
 import { authClient } from '$lib/auth-client';
 import { Err, Ok } from 'wellcrafted/result';
-import { defineMutation } from './_client';
+import { defineMutation, defineQuery } from './_client';
+
+export const getSession = defineQuery({
+	queryKey: ['auth', 'getSession'] as const,
+	resultQueryFn: async () => {
+		const { data, error } = await authClient.getSession();
+		if (error) return Err(error);
+		return Ok(data);
+	},
+	select: (data) => data?.session ?? null,
+});
+
+export const getUser = defineQuery({
+	queryKey: ['auth', 'getSession'] as const,
+	resultQueryFn: async () => {
+		const { data, error } = await authClient.getSession();
+		if (error) return Err(error);
+		return Ok(data);
+	},
+	select: (data) => data?.user ?? null,
+});
 
 export const signInWithGithub = defineMutation({
 	mutationKey: ['auth', 'signInWithGithub'] as const,
