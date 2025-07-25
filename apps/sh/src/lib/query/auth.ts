@@ -33,3 +33,12 @@ export const signInWithGithub = defineMutation({
 		return Ok(data);
 	},
 });
+
+export const signOut = defineMutation({
+	mutationKey: ['auth', 'signOut'] as const,
+	resultMutationFn: async () => {
+		const { error } = await authClient.signOut();
+		if (error) return Err(error);
+		return Ok(null);
+	},
+});
