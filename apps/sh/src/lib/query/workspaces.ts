@@ -30,53 +30,6 @@ export type Workspace = WorkspaceConfig &
 	};
 
 /**
- * Fetches all workspace configs and attempts to merge them with live OpenCode app information.
- *
- * For each workspace config:
- * - Attempts to connect to its OpenCode server using the workspace URL
- * - If connection succeeds: marks connected=true and includes the OpenCode app info
- * - If connection fails: marks connected=false (workspace unreachable)
- *
- * Checks all workspaces in parallel for optimal performance.
- * Used in the UI to display which workspaces are online vs offline.
- *
- * @returns Array of workspaces with their connection status and app info (if connected)
- */
-export const getWorkspaces = () =>
-	defineQuery({
-		// Only refetch if workspaces exist
-		enabled: workspaceConfigs.value.length > 0,
-		queryKey: ['workspaces'],
-		resultQueryFn: async (): Promise<Ok<Workspace[]>> => {
-			const workspacePromises = workspaceConfigs.value.map(
-				async (config): Promise<Workspace> => {
-					const client = createWorkspaceClient(config);
-
-					const { data, error } = await api.getApp({ client });
-
-					if (data && !error) {
-						return {
-							...config,
-							appInfo: data,
-							checkedAt: Date.now(),
-							connected: true,
-						};
-					}
-
-					return {
-						...config,
-						checkedAt: Date.now(),
-						connected: false,
-					};
-				},
-			);
-
-			const enhancedWorkspaces = await Promise.all(workspacePromises);
-			return Ok(enhancedWorkspaces);
-		},
-	});
-
-/**
  * Tests a workspace connection by attempting to connect to an OpenCode server.
  *
  * This is used for validating workspace credentials before creating a workspace config.
