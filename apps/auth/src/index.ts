@@ -6,10 +6,6 @@ import type { Env } from '@repo/constants/env-schema';
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.on(['POST', 'GET'], '/api/auth/*', (c) => {
-	return auth(c.env).handler(c.req.raw);
-});
-
 app.use('/api/auth/*', (c, next) =>
 	cors({
 		origin: APP_URLS(c.env),
@@ -20,6 +16,10 @@ app.use('/api/auth/*', (c, next) =>
 		credentials: true,
 	})(c, next),
 );
+
+app.on(['POST', 'GET'], '/api/auth/*', (c) => {
+	return auth(c.env).handler(c.req.raw);
+});
 
 export type AppType = typeof app;
 
