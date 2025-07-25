@@ -73,8 +73,7 @@ try {
 	console.error('❌ Unexpected error:', error);
 	if (!process.argv.includes('--print-logs')) {
 		console.error(
-			'Run with --print-logs for more details, or check log file at ' +
-				Log.file(),
+			`Run with --print-logs for more details, or check log file at ${Log.file()}`,
 		);
 	}
 	process.exit(1);
