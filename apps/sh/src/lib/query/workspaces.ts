@@ -44,11 +44,6 @@ export type Workspace = WorkspaceConfig &
  */
 export const getWorkspace = (config: Accessor<WorkspaceConfig>) =>
 	defineQuery({
-		initialData: queryClient
-			.getQueryData<Workspace[]>(['workspaces'])
-			?.find((w) => w.id === config().id),
-		initialDataUpdatedAt: () =>
-			queryClient.getQueryState<Workspace[]>(['workspaces'])?.dataUpdatedAt,
 		queryKey: ['workspace', config().id],
 		resultQueryFn: async (): Promise<Ok<Workspace>> => {
 			const client = createWorkspaceClient(config());
