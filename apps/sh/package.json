@@ -50,6 +50,7 @@
 		"@tanstack/svelte-query-devtools": "https://pkg.pr.new/@tanstack/svelte-query-devtools@svelte-5-adapter",
 		"arktype": "catalog:",
 		"better-auth": "^1.3.3",
+		"bits-ui": "catalog:",
 		"hono": "^4.8.5",
 		"isomorphic-dompurify": "^2.26.0",
 		"marked": "^16.1.1",
