@@ -35,7 +35,6 @@
 	let testSuccess = $state(false);
 	let appInfo = $state<App | null>(null);
 
-
 	// Reset form when dialog opens
 	$effect(() => {
 		if (open) {
@@ -53,12 +52,12 @@
 		}
 	});
 
-
-
 	// Manual setup commands (non-PM commands)
 	const opencodeCommand = $derived(`opencode serve -p ${port}` as const);
 	const ngrokCommand = $derived(`ngrok http ${port}` as const);
-	const cloudflaredCommand = $derived(`cloudflared tunnel --url http://localhost:${port}` as const);
+	const cloudflaredCommand = $derived(
+		`cloudflared tunnel --url http://localhost:${port}` as const,
+	);
 
 	async function copyToClipboard(text: string) {
 		try {
@@ -117,7 +116,6 @@
 		}
 	}
 
-
 	function handleCreate() {
 		if (!workspaceName.trim()) {
 			toast.error('Please enter a workspace name');
@@ -166,18 +164,21 @@
 				<div class="space-y-4">
 					<div class="space-y-2">
 						<p class="text-sm text-muted-foreground">
-							Run this command to start your server and add the workspace automatically:
+							Run this command to start your server and add the workspace
+							automatically:
 						</p>
 					</div>
-					
-					<PMCommand 
-						command="execute" 
-						args={['@getepicenter/opencode', 'serve', '--tunnel', '--open']} 
+
+					<PMCommand
+						command="execute"
+						args={['@getepicenter/opencode', 'serve', '--tunnel', '--open']}
 					/>
-					
+
 					<div class="space-y-2">
 						<p class="text-sm font-medium">What this does:</p>
-						<ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+						<ul
+							class="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2"
+						>
 							<li>Starts your OpenCode server</li>
 							<li>Creates a secure tunnel automatically</li>
 							<li>Opens a new tab with your workspace pre-configured</li>
@@ -218,7 +219,7 @@
 							Test Connection
 						{/if}
 					</Button>
-					
+
 					{#if testSuccess && appInfo}
 						<div class="space-y-4 pt-4 border-t">
 							<div class="space-y-2">
@@ -241,13 +242,15 @@
 				<!-- Manual Setup Commands -->
 				<Accordion.Root type="single">
 					<Accordion.Item value="manual-commands">
-						<Accordion.Trigger>Need to start your server manually?</Accordion.Trigger>
+						<Accordion.Trigger
+							>Need to start your server manually?</Accordion.Trigger
+						>
 						<Accordion.Content>
 							<div class="space-y-6 pt-4">
 								<p class="text-sm text-muted-foreground">
 									Run these commands separately and paste the tunnel URL above
 								</p>
-								
+
 								<!-- Start OpenCode -->
 								<div class="space-y-2">
 									<p class="text-sm font-medium">Start OpenCode server:</p>
@@ -264,14 +267,16 @@
 										</Button>
 									</div>
 								</div>
-								
+
 								<!-- Create tunnel -->
 								<div class="space-y-3">
 									<p class="text-sm font-medium">Create tunnel:</p>
-									
+
 									<Accordion.Root type="single" class="w-full">
 										<Accordion.Item value="cloudflared">
-											<Accordion.Trigger class="text-sm">Cloudflared</Accordion.Trigger>
+											<Accordion.Trigger class="text-sm"
+												>Cloudflared</Accordion.Trigger
+											>
 											<Accordion.Content>
 												<div class="space-y-2 pt-2">
 													<div class="flex items-center gap-2">
@@ -281,7 +286,8 @@
 														<Button
 															size="icon"
 															variant="ghost"
-															onclick={() => copyToClipboard(cloudflaredCommand)}
+															onclick={() =>
+																copyToClipboard(cloudflaredCommand)}
 														>
 															<Copy class="h-4 w-4" />
 														</Button>
@@ -292,9 +298,11 @@
 												</div>
 											</Accordion.Content>
 										</Accordion.Item>
-										
+
 										<Accordion.Item value="ngrok">
-											<Accordion.Trigger class="text-sm">ngrok</Accordion.Trigger>
+											<Accordion.Trigger class="text-sm"
+												>ngrok</Accordion.Trigger
+											>
 											<Accordion.Content>
 												<div class="space-y-2 pt-2">
 													<div class="flex items-center gap-2">
@@ -363,9 +371,7 @@
 
 		<Modal.Footer>
 			<div class="flex items-center justify-end gap-2">
-				<Button variant="outline" onclick={() => (open = false)}>
-					Cancel
-				</Button>
+				<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
 				<Button
 					onclick={handleCreate}
 					disabled={!testSuccess || !workspaceName.trim()}

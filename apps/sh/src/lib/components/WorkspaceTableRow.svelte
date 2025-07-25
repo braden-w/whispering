@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
-	
+
 	import WorkspaceConnectionBadge from './WorkspaceConnectionBadge.svelte';
 	import DeleteWorkspaceConfigButton from './DeleteWorkspaceConfigButton.svelte';
 	import EditWorkspaceConfigButton from './EditWorkspaceConfigButton.svelte';
@@ -82,9 +82,7 @@
 	{#if columnVisibility.rootPath !== false}
 		<Table.Cell
 			class="max-w-[200px] truncate"
-			title={workspace?.connected
-				? workspace.appInfo.path.root
-				: ''}
+			title={workspace?.connected ? workspace.appInfo.path.root : ''}
 		>
 			{#if workspace?.connected}
 				<code class="text-xs">{workspace.appInfo.path.root}</code>
@@ -126,8 +124,14 @@
 				>
 					{workspace?.connected ? 'Open' : 'Connect'}
 				</Button>
-				<EditWorkspaceConfigButton workspaceConfig={config} disabled={workspaceQuery.isPending} />
-				<DeleteWorkspaceConfigButton workspaceConfig={config} disabled={workspaceQuery.isPending} />
+				<EditWorkspaceConfigButton
+					workspaceConfig={config}
+					disabled={workspaceQuery.isPending}
+				/>
+				<DeleteWorkspaceConfigButton
+					workspaceConfig={config}
+					disabled={workspaceQuery.isPending}
+				/>
 			</div>
 		</Table.Cell>
 	{/if}

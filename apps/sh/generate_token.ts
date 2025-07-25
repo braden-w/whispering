@@ -78,11 +78,11 @@ async function provisionTunnel(userSubdomain, userPort) {
 		console.log(`   ✅ Tunnel created with ID: ${tunnelId}`);
 
 		// --- STEP 2: GET THE TUNNEL TOKEN ---
-		console.log(`   [2/5] Fetching tunnel token...`);
+		console.log('   [2/5] Fetching tunnel token...');
 		const tunnelToken = await apiRequest(
 			`/accounts/${CLOUDFLARE_ACCOUNT_ID}/cfd_tunnel/${tunnelId}/token`,
 		);
-		console.log(`   ✅ Token fetched successfully.`);
+		console.log('   ✅ Token fetched successfully.');
 
 		// --- STEP 3: CREATE DNS CNAME RECORD ---
 		console.log(
@@ -102,7 +102,7 @@ async function provisionTunnel(userSubdomain, userPort) {
 			},
 		);
 		dnsRecordId = createDnsResult.id;
-		console.log(`   ✅ DNS record created.`);
+		console.log('   ✅ DNS record created.');
 
 		// --- STEP 4: CONFIGURE TUNNEL INGRESS RULES ---
 		console.log(
@@ -124,10 +124,10 @@ async function provisionTunnel(userSubdomain, userPort) {
 				body: JSON.stringify({ config: ingressConfig }),
 			},
 		);
-		console.log(`   ✅ Tunnel configured successfully.`);
+		console.log('   ✅ Tunnel configured successfully.');
 
 		// --- STEP 5: RETURN THE FINAL COMMAND ---
-		console.log(`   [5/5] Generating final command for the user...`);
+		console.log('   [5/5] Generating final command for the user...');
 		const runCommand = `cloudflared tunnel --no-autoupdate run --token ${tunnelToken}`;
 
 		return { finalUrl, runCommand };
@@ -180,7 +180,7 @@ async function main() {
 	}
 
 	const userSubdomain = args[0];
-	const userPort = parseInt(args[1], 10);
+	const userPort = Number.parseInt(args[1], 10);
 
 	try {
 		const result = await provisionTunnel(userSubdomain, userPort);

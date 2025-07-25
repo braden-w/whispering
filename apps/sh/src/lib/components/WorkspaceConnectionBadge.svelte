@@ -11,7 +11,6 @@
 		workspaceConfig,
 	}: { refetchInterval?: number; workspaceConfig: WorkspaceConfig } = $props();
 
-
 	const workspaceQuery = createQuery(() => ({
 		...rpc.workspaces.getWorkspace(() => workspaceConfig).options(),
 		refetchInterval,
@@ -19,7 +18,7 @@
 
 	// True only before we've received ANY response (success or failure)
 	const isAwaitingFirstResponse = $derived(
-		workspaceQuery.dataUpdatedAt === 0 && workspaceQuery.errorUpdatedAt === 0
+		workspaceQuery.dataUpdatedAt === 0 && workspaceQuery.errorUpdatedAt === 0,
 	);
 </script>
 

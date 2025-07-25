@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { goto} from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
@@ -11,7 +11,7 @@
 	import { ChevronDown, Plus } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	
+
 	let { data }: { data: PageData } = $props();
 
 	// Define available columns
@@ -24,7 +24,7 @@
 		{ hideable: false, id: 'status', label: 'Status' },
 		{ hideable: true, id: 'lastUsed', label: 'Last Used' },
 		{ hideable: false, id: 'actions', label: 'Actions' },
-	] as const
+	] as const;
 
 	type ColumnId = (typeof columns)[number]['id'];
 
@@ -40,12 +40,13 @@
 		url: true,
 	});
 
-
 	// Create workspace from URL params on mount
 	onMount(() => {
 		if (data.createWorkspaceParams) {
 			workspaceConfigs.create(data.createWorkspaceParams);
-			toast.success(`Workspace "${data.createWorkspaceParams.name}" added successfully`);
+			toast.success(
+				`Workspace "${data.createWorkspaceParams.name}" added successfully`,
+			);
 			// Erase the URL params
 			goto('/workspaces', { replaceState: true });
 		}
@@ -119,10 +120,10 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						{#if columnVisibility.name !== false}<Table.Head
-							>Name</Table.Head>{/if}
-						{#if columnVisibility.port !== false}<Table.Head
-							>Port</Table.Head>{/if}
+						{#if columnVisibility.name !== false}<Table.Head>Name</Table.Head
+							>{/if}
+						{#if columnVisibility.port !== false}<Table.Head>Port</Table.Head
+							>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}
 						{#if columnVisibility.rootPath !== false}<Table.Head

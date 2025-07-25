@@ -44,7 +44,9 @@
 {:else if part.type === 'file'}
 	{@const FileIcon = getFileIcon(part.mime)}
 	<div class="my-3">
-		<div class="flex items-center gap-3 p-4 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+		<div
+			class="flex items-center gap-3 p-4 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+		>
 			<div class="flex-shrink-0">
 				<FileIcon class="h-5 w-5 text-muted-foreground" />
 			</div>
@@ -71,17 +73,23 @@
 	</div>
 {:else if part.type === 'step-start'}
 	<div class="my-2">
-		<div class="flex items-center gap-3 text-sm text-muted-foreground border-l-4 border-primary/60 bg-primary/5 pl-4 py-2 rounded-r">
+		<div
+			class="flex items-center gap-3 text-sm text-muted-foreground border-l-4 border-primary/60 bg-primary/5 pl-4 py-2 rounded-r"
+		>
 			<div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 			<span class="font-medium">Starting step...</span>
 		</div>
 	</div>
 {:else if part.type === 'step-finish'}
 	<div class="my-2">
-		<div class="flex items-center justify-between text-sm border-l-4 border-green-500/60 bg-green-500/5 pl-4 py-2 rounded-r">
+		<div
+			class="flex items-center justify-between text-sm border-l-4 border-green-500/60 bg-green-500/5 pl-4 py-2 rounded-r"
+		>
 			<div class="flex items-center gap-3">
 				<div class="w-2 h-2 bg-green-500 rounded-full"></div>
-				<span class="font-medium text-green-700 dark:text-green-400">Step completed</span>
+				<span class="font-medium text-green-700 dark:text-green-400"
+					>Step completed</span
+				>
 			</div>
 			<div class="flex items-center gap-3 text-xs text-muted-foreground">
 				{#if part.cost > 0}
@@ -99,7 +107,9 @@
 	</div>
 {:else if part.type === 'snapshot'}
 	<div class="my-3">
-		<div class="flex items-start gap-3 p-4 border border-blue-200 dark:border-blue-800 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/30">
+		<div
+			class="flex items-start gap-3 p-4 border border-blue-200 dark:border-blue-800 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/30"
+		>
 			<div class="flex-shrink-0 mt-0.5">
 				<Camera class="h-5 w-5 text-blue-600 dark:text-blue-400" />
 			</div>
@@ -108,7 +118,8 @@
 					System Snapshot
 				</div>
 				<div class="relative">
-					<pre class="text-xs text-blue-800 dark:text-blue-200 font-mono bg-white/80 dark:bg-blue-950/50 p-3 rounded border border-blue-200/50 dark:border-blue-700/50 overflow-x-auto whitespace-pre-wrap break-words">{part.snapshot}</pre>
+					<pre
+						class="text-xs text-blue-800 dark:text-blue-200 font-mono bg-white/80 dark:bg-blue-950/50 p-3 rounded border border-blue-200/50 dark:border-blue-700/50 overflow-x-auto whitespace-pre-wrap break-words">{part.snapshot}</pre>
 				</div>
 			</div>
 		</div>

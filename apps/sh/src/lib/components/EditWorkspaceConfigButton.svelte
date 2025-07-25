@@ -30,9 +30,11 @@
 			port,
 			url,
 		} satisfies UpdateWorkspaceParams);
-		
+
 		if (validationResult instanceof type.errors) {
-			toast.error('Validation failed', { description: validationResult.summary });
+			toast.error('Validation failed', {
+				description: validationResult.summary,
+			});
 			return;
 		}
 
@@ -54,11 +56,7 @@
 		<div class="space-y-4">
 			<div class="space-y-2">
 				<Label for="edit-name">Workspace Name</Label>
-				<Input
-					id="edit-name"
-					bind:value={name}
-					placeholder="My Project"
-				/>
+				<Input id="edit-name" bind:value={name} placeholder="My Project" />
 			</div>
 
 			<div class="space-y-2">

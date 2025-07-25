@@ -213,7 +213,6 @@ export const setAuthParams = async ({
 				}
 				options.query[name] = token;
 				break;
-			case 'header':
 			default:
 				options.headers.set(name, token);
 				break;
@@ -363,9 +362,8 @@ class Interceptors<Interceptor> {
 	getInterceptorIndex(id: Interceptor | number): number {
 		if (typeof id === 'number') {
 			return this._fns[id] ? id : -1;
-		} else {
-			return this._fns.indexOf(id);
 		}
+			return this._fns.indexOf(id);
 	}
 
 	update(id: Interceptor | number, fn: Interceptor) {
@@ -373,9 +371,8 @@ class Interceptors<Interceptor> {
 		if (this._fns[index]) {
 			this._fns[index] = fn;
 			return id;
-		} else {
-			return false;
 		}
+			return false;
 	}
 
 	use(fn: Interceptor) {

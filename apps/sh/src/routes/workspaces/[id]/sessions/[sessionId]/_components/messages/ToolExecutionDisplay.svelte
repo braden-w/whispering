@@ -63,7 +63,8 @@
 
 	const hasMetadata = $derived.by(() => {
 		return (
-			(toolPart.state.status === 'completed' || toolPart.state.status === 'running') &&
+			(toolPart.state.status === 'completed' ||
+				toolPart.state.status === 'running') &&
 			'metadata' in toolPart.state &&
 			toolPart.state.metadata &&
 			Object.keys(toolPart.state.metadata).length > 0
@@ -95,7 +96,7 @@
 					class={cn(
 						'h-4 w-4',
 						statusConfig.color,
-						statusConfig.animate && 'animate-spin'
+						statusConfig.animate && 'animate-spin',
 					)}
 				/>
 				<span class="font-medium text-sm text-foreground">{toolPart.tool}</span>
@@ -171,7 +172,9 @@
 						</div>
 						<pre
 							class="text-xs bg-muted/50 text-foreground p-2 rounded overflow-x-auto border">{JSON.stringify(
-								(toolPart.state.status === 'completed' || toolPart.state.status === 'running') && 'metadata' in toolPart.state
+								(toolPart.state.status === 'completed' ||
+									toolPart.state.status === 'running') &&
+									'metadata' in toolPart.state
 									? toolPart.state.metadata
 									: {},
 								null,
