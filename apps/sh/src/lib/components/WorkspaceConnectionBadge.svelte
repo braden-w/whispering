@@ -17,18 +17,13 @@
 		refetchInterval,
 	}));
 
-	// Track if we've ever attempted a fetch (success or failure)
-	let hasAttemptedInitialFetch = $state(false);
-
-	// Mark as attempted once we have any result (success or failure)
-	$effect(() => {
-		if (workspaceQuery.dataUpdatedAt > 0 || workspaceQuery.errorUpdatedAt > 0) {
-			hasAttemptedInitialFetch = true;
-		}
-	});
+	// True only before we've received ANY response (success or failure)
+	const isAwaitingFirstResponse = $derived(
+		workspaceQuery.dataUpdatedAt === 0 && workspaceQuery.errorUpdatedAt === 0
+	);
 </script>
 
-{#if !hasAttemptedInitialFetch && workspaceQuery.isPending}
+{#if isAwaitingFirstResponse && workspaceQuery.isPending}
 	<Badge variant="secondary">
 		<Loader2 class="mr-1 h-3 w-3 animate-spin" />
 		Checking
