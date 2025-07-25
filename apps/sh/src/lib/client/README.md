@@ -55,7 +55,7 @@ When the OpenCode API changes:
 
 ```bash
 # Regenerate from running server
-pnpm openapi-ts
+bun openapi-ts
 ```
 
 This will:

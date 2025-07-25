@@ -14,7 +14,7 @@ A web interface for managing and connecting to OpenCode servers. Connect to mult
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm
+- Node.js 18+ and bun
 - Access to one or more OpenCode servers
 
 ### Development
@@ -22,13 +22,13 @@ A web interface for managing and connecting to OpenCode servers. Connect to mult
 1. Install dependencies:
 
 ```bash
-pnpm install
+bun install
 ```
 
 2. Start the development server:
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 3. Open [http://localhost:5173](http://localhost:5173) in your browser
@@ -36,13 +36,13 @@ pnpm dev
 ### Building for Production
 
 ```bash
-pnpm build
+bun build
 ```
 
 Preview the production build:
 
 ```bash
-pnpm preview
+bun preview
 ```
 
 ## Deployment
@@ -50,7 +50,7 @@ pnpm preview
 This project is configured for Cloudflare Pages deployment:
 
 ```bash
-pnpm deploy
+bun deploy
 ```
 
 ## Usage

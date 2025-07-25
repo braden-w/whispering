@@ -5,7 +5,7 @@ The unified command-line interface for the [epicenter.sh](https://epicenter.sh) 
 ## Installation
 
 ```bash
-npm install -g @epicenter/cli
+bun install -g @epicenter/cli
 ```
 
 ## Usage

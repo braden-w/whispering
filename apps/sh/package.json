@@ -13,7 +13,7 @@
 		"format": "prettier --write .",
 		"lint": "eslint --fix .",
 		"openapi-ts": "openapi-ts",
-		"deploy": "pnpm build && wrangler pages deploy --project-name=epicenter-sh"
+		"deploy": "bun run build && wrangler pages deploy --project-name=epicenter-sh"
 	},
 	"devDependencies": {
 		"@epicenter/auth": "workspace:*",
