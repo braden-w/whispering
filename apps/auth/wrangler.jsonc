@@ -5,9 +5,6 @@
 	"compatibility_date": "2025-07-24",
 	"env": {
 		"development": {
-			"vars": {
-				"MODE": "development"
-			},
 			"observability": {
 				"enabled": true,
 				"head_sampling_rate": 1
@@ -20,9 +17,6 @@
 					"custom_domain": true
 				}
 			],
-			"vars": {
-				"MODE": "production"
-			},
 			"observability": {
 				"enabled": true,
 				"head_sampling_rate": 1
