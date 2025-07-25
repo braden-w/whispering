@@ -29,6 +29,9 @@ importers:
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
+      '@repo/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
       '@repo/svelte-utils':
         specifier: workspace:*
         version: link:../../packages/svelte-utils
@@ -192,9 +195,6 @@ importers:
       better-auth:
         specifier: ^1.3.3
         version: 1.3.3
-      dotenv:
-        specifier: ^17.2.0
-        version: 17.2.0
       drizzle-orm:
         specifier: ^0.44.3
         version: 0.44.3(@cloudflare/workers-types@4.20250719.0)(@neondatabase/serverless@1.0.1)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.2.19(@types/react@19.1.8))(kysely@0.28.3)
@@ -205,6 +205,9 @@ importers:
       '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@repo/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
       drizzle-kit:
         specifier: ^0.31.4
         version: 0.31.4
@@ -242,6 +245,9 @@ importers:
 
   apps/sh:
     dependencies:
+      '@repo/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
       '@tanstack/svelte-query':
         specifier: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b
         version: https://pkg.pr.new/epicenterhq/query/@tanstack/svelte-query@fcc9ad6fc7c2ab51fb289b380b3cb99409ea802b(svelte@5.35.5)
@@ -251,6 +257,12 @@ importers:
       arktype:
         specifier: ^2.1.20
         version: 2.1.20
+      better-auth:
+        specifier: ^1.3.3
+        version: 1.3.3
+      hono:
+        specifier: ^4.8.5
+        version: 4.8.5
       isomorphic-dompurify:
         specifier: ^2.26.0
         version: 2.26.0
@@ -263,6 +275,9 @@ importers:
       nanoid:
         specifier: ^5.1.5
         version: 5.1.5
+      simple-icons:
+        specifier: ^15.7.0
+        version: 15.7.0
       svelte-sonner:
         specifier: ^1.0.5
         version: 1.0.5(svelte@5.35.5)
@@ -270,6 +285,9 @@ importers:
         specifier: ^0.20.0
         version: 0.20.0
     devDependencies:
+      '@epicenter/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@eslint/compat':
         specifier: ^1.2.5
         version: 1.3.1(eslint@9.31.0(jiti@2.4.2))
@@ -395,6 +413,19 @@ importers:
       typescript-eslint:
         specifier: ^8.36.0
         version: 8.36.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+
+  packages/constants:
+    dependencies:
+      arktype:
+        specifier: ^2.1.20
+        version: 2.1.20
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.5
+        version: 20.19.9
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   packages/shared:
     dependencies:
@@ -2019,6 +2050,9 @@ packages:
   '@types/node@18.19.112':
     resolution: {integrity: sha512-i+Vukt9POdS/MBI7YrrkkI5fMfwFtOjphSmt4WXYLfwqsfr6z/HdCx7LqT9M7JktGob8WNgj8nFB4TbGNE4Cog==}
 
+  '@types/node@20.19.9':
+    resolution: {integrity: sha512-cuVNgarYWZqxRJDQHEB58GEONhOK79QVR/qYx4S7kcUObQvUwvFnYxJuuHUKm2aieN9X3yZB4LZsuYNU1Qphsw==}
+
   '@types/node@22.15.32':
     resolution: {integrity: sha512-3jigKqgSjsH6gYZv2nEsqdXfZqIFGAV36XYYjf9KGZ3PSG+IhLecqPnI310RvjutyMwifE2hhhNEklOUrvx/wA==}
 
@@ -2524,10 +2558,6 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
-    engines: {node: '>=12'}
-
-  dotenv@17.2.0:
-    resolution: {integrity: sha512-Q4sgBT60gzd0BB0lSyYD3xM4YxrXA9y4uBDof1JNYGzOXrQdQ6yX+7XIAqoFOGQFOTK1D3Hts5OllpxMDZFONQ==}
     engines: {node: '>=12'}
 
   drizzle-kit@0.31.4:
@@ -4056,6 +4086,10 @@ packages:
 
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
+
+  simple-icons@15.7.0:
+    resolution: {integrity: sha512-buN9moq1lh6Tujgr2Nc3Vgi4naE0IOKon48G42aLWqSNxjWJlUx+YSqobKcefom4uv1xyAVFcjQOJIhBJvXjGw==}
+    engines: {node: '>=0.12.18'}
 
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
@@ -5902,6 +5936,10 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
+  '@types/node@20.19.9':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/node@22.15.32':
     dependencies:
       undici-types: 6.21.0
@@ -5909,7 +5947,6 @@ snapshots:
   '@types/node@24.0.3':
     dependencies:
       undici-types: 7.8.0
-    optional: true
 
   '@types/pg@8.15.4':
     dependencies:
@@ -6199,7 +6236,7 @@ snapshots:
 
   bun-types@1.2.19(@types/react@19.1.8):
     dependencies:
-      '@types/node': 22.15.32
+      '@types/node': 24.0.3
       '@types/react': 19.1.8
 
   bundle-name@4.1.0:
@@ -6424,8 +6461,6 @@ snapshots:
       '@types/trusted-types': 2.0.7
 
   dotenv@16.6.1: {}
-
-  dotenv@17.2.0: {}
 
   drizzle-kit@0.31.4:
     dependencies:
@@ -7912,6 +7947,8 @@ snapshots:
       once: 1.4.0
       simple-concat: 1.0.1
 
+  simple-icons@15.7.0: {}
+
   simple-swizzle@0.2.2:
     dependencies:
       is-arrayish: 0.3.2
@@ -8210,8 +8247,7 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici-types@7.8.0:
-    optional: true
+  undici-types@7.8.0: {}
 
   undici@7.12.0: {}
 
