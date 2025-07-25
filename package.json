@@ -37,6 +37,7 @@
 			"concurrently": "^9.1.2"
 		}
 	},
+	"packageManager": "bun@1.2.19",
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
