@@ -30,31 +30,6 @@ export type Workspace = WorkspaceConfig &
 	};
 
 /**
- * Tests a workspace connection by attempting to connect to an OpenCode server.
- *
- * This is used for validating workspace credentials before creating a workspace config.
- * Takes connection parameters and attempts to fetch the app info.
- *
- * @param params - The workspace connection parameters (port, url, password)
- * @returns The app info if connection succeeds, or throws an error
- */
-export const testWorkspaceConnection = (params: {
-	port: Port;
-	url: URL;
-	password: Password | null;
-}) =>
-	defineQuery({
-		queryKey: ['test-workspace', params],
-		resultQueryFn: async (): Promise<Ok<boolean>> => {
-			const client = createWorkspaceClient({ url: params.url });
-			const { data, error } = await api.getApp({ client });
-
-			if (error || !data) return Ok(false);
-			return Ok(true);
-		},
-	});
-
-/**
  * Fetches a single workspace config and attempts to merge it with live OpenCode app information.
  *
  * Takes a workspace config and:
