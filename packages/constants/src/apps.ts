@@ -11,7 +11,7 @@ import type { ImportMetaEnv } from 'vite/types';
  *
  * @example
  * // In production:
- * APPS(env).AUTH.URL // 'https://auth.epicenter.sh'
+ * APPS(env).AUTH.URL // 'https://auth.epicenter.so'
  *
  * // In development:
  * APPS(env).AUTH.URL // 'http://localhost:8787'
@@ -26,7 +26,7 @@ export const APPS = ({
 		AUTH: {
 			URL:
 				MODE === 'production'
-					? 'https://auth.epicenter.sh'
+					? 'https://auth.epicenter.so'
 					: 'http://localhost:8787',
 		},
 		/**
