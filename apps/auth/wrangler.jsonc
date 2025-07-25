@@ -3,6 +3,19 @@
 	"name": "auth",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-24",
+	"env": {
+		"development": {
+			"vars": {
+				"ENVIRONMENT": "development"
+			}
+		},
+		"production": {
+			"vars": {
+				"ENVIRONMENT": "production"
+			}
+		}
+	}
+
 	// "compatibility_flags": [
 	//   "nodejs_compat"
 	// ],

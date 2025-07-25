@@ -2,8 +2,8 @@
 	"name": "@epicenter/auth",
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev",
-		"deploy": "wrangler deploy --minify",
+		"dev": "wrangler dev --env development",
+		"deploy": "wrangler deploy --env production --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
 		"format": "prettier --write .",
 		"lint": "eslint --fix ."
