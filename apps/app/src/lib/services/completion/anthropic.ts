@@ -20,14 +20,14 @@ export function createAnthropicCompletionService(): CompletionService {
 						messages: [{ role: 'user', content: userPrompt }],
 						max_tokens: 1024,
 					}),
-				mapError: (error) => {
+				mapErr: (error) => {
 					// Check if it's NOT an Anthropic API error
 					if (!(error instanceof Anthropic.APIError)) {
 						// This is an unexpected error type
 						throw error;
 					}
 					// Return the error directly
-					return error;
+					return Err(error);
 				},
 			});
 

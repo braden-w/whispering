@@ -1,6 +1,6 @@
 import type { VadState } from '$lib/constants/audio';
 import { MicVAD, utils } from '@ricky0123/vad-web';
-import { createTaggedError } from 'wellcrafted/error';
+import { createTaggedError, extractErrorMessage } from 'wellcrafted/error';
 import { Err, Ok, tryAsync, trySync } from 'wellcrafted/result';
 import { cleanupRecordingStream, getRecordingStream } from './device-stream';
 
@@ -78,8 +78,8 @@ export function createVadService() {
 						},
 						model: 'v5',
 					}),
-				mapError: (error) =>
-					VadRecorderServiceError({
+				mapErr: (error) =>
+					VadRecorderServiceErr({
 						message:
 							'Failed to start voice activated capture. Your voice activated capture could not be started.',
 						context: { deviceId },
@@ -94,18 +94,12 @@ export function createVadService() {
 				return Err(initializeVadError);
 			}
 
-			maybeVad = newVad;
-
 			// Start listening
 			const { error: startError } = trySync({
 				try: () => newVad.start(),
-				mapError: (error) =>
-					VadRecorderServiceError({
-						message: `Failed to start Voice Activity Detector. ${
-							error instanceof Error
-								? error.message
-								: 'An unknown error occurred while starting the VAD.'
-						}`,
+				mapErr: (error) =>
+					VadRecorderServiceErr({
+						message: `Failed to start Voice Activity Detector. ${extractErrorMessage(error)}`,
 						context: { vadState },
 						cause: error,
 					}),
@@ -114,7 +108,12 @@ export function createVadService() {
 				// Clean up everything on start error
 				trySync({
 					try: () => newVad.destroy(),
-					mapError: () => null,
+					mapErr: (error) =>
+						VadRecorderServiceErr({
+							message: `Failed to destroy Voice Activity Detector. ${extractErrorMessage(error)}`,
+							context: { vadState },
+							cause: error,
+						}),
 				});
 				cleanupRecordingStream(stream);
 				maybeVad = null;
@@ -122,6 +121,7 @@ export function createVadService() {
 				return Err(startError);
 			}
 
+			maybeVad = newVad;
 			vadState = 'LISTENING';
 			return Ok(deviceOutcome);
 		},
@@ -132,8 +132,8 @@ export function createVadService() {
 			const vad = maybeVad;
 			const { error: destroyError } = trySync({
 				try: () => vad.destroy(),
-				mapError: (error) =>
-					VadRecorderServiceError({
+				mapErr: (error) =>
+					VadRecorderServiceErr({
 						message: `Failed to stop Voice Activity Detector. ${
 							error instanceof Error ? error.message : 'Failed to stop VAD'
 						}`,

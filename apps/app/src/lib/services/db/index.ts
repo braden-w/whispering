@@ -1,7 +1,7 @@
 import { DownloadServiceLive } from '../download';
 import { createDbServiceDexie } from './dexie';
 
-export { createDbServiceDexie } from './dexie';
+export { createDbServiceDexie, DbServiceErr } from './dexie';
 export {
 	generateDefaultTransformation,
 	generateDefaultTransformationStep,
@@ -18,8 +18,6 @@ export type {
 	TransformationStep,
 	TransformationStepRun,
 } from './models';
-export type { DbService, DbServiceError } from './dexie';
-export { DbServiceError, DbServiceErr } from './dexie';
 
 export const DbServiceLive = createDbServiceDexie({
 	DownloadService: DownloadServiceLive,

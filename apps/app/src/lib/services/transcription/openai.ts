@@ -89,13 +89,12 @@ export function createOpenaiTranscriptionService() {
 						`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 						{ type: audioBlob.type },
 					),
-				mapError: (error) =>
-					({
-						name: 'WhisperingError' as const,
+				mapErr: (error) =>
+					WhisperingErr({
 						title: '📁 File Creation Failed',
 						description:
 							'Failed to create audio file for transcription. Please try again.',
-					}) satisfies WhisperingError,
+					}),
 			});
 
 			if (fileError) return Err(fileError);
@@ -118,14 +117,14 @@ export function createOpenaiTranscriptionService() {
 							? Number.parseFloat(options.temperature)
 							: undefined,
 					}),
-				mapError: (error) => {
+				mapErr: (error) => {
 					// Check if it's NOT an OpenAI API error
 					if (!(error instanceof OpenAI.APIError)) {
 						// This is an unexpected error type
 						throw error;
 					}
 					// Return the error directly
-					return error;
+					return Err(error);
 				},
 			});
 

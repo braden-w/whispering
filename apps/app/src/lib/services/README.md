@@ -112,7 +112,7 @@ async function transcribe(
 ): Promise<Result<string, TranscriptionError>> {
 	return tryAsync({
 		try: () => apiCall(blob),
-		mapError: (error) => TranscriptionError({
+		mapErr: (error) => TranscriptionErr({
 			message: 'Failed to transcribe audio',
 			cause: error,
 		}),
@@ -185,7 +185,7 @@ This pattern ensures consistent error handling and avoids double-wrapping errors
    ```typescript
    return tryAsync({
    	try: () => navigator.mediaDevices.getUserMedia(constraints),
-   	mapError: (error) => DeviceStreamServiceError({
+   	mapErr: (error) => DeviceStreamServiceErr({
    		message: 'Unable to access microphone. Please check permissions.',
    		context: { constraints, hasPermission },
    		cause: error,

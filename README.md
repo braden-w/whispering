@@ -774,7 +774,7 @@ Adding a new transcription service involves four main steps:
          // Make the API call
          const { data, error } = await tryAsync({
            try: () => yourServiceClient.transcribe(audioBlob, options),
-           mapError: (error) => WhisperingErr({
+           mapErr: (error) => WhisperingErr({
              title: '❌ Transcription Failed',
              description: error.message,
              action: { type: 'more-details', error },
@@ -953,7 +953,7 @@ AI transformations in Whispering use completion services that can be integrated 
          // Make the completion request
          const { data, error } = await tryAsync({
            try: () => yourProviderClient.complete(options),
-           mapError: (error) => WhisperingErr({
+           mapErr: (error) => WhisperingErr({
              title: '❌ Completion Failed',
              description: error.message,
              action: { type: 'more-details', error },
