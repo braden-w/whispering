@@ -1,5 +1,5 @@
 {
-	"name": "@repo/sh",
+	"name": "@epicenter/sh",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
