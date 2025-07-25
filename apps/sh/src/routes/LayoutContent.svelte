@@ -5,10 +5,14 @@
 	import { Button } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { LightSwitch } from '@repo/ui/light-switch';
-	import { Settings, User, } from 'lucide-svelte';
+	import { Settings, User, LogOut, Loader2 } from 'lucide-svelte';
+  import * as rpc from '$lib/query';
+	import { createMutation } from '@tanstack/svelte-query';
 
 	let { children } = $props();
 	let settingsOpen = $state(false);
+
+  const signOut = createMutation(rpc.auth.signOut.options);
 </script>
 
 <div class="relative min-h-screen bg-background">
@@ -64,6 +68,16 @@
 							<DropdownMenu.Label>Account</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<SignInWithGithubButton></SignInWithGithubButton>
+              <DropdownMenu.Item>
+                <Button variant="ghost" size="icon" onclick={() => signOut.mutate({})}>
+									         {#if signOut.isPending}
+									           <Loader2 class="h-4 w-4 animate-spin" />
+									         {:else}
+                  <LogOut class="h-4 w-4" />
+									         {/if}
+                  <span class="sr-only">Sign out</span>
+                </Button>
+              </DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				</nav>
