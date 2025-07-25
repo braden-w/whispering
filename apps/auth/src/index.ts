@@ -10,16 +10,15 @@ app.on(['POST', 'GET'], '/api/auth/*', (c) => {
 	return auth(c.env).handler(c.req.raw);
 });
 
-app.use(
-	'/api/auth/*',
+app.use('/api/auth/*', (c, next) =>
 	cors({
-		origin: APP_URLS,
+		origin: APP_URLS(c.env),
 		allowHeaders: ['Content-Type', 'Authorization'],
 		allowMethods: ['POST', 'GET', 'OPTIONS'],
 		exposeHeaders: ['Content-Length'],
 		maxAge: 600,
 		credentials: true,
-	}),
+	})(c, next),
 );
 
 export type AppType = typeof app;

@@ -13,7 +13,7 @@ export const auth = (env: Env) =>
 				clientSecret: env.GITHUB_CLIENT_SECRET,
 			},
 		},
-		trustedOrigins: APP_URLS,
+		trustedOrigins: APP_URLS(env),
 		baseURL: APPS(env).AUTH.URL,
 		advanced: {
 			crossSubDomainCookies: {

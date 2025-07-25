@@ -64,4 +64,5 @@ export type App = keyof ReturnType<typeof APPS>;
  *   credentials: true
  * })
  */
-export const APP_URLS = Object.values(APPS).map((app) => app.URL);
+export const APP_URLS = (env: Pick<Env, 'ENVIRONMENT'>) =>
+	Object.values(APPS(env)).map((app) => app.URL);
