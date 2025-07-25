@@ -1,8 +1,8 @@
 import { type } from 'arktype';
 
 const envSchema = type({
-	// Environment (not NODE_ENV because it's not available in Workers. We manually set it per environment)
-	ENVIRONMENT: "'development' | 'production'",
+	// Mode (not NODE_ENV because it's not available in Workers. We manually set it in Cloudflare's `env` and it is already present in Vite's `import.meta.env`)
+	MODE: "'development' | 'production'",
 
 	// Auth service
 	DATABASE_URL: 'string.url',

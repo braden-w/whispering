@@ -1,12 +1,13 @@
 import type { Env } from '#env-schema';
+import type { ImportMetaEnv } from 'vite/types';
 
 /**
  * Configuration for all application URLs across the ecosystem.
  *
- * URLs are environment-aware and swap between production and development based on the
- * `ENVIRONMENT` environment variable:
- * - In production (ENVIRONMENT='production'): Uses production domains
- * - In development (any other ENVIRONMENT value): Uses localhost URLs
+ * URLs are mode-aware and swap between production and development based on the
+ * `MODE` variable:
+ * - In production (MODE='production'): Uses production domains
+ * - In development (any other MODE value): Uses localhost URLs
  *
  * @example
  * // In production:
@@ -15,14 +16,16 @@ import type { Env } from '#env-schema';
  * // In development:
  * APPS(env).AUTH.URL // 'http://localhost:8787'
  */
-export const APPS = ({ ENVIRONMENT }: Pick<Env, 'ENVIRONMENT'>) =>
+export const APPS = ({
+	MODE,
+}: Pick<Env, 'MODE'> | Pick<ImportMetaEnv, 'MODE'>) =>
 	({
 		/**
 		 * Authentication service for the application ecosystem
 		 */
 		AUTH: {
 			URL:
-				ENVIRONMENT === 'production'
+				MODE === 'production'
 					? 'https://auth.epicenter.sh'
 					: 'http://localhost:8787',
 		},
@@ -31,7 +34,7 @@ export const APPS = ({ ENVIRONMENT }: Pick<Env, 'ENVIRONMENT'>) =>
 		 */
 		SH: {
 			URL:
-				ENVIRONMENT === 'production'
+				MODE === 'production'
 					? 'https://epicenter.sh'
 					: 'http://localhost:5173',
 		},
@@ -40,7 +43,7 @@ export const APPS = ({ ENVIRONMENT }: Pick<Env, 'ENVIRONMENT'>) =>
 		 */
 		AUDIO: {
 			URL:
-				ENVIRONMENT === 'production'
+				MODE === 'production'
 					? 'https://whispering.bradenwong.com'
 					: 'http://localhost:1420',
 		},
@@ -55,7 +58,7 @@ export type App = keyof ReturnType<typeof APPS>;
  * A list of all application URLs extracted from the APPS configuration.
  * Primarily used for CORS configuration to allow cross-origin requests between services.
  *
- * The URLs in this array will change based on the environment:
+ * The URLs in this array will change based on the mode:
  *
  * @example
  * // Use in CORS configuration
@@ -64,5 +67,5 @@ export type App = keyof ReturnType<typeof APPS>;
  *   credentials: true
  * })
  */
-export const APP_URLS = (env: Pick<Env, 'ENVIRONMENT'>) =>
+export const APP_URLS = (env: Pick<Env, 'MODE'>) =>
 	Object.values(APPS(env)).map((app) => app.URL);

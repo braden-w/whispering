@@ -6,7 +6,7 @@
 	"env": {
 		"development": {
 			"vars": {
-				"ENVIRONMENT": "development"
+				"MODE": "development"
 			},
 			"observability": {
 				"enabled": true,
@@ -15,7 +15,7 @@
 		},
 		"production": {
 			"vars": {
-				"ENVIRONMENT": "production"
+				"MODE": "production"
 			},
 			"observability": {
 				"enabled": true,
