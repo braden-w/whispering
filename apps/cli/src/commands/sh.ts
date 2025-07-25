@@ -82,7 +82,7 @@ export const ShCommand = cmd({
 				console.log(`  Tunnel:     ${tunnelProcess.url}`);
 				if (args.open) {
 					const EPICENTER_WORKSPACE_URL =
-						'https://epicenter.sh/workspaces' as const;
+						`${APPS(env).SH.URL}/workspaces` as const;
 					const currentDirName = basename(cwd);
 					const params = new URLSearchParams({
 						url: tunnelProcess.url,
