@@ -8,6 +8,8 @@ import { Log } from '@epicenter/opencode/util/log.ts';
 import { basename } from 'node:path';
 import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
+import { APPS } from '@repo/constants';
+import { env } from '@repo/constants/env';
 
 const log = Log.create({ service: 'sh' });
 
@@ -29,7 +31,7 @@ export const ShCommand = cmd({
 				alias: ['c'],
 				type: 'array',
 				describe: 'CORS allowed origins',
-				default: ['https://epicenter.sh'],
+				default: [APPS(env).SH.URL],
 			})
 			.option('tunnel', {
 				alias: ['t'],
