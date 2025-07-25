@@ -3,8 +3,8 @@
 	import { Tooltip as TooltipPrimitive } from 'bits-ui';
 
 	let {
-		arrowClasses,
 		children,
+		arrowClasses,
 		class: className,
 		ref = $bindable(null),
 		side = 'top',

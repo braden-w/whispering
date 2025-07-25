@@ -23,7 +23,7 @@ return Err({
 const { VadRecorderServiceError, VadRecorderServiceErr } = createTaggedError(
   'VadRecorderServiceError',
 );
-type VadRecorderServiceError = ReturnType<typeof VadRecorderServiceErr>;
+type VadRecorderServiceError = ReturnType<typeof VadRecorderServiceError>;
 
 // Usage - Option 1 (plain error):
 const error = VadRecorderServiceError({

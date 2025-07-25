@@ -1,7 +1,7 @@
 import { Ok, tryAsync } from 'wellcrafted/result';
 // import { extension } from '@repo/extension';
 import type { ClipboardService } from '.';
-import { ClipboardServiceErr, ClipboardServiceError } from './types';
+import { ClipboardServiceErr } from './types';
 // import { WhisperingErr } from '$lib/result';
 
 export function createClipboardServiceWeb(): ClipboardService {
@@ -9,8 +9,8 @@ export function createClipboardServiceWeb(): ClipboardService {
 		copyToClipboard: async (text) => {
 			const { error: copyError } = await tryAsync({
 				try: () => navigator.clipboard.writeText(text),
-				mapError: (error) =>
-					ClipboardServiceError({
+				mapErr: (error) =>
+					ClipboardServiceErr({
 						message:
 							'There was an error copying to the clipboard using the browser Clipboard API. Please try again.',
 						context: { text },

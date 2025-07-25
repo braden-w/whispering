@@ -3,7 +3,7 @@ import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 import { Err, Ok, tryAsync } from 'wellcrafted/result';
 import type { DownloadService } from '.';
-import { DownloadServiceError } from './types';
+import { DownloadServiceErr } from './types';
 
 export function createDownloadServiceDesktop(): DownloadService {
 	return {
@@ -16,8 +16,8 @@ export function createDownloadServiceDesktop(): DownloadService {
 					});
 					return path;
 				},
-				mapError: (error) =>
-					DownloadServiceError({
+				mapErr: (error) =>
+					DownloadServiceErr({
 						message:
 							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
 						context: { name, blob },
@@ -26,21 +26,19 @@ export function createDownloadServiceDesktop(): DownloadService {
 			});
 			if (saveError) return Err(saveError);
 			if (path === null) {
-				return Err(
-					DownloadServiceError({
-						message: 'Please specify a path to save the recording.',
-						context: { name, blob },
-						cause: undefined,
-					}),
-				);
+				return DownloadServiceErr({
+					message: 'Please specify a path to save the recording.',
+					context: { name, blob },
+					cause: undefined,
+				});
 			}
 			const { error: writeError } = await tryAsync({
 				try: async () => {
 					const contents = new Uint8Array(await blob.arrayBuffer());
 					await writeFile(path, contents);
 				},
-				mapError: (error) =>
-					DownloadServiceError({
+				mapErr: (error) =>
+					DownloadServiceErr({
 						message:
 							'There was an error saving the recording using the Tauri Filesystem API. Please try again.',
 						context: { name, blob, path },

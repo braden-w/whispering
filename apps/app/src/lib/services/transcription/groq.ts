@@ -85,14 +85,13 @@ export function createGroqTranscriptionService() {
 						`recording.${getExtensionFromAudioBlob(audioBlob)}`,
 						{ type: audioBlob.type },
 					),
-				mapError: (error) =>
-					({
-						name: 'WhisperingError' as const,
+				mapErr: (error) =>
+					WhisperingErr({
 						title: '📄 File Creation Failed',
 						description:
 							'Failed to create audio file for transcription. Please try again.',
 						action: { type: 'more-details', error },
-					}) satisfies WhisperingError,
+					}),
 			});
 
 			if (fileError) return Err(fileError);
@@ -115,14 +114,14 @@ export function createGroqTranscriptionService() {
 							? Number.parseFloat(options.temperature)
 							: undefined,
 					}),
-				mapError: (error) => {
+				mapErr: (error) => {
 					// Check if it's NOT a Groq API error
 					if (!(error instanceof Groq.APIError)) {
 						// This is an unexpected error type
 						throw error;
 					}
 					// Return the error directly
-					return error;
+					return Err(error);
 				},
 			});
 

@@ -4,15 +4,15 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { type } from '@tauri-apps/plugin-os';
 import { Err, Ok, tryAsync } from 'wellcrafted/result';
 import type { ClipboardService } from '.';
-import { ClipboardServiceError } from './types';
+import { ClipboardServiceErr } from './types';
 
 export function createClipboardServiceDesktop(): ClipboardService {
 	return {
 		copyToClipboard: (text) =>
 			tryAsync({
 				try: () => writeText(text),
-				mapError: (error) =>
-					ClipboardServiceError({
+				mapErr: (error) =>
+					ClipboardServiceErr({
 						message:
 							'There was an error copying to the clipboard using the Tauri Clipboard Manager API. Please try again.',
 						context: { text },
@@ -24,8 +24,8 @@ export function createClipboardServiceDesktop(): ClipboardService {
 			// Try to paste using keyboard shortcut
 			const { error: pasteError } = await tryAsync({
 				try: () => invoke<void>('paste'),
-				mapError: (error) =>
-					ClipboardServiceError({
+				mapErr: (error) =>
+					ClipboardServiceErr({
 						message:
 							'There was an error simulating the paste keyboard shortcut. Please try pasting manually with Cmd/Ctrl+V.',
 						cause: error,
@@ -48,8 +48,8 @@ export function createClipboardServiceDesktop(): ClipboardService {
 					invoke<boolean>('is_macos_accessibility_enabled', {
 						askIfNotAllowed: false,
 					}),
-				mapError: (error) =>
-					ClipboardServiceError({
+				mapErr: (error) =>
+					ClipboardServiceErr({
 						message:
 							'There was an error checking if accessibility is enabled. Please try again.',
 						cause: error,

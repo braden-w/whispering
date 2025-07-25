@@ -15,11 +15,11 @@ import type { Result } from 'wellcrafted/result';
  * - Extension (Future): Chrome extension API, full action support
  */
 
-const { NotificationServiceError, NotificationServiceErr } = createTaggedError(
-	'NotificationServiceError',
-);
-type NotificationServiceError = ReturnType<typeof NotificationServiceError>;
-export { NotificationServiceError, NotificationServiceErr };
+export const { NotificationServiceError, NotificationServiceErr } =
+	createTaggedError('NotificationServiceError');
+export type NotificationServiceError = ReturnType<
+	typeof NotificationServiceError
+>;
 
 /**
  * Link action for internal navigation

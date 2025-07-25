@@ -17,14 +17,14 @@ export function createOpenAiCompletionService(): CompletionService {
 							{ role: 'user', content: userPrompt },
 						],
 					}),
-				mapError: (error) => {
+				mapErr: (error) => {
 					// Check if it's NOT an OpenAI API error
 					if (!(error instanceof OpenAI.APIError)) {
 						// This is an unexpected error type
 						throw error;
 					}
 					// Return the error directly
-					return error;
+					return Err(error);
 				},
 			});
 

@@ -64,8 +64,8 @@ export async function enumerateRecordingDevices(): Promise<
 			);
 			return audioInputDevices;
 		},
-		mapError: (error) =>
-			DeviceStreamServiceError({
+		mapErr: (error) =>
+			DeviceStreamServiceErr({
 				message:
 					'We need permission to see your microphones. Check your browser settings and try again.',
 				context: { permissionRequired: 'microphone' },
@@ -89,8 +89,8 @@ export async function getStreamForDeviceId(recordingDeviceId: string) {
 			});
 			return stream;
 		},
-		mapError: (error) =>
-			DeviceStreamServiceError({
+		mapErr: (error) =>
+			DeviceStreamServiceErr({
 				message:
 					'Unable to connect to the selected microphone. This could be because the device is already in use by another application, has been disconnected, or lacks proper permissions. Please check that your microphone is connected, not being used elsewhere, and that you have granted microphone permissions.',
 				context: {

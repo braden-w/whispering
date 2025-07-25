@@ -12,11 +12,11 @@
 
 	let {
 		children,
+		title = 'Command Palette',
 		description = 'Search for a command to run',
 		open = $bindable(false),
 		portalProps,
 		ref = $bindable(null),
-		title = 'Command Palette',
 		value = $bindable(''),
 		...restProps
 	}: WithoutChildrenOrChild<CommandPrimitive.RootProps> &

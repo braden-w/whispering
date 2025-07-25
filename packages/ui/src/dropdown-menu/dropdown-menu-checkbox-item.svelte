@@ -7,8 +7,8 @@
 	import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui';
 
 	let {
-		checked = $bindable(false),
 		children: childrenProp,
+		checked = $bindable(false),
 		class: className,
 		indeterminate = $bindable(false),
 		ref = $bindable(null),

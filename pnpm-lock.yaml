@@ -114,8 +114,8 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0(ws@8.18.0)(zod@3.25.67)
       wellcrafted:
-        specifier: ^0.20.0
-        version: 0.20.0
+        specifier: ^0.21.0
+        version: 0.21.0
       zod:
         specifier: ^3.25.67
         version: 3.25.67
@@ -435,9 +435,6 @@ importers:
       lucide-svelte:
         specifier: ^0.468.0
         version: 0.468.0(svelte@5.35.5)
-      wellcrafted:
-        specifier: ^0.20.0
-        version: 0.20.0
       zod:
         specifier: ^3.25.67
         version: 3.25.67
@@ -4531,6 +4528,9 @@ packages:
   wellcrafted@0.20.0:
     resolution: {integrity: sha512-AsMePq8VF22auhrDcApvxjPgqZo87wcW9DRatGhDyAq72/dMka/+NUNVJcBfJfdUgLczT03g5p/0dIix6Lg42Q==}
 
+  wellcrafted@0.21.0:
+    resolution: {integrity: sha512-OkihUBkY3+eY4oO8Ex1aQVRYu3dfx4cAxZb+4fH0jXRYnyvuqJJGS1GpHFXnXKM739QF/aoBO2S8phXznp1QMg==}
+
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
@@ -8336,6 +8336,8 @@ snapshots:
   webidl-conversions@7.0.0: {}
 
   wellcrafted@0.20.0: {}
+
+  wellcrafted@0.21.0: {}
 
   whatwg-encoding@3.1.1:
     dependencies:
