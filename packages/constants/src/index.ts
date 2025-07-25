@@ -1,1 +1,1 @@
-export { APPS, type App, APP_URLS } from './apps.js';
+export { APPS, type App, APP_URLS } from '#apps';

@@ -1,4 +1,4 @@
-import type { Env } from './env-schema.js';
+import type { Env } from '#env-schema';
 
 /**
  * Configuration for all application URLs across the ecosystem.

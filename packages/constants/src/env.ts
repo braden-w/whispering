@@ -1,4 +1,4 @@
-import { validateEnv } from './env-schema.js';
+import { validateEnv } from '#env-schema';
 
 /**
  * Build-time environment variables.
