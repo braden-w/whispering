@@ -44,7 +44,14 @@
 	{#if columnVisibility.name !== false}
 		<Table.Cell class="font-medium">
 			<div class="flex items-center gap-2">
-				{config.name}
+				<Button
+					variant="link"
+					class="p-0"
+					onclick={handleConnect}
+					disabled={workspaceQuery.isPending}
+				>
+					{config.name}
+				</Button>
 				{#if workspace?.connected && workspace.appInfo.git}
 					<Tooltip.Provider>
 						<Tooltip.Root>
@@ -115,11 +122,12 @@
 					size="sm"
 					variant="default"
 					onclick={handleConnect}
+					disabled={workspaceQuery.isPending || !workspace?.connected}
 				>
-					Connect
+					{workspace?.connected ? 'Open' : 'Connect'}
 				</Button>
-				<EditWorkspaceConfigButton workspaceConfig={config} />
-				<DeleteWorkspaceConfigButton workspaceConfig={config} />
+				<EditWorkspaceConfigButton workspaceConfig={config} disabled={workspaceQuery.isPending} />
+				<DeleteWorkspaceConfigButton workspaceConfig={config} disabled={workspaceQuery.isPending} />
 			</div>
 		</Table.Cell>
 	{/if}
