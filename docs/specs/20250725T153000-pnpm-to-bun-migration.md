@@ -81,7 +81,7 @@ Add the `workspaces` field with catalogs to your root `package.json`:
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "catalog:default",
+    "@types/node": "catalog:",
     "concurrently": "latest",
     "turbo": "latest"
   }
@@ -94,22 +94,22 @@ Update workspace packages to reference catalog versions. For example, in `packag
 ```json
 {
   "devDependencies": {
-    "@types/node": "catalog:default",
-    "eslint": "catalog:default",
-    "prettier": "catalog:default",
-    "svelte": "catalog:default",
-    "tailwindcss": "catalog:default",
-    "typescript": "catalog:default"
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "svelte": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
   },
   "dependencies": {
-    "bits-ui": "catalog:default",
-    "clsx": "catalog:default",
-    "lucide-svelte": "catalog:default",
-    "mode-watcher": "catalog:default",
-    "svelte-sonner": "catalog:default",
-    "@tanstack/svelte-table": "catalog:default",
-    "tailwind-merge": "catalog:default",
-    "tailwind-variants": "catalog:default"
+    "bits-ui": "catalog:",
+    "clsx": "catalog:",
+    "lucide-svelte": "catalog:",
+    "mode-watcher": "catalog:",
+    "svelte-sonner": "catalog:",
+    "@tanstack/svelte-table": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwind-variants": "catalog:"
   }
 }
 ```
