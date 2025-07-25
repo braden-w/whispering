@@ -12,8 +12,8 @@
 	import { displaySize } from '.';
 
 	let {
-		accept,
 		children,
+		accept,
 		class: className,
 		disabled = false,
 		fileCount,
