@@ -186,93 +186,76 @@ const workspaces = {
 };
 
 /**
- * Individual workspace redirect methods with flash message support
+ * Creates redirect methods for a specific workspace
+ * @param workspaceId - The ID of the workspace to redirect to
+ * @returns An object with redirect methods for different message types
+ * @example
+ * ```typescript
+ * // Chained method pattern
+ * if (sessionError) {
+ *   return redirectTo.workspace(params.id).error(sessionError);
+ * }
+ *
+ * // With custom message
+ * if (!session) {
+ *   return redirectTo.workspace(params.id).info({
+ *     title: 'Session Not Found',
+ *     description: 'The requested session does not exist'
+ *   });
+ * }
+ * ```
  */
-const workspace = {
-	/**
-	 * Redirect to a specific workspace with an error message
-	 * @param workspaceId - The ID of the workspace to redirect to
-	 * @param message - The error message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * if (sessionError) {
-	 *   return redirectTo.workspace.error(params.id, {
-	 *     title: 'Session Error',
-	 *     description: sessionError.description
-	 *   });
-	 * }
-	 * ```
-	 */
-	error(workspaceId: string, message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-			...message,
-			type: 'error',
-		});
-	},
+function workspace(workspaceId: string) {
+	return {
+		/**
+		 * Redirect to the workspace with an error message
+		 * @param message - The error message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		error(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
+				...message,
+				type: 'error',
+			});
+		},
 
-	/**
-	 * Redirect to a specific workspace with an informational message
-	 * @param workspaceId - The ID of the workspace to redirect to
-	 * @param message - The info message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * if (!session) {
-	 *   return redirectTo.workspace.info(params.id, {
-	 *     title: 'Session Not Found',
-	 *     description: 'The requested session does not exist'
-	 *   });
-	 * }
-	 * ```
-	 */
-	info(workspaceId: string, message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-			...message,
-			type: 'info',
-		});
-	},
+		/**
+		 * Redirect to the workspace with an informational message
+		 * @param message - The info message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		info(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
+				...message,
+				type: 'info',
+			});
+		},
 
-	/**
-	 * Redirect to a specific workspace with a success message
-	 * @param workspaceId - The ID of the workspace to redirect to
-	 * @param message - The success message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.workspace.success(params.id, {
-	 *   title: 'Session Created',
-	 *   description: 'Your new conversation has been started'
-	 * });
-	 * ```
-	 */
-	success(workspaceId: string, message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-			...message,
-			type: 'success',
-		});
-	},
+		/**
+		 * Redirect to the workspace with a success message
+		 * @param message - The success message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		success(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
+				...message,
+				type: 'success',
+			});
+		},
 
-	/**
-	 * Redirect to a specific workspace with a warning message
-	 * @param workspaceId - The ID of the workspace to redirect to
-	 * @param message - The warning message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.workspace.warning(params.id, {
-	 *   title: 'Limited Functionality',
-	 *   description: 'Some features may be unavailable in offline mode'
-	 * });
-	 * ```
-	 */
-	warning(workspaceId: string, message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-			...message,
-			type: 'warning',
-		});
-	},
-};
+		/**
+		 * Redirect to the workspace with a warning message
+		 * @param message - The warning message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		warning(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
+				...message,
+				type: 'warning',
+			});
+		},
+	};
+}
 
 /**
  * Unified redirect API with flash message support.

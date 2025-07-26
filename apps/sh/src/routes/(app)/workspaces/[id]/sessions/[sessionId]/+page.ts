@@ -24,12 +24,12 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (sessionError) {
-		redirectTo.workspace.error(params.id, sessionError);
+		redirectTo.workspace(params.id).error(sessionError);
 		return;
 	}
 
 	if (!session) {
-		redirectTo.workspace.info(params.id, {
+		redirectTo.workspace(params.id).info({
 			title: 'Session not found',
 			description:
 				"The conversation you're looking for doesn't exist. It may have been deleted or you may have an outdated link.",
@@ -46,12 +46,12 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (messagesError) {
-		redirectTo.workspace.error(params.id, messagesError);
+		redirectTo.workspace(params.id).error(messagesError);
 		return;
 	}
 
 	if (!messages) {
-		redirectTo.workspace.error(params.id, {
+		redirectTo.workspace(params.id).error({
 			title: 'Failed to load conversation',
 			description:
 				'Unable to load the messages for this conversation (messages were somehow undefined). Please try again or start a new conversation.',
@@ -64,12 +64,12 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (providersError) {
-		redirectTo.workspace.error(params.id, providersError);
+		redirectTo.workspace(params.id).error(providersError);
 		return;
 	}
 
 	if (!providers) {
-		redirectTo.workspace.error(params.id, {
+		redirectTo.workspace(params.id).error({
 			title: 'Configuration error',
 			description:
 				'Unable to load AI providers. Please check your workspace configuration and try again.',
@@ -82,12 +82,12 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (modesError) {
-		redirectTo.workspace.error(params.id, modesError);
+		redirectTo.workspace(params.id).error(modesError);
 		return;
 	}
 
 	if (!modes) {
-		redirectTo.workspace.error(params.id, {
+		redirectTo.workspace(params.id).error({
 			title: 'Configuration error',
 			description:
 				'Unable to load available modes. Please check your workspace configuration and try again.',
