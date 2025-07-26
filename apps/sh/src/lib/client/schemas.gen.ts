@@ -102,6 +102,9 @@ export const Event_permission_updatedSchema = {
 
 export const permission_infoSchema = {
 	properties: {
+		title: {
+			type: 'string',
+		},
 		id: {
 			type: 'string',
 		},
@@ -120,9 +123,6 @@ export const permission_infoSchema = {
 			},
 			required: ['created'],
 			type: 'object',
-		},
-		title: {
-			type: 'string',
 		},
 	},
 	required: ['id', 'sessionID', 'title', 'metadata', 'time'],
@@ -750,6 +750,9 @@ export const ToolStatePendingSchema = {
 
 export const ToolStateRunningSchema = {
 	properties: {
+		title: {
+			type: 'string',
+		},
 		input: {},
 		metadata: {
 			additionalProperties: {},
@@ -768,9 +771,6 @@ export const ToolStateRunningSchema = {
 			required: ['start'],
 			type: 'object',
 		},
-		title: {
-			type: 'string',
-		},
 	},
 	required: ['status', 'time'],
 	type: 'object',
@@ -778,6 +778,9 @@ export const ToolStateRunningSchema = {
 
 export const ToolStateCompletedSchema = {
 	properties: {
+		title: {
+			type: 'string',
+		},
 		input: {
 			additionalProperties: {},
 			type: 'object',
@@ -804,9 +807,6 @@ export const ToolStateCompletedSchema = {
 			},
 			required: ['start', 'end'],
 			type: 'object',
-		},
-		title: {
-			type: 'string',
 		},
 	},
 	required: ['status', 'input', 'output', 'title', 'metadata', 'time'],
@@ -979,6 +979,9 @@ export const Event_session_updatedSchema = {
 
 export const SessionSchema = {
 	properties: {
+		title: {
+			type: 'string',
+		},
 		id: {
 			pattern: '^ses',
 			type: 'string',
@@ -1022,9 +1025,6 @@ export const SessionSchema = {
 			},
 			required: ['created', 'updated'],
 			type: 'object',
-		},
-		title: {
-			type: 'string',
 		},
 		version: {
 			type: 'string',
@@ -1279,14 +1279,15 @@ export const ConfigSchema = {
 			type: 'array',
 		},
 		keybinds: {
-			$ref: '#/components/schemas/KeybindsConfig',
 			description: 'Custom keybind configurations',
+			$ref: '#/components/schemas/KeybindsConfig',
 		},
 		layout: {
-			$ref: '#/components/schemas/LayoutConfig',
 			description: '@deprecated Always uses stretch layout.',
+			$ref: '#/components/schemas/LayoutConfig',
 		},
 		mcp: {
+			description: 'MCP (Model Context Protocol) server configurations',
 			additionalProperties: {
 				discriminator: {
 					mapping: {
@@ -1304,14 +1305,13 @@ export const ConfigSchema = {
 					},
 				],
 			},
-			description: 'MCP (Model Context Protocol) server configurations',
 			type: 'object',
 		},
 		mode: {
+			description: 'Modes configuration, see https://opencode.ai/docs/modes',
 			additionalProperties: {
 				$ref: '#/components/schemas/ModeConfig',
 			},
-			description: 'Modes configuration, see https://opencode.ai/docs/modes',
 			properties: {
 				build: {
 					$ref: '#/components/schemas/ModeConfig',
@@ -1328,6 +1328,7 @@ export const ConfigSchema = {
 			type: 'string',
 		},
 		provider: {
+			description: 'Custom provider configurations and model overrides',
 			additionalProperties: {
 				properties: {
 					api: {
@@ -1419,7 +1420,6 @@ export const ConfigSchema = {
 				required: ['models'],
 				type: 'object',
 			},
-			description: 'Custom provider configurations and model overrides',
 			type: 'object',
 		},
 		share: {
@@ -1450,183 +1450,183 @@ export const KeybindsConfigSchema = {
 	additionalProperties: false,
 	properties: {
 		app_exit: {
-			default: 'ctrl+c,<leader>q',
 			description: 'Exit the application',
+			default: 'ctrl+c,<leader>q',
 			type: 'string',
 		},
 		app_help: {
-			default: '<leader>h',
 			description: 'Show help dialog',
+			default: '<leader>h',
 			type: 'string',
 		},
 		editor_open: {
-			default: '<leader>e',
 			description: 'Open external editor',
+			default: '<leader>e',
 			type: 'string',
 		},
 		file_close: {
-			default: 'esc',
 			description: 'Close file',
+			default: 'esc',
 			type: 'string',
 		},
 		file_diff_toggle: {
-			default: '<leader>v',
 			description: 'Split/unified diff',
+			default: '<leader>v',
 			type: 'string',
 		},
 		file_list: {
-			default: '<leader>f',
 			description: 'List files',
+			default: '<leader>f',
 			type: 'string',
 		},
 		file_search: {
-			default: '<leader>/',
 			description: 'Search file',
+			default: '<leader>/',
 			type: 'string',
 		},
 		input_clear: {
-			default: 'ctrl+c',
 			description: 'Clear input field',
+			default: 'ctrl+c',
 			type: 'string',
 		},
 		input_newline: {
-			default: 'shift+enter,ctrl+j',
 			description: 'Insert newline in input',
+			default: 'shift+enter,ctrl+j',
 			type: 'string',
 		},
 		input_paste: {
-			default: 'ctrl+v',
 			description: 'Paste from clipboard',
+			default: 'ctrl+v',
 			type: 'string',
 		},
 		input_submit: {
-			default: 'enter',
 			description: 'Submit input',
+			default: 'enter',
 			type: 'string',
 		},
 		leader: {
-			default: 'ctrl+x',
 			description: 'Leader key for keybind combinations',
+			default: 'ctrl+x',
 			type: 'string',
 		},
 		messages_copy: {
-			default: '<leader>y',
 			description: 'Copy message',
+			default: '<leader>y',
 			type: 'string',
 		},
 		messages_first: {
-			default: 'ctrl+g',
 			description: 'Navigate to first message',
+			default: 'ctrl+g',
 			type: 'string',
 		},
 		messages_half_page_down: {
-			default: 'ctrl+alt+d',
 			description: 'Scroll messages down by half page',
+			default: 'ctrl+alt+d',
 			type: 'string',
 		},
 		messages_half_page_up: {
-			default: 'ctrl+alt+u',
 			description: 'Scroll messages up by half page',
+			default: 'ctrl+alt+u',
 			type: 'string',
 		},
 		messages_last: {
-			default: 'ctrl+alt+g',
 			description: 'Navigate to last message',
+			default: 'ctrl+alt+g',
 			type: 'string',
 		},
 		messages_layout_toggle: {
-			default: '<leader>p',
 			description: 'Toggle layout',
+			default: '<leader>p',
 			type: 'string',
 		},
 		messages_next: {
-			default: 'ctrl+down',
 			description: 'Navigate to next message',
+			default: 'ctrl+down',
 			type: 'string',
 		},
 		messages_page_down: {
-			default: 'pgdown',
 			description: 'Scroll messages down by one page',
+			default: 'pgdown',
 			type: 'string',
 		},
 		messages_page_up: {
-			default: 'pgup',
 			description: 'Scroll messages up by one page',
+			default: 'pgup',
 			type: 'string',
 		},
 		messages_previous: {
-			default: 'ctrl+up',
 			description: 'Navigate to previous message',
+			default: 'ctrl+up',
 			type: 'string',
 		},
 		messages_revert: {
-			default: '<leader>r',
 			description: 'Revert message',
+			default: '<leader>r',
 			type: 'string',
 		},
 		model_list: {
-			default: '<leader>m',
 			description: 'List available models',
+			default: '<leader>m',
 			type: 'string',
 		},
 		project_init: {
-			default: '<leader>i',
 			description: 'Create/update AGENTS.md',
+			default: '<leader>i',
 			type: 'string',
 		},
 		session_compact: {
-			default: '<leader>c',
 			description: 'Compact the session',
+			default: '<leader>c',
 			type: 'string',
 		},
 		session_export: {
-			default: '<leader>x',
 			description: 'Export session to editor',
+			default: '<leader>x',
 			type: 'string',
 		},
 		session_interrupt: {
-			default: 'esc',
 			description: 'Interrupt current session',
+			default: 'esc',
 			type: 'string',
 		},
 		session_list: {
-			default: '<leader>l',
 			description: 'List all sessions',
+			default: '<leader>l',
 			type: 'string',
 		},
 		session_new: {
-			default: '<leader>n',
 			description: 'Create a new session',
+			default: '<leader>n',
 			type: 'string',
 		},
 		session_share: {
-			default: '<leader>s',
 			description: 'Share current session',
+			default: '<leader>s',
 			type: 'string',
 		},
 		session_unshare: {
-			default: '<leader>u',
 			description: 'Unshare current session',
+			default: '<leader>u',
 			type: 'string',
 		},
 		switch_mode: {
-			default: 'tab',
 			description: 'Next mode',
+			default: 'tab',
 			type: 'string',
 		},
 		switch_mode_reverse: {
-			default: 'shift+tab',
 			description: 'Previous Mode',
+			default: 'shift+tab',
 			type: 'string',
 		},
 		theme_list: {
-			default: '<leader>t',
 			description: 'List available themes',
+			default: '<leader>t',
 			type: 'string',
 		},
 		tool_details: {
-			default: '<leader>d',
 			description: 'Toggle tool details',
+			default: '<leader>d',
 			type: 'string',
 		},
 	},
@@ -1808,15 +1808,15 @@ export const McpLocalConfigSchema = {
 			type: 'boolean',
 		},
 		environment: {
+			description: 'Environment variables to set when running the MCP server',
 			additionalProperties: {
 				type: 'string',
 			},
-			description: 'Environment variables to set when running the MCP server',
 			type: 'object',
 		},
 		type: {
-			const: 'local',
 			description: 'Type of MCP server connection',
+			const: 'local',
 			type: 'string',
 		},
 	},
@@ -1832,15 +1832,15 @@ export const McpRemoteConfigSchema = {
 			type: 'boolean',
 		},
 		headers: {
+			description: 'Headers to send with the request',
 			additionalProperties: {
 				type: 'string',
 			},
-			description: 'Headers to send with the request',
 			type: 'object',
 		},
 		type: {
-			const: 'remote',
 			description: 'Type of MCP server connection',
+			const: 'remote',
 			type: 'string',
 		},
 		url: {

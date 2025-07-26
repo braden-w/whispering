@@ -20,8 +20,8 @@ export const getSessions = (workspaceConfig: Accessor<WorkspaceConfig>) =>
 			const { data, error } = await api.getSession({ client });
 			if (error) {
 				return ShErr({
-					description: extractErrorMessage(error),
 					title: 'Failed to fetch sessions',
+					description: extractErrorMessage(error),
 				});
 			}
 
@@ -47,8 +47,8 @@ export const createSession = defineMutation({
 		const { data: session, error } = await api.postSession({ client });
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to create session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(session);
@@ -78,8 +78,8 @@ export const deleteSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to delete session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -109,8 +109,8 @@ export const shareSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to share session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -140,8 +140,8 @@ export const unshareSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to unshare session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -171,8 +171,8 @@ export const abortSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to abort session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -205,8 +205,8 @@ export const initializeSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to initialize session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -239,8 +239,8 @@ export const summarizeSession = defineMutation({
 		});
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to summarize session',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);
@@ -260,8 +260,8 @@ export const getSessionById = (
 			const { data, error } = await api.getSession({ client });
 			if (error) {
 				return ShErr({
-					description: extractErrorMessage(error),
 					title: 'Failed to fetch sessions',
+					description: extractErrorMessage(error),
 				});
 			}
 

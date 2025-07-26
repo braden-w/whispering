@@ -363,7 +363,7 @@ class Interceptors<Interceptor> {
 		if (typeof id === 'number') {
 			return this._fns[id] ? id : -1;
 		}
-			return this._fns.indexOf(id);
+		return this._fns.indexOf(id);
 	}
 
 	update(id: Interceptor | number, fn: Interceptor) {
@@ -372,7 +372,7 @@ class Interceptors<Interceptor> {
 			this._fns[index] = fn;
 			return id;
 		}
-			return false;
+		return false;
 	}
 
 	use(fn: Interceptor) {

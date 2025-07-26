@@ -1,27 +1,28 @@
 <script lang="ts">
 	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
 
-	import WorkspaceConnectionBadge from './WorkspaceConnectionBadge.svelte';
-	import DeleteWorkspaceConfigButton from './DeleteWorkspaceConfigButton.svelte';
-	import EditWorkspaceConfigButton from './EditWorkspaceConfigButton.svelte';
+	import { goto } from '$app/navigation';
 	import * as rpc from '$lib/query';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import { Badge } from '@repo/ui/badge';
+	import { badgeVariants } from '@repo/ui/badge';
 	import { Button } from '@repo/ui/button';
 	import * as Table from '@repo/ui/table';
 	import * as Tooltip from '@repo/ui/tooltip';
-	import { badgeVariants } from '@repo/ui/badge';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { GitBranch } from 'lucide-svelte';
-	import { goto } from '$app/navigation';
+
+	import DeleteWorkspaceConfigButton from './DeleteWorkspaceConfigButton.svelte';
+	import EditWorkspaceConfigButton from './EditWorkspaceConfigButton.svelte';
+	import WorkspaceConnectionBadge from './WorkspaceConnectionBadge.svelte';
 
 	let {
-		config,
 		columnVisibility,
+		config,
 	}: {
-		config: WorkspaceConfig;
 		columnVisibility: Record<string, boolean>;
+		config: WorkspaceConfig;
 	} = $props();
 
 	const workspaceQuery = createQuery(() => ({

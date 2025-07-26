@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
@@ -11,6 +10,8 @@
 	import { ChevronDown, Plus } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+
+	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
@@ -32,9 +33,9 @@
 	let columnVisibility = $state<Record<ColumnId, boolean>>({
 		actions: true,
 		cwd: false, // Hidden by default
+		lastUsed: true,
 		name: true,
 		port: true,
-		lastUsed: true,
 		rootPath: false, // Hidden by default
 		status: true,
 		url: true,

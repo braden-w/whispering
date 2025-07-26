@@ -19,8 +19,8 @@ export const getModes = (workspace: Accessor<WorkspaceConfig>) =>
 			const { data, error } = await api.getMode({ client });
 			if (error) {
 				return ShErr({
-					description: extractErrorMessage(error),
 					title: 'Failed to fetch modes',
+					description: extractErrorMessage(error),
 				});
 			}
 

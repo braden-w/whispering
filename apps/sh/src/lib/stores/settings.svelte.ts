@@ -1,5 +1,6 @@
 import { createPersistedState } from '@repo/svelte-utils';
 import { type } from 'arktype';
+
 import { Password } from './workspace-configs.svelte';
 
 /**

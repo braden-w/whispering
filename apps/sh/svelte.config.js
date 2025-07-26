@@ -5,7 +5,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	kit: {
 		adapter: adapter({
-			fallback: 'index.html' // SPA fallback for dynamic routes
+			fallback: 'index.html', // SPA fallback for dynamic routes
 		}),
 	},
 

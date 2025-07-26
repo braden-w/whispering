@@ -33,8 +33,8 @@ export const getMessagesBySessionId = (
 
 			if (error) {
 				return ShErr({
-					description: extractErrorMessage(error),
 					title: 'Failed to fetch messages',
+					description: extractErrorMessage(error),
 				});
 			}
 
@@ -66,8 +66,8 @@ export const sendMessage = defineMutation({
 
 		if (error) {
 			return ShErr({
-				description: extractErrorMessage(error),
 				title: 'Failed to send message',
+				description: extractErrorMessage(error),
 			});
 		}
 		return Ok(data);

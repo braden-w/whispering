@@ -1,7 +1,7 @@
 import { CreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
-import type { PageLoad } from './$types';
-
 import { type } from 'arktype';
+
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = ({ url }) => {
 	const port = url.searchParams.get('port');
@@ -10,10 +10,10 @@ export const load: PageLoad = ({ url }) => {
 	const name = url.searchParams.get('name');
 
 	const validated = CreateWorkspaceParams({
+		name,
+		password,
 		port: port ? Number.parseInt(port, 10) : null,
 		url: workspaceUrl,
-		password,
-		name,
 	});
 
 	if (validated instanceof type.errors) return { createWorkspaceParams: null };

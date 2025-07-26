@@ -308,6 +308,7 @@ export function createMessageSubscriber({
 						'title?': 'string',
 					})
 					.or({
+						title: 'string',
 						input: 'Record<string, unknown>',
 						metadata: 'Record<string, unknown>',
 						output: 'string',
@@ -316,7 +317,6 @@ export function createMessageSubscriber({
 							end: 'number',
 							start: 'number',
 						},
-						title: 'string',
 					})
 					.or({
 						error: 'string',

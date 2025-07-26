@@ -1,17 +1,20 @@
 <script lang="ts">
-	import SignInWithGithubButton from './SignInWithGithubButton.svelte';
 	import { page } from '$app/state';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
+	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { LightSwitch } from '@repo/ui/light-switch';
-	import { Settings, User, LogOut, Loader2 } from 'lucide-svelte';
-	import * as rpc from '$lib/query';
 	import { createMutation } from '@tanstack/svelte-query';
+	import { Loader2, LogOut, Settings, User } from 'lucide-svelte';
+	import { siGithub } from 'simple-icons';
 
 	let { children } = $props();
 	let settingsOpen = $state(false);
 
+	const signInWithGithubMutation = createMutation(
+		rpc.auth.signInWithGithub.options,
+	);
 	const signOut = createMutation(rpc.auth.signOut.options);
 </script>
 
@@ -68,7 +71,19 @@
 					<DropdownMenu.Content align="end" class="w-56">
 						<DropdownMenu.Label>Account</DropdownMenu.Label>
 						<DropdownMenu.Separator />
-						<SignInWithGithubButton></SignInWithGithubButton>
+						<DropdownMenu.Item
+							class="cursor-pointer"
+							onclick={() => signInWithGithubMutation.mutate()}
+						>
+							{#if signInWithGithubMutation.isPending}
+								<Loader2 class="animate-spin" />
+							{:else}
+								<span class="dark:invert">
+									{@html siGithub.svg}
+								</span>
+								Sign in with GitHub
+							{/if}
+						</DropdownMenu.Item>
 						<DropdownMenu.Item>
 							<Button
 								variant="ghost"

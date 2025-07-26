@@ -1,7 +1,8 @@
 import { authClient } from '$lib/auth-client';
-import { Err, Ok } from 'wellcrafted/result';
-import { defineMutation, defineQuery } from './_client';
 import { APPS } from '@repo/constants';
+import { Err, Ok } from 'wellcrafted/result';
+
+import { defineMutation, defineQuery } from './_client';
 
 export const getSession = defineQuery({
 	queryKey: ['auth', 'getSession'] as const,
@@ -27,8 +28,8 @@ export const signInWithGithub = defineMutation({
 	mutationKey: ['auth', 'signInWithGithub'] as const,
 	resultMutationFn: async () => {
 		const { data, error } = await authClient.signIn.social({
-			provider: 'github',
 			callbackURL: `${APPS(import.meta.env).SH.URL}/workspaces`,
+			provider: 'github',
 		});
 		if (error) return Err(error);
 		return Ok(data);

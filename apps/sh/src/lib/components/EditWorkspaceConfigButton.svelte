@@ -1,8 +1,8 @@
 <script lang="ts">
 	import {
-		workspaceConfigs,
 		UpdateWorkspaceParams,
 		type WorkspaceConfig,
+		workspaceConfigs,
 	} from '$lib/stores/workspace-configs.svelte';
 	import { Button } from '@repo/ui/button';
 	import { buttonVariants } from '@repo/ui/button';

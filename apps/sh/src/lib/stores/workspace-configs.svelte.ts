@@ -110,12 +110,6 @@ export const workspaceConfigs = (() => {
 	});
 
 	return {
-		get value() {
-			return workspaceConfigs.value;
-		},
-		getById: (id: string) => {
-			return workspaceConfigs.value.find((w) => w.id === id);
-		},
 		create: (data: CreateWorkspaceParams) => {
 			const newWorkspace: WorkspaceConfig = {
 				...data,
@@ -128,17 +122,23 @@ export const workspaceConfigs = (() => {
 			toast.success('Workspace created successfully');
 			return newWorkspace;
 		},
+		delete: (id: string) => {
+			workspaceConfigs.value = workspaceConfigs.value.filter(
+				(w) => w.id !== id,
+			);
+			toast.success('Workspace deleted successfully');
+		},
+		getById: (id: string) => {
+			return workspaceConfigs.value.find((w) => w.id === id);
+		},
 		update: (id: string, data: UpdateWorkspaceParams) => {
 			workspaceConfigs.value = workspaceConfigs.value.map((w) =>
 				w.id === id ? { ...w, ...data, lastAccessedAt: Date.now() } : w,
 			);
 			toast.success('Workspace updated successfully');
 		},
-		delete: (id: string) => {
-			workspaceConfigs.value = workspaceConfigs.value.filter(
-				(w) => w.id !== id,
-			);
-			toast.success('Workspace deleted successfully');
+		get value() {
+			return workspaceConfigs.value;
 		},
 	};
 })();

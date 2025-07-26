@@ -50,6 +50,45 @@ async function apiRequest(endpoint, options = {}) {
 	return data.result;
 }
 
+// --- EXAMPLE USAGE ---
+// This is how you would call the function from your backend code.
+async function main() {
+	// Get user input from command line arguments or an API request body
+	const args = process.argv.slice(2);
+	if (args.length !== 2) {
+		console.log(
+			'Usage: node provision_tunnel.js <user_subdomain> <user_local_port>',
+		);
+		console.log('Example: node provision_tunnel.js user-john-smith 8080');
+		return;
+	}
+
+	const userSubdomain = args[0];
+	const userPort = Number.parseInt(args[1], 10);
+
+	try {
+		const result = await provisionTunnel(userSubdomain, userPort);
+
+		console.log('\n🎉 Provisioning Complete! 🎉');
+		console.log(
+			'==============================================================================',
+		);
+		console.log(`Public URL: ${result.finalUrl}`);
+		console.log(
+			'\nTo give this to your user, provide them with the following single command',
+		);
+		console.log('to run on their machine:\n');
+		console.log(`   ${result.runCommand}`);
+		console.log(
+			'\n==============================================================================',
+		);
+	} catch (error) {
+		console.error(
+			'\nProvisioning failed. Please check the error messages above.',
+		);
+	}
+}
+
 /**
  * Provisions a new Cloudflare Tunnel for a user.
  * @param {string} userSubdomain - A unique name for the user's subdomain.
@@ -70,8 +109,8 @@ async function provisionTunnel(userSubdomain, userPort) {
 		const createTunnelResult = await apiRequest(
 			`/accounts/${CLOUDFLARE_ACCOUNT_ID}/cfd_tunnel`,
 			{
-				method: 'POST',
 				body: JSON.stringify({ name: tunnelName }),
+				method: 'POST',
 			},
 		);
 		tunnelId = createTunnelResult.id;
@@ -91,14 +130,14 @@ async function provisionTunnel(userSubdomain, userPort) {
 		const createDnsResult = await apiRequest(
 			`/zones/${CLOUDFLARE_ZONE_ID}/dns_records`,
 			{
-				method: 'POST',
 				body: JSON.stringify({
-					type: 'CNAME',
-					name: userSubdomain,
-					content: `${tunnelId}.cfargotunnel.com`,
-					proxied: true,
 					comment: `Tunnel for ${tunnelName}`,
+					content: `${tunnelId}.cfargotunnel.com`,
+					name: userSubdomain,
+					proxied: true,
+					type: 'CNAME',
 				}),
+				method: 'POST',
 			},
 		);
 		dnsRecordId = createDnsResult.id;
@@ -120,8 +159,8 @@ async function provisionTunnel(userSubdomain, userPort) {
 		await apiRequest(
 			`/accounts/${CLOUDFLARE_ACCOUNT_ID}/cfd_tunnel/${tunnelId}/configurations`,
 			{
-				method: 'PUT',
 				body: JSON.stringify({ config: ingressConfig }),
+				method: 'PUT',
 			},
 		);
 		console.log('   ✅ Tunnel configured successfully.');
@@ -163,45 +202,6 @@ async function provisionTunnel(userSubdomain, userPort) {
 		}
 		// Re-throw the original error to signal failure to the caller
 		throw error;
-	}
-}
-
-// --- EXAMPLE USAGE ---
-// This is how you would call the function from your backend code.
-async function main() {
-	// Get user input from command line arguments or an API request body
-	const args = process.argv.slice(2);
-	if (args.length !== 2) {
-		console.log(
-			'Usage: node provision_tunnel.js <user_subdomain> <user_local_port>',
-		);
-		console.log('Example: node provision_tunnel.js user-john-smith 8080');
-		return;
-	}
-
-	const userSubdomain = args[0];
-	const userPort = Number.parseInt(args[1], 10);
-
-	try {
-		const result = await provisionTunnel(userSubdomain, userPort);
-
-		console.log('\n🎉 Provisioning Complete! 🎉');
-		console.log(
-			'==============================================================================',
-		);
-		console.log(`Public URL: ${result.finalUrl}`);
-		console.log(
-			'\nTo give this to your user, provide them with the following single command',
-		);
-		console.log('to run on their machine:\n');
-		console.log(`   ${result.runCommand}`);
-		console.log(
-			'\n==============================================================================',
-		);
-	} catch (error) {
-		console.error(
-			'\nProvisioning failed. Please check the error messages above.',
-		);
 	}
 }
 

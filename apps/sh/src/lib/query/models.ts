@@ -19,8 +19,8 @@ export const getProviders = (workspace: Accessor<WorkspaceConfig>) =>
 			const { data, error } = await api.getConfigProviders({ client });
 			if (error) {
 				return ShErr({
-					description: extractErrorMessage(error),
 					title: 'Failed to fetch providers',
+					description: extractErrorMessage(error),
 				});
 			}
 
