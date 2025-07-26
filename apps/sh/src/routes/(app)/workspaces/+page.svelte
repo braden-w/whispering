@@ -3,6 +3,7 @@
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
+	import { showRedirectToast } from '$lib/utils/redirects';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
@@ -41,8 +42,16 @@
 		url: true,
 	});
 
-	// Create workspace from URL params on mount
+	// Handle redirect messages and workspace creation on mount
 	onMount(() => {
+		// Show redirect message if present
+		if (data.redirectMessage) {
+			showRedirectToast(data.redirectMessage);
+			// Clean up URL parameters after showing the toast
+			goto('/workspaces', { replaceState: true });
+		}
+
+		// Create workspace from URL params
 		if (data.createWorkspaceParams) {
 			workspaceConfigs.create(data.createWorkspaceParams);
 			toast.success(

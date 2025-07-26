@@ -1,5 +1,6 @@
 import * as rpc from '$lib/query';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
+import { redirectToWorkspacesWithError } from '$lib/utils/redirects';
 import { redirect } from '@sveltejs/kit';
 
 import type { PageLoad } from './$types';
@@ -7,7 +8,12 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ params }) => {
 	const workspaceConfig = workspaceConfigs.getById(params.id);
 
-	if (!workspaceConfig) redirect(302, '/workspaces');
+	if (!workspaceConfig) {
+		redirectToWorkspacesWithError(
+			'Workspace not found',
+			'The requested workspace could not be found',
+		);
+	}
 
 	const { data: session, error: sessionError } = await rpc.sessions
 		.getSessionById(
@@ -16,7 +22,12 @@ export const load: PageLoad = async ({ params }) => {
 		)
 		.ensure();
 
-	if (sessionError) redirect(302, '/workspaces');
+	if (sessionError) {
+		redirectToWorkspacesWithError(
+			'Failed to load session',
+			sessionError.title || 'Could not connect to the workspace',
+		);
+	}
 
 	if (!session) redirect(302, `/workspaces/${params.id}`);
 
