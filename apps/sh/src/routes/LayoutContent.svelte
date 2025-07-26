@@ -73,7 +73,7 @@
 							<Button
 								variant="ghost"
 								size="icon"
-								onclick={() => signOut.mutate({})}
+								onclick={() => signOut.mutate()}
 							>
 								{#if signOut.isPending}
 									<Loader2 class="h-4 w-4 animate-spin" />

@@ -12,7 +12,7 @@
 
 <DropdownMenu.Item
 	class="cursor-pointer"
-	onclick={() => signInWithGithubMutation.mutate({})}
+	onclick={() => signInWithGithubMutation.mutate()}
 >
 	{#if signInWithGithubMutation.isPending}
 		<Loader2 class="animate-spin" />
