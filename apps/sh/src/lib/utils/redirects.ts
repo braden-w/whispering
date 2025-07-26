@@ -38,152 +38,78 @@ function redirectWithFlash(
 }
 
 /**
- * Homepage redirect methods with flash message support
+ * Creates an object with error, info, success, and warning redirect methods
+ * @internal
  */
-const homepage = {
-	/**
-	 * Redirect to homepage with an error message
-	 * @param message - The error message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * if (!authorized) {
-	 *   return redirectTo.homepage.error({
-	 *     title: 'Access Denied',
-	 *     description: 'You do not have permission to view this page'
-	 *   });
-	 * }
-	 * ```
-	 */
-	error(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/', { ...message, type: 'error' });
-	},
+function createRedirectMethods(location: `/${string}`) {
+	return {
+		/**
+		 * Redirect with an error message
+		 * @param message - The error message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		error(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, location, { ...message, type: 'error' });
+		},
 
-	/**
-	 * Redirect to homepage with an informational message
-	 * @param message - The info message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.homepage.info({
-	 *   title: 'Welcome',
-	 *   description: 'Please log in to continue'
-	 * });
-	 * ```
-	 */
-	info(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/', { ...message, type: 'info' });
-	},
+		/**
+		 * Redirect with an informational message
+		 * @param message - The info message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		info(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, location, { ...message, type: 'info' });
+		},
 
-	/**
-	 * Redirect to homepage with a success message
-	 * @param message - The success message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.homepage.success({
-	 *   title: 'Logged Out',
-	 *   description: 'You have been successfully logged out'
-	 * });
-	 * ```
-	 */
-	success(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/', { ...message, type: 'success' });
-	},
+		/**
+		 * Redirect with a success message
+		 * @param message - The success message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		success(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, location, { ...message, type: 'success' });
+		},
 
-	/**
-	 * Redirect to homepage with a warning message
-	 * @param message - The warning message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.homepage.warning({
-	 *   title: 'Session Expired',
-	 *   description: 'Your session has expired. Please log in again.'
-	 * });
-	 * ```
-	 */
-	warning(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/', { ...message, type: 'warning' });
-	},
-};
+		/**
+		 * Redirect with a warning message
+		 * @param message - The warning message to display
+		 * @returns Never - this function always throws a redirect
+		 */
+		warning(message: Omit<FlashMessage, 'type'>): never {
+			return redirectWithFlash(302, location, { ...message, type: 'warning' });
+		},
+	};
+}
+
+/**
+ * Homepage redirect methods with flash message support
+ * @example
+ * ```typescript
+ * if (!authorized) {
+ *   redirectTo.homepage.error({
+ *     title: 'Access Denied',
+ *     description: 'You do not have permission to view this page'
+ *   });
+ *   return;
+ * }
+ * ```
+ */
+const homepage = createRedirectMethods('/');
 
 /**
  * Workspaces list redirect methods with flash message support
+ * @example
+ * ```typescript
+ * if (!workspaceConfig) {
+ *   redirectTo.workspaces.error({
+ *     title: 'Workspace Not Found',
+ *     description: 'The workspace you requested does not exist'
+ *   });
+ *   return;
+ * }
+ * ```
  */
-const workspaces = {
-	/**
-	 * Redirect to workspaces list with an error message
-	 * @param message - The error message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * if (!workspaceConfig) {
-	 *   return redirectTo.workspaces.error({
-	 *     title: 'Workspace Not Found',
-	 *     description: 'The workspace you requested does not exist'
-	 *   });
-	 * }
-	 * ```
-	 */
-	error(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/workspaces', { ...message, type: 'error' });
-	},
-
-	/**
-	 * Redirect to workspaces list with an informational message
-	 * @param message - The info message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.workspaces.info({
-	 *   title: 'Select Workspace',
-	 *   description: 'Please choose a workspace to continue'
-	 * });
-	 * ```
-	 */
-	info(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/workspaces', { ...message, type: 'info' });
-	},
-
-	/**
-	 * Redirect to workspaces list with a success message
-	 * @param message - The success message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.workspaces.success({
-	 *   title: 'Workspace Deleted',
-	 *   description: 'The workspace has been successfully removed'
-	 * });
-	 * ```
-	 */
-	success(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/workspaces', {
-			...message,
-			type: 'success',
-		});
-	},
-
-	/**
-	 * Redirect to workspaces list with a warning message
-	 * @param message - The warning message to display
-	 * @returns Never - this function always throws a redirect
-	 * @example
-	 * ```typescript
-	 * return redirectTo.workspaces.warning({
-	 *   title: 'Connection Unstable',
-	 *   description: 'Some workspaces may be experiencing connectivity issues'
-	 * });
-	 * ```
-	 */
-	warning(message: Omit<FlashMessage, 'type'>): never {
-		return redirectWithFlash(302, '/workspaces', {
-			...message,
-			type: 'warning',
-		});
-	},
-};
+const workspaces = createRedirectMethods('/workspaces');
 
 /**
  * Creates redirect methods for a specific workspace
@@ -193,68 +119,22 @@ const workspaces = {
  * ```typescript
  * // Chained method pattern
  * if (sessionError) {
- *   return redirectTo.workspace(params.id).error(sessionError);
+ *   redirectTo.workspace(params.id).error(sessionError);
+ *   return;
  * }
  *
  * // With custom message
  * if (!session) {
- *   return redirectTo.workspace(params.id).info({
+ *   redirectTo.workspace(params.id).info({
  *     title: 'Session Not Found',
  *     description: 'The requested session does not exist'
  *   });
+ *   return;
  * }
  * ```
  */
 function workspace(workspaceId: string) {
-	return {
-		/**
-		 * Redirect to the workspace with an error message
-		 * @param message - The error message to display
-		 * @returns Never - this function always throws a redirect
-		 */
-		error(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-				...message,
-				type: 'error',
-			});
-		},
-
-		/**
-		 * Redirect to the workspace with an informational message
-		 * @param message - The info message to display
-		 * @returns Never - this function always throws a redirect
-		 */
-		info(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-				...message,
-				type: 'info',
-			});
-		},
-
-		/**
-		 * Redirect to the workspace with a success message
-		 * @param message - The success message to display
-		 * @returns Never - this function always throws a redirect
-		 */
-		success(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-				...message,
-				type: 'success',
-			});
-		},
-
-		/**
-		 * Redirect to the workspace with a warning message
-		 * @param message - The warning message to display
-		 * @returns Never - this function always throws a redirect
-		 */
-		warning(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, `/workspaces/${workspaceId}` as const, {
-				...message,
-				type: 'warning',
-			});
-		},
-	};
+	return createRedirectMethods(`/workspaces/${workspaceId}` as const);
 }
 
 /**
