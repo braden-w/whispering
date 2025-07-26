@@ -3,16 +3,10 @@ import type { Accessor } from '@tanstack/svelte-query';
 
 import { createWorkspaceClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
-import {
-	type Password,
-	type Port,
-	type URL,
-	type WorkspaceConfig,
-	workspaceConfigs,
-} from '$lib/stores/workspace-configs.svelte';
-import { Err, Ok } from 'wellcrafted/result';
+import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import { Ok } from 'wellcrafted/result';
 
-import { defineQuery, queryClient } from './_client';
+import { defineQuery } from './_client';
 
 /**
  * A workspace configuration merged with live OpenCode app information.

@@ -3,17 +3,15 @@
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-	import { useCreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
+	import {
+		useCreateWorkspaceParams,
+		useFlashMessage,
+	} from '$lib/utils/search-params.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
 	import { cn } from '@repo/ui/utils';
 	import { ChevronDown, Plus } from 'lucide-svelte';
-	import { useFlashMessage } from '$lib/utils/redirects.svelte';
-
-	import type { PageData } from './$types';
-
-	let { data }: { data: PageData } = $props();
 
 	// Define available columns
 	const columns = [

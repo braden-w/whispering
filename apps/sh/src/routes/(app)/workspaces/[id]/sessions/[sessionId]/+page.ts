@@ -1,6 +1,6 @@
 import * as rpc from '$lib/query';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-import { redirectToWorkspacesWithError } from '$lib/utils/redirects';
+import { redirectToWorkspacesWithError } from '$lib/utils/redirects.svelte';
 import { redirect } from '@sveltejs/kit';
 
 import type { PageLoad } from './$types';
