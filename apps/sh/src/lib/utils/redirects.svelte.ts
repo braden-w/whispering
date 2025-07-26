@@ -48,15 +48,18 @@ export function redirectToWorkspacesWithError(message: RedirectMessage): never {
 	return redirectWithMessage(302, '/workspaces', message);
 }
 
-export function useShowRedirectToastIfParamsPresent(url: URL) {
-	const title = url.searchParams.get(REDIRECT_MESSAGE_PARAMS.title);
-	const description = url.searchParams.get(REDIRECT_MESSAGE_PARAMS.description);
+export const useShowRedirectToastIfParamsPresent = (url: URL) =>
+	$effect(() => {
+		const title = url.searchParams.get(REDIRECT_MESSAGE_PARAMS.title);
+		const description = url.searchParams.get(
+			REDIRECT_MESSAGE_PARAMS.description,
+		);
 
-	const validated = RedirectMessage({ title, description });
-	if (validated instanceof type.errors) return;
+		const validated = RedirectMessage({ title, description });
+		if (validated instanceof type.errors) return;
 
-	toast.error(validated.title, { description: validated.description });
+		toast.error(validated.title, { description: validated.description });
 
-	url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.title);
-	url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.description);
-}
+		url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.title);
+		url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.description);
+	});
