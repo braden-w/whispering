@@ -22,12 +22,7 @@ export const load: PageLoad = async ({ params }) => {
 		)
 		.ensure();
 
-	if (sessionError) {
-		redirectToWorkspacesWithError(
-			'Failed to load session',
-			sessionError.title || 'Could not connect to the workspace',
-		);
-	}
+	if (sessionError) redirectToWorkspacesWithError(sessionError);
 
 	if (!session) redirect(302, `/workspaces/${params.id}`);
 
