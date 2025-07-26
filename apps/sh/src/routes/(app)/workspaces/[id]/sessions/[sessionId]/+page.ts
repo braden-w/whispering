@@ -1,6 +1,6 @@
 import * as rpc from '$lib/query';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-import { redirectTo } from '$lib/utils/redirects';
+import { redirectTo } from '$lib/utils/redirect-with-flash-message';
 
 import type { PageLoad } from './$types';
 

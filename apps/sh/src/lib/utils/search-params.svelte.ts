@@ -5,7 +5,10 @@ import {
 	workspaceConfigs,
 	CreateWorkspaceParams,
 } from '$lib/stores/workspace-configs.svelte';
-import { FLASH_MESSAGE_PARAMS, FlashMessage } from './redirects';
+import {
+	FLASH_MESSAGE_PARAMS,
+	FlashMessage,
+} from './redirect-with-flash-message';
 
 /**
  * Hook that monitors URL parameters for flash messages, displays them as toasts,
