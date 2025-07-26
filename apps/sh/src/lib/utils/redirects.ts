@@ -1,5 +1,6 @@
 import { APPS } from '@repo/constants';
 import { redirect } from '@sveltejs/kit';
+import { type } from 'arktype';
 import { toast } from 'svelte-sonner';
 
 const REDIRECT_MESSAGE_PARAMS = {
@@ -7,10 +8,12 @@ const REDIRECT_MESSAGE_PARAMS = {
 	description: 'redirect_description',
 } as const;
 
-/**
- * Redirect message type - currently only supports error type
- */
-type RedirectMessage = { title: string; description: string };
+const RedirectMessage = type({
+	title: 'string',
+	description: 'string',
+});
+
+type RedirectMessage = typeof RedirectMessage.infer;
 
 /**
  * Internal helper that wraps SvelteKit's redirect with message support
@@ -34,46 +37,26 @@ function redirectWithMessage(
 /**
  * Redirect to homepage with an error message
  */
-export function redirectToHomepageWithError(
-	title: string,
-	description: string,
-): never {
-	return redirectWithMessage(302, '/', {
-		title,
-		description,
-	});
+export function redirectToHomepageWithError(message: RedirectMessage): never {
+	return redirectWithMessage(302, '/', message);
 }
 
 /**
  * Redirect to workspaces page with an error message
  */
-export function redirectToWorkspacesWithError(
-	title: string,
-	description: string,
-): never {
-	return redirectWithMessage(302, '/workspaces', {
-		title,
-		description,
-	});
+export function redirectToWorkspacesWithError(message: RedirectMessage): never {
+	return redirectWithMessage(302, '/workspaces', message);
 }
 
-/**
- * Extract redirect message from URL search parameters
- * Use this in page load functions to get the message
- */
-export function extractRedirectMessage(url: URL): RedirectMessage | null {
+export function useShowRedirectToastIfParamsPresent(url: URL) {
 	const title = url.searchParams.get(REDIRECT_MESSAGE_PARAMS.title);
 	const description = url.searchParams.get(REDIRECT_MESSAGE_PARAMS.description);
 
-	if (!title || !description) return null;
+	const validated = RedirectMessage({ title, description });
+	if (validated instanceof type.errors) return;
 
-	return { title, description };
-}
+	toast.error(validated.title, { description: validated.description });
 
-/**
- * Show a redirect message as a toast
- * Use this in components on mount to display the message
- */
-export function showRedirectToast(message: RedirectMessage): void {
-	toast.error(message.title, { description: message.description });
+	url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.title);
+	url.searchParams.delete(REDIRECT_MESSAGE_PARAMS.description);
 }
