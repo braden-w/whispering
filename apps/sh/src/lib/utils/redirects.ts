@@ -2,6 +2,84 @@ import { redirect } from '@sveltejs/kit';
 import { type } from 'arktype';
 
 /**
+ * Unified redirect API with flash message support.
+ *
+ * Provides a consistent interface for redirecting to different parts of the application
+ * with user-friendly flash messages. All redirect methods return `never` and should be
+ * followed by a `return` statement for explicit control flow.
+ *
+ * @example
+ * ```typescript
+ * import { redirectTo } from '$lib/utils/redirects';
+ *
+ * // In a load function or server action
+ * if (!authorized) {
+ *   redirectTo.homepage.error({
+ *     title: 'Access Denied',
+ *     description: 'You do not have permission to view this resource'
+ *   });
+ *   return;
+ * }
+ * ```
+ */
+export const redirectTo = {
+	/**
+	 * Homepage redirect methods with flash message support
+	 * @example
+	 * ```typescript
+	 * if (!authorized) {
+	 *   redirectTo.homepage.error({
+	 *     title: 'Access Denied',
+	 *     description: 'You do not have permission to view this page'
+	 *   });
+	 *   return;
+	 * }
+	 * ```
+	 */
+	homepage: createRedirectMethods('/' as const),
+
+	/**
+	 * Workspaces list redirect methods with flash message support
+	 * @example
+	 * ```typescript
+	 * if (!workspaceConfig) {
+	 *   redirectTo.workspaces.error({
+	 *     title: 'Workspace Not Found',
+	 *     description: 'The workspace you requested does not exist'
+	 *   });
+	 *   return;
+	 * }
+	 * ```
+	 */
+	workspaces: createRedirectMethods('/workspaces' as const),
+
+	/**
+	 * Creates redirect methods for a specific workspace
+	 * @param workspaceId - The ID of the workspace to redirect to
+	 * @returns An object with redirect methods for different message types
+	 * @example
+	 * ```typescript
+	 * // Chained method pattern
+	 * if (sessionError) {
+	 *   redirectTo.workspace(params.id).error(sessionError);
+	 *   return;
+	 * }
+	 *
+	 * // With custom message
+	 * if (!session) {
+	 *   redirectTo.workspace(params.id).info({
+	 *     title: 'Session Not Found',
+	 *     description: 'The requested session does not exist'
+	 *   });
+	 *   return;
+	 * }
+	 * ```
+	 */
+	workspace: (workspaceId: string) =>
+		createRedirectMethods(`/workspaces/${workspaceId}` as const),
+} as const;
+
+/**
  * Flash message schema for validation
  */
 export const FlashMessage = type({
@@ -20,22 +98,6 @@ export const FLASH_MESSAGE_PARAMS = {
 	description: 'flash_description',
 	type: 'flash_type',
 } as const;
-
-/**
- * Internal helper that wraps SvelteKit's redirect with flash message support
- * @internal
- */
-function redirectWithFlash(
-	status: number,
-	location: `/${string}`,
-	message: FlashMessage,
-): never {
-	const url = new URL(location, import.meta.env.BASE_URL);
-	url.searchParams.set(FLASH_MESSAGE_PARAMS.title, message.title);
-	url.searchParams.set(FLASH_MESSAGE_PARAMS.description, message.description);
-	url.searchParams.set(FLASH_MESSAGE_PARAMS.type, message.type);
-	return redirect(status, url.pathname + url.search);
-}
 
 /**
  * Creates an object with error, info, success, and warning redirect methods
@@ -82,83 +144,17 @@ function createRedirectMethods(location: `/${string}`) {
 }
 
 /**
- * Homepage redirect methods with flash message support
- * @example
- * ```typescript
- * if (!authorized) {
- *   redirectTo.homepage.error({
- *     title: 'Access Denied',
- *     description: 'You do not have permission to view this page'
- *   });
- *   return;
- * }
- * ```
+ * Internal helper that wraps SvelteKit's redirect with flash message support
+ * @internal
  */
-const homepage = createRedirectMethods('/');
-
-/**
- * Workspaces list redirect methods with flash message support
- * @example
- * ```typescript
- * if (!workspaceConfig) {
- *   redirectTo.workspaces.error({
- *     title: 'Workspace Not Found',
- *     description: 'The workspace you requested does not exist'
- *   });
- *   return;
- * }
- * ```
- */
-const workspaces = createRedirectMethods('/workspaces');
-
-/**
- * Creates redirect methods for a specific workspace
- * @param workspaceId - The ID of the workspace to redirect to
- * @returns An object with redirect methods for different message types
- * @example
- * ```typescript
- * // Chained method pattern
- * if (sessionError) {
- *   redirectTo.workspace(params.id).error(sessionError);
- *   return;
- * }
- *
- * // With custom message
- * if (!session) {
- *   redirectTo.workspace(params.id).info({
- *     title: 'Session Not Found',
- *     description: 'The requested session does not exist'
- *   });
- *   return;
- * }
- * ```
- */
-function workspace(workspaceId: string) {
-	return createRedirectMethods(`/workspaces/${workspaceId}` as const);
+function redirectWithFlash(
+	status: number,
+	location: `/${string}`,
+	message: FlashMessage,
+): never {
+	const url = new URL(location, import.meta.env.BASE_URL);
+	url.searchParams.set(FLASH_MESSAGE_PARAMS.title, message.title);
+	url.searchParams.set(FLASH_MESSAGE_PARAMS.description, message.description);
+	url.searchParams.set(FLASH_MESSAGE_PARAMS.type, message.type);
+	return redirect(status, url.pathname + url.search);
 }
-
-/**
- * Unified redirect API with flash message support.
- *
- * Provides a consistent interface for redirecting to different parts of the application
- * with user-friendly flash messages. All redirect methods return `never` and should be
- * preceded by a `return` statement for explicit control flow.
- *
- * @example
- * ```typescript
- * import { redirectTo } from '$lib/utils/redirects';
- *
- * // In a load function or server action
- * if (!authorized) {
- *   return redirectTo.homepage.error({
- *     title: 'Access Denied',
- *     description: 'You do not have permission to view this resource'
- *   });
- * }
- * ```
- */
-export const redirectTo = {
-	homepage,
-	workspace,
-	workspaces,
-} as const;
