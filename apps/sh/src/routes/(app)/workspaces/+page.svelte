@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-	import { showRedirectToast } from '$lib/utils/redirects';
+	import { useCreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
 	import { cn } from '@repo/ui/utils';
 	import { ChevronDown, Plus } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { useFlashMessage } from '$lib/utils/redirects.svelte';
 
 	import type { PageData } from './$types';
 
@@ -42,22 +41,8 @@
 		url: true,
 	});
 
-	// Handle redirect messages and workspace creation on mount
-	$effect(() => {
-		if (!data.params) return;
-		switch (data.params.type) {
-			case 'redirectMessage':
-				showRedirectToast(data.params.redirectMessage);
-				break;
-			case 'createWorkspaceParams':
-				workspaceConfigs.create(data.params.createWorkspaceParams);
-				toast.success(
-					`Workspace "${data.params.createWorkspaceParams.name}" added successfully`,
-				);
-				break;
-		}
-		goto('/workspaces', { replaceState: true });
-	});
+	useFlashMessage(page.url);
+	useCreateWorkspaceParams(page.url);
 </script>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
