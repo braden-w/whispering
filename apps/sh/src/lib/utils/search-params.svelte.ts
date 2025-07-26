@@ -5,17 +5,7 @@ import {
 	workspaceConfigs,
 	CreateWorkspaceParams,
 } from '$lib/stores/workspace-configs.svelte';
-
-/**
- * Flash message schema and type
- */
-const FlashMessage = type({
-	title: 'string',
-	description: 'string',
-	type: "'error' | 'success' | 'info' | 'warning'",
-});
-
-type FlashMessage = typeof FlashMessage.infer;
+import { FLASH_MESSAGE_PARAMS, FlashMessage } from './redirects';
 
 /**
  * Hook that monitors URL parameters for flash messages, displays them as toasts,
@@ -39,15 +29,6 @@ type FlashMessage = typeof FlashMessage.infer;
  * ```
  */
 export function useFlashMessage(url: URL) {
-	/**
-	 * URL search parameter constants for flash messages
-	 */
-	const FLASH_MESSAGE_PARAMS = {
-		title: 'flash_title',
-		description: 'flash_description',
-		type: 'flash_type',
-	} as const;
-
 	$effect(() => {
 		const validated = FlashMessage({
 			title: url.searchParams.get(FLASH_MESSAGE_PARAMS.title),

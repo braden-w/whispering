@@ -1,6 +1,6 @@
 import * as rpc from '$lib/query';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-import * as redirectTo from '$lib/utils/redirects';
+import { redirectTo } from '$lib/utils/redirects';
 
 import type { PageLoad } from './$types';
 
@@ -13,6 +13,7 @@ export const load: PageLoad = async ({ params }) => {
 			description:
 				"The workspace you're looking for doesn't exist. It may have been deleted or you may not have access to it.",
 		});
+		return;
 	}
 
 	const { data: session, error: sessionError } = await rpc.sessions
@@ -24,6 +25,7 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (sessionError) {
 		redirectTo.workspace.error(params.id, sessionError);
+		return;
 	}
 
 	if (!session) {
@@ -32,6 +34,7 @@ export const load: PageLoad = async ({ params }) => {
 			description:
 				"The conversation you're looking for doesn't exist. It may have been deleted or you may have an outdated link.",
 		});
+		return;
 	}
 
 	// Fetch initial messages
@@ -44,6 +47,7 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (messagesError) {
 		redirectTo.workspace.error(params.id, messagesError);
+		return;
 	}
 
 	if (!messages) {
@@ -52,6 +56,7 @@ export const load: PageLoad = async ({ params }) => {
 			description:
 				'Unable to load the messages for this conversation (messages were somehow undefined). Please try again or start a new conversation.',
 		});
+		return;
 	}
 
 	const { data: providers, error: providersError } = await rpc.models
@@ -60,6 +65,7 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (providersError) {
 		redirectTo.workspace.error(params.id, providersError);
+		return;
 	}
 
 	if (!providers) {
@@ -68,6 +74,7 @@ export const load: PageLoad = async ({ params }) => {
 			description:
 				'Unable to load AI providers. Please check your workspace configuration and try again.',
 		});
+		return;
 	}
 
 	const { data: modes, error: modesError } = await rpc.modes
@@ -76,6 +83,7 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (modesError) {
 		redirectTo.workspace.error(params.id, modesError);
+		return;
 	}
 
 	if (!modes) {
@@ -84,6 +92,7 @@ export const load: PageLoad = async ({ params }) => {
 			description:
 				'Unable to load available modes. Please check your workspace configuration and try again.',
 		});
+		return;
 	}
 
 	return {
