@@ -44,10 +44,45 @@ export function redirectToHomepageWithError(
 }
 
 /**
+ * Redirect to homepage with an info flash message
+ */
+export function redirectToHomepageWithInfo(
+	message: Omit<FlashMessage, 'type'>,
+): never {
+	return redirectWithFlash(302, '/', { ...message, type: 'info' });
+}
+
+/**
  * Redirect to workspaces page with an error flash message
  */
 export function redirectToWorkspacesWithError(
 	message: Omit<FlashMessage, 'type'>,
 ): never {
 	return redirectWithFlash(302, '/workspaces', { ...message, type: 'error' });
+}
+
+/**
+ * Redirect to a specific workspace page with an info flash message
+ */
+export function redirectToWorkspaceWithInfo(
+	workspaceId: string,
+	message: Omit<FlashMessage, 'type'>,
+): never {
+	return redirectWithFlash(302, `/workspaces/${workspaceId}` as `/${string}`, {
+		...message,
+		type: 'info',
+	});
+}
+
+/**
+ * Redirect to a specific workspace page with an error flash message
+ */
+export function redirectToWorkspaceWithError(
+	workspaceId: string,
+	message: Omit<FlashMessage, 'type'>,
+): never {
+	return redirectWithFlash(302, `/workspaces/${workspaceId}` as `/${string}`, {
+		...message,
+		type: 'error',
+	});
 }
