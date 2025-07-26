@@ -3,10 +3,7 @@
 	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
 	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
 	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-	import {
-		useCreateWorkspaceParams,
-		useFlashMessage,
-	} from '$lib/utils/search-params.svelte';
+	import { useCreateWorkspaceParams } from '$lib/utils/search-params.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
@@ -39,7 +36,6 @@
 		url: true,
 	});
 
-	useFlashMessage(page.url);
 	useCreateWorkspaceParams(page.url);
 </script>
 
