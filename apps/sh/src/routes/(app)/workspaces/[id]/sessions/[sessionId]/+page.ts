@@ -1,10 +1,6 @@
 import * as rpc from '$lib/query';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-import {
-	redirectToWorkspaceWithInfo,
-	redirectToWorkspacesWithError,
-	redirectToWorkspaceWithError,
-} from '$lib/utils/redirects.svelte';
+import * as redirectTo from '$lib/utils/redirects';
 
 import type { PageLoad } from './$types';
 
@@ -12,7 +8,7 @@ export const load: PageLoad = async ({ params }) => {
 	const workspaceConfig = workspaceConfigs.getById(params.id);
 
 	if (!workspaceConfig) {
-		redirectToWorkspacesWithError({
+		redirectTo.workspaces.error({
 			title: 'Workspace not found',
 			description:
 				"The workspace you're looking for doesn't exist. It may have been deleted or you may not have access to it.",
@@ -27,11 +23,11 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (sessionError) {
-		redirectToWorkspaceWithError(params.id, sessionError);
+		redirectTo.workspace.error(params.id, sessionError);
 	}
 
 	if (!session) {
-		redirectToWorkspaceWithInfo(params.id, {
+		redirectTo.workspace.info(params.id, {
 			title: 'Session not found',
 			description:
 				"The conversation you're looking for doesn't exist. It may have been deleted or you may have an outdated link.",
@@ -47,11 +43,11 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (messagesError) {
-		redirectToWorkspaceWithError(params.id, messagesError);
+		redirectTo.workspace.error(params.id, messagesError);
 	}
 
 	if (!messages) {
-		redirectToWorkspaceWithError(params.id, {
+		redirectTo.workspace.error(params.id, {
 			title: 'Failed to load conversation',
 			description:
 				'Unable to load the messages for this conversation (messages were somehow undefined). Please try again or start a new conversation.',
@@ -63,11 +59,11 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (providersError) {
-		redirectToWorkspaceWithError(params.id, providersError);
+		redirectTo.workspace.error(params.id, providersError);
 	}
 
 	if (!providers) {
-		redirectToWorkspaceWithError(params.id, {
+		redirectTo.workspace.error(params.id, {
 			title: 'Configuration error',
 			description:
 				'Unable to load AI providers. Please check your workspace configuration and try again.',
@@ -79,11 +75,11 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (modesError) {
-		redirectToWorkspaceWithError(params.id, modesError);
+		redirectTo.workspace.error(params.id, modesError);
 	}
 
 	if (!modes) {
-		redirectToWorkspaceWithError(params.id, {
+		redirectTo.workspace.error(params.id, {
 			title: 'Configuration error',
 			description:
 				'Unable to load available modes. Please check your workspace configuration and try again.',
