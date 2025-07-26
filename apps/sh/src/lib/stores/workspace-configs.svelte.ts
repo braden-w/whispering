@@ -1,3 +1,4 @@
+import { goto } from '$app/navigation';
 import { createPersistedState } from '@repo/svelte-utils';
 import { type } from 'arktype';
 import { nanoid } from 'nanoid';
@@ -10,7 +11,6 @@ export const Port = type('1024 <= number.integer <= 65535#Port');
 export type Port = typeof Port.infer;
 
 export const URL = type('string.url#URL');
-export type URL = typeof URL.infer;
 
 /**
  * Configuration for connecting to an OpenCode server instance.
@@ -42,6 +42,52 @@ export const CreateWorkspaceParams = WorkspaceConfig.pick(
 );
 
 export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
+
+/**
+ * Hook that monitors URL parameters for workspace creation data,
+ * creates the workspace if valid parameters are found, and cleans the URL.
+ * 
+ * This hook enables deep linking for workspace creation, allowing users to share
+ * pre-configured workspace links that automatically create workspaces on load.
+ * 
+ * @param url - The reactive URL object from $page.url
+ * 
+ * @example
+ * ```svelte
+ * import { page } from '$app/state';
+ * import { useCreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
+ * 
+ * useCreateWorkspaceParams(page.url);
+ * ```
+ */
+export const useCreateWorkspaceParams = (url: URL) =>
+	$effect(() => {
+		const port = url.searchParams.get('port');
+		const workspaceUrl = url.searchParams.get('url');
+		const password = url.searchParams.get('password');
+		const name = url.searchParams.get('name');
+
+		const workspace = CreateWorkspaceParams({
+			name,
+			password,
+			port: port ? Number.parseInt(port, 10) : null,
+			url: workspaceUrl,
+		});
+		if (workspace instanceof type.errors) return;
+		workspaceConfigs.create(workspace);
+		
+		// Clean URL without navigation by replacing the current history entry
+		const cleanUrl = new URL(url);
+		cleanUrl.searchParams.delete('port');
+		cleanUrl.searchParams.delete('url');
+		cleanUrl.searchParams.delete('password');
+		cleanUrl.searchParams.delete('name');
+		
+		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
+			replaceState: true,
+			noScroll: true,
+		});
+	});
 
 export const UpdateWorkspaceParams = WorkspaceConfig.omit(
 	'id',
