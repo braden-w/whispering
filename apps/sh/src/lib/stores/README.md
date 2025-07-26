@@ -60,18 +60,17 @@ Result: "Hello world"
 ```typescript
 // In your +page.ts load function
 import * as rpc from '$lib/query';
-import { queryClient } from '$lib/query/_client';
 
 export const load = async ({ params }) => {
 	// Fetch initial messages
-	const messages = await queryClient.ensureQueryData(
-		rpc.messages
-			.getMessagesBySessionId(
-				() => workspaceConfig,
-				() => params.sessionId,
-			)
-			.options(),
-	);
+	const { data: messages, error } = await rpc.messages
+		.getMessagesBySessionId(
+			() => workspaceConfig,
+			() => params.sessionId,
+		)
+		.ensure();
+
+	if (error) redirect(302, '/workspaces');
 
 	return {
 		messages,

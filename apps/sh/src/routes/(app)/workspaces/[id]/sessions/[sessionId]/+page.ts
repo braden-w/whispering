@@ -1,43 +1,46 @@
 import * as rpc from '$lib/query';
-import { queryClient } from '$lib/query/_client.js';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ params }) => {
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async ({ params }) => {
 	const workspaceConfig = workspaceConfigs.getById(params.id);
 
 	if (!workspaceConfig) redirect(302, '/workspaces');
 
-	const sessions = await queryClient.ensureQueryData(
-		rpc.sessions
-			.getSessionById(
-				() => workspaceConfig,
-				() => params.sessionId,
-			)
-			.options(),
-	);
+	const { data: session, error: sessionError } = await rpc.sessions
+		.getSessionById(
+			() => workspaceConfig,
+			() => params.sessionId,
+		)
+		.ensure();
 
-	const session = sessions?.find((s) => s.id === params.sessionId);
+	if (sessionError) redirect(302, '/workspaces');
 
 	if (!session) redirect(302, `/workspaces/${params.id}`);
 
 	// Fetch initial messages
-	const messages = await queryClient.ensureQueryData(
-		rpc.messages
-			.getMessagesBySessionId(
-				() => workspaceConfig,
-				() => params.sessionId,
-			)
-			.options(),
-	);
+	const { data: messages, error: messagesError } = await rpc.messages
+		.getMessagesBySessionId(
+			() => workspaceConfig,
+			() => params.sessionId,
+		)
+		.ensure();
 
-	const providers = await queryClient.ensureQueryData(
-		rpc.models.getProviders(() => workspaceConfig).options(),
-	);
+	if (messagesError) redirect(302, `/workspaces/${params.id}`);
 
-	const modes = await queryClient.ensureQueryData(
-		rpc.modes.getModes(() => workspaceConfig).options(),
-	);
+	const { data: providers, error: providersError } = await rpc.models
+		.getProviders(() => workspaceConfig)
+		.ensure();
+
+	if (providersError) redirect(302, `/workspaces/${params.id}`);
+
+	const { data: modes, error: modesError } = await rpc.modes
+		.getModes(() => workspaceConfig)
+		.ensure();
+
+	if (modesError) redirect(302, `/workspaces/${params.id}`);
 
 	return {
 		messages,

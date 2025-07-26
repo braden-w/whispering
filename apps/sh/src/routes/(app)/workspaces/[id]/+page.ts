@@ -1,5 +1,4 @@
 import * as rpc from '$lib/query';
-import { queryClient } from '$lib/query/_client';
 import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
 import { redirect } from '@sveltejs/kit';
 
@@ -10,11 +9,11 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (!workspaceConfig) redirect(302, '/workspaces');
 
-	const sessions = await queryClient.ensureQueryData(
-		rpc.sessions.getSessions(() => workspaceConfig).options(),
-	);
+	const { data: sessions, error } = await rpc.sessions
+		.getSessions(() => workspaceConfig)
+		.ensure();
 
-	if (!sessions) redirect(302, '/workspaces');
+	if (error) redirect(302, '/workspaces');
 
 	return { sessions, workspaceConfig };
 };
