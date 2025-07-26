@@ -43,23 +43,20 @@
 	});
 
 	// Handle redirect messages and workspace creation on mount
-	onMount(() => {
-		// Show redirect message if present
-		if (data.redirectMessage) {
-			showRedirectToast(data.redirectMessage);
-			// Clean up URL parameters after showing the toast
-			goto('/workspaces', { replaceState: true });
+	$effect(() => {
+		if (!data.params) return;
+		switch (data.params.type) {
+			case 'redirectMessage':
+				showRedirectToast(data.params.redirectMessage);
+				break;
+			case 'createWorkspaceParams':
+				workspaceConfigs.create(data.params.createWorkspaceParams);
+				toast.success(
+					`Workspace "${data.params.createWorkspaceParams.name}" added successfully`,
+				);
+				break;
 		}
-
-		// Create workspace from URL params
-		if (data.createWorkspaceParams) {
-			workspaceConfigs.create(data.createWorkspaceParams);
-			toast.success(
-				`Workspace "${data.createWorkspaceParams.name}" added successfully`,
-			);
-			// Erase the URL params
-			goto('/workspaces', { replaceState: true });
-		}
+		goto('/workspaces', { replaceState: true });
 	});
 </script>
 

@@ -1,33 +1,25 @@
-import { CreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
+import { extractCreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
 import { extractRedirectMessage } from '$lib/utils/redirects';
-import { type } from 'arktype';
 
-import type { PageLoad } from './$types';
+export function load({ url }) {
+	const params = extractParams(url);
+	return params;
+}
 
-export const load: PageLoad = ({ url }) => {
+function extractParams(url: URL) {
 	const redirectMessage = extractRedirectMessage(url);
 
-	const port = url.searchParams.get('port');
-	const workspaceUrl = url.searchParams.get('url');
-	const password = url.searchParams.get('password');
-	const name = url.searchParams.get('name');
-
-	const validated = CreateWorkspaceParams({
-		name,
-		password,
-		port: port ? Number.parseInt(port, 10) : null,
-		url: workspaceUrl,
-	});
-
-	if (validated instanceof type.errors) {
-		return {
-			createWorkspaceParams: null,
-			redirectMessage,
-		};
+	if (redirectMessage) {
+		return { params: { type: 'redirectMessage', redirectMessage } } as const;
 	}
 
-	return {
-		createWorkspaceParams: validated,
-		redirectMessage,
-	};
-};
+	const createWorkspaceParams = extractCreateWorkspaceParams(url);
+
+	if (createWorkspaceParams) {
+		return {
+			params: { type: 'createWorkspaceParams', createWorkspaceParams },
+		} as const;
+	}
+
+	return { params: null } as const;
+}
