@@ -46,21 +46,21 @@ export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
 /**
  * Hook that monitors URL parameters for workspace creation data,
  * creates the workspace if valid parameters are found, and cleans the URL.
- * 
+ *
  * This hook enables deep linking for workspace creation, allowing users to share
  * pre-configured workspace links that automatically create workspaces on load.
- * 
+ *
  * @param url - The reactive URL object from $page.url
- * 
+ *
  * @example
  * ```svelte
  * import { page } from '$app/state';
  * import { useCreateWorkspaceParams } from '$lib/stores/workspace-configs.svelte';
- * 
+ *
  * useCreateWorkspaceParams(page.url);
  * ```
  */
-export const useCreateWorkspaceParams = (url: URL) =>
+export function useCreateWorkspaceParams(url: URL) {
 	$effect(() => {
 		const port = url.searchParams.get('port');
 		const workspaceUrl = url.searchParams.get('url');
@@ -75,19 +75,20 @@ export const useCreateWorkspaceParams = (url: URL) =>
 		});
 		if (workspace instanceof type.errors) return;
 		workspaceConfigs.create(workspace);
-		
+
 		// Clean URL without navigation by replacing the current history entry
 		const cleanUrl = new URL(url);
 		cleanUrl.searchParams.delete('port');
 		cleanUrl.searchParams.delete('url');
 		cleanUrl.searchParams.delete('password');
 		cleanUrl.searchParams.delete('name');
-		
+
 		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
 			replaceState: true,
 			noScroll: true,
 		});
 	});
+}
 
 export const UpdateWorkspaceParams = WorkspaceConfig.omit(
 	'id',

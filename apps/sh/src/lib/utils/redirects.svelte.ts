@@ -76,7 +76,7 @@ export function redirectToWorkspacesWithError(
  * useFlashMessage(page.url);
  * ```
  */
-export const useFlashMessage = (url: URL) =>
+export function useFlashMessage(url: URL) {
 	$effect(() => {
 		const validated = FlashMessage({
 			title: url.searchParams.get(FLASH_MESSAGE_PARAMS.title),
@@ -99,3 +99,4 @@ export const useFlashMessage = (url: URL) =>
 			noScroll: true,
 		});
 	});
+}
