@@ -10,27 +10,16 @@
 		"url": "https://github.com/getepicenter/cli"
 	},
 	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],
-	"bin": {
-		"epicenter": "./bin/epicenter"
-	},
 	"scripts": {
-		"dev": "bun run src/index.ts",
-		"build": "bun build --target=bun --outdir=dist src/index.ts",
-		"typecheck": "tsc --noEmit"
+		"dev": "bun run src/index.ts"
 	},
 	"exports": {
 		".": "./src/index.ts"
 	},
+	"files": ["src"],
 	"dependencies": {
 		"@epicenter/opencode": "latest",
 		"get-port": "^7.1.0",
 		"yargs": "^17.7.2"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/yargs": "^17.0.33"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
 	}
 }
