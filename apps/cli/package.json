@@ -10,6 +10,9 @@
 		"url": "https://github.com/getepicenter/cli"
 	},
 	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],
+	"bin": {
+		"epicenter": "./src/index.ts"
+	},
 	"scripts": {
 		"dev": "infisical run -- bun run src/index.ts"
 	},
