@@ -20,7 +20,8 @@
 	<LayoutContent>
 		{@render children()}
 	</LayoutContent>
-	<Toaster richColors position="top-right" />
-	<SvelteQueryDevtools buttonPosition="bottom-right" />
-	<ModeWatcher />
 </QueryClientProvider>
+
+<Toaster richColors position="top-right" />
+<ModeWatcher />
+<SvelteQueryDevtools client={queryClient} buttonPosition="bottom-right" />
