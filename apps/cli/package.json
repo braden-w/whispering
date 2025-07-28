@@ -7,17 +7,32 @@
 	"homepage": "https://epicenter.sh",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/getepicenter/cli"
+		"url": "git+https://github.com/braden-w/whispering.git",
+		"directory": "apps/cli"
 	},
-	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],
+	"keywords": [
+		"epicenter",
+		"cli",
+		"opencode",
+		"ai",
+		"code",
+		"assistant"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"bin": {
-		"epicenter": "./src/index.ts"
+		"epicenter": "src/index.ts"
 	},
 	"scripts": {
 		"dev": "infisical run -- bun run src/index.ts",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": ["src", "README.md", "package.json"],
+	"files": [
+		"src",
+		"README.md",
+		"package.json"
+	],
 	"dependencies": {
 		"@epicenter/opencode": "latest",
 		"get-port": "^7.1.0",
