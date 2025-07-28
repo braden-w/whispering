@@ -1,0 +1,27 @@
+{
+	"name": "@repo/db",
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio"
+	},
+	"dependencies": {
+		"@neondatabase/serverless": "^1.0.1",
+		"arktype": "^2.1.20",
+		"drizzle-orm": "^0.44.3"
+	},
+	"devDependencies": {
+		"@repo/config": "workspace:*",
+		"@repo/constants": "workspace:*",
+		"drizzle-kit": "^0.31.4",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./schema": "./src/schema/index.ts"
+	}
+}
