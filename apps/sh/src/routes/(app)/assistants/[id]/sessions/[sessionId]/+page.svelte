@@ -21,7 +21,7 @@
 	import ModeSelector from './_components/session-controls/ModeSelector.svelte';
 
 	let { data }: { data: PageData } = $props();
-	const workspaceConfig = $derived(data.workspaceConfig);
+	const assistantConfig = $derived(data.assistantConfig);
 	const session = $derived(data.session);
 	const sessionId = $derived(session.id);
 
@@ -43,7 +43,7 @@
 	const messages = createMessageSubscriber({
 		initialMessages: () => data.messages ?? [],
 		sessionId: () => sessionId,
-		workspace: () => workspaceConfig,
+		assistant: () => assistantConfig,
 	});
 	let messageContent = $state('');
 	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
@@ -80,7 +80,7 @@
 					providerID: selectedModel.providerId,
 				},
 				sessionId,
-				workspaceConfig,
+				assistantConfig,
 			},
 			{
 				onError: (error) => {
@@ -113,8 +113,8 @@
 		<Breadcrumb.Root class="mb-3 sm:mb-4">
 			<Breadcrumb.List>
 				<Breadcrumb.Item>
-					<Breadcrumb.Link href="/workspaces" class="text-xs sm:text-sm"
-						>Workspaces</Breadcrumb.Link
+					<Breadcrumb.Link href="/assistants" class="text-xs sm:text-sm"
+						>Assistants</Breadcrumb.Link
 					>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator>
@@ -122,10 +122,10 @@
 				</Breadcrumb.Separator>
 				<Breadcrumb.Item>
 					<Breadcrumb.Link
-						href="/workspaces/{workspaceConfig.id}"
+						href="/assistants/{assistantConfig.id}"
 						class="text-xs sm:text-sm"
 					>
-						{workspaceConfig.name}
+						{assistantConfig.name}
 					</Breadcrumb.Link>
 				</Breadcrumb.Item>
 				<Breadcrumb.Separator>
@@ -163,7 +163,7 @@
 							variant="destructive"
 							onclick={() => {
 								abortSessionMutation.mutate(
-									{ sessionId, workspaceConfig },
+									{ sessionId, assistantConfig },
 									{
 										onError: (error) => {
 											toast.error(error.title, {
@@ -186,7 +186,7 @@
 							variant="outline"
 							onclick={() => {
 								unshareSessionMutation.mutate(
-									{ sessionId, workspaceConfig },
+									{ sessionId, assistantConfig },
 									{
 										onError: (error) => {
 											toast.error(error.title, {
@@ -208,7 +208,7 @@
 							variant="outline"
 							onclick={() => {
 								shareSessionMutation.mutate(
-									{ sessionId, workspaceConfig },
+									{ sessionId, assistantConfig },
 									{
 										onError: (error) => {
 											toast.error(error.title, {
@@ -245,7 +245,7 @@
 								<AlertDialog.Action
 									onclick={() => {
 										deleteSessionMutation.mutate(
-											{ sessionId, workspaceConfig },
+											{ sessionId, assistantConfig },
 											{
 												onError: (error) => {
 													toast.error(error.title, {
@@ -254,7 +254,7 @@
 												},
 												onSuccess: () => {
 													toast.success('Session deleted successfully');
-													goto(`/workspaces/${workspaceConfig.id}`);
+													goto(`/assistants/${assistantConfig.id}`);
 												},
 											},
 										);
@@ -275,11 +275,11 @@
 			<!-- Session Controls -->
 			<div class="flex items-center gap-2">
 				<ModeSelector
-					{workspaceConfig}
+					{assistantConfig}
 					bind:value={messageMode}
 					onModeChange={handleModeChange}
 				/>
-				<ModelSelector {workspaceConfig} bind:value={selectedModel} />
+				<ModelSelector {assistantConfig} bind:value={selectedModel} />
 			</div>
 
 			<MessageInput

@@ -146,10 +146,10 @@ export const load: PageLoad = async ({ params }) => {
 
 - `rpc.messages.getMessagesBySessionId(sessionId)` - Fetch messages for a session
 
-### Workspaces
+### Assistants
 
-- `rpc.workspaces.getWorkspaces` - Fetch all workspace configs and check their connection status
-- `rpc.workspaces.getWorkspace(config)` - Check connection status for a single workspace
+- `rpc.assistants.getAssistants` - Fetch all assistant configs and check their connection status
+- `rpc.assistants.getAssistant(config)` - Check connection status for a single assistant
 
 ## Available Mutations
 
@@ -201,46 +201,46 @@ if (error) {
 
 All queries and mutations are fully typed. The TypeScript compiler will enforce correct parameter types and provide autocomplete for available options.
 
-## Workspace Connection Checking
+## Assistant Connection Checking
 
-The workspace queries handle checking which OpenCode servers are online and available.
+The assistant queries handle checking which OpenCode servers are online and available.
 
 ### How it Works
 
-When you query workspaces, the system:
+When you query assistants, the system:
 
-1. Takes your saved workspace configurations
+1. Takes your saved assistant configurations
 2. Attempts to connect to each OpenCode server in parallel
 3. Merges the config with live app info if the connection succeeds
-4. Returns enhanced workspace objects with connection status
+4. Returns enhanced assistant objects with connection status
 
-### Workspace Type
+### Assistant Type
 
 ```typescript
-type Workspace = WorkspaceConfig & {
+type Assistant = AssistantConfig & {
 	checkedAt: number; // Unix timestamp of last connection check
 } & (
-		| { connected: true; appInfo: App } // Online workspace with full app info
-		| { connected: false } // Offline/unreachable workspace
+		| { connected: true; appInfo: App } // Online assistant with full app info
+		| { connected: false } // Offline/unreachable assistant
 	);
 ```
 
 ### Usage Example
 
 ```typescript
-// Check all workspaces
-const workspacesQuery = createQuery(rpc.workspaces.getWorkspaces.options);
+// Check all assistants
+const assistantsQuery = createQuery(rpc.assistants.getAssistants.options);
 
 // In your component
-{#each $workspacesQuery.data as workspace}
-  {#if workspace.connected}
-    <div>✅ {workspace.name} - Online</div>
-    <div>Version: {workspace.appInfo.version}</div>
+{#each $assistantsQuery.data as assistant}
+  {#if assistant.connected}
+    <div>✅ {assistant.name} - Online</div>
+    <div>Version: {assistant.appInfo.version}</div>
   {:else}
-    <div>❌ {workspace.name} - Offline</div>
-    <div>Last checked: {new Date(workspace.checkedAt).toLocaleTimeString()}</div>
+    <div>❌ {assistant.name} - Offline</div>
+    <div>Last checked: {new Date(assistant.checkedAt).toLocaleTimeString()}</div>
   {/if}
 {/each}
 ```
 
-This pattern is used throughout the UI to show users which workspaces are currently available for connection.
+This pattern is used throughout the UI to show users which assistants are currently available for connection.

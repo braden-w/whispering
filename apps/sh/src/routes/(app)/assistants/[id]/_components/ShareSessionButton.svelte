@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
@@ -10,10 +10,10 @@
 
 	let {
 		session,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		session: Session;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	const isShared = $derived(!!session.share?.url);
@@ -32,7 +32,7 @@
 		variant="ghost"
 		onclick={() =>
 			unshareSessionMutation.mutate(
-				{ sessionId: session.id, workspaceConfig },
+				{ sessionId: session.id, assistantConfig },
 				{
 					onError: (error) => {
 						toast.error(error.title, {
@@ -55,7 +55,7 @@
 		variant="ghost"
 		onclick={() =>
 			shareSessionMutation.mutate(
-				{ sessionId: session.id, workspaceConfig },
+				{ sessionId: session.id, assistantConfig },
 				{
 					onError: (error) => {
 						toast.error(error.title, {

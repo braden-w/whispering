@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import { Badge } from '@repo/ui/badge';
@@ -11,15 +11,15 @@
 
 	let {
 		sessions,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessions: Session[];
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	function getSessionHref(session: Session) {
-		return workspaceConfig
-			? `/workspaces/${workspaceConfig.id}/sessions/${session.id}`
+		return assistantConfig
+			? `/assistants/${assistantConfig.id}/sessions/${session.id}`
 			: `/session/${session.id}`;
 	}
 
@@ -68,8 +68,8 @@
 					</Table.Cell>
 					<Table.Cell>
 						<div class="flex items-center justify-end gap-2">
-							<ShareSessionButton {session} {workspaceConfig} />
-							<DeleteSessionButton {session} {workspaceConfig} />
+							<ShareSessionButton {session} {assistantConfig} />
+							<DeleteSessionButton {session} {assistantConfig} />
 						</div>
 					</Table.Cell>
 				</Table.Row>

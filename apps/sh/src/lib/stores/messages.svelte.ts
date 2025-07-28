@@ -6,10 +6,10 @@ import type {
 	Message as MessageInfo,
 	Part,
 } from '$lib/client/types.gen';
-import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 
-import { createWorkspaceClient } from '$lib/client/client.gen';
+import { createAssistantClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import { type } from 'arktype';
 import { createSubscriber } from 'svelte/reactivity';
@@ -19,8 +19,8 @@ export type Message = { info: MessageInfo; parts: Part[] };
 /**
  * Creates a reactive message subscriber for real-time SSE updates
  *
- * @param params - Configuration object containing workspace, sessionId, and initial messages
- * @param params.workspace - Accessor to the workspace configuration
+ * @param params - Configuration object containing assistant, sessionId, and initial messages
+ * @param params.assistant - Accessor to the assistant configuration
  * @param params.sessionId - Accessor to the session ID
  * @param params.initialMessages - Accessor to pre-fetched messages from the load function
  * @returns A reactive value containing the messages with their parts
@@ -32,7 +32,7 @@ export type Message = { info: MessageInfo; parts: Part[] };
  * @example
  * ```ts
  * const messages = createMessageSubscriber({
- *   workspace: () => workspaceConfig,
+ *   assistant: () => assistantConfig,
  *   sessionId: () => session.id,
  *   initialMessages: () => data.messages
  * });
@@ -46,11 +46,11 @@ export type Message = { info: MessageInfo; parts: Part[] };
 export function createMessageSubscriber({
 	initialMessages,
 	sessionId,
-	workspace,
+	assistant,
 }: {
 	initialMessages: Accessor<Message[]>;
 	sessionId: Accessor<string>;
-	workspace: Accessor<WorkspaceConfig>;
+	assistant: Accessor<AssistantConfig>;
 }) {
 	// Initialize with pre-fetched messages
 	let messages = $state<Message[]>(initialMessages());
@@ -412,7 +412,7 @@ export function createMessageSubscriber({
 		}
 
 		// Construct SSE URL with authentication
-		const sseUrl = new URL('/event', workspace().url);
+		const sseUrl = new URL('/event', assistant().url);
 		eventSource = new EventSource(sseUrl.toString());
 
 		// Handle all SSE events (server sends everything as 'message' events)

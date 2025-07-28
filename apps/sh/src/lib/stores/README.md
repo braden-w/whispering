@@ -65,12 +65,12 @@ export const load = async ({ params }) => {
 	// Fetch initial messages
 	const { data: messages, error } = await rpc.messages
 		.getMessagesBySessionId(
-			() => workspaceConfig,
+			() => assistantConfig,
 			() => params.sessionId,
 		)
 		.ensure();
 
-	if (error) redirect(302, '/workspaces');
+	if (error) redirect(302, '/assistants');
 
 	return {
 		messages,
@@ -82,7 +82,7 @@ export const load = async ({ params }) => {
 import { createMessageSubscriber } from '$lib/stores/messages.svelte';
 
 const messages = createMessageSubscriber({
-	workspace: () => workspaceConfig,
+	assistant: () => assistantConfig,
 	sessionId: () => session.id,
 	initialMessages: () => data.messages ?? [],
 });

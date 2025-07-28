@@ -42,7 +42,7 @@ export const signInWithGithub = defineMutation({
 	mutationKey: ['auth', 'signInWithGithub'] as const,
 	resultMutationFn: async () => {
 		const { data, error } = await authClient.signIn.social({
-			callbackURL: `${APPS(import.meta.env).SH.URL}/workspaces`,
+			callbackURL: `${APPS(import.meta.env).SH.URL}/assistants`,
 			provider: 'github',
 		});
 		if (error) return AuthToShErr(error);

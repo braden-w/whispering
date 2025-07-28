@@ -1,7 +1,7 @@
 import { createPersistedState } from '@repo/svelte-utils';
 import { type } from 'arktype';
 
-import { Password } from './workspace-configs.svelte';
+import { Password } from './assistant-configs.svelte';
 
 /**
  * Application settings that are persisted across sessions.
@@ -9,13 +9,13 @@ import { Password } from './workspace-configs.svelte';
  */
 const AppSettings = type({
 	/**
-	 * Default password for new workspace connections.
-	 * This value is pre-populated when creating new workspaces.
+	 * Default password for new assistant connections.
+	 * This value is pre-populated when creating new assistants.
 	 */
 	defaultPassword: Password,
 	/**
-	 * Default username for new workspace connections.
-	 * This value is pre-populated when creating new workspaces.
+	 * Default username for new assistant connections.
+	 * This value is pre-populated when creating new assistants.
 	 */
 	defaultUsername: 'string > 0',
 });

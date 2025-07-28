@@ -22,7 +22,7 @@ epicenter sh
 # - Discovers an available port (starting from 4096)
 # - Enables Cloudflare tunnel
 # - Sets CORS origins to https://epicenter.sh
-# - Opens epicenter.sh workspace in your browser
+# - Opens epicenter.sh assistant in your browser
 ```
 
 ### Customize Settings
@@ -69,7 +69,7 @@ The Epicenter CLI imports the opencode serve functionality from the [`@epicenter
 - **Port Range**: Searches for available ports from 4096-4196
 - **Default CORS**: `https://epicenter.sh`
 - **Tunnel**: Enabled by default using `cloudflared`
-- **Auto-open**: Opens epicenter.sh workspace automatically when tunnel is active
+- **Auto-open**: Opens epicenter.sh assistant automatically when tunnel is active
 
 ## Development
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import CreateWorkspaceConfigModal from '$lib/components/CreateWorkspaceConfigModal.svelte';
-	import WorkspaceTableRow from '$lib/components/WorkspaceTableRow.svelte';
-	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
-	import { useCreateWorkspaceParams } from '$lib/utils/search-params.svelte';
+	import CreateAssistantConfigModal from '$lib/components/CreateAssistantConfigModal.svelte';
+	import AssistantTableRow from '$lib/components/AssistantTableRow.svelte';
+	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
+	import { useCreateAssistantParams } from '$lib/utils/search-params.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
@@ -36,7 +36,7 @@
 		url: true,
 	});
 
-	useCreateWorkspaceParams(page.url);
+	useCreateAssistantParams(page.url);
 </script>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
@@ -44,7 +44,7 @@
 		class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
 	>
 		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Workspaces</h1>
+			<h1 class="text-3xl font-bold tracking-tight">Assistants</h1>
 			<p class="text-muted-foreground mt-1">
 				Manage your OpenCode server connections
 			</p>
@@ -80,26 +80,26 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 
-			<CreateWorkspaceConfigModal>
+			<CreateAssistantConfigModal>
 				{#snippet triggerChild({ props })}
-					<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Workspace</Button
+					<Button {...props}><Plus class="mr-2 h-4 w-4" /> Add Assistant</Button
 					>
 				{/snippet}
-			</CreateWorkspaceConfigModal>
+			</CreateAssistantConfigModal>
 		</div>
 	</div>
 
-	{#if workspaceConfigs.value.length === 0}
+	{#if assistantConfigs.value.length === 0}
 		<div class="rounded-lg border border-dashed p-8 text-center">
-			<h3 class="text-lg font-semibold">No workspaces yet</h3>
+			<h3 class="text-lg font-semibold">No assistants yet</h3>
 			<p class="text-muted-foreground mt-2">
-				Create your first workspace to connect to an OpenCode server
+				Create your first assistant to connect to an OpenCode server
 			</p>
-			<CreateWorkspaceConfigModal>
+			<CreateAssistantConfigModal>
 				{#snippet triggerChild({ props })}
-					<Button {...props} class="mt-4">Create Workspace</Button>
+					<Button {...props} class="mt-4">Create Assistant</Button>
 				{/snippet}
-			</CreateWorkspaceConfigModal>
+			</CreateAssistantConfigModal>
 		</div>
 	{:else}
 		<div class="rounded border">
@@ -129,8 +129,8 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each workspaceConfigs.value as config}
-						<WorkspaceTableRow {config} {columnVisibility} />
+					{#each assistantConfigs.value as config}
+						<AssistantTableRow {config} {columnVisibility} />
 					{/each}
 				</Table.Body>
 			</Table.Root>

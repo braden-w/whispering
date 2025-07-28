@@ -1,8 +1,8 @@
 import type { PostSessionByIdMessageData } from '$lib/client/types.gen';
-import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 
-import { createWorkspaceClient } from '$lib/client/client.gen';
+import { createAssistantClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import { ShErr } from '$lib/result';
 import { extractErrorMessage } from 'wellcrafted/error';
@@ -12,19 +12,19 @@ import { defineMutation, defineQuery } from './_client';
 
 // Query for fetching messages by session ID
 export const getMessagesBySessionId = (
-	workspaceConfig: Accessor<WorkspaceConfig>,
+	assistantConfig: Accessor<AssistantConfig>,
 	sessionId: Accessor<string>,
 ) =>
 	defineQuery({
 		queryKey: [
-			'workspaces',
-			workspaceConfig().id,
+			'assistants',
+			assistantConfig().id,
 			'sessions',
 			sessionId(),
 			'messages',
 		],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspaceConfig());
+			const client = createAssistantClient(assistantConfig());
 
 			const { data, error } = await api.getSessionByIdMessage({
 				client,
@@ -48,15 +48,15 @@ export const sendMessage = defineMutation({
 	resultMutationFn: async ({
 		body,
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		body: PostSessionByIdMessageData['body'];
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
-		// TODO: Provider and model should come from workspace settings or user preferences
+		// TODO: Provider and model should come from assistant settings or user preferences
 		// For now, we'll use default values
 		const { data, error } = await api.postSessionByIdMessage({
 			body,

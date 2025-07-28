@@ -11,5 +11,5 @@
 	<p class="text-muted-foreground mb-8">
 		Connect to your OpenCode servers to start chatting
 	</p>
-	<Button href="/workspaces" size="lg">Go to Workspaces</Button>
+	<Button href="/assistants" size="lg">Go to Assistants</Button>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import { formatDistanceToNow } from '$lib/utils/date';
@@ -13,8 +13,8 @@
 
 	let {
 		session,
-		workspaceConfig,
-	}: { session: Session; workspaceConfig: WorkspaceConfig } = $props();
+		assistantConfig,
+	}: { session: Session; assistantConfig: AssistantConfig } = $props();
 	let deleteDialogOpen = $state(false);
 
 	const shareSessionMutation = createMutation(
@@ -34,8 +34,8 @@
 
 <Card.Root class="hover:shadow-md transition-shadow cursor-pointer">
 	<a
-		href={workspaceConfig
-			? `/workspaces/${workspaceConfig.id}/sessions/${session.id}`
+		href={assistantConfig
+			? `/assistants/${assistantConfig.id}/sessions/${session.id}`
 			: `/session/${session.id}`}
 		class="block"
 	>
@@ -69,7 +69,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						unshareSessionMutation.mutate(
-							{ sessionId: session.id, workspaceConfig },
+							{ sessionId: session.id, assistantConfig },
 							{
 								onError: (error) => {
 									toast.error(error.title, {
@@ -92,7 +92,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						shareSessionMutation.mutate(
-							{ sessionId: session.id, workspaceConfig },
+							{ sessionId: session.id, assistantConfig },
 							{
 								onError: (error) => {
 									toast.error(error.title, {
@@ -130,7 +130,7 @@
 					<AlertDialog.Action
 						onclick={() =>
 							deleteSessionMutation.mutate(
-								{ sessionId: session.id, workspaceConfig },
+								{ sessionId: session.id, assistantConfig },
 								{
 									onError: (error) => {
 										toast.error(error.title, {

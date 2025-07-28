@@ -1,6 +1,6 @@
-# Workspace Setup Guide
+# Assistant Setup Guide
 
-This guide explains how to set up and connect to an OpenCode workspace using the simplified architecture with built-in CORS support.
+This guide explains how to set up and connect to an OpenCode assistant using the simplified architecture with built-in CORS support.
 
 ## Architecture Overview
 
@@ -68,7 +68,7 @@ EOF
 
 ### Step 3: (Optional) Expose with ngrok
 
-To access your workspace from the internet:
+To access your assistant from the internet:
 
 You have two options:
 
@@ -128,7 +128,7 @@ Only used by the "Auto-detect" button in the UI.
 1. **Simpler Setup**: Only need to run OpenCode (and optionally ngrok)
 2. **Better Performance**: No proxy overhead for every API request
 3. **Fewer Dependencies**: Don't need complex proxy configurations
-4. **Direct URLs**: Workspace URLs work directly without transformation
+4. **Direct URLs**: Assistant URLs work directly without transformation
 5. **Less Resource Usage**: Fewer processes running on your system
 
 ## Troubleshooting
@@ -170,7 +170,7 @@ If you were using the previous architecture:
 
 1. **Update OpenCode**: Ensure you have a version with built-in CORS support
 2. **Remove Complex Proxies**: You no longer need the Hono proxy or complex Caddy setups
-3. **Update Workspace URLs**: URLs can now be used directly without proxy transformation
+3. **Update Assistant URLs**: URLs can now be used directly without proxy transformation
 4. **Single Port**: The system will automatically migrate from private/public ports to a single port
 5. **Authentication**: Username is no longer required; authentication is handled at the OpenCode level
 

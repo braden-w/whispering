@@ -22,7 +22,7 @@ export type URL = typeof URL.infer;
  * - No more Caddy proxy needed for CORS
  * - Authentication handled at OpenCode level
  */
-const WorkspaceConfig = type({
+const AssistantConfig = type({
 	createdAt: 'number',
 	id: 'string',
 	lastAccessedAt: 'number',
@@ -32,49 +32,49 @@ const WorkspaceConfig = type({
 	url: URL,
 });
 
-export type WorkspaceConfig = typeof WorkspaceConfig.infer;
+export type AssistantConfig = typeof AssistantConfig.infer;
 
-export const CreateWorkspaceParams = WorkspaceConfig.pick(
+export const CreateAssistantParams = AssistantConfig.pick(
 	'password',
 	'port',
 	'url',
 	'name',
 );
 
-export type CreateWorkspaceParams = typeof CreateWorkspaceParams.infer;
+export type CreateAssistantParams = typeof CreateAssistantParams.infer;
 
-export const UpdateWorkspaceParams = WorkspaceConfig.omit(
+export const UpdateAssistantParams = AssistantConfig.omit(
 	'id',
 	'createdAt',
 	'lastAccessedAt',
 ).partial();
-export type UpdateWorkspaceParams = typeof UpdateWorkspaceParams.infer;
+export type UpdateAssistantParams = typeof UpdateAssistantParams.infer;
 
 /**
- * The reactive store containing all of the user's saved workspace configurations.
- * Automatically synced with localStorage under the key 'opencode-workspace-configs'.
+ * The reactive store containing all of the user's saved assistant configurations.
+ * Automatically synced with localStorage under the key 'opencode-assistant-configs'.
  */
-export const workspaceConfigs = (() => {
-	const workspaceConfigs = createPersistedState({
-		key: 'opencode-workspace-configs',
+export const assistantConfigs = (() => {
+	const assistantConfigs = createPersistedState({
+		key: 'opencode-assistant-configs',
 		onParseError: (error) => {
 			if (error.type === 'storage_empty') {
 				return []; // First time user
 			}
 
 			if (error.type === 'json_parse_error') {
-				console.error('Corrupted workspace data:', error);
-				toast.error('Failed to load workspaces', {
-					description: 'Your workspace data appears to be corrupted',
+				console.error('Corrupted assistant data:', error);
+				toast.error('Failed to load assistants', {
+					description: 'Your assistant data appears to be corrupted',
 				});
 				return [];
 			}
 
 			if (error.type === 'schema_validation_failed') {
 				console.warn(
-					'Invalid workspace data, attempting recovery and migration',
+					'Invalid assistant data, attempting recovery and migration',
 				);
-				// Try to recover and migrate valid workspaces
+				// Try to recover and migrate valid assistants
 				if (Array.isArray(error.value)) {
 					const migrated = error.value.map((w) => {
 						// Migrate from old format if needed
@@ -89,12 +89,12 @@ export const workspaceConfigs = (() => {
 					});
 
 					const valid = migrated.filter((w) => {
-						const result = WorkspaceConfig(w);
+						const result = AssistantConfig(w);
 						if (result instanceof type.errors) return false;
 						return true;
 					});
 					if (valid.length > 0) {
-						toast.warning('Workspaces have been migrated to the new format');
+						toast.warning('Assistants have been migrated to the new format');
 						return valid;
 					}
 				}
@@ -103,42 +103,42 @@ export const workspaceConfigs = (() => {
 			return [];
 		},
 		onUpdateError: (error) => {
-			console.error('Failed to save workspaces:', error);
+			console.error('Failed to save assistants:', error);
 			toast.error('Failed to save changes');
 		},
-		schema: WorkspaceConfig.array(),
+		schema: AssistantConfig.array(),
 	});
 
 	return {
-		create: (data: CreateWorkspaceParams) => {
-			const newWorkspace: WorkspaceConfig = {
+		create: (data: CreateAssistantParams) => {
+			const newAssistant: AssistantConfig = {
 				...data,
 				createdAt: Date.now(),
 				id: nanoid(),
 				lastAccessedAt: Date.now(),
 			};
 
-			workspaceConfigs.value = [...workspaceConfigs.value, newWorkspace];
-			toast.success('Workspace created successfully');
-			return newWorkspace;
+			assistantConfigs.value = [...assistantConfigs.value, newAssistant];
+			toast.success('Assistant created successfully');
+			return newAssistant;
 		},
 		delete: (id: string) => {
-			workspaceConfigs.value = workspaceConfigs.value.filter(
+			assistantConfigs.value = assistantConfigs.value.filter(
 				(w) => w.id !== id,
 			);
-			toast.success('Workspace deleted successfully');
+			toast.success('Assistant deleted successfully');
 		},
 		getById: (id: string) => {
-			return workspaceConfigs.value.find((w) => w.id === id);
+			return assistantConfigs.value.find((w) => w.id === id);
 		},
-		update: (id: string, data: UpdateWorkspaceParams) => {
-			workspaceConfigs.value = workspaceConfigs.value.map((w) =>
+		update: (id: string, data: UpdateAssistantParams) => {
+			assistantConfigs.value = assistantConfigs.value.map((w) =>
 				w.id === id ? { ...w, ...data, lastAccessedAt: Date.now() } : w,
 			);
-			toast.success('Workspace updated successfully');
+			toast.success('Assistant updated successfully');
 		},
 		get value() {
-			return workspaceConfigs.value;
+			return assistantConfigs.value;
 		},
 	};
 })();

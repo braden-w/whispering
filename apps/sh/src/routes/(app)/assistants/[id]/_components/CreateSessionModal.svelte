@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import { goto } from '$app/navigation';
 	import * as rpc from '$lib/query';
@@ -12,10 +12,10 @@
 
 	let {
 		open = $bindable(false),
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		open?: boolean;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	let title = $state('');
@@ -45,13 +45,13 @@
 			onsubmit={(e) => {
 				e.preventDefault();
 
-				if (!workspaceConfig) {
-					toast.error('No workspace selected');
+				if (!assistantConfig) {
+					toast.error('No assistant selected');
 					return;
 				}
 
 				createSessionMutation.mutate(
-					{ workspaceConfig },
+					{ assistantConfig },
 					{
 						onError: (error) => {
 							toast.error(error.title, {
@@ -62,7 +62,7 @@
 						onSuccess: (data) => {
 							toast.success('Session created successfully');
 							if (data?.id) {
-								goto(`/workspaces/${workspaceConfig.id}/sessions/${data.id}`);
+								goto(`/assistants/${assistantConfig.id}/sessions/${data.id}`);
 								open = false;
 								title = '';
 							}

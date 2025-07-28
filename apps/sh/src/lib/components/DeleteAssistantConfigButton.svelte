@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
-	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
+	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { Button } from '@repo/ui/button';
 	import { Trash2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
-	let { workspaceConfig }: { workspaceConfig: WorkspaceConfig } = $props();
+	let { assistantConfig }: { assistantConfig: AssistantConfig } = $props();
 	let open = $state(false);
 </script>
 
@@ -23,7 +23,7 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete the workspace "{workspaceConfig.name}".
+				This will permanently delete the assistant "{assistantConfig.name}".
 				This action cannot be undone.
 			</AlertDialog.Description>
 		</AlertDialog.Header>
@@ -31,9 +31,9 @@
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action
 				onclick={() => {
-					workspaceConfigs.delete(workspaceConfig.id);
+					assistantConfigs.delete(assistantConfig.id);
 					open = false;
-					toast.success('Deleted workspace');
+					toast.success('Deleted assistant');
 				}}>Delete</AlertDialog.Action
 			>
 		</AlertDialog.Footer>

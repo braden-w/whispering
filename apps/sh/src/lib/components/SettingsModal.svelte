@@ -48,7 +48,7 @@
 		<Modal.Header>
 			<Modal.Title>Settings</Modal.Title>
 			<Modal.Description>
-				Configure default credentials for new workspace connections
+				Configure default credentials for new assistant connections
 			</Modal.Description>
 		</Modal.Header>
 
@@ -73,8 +73,8 @@
 				/>
 			</div>
 			<p class="text-sm text-muted-foreground">
-				These credentials will be used as defaults when creating new workspaces.
-				You can always override them for individual workspaces.
+				These credentials will be used as defaults when creating new assistants.
+				You can always override them for individual assistants.
 			</p>
 		</div>
 

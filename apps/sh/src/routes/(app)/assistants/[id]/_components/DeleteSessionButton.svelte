@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
@@ -11,10 +11,10 @@
 
 	let {
 		session,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		session: Session;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	let open = $state(false);
@@ -43,7 +43,7 @@
 			<AlertDialog.Action
 				onclick={() =>
 					deleteSessionMutation.mutate(
-						{ sessionId: session.id, workspaceConfig },
+						{ sessionId: session.id, assistantConfig },
 						{
 							onError: (error) => {
 								toast.error(error.title, {

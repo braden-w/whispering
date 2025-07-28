@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
@@ -14,19 +14,19 @@
 		class: className,
 		placeholder = 'Select a model...',
 		value = $bindable<null | { modelId: string; providerId: string }>(null),
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		class?: string;
 		placeholder?: string;
 		value?: null | { modelId: string; providerId: string };
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	const combobox = useCombobox();
 
 	// Create query for providers
 	const providersQuery = createQuery(
-		rpc.models.getProviders(() => workspaceConfig).options,
+		rpc.models.getProviders(() => assistantConfig).options,
 	);
 
 	const providers = $derived(providersQuery.data?.providers ?? []);

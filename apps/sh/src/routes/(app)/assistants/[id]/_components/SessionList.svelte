@@ -1,15 +1,15 @@
 <script lang="ts">
 	import type { Session } from '$lib/client/types.gen';
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import SessionTable from './SessionTable.svelte';
 
 	let {
 		sessions,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessions: Session[];
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 </script>
 
@@ -35,5 +35,5 @@
 		</p>
 	</div>
 {:else}
-	<SessionTable {sessions} {workspaceConfig} />
+	<SessionTable {sessions} {assistantConfig} />
 {/if}

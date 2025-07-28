@@ -39,14 +39,14 @@
 						Home
 					</a>
 					<a
-						href="/workspaces"
+						href="/assistants"
 						class="transition-colors hover:text-foreground/80 {page.url.pathname.startsWith(
-							'/workspaces',
+							'/assistants',
 						)
 							? 'text-foreground'
 							: 'text-foreground/60'}"
 					>
-						Workspaces
+						Assistants
 					</a>
 				</nav>
 			</div>

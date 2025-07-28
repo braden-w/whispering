@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import { Skeleton } from '@repo/ui/skeleton';
@@ -11,17 +11,17 @@
 		class: className,
 		onModeChange,
 		value = $bindable(),
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		class?: string;
 		onModeChange?: (mode: string) => void;
 		value?: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	} = $props();
 
 	// Create query for modes
 	const modesQuery = createQuery(
-		rpc.modes.getModes(() => workspaceConfig).options,
+		rpc.modes.getModes(() => assistantConfig).options,
 	);
 
 	const modes = $derived(modesQuery.data ?? []);

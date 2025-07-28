@@ -1,7 +1,7 @@
-import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 
-import { createWorkspaceClient } from '$lib/client/client.gen';
+import { createAssistantClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import { ShErr } from '$lib/result';
 import { extractErrorMessage } from 'wellcrafted/error';
@@ -10,11 +10,11 @@ import { Ok } from 'wellcrafted/result';
 import { defineQuery } from './_client';
 
 // Query for fetching all providers and models
-export const getProviders = (workspace: Accessor<WorkspaceConfig>) =>
+export const getProviders = (assistant: Accessor<AssistantConfig>) =>
 	defineQuery({
-		queryKey: ['workspaces', workspace().id, 'providers'],
+		queryKey: ['assistants', assistant().id, 'providers'],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspace());
+			const client = createAssistantClient(assistant());
 
 			const { data, error } = await api.getConfigProviders({ client });
 			if (error) {

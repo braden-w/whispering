@@ -39,35 +39,35 @@ export const redirectTo = {
 	homepage: createRedirectMethods('/' as const),
 
 	/**
-	 * Workspaces list redirect methods with flash message support
+	 * Assistants list redirect methods with flash message support
 	 * @example
 	 * ```typescript
-	 * if (!workspaceConfig) {
-	 *   redirectTo.workspaces.error({
-	 *     title: 'Workspace Not Found',
-	 *     description: 'The workspace you requested does not exist'
+	 * if (!assistantConfig) {
+	 *   redirectTo.assistants.error({
+	 *     title: 'Assistant Not Found',
+	 *     description: 'The assistant you requested does not exist'
 	 *   });
 	 *   return;
 	 * }
 	 * ```
 	 */
-	workspaces: createRedirectMethods('/workspaces' as const),
+	assistants: createRedirectMethods('/assistants' as const),
 
 	/**
-	 * Creates redirect methods for a specific workspace
-	 * @param workspaceId - The ID of the workspace to redirect to
+	 * Creates redirect methods for a specific assistant
+	 * @param assistantId - The ID of the assistant to redirect to
 	 * @returns An object with redirect methods for different message types
 	 * @example
 	 * ```typescript
 	 * // Chained method pattern
 	 * if (sessionError) {
-	 *   redirectTo.workspace(params.id).error(sessionError);
+	 *   redirectTo.assistant(params.id).error(sessionError);
 	 *   return;
 	 * }
 	 *
 	 * // With custom message
 	 * if (!session) {
-	 *   redirectTo.workspace(params.id).info({
+	 *   redirectTo.assistant(params.id).info({
 	 *     title: 'Session Not Found',
 	 *     description: 'The requested session does not exist'
 	 *   });
@@ -75,8 +75,8 @@ export const redirectTo = {
 	 * }
 	 * ```
 	 */
-	workspace: (workspaceId: string) =>
-		createRedirectMethods(`/workspaces/${workspaceId}` as const),
+	assistant: (assistantId: string) =>
+		createRedirectMethods(`/assistants/${assistantId}` as const),
 } as const;
 
 /**

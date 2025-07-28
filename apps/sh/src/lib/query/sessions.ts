@@ -1,8 +1,8 @@
 import type { PostSessionByIdSummarizeData } from '$lib/client/types.gen';
-import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 
-import { createWorkspaceClient } from '$lib/client/client.gen';
+import { createAssistantClient } from '$lib/client/client.gen';
 import * as api from '$lib/client/sdk.gen';
 import { ShErr } from '$lib/result';
 import { extractErrorMessage } from 'wellcrafted/error';
@@ -10,12 +10,12 @@ import { Ok } from 'wellcrafted/result';
 
 import { defineMutation, defineQuery, queryClient } from './_client';
 
-// Query for fetching all sessions in a workspace
-export const getSessions = (workspaceConfig: Accessor<WorkspaceConfig>) =>
+// Query for fetching all sessions in an assistant
+export const getSessions = (assistantConfig: Accessor<AssistantConfig>) =>
 	defineQuery({
-		queryKey: ['workspaces', workspaceConfig().id, 'sessions'],
+		queryKey: ['assistants', assistantConfig().id, 'sessions'],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspaceConfig());
+			const client = createAssistantClient(assistantConfig());
 
 			const { data, error } = await api.getSession({ client });
 			if (error) {
@@ -32,17 +32,17 @@ export const getSessions = (workspaceConfig: Accessor<WorkspaceConfig>) =>
 // Mutation for creating a new session
 export const createSession = defineMutation({
 	mutationKey: ['createSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
-		workspaceConfig,
+		assistantConfig,
 	}: {
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data: session, error } = await api.postSession({ client });
 		if (error) {
@@ -58,19 +58,19 @@ export const createSession = defineMutation({
 // Mutation for deleting a session
 export const deleteSession = defineMutation({
 	mutationKey: ['deleteSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.deleteSessionById({
 			client,
@@ -89,19 +89,19 @@ export const deleteSession = defineMutation({
 // Mutation for sharing a session
 export const shareSession = defineMutation({
 	mutationKey: ['shareSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.postSessionByIdShare({
 			client,
@@ -120,19 +120,19 @@ export const shareSession = defineMutation({
 // Mutation for unsharing a session
 export const unshareSession = defineMutation({
 	mutationKey: ['unshareSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.deleteSessionByIdShare({
 			client,
@@ -151,19 +151,19 @@ export const unshareSession = defineMutation({
 // Mutation for aborting a session
 export const abortSession = defineMutation({
 	mutationKey: ['abortSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.postSessionByIdAbort({
 			client,
@@ -182,21 +182,21 @@ export const abortSession = defineMutation({
 // Mutation for initializing a session
 export const initializeSession = defineMutation({
 	mutationKey: ['initializeSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		body,
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		body?: { messageID: string; modelID: string; providerID: string };
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.postSessionByIdInit({
 			body,
@@ -216,21 +216,21 @@ export const initializeSession = defineMutation({
 // Mutation for summarizing a session
 export const summarizeSession = defineMutation({
 	mutationKey: ['summarizeSession'],
-	onSuccess: (_, { workspaceConfig }) => {
+	onSuccess: (_, { assistantConfig }) => {
 		queryClient.invalidateQueries({
-			queryKey: ['workspaces', workspaceConfig.id, 'sessions'],
+			queryKey: ['assistants', assistantConfig.id, 'sessions'],
 		});
 	},
 	resultMutationFn: async ({
 		body,
 		sessionId,
-		workspaceConfig,
+		assistantConfig,
 	}: {
 		body: PostSessionByIdSummarizeData['body'];
 		sessionId: string;
-		workspaceConfig: WorkspaceConfig;
+		assistantConfig: AssistantConfig;
 	}) => {
-		const client = createWorkspaceClient(workspaceConfig);
+		const client = createAssistantClient(assistantConfig);
 
 		const { data, error } = await api.postSessionByIdSummarize({
 			body,
@@ -249,13 +249,13 @@ export const summarizeSession = defineMutation({
 
 // Query for fetching a single session by ID
 export const getSessionById = (
-	workspaceConfig: Accessor<WorkspaceConfig>,
+	assistantConfig: Accessor<AssistantConfig>,
 	sessionId: Accessor<string>,
 ) =>
 	defineQuery({
-		queryKey: ['workspaces', workspaceConfig().id, 'sessions'],
+		queryKey: ['assistants', assistantConfig().id, 'sessions'],
 		resultQueryFn: async () => {
-			const client = createWorkspaceClient(workspaceConfig());
+			const client = createAssistantClient(assistantConfig());
 
 			const { data, error } = await api.getSession({ client });
 			if (error) {

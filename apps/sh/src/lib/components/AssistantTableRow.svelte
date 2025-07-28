@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { WorkspaceConfig } from '$lib/stores/workspace-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import { goto } from '$app/navigation';
 	import * as rpc from '$lib/query';
-	import { workspaceConfigs } from '$lib/stores/workspace-configs.svelte';
+	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import { Badge } from '@repo/ui/badge';
 	import { badgeVariants } from '@repo/ui/badge';
@@ -13,32 +13,32 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { GitBranch } from 'lucide-svelte';
 
-	import DeleteWorkspaceConfigButton from './DeleteWorkspaceConfigButton.svelte';
-	import EditWorkspaceConfigButton from './EditWorkspaceConfigButton.svelte';
-	import WorkspaceConnectionBadge from './WorkspaceConnectionBadge.svelte';
+	import DeleteAssistantConfigButton from './DeleteAssistantConfigButton.svelte';
+	import EditAssistantConfigButton from './EditAssistantConfigButton.svelte';
+	import AssistantConnectionBadge from './AssistantConnectionBadge.svelte';
 
 	let {
 		columnVisibility,
 		config,
 	}: {
 		columnVisibility: Record<string, boolean>;
-		config: WorkspaceConfig;
+		config: AssistantConfig;
 	} = $props();
 
-	const workspaceQuery = createQuery(() => ({
-		...rpc.workspaces.getWorkspace(() => config).options(),
+	const assistantQuery = createQuery(() => ({
+		...rpc.assistants.getAssistant(() => config).options(),
 		refetchInterval: 5000, // Refresh every 5 seconds
 	}));
 
 	function handleConnect() {
 		// Update last used timestamp
-		workspaceConfigs.update(config.id, {});
+		assistantConfigs.update(config.id, {});
 
-		// Navigate to workspace sessions
-		goto(`/workspaces/${config.id}`);
+		// Navigate to assistant sessions
+		goto(`/assistants/${config.id}`);
 	}
 
-	const workspace = $derived(workspaceQuery.data);
+	const assistant = $derived(assistantQuery.data);
 </script>
 
 <Table.Row>
@@ -49,11 +49,11 @@
 					variant="link"
 					class="p-0"
 					onclick={handleConnect}
-					disabled={workspaceQuery.isPending}
+					disabled={assistantQuery.isPending}
 				>
 					{config.name}
 				</Button>
-				{#if workspace?.connected && workspace.appInfo.git}
+				{#if assistant?.connected && assistant.appInfo.git}
 					<Tooltip.Provider>
 						<Tooltip.Root>
 							<Tooltip.Trigger class={badgeVariants({ variant: 'secondary' })}>
@@ -83,10 +83,10 @@
 	{#if columnVisibility.rootPath !== false}
 		<Table.Cell
 			class="max-w-[200px] truncate"
-			title={workspace?.connected ? workspace.appInfo.path.root : ''}
+			title={assistant?.connected ? assistant.appInfo.path.root : ''}
 		>
-			{#if workspace?.connected}
-				<code class="text-xs">{workspace.appInfo.path.root}</code>
+			{#if assistant?.connected}
+				<code class="text-xs">{assistant.appInfo.path.root}</code>
 			{:else}
 				<span class="text-muted-foreground">—</span>
 			{/if}
@@ -95,10 +95,10 @@
 	{#if columnVisibility.cwd !== false}
 		<Table.Cell
 			class="max-w-[200px] truncate"
-			title={workspace?.connected ? workspace.appInfo.path.cwd : ''}
+			title={assistant?.connected ? assistant.appInfo.path.cwd : ''}
 		>
-			{#if workspace?.connected}
-				<code class="text-xs">{workspace.appInfo.path.cwd}</code>
+			{#if assistant?.connected}
+				<code class="text-xs">{assistant.appInfo.path.cwd}</code>
 			{:else}
 				<span class="text-muted-foreground">—</span>
 			{/if}
@@ -106,7 +106,7 @@
 	{/if}
 	{#if columnVisibility.status !== false}
 		<Table.Cell>
-			<WorkspaceConnectionBadge workspaceConfig={config} />
+			<AssistantConnectionBadge assistantConfig={config} />
 		</Table.Cell>
 	{/if}
 	{#if columnVisibility.lastUsed !== false}
@@ -121,17 +121,17 @@
 					size="sm"
 					variant="default"
 					onclick={handleConnect}
-					disabled={workspaceQuery.isPending || !workspace?.connected}
+					disabled={assistantQuery.isPending || !assistant?.connected}
 				>
-					{workspace?.connected ? 'Open' : 'Connect'}
+					{assistant?.connected ? 'Open' : 'Connect'}
 				</Button>
-				<EditWorkspaceConfigButton
-					workspaceConfig={config}
-					disabled={workspaceQuery.isPending}
+				<EditAssistantConfigButton
+					assistantConfig={config}
+					disabled={assistantQuery.isPending}
 				/>
-				<DeleteWorkspaceConfigButton
-					workspaceConfig={config}
-					disabled={workspaceQuery.isPending}
+				<DeleteAssistantConfigButton
+					assistantConfig={config}
+					disabled={assistantQuery.isPending}
 				/>
 			</div>
 		</Table.Cell>
