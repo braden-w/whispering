@@ -9,6 +9,7 @@ import {
 	FLASH_MESSAGE_PARAMS,
 	FlashMessage,
 } from './redirect-with-flash-message';
+import { untrack } from 'svelte';
 
 /**
  * Hook that monitors URL parameters for flash messages, displays them as toasts,
@@ -97,7 +98,7 @@ export const useCreateWorkspaceParams = (url: URL) => {
 			url: workspaceUrl,
 		});
 		if (workspace instanceof type.errors) return;
-		workspaceConfigs.create(workspace);
+		untrack(() => workspaceConfigs.create(workspace));
 
 		// Clean URL without navigation by replacing the current history entry
 		const cleanUrl = new URL(url);
