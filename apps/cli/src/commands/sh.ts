@@ -8,7 +8,8 @@ import { Log } from '@epicenter/opencode/util/log.ts';
 import { basename } from 'node:path';
 import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
-import { APPS } from '@repo/constants/node';
+
+const EPICENTER_SH_URL = 'https://epicenter.sh' as const;
 
 const log = Log.create({ service: 'sh' });
 
@@ -30,7 +31,7 @@ export const ShCommand = cmd({
 				alias: ['c'],
 				type: 'array',
 				describe: 'CORS allowed origins',
-				default: [APPS.SH.URL],
+				default: [EPICENTER_SH_URL],
 			})
 			.option('tunnel', {
 				alias: ['t'],
@@ -81,7 +82,7 @@ export const ShCommand = cmd({
 				console.log(`  Tunnel:     ${tunnelProcess.url}`);
 				if (args.open) {
 					const EPICENTER_ASSISTANT_URL =
-						`${APPS.SH.URL}/assistants` as const;
+						`${EPICENTER_SH_URL}/assistants` as const;
 					const currentDirName = basename(cwd);
 					const params = new URLSearchParams({
 						url: tunnelProcess.url,
