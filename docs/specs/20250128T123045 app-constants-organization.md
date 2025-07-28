@@ -62,6 +62,10 @@ export const APPS = {
 
 **Node.js contexts** (`src/env/node.ts`):
 ```typescript
+import { validateEnv } from '#env-schema';
+
+export const env = validateEnv(process.env);
+
 export const APPS = {
   AUTH: {
     URL: process.env.NODE_ENV === 'production'
@@ -79,13 +83,14 @@ export const APPS = {
 Now consumers import exactly what they need:
 
 ```typescript
-// Client-side code
+// Client-side code (just APPS)
 import { APPS } from '@repo/constants/env/vite';
 const authUrl = APPS.AUTH.URL;
 
-// Server-side code
-import { APPS } from '@repo/constants/env/node';
+// Server-side code (APPS + validated env)
+import { APPS, env } from '@repo/constants/env/node';
 const authUrl = APPS.AUTH.URL;
+const dbUrl = env.DATABASE_URL;
 ```
 
 ## Why Separate Files Matter
