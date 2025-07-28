@@ -8,7 +8,7 @@ import { Log } from '@epicenter/opencode/util/log.ts';
 import { basename } from 'node:path';
 import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
-import { APPS } from '@repo/constants/env/node';
+import { APPS } from '@repo/constants/node';
 
 const log = Log.create({ service: 'sh' });
 

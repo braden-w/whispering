@@ -1,5 +1,5 @@
 import { defineConfig } from 'drizzle-kit';
-import { env } from '@repo/constants/env';
+import { env } from '@repo/constants/node';
 
 export default defineConfig({
 	schema: './src/schema/*',

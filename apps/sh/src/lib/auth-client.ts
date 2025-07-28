@@ -1,8 +1,8 @@
-import { APPS } from '@repo/constants';
+import { APPS } from '@repo/constants/vite';
 import { createAuthClient } from 'better-auth/client';
 
 export const authClient = createAuthClient({
-	baseURL: APPS(import.meta.env).AUTH.URL,
+	baseURL: APPS.AUTH.URL,
 	fetchOptions: {
 		credentials: 'include',
 	},

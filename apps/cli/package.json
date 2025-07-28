@@ -14,12 +14,10 @@
 		"epicenter": "./src/index.ts"
 	},
 	"scripts": {
-		"dev": "infisical run -- bun run src/index.ts"
+		"dev": "infisical run -- bun run src/index.ts",
+		"typecheck": "tsc --noEmit"
 	},
-	"exports": {
-		".": "./src/index.ts"
-	},
-	"files": ["src"],
+	"files": ["src", "README.md", "package.json"],
 	"dependencies": {
 		"@epicenter/opencode": "latest",
 		"get-port": "^7.1.0",

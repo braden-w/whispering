@@ -2,13 +2,21 @@
 
 The unified command-line interface for the [epicenter.sh](https://epicenter.sh) ecosystem.
 
-## Installation
+## Requirements
+
+This CLI requires [Bun](https://bun.sh). Install it first:
 
 ```bash
-bun install -g @epicenter/cli
+curl -fsSL https://bun.sh/install | bash
 ```
 
 ## Usage
+
+No installation needed! Just use `bunx`:
+
+```bash
+bunx @epicenter/cli sh
+```
 
 ### Start OpenCode Server with Smart Defaults
 
@@ -16,7 +24,7 @@ The `sh` command provides intelligent opencode integration with automatic config
 
 ```bash
 # Simple usage with all smart defaults
-epicenter sh
+bunx @epicenter/cli sh
 
 # The CLI automatically:
 # - Discovers an available port (starting from 4096)
@@ -31,29 +39,29 @@ You can override any of the smart defaults:
 
 ```bash
 # Use a specific port
-epicenter sh --port 8080
+bunx @epicenter/cli sh --port 8080
 
 # Disable tunnel
-epicenter sh --no-tunnel
+bunx @epicenter/cli sh --no-tunnel
 
 # Add additional CORS origins
-epicenter sh --cors-origins https://epicenter.sh https://custom.domain.com
+bunx @epicenter/cli sh --cors-origins https://epicenter.sh https://custom.domain.com
 
 # Disable auto-opening browser
-epicenter sh --no-open
+bunx @epicenter/cli sh --no-open
 ```
 
 ### Examples
 
 ```bash
 # Default: Auto port discovery, tunnel, CORS, and auto-open
-epicenter sh
+bunx @epicenter/cli sh
 
 # Custom port with tunnel disabled
-epicenter sh --port 3000 --no-tunnel
+bunx @epicenter/cli sh --port 3000 --no-tunnel
 
 # Multiple CORS origins
-epicenter sh --cors-origins https://epicenter.sh https://localhost:3000
+bunx @epicenter/cli sh --cors-origins https://epicenter.sh https://localhost:3000
 ```
 
 ## How It Works

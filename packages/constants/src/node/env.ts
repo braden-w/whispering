@@ -1,7 +1,11 @@
-import { validateEnv } from '#env-schema';
+import { validateNodeEnv } from './schema.js';
+import { APPS as APPS_LAZY } from '../cloudflare/apps.js';
 
 /**
- * Build-time environment variables.
+ * Node.js build-time environment and URLs.
+ * Uses process.env.NODE_ENV for environment detection.
+ *
+ * For use in Node.js contexts (server-side applications).
  *
  * IMPORTANT: This file reads from `process.env` which is only available at build time.
  * DO NOT import this file inside Cloudflare Workers or other edge runtime environments
@@ -13,6 +17,6 @@ import { validateEnv } from '#env-schema';
  *
  * For runtime environments like Cloudflare Workers, access environment variables through
  * the platform's native env object (`c.env`) instead. It should already be typed as
- * `Env`, or you can pass it to the `validateEnv` function.
+ * `NodeEnv`, or you can pass it to the `validateNodeEnv` function.
  */
-export const env = validateEnv(process.env);
+export const env = validateNodeEnv(process.env);

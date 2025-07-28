@@ -1,9 +1,9 @@
-import { APPS } from '@repo/constants';
+import { APPS } from '@repo/constants/vite';
 
 /**
  * URL and pathname constants for the Whispering application
  */
-export const WHISPERING_URL = APPS(import.meta.env).AUDIO.URL;
+export const WHISPERING_URL = APPS.AUDIO.URL;
 
 export const WHISPERING_URL_WILDCARD = `${WHISPERING_URL}/*` as const;
 

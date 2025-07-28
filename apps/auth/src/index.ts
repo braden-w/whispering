@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { APP_URLS } from '@repo/constants';
+import { APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
 import { auth } from './lib/auth';
-import type { Env } from '@repo/constants/env-schema';
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: CloudflareEnv }>();
 
 app.use('/api/auth/*', (c, next) =>
 	cors({
