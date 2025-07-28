@@ -6,9 +6,9 @@
 		"#*": ["./src/*.ts", "./src/*/index.ts"]
 	},
 	"exports": {
-		"./vite": "./src/vite/index.ts",
-		"./node": "./src/node/index.ts",
-		"./cloudflare": "./src/cloudflare/index.ts"
+		"./vite": "./src/vite.ts",
+		"./node": "./src/node.ts",
+		"./cloudflare": "./src/cloudflare.ts"
 	},
 	"dependencies": {
 		"arktype": "^2.1.20"

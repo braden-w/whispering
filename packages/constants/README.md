@@ -1,49 +1,41 @@
 # @repo/constants
 
-Environment constants and configuration management for the monorepo.
+Environment-aware constants and configuration for all services in the ecosystem. This package provides a unified way to manage service URLs and environment-specific settings across different platforms (Node.js, Cloudflare Workers, and Vite).
 
-## Simple API - Grouped by Platform
+## Installation
 
-This package provides all constants and utilities grouped by runtime environment for clean imports:
-
-### Vite/Client Contexts
-
-Everything you need for client-side applications:
-
-```typescript
-import { APPS, APP_URLS, validateViteEnv, type ViteEnv } from '@repo/constants/vite';
-
-// App constants (uses import.meta.env.MODE)
-const authUrl = APPS.AUTH.URL;
-
-// URL arrays for CORS, etc.
-const corsOrigins = APP_URLS;
-
-// Environment validation (MODE only)
-const env = validateViteEnv(import.meta.env);
+```bash
+bun add @repo/constants
 ```
 
-### Node.js/Server Contexts
+## Architecture
 
-Everything you need for server-side applications:
+Files are separated by runtime context (`./cloudflare`, `./node`, `./vite`) to prevent import issues:
+
+- **`/node`**: For Node.js server environments. Build-time evaluation using `process.env.NODE_ENV`.
+- **`/cloudflare`**: For Cloudflare Workers. Runtime evaluation using `c.env` and lazily evaluating at runtime per request.
+- **`/vite`**: For Vite client applications. Build-time evaluation using `import.meta.env.MODE`.
+
+## Usage
+
+### Node.js
 
 ```typescript
-import { APPS, APP_URLS, env, validateNodeEnv, type NodeEnv } from '@repo/constants/node';
+import { APPS, APP_URLS, env } from '@repo/constants/node';
 
-// App constants (uses process.env.NODE_ENV)
-const authUrl = APPS.AUTH.URL;
+// Access pre-evaluated constants
+console.log(APPS.AUTH.URL); // 'http://localhost:8787' or 'https://auth.epicenter.so'
 
-// Environment variables (includes validation)
-const dbUrl = env.DATABASE_URL;
+// Use in CORS configuration
+const corsOptions = {
+  origin: APP_URLS
+};
 
-// URL arrays for CORS, etc.
-const corsOrigins = APP_URLS;
-
-// Custom validation
-const myEnv = validateNodeEnv(customEnvObject);
+// Access validated environment
+console.log(env.NODE_ENV); // 'development' or 'production'
 ```
 
-### Cloudflare Workers Contexts
+### Cloudflare Workers
 
 Everything you need for Cloudflare Workers with runtime environment:
 
@@ -67,63 +59,14 @@ app.get('/config', (c) => {
     return c.json({ authUrl });
 });
 ```
+### Vite
 
-## Design Principles
-
-### 1. Context Separation
-Files are separated by runtime context to prevent import issues:
-- Vite files use `import.meta.env.MODE`
-- Node files use `process.env.NODE_ENV`  
-- Never mix these in the same file
-
-### 2. Minimal Imports
-Each context gets exactly what it needs:
-- Client code: Just URL constants
-- Server code: Choose between constants-only or constants + validation
-- Validation: Context-specific schemas only
-
-### 3. Build-Time Resolution
-Constants resolve at build time, not runtime:
-- `MODE=production` → hardcoded production URLs
-- `NODE_ENV=production` → hardcoded production URLs
-- No runtime environment checking
-
-## Migration Guide
-
-### From Old Pattern
 ```typescript
-// OLD: Runtime function with env parameter
-import { APPS } from '@repo/constants';
-const url = APPS(import.meta.env).SH.URL;
+import { APPS, APP_URLS } from '@repo/constants/vite';
+
+// Use in your client application
+const authEndpoint = `${APPS.AUTH.URL}/api/login`;
+
+// Configure allowed origins
+const allowedOrigins = APP_URLS;
 ```
-
-### To New Pattern
-```typescript
-// NEW: Build-time constants
-import { APPS } from '@repo/constants/vite';
-const url = APPS.SH.URL;
-```
-
-## File Structure
-
-```
-src/
-├── vite/
-│   ├── index.ts       # Barrel export (import from @repo/constants/vite)
-│   ├── apps.ts        # APPS constants
-│   └── schema.ts      # ViteEnv validation
-├── node/
-│   ├── index.ts       # Barrel export (import from @repo/constants/node)
-│   ├── apps.ts        # APPS constants
-│   ├── schema.ts      # NodeEnv validation
-│   └── env.ts         # Full environment + validation
-└── cloudflare/
-    ├── index.ts       # Barrel export (import from @repo/constants/cloudflare)
-    └── apps.ts        # Runtime APPS functions
-```
-
-## Exports
-
-- `./vite` - All Vite/client constants and utilities
-- `./node` - All Node.js/server constants and utilities
-- `./cloudflare` - All Cloudflare Workers constants and utilities
