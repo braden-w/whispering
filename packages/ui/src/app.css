@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/manrope';
 
 @import 'tw-animate-css';
 
@@ -29,6 +30,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+	--font-sans: 'Manrope Variable', sans-serif;
 	--radius: 0.625rem;
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.129 0.042 264.695);
@@ -65,6 +67,7 @@
 }
 
 .dark {
+	--font-sans: 'Manrope Variable', sans-serif;
 	--background: oklch(0.129 0.042 264.695);
 	--foreground: oklch(0.984 0.003 247.858);
 	--card: oklch(0.208 0.042 265.755);
@@ -100,6 +103,7 @@
 }
 
 @theme inline {
+	--font-sans: var(--font-sans);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
