@@ -15,7 +15,7 @@ const nodeEnvSchema = type({
 	GITHUB_CLIENT_SECRET: 'string',
 });
 
-export function validateNodeEnv(env: unknown): Env {
+export function validateNodeEnv(env: unknown): NodeEnv {
 	const result = nodeEnvSchema(env);
 	if (result instanceof type.errors) throw new Error(result.summary);
 	return result;

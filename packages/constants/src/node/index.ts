@@ -4,5 +4,5 @@
  */
 
 export { APPS, APP_URLS } from './apps.js';
-export { validateNodeEnv, type Env, type NodeEnv } from './schema.js';
-export { APPS as APPS_WITH_ENV, env } from './env.js';
+export { validateNodeEnv, type NodeEnv } from './schema.js';
+export { env } from './env.js';

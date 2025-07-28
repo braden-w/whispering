@@ -1,5 +1,4 @@
 import { validateNodeEnv } from './schema.js';
-import { APPS as APPS_LAZY } from '../cloudflare/apps.js';
 
 /**
  * Node.js build-time environment and URLs.
