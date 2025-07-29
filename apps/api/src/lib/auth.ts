@@ -1,9 +1,9 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@repo/db';
-import { APPS, APP_URLS, type Env } from '@repo/constants/cloudflare';
+import { APPS, APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
 
-export const auth = (env: Env) =>
+export const auth = (env: CloudflareEnv) =>
 	betterAuth({
 		database: drizzleAdapter(db(env), { provider: 'pg' }),
 		socialProviders: {
@@ -20,3 +20,8 @@ export const auth = (env: Env) =>
 			},
 		},
 	});
+
+export type AuthType = {
+	user: ReturnType<typeof auth>['$Infer']['Session']['user'] | null;
+	session: ReturnType<typeof auth>['$Infer']['Session']['session'] | null;
+};
