@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { trpcServer } from '@hono/trpc-server';
 import { APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
-import { auth, type Session, type User, type AuthType } from './lib/auth';
-import { assistantConfigsRouter } from './routes/assistant-configs';
+import { auth, type Session, type User } from './lib/auth';
+import { appRouter } from './trpc/routers';
+import { createContext } from './trpc/context';
 
 const app = new Hono<{
 	Bindings: CloudflareEnv;
@@ -12,7 +14,6 @@ const app = new Hono<{
 	};
 }>();
 
-// CORS middleware for all routes
 app.use('*', (c, next) =>
 	cors({
 		origin: APP_URLS(c.env),
@@ -45,12 +46,18 @@ app.on(['POST', 'GET'], '/api/auth/*', (c) => {
 	return auth(c.env).handler(c.req.raw);
 });
 
-app.route('/api/assistant-configs', assistantConfigsRouter);
+app.use(
+	'/trpc/*',
+	trpcServer({
+		router: appRouter,
+		createContext: (opts, c) => createContext(c),
+	}),
+);
 
 app.get('/health', (c) => {
 	return c.json({ status: 'ok' });
 });
 
-export type ApiType = typeof app;
+export type { AppRouter } from './trpc/routers';
 
 export default app;
