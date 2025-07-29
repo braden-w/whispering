@@ -1,14 +1,13 @@
-import { TRPCError } from '@trpc/server';
-import { type } from 'arktype';
-import { eq, and, desc } from 'drizzle-orm';
-import { db } from '@repo/db';
 import {
 	assistantConfig,
 	assistantConfigInsertSchema,
 	assistantConfigUpdateSchema,
 } from '@repo/db/schema';
-import { router, authedProcedure } from '../index';
+import { TRPCError } from '@trpc/server';
+import { type } from 'arktype';
+import { and, desc, eq } from 'drizzle-orm';
 import { extractErrorMessage } from 'wellcrafted/error';
+import { authedProcedure, router } from '../index';
 
 export const assistantConfigRouter = router({
 	// List all assistant configs for user
