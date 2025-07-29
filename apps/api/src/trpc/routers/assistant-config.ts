@@ -85,7 +85,7 @@ export const assistantConfigRouter = router({
 
 	// Update assistant config
 	update: authedProcedure
-		.input(assistantConfigUpdateSchema.omit('userId').and({ id: 'string' }))
+		.input(assistantConfigUpdateSchema.omit('userId'))
 		.mutation(async ({ ctx, input }) => {
 			const { id, ...updateData } = input;
 

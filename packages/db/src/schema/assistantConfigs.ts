@@ -50,5 +50,7 @@ export type AssistantConfigSelect = typeof assistantConfigSelectSchema.infer;
 export const assistantConfigInsertSchema = createInsertSchema(assistantConfig);
 export type AssistantConfigInsert = typeof assistantConfigInsertSchema.infer;
 
-export const assistantConfigUpdateSchema = createUpdateSchema(assistantConfig);
+export const assistantConfigUpdateSchema = createUpdateSchema(
+	assistantConfig,
+).and({ userId: 'string', id: 'string' });
 export type AssistantConfigUpdate = typeof assistantConfigUpdateSchema.infer;
