@@ -1,6 +1,6 @@
 {
 	"name": "@epicenter/cli",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Epicenter CLI designed for seamless integration with opencode and epicenter.sh",
 	"type": "module",
 	"author": "Braden Wong <braden@epicenter.sh>",
