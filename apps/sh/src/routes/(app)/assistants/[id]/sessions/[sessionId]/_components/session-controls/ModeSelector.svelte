@@ -8,15 +8,15 @@
 	import { Code, Lightbulb, MessageSquare } from 'lucide-svelte';
 
 	let {
+		assistantConfig,
 		class: className,
 		onModeChange,
 		value = $bindable(),
-		assistantConfig,
 	}: {
+		assistantConfig: AssistantConfig;
 		class?: string;
 		onModeChange?: (mode: string) => void;
 		value?: string;
-		assistantConfig: AssistantConfig;
 	} = $props();
 
 	// Create query for modes

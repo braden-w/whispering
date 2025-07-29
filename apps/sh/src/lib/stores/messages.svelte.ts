@@ -44,13 +44,13 @@ export type Message = { info: MessageInfo; parts: Part[] };
  * ```
  */
 export function createMessageSubscriber({
+	assistant,
 	initialMessages,
 	sessionId,
-	assistant,
 }: {
+	assistant: Accessor<AssistantConfig>;
 	initialMessages: Accessor<Message[]>;
 	sessionId: Accessor<string>;
-	assistant: Accessor<AssistantConfig>;
 }) {
 	// Initialize with pre-fetched messages
 	let messages = $state<Message[]>(initialMessages());

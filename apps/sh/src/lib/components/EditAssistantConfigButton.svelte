@@ -1,8 +1,8 @@
 <script lang="ts">
 	import {
-		UpdateAssistantParams,
 		type AssistantConfig,
 		assistantConfigs,
+		UpdateAssistantParams,
 	} from '$lib/stores/assistant-configs.svelte';
 	import { Button } from '@repo/ui/button';
 	import { buttonVariants } from '@repo/ui/button';

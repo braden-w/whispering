@@ -11,15 +11,15 @@
 	import { CheckIcon, ChevronsUpDownIcon } from 'lucide-svelte';
 
 	let {
+		assistantConfig,
 		class: className,
 		placeholder = 'Select a model...',
 		value = $bindable<null | { modelId: string; providerId: string }>(null),
-		assistantConfig,
 	}: {
+		assistantConfig: AssistantConfig;
 		class?: string;
 		placeholder?: string;
 		value?: null | { modelId: string; providerId: string };
-		assistantConfig: AssistantConfig;
 	} = $props();
 
 	const combobox = useCombobox();

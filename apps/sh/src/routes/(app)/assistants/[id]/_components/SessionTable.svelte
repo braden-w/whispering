@@ -10,11 +10,11 @@
 	import ShareSessionButton from './ShareSessionButton.svelte';
 
 	let {
-		sessions,
 		assistantConfig,
+		sessions,
 	}: {
-		sessions: Session[];
 		assistantConfig: AssistantConfig;
+		sessions: Session[];
 	} = $props();
 
 	function getSessionHref(session: Session) {

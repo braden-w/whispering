@@ -13,9 +13,9 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { GitBranch } from 'lucide-svelte';
 
+	import AssistantConnectionBadge from './AssistantConnectionBadge.svelte';
 	import DeleteAssistantConfigButton from './DeleteAssistantConfigButton.svelte';
 	import EditAssistantConfigButton from './EditAssistantConfigButton.svelte';
-	import AssistantConnectionBadge from './AssistantConnectionBadge.svelte';
 
 	let {
 		columnVisibility,

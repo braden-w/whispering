@@ -10,11 +10,11 @@
 	import { toast } from 'svelte-sonner';
 
 	let {
-		session,
 		assistantConfig,
+		session,
 	}: {
-		session: Session;
 		assistantConfig: AssistantConfig;
+		session: Session;
 	} = $props();
 
 	let open = $state(false);
@@ -43,7 +43,7 @@
 			<AlertDialog.Action
 				onclick={() =>
 					deleteSessionMutation.mutate(
-						{ sessionId: session.id, assistantConfig },
+						{ assistantConfig, sessionId: session.id },
 						{
 							onError: (error) => {
 								toast.error(error.title, {

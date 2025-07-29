@@ -24,36 +24,6 @@ import { type } from 'arktype';
  */
 export const redirectTo = {
 	/**
-	 * Homepage redirect methods with flash message support
-	 * @example
-	 * ```typescript
-	 * if (!authorized) {
-	 *   redirectTo.homepage.error({
-	 *     title: 'Access Denied',
-	 *     description: 'You do not have permission to view this page'
-	 *   });
-	 *   return;
-	 * }
-	 * ```
-	 */
-	homepage: createRedirectMethods('/' as const),
-
-	/**
-	 * Assistants list redirect methods with flash message support
-	 * @example
-	 * ```typescript
-	 * if (!assistantConfig) {
-	 *   redirectTo.assistants.error({
-	 *     title: 'Assistant Not Found',
-	 *     description: 'The assistant you requested does not exist'
-	 *   });
-	 *   return;
-	 * }
-	 * ```
-	 */
-	assistants: createRedirectMethods('/assistants' as const),
-
-	/**
 	 * Creates redirect methods for a specific assistant
 	 * @param assistantId - The ID of the assistant to redirect to
 	 * @returns An object with redirect methods for different message types
@@ -77,6 +47,36 @@ export const redirectTo = {
 	 */
 	assistant: (assistantId: string) =>
 		createRedirectMethods(`/assistants/${assistantId}` as const),
+
+	/**
+	 * Assistants list redirect methods with flash message support
+	 * @example
+	 * ```typescript
+	 * if (!assistantConfig) {
+	 *   redirectTo.assistants.error({
+	 *     title: 'Assistant Not Found',
+	 *     description: 'The assistant you requested does not exist'
+	 *   });
+	 *   return;
+	 * }
+	 * ```
+	 */
+	assistants: createRedirectMethods('/assistants' as const),
+
+	/**
+	 * Homepage redirect methods with flash message support
+	 * @example
+	 * ```typescript
+	 * if (!authorized) {
+	 *   redirectTo.homepage.error({
+	 *     title: 'Access Denied',
+	 *     description: 'You do not have permission to view this page'
+	 *   });
+	 *   return;
+	 * }
+	 * ```
+	 */
+	homepage: createRedirectMethods('/' as const),
 } as const;
 
 /**

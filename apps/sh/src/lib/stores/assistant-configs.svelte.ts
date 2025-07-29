@@ -77,7 +77,7 @@ export const assistantConfigs = (() => {
 					const migrated = error.value.map((w) => {
 						// Migrate from old format if needed
 						if ('privatePort' in w || 'port' in w) {
-							const { privatePort, publicPort, port, username, ...rest } = w;
+							const { port, privatePort, publicPort, username, ...rest } = w;
 							// Remove port fields during migration
 							return rest;
 						}

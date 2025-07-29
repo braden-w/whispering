@@ -12,9 +12,9 @@
 	import { toast } from 'svelte-sonner';
 
 	let {
-		session,
 		assistantConfig,
-	}: { session: Session; assistantConfig: AssistantConfig } = $props();
+		session,
+	}: { assistantConfig: AssistantConfig; session: Session; } = $props();
 	let deleteDialogOpen = $state(false);
 
 	const shareSessionMutation = createMutation(
@@ -69,7 +69,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						unshareSessionMutation.mutate(
-							{ sessionId: session.id, assistantConfig },
+							{ assistantConfig, sessionId: session.id },
 							{
 								onError: (error) => {
 									toast.error(error.title, {
@@ -92,7 +92,7 @@
 					onclick={(e) => {
 						e.preventDefault();
 						shareSessionMutation.mutate(
-							{ sessionId: session.id, assistantConfig },
+							{ assistantConfig, sessionId: session.id },
 							{
 								onError: (error) => {
 									toast.error(error.title, {
@@ -130,7 +130,7 @@
 					<AlertDialog.Action
 						onclick={() =>
 							deleteSessionMutation.mutate(
-								{ sessionId: session.id, assistantConfig },
+								{ assistantConfig, sessionId: session.id },
 								{
 									onError: (error) => {
 										toast.error(error.title, {

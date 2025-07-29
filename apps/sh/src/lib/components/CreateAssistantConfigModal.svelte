@@ -4,12 +4,12 @@
 
 	import { createAssistantClient } from '$lib/client/client.gen';
 	import * as api from '$lib/client/sdk.gen';
-	import { settings } from '$lib/stores/settings.svelte';
 	import {
-		generateAvailablePort,
 		assistantConfigs,
+		generateAvailablePort,
 		URL,
 	} from '$lib/stores/assistant-configs.svelte';
+	import { settings } from '$lib/stores/settings.svelte';
 	import * as Accordion from '@repo/ui/accordion';
 	import { Button, type Props as ButtonProps } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';

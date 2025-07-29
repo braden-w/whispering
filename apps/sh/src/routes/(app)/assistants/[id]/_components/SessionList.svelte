@@ -5,11 +5,11 @@
 	import SessionTable from './SessionTable.svelte';
 
 	let {
-		sessions,
 		assistantConfig,
+		sessions,
 	}: {
-		sessions: Session[];
 		assistantConfig: AssistantConfig;
+		sessions: Session[];
 	} = $props();
 </script>
 

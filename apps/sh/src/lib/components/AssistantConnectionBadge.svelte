@@ -7,9 +7,9 @@
 	import { CheckCircle2, Loader2, XCircle } from 'lucide-svelte';
 
 	let {
-		refetchInterval = 2000,
 		assistantConfig,
-	}: { refetchInterval?: number; assistantConfig: AssistantConfig } = $props();
+		refetchInterval = 2000,
+	}: { assistantConfig: AssistantConfig; refetchInterval?: number; } = $props();
 
 	const assistantQuery = createQuery(() => ({
 		...rpc.assistants.getAssistant(() => assistantConfig).options(),

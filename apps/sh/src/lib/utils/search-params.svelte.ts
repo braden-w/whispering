@@ -1,15 +1,16 @@
 import { goto } from '$app/navigation';
-import { type } from 'arktype';
-import { toast } from 'svelte-sonner';
 import {
 	assistantConfigs,
 	CreateAssistantParams,
 } from '$lib/stores/assistant-configs.svelte';
+import { type } from 'arktype';
+import { untrack } from 'svelte';
+import { toast } from 'svelte-sonner';
+
 import {
 	FLASH_MESSAGE_PARAMS,
 	FlashMessage,
 } from './redirect-with-flash-message';
-import { untrack } from 'svelte';
 
 /**
  * Hook that monitors URL parameters for flash messages, displays them as toasts,
@@ -51,8 +52,8 @@ export function useFlashMessage(url: URL) {
 		cleanUrl.searchParams.delete(FLASH_MESSAGE_PARAMS.type);
 
 		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
-			replaceState: true,
 			noScroll: true,
+			replaceState: true,
 		});
 	});
 }
@@ -80,9 +81,9 @@ export const useCreateAssistantParams = (url: URL) => {
 	 */
 	const ASSISTANT_CREATE_PARAMS = {
 		name: 'name',
-		url: 'url',
-		port: 'port',
 		password: 'password',
+		port: 'port',
+		url: 'url',
 	} as const;
 
 	$effect(() => {
@@ -108,8 +109,8 @@ export const useCreateAssistantParams = (url: URL) => {
 		cleanUrl.searchParams.delete(ASSISTANT_CREATE_PARAMS.name);
 
 		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
-			replaceState: true,
 			noScroll: true,
+			replaceState: true,
 		});
 	});
 };

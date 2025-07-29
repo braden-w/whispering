@@ -1,10 +1,11 @@
+import type { BetterFetchResponse } from 'better-auth/client';
+
 import { authClient } from '$lib/auth-client';
+import { ShErr } from '$lib/result';
 import { APPS } from '@repo/constants/vite';
 import { Err, Ok } from 'wellcrafted/result';
 
 import { defineMutation, defineQuery } from './_client';
-import { ShErr } from '$lib/result';
-import type { BetterFetchResponse } from 'better-auth/client';
 
 function AuthToShErr<
 	T extends BetterFetchResponse<unknown, unknown, false>['error'],

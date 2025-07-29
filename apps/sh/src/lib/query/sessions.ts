@@ -64,11 +64,11 @@ export const deleteSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
-		sessionId,
 		assistantConfig,
+		sessionId,
 	}: {
-		sessionId: string;
 		assistantConfig: AssistantConfig;
+		sessionId: string;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 
@@ -95,11 +95,11 @@ export const shareSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
-		sessionId,
 		assistantConfig,
+		sessionId,
 	}: {
-		sessionId: string;
 		assistantConfig: AssistantConfig;
+		sessionId: string;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 
@@ -126,11 +126,11 @@ export const unshareSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
-		sessionId,
 		assistantConfig,
+		sessionId,
 	}: {
-		sessionId: string;
 		assistantConfig: AssistantConfig;
+		sessionId: string;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 
@@ -157,11 +157,11 @@ export const abortSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
-		sessionId,
 		assistantConfig,
+		sessionId,
 	}: {
-		sessionId: string;
 		assistantConfig: AssistantConfig;
+		sessionId: string;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 
@@ -188,13 +188,13 @@ export const initializeSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
+		assistantConfig,
 		body,
 		sessionId,
-		assistantConfig,
 	}: {
+		assistantConfig: AssistantConfig;
 		body?: { messageID: string; modelID: string; providerID: string };
 		sessionId: string;
-		assistantConfig: AssistantConfig;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 
@@ -222,13 +222,13 @@ export const summarizeSession = defineMutation({
 		});
 	},
 	resultMutationFn: async ({
+		assistantConfig,
 		body,
 		sessionId,
-		assistantConfig,
 	}: {
+		assistantConfig: AssistantConfig;
 		body: PostSessionByIdSummarizeData['body'];
 		sessionId: string;
-		assistantConfig: AssistantConfig;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 

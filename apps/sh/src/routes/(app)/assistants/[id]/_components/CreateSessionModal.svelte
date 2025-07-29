@@ -11,11 +11,11 @@
 	import { toast } from 'svelte-sonner';
 
 	let {
-		open = $bindable(false),
 		assistantConfig,
+		open = $bindable(false),
 	}: {
-		open?: boolean;
 		assistantConfig: AssistantConfig;
+		open?: boolean;
 	} = $props();
 
 	let title = $state('');

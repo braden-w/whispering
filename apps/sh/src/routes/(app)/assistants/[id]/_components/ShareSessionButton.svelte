@@ -9,11 +9,11 @@
 	import { toast } from 'svelte-sonner';
 
 	let {
-		session,
 		assistantConfig,
+		session,
 	}: {
-		session: Session;
 		assistantConfig: AssistantConfig;
+		session: Session;
 	} = $props();
 
 	const isShared = $derived(!!session.share?.url);
@@ -32,7 +32,7 @@
 		variant="ghost"
 		onclick={() =>
 			unshareSessionMutation.mutate(
-				{ sessionId: session.id, assistantConfig },
+				{ assistantConfig, sessionId: session.id },
 				{
 					onError: (error) => {
 						toast.error(error.title, {
@@ -55,7 +55,7 @@
 		variant="ghost"
 		onclick={() =>
 			shareSessionMutation.mutate(
-				{ sessionId: session.id, assistantConfig },
+				{ assistantConfig, sessionId: session.id },
 				{
 					onError: (error) => {
 						toast.error(error.title, {

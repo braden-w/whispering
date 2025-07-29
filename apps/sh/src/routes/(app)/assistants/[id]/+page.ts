@@ -15,5 +15,5 @@ export const load: PageLoad = async ({ params }) => {
 
 	if (error) redirect(302, '/assistants');
 
-	return { sessions, assistantConfig };
+	return { assistantConfig, sessions };
 };

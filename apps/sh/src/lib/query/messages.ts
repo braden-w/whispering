@@ -46,13 +46,13 @@ export const getMessagesBySessionId = (
 export const sendMessage = defineMutation({
 	mutationKey: ['sendMessage'],
 	resultMutationFn: async ({
+		assistantConfig,
 		body,
 		sessionId,
-		assistantConfig,
 	}: {
+		assistantConfig: AssistantConfig;
 		body: PostSessionByIdMessageData['body'];
 		sessionId: string;
-		assistantConfig: AssistantConfig;
 	}) => {
 		const client = createAssistantClient(assistantConfig);
 

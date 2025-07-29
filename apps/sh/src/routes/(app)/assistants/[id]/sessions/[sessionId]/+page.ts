@@ -96,11 +96,11 @@ export const load: PageLoad = async ({ params }) => {
 	}
 
 	return {
+		assistantConfig,
 		messages,
 		modes,
 		providers,
 		session,
 		sessionId: params.sessionId,
-		assistantConfig,
 	};
 };
