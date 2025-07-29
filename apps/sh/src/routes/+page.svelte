@@ -23,7 +23,7 @@
 	<div class="w-full mb-8">
 		<PMCommand
 			command="execute"
-			args={['@epicenter/cli', 'sh']}
+			args={['@epicenter/cli@latest', 'sh']}
 			agent="bun"
 			agents={['bun']}
 		/>
