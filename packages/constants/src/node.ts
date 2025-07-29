@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { createApps, createAppUrls } from './apps.js';
+import { createApps, createAppUrls } from '#apps';
 
 /**
  * Node.js/server-side constants and utilities
@@ -9,7 +9,7 @@ import { createApps, createAppUrls } from './apps.js';
 // Schema
 const nodeEnvSchema = type({
 	NODE_ENV: "'development' | 'production'",
-	
+
 	// Auth service
 	DATABASE_URL: 'string.url',
 	BETTER_AUTH_URL: 'string.url',
@@ -48,7 +48,7 @@ export const env = validateNodeEnv(process.env);
 /**
  * Node.js build-time URLs (derived from shared lazy functions).
  * Uses process.env.NODE_ENV for environment detection.
- * 
+ *
  * For use in Node.js contexts that only need URL constants.
  */
 export const APPS = createApps(env.NODE_ENV);
@@ -56,7 +56,7 @@ export const APPS = createApps(env.NODE_ENV);
 /**
  * All application URLs for Node.js contexts.
  * Derived from shared lazy function, evaluated at build time.
- * 
+ *
  * Primarily used for CORS configuration in server-side applications.
  */
 export const APP_URLS = createAppUrls(env.NODE_ENV);

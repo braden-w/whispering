@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { createApps, createAppUrls } from './apps.js';
+import { createApps, createAppUrls } from '#apps';
 
 /**
  * Vite/client-side constants and utilities
