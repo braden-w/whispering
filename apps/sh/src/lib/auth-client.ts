@@ -3,6 +3,7 @@ import { createAuthClient } from 'better-auth/client';
 
 export const authClient = createAuthClient({
 	baseURL: APPS.API.URL,
+	basePath: '/auth',
 	fetchOptions: {
 		credentials: 'include',
 	},
