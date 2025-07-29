@@ -16,5 +16,5 @@ export type TunnelProvider = 'cloudflare' | 'ngrok';
 export type TunnelService = {
 	ensureInstalled(): Promise<Result<void, TunnelServiceError>>;
 	startTunnel(port: number): Promise<Result<TunnelProcess, TunnelServiceError>>;
-	stopTunnel(process: TunnelProcess): Result<void, TunnelServiceError>;
+	stopTunnel(): Result<void, TunnelServiceError>;
 };

@@ -1,13 +1,14 @@
+import { bootstrap } from '@epicenter/opencode/cli/bootstrap.ts';
 import { Provider } from '@epicenter/opencode/provider/provider.ts';
 import { Server } from '@epicenter/opencode/server/server.ts';
 import { Share } from '@epicenter/opencode/share/share.ts';
-import { bootstrap } from '@epicenter/opencode/cli/bootstrap.ts';
-import { Cloudflared } from '@epicenter/opencode/util/cloudflared.ts';
-import { Browser } from '@epicenter/opencode/util/browser.ts';
 import { Log } from '@epicenter/opencode/util/log.ts';
-import { basename } from 'node:path';
-import { cmd } from '../utils/cmd';
 import getPort from 'get-port';
+import { basename } from 'node:path';
+import type { TunnelProcess, TunnelProvider } from '../services/tunnel';
+import { createTunnelService } from '../services/tunnel';
+import { BrowserServiceLive } from '../services/browser';
+import { cmd } from '../utils/cmd';
 
 const EPICENTER_SH_URL = 'https://epicenter.sh' as const;
 
@@ -20,7 +21,8 @@ export const ShCommand = cmd({
 			.option('port', {
 				alias: ['p'],
 				type: 'number',
-				describe: 'port to listen on (auto-discovered if not specified)',
+				describe:
+					'port to listen on (auto-discovered by default, if conflict, use --port)',
 			})
 			.option('hostname', {
 				type: 'string',
@@ -35,9 +37,10 @@ export const ShCommand = cmd({
 			})
 			.option('tunnel', {
 				alias: ['t'],
-				type: 'boolean',
-				describe: 'expose via Cloudflare tunnel (use --no-tunnel to disable)',
-				default: true,
+				type: 'string',
+				describe: 'enable tunnel with specified provider',
+				choices: ['cloudflare', 'ngrok'],
+				default: 'cloudflare',
 			})
 			.option('open', {
 				alias: ['o'],
@@ -57,7 +60,8 @@ export const ShCommand = cmd({
 			const hostname = args.hostname;
 			const port = await getPort({ port: args.port });
 			const corsOrigins = (args['cors-origins'] ?? []).map(String);
-			const tunnel = args.tunnel;
+			const tunnelProvider = args.tunnel as TunnelProvider;
+			const tunnelService = createTunnelService(tunnelProvider);
 
 			Share.init();
 			const server = Server.listen({
@@ -68,14 +72,33 @@ export const ShCommand = cmd({
 
 			const localUrl = `http://${server.hostname}:${server.port}`;
 
-			// Display server information
-			console.log('\n✓ Server running\n');
+			// Display server information with tunnel provider
+			if (tunnelProvider) {
+				console.log(`\n✓ Server running with ${tunnelProvider} tunnel\n`);
+			} else {
+				console.log('\n✓ Server running\n');
+			}
 			console.log(`  Local:      ${localUrl}`);
 
-			let tunnelProcess: Cloudflared.TunnelProcess | null = null;
-			if (tunnel) {
-				await Cloudflared.ensureInstalled();
-				tunnelProcess = await Cloudflared.startTunnel(port);
+			let tunnelProcess: TunnelProcess | null = null;
+			if (tunnelProvider) {
+				// Ensure the tunnel provider is installed
+				const { error: ensureInstalledError } =
+					await tunnelService.ensureInstalled();
+				if (ensureInstalledError) {
+					console.error(ensureInstalledError.message);
+					process.exit(1);
+				}
+
+				// Start the tunnel
+				const { data: newTunnel, error: tunnelError } =
+					await tunnelService.startTunnel(port);
+				if (tunnelError) {
+					console.error(tunnelError.message);
+					process.exit(1);
+				}
+
+				tunnelProcess = newTunnel;
 			}
 
 			if (tunnelProcess?.url) {
@@ -86,22 +109,27 @@ export const ShCommand = cmd({
 					const currentDirName = basename(cwd);
 					const params = new URLSearchParams({
 						url: tunnelProcess.url,
-						port: port.toString(),
 						name: currentDirName,
 					});
 					const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
 					console.log(`  Epicenter:  ${url}`);
 					console.log();
 					console.log('  Opening browser...');
-					await Browser.openUrl(url);
+					const { error: browserError } = await BrowserServiceLive.openUrl(url);
+					if (browserError) {
+						console.error('Failed to open browser:', browserError.message);
+					}
 				}
 			}
 			// Handle graceful shutdown
 			const cleanup = () => {
 				console.log('\nShutting down...');
 				server.stop();
-				if (tunnelProcess) {
-					Cloudflared.stopTunnel(tunnelProcess);
+				if (tunnelProcess && tunnelProvider) {
+					const { error: stopError } = tunnelService.stopTunnel();
+					if (stopError) {
+						console.error('Failed to stop tunnel:', stopError.message);
+					}
 				}
 				process.exit(0);
 			};

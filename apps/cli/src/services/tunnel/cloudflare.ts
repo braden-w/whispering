@@ -6,6 +6,8 @@ import type { Subprocess } from 'bun';
 import { extractErrorMessage } from 'wellcrafted/error';
 
 export function createTunnelServiceCloudflare(): TunnelService {
+	let currentTunnelProcess: TunnelProcess | null = null;
+
 	return {
 		async ensureInstalled() {
 			const { data: proc, error } = await tryAsync({
@@ -38,6 +40,11 @@ export function createTunnelServiceCloudflare(): TunnelService {
 		},
 
 		async startTunnel(port: number) {
+			// Stop any existing tunnel before starting a new one
+			if (currentTunnelProcess) {
+				this.stopTunnel();
+			}
+
 			const tunnelProc = spawn(
 				['cloudflared', 'tunnel', '--url', `http://localhost:${port}`],
 				{
@@ -52,7 +59,7 @@ export function createTunnelServiceCloudflare(): TunnelService {
 				},
 			);
 
-			const tunnelProcess: TunnelProcess = { process: tunnelProc, url: null };
+			currentTunnelProcess = { process: tunnelProc, url: null };
 
 			return new Promise(async (resolve) => {
 				try {
@@ -64,9 +71,9 @@ export function createTunnelServiceCloudflare(): TunnelService {
 						const urlMatch = data.match(
 							/\|\s+(https:\/\/[^|]+\.trycloudflare\.com)\s+\|/,
 						);
-						if (urlMatch) {
-							tunnelProcess.url = urlMatch[1].trim();
-							resolve(Ok(tunnelProcess));
+						if (urlMatch && currentTunnelProcess) {
+							currentTunnelProcess.url = urlMatch[1].trim();
+							resolve(Ok(currentTunnelProcess));
 							return;
 						}
 					}
@@ -75,40 +82,36 @@ export function createTunnelServiceCloudflare(): TunnelService {
 					const exitCode = await tunnelProc.exited;
 					if (exitCode !== 0) {
 						resolve(
-							Err(
-								TunnelServiceErr(
-									`Failed to start cloudflared tunnel on port ${port} (exit code: ${exitCode})`,
-								),
-							),
+							TunnelServiceErr({
+								message: `Failed to start cloudflared tunnel on port ${port} (exit code: ${exitCode})`,
+							}),
 						);
 					} else {
 						resolve(
-							Err(
-								TunnelServiceErr(
-									`Failed to start cloudflared tunnel on port ${port}`,
-								),
-							),
+							TunnelServiceErr({
+								message: `Failed to start cloudflared tunnel on port ${port}`,
+							}),
 						);
 					}
 				} catch (error) {
 					resolve(
-						Err(
-							TunnelServiceErr(
-								`Tunnel start error: ${
-									error instanceof Error ? error.message : String(error)
-								}`,
-							),
-						),
+						TunnelServiceErr({
+							message: `Tunnel start error: ${
+								error instanceof Error ? error.message : String(error)
+							}`,
+							cause: error,
+						}),
 					);
 				}
 			});
 		},
 
-		stopTunnel(process: TunnelProcess) {
+		stopTunnel() {
 			return trySync({
 				try: () => {
-					if (process.process && !process.process.killed) {
-						process.process.kill('SIGTERM');
+					if (currentTunnelProcess?.process && !currentTunnelProcess.process.killed) {
+						currentTunnelProcess.process.kill('SIGTERM');
+						currentTunnelProcess = null;
 					}
 				},
 				mapErr: (error) =>

@@ -5,6 +5,8 @@ import { spawn } from 'bun';
 import type { Subprocess } from 'bun';
 
 export function createTunnelServiceNgrok(): TunnelService {
+	let currentTunnelProcess: TunnelProcess | null = null;
+
 	return {
 		async ensureInstalled() {
 			const { data, error } = await tryAsync({
@@ -36,6 +38,11 @@ export function createTunnelServiceNgrok(): TunnelService {
 		},
 
 		async startTunnel(port: number) {
+			// Stop any existing tunnel before starting a new one
+			if (currentTunnelProcess) {
+				this.stopTunnel();
+			}
+
 			const tunnelProc = spawn(
 				['ngrok', 'http', '--log=stdout', '--log-format=json', port.toString()],
 				{
@@ -50,7 +57,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 				},
 			);
 
-			const tunnelProcess: TunnelProcess = { process: tunnelProc, url: null };
+			currentTunnelProcess = { process: tunnelProc, url: null };
 
 			return new Promise(async (resolve) => {
 				try {
@@ -64,20 +71,18 @@ export function createTunnelServiceNgrok(): TunnelService {
 								const json = JSON.parse(line);
 
 								// Found the tunnel URL
-								if (json.msg === 'started tunnel' && json.url) {
-									tunnelProcess.url = json.url;
-									resolve(Ok(tunnelProcess));
+								if (json.msg === 'started tunnel' && json.url && currentTunnelProcess) {
+									currentTunnelProcess.url = json.url;
+									resolve(Ok(currentTunnelProcess));
 									return;
 								}
 
 								// Check for errors
 								if (json.err && json.err !== '<nil>') {
 									resolve(
-										Err(
-											TunnelServiceErr(
-												`Failed to start ngrok tunnel on port ${port}: ${json.err}`,
-											),
-										),
+										TunnelServiceErr({
+											message: `Failed to start ngrok tunnel on port ${port}: ${json.err}`,
+										}),
 									);
 									return;
 								}
@@ -90,34 +95,37 @@ export function createTunnelServiceNgrok(): TunnelService {
 					// If we get here, process ended without URL
 					const exitCode = await tunnelProc.exited;
 					resolve(
-						Err(
-							TunnelServiceErr(
-								`ngrok process ended without providing URL (exit code: ${exitCode})`,
-							),
-						),
+						TunnelServiceErr({
+							message: `ngrok process ended without providing URL (exit code: ${exitCode})`,
+						}),
 					);
 				} catch (error) {
 					resolve(
-						Err(
-							TunnelServiceErr(
-								`Tunnel start error: ${
-									error instanceof Error ? error.message : String(error)
-								}`,
-							),
-						),
+						TunnelServiceErr({
+							message: `Tunnel start error: ${
+								error instanceof Error ? error.message : String(error)
+							}`,
+							cause: error,
+						}),
 					);
 				}
 			});
 		},
 
-		stopTunnel(process: TunnelProcess) {
-			return trySync(() => {
-				if (process.process && !process.process.killed) {
-					process.process.kill('SIGTERM');
-				}
-			}).mapErr((error) =>
-				TunnelServiceErr(`Failed to stop tunnel: ${error.message}`),
-			);
+		stopTunnel() {
+			return trySync({
+				try: () => {
+					if (currentTunnelProcess?.process && !currentTunnelProcess.process.killed) {
+						currentTunnelProcess.process.kill('SIGTERM');
+						currentTunnelProcess = null;
+					}
+				},
+				mapErr: (error) =>
+					TunnelServiceErr({
+						message: `Failed to stop tunnel: ${error instanceof Error ? error.message : String(error)}`,
+						cause: error,
+					}),
+			});
 		},
 	};
 }
