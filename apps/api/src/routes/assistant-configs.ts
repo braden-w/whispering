@@ -2,21 +2,25 @@ import { Hono } from 'hono';
 import { validator } from 'hono/validator';
 import { createFactory } from 'hono/factory';
 import { type } from 'arktype';
-import { customAlphabet } from 'nanoid';
 import { eq, and, desc } from 'drizzle-orm';
 import { db } from '@repo/db';
 import {
 	assistantConfig,
 	assistantConfigInsertSchema,
 	assistantConfigUpdateSchema,
-	type AssistantConfigInsert,
-	type AssistantConfigUpdate,
 } from '@repo/db/schema';
 import type { CloudflareEnv } from '@repo/constants/cloudflare';
 import type { Session, User } from '../lib/auth';
+import { createTaggedError } from 'wellcrafted/error';
+import { Err, Ok, tryAsync } from 'wellcrafted/result';
 
-// Custom nanoid generator: lowercase letters + numbers, 12 chars
+// Create tagged errors for assistant config operations
+const { AssistantConfigError, AssistantConfigErr } = createTaggedError(
+	'AssistantConfigError',
+);
+export type AssistantConfigError = ReturnType<typeof AssistantConfigError>;
 
+// Create factory for type-safe middleware
 const factory = createFactory<{
 	Bindings: CloudflareEnv;
 	Variables: {
@@ -25,6 +29,7 @@ const factory = createFactory<{
 	};
 }>();
 
+// Auth middleware
 const requireAuth = factory.createMiddleware(async (c, next) => {
 	if (!c.var.user || !c.var.session) {
 		return c.json({ error: 'Unauthorized' }, 401);
@@ -42,17 +47,28 @@ export const assistantConfigsRouter = new Hono<{
 
 assistantConfigsRouter.use('*', requireAuth);
 
+// List all assistant configs for user
 assistantConfigsRouter.get('/', async (c) => {
 	const userId = c.var.user.id;
 
-	const configs = await db(c.env).query.assistantConfig.findMany({
-		where: eq(assistantConfig.userId, userId),
-		orderBy: [desc(assistantConfig.lastAccessedAt)],
+	const { data: configs, error } = await tryAsync({
+		try: () =>
+			db(c.env).query.assistantConfig.findMany({
+				where: eq(assistantConfig.userId, userId),
+				orderBy: [desc(assistantConfig.lastAccessedAt)],
+			}),
+		mapErr: (error) =>
+			AssistantConfigErr({
+				message: 'Failed to list assistant configurations',
+				cause: error,
+			}),
 	});
 
-	return c.json(configs);
+	if (error) return c.json(Err(error));
+	return c.json(Ok(configs));
 });
 
+// Create new assistant config
 assistantConfigsRouter.post(
 	'/',
 	validator('json', (value, c) => {
@@ -69,55 +85,90 @@ assistantConfigsRouter.post(
 		const userId = c.var.user.id;
 		const validatedData = c.req.valid('json');
 
-		try {
-			const [newConfig] = await db(c.env)
-				.insert(assistantConfig)
-				.values({ ...validatedData, userId })
-				.returning();
-
-			return c.json(newConfig, 201);
-		} catch (error) {
-			// Check for unique constraint violation
-			if (error instanceof Error && 'code' in error) {
-				const dbError = error as { code: string; constraint?: string };
-				if (
-					dbError.code === '23505' &&
-					dbError.constraint === 'user_url_unique'
-				) {
-					return c.json(
-						{ error: 'You already have an assistant with this URL' },
-						409,
-					);
+		const { data: newConfig, error } = await tryAsync({
+			try: () =>
+				db(c.env)
+					.insert(assistantConfig)
+					.values({ ...validatedData, userId })
+					.returning()
+					.then(([config]) => config),
+			mapErr: (error) => {
+				// Check for unique constraint violation
+				if (error instanceof Error && 'code' in error) {
+					const dbError = error as { code: string; constraint?: string };
+					if (
+						dbError.code === '23505' &&
+						dbError.constraint === 'user_url_unique'
+					) {
+						return AssistantConfigErr({
+							message: 'You already have an assistant with this URL',
+							cause: error,
+							context: { code: 'UNIQUE_CONSTRAINT' },
+						});
+					}
 				}
+				return AssistantConfigErr({
+					message: 'Failed to create assistant configuration',
+					cause: error,
+				});
+			},
+		});
+
+		if (error) {
+			if (error.context?.code === 'UNIQUE_CONSTRAINT') {
+				return c.json(Err(error), 409);
 			}
-			throw error;
+			return c.json(Err(error));
 		}
+
+		return c.json(Ok(newConfig), 201);
 	},
 );
 
+// Get specific assistant config
 assistantConfigsRouter.get('/:id', async (c) => {
 	const userId = c.var.user.id;
 	const configId = c.req.param('id');
 
-	const config = await db(c.env).query.assistantConfig.findFirst({
-		where: and(
-			eq(assistantConfig.id, configId),
-			eq(assistantConfig.userId, userId),
-		),
+	const { data: config, error } = await tryAsync({
+		try: () =>
+			db(c.env).query.assistantConfig.findFirst({
+				where: and(
+					eq(assistantConfig.id, configId),
+					eq(assistantConfig.userId, userId),
+				),
+			}),
+		mapErr: (error) =>
+			AssistantConfigErr({
+				message: 'Failed to fetch assistant configuration',
+				cause: error,
+			}),
 	});
 
+	if (error) return c.json(Err(error));
+
 	if (!config) {
-		return c.json({ error: 'Assistant config not found' }, 404);
+		return c.json(
+			Err(
+				AssistantConfigError({
+					message: 'Assistant configuration not found',
+					cause: new Error('NOT_FOUND'),
+				}),
+			),
+			404,
+		);
 	}
 
+	// Update last accessed timestamp
 	await db(c.env)
 		.update(assistantConfig)
 		.set({ lastAccessedAt: new Date() })
 		.where(eq(assistantConfig.id, configId));
 
-	return c.json(config);
+	return c.json(Ok(config));
 });
 
+// Update assistant config
 assistantConfigsRouter.put(
 	'/:id',
 	validator('json', (value, c) => {
@@ -135,55 +186,104 @@ assistantConfigsRouter.put(
 		const configId = c.req.param('id');
 		const validatedData = c.req.valid('json');
 
-		try {
-			const [updated] = await db(c.env)
-				.update(assistantConfig)
-				.set({ ...validatedData, userId })
+		const { data: updatedConfigs, error } = await tryAsync({
+			try: () =>
+				db(c.env)
+					.update(assistantConfig)
+					.set({ ...validatedData, userId })
+					.where(
+						and(
+							eq(assistantConfig.id, configId),
+							eq(assistantConfig.userId, userId),
+						),
+					)
+					.returning(),
+			mapErr: (error) => {
+				// Check for unique constraint violation
+				if (error instanceof Error && 'code' in error) {
+					const dbError = error as { code: string; constraint?: string };
+					if (
+						dbError.code === '23505' &&
+						dbError.constraint === 'user_url_unique'
+					) {
+						return AssistantConfigErr({
+							message: 'You already have an assistant with this URL',
+							cause: error,
+							context: { code: 'UNIQUE_CONSTRAINT' },
+						});
+					}
+				}
+				return AssistantConfigErr({
+					message: 'Failed to update assistant configuration',
+					cause: error,
+				});
+			},
+		});
+
+		if (error) {
+			if (error.context?.code === 'UNIQUE_CONSTRAINT') {
+				return c.json(Err(error), 409);
+			}
+			return c.json(Err(error));
+		}
+
+		const [updated] = updatedConfigs || [];
+		if (!updated) {
+			return c.json(
+				Err(
+					AssistantConfigError({
+						message: 'Assistant configuration not found',
+						cause: new Error('NOT_FOUND'),
+					}),
+				),
+				404,
+			);
+		}
+
+		return c.json(Ok(updated));
+	},
+);
+
+// Delete assistant config
+assistantConfigsRouter.delete('/:id', async (c) => {
+	const userId = c.var.user.id;
+	const configId = c.req.param('id');
+
+	const { data: deletedConfigs, error } = await tryAsync({
+		try: () =>
+			db(c.env)
+				.delete(assistantConfig)
 				.where(
 					and(
 						eq(assistantConfig.id, configId),
 						eq(assistantConfig.userId, userId),
 					),
 				)
-				.returning();
+				.returning(),
+		mapErr: (error) =>
+			AssistantConfigErr({
+				message: 'Failed to delete assistant configuration',
+				cause: error,
+			}),
+	});
 
-			if (!updated) {
-				return c.json({ error: 'Assistant config not found' }, 404);
-			}
+	if (error) return c.json(Err(error));
 
-			return c.json(updated);
-		} catch (error) {
-			if (error instanceof Error && 'code' in error) {
-				const dbError = error as { code: string; constraint?: string };
-				if (
-					dbError.code === '23505' &&
-					dbError.constraint === 'user_url_unique'
-				) {
-					return c.json(
-						{ error: 'You already have an assistant with this URL' },
-						409,
-					);
-				}
-			}
-			throw error;
-		}
-	},
-);
-
-assistantConfigsRouter.delete('/:id', async (c) => {
-	const userId = c.var.user.id;
-	const configId = c.req.param('id');
-
-	const [deleted] = await db(c.env)
-		.delete(assistantConfig)
-		.where(
-			and(eq(assistantConfig.id, configId), eq(assistantConfig.userId, userId)),
-		)
-		.returning();
-
+	const [deleted] = deletedConfigs || [];
 	if (!deleted) {
-		return c.json({ error: 'Assistant config not found' }, 404);
+		return c.json(
+			Err(
+				AssistantConfigError({
+					message: 'Assistant configuration not found',
+					cause: new Error('NOT_FOUND'),
+				}),
+			),
+			404,
+		);
 	}
 
-	return c.json({ message: 'Assistant config deleted successfully' });
+	return c.json(Ok({ message: 'Assistant config deleted successfully' }));
 });
+
+// Export route type for RPC if needed
+export type AssistantConfigsRouter = typeof assistantConfigsRouter;
