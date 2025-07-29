@@ -3,10 +3,12 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:push": "drizzle-kit push",
-		"db:studio": "drizzle-kit studio"
+		"db:generate": "infisical run -- drizzle-kit generate",
+		"db:drop": "infisical run -- drizzle-kit drop",
+		"db:studio": "infisical run -- drizzle-kit studio",
+		"db:migrate:dev": "infisical run --env=dev -- drizzle-kit migrate",
+		"db:migrate:prod": "infisical run --env=prod -- drizzle-kit migrate",
+		"db:migrate:all": "bun run db:migrate:dev && bun run db:migrate:prod"
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.1",
