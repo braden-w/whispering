@@ -2,6 +2,7 @@ import { Ok, Err, trySync, tryAsync } from 'wellcrafted/result';
 import type { TunnelService, TunnelProcess } from './types';
 import { TunnelServiceErr } from './types';
 import { spawn, $ } from 'bun';
+import { type } from 'arktype';
 
 export function createTunnelServiceNgrok(): TunnelService {
 	let currentTunnelProcess: TunnelProcess | null = null;
@@ -29,81 +30,83 @@ export function createTunnelServiceNgrok(): TunnelService {
 				this.stopTunnel();
 			}
 
-			const tunnelProc = spawn(
-				['ngrok', 'http', '--log=stdout', '--log-format=json', port.toString()],
-				{
-					stdin: 'ignore',
-					stdout: 'pipe',
-					stderr: 'pipe',
-					onExit(_proc, exitCode, signalCode, error) {
-						if (error) {
-							console.error('Tunnel process error:', error.message);
-						}
-					},
-				},
-			);
+			return tryAsync({
+				try: async () => {
+					const tunnelProc = spawn(
+						[
+							'ngrok',
+							'http',
+							'--log=stdout',
+							'--log-format=json',
+							port.toString(),
+						],
+						{
+							stdin: 'ignore',
+							stdout: 'pipe',
+							stderr: 'pipe',
+						},
+					);
 
-			currentTunnelProcess = { process: tunnelProc, url: null };
+					currentTunnelProcess = { process: tunnelProc, url: null };
 
-			return new Promise(async (resolve) => {
-				try {
 					// Read stdout for JSON messages
+					const decoder = new TextDecoder();
 					for await (const chunk of tunnelProc.stdout as any) {
-						const data = new TextDecoder().decode(chunk);
+						const data = decoder.decode(chunk);
 						const lines = data.split('\n').filter((line) => line.trim());
 
 						for (const line of lines) {
-							try {
-								const json = JSON.parse(line);
+							const json = type('string.json.parse').to({
+								msg: 'string',
+								url: 'string',
+								err: 'string',
+							})(line);
 
-								// Found the tunnel URL
-								if (json.msg === 'started tunnel' && json.url && currentTunnelProcess) {
+							if (json instanceof type.errors) {
+								// Skip errors related to JSON parsing
+								continue;
+							}
+
+							// Found the tunnel URL
+							if (json.msg === 'started tunnel' && json.url) {
+								if (currentTunnelProcess) {
 									currentTunnelProcess.url = json.url;
-									resolve(Ok(currentTunnelProcess));
-									return;
+									return currentTunnelProcess;
 								}
+							}
 
-								// Check for errors
-								if (json.err && json.err !== '<nil>') {
-									resolve(
-										TunnelServiceErr({
-											message: `Failed to start ngrok tunnel on port ${port}: ${json.err}`,
-											cause: json.err,
-										}),
-									);
-									return;
-								}
-							} catch (e) {
-								// Not JSON, ignore
+							// Check for errors
+							if (json.err && json.err !== '<nil>') {
+								throw new Error(`${json.err}`);
 							}
 						}
 					}
 
-					// If we get here, process ended without URL
+					// Stream ended without finding URL
 					const exitCode = await tunnelProc.exited;
-					resolve(
-						TunnelServiceErr({
-							message: `ngrok process ended without providing URL (exit code: ${exitCode})`,
-							cause: exitCode,
-						}),
+					throw new Error(
+						`ngrok process ended without providing URL${
+							exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
+						}`,
 					);
-				} catch (error) {
-					resolve(
-						TunnelServiceErr({
-							message: `Tunnel start error: ${
-								error instanceof Error ? error.message : String(error)
-							}`,
-							cause: error,
-						}),
-					);
-				}
+				},
+				mapErr: (error) =>
+					TunnelServiceErr({
+						message: `Failed to start ngrok tunnel on port ${port}: ${
+							error instanceof Error ? error.message : String(error)
+						}`,
+						cause: error,
+					}),
 			});
 		},
 
 		stopTunnel() {
 			return trySync({
 				try: () => {
-					if (currentTunnelProcess?.process && !currentTunnelProcess.process.killed) {
+					if (
+						currentTunnelProcess?.process &&
+						!currentTunnelProcess.process.killed
+					) {
 						currentTunnelProcess.process.kill('SIGTERM');
 						currentTunnelProcess = null;
 					}

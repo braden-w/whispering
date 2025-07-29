@@ -31,64 +31,51 @@ export function createTunnelServiceCloudflare(): TunnelService {
 				this.stopTunnel();
 			}
 
-			const tunnelProc = spawn(
-				['cloudflared', 'tunnel', '--url', `http://localhost:${port}`],
-				{
-					stdin: 'ignore',
-					stdout: 'ignore',
-					stderr: 'pipe',
-					onExit(_proc, exitCode, signalCode, error) {
-						if (error) {
-							console.error('Tunnel process error:', error.message);
-						}
-					},
-				},
-			);
+			return tryAsync({
+				try: async () => {
+					const tunnelProc = spawn(
+						['cloudflared', 'tunnel', '--url', `http://localhost:${port}`],
+						{
+							stdin: 'ignore',
+							stdout: 'ignore',
+							stderr: 'pipe',
+						},
+					);
 
-			currentTunnelProcess = { process: tunnelProc, url: null };
+					currentTunnelProcess = { process: tunnelProc, url: null };
 
-			return new Promise(async (resolve) => {
-				try {
 					// Read from stderr stream to parse tunnel URL
+					const decoder = new TextDecoder();
 					for await (const chunk of tunnelProc.stderr as any) {
-						const data = new TextDecoder().decode(chunk);
-
+						const data = decoder.decode(chunk);
+						
 						// Parse the tunnel URL from the box format
 						const urlMatch = data.match(
 							/\|\s+(https:\/\/[^|]+\.trycloudflare\.com)\s+\|/,
 						);
-						if (urlMatch && currentTunnelProcess) {
-							currentTunnelProcess.url = urlMatch[1].trim();
-							resolve(Ok(currentTunnelProcess));
-							return;
+						
+						if (urlMatch?.[1]) {
+							const url = urlMatch[1].trim();
+							if (currentTunnelProcess) {
+								currentTunnelProcess.url = url;
+								return currentTunnelProcess;
+							}
 						}
 					}
 
-					// If we reach here, the stream ended without finding URL
+					// Stream ended without finding URL
 					const exitCode = await tunnelProc.exited;
-					if (exitCode !== 0) {
-						resolve(
-							TunnelServiceErr({
-								message: `Failed to start cloudflared tunnel on port ${port} (exit code: ${exitCode})`,
-							}),
-						);
-					} else {
-						resolve(
-							TunnelServiceErr({
-								message: `Failed to start cloudflared tunnel on port ${port}`,
-							}),
-						);
-					}
-				} catch (error) {
-					resolve(
-						TunnelServiceErr({
-							message: `Tunnel start error: ${
-								error instanceof Error ? error.message : String(error)
-							}`,
-							cause: error,
-						}),
+					throw new Error(
+						`Failed to start cloudflared tunnel on port ${port}${
+							exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
+						}`,
 					);
-				}
+				},
+				mapErr: (error) => 
+					TunnelServiceErr({
+						message: error instanceof Error ? error.message : String(error),
+						cause: error,
+					}),
 			});
 		},
 
