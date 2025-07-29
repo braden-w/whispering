@@ -11,7 +11,7 @@ import {
 } from '@repo/db/schema';
 import type { CloudflareEnv } from '@repo/constants/cloudflare';
 import type { Session, User } from '../lib/auth';
-import { createTaggedError } from 'wellcrafted/error';
+import { createTaggedError, extractErrorMessage } from 'wellcrafted/error';
 import { Err, Ok, tryAsync } from 'wellcrafted/result';
 
 // Create tagged errors for assistant config operations
@@ -59,12 +59,12 @@ assistantConfigsRouter.get('/', async (c) => {
 			}),
 		mapErr: (error) =>
 			AssistantConfigErr({
-				message: 'Failed to list assistant configurations',
+				message: `Failed to list assistant configurations: ${extractErrorMessage(error)}`,
 				cause: error,
 			}),
 	});
 
-	if (error) return c.json(Err(error));
+	if (error) return c.json(Err(error), 500);
 	return c.json(Ok(configs));
 });
 
@@ -92,34 +92,14 @@ assistantConfigsRouter.post(
 					.values({ ...validatedData, userId })
 					.returning()
 					.then(([config]) => config),
-			mapErr: (error) => {
-				// Check for unique constraint violation
-				if (error instanceof Error && 'code' in error) {
-					const dbError = error as { code: string; constraint?: string };
-					if (
-						dbError.code === '23505' &&
-						dbError.constraint === 'user_url_unique'
-					) {
-						return AssistantConfigErr({
-							message: 'You already have an assistant with this URL',
-							cause: error,
-							context: { code: 'UNIQUE_CONSTRAINT' },
-						});
-					}
-				}
-				return AssistantConfigErr({
-					message: 'Failed to create assistant configuration',
+			mapErr: (error) =>
+				AssistantConfigErr({
+					message: `Failed to create assistant configuration: ${extractErrorMessage(error)}`,
 					cause: error,
-				});
-			},
+				}),
 		});
 
-		if (error) {
-			if (error.context?.code === 'UNIQUE_CONSTRAINT') {
-				return c.json(Err(error), 409);
-			}
-			return c.json(Err(error));
-		}
+		if (error) return c.json(Err(error), 500);
 
 		return c.json(Ok(newConfig), 201);
 	},
@@ -140,12 +120,12 @@ assistantConfigsRouter.get('/:id', async (c) => {
 			}),
 		mapErr: (error) =>
 			AssistantConfigErr({
-				message: 'Failed to fetch assistant configuration',
+				message: `Failed to fetch assistant configuration: ${extractErrorMessage(error)}`,
 				cause: error,
 			}),
 	});
 
-	if (error) return c.json(Err(error));
+	if (error) return c.json(Err(error), 500);
 
 	if (!config) {
 		return c.json(
@@ -198,34 +178,14 @@ assistantConfigsRouter.put(
 						),
 					)
 					.returning(),
-			mapErr: (error) => {
-				// Check for unique constraint violation
-				if (error instanceof Error && 'code' in error) {
-					const dbError = error as { code: string; constraint?: string };
-					if (
-						dbError.code === '23505' &&
-						dbError.constraint === 'user_url_unique'
-					) {
-						return AssistantConfigErr({
-							message: 'You already have an assistant with this URL',
-							cause: error,
-							context: { code: 'UNIQUE_CONSTRAINT' },
-						});
-					}
-				}
-				return AssistantConfigErr({
-					message: 'Failed to update assistant configuration',
+			mapErr: (error) =>
+				AssistantConfigErr({
+					message: `Failed to update assistant configuration: ${extractErrorMessage(error)}`,
 					cause: error,
-				});
-			},
+				}),
 		});
 
-		if (error) {
-			if (error.context?.code === 'UNIQUE_CONSTRAINT') {
-				return c.json(Err(error), 409);
-			}
-			return c.json(Err(error));
-		}
+		if (error) return c.json(Err(error), 500);
 
 		const [updated] = updatedConfigs || [];
 		if (!updated) {
@@ -262,12 +222,12 @@ assistantConfigsRouter.delete('/:id', async (c) => {
 				.returning(),
 		mapErr: (error) =>
 			AssistantConfigErr({
-				message: 'Failed to delete assistant configuration',
+				message: `Failed to delete assistant configuration: ${extractErrorMessage(error)}`,
 				cause: error,
 			}),
 	});
 
-	if (error) return c.json(Err(error));
+	if (error) return c.json(Err(error), 500);
 
 	const [deleted] = deletedConfigs || [];
 	if (!deleted) {
