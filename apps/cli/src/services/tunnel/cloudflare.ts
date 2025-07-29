@@ -1,8 +1,7 @@
 import { Ok, Err, trySync, tryAsync } from 'wellcrafted/result';
 import type { TunnelService, TunnelProcess } from './types';
 import { TunnelServiceErr } from './types';
-import { spawn } from 'bun';
-import type { Subprocess } from 'bun';
+import { spawn, $ } from 'bun';
 import { extractErrorMessage } from 'wellcrafted/error';
 
 export function createTunnelServiceCloudflare(): TunnelService {
@@ -10,15 +9,9 @@ export function createTunnelServiceCloudflare(): TunnelService {
 
 	return {
 		async ensureInstalled() {
-			const { data: proc, error } = await tryAsync({
+			const { error } = await tryAsync({
 				try: async () => {
-					const proc = spawn(['cloudflared', '--version'], {
-						stdin: 'ignore',
-						stdout: 'ignore',
-						stderr: 'ignore',
-					});
-					await proc.exited;
-					return proc;
+					await $`cloudflared --version`.quiet();
 				},
 				mapErr: (error) => {
 					return TunnelServiceErr({
@@ -29,13 +22,6 @@ export function createTunnelServiceCloudflare(): TunnelService {
 			});
 
 			if (error) return Err(error);
-
-			if (proc.exitCode !== 0) {
-				return TunnelServiceErr({
-					message: `cloudflared is not installed.\n\n${getInstallInstructions()}`,
-					cause: proc.exitCode,
-				});
-			}
 			return Ok(undefined);
 		},
 
@@ -109,7 +95,10 @@ export function createTunnelServiceCloudflare(): TunnelService {
 		stopTunnel() {
 			return trySync({
 				try: () => {
-					if (currentTunnelProcess?.process && !currentTunnelProcess.process.killed) {
+					if (
+						currentTunnelProcess?.process &&
+						!currentTunnelProcess.process.killed
+					) {
 						currentTunnelProcess.process.kill('SIGTERM');
 						currentTunnelProcess = null;
 					}

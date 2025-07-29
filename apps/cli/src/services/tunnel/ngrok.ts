@@ -1,23 +1,16 @@
 import { Ok, Err, trySync, tryAsync } from 'wellcrafted/result';
 import type { TunnelService, TunnelProcess } from './types';
 import { TunnelServiceErr } from './types';
-import { spawn } from 'bun';
-import type { Subprocess } from 'bun';
+import { spawn, $ } from 'bun';
 
 export function createTunnelServiceNgrok(): TunnelService {
 	let currentTunnelProcess: TunnelProcess | null = null;
 
 	return {
 		async ensureInstalled() {
-			const { data, error } = await tryAsync({
+			const { error } = await tryAsync({
 				try: async () => {
-					const proc = spawn(['ngrok', 'version'], {
-						stdin: 'ignore',
-						stdout: 'ignore',
-						stderr: 'ignore',
-					});
-					await proc.exited;
-					return proc;
+					await $`ngrok version`.quiet();
 				},
 				mapErr: (error) =>
 					TunnelServiceErr({
@@ -27,13 +20,6 @@ export function createTunnelServiceNgrok(): TunnelService {
 			});
 
 			if (error) return Err(error);
-
-			if (data.exitCode !== 0) {
-				return TunnelServiceErr({
-					message: `ngrok is not installed.\n\n${getInstallInstructions()}`,
-					cause: data.exitCode,
-				});
-			}
 			return Ok(undefined);
 		},
 
@@ -82,6 +68,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 									resolve(
 										TunnelServiceErr({
 											message: `Failed to start ngrok tunnel on port ${port}: ${json.err}`,
+											cause: json.err,
 										}),
 									);
 									return;
@@ -97,6 +84,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 					resolve(
 						TunnelServiceErr({
 							message: `ngrok process ended without providing URL (exit code: ${exitCode})`,
+							cause: exitCode,
 						}),
 					);
 				} catch (error) {
