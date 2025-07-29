@@ -5,8 +5,16 @@ import {
 	unique,
 	primaryKey,
 } from 'drizzle-orm/pg-core';
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from 'drizzle-arktype';
+import { customAlphabet } from 'nanoid';
 
 import { user } from './auth';
+
+const generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
 
 export const assistantConfig = pgTable(
 	'assistant_config',
@@ -14,7 +22,9 @@ export const assistantConfig = pgTable(
 		userId: text('user_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
-		id: text('id').notNull(),
+		id: text('id')
+			.notNull()
+			.$defaultFn(() => generateId()),
 		name: text('name').notNull(),
 		url: text('url').notNull(),
 		password: text('password'),
@@ -28,8 +38,17 @@ export const assistantConfig = pgTable(
 			.$defaultFn(() => /* @__PURE__ */ new Date())
 			.notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.id] }),
-		userUrlUnique: unique('user_url_unique').on(table.userId, table.url),
-	}),
+	(table) => [
+		primaryKey({ columns: [table.userId, table.id] }),
+		unique('user_url_unique').on(table.userId, table.url),
+	],
 );
+
+export const assistantConfigSelectSchema = createSelectSchema(assistantConfig);
+export type AssistantConfigSelect = typeof assistantConfigSelectSchema.infer;
+
+export const assistantConfigInsertSchema = createInsertSchema(assistantConfig);
+export type AssistantConfigInsert = typeof assistantConfigInsertSchema.infer;
+
+export const assistantConfigUpdateSchema = createUpdateSchema(assistantConfig);
+export type AssistantConfigUpdate = typeof assistantConfigUpdateSchema.infer;
