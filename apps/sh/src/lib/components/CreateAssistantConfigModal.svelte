@@ -8,6 +8,7 @@
 	import {
 		generateAvailablePort,
 		assistantConfigs,
+		URL,
 	} from '$lib/stores/assistant-configs.svelte';
 	import * as Accordion from '@repo/ui/accordion';
 	import { Button, type Props as ButtonProps } from '@repo/ui/button';
@@ -24,7 +25,6 @@
 		$props();
 
 	let open = $state(false);
-	let isCheckingPorts = $state(false);
 
 	// Form state
 	let password = $state(settings.value.defaultPassword);
@@ -85,8 +85,7 @@
 				lastAccessedAt: 0,
 				name: 'test',
 				password,
-				port,
-				url: ngrokUrl,
+				url: ngrokUrl as URL,
 			};
 
 			const client = createAssistantClient(testAssistant);
@@ -130,8 +129,7 @@
 		assistantConfigs.create({
 			name: assistantName.trim(),
 			password,
-			port,
-			url: ngrokUrl,
+			url: ngrokUrl as URL,
 		});
 
 		toast.success(`Created assistant "${assistantName}"`);

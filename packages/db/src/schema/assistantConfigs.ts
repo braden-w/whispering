@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, unique } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core';
 
 import { user } from './auth';
 
@@ -11,7 +11,6 @@ export const assistantConfig = pgTable(
 			.references(() => user.id, { onDelete: 'cascade' }),
 		name: text('name').notNull(),
 		url: text('url').notNull(),
-		port: integer('port').notNull(),
 		password: text('password'),
 		createdAt: timestamp('created_at')
 			.$defaultFn(() => /* @__PURE__ */ new Date())

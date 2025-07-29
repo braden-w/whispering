@@ -13,7 +13,6 @@
 	// Define available columns
 	const columns = [
 		{ hideable: false, id: 'name', label: 'Name' },
-		{ hideable: false, id: 'port', label: 'Port' },
 		{ hideable: true, id: 'url', label: 'URL' },
 		{ hideable: true, id: 'rootPath', label: 'Root Path' },
 		{ hideable: true, id: 'cwd', label: 'CWD' },
@@ -30,7 +29,6 @@
 		cwd: false, // Hidden by default
 		lastUsed: true,
 		name: true,
-		port: true,
 		rootPath: false, // Hidden by default
 		status: true,
 		url: true,
@@ -107,8 +105,6 @@
 				<Table.Header>
 					<Table.Row>
 						{#if columnVisibility.name !== false}<Table.Head>Name</Table.Head
-							>{/if}
-						{#if columnVisibility.port !== false}<Table.Head>Port</Table.Head
 							>{/if}
 						{#if columnVisibility.url !== false}<Table.Head>URL</Table.Head
 							>{/if}

@@ -68,13 +68,6 @@
 			</div>
 		</Table.Cell>
 	{/if}
-	{#if columnVisibility.port !== false}
-		<Table.Cell>
-			<Badge variant="secondary" class="text-xs font-mono">
-				{config.port}
-			</Badge>
-		</Table.Cell>
-	{/if}
 	{#if columnVisibility.url !== false}
 		<Table.Cell class="max-w-[200px] truncate">
 			<code class="text-xs">{config.url}</code>

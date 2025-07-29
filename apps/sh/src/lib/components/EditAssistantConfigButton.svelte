@@ -20,14 +20,12 @@
 	// Form state - initialize with assistant values
 	let name = $derived(assistantConfig.name);
 	let url = $derived(assistantConfig.url);
-	let port = $derived(assistantConfig.port);
 	let password = $derived(assistantConfig.password);
 
 	function handleSave() {
 		const validationResult = UpdateAssistantParams({
 			name: name.trim(),
 			password,
-			port,
 			url,
 		} satisfies UpdateAssistantParams);
 
@@ -65,17 +63,6 @@
 					id="edit-url"
 					bind:value={url}
 					placeholder="https://your-tunnel-url.example.com"
-				/>
-			</div>
-
-			<div class="space-y-2">
-				<Label for="edit-port">OpenCode Port</Label>
-				<Input
-					id="edit-port"
-					type="number"
-					bind:value={port}
-					min="1024"
-					max="65535"
 				/>
 			</div>
 

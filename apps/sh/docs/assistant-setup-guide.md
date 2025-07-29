@@ -89,13 +89,13 @@ This creates a secure HTTPS tunnel directly to your OpenCode server. Authenticat
 
 ## Port Configuration
 
-The simplified setup uses a single port:
+The simplified setup requires minimal port configuration:
 
-- **OpenCode Port**: Main server port (default: 4096, configurable)
-- **ngrok API Port**: Always 4040 (ngrok's default API port)
-- **Caddy Proxy Port**: Always 4080 (only for optional ngrok API access)
+- **OpenCode**: Runs on any available port (default: 4096)
+- **ngrok API**: Always 4040 (ngrok's default API port)
+- **Caddy Proxy**: Always 4080 (only for optional ngrok API access)
 
-The system automatically checks port availability starting from 4096 and suggests alternatives if needed.
+When creating a new assistant, the system will suggest an available port starting from 4096. The actual port is included in the URL you provide (e.g., `https://abc123.ngrok.io` or `http://localhost:4096`).
 
 ## Connection Flows
 
@@ -171,7 +171,7 @@ If you were using the previous architecture:
 1. **Update OpenCode**: Ensure you have a version with built-in CORS support
 2. **Remove Complex Proxies**: You no longer need the Hono proxy or complex Caddy setups
 3. **Update Assistant URLs**: URLs can now be used directly without proxy transformation
-4. **Single Port**: The system will automatically migrate from private/public ports to a single port
+4. **URL-Based Configuration**: The system now uses the full URL instead of separate port configuration
 5. **Authentication**: Username is no longer required; authentication is handled at the OpenCode level
 
 ### What Changed:

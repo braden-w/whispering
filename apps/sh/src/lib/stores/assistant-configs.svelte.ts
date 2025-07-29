@@ -18,7 +18,7 @@ export type URL = typeof URL.infer;
  * Contains all the necessary credentials and connection details.
  *
  * Simplified architecture:
- * - port: The single port OpenCode runs on (with built-in CORS support)
+ * - URL includes the full address with port
  * - No more Caddy proxy needed for CORS
  * - Authentication handled at OpenCode level
  */
@@ -28,7 +28,6 @@ const AssistantConfig = type({
 	lastAccessedAt: 'number',
 	name: 'string',
 	password: [Password, '|', 'null'],
-	port: Port,
 	url: URL,
 });
 
@@ -36,7 +35,6 @@ export type AssistantConfig = typeof AssistantConfig.infer;
 
 export const CreateAssistantParams = AssistantConfig.pick(
 	'password',
-	'port',
 	'url',
 	'name',
 );
@@ -78,12 +76,10 @@ export const assistantConfigs = (() => {
 				if (Array.isArray(error.value)) {
 					const migrated = error.value.map((w) => {
 						// Migrate from old format if needed
-						if ('privatePort' in w) {
-							const { privatePort, publicPort, username, ...rest } = w;
-							return {
-								...rest,
-								port: privatePort || 4096,
-							};
+						if ('privatePort' in w || 'port' in w) {
+							const { privatePort, publicPort, port, username, ...rest } = w;
+							// Remove port fields during migration
+							return rest;
 						}
 						return w;
 					});
