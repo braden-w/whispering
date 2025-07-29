@@ -21,7 +21,5 @@ export const auth = (env: CloudflareEnv) =>
 		},
 	});
 
-export type AuthType = {
-	user: ReturnType<typeof auth>['$Infer']['Session']['user'] | null;
-	session: ReturnType<typeof auth>['$Infer']['Session']['session'] | null;
-};
+export type User = ReturnType<typeof auth>['$Infer']['Session']['user'];
+export type Session = ReturnType<typeof auth>['$Infer']['Session']['session'];

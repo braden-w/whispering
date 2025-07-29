@@ -5,7 +5,7 @@ import { eq, and, desc, DrizzleError } from 'drizzle-orm';
 import { db } from '@repo/db';
 import { assistantConfig } from '@repo/db/schema';
 import type { CloudflareEnv } from '@repo/constants/cloudflare';
-import type { AuthType } from '../lib/auth';
+import type { Session, User } from '../lib/auth';
 
 // Custom nanoid generator: lowercase letters + numbers, 12 chars
 const generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
@@ -13,8 +13,8 @@ const generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
 export const assistantConfigsRouter = new Hono<{
 	Bindings: CloudflareEnv;
 	Variables: {
-		user: NonNullable<AuthType['user']>;
-		session: NonNullable<AuthType['session']>;
+		user: User;
+		session: Session;
 	};
 }>();
 

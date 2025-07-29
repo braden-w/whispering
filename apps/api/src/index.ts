@@ -1,12 +1,15 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
-import { auth, type AuthType } from './lib/auth';
+import { auth, type Session, type User, type AuthType } from './lib/auth';
 import { assistantConfigsRouter } from './routes/assistant-configs';
 
 const app = new Hono<{
 	Bindings: CloudflareEnv;
-	Variables: AuthType;
+	Variables: {
+		user: User | null;
+		session: Session | null;
+	};
 }>();
 
 // CORS middleware for all routes
