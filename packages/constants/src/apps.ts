@@ -8,10 +8,10 @@ export const createApps = (env: 'development' | 'production') => {
 	const isProduction = env === 'production';
 	return {
 		/**
-		 * Authentication service for the application ecosystem
+		 * Main API service for the application ecosystem (includes auth)
 		 */
-		AUTH: {
-			URL: isProduction ? 'https://auth.epicenter.so' : 'http://localhost:8787',
+		API: {
+			URL: isProduction ? 'https://api.epicenter.so' : 'http://localhost:8787',
 		},
 		/**
 		 * Main epicenter.sh web application

@@ -10,7 +10,6 @@ import { createApps, createAppUrls } from '#apps';
 const nodeEnvSchema = type({
 	NODE_ENV: "'development' | 'production'",
 
-	// Auth service
 	DATABASE_URL: 'string.url',
 	BETTER_AUTH_URL: 'string.url',
 	BETTER_AUTH_SECRET: 'string',

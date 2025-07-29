@@ -13,7 +13,7 @@ export const auth = (env: Env) =>
 			},
 		},
 		trustedOrigins: APP_URLS(env),
-		baseURL: APPS(env).AUTH.URL,
+		baseURL: APPS(env).API.URL,
 		advanced: {
 			crossSubDomainCookies: {
 				enabled: true,
