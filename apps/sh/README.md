@@ -1,14 +1,16 @@
 # epicenter.sh
 
-A web interface for managing and connecting to OpenCode servers. Connect to multiple assistants, manage sessions, and chat with AI assistants directly from your browser.
+A web interface for self-hosted AI coding assistants. Connect to OpenCode servers running locally or tunneled through ngrok. Your code stays on your machine, even with cloud deployment.
 
 ## Features
 
+- **Flexible Deployment**: Run fully local or deploy to cloud with tunneled connections
+- **Privacy-First**: Your code never leaves your machine, regardless of deployment choice
 - **Assistant Management**: Connect to multiple OpenCode servers with custom configurations
 - **Session Management**: Create, manage, and navigate between chat sessions
+- **Secure Tunneling**: Built-in support for ngrok tunnels with authentication
 - **Real-time Status**: Live connection status and assistant information
-- **Secure Authentication**: Username/password authentication with configurable defaults
-- **Responsive Design**: Works seamlessly across desktop and mobile devices
+- **Open Source**: Transparent, auditable code with no tracking
 
 ## Getting Started
 
@@ -45,20 +47,37 @@ Preview the production build:
 bun preview
 ```
 
-## Deployment
+## Deployment Options
 
-This project is configured for Cloudflare Pages deployment:
+### Local Development
+
+Run both epicenter.sh and OpenCode locally:
+
+```bash
+bun dev
+```
+
+### Cloud Deployment
+
+Deploy epicenter.sh to Cloudflare Pages while keeping OpenCode local:
 
 ```bash
 bun deploy
 ```
 
+Use ngrok to tunnel your local OpenCode servers for cloud access. See the [Assistant Setup Guide](docs/assistant-setup-guide.md) for detailed configuration instructions.
+
 ## Usage
 
-1. **Add an Assistant**: Click "Add Assistant" to configure a connection to your OpenCode server
+1. **Add an Assistant**: Navigate to the Assistants page and click "Add Assistant" to configure a connection
 2. **Connect**: Use the "Connect" button to establish a connection and view assistant details
-3. **Start Chatting**: Navigate to an assistant to create sessions and start conversations
-4. **Manage Settings**: Configure default credentials in the settings modal
+3. **Create Sessions**: Navigate to an assistant to create new chat sessions
+4. **Start Chatting**: Select a model and mode, then start conversations with your codebase
+5. **Manage Settings**: Configure default credentials and connection settings
+
+For detailed setup instructions including ngrok tunneling, see the [Assistant Setup Guide](docs/assistant-setup-guide.md).
+
+<!-- TODO: Update screenshots to reflect new page titles and navigation -->
 
 ## Tech Stack
 

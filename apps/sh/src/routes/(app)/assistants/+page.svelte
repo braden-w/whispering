@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import CreateAssistantConfigModal from '$lib/components/CreateAssistantConfigModal.svelte';
 	import AssistantTableRow from '$lib/components/AssistantTableRow.svelte';
+	import CreateAssistantConfigModal from '$lib/components/CreateAssistantConfigModal.svelte';
 	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 	import { useCreateAssistantParams } from '$lib/utils/search-params.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
@@ -36,6 +36,14 @@
 
 	useCreateAssistantParams(page.url);
 </script>
+
+<svelte:head>
+	<title>Assistants - Manage Your OpenCode Connections | epicenter.sh</title>
+	<meta
+		name="description"
+		content="Connect to OpenCode servers running locally or tunneled through ngrok. Manage multiple AI assistants for different codebases."
+	/>
+</svelte:head>
 
 <div class="px-4 sm:px-6 py-6 sm:py-8">
 	<div

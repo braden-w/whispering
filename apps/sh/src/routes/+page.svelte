@@ -2,6 +2,14 @@
 	import { PMCommand } from '@repo/ui/pm-command';
 </script>
 
+<svelte:head>
+	<title>epicenter.sh - Web Interface for Self-Hosted AI Coding</title>
+	<meta
+		name="description"
+		content="Connect to OpenCode servers from your browser. Run fully local or tunnel through ngrok. Your code stays on your machine, even with cloud deployment."
+	/>
+</svelte:head>
+
 <div
 	class="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] px-4 sm:px-6 max-w-2xl mx-auto"
 >
@@ -11,7 +19,7 @@
 	<p class="text-muted-foreground mb-8 text-center">
 		Get started by running this command in your terminal:
 	</p>
-	
+
 	<div class="w-full mb-8">
 		<PMCommand
 			command="execute"
@@ -20,8 +28,9 @@
 			agents={['bun']}
 		/>
 	</div>
-	
+
 	<p class="text-sm text-muted-foreground text-center">
-		This will start your OpenCode server and open epicenter.sh with your assistant pre-configured.
+		This will start your OpenCode server and open epicenter.sh with your
+		assistant pre-configured.
 	</p>
 </div>

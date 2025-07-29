@@ -22,6 +22,14 @@
 	let createDialogOpen = $state(false);
 </script>
 
+<svelte:head>
+	<title>{assistantConfig?.name} Sessions | epicenter.sh</title>
+	<meta
+		name="description"
+		content="View and manage chat sessions with your {assistantConfig?.name} OpenCode assistant. Direct local connection or secure tunnel access."
+	/>
+</svelte:head>
+
 {#if assistantConfig}
 	<!-- Breadcrumb Section -->
 	<header class="border-b flex h-14 items-center px-4 sm:px-6">
