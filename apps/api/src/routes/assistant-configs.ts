@@ -56,7 +56,7 @@ assistantConfigsRouter.get('/', async (c) => {
 assistantConfigsRouter.post(
 	'/',
 	validator('json', (value, c) => {
-		const parsed = assistantConfigInsertSchema(value);
+		const parsed = assistantConfigInsertSchema.omit('userId')(value);
 		if (parsed instanceof type.errors) {
 			return c.json(
 				{ error: 'Invalid request body', details: parsed.summary },
@@ -72,7 +72,7 @@ assistantConfigsRouter.post(
 		try {
 			const [newConfig] = await db(c.env)
 				.insert(assistantConfig)
-				.values(validatedData)
+				.values({ ...validatedData, userId })
 				.returning();
 
 			return c.json(newConfig, 201);
@@ -95,7 +95,6 @@ assistantConfigsRouter.post(
 	},
 );
 
-// Get specific assistant config
 assistantConfigsRouter.get('/:id', async (c) => {
 	const userId = c.var.user.id;
 	const configId = c.req.param('id');
@@ -119,11 +118,10 @@ assistantConfigsRouter.get('/:id', async (c) => {
 	return c.json(config);
 });
 
-// Update assistant config
 assistantConfigsRouter.put(
 	'/:id',
 	validator('json', (value, c) => {
-		const parsed = assistantConfigUpdateSchema(value);
+		const parsed = assistantConfigUpdateSchema.omit('userId')(value);
 		if (parsed instanceof type.errors) {
 			return c.json(
 				{ error: 'Invalid request body', details: parsed.summary },
@@ -140,7 +138,7 @@ assistantConfigsRouter.put(
 		try {
 			const [updated] = await db(c.env)
 				.update(assistantConfig)
-				.set(validatedData)
+				.set({ ...validatedData, userId })
 				.where(
 					and(
 						eq(assistantConfig.id, configId),
@@ -172,7 +170,6 @@ assistantConfigsRouter.put(
 	},
 );
 
-// Delete assistant config
 assistantConfigsRouter.delete('/:id', async (c) => {
 	const userId = c.var.user.id;
 	const configId = c.req.param('id');
