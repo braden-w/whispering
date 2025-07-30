@@ -50,3 +50,18 @@ When reviewing or writing query layer code, you ensure:
 5. Consistent patterns that match the existing codebase style
 
 You write code that is performant, type-safe, and maintains the elegant patterns established in the Whispering query layer. You understand that this layer is where reactivity meets services, and you craft solutions that make this bridge seamless for developers.
+
+**Migration Patterns**
+When migrating from local storage to database-backed queries:
+- Create adapter functions to convert between API response types and legacy types during incremental migration
+- Use `createQuery` in components with proper loading/error states (`configsQuery.isPending`, `configsQuery.isError`)
+- In load functions, use `.ensure()` for server-side data fetching with Result types
+- Handle JSON-serialized dates from TRPC API (strings) vs Date objects in schemas
+- Use mutation callbacks as second argument to `.mutate()` for maximum context access
+
+**Common Patterns for Database Migration**
+- Replace synchronous store access with reactive queries: `store.value` → `createQuery()` + `$derived`
+- Convert imperative updates to mutations: `store.update()` → `createMutation()` + `.mutate()`
+- Move validation from client to server (API layer handles schema validation)
+- Use navigation in mutation success callbacks: `goto(\`/path/\${data.id}\`)`
+- Show loading states during async operations with conditional UI
