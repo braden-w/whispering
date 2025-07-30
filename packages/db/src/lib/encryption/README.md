@@ -17,50 +17,52 @@ Symmetric encryption is a two-way transformation where:
 
 ## How the Factory Pattern Works
 
-The `createEncryptionUtils` factory creates encryption utilities bound to a specific user and context:
+The `createEncryptionUtils` factory creates encryption utilities bound to a specific user and purpose:
 
 ```typescript
 const encryptionUtils = await createEncryptionUtils({
   userId: 'user-123',
   env: ctx.env,
-  salt: 'my-feature-v1',
-  purpose: 'api-key-encryption'
+  purpose: 'assistant-config'
 });
 ```
 
 The factory:
 1. **Derives a unique key** by combining:
    - Master key from `BETTER_AUTH_SECRET`
-   - Salt (for versioning)
+   - Purpose string (for key separation)
    - User ID (for user isolation)
-   - Purpose (for context separation)
 2. **Returns utility functions** that use this key
 
 ## Key Derivation Pattern
 
 ```
-Master Key + Salt + User ID + Purpose → SHA256 → Base64 → Encryption Key
+Master Key + Purpose + User ID → SHA256 → Base64 → Encryption Key
 ```
 
 This ensures:
 - **User isolation**: Each user's data is encrypted with a different key
-- **Context separation**: Different features use different keys
-- **Version control**: Salt allows key rotation when needed
+- **Purpose separation**: Different purposes use different keys
+- **Security**: Keys are derived using cryptographic standards
+
+## The `purpose` Parameter
+
+The `purpose` parameter ensures that keys derived for different purposes are cryptographically distinct.
+
+**Important**: The `purpose` parameter should NOT include version information. Version should be stored separately with the encrypted data structure.
 
 ## Usage Examples
 
-### Assistant Password Encryption
+### Assistant Configuration Encryption
 ```typescript
-// Define constants for this feature
-const ASSISTANT_PASSWORD_SALT = 'epicenter-assistant-password-v1';
-const ASSISTANT_PASSWORD_PURPOSE = 'assistant-password-encryption';
+// Define purpose for key separation
+const ASSISTANT_CONFIG_PURPOSE = 'assistant-config';
 
 // Create utilities
 const encryptionUtils = await createEncryptionUtils({
   userId: ctx.user.id,
   env: ctx.env,
-  salt: ASSISTANT_PASSWORD_SALT,
-  purpose: ASSISTANT_PASSWORD_PURPOSE,
+  purpose: ASSISTANT_CONFIG_PURPOSE,
 });
 
 // Encrypt before storing
@@ -76,13 +78,11 @@ const decrypted = await encryptionUtils.decrypt(config.password);
 
 ### API Key Encryption
 ```typescript
-const API_KEY_SALT = 'epicenter-api-keys-v1';
-const API_KEY_PURPOSE = 'api-key-encryption';
+const API_KEY_PURPOSE = 'api-keys';
 
 const encryptionUtils = await createEncryptionUtils({
   userId: ctx.user.id,
   env: ctx.env,
-  salt: API_KEY_SALT,
   purpose: API_KEY_PURPOSE,
 });
 
@@ -92,13 +92,11 @@ const encryptedKey = await encryptionUtils.encrypt(apiKey);
 
 ### OAuth Token Encryption
 ```typescript
-const OAUTH_TOKEN_SALT = 'epicenter-oauth-tokens-v1';
-const OAUTH_TOKEN_PURPOSE = 'oauth-token-encryption';
+const OAUTH_TOKEN_PURPOSE = 'oauth-tokens';
 
 const encryptionUtils = await createEncryptionUtils({
   userId: ctx.user.id,
   env: ctx.env,
-  salt: OAUTH_TOKEN_SALT,
   purpose: OAUTH_TOKEN_PURPOSE,
 });
 
@@ -106,10 +104,48 @@ const encryptionUtils = await createEncryptionUtils({
 const encryptedToken = await encryptionUtils.encrypt(refreshToken);
 ```
 
+## Purpose String Best Practices
+
+When creating purpose strings, follow these guidelines:
+
+1. **Use descriptive purpose names**:
+   - `'assistant-config'` - For assistant configuration data
+   - `'user-data'` - For general user data
+   - `'authentication'` - For auth-related secrets
+   - `'api-keys'` - For API key storage
+   - `'oauth-tokens'` - For OAuth tokens
+
+2. **Do NOT include version in purpose string**:
+   - ❌ Bad: `'assistant-config-v1'`
+   - ✅ Good: `'assistant-config'`
+
+3. **Keep it simple and consistent**:
+   - Use lowercase with hyphens
+   - Be descriptive but concise
+   - Use the same purpose string for the same use case across your app
+
+## Version Management
+
+Version information should be stored separately from the encryption process. When you need to track encryption versions:
+
+1. Store version in your database schema
+2. Include version in the encrypted data structure
+3. Handle version during migration, not key derivation
+
+Example:
+```typescript
+// Store version with your data
+await db.insert(assistantConfig).values({
+  password: encrypted,
+  encryptionVersion: 1, // Track version separately
+  // ... other fields
+});
+```
+
 ## Security Considerations
 
 1. **Master Key Security**: The `BETTER_AUTH_SECRET` must be kept secure and never exposed
-2. **Key Rotation**: Change the salt version to rotate keys (requires data migration)
+2. **Key Rotation**: When rotating keys, migrate data by decrypting with old key and re-encrypting with new key
 3. **Error Handling**: Always handle decryption errors gracefully
 4. **Type Safety**: Use the `EncryptedData` type to ensure proper handling
 
@@ -133,12 +169,12 @@ const encryptedToken = await encryptionUtils.encrypt(refreshToken);
 Storing Sensitive Data:
 Plain Text → createEncryptionUtils → encrypt() → Encrypted Data → Store in DB
                     ↑
-            userId + salt + purpose
+            userId + purpose
 
 Retrieving Sensitive Data:
 DB → Encrypted Data → createEncryptionUtils → decrypt() → Plain Text
                             ↑
-                    userId + salt + purpose
+                    userId + purpose
 ```
 
-The key insight: The same parameters (userId, salt, purpose) must be used for both encryption and decryption to derive the same key.
+The key insight: The same parameters (userId, purpose) must be used for both encryption and decryption to derive the same key.
