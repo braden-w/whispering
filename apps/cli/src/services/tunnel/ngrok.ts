@@ -50,37 +50,61 @@ export function createTunnelServiceNgrok(): TunnelService {
 
 					// Read stdout for JSON messages
 					const decoder = new TextDecoder();
-					for await (const chunk of tunnelProc.stdout as any) {
-						const data = decoder.decode(chunk);
-						const lines = data.split('\n').filter((line) => line.trim());
+					let tunnelUrl: string | null = null;
 
-						for (const line of lines) {
-							const json = type('string.json.parse').to({
-								'msg?': 'string',
-								'url?': 'string',
-								'err?': 'string',
-							})(line);
+					// Continue reading stdout in background to keep the process alive
+					// This prevents the stdout buffer from filling up and blocking ngrok
+					(async () => {
+						for await (const chunk of tunnelProc.stdout as any) {
+							const data = decoder.decode(chunk);
+							const lines = data.split('\n').filter((line) => line.trim());
 
-							// Skip errors related to JSON parsing
-							if (json instanceof type.errors) continue;
+							for (const line of lines) {
+								const json = type('string.json.parse').to({
+									'msg?': 'string',
+									'url?': 'string',
+									'err?': 'string',
+								})(line);
 
-							// Found the tunnel URL
-							if (json.msg === 'started tunnel' && json.url) return json.url;
+								if (json instanceof type.errors) continue;
 
-							// Check for errors
-							if (json.err && json.err !== '<nil>') {
-								throw new Error(`${json.err}`);
+								// Store the tunnel URL when found
+								if (json.msg === 'started tunnel' && json.url && !tunnelUrl) {
+									tunnelUrl = json.url;
+								}
+
+								// Log errors but don't throw (keep reading)
+								if (json.err && json.err !== '<nil>') {
+									console.error(`ngrok error: ${json.err}`);
+								}
 							}
+						}
+					})();
+
+					// Wait for the tunnel URL to be found
+					const maxWaitTime = 30000; // 30 seconds
+					const pollInterval = 100; // 100ms
+					const startTime = Date.now();
+
+					while (!tunnelUrl) {
+						await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+						if (Date.now() - startTime > maxWaitTime) {
+							throw new Error('Timeout waiting for ngrok tunnel URL');
+						}
+
+						// Check if process has exited
+						if (tunnelProc.killed) {
+							const exitCode = await tunnelProc.exited;
+							throw new Error(
+								`ngrok process ended without providing URL${
+									exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
+								}`,
+							);
 						}
 					}
 
-					// Stream ended without finding URL
-					const exitCode = await tunnelProc.exited;
-					throw new Error(
-						`ngrok process ended without providing URL${
-							exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
-						}`,
-					);
+					return tunnelUrl;
 				},
 				mapErr: (error) =>
 					TunnelServiceErr({
