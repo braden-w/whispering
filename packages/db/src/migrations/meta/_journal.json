@@ -15,6 +15,13 @@
       "when": 1753913636101,
       "tag": "0001_perfect_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753913673555,
+      "tag": "0002_wealthy_lady_mastermind",
+      "breakpoints": true
     }
   ]
 }
