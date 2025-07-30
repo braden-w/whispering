@@ -1,6 +1,6 @@
 {
-  "id": "4797d266-88ee-48e2-aa01-65256913a450",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d928856f-97cc-4f69-a0de-39a07ce85d32",
+  "prevId": "4797d266-88ee-48e2-aa01-65256913a450",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -237,6 +237,13 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
+        },
+        "is_anonymous": {
+          "name": "is_anonymous",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
