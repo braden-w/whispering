@@ -1,13 +1,46 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from '@repo/db';
+import { db as createDb } from '@repo/db';
 import { APPS, APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
 import { anonymous } from 'better-auth/plugins';
+import { eq } from 'drizzle-orm';
+import { assistantConfig } from '@repo/db/schema';
+import { Err, tryAsync } from 'wellcrafted/result';
+import { extractErrorMessage } from 'wellcrafted/error';
 
-export const auth = (env: CloudflareEnv) =>
-	betterAuth({
-		plugins: [anonymous()],
-		database: drizzleAdapter(db(env), { provider: 'pg' }),
+export const auth = (env: CloudflareEnv) => {
+	const db = createDb(env);
+	return betterAuth({
+		plugins: [
+			anonymous({
+				emailDomainName: 'epicenter.so',
+				onLinkAccount: async ({ anonymousUser, newUser }) => {
+					console.log(
+						'Migrating assistant configs from anonymous user to new user',
+					);
+					const { error } = await tryAsync({
+						try: async () => {
+							await db
+								.update(assistantConfig)
+								.set({
+									userId: newUser.user.id,
+								})
+								.where(eq(assistantConfig.userId, anonymousUser.user.id));
+						},
+						mapErr: (error) =>
+							Err(
+								`Failed to migrate assistant configs: ${extractErrorMessage(error)}`,
+							),
+					});
+					if (error) {
+						console.error('Error migrating assistant configs:', error);
+						return;
+					}
+					console.log('Assistant configs migrated successfully');
+				},
+			}),
+		],
+		database: drizzleAdapter(db, { provider: 'pg' }),
 		socialProviders: {
 			github: {
 				clientId: env.GITHUB_CLIENT_ID,
@@ -22,6 +55,7 @@ export const auth = (env: CloudflareEnv) =>
 			},
 		},
 	});
+};
 
 export type User = ReturnType<typeof auth>['$Infer']['Session']['user'];
 export type Session = ReturnType<typeof auth>['$Infer']['Session']['session'];
