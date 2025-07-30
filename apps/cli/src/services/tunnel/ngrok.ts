@@ -60,23 +60,25 @@ export function createTunnelServiceNgrok(): TunnelService {
 							const lines = data.split('\n').filter((line) => line.trim());
 
 							for (const line of lines) {
-								const json = type('string.json.parse').to({
-									'msg?': 'string',
-									'url?': 'string',
-									'err?': 'string',
+								// Process if the line is a tunnel started log
+								const tunnelStart = type('string.json.parse').to({
+									lvl: "'info'",
+									msg: "'started tunnel'",
+									name: "'command_line'",
+									obj: "'tunnels'",
+									addr: 'string',
+									url: 'string.url',
 								})(line);
+								const isTunnelStarted = !(tunnelStart instanceof type.errors);
+								if (isTunnelStarted) tunnelUrl = tunnelStart.url;
 
-								if (json instanceof type.errors) continue;
-
-								// Store the tunnel URL when found
-								if (json.msg === 'started tunnel' && json.url && !tunnelUrl) {
-									tunnelUrl = json.url;
-								}
-
-								// Log errors but don't throw (keep reading)
-								if (json.err && json.err !== '<nil>') {
-									console.error(`ngrok error: ${json.err}`);
-								}
+								// Process if the line is an error log
+								const errorLogged = type('string.json.parse').to({
+									err: type('string').narrow((s) => s !== '<nil>'),
+								})(line);
+								const isError = !(errorLogged instanceof type.errors);
+								if (isError) console.error(`ngrok error: ${errorLogged.err}`);
+								// Ignore other logs
 							}
 						}
 					})();
