@@ -40,7 +40,7 @@ export const assistantConfig = pgTable(
 	},
 	(table) => [
 		primaryKey({ columns: [table.userId, table.id] }),
-		unique('user_url_unique').on(table.userId, table.url),
+		unique('assistant_config_user_id_url_unique').on(table.userId, table.url),
 	],
 );
 
