@@ -1,24 +1,88 @@
 import {
 	assistantConfig,
+	AssistantConfigInsert,
 	assistantConfigInsertSchema,
+	type AssistantConfigSelect,
 	assistantConfigUpdateSchema,
 } from '@repo/db/schema';
+import {
+	createEncryptionUtils,
+	type EncryptedData,
+} from '@repo/db/lib/encryption';
 import { TRPCError } from '@trpc/server';
 import { type } from 'arktype';
 import { and, desc, eq } from 'drizzle-orm';
 import { extractErrorMessage } from 'wellcrafted/error';
 import { authedProcedure, router } from '../index';
 
+/**
+ * TRPC middleware that adds encryption utilities to the context.
+ * This ensures all assistant config procedures have access to consistent
+ * encryption/decryption functions that are bound to the current user.
+ */
+export const assistantConfigProcedure = authedProcedure.use(
+	async ({ ctx, next }) => {
+		const encryptionUtils = await createEncryptionUtils({
+			userId: ctx.user.id,
+			env: ctx.env,
+			purpose: 'assistant-config' as const,
+		});
+
+		/**
+		 * Decrypts the password field of an assistant config.
+		 * Returns null for password if decryption fails or password is not set.
+		 */
+		const decryptConfig = async (
+			config: AssistantConfigSelect,
+		): Promise<
+			Omit<AssistantConfigSelect, 'password'> & { password: string | null }
+		> => {
+			if (!config.password) return { ...config, password: null };
+			try {
+				const decrypted = await encryptionUtils.decrypt(config.password);
+				return { ...config, password: decrypted };
+			} catch (error) {
+				console.error('Failed to decrypt password:', error);
+				return { ...config, password: null };
+			}
+		};
+
+		/**
+		 * Encrypts the password field of a config object if present.
+		 * Returns the config with encrypted password or null if no password.
+		 */
+		const encryptConfig = async <T extends { password?: string | null }>(
+			config: T,
+		): Promise<Omit<T, 'password'> & { password: EncryptedData | null }> => {
+			if (config.password) {
+				return {
+					...config,
+					password: await encryptionUtils.encrypt(config.password),
+				};
+			}
+			return { ...config, password: null };
+		};
+
+		return next({
+			ctx: { ...ctx, encryptionUtils, decryptConfig, encryptConfig },
+		});
+	},
+);
+
 export const assistantConfigRouter = router({
 	// List all assistant configs for user
-	list: authedProcedure.query(async ({ ctx }) => {
+	list: assistantConfigProcedure.query(async ({ ctx }) => {
 		try {
 			const configs = await ctx.db.query.assistantConfig.findMany({
 				where: eq(assistantConfig.userId, ctx.user.id),
 				orderBy: [desc(assistantConfig.lastAccessedAt)],
 			});
 
-			return configs;
+			const decryptedConfigs = await Promise.all(
+				configs.map(ctx.decryptConfig),
+			);
+
+			return decryptedConfigs;
 		} catch (error) {
 			throw new TRPCError({
 				code: 'INTERNAL_SERVER_ERROR',
@@ -28,7 +92,7 @@ export const assistantConfigRouter = router({
 	}),
 
 	// Get specific assistant config
-	getById: authedProcedure
+	getById: assistantConfigProcedure
 		.input(type({ id: 'string' }))
 		.query(async ({ ctx, input }) => {
 			try {
@@ -52,7 +116,8 @@ export const assistantConfigRouter = router({
 					.set({ lastAccessedAt: new Date() })
 					.where(eq(assistantConfig.id, input.id));
 
-				return config;
+				const decryptedConfig = await ctx.decryptConfig(config);
+				return decryptedConfig;
 			} catch (error) {
 				if (error instanceof TRPCError) throw error;
 
@@ -64,16 +129,19 @@ export const assistantConfigRouter = router({
 		}),
 
 	// Create new assistant config
-	create: authedProcedure
+	create: assistantConfigProcedure
 		.input(assistantConfigInsertSchema.omit('userId'))
 		.mutation(async ({ ctx, input }) => {
 			try {
+				// Encrypt password if provided
+				const encryptedInput = await ctx.encryptConfig(input);
+
 				const [newConfig] = await ctx.db
 					.insert(assistantConfig)
-					.values({ ...input, userId: ctx.user.id })
+					.values({ ...encryptedInput, userId: ctx.user.id })
 					.returning();
 
-				return newConfig;
+				return ctx.decryptConfig(newConfig);
 			} catch (error) {
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -83,15 +151,18 @@ export const assistantConfigRouter = router({
 		}),
 
 	// Update assistant config
-	update: authedProcedure
+	update: assistantConfigProcedure
 		.input(assistantConfigUpdateSchema.omit('userId'))
 		.mutation(async ({ ctx, input }) => {
 			const { id, ...updateData } = input;
 
 			try {
+				// Encrypt password if provided
+				const encryptedUpdateData = await ctx.encryptConfig(updateData);
+
 				const [updated] = await ctx.db
 					.update(assistantConfig)
-					.set({ ...updateData })
+					.set(encryptedUpdateData)
 					.where(
 						and(
 							eq(assistantConfig.id, id),
@@ -107,7 +178,8 @@ export const assistantConfigRouter = router({
 					});
 				}
 
-				return updated;
+				// Return with decrypted password
+				return ctx.decryptConfig(updated);
 			} catch (error) {
 				if (error instanceof TRPCError) throw error;
 
@@ -118,7 +190,7 @@ export const assistantConfigRouter = router({
 			}
 		}),
 
-	delete: authedProcedure
+	delete: assistantConfigProcedure
 		.input(type({ id: 'string' }))
 		.mutation(async ({ ctx, input }) => {
 			try {
