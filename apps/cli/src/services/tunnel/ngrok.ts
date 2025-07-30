@@ -1,11 +1,12 @@
 import { Ok, Err, trySync, tryAsync } from 'wellcrafted/result';
-import type { TunnelService, TunnelProcess } from './types';
+import type { TunnelService } from './types';
 import { TunnelServiceErr } from './types';
 import { spawn, $ } from 'bun';
 import { type } from 'arktype';
+import type { Subprocess } from 'bun';
 
 export function createTunnelServiceNgrok(): TunnelService {
-	let currentTunnelProcess: TunnelProcess | null = null;
+	let currentProcess: Subprocess | null = null;
 
 	return {
 		async ensureInstalled() {
@@ -26,9 +27,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 
 		async startTunnel(port: number) {
 			// Stop any existing tunnel before starting a new one
-			if (currentTunnelProcess) {
-				this.stopTunnel();
-			}
+			if (currentProcess) this.stopTunnel();
 
 			return tryAsync({
 				try: async () => {
@@ -47,7 +46,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 						},
 					);
 
-					currentTunnelProcess = { process: tunnelProc, url: null };
+					currentProcess = tunnelProc;
 
 					// Read stdout for JSON messages
 					const decoder = new TextDecoder();
@@ -66,12 +65,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 							if (json instanceof type.errors) continue;
 
 							// Found the tunnel URL
-							if (json.msg === 'started tunnel' && json.url) {
-								if (currentTunnelProcess) {
-									currentTunnelProcess.url = json.url;
-									return currentTunnelProcess;
-								}
-							}
+							if (json.msg === 'started tunnel' && json.url) return json.url;
 
 							// Check for errors
 							if (json.err && json.err !== '<nil>') {
@@ -101,12 +95,9 @@ export function createTunnelServiceNgrok(): TunnelService {
 		stopTunnel() {
 			return trySync({
 				try: () => {
-					if (
-						currentTunnelProcess?.process &&
-						!currentTunnelProcess.process.killed
-					) {
-						currentTunnelProcess.process.kill('SIGTERM');
-						currentTunnelProcess = null;
+					if (currentProcess && !currentProcess.killed) {
+						currentProcess.kill('SIGTERM');
+						currentProcess = null;
 					}
 				},
 				mapErr: (error) =>

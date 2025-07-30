@@ -1,11 +1,12 @@
 import { Ok, Err, trySync, tryAsync } from 'wellcrafted/result';
-import type { TunnelService, TunnelProcess } from './types';
+import type { TunnelService } from './types';
 import { TunnelServiceErr } from './types';
 import { spawn, $ } from 'bun';
 import { extractErrorMessage } from 'wellcrafted/error';
+import type { Subprocess } from 'bun';
 
 export function createTunnelServiceCloudflare(): TunnelService {
-	let currentTunnelProcess: TunnelProcess | null = null;
+	let currentProcess: Subprocess | null = null;
 
 	return {
 		async ensureInstalled() {
@@ -27,9 +28,7 @@ export function createTunnelServiceCloudflare(): TunnelService {
 
 		async startTunnel(port: number) {
 			// Stop any existing tunnel before starting a new one
-			if (currentTunnelProcess) {
-				this.stopTunnel();
-			}
+			if (currentProcess) this.stopTunnel();
 
 			return tryAsync({
 				try: async () => {
@@ -42,24 +41,21 @@ export function createTunnelServiceCloudflare(): TunnelService {
 						},
 					);
 
-					currentTunnelProcess = { process: tunnelProc, url: null };
+					currentProcess = tunnelProc;
 
 					// Read from stderr stream to parse tunnel URL
 					const decoder = new TextDecoder();
 					for await (const chunk of tunnelProc.stderr as any) {
 						const data = decoder.decode(chunk);
-						
+
 						// Parse the tunnel URL from the box format
 						const urlMatch = data.match(
 							/\|\s+(https:\/\/[^|]+\.trycloudflare\.com)\s+\|/,
 						);
-						
+
 						if (urlMatch?.[1]) {
 							const url = urlMatch[1].trim();
-							if (currentTunnelProcess) {
-								currentTunnelProcess.url = url;
-								return currentTunnelProcess;
-							}
+							return url;
 						}
 					}
 
@@ -71,7 +67,7 @@ export function createTunnelServiceCloudflare(): TunnelService {
 						}`,
 					);
 				},
-				mapErr: (error) => 
+				mapErr: (error) =>
 					TunnelServiceErr({
 						message: error instanceof Error ? error.message : String(error),
 						cause: error,
@@ -82,12 +78,9 @@ export function createTunnelServiceCloudflare(): TunnelService {
 		stopTunnel() {
 			return trySync({
 				try: () => {
-					if (
-						currentTunnelProcess?.process &&
-						!currentTunnelProcess.process.killed
-					) {
-						currentTunnelProcess.process.kill('SIGTERM');
-						currentTunnelProcess = null;
+					if (currentProcess && !currentProcess.killed) {
+						currentProcess.kill('SIGTERM');
+						currentProcess = null;
 					}
 				},
 				mapErr: (error) =>

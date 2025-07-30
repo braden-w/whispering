@@ -5,7 +5,7 @@ import { Share } from '@epicenter/opencode/share/share.ts';
 import { Log } from '@epicenter/opencode/util/log.ts';
 import getPort from 'get-port';
 import { basename } from 'node:path';
-import type { TunnelProcess, TunnelProvider } from '../services/tunnel';
+import type { TunnelProvider } from '../services/tunnel';
 import { createTunnelService } from '../services/tunnel';
 import { BrowserServiceLive } from '../services/browser';
 import { cmd } from '../utils/cmd';
@@ -80,56 +80,48 @@ export const ShCommand = cmd({
 			}
 			console.log(`  Local:      ${localUrl}`);
 
-			let tunnelProcess: TunnelProcess | null = null;
-			if (tunnelProvider) {
-				// Ensure the tunnel provider is installed
-				const { error: ensureInstalledError } =
-					await tunnelService.ensureInstalled();
-				if (ensureInstalledError) {
-					console.error(ensureInstalledError.message);
-					process.exit(1);
-				}
-
-				// Start the tunnel
-				const { data: newTunnel, error: tunnelError } =
-					await tunnelService.startTunnel(port);
-				if (tunnelError) {
-					console.error(tunnelError.message);
-					process.exit(1);
-				}
-
-				tunnelProcess = newTunnel;
+			// Ensure the tunnel provider is installed
+			const { error: ensureInstalledError } =
+				await tunnelService.ensureInstalled();
+			if (ensureInstalledError) {
+				console.error(ensureInstalledError.message);
+				process.exit(1);
 			}
 
-			if (tunnelProcess?.url) {
-				console.log(`  Tunnel:     ${tunnelProcess.url}`);
-				if (args.open) {
-					const EPICENTER_ASSISTANT_URL =
-						`${EPICENTER_SH_URL}/assistants` as const;
-					const currentDirName = basename(cwd);
-					const params = new URLSearchParams({
-						url: tunnelProcess.url,
-						name: currentDirName,
-					});
-					const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
-					console.log(`  Epicenter:  ${url}`);
-					console.log();
-					console.log('  Opening browser...');
-					const { error: browserError } = await BrowserServiceLive.openUrl(url);
-					if (browserError) {
-						console.error('Failed to open browser:', browserError.message);
-					}
+			// Start the tunnel
+			const { data: tunnelUrl, error: tunnelError } =
+				await tunnelService.startTunnel(port);
+			if (tunnelError) {
+				console.error(tunnelError.message);
+				process.exit(1);
+			}
+
+			console.log(`  Tunnel:     ${tunnelUrl}`);
+			if (args.open) {
+				const EPICENTER_ASSISTANT_URL =
+					`${EPICENTER_SH_URL}/assistants` as const;
+				const currentDirName = basename(cwd);
+				const params = new URLSearchParams({
+					url: tunnelUrl,
+					name: currentDirName,
+				});
+				const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
+				console.log(`  Epicenter:  ${url}`);
+				console.log();
+				console.log('  Opening browser...');
+				const { error: browserError } = await BrowserServiceLive.openUrl(url);
+				if (browserError) {
+					console.error('Failed to open browser:', browserError.message);
 				}
 			}
+
 			// Handle graceful shutdown
 			const cleanup = () => {
 				console.log('\nShutting down...');
 				server.stop();
-				if (tunnelProcess && tunnelProvider) {
-					const { error: stopError } = tunnelService.stopTunnel();
-					if (stopError) {
-						console.error('Failed to stop tunnel:', stopError.message);
-					}
+				const { error: stopError } = tunnelService.stopTunnel();
+				if (stopError) {
+					console.error('Failed to stop tunnel:', stopError.message);
 				}
 				process.exit(0);
 			};
