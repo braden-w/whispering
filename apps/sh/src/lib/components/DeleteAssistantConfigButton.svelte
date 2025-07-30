@@ -1,14 +1,39 @@
 <script lang="ts">
-	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
-
-	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
+	import { goto } from '$app/navigation';
+	import * as rpc from '$lib/query';
+	import type { AssistantConfig } from '$lib/types/assistant-config';
 	import * as AlertDialog from '@repo/ui/alert-dialog';
 	import { Button } from '@repo/ui/button';
-	import { Trash2 } from 'lucide-svelte';
+	import { createMutation } from '@tanstack/svelte-query';
+	import { Loader2, Trash2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { assistantConfig }: { assistantConfig: AssistantConfig } = $props();
 	let open = $state(false);
+
+	// Delete mutation
+	const deleteMutation = createMutation(
+		rpc.assistantConfigs.deleteAssistantConfig.options
+	);
+
+	function handleDelete() {
+		deleteMutation.mutate(
+			{ id: assistantConfig.id },
+			{
+				onSuccess: () => {
+					toast.success('Deleted assistant');
+					open = false;
+					// Navigate back to assistants list if we're on the assistant page
+					if (window.location.pathname.includes(`/assistants/${assistantConfig.id}`)) {
+						goto('/assistants');
+					}
+				},
+				onError: (error) => {
+					toast.error(error.title, { description: error.description });
+				},
+			}
+		);
+	}
 </script>
 
 <AlertDialog.Root bind:open>
@@ -29,13 +54,14 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action
-				onclick={() => {
-					assistantConfigs.delete(assistantConfig.id);
-					open = false;
-					toast.success('Deleted assistant');
-				}}>Delete</AlertDialog.Action
-			>
+			<AlertDialog.Action onclick={handleDelete} disabled={deleteMutation.isPending}>
+				{#if deleteMutation.isPending}
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					Deleting...
+				{:else}
+					Delete
+				{/if}
+			</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

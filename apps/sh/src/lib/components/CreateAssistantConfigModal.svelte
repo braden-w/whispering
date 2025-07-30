@@ -2,13 +2,11 @@
 	import type { App } from '$lib/client/types.gen';
 	import type { Snippet } from 'svelte';
 
+	import { goto } from '$app/navigation';
 	import { createAssistantClient } from '$lib/client/client.gen';
 	import * as api from '$lib/client/sdk.gen';
-	import {
-		assistantConfigs,
-		generateAvailablePort,
-		URL,
-	} from '$lib/stores/assistant-configs.svelte';
+	import * as rpc from '$lib/query';
+	import { generateAvailablePort, type URL } from '$lib/utils/port';
 	import { settings } from '$lib/stores/settings.svelte';
 	import * as Accordion from '@repo/ui/accordion';
 	import { Button, type Props as ButtonProps } from '@repo/ui/button';
@@ -17,7 +15,7 @@
 	import * as Modal from '@repo/ui/modal';
 	import { PMCommand } from '@repo/ui/pm-command';
 	import * as Tabs from '@repo/ui/tabs';
-	import { type } from 'arktype';
+	import { createMutation } from '@tanstack/svelte-query';
 	import { CheckCircle2, Copy, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -34,6 +32,11 @@
 	let isTesting = $state(false);
 	let testSuccess = $state(false);
 	let appInfo = $state<App | null>(null);
+
+	// Create mutation for adding assistant config
+	const createAssistantMutation = createMutation(
+		rpc.assistantConfigs.createAssistantConfig.options
+	);
 
 	// Reset form when dialog opens
 	$effect(() => {
@@ -126,14 +129,24 @@
 			return;
 		}
 
-		assistantConfigs.create({
-			name: assistantName.trim(),
-			password,
-			url: ngrokUrl as URL,
-		});
-
-		toast.success(`Created assistant "${assistantName}"`);
-		open = false;
+		createAssistantMutation.mutate(
+			{
+				name: assistantName.trim(),
+				password,
+				url: ngrokUrl,
+			},
+			{
+				onSuccess: (data) => {
+					toast.success(`Created assistant "${assistantName}"`);
+					open = false;
+					// Navigate to the new assistant
+					goto(`/assistants/${data.id}`);
+				},
+				onError: (error) => {
+					toast.error(error.title, { description: error.description });
+				},
+			}
+		);
 	}
 </script>
 
@@ -372,9 +385,14 @@
 				<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
 				<Button
 					onclick={handleCreate}
-					disabled={!testSuccess || !assistantName.trim()}
+					disabled={!testSuccess || !assistantName.trim() || createAssistantMutation.isPending}
 				>
-					Create Assistant
+					{#if createAssistantMutation.isPending}
+						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						Creating...
+					{:else}
+						Create Assistant
+					{/if}
 				</Button>
 			</div>
 		</Modal.Footer>

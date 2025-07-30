@@ -1,13 +1,14 @@
 import * as rpc from '$lib/query';
-import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 import { redirectTo } from '$lib/utils/redirect-with-flash-message';
 
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {
-	const assistantConfig = assistantConfigs.getById(params.id);
+	const { data: assistantConfig, error: configError } = await rpc.assistantConfigs
+		.getAssistantConfigById(() => params.id)
+		.ensure();
 
-	if (!assistantConfig) {
+	if (configError || !assistantConfig) {
 		redirectTo.assistants.error({
 			title: 'Assistant not found',
 			description:

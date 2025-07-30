@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
+	import type { AssistantConfig } from '$lib/types/assistant-config';
 
 	import * as rpc from '$lib/query';
 	import { Skeleton } from '@repo/ui/skeleton';

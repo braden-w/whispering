@@ -1,9 +1,7 @@
 <script lang="ts">
-	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
-
 	import { goto } from '$app/navigation';
 	import * as rpc from '$lib/query';
-	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
+	import type { AssistantConfig } from '$lib/types/assistant-config';
 	import { formatDistanceToNow } from '$lib/utils/date';
 	import { Badge } from '@repo/ui/badge';
 	import { badgeVariants } from '@repo/ui/badge';
@@ -31,10 +29,8 @@
 	}));
 
 	function handleConnect() {
-		// Update last used timestamp
-		assistantConfigs.update(config.id, {});
-
 		// Navigate to assistant sessions
+		// The server will update lastAccessedAt when fetching sessions
 		goto(`/assistants/${config.id}`);
 	}
 

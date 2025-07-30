@@ -1,16 +1,13 @@
 <script lang="ts">
-	import {
-		type AssistantConfig,
-		assistantConfigs,
-		UpdateAssistantParams,
-	} from '$lib/stores/assistant-configs.svelte';
+	import * as rpc from '$lib/query';
+	import type { AssistantConfig } from '$lib/types/assistant-config';
 	import { Button } from '@repo/ui/button';
 	import { buttonVariants } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Modal from '@repo/ui/modal';
-	import { type } from 'arktype';
-	import { Edit } from 'lucide-svelte';
+	import { createMutation } from '@tanstack/svelte-query';
+	import { Edit, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { assistantConfig }: { assistantConfig: AssistantConfig } = $props();
@@ -18,26 +15,47 @@
 	let open = $state(false);
 
 	// Form state - initialize with assistant values
-	let name = $derived(assistantConfig.name);
-	let url = $derived(assistantConfig.url);
-	let password = $derived(assistantConfig.password);
+	let name = $state(assistantConfig.name);
+	let url = $state(assistantConfig.url);
+	let password = $state(assistantConfig.password);
+
+	// Reset form when modal opens
+	$effect(() => {
+		if (open) {
+			name = assistantConfig.name;
+			url = assistantConfig.url;
+			password = assistantConfig.password;
+		}
+	});
+
+	// Update mutation
+	const updateMutation = createMutation(
+		rpc.assistantConfigs.updateAssistantConfig.options
+	);
 
 	function handleSave() {
-		const validationResult = UpdateAssistantParams({
-			name: name.trim(),
-			password,
-			url,
-		} satisfies UpdateAssistantParams);
-
-		if (validationResult instanceof type.errors) {
-			toast.error('Validation failed', {
-				description: validationResult.summary,
-			});
+		if (!name.trim()) {
+			toast.error('Please enter a name');
 			return;
 		}
 
-		assistantConfigs.update(assistantConfig.id, validationResult);
-		open = false;
+		updateMutation.mutate(
+			{
+				id: assistantConfig.id,
+				name: name.trim(),
+				password,
+				url,
+			},
+			{
+				onSuccess: () => {
+					toast.success('Assistant updated successfully');
+					open = false;
+				},
+				onError: (error) => {
+					toast.error(error.title, { description: error.description });
+				},
+			}
+		);
 	}
 </script>
 
@@ -80,7 +98,14 @@
 
 		<Modal.Footer>
 			<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
-			<Button onclick={handleSave}>Save Changes</Button>
+			<Button onclick={handleSave} disabled={updateMutation.isPending}>
+				{#if updateMutation.isPending}
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					Saving...
+				{:else}
+					Save Changes
+				{/if}
+			</Button>
 		</Modal.Footer>
 	</Modal.Content>
 </Modal.Root>

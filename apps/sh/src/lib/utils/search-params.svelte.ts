@@ -1,10 +1,5 @@
 import { goto } from '$app/navigation';
-import {
-	assistantConfigs,
-	CreateAssistantParams,
-} from '$lib/stores/assistant-configs.svelte';
 import { type } from 'arktype';
-import { untrack } from 'svelte';
 import { toast } from 'svelte-sonner';
 
 import {
@@ -76,41 +71,12 @@ export function useFlashMessage(url: URL) {
  * ```
  */
 export const useCreateAssistantParams = (url: URL) => {
-	/**
-	 * URL search parameter constants for assistant creation
-	 */
-	const ASSISTANT_CREATE_PARAMS = {
-		name: 'name',
-		password: 'password',
-		port: 'port',
-		url: 'url',
-	} as const;
-
-	$effect(() => {
-		const port = url.searchParams.get(ASSISTANT_CREATE_PARAMS.port);
-		const assistantUrl = url.searchParams.get(ASSISTANT_CREATE_PARAMS.url);
-		const password = url.searchParams.get(ASSISTANT_CREATE_PARAMS.password);
-		const name = url.searchParams.get(ASSISTANT_CREATE_PARAMS.name);
-
-		const assistant = CreateAssistantParams({
-			name,
-			password,
-			port: port ? Number.parseInt(port, 10) : null,
-			url: assistantUrl,
-		});
-		if (assistant instanceof type.errors) return;
-		untrack(() => assistantConfigs.create(assistant));
-
-		// Clean URL without navigation by replacing the current history entry
-		const cleanUrl = new URL(url);
-		cleanUrl.searchParams.delete(ASSISTANT_CREATE_PARAMS.port);
-		cleanUrl.searchParams.delete(ASSISTANT_CREATE_PARAMS.url);
-		cleanUrl.searchParams.delete(ASSISTANT_CREATE_PARAMS.password);
-		cleanUrl.searchParams.delete(ASSISTANT_CREATE_PARAMS.name);
-
-		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
-			noScroll: true,
-			replaceState: true,
-		});
-	});
+	// TODO: Implement URL-based assistant creation with database
+	// This functionality is temporarily disabled during migration
+	// from localStorage to database storage.
+	// 
+	// Implementation notes:
+	// - Need to check auth state before creating
+	// - Use rpc.assistantConfigs.createAssistantConfig mutation
+	// - Handle async creation properly
 };

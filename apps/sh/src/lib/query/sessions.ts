@@ -1,5 +1,5 @@
 import type { PostSessionByIdSummarizeData } from '$lib/client/types.gen';
-import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
+import type { AssistantConfig } from '$lib/types/assistant-config';
 import type { Accessor } from '@tanstack/svelte-query';
 
 import { createAssistantClient } from '$lib/client/client.gen';
