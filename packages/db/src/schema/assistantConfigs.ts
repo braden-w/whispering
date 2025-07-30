@@ -13,6 +13,7 @@ import {
 import { customAlphabet } from 'nanoid';
 
 import { user } from './auth';
+import type { EncryptedData } from '../lib/encryption';
 
 const generateId = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
 
@@ -27,7 +28,7 @@ export const assistantConfig = pgTable(
 			.$defaultFn(() => generateId()),
 		name: text('name').notNull(),
 		url: text('url').notNull(),
-		password: text('password'),
+		password: text('password').$type<EncryptedData>(),
 		createdAt: timestamp('created_at')
 			.$defaultFn(() => /* @__PURE__ */ new Date())
 			.notNull(),
