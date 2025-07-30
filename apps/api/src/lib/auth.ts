@@ -40,6 +40,7 @@ export const auth = (env: CloudflareEnv) => {
 				},
 			}),
 		],
+		basePath: '/auth',
 		database: drizzleAdapter(db, { provider: 'pg' }),
 		socialProviders: {
 			github: {
