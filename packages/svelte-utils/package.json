@@ -9,7 +9,7 @@
 		"./createPersistedState": "./src/createPersistedState.svelte.ts"
 	},
 	"dependencies": {
-		"wellcrafted": "^0.20.0"
+		"wellcrafted": "catalog:"
 	},
 	"devDependencies": {
 		"@standard-schema/spec": "^1.0.0-beta.3",
