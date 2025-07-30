@@ -2,9 +2,11 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@repo/db';
 import { APPS, APP_URLS, type CloudflareEnv } from '@repo/constants/cloudflare';
+import { anonymous } from 'better-auth/plugins';
 
 export const auth = (env: CloudflareEnv) =>
 	betterAuth({
+		plugins: [anonymous()],
 		database: drizzleAdapter(db(env), { provider: 'pg' }),
 		socialProviders: {
 			github: {
