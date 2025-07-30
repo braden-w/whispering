@@ -5,15 +5,15 @@ import {
 import type { Brand } from 'wellcrafted/brand';
 
 export type Password = string & Brand<'Password'>;
-export type PasswordHash = string & Brand<'PasswordHash'>;
+export type HashedPassword = string & Brand<'HashedPassword'>;
 
-export async function hashPassword(password: Password): Promise<PasswordHash> {
-	return (await hashPasswordBetterAuth(password)) as PasswordHash;
+export async function hashPassword(password: Password): Promise<HashedPassword> {
+	return (await hashPasswordBetterAuth(password)) as HashedPassword;
 }
 
 export function verifyPassword({
 	password,
 	hash,
-}: { password: Password; hash: PasswordHash }): Promise<boolean> {
+}: { password: Password; hash: HashedPassword }): Promise<boolean> {
 	return verifyPasswordBetterAuth({ password, hash });
 }
