@@ -4,6 +4,7 @@ import { TunnelServiceErr } from './types';
 import { spawn, $ } from 'bun';
 import { type } from 'arktype';
 import type { Subprocess } from 'bun';
+import { extractErrorMessage } from 'wellcrafted/error';
 
 export function createTunnelServiceNgrok(): TunnelService {
 	let currentProcess: Subprocess | null = null;
@@ -84,14 +85,14 @@ export function createTunnelServiceNgrok(): TunnelService {
 					})();
 
 					// Wait for the tunnel URL to be found
-					const maxWaitTime = 30000; // 30 seconds
-					const pollInterval = 100; // 100ms
+					const MAX_WAIT = 30_000; // 30 seconds
+					const POLL_INTERVAL = 100; // 100ms
 					const startTime = Date.now();
 
 					while (!tunnelUrl) {
-						await new Promise((resolve) => setTimeout(resolve, pollInterval));
+						await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
 
-						if (Date.now() - startTime > maxWaitTime) {
+						if (Date.now() - startTime > MAX_WAIT) {
 							throw new Error('Timeout waiting for ngrok tunnel URL');
 						}
 
@@ -110,9 +111,7 @@ export function createTunnelServiceNgrok(): TunnelService {
 				},
 				mapErr: (error) =>
 					TunnelServiceErr({
-						message: `Failed to start ngrok tunnel on port ${port}: ${
-							error instanceof Error ? error.message : String(error)
-						}`,
+						message: `Failed to start ngrok tunnel on port ${port}: ${extractErrorMessage(error)}`,
 						cause: error,
 					}),
 			});
