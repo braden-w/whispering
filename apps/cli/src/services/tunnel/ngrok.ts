@@ -57,15 +57,13 @@ export function createTunnelServiceNgrok(): TunnelService {
 
 						for (const line of lines) {
 							const json = type('string.json.parse').to({
-								msg: 'string',
-								url: 'string',
-								err: 'string',
+								'msg?': 'string',
+								'url?': 'string',
+								'err?': 'string',
 							})(line);
 
-							if (json instanceof type.errors) {
-								// Skip errors related to JSON parsing
-								continue;
-							}
+							// Skip errors related to JSON parsing
+							if (json instanceof type.errors) continue;
 
 							// Found the tunnel URL
 							if (json.msg === 'started tunnel' && json.url) {
