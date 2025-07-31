@@ -4,9 +4,8 @@ import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {
-	const { data: assistantConfig, error: configError } = await rpc.assistantConfigs
-		.getAssistantConfigById(() => params.id)
-		.ensure();
+	const { data: assistantConfig, error: configError } =
+		await rpc.assistantConfigs.getAssistantConfigById(() => params.id).ensure();
 
 	if (configError || !assistantConfig) redirect(302, '/assistants');
 
