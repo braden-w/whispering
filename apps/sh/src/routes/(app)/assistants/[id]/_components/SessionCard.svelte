@@ -14,7 +14,7 @@
 	let {
 		assistantConfig,
 		session,
-	}: { assistantConfig: AssistantConfig; session: Session; } = $props();
+	}: { assistantConfig: AssistantConfig; session: Session } = $props();
 	let deleteDialogOpen = $state(false);
 
 	const shareSessionMutation = createMutation(
