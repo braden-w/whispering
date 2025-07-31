@@ -84,19 +84,14 @@
 								Sign in with GitHub
 							{/if}
 						</DropdownMenu.Item>
-						<DropdownMenu.Item>
-							<Button
-								variant="ghost"
-								size="icon"
-								onclick={() => signOut.mutate()}
-							>
-								{#if signOut.isPending}
-									<Loader2 class="h-4 w-4 animate-spin" />
-								{:else}
-									<LogOut class="h-4 w-4" />
-								{/if}
-								<span class="sr-only">Sign out</span>
-							</Button>
+						<DropdownMenu.Item class="cursor-pointer"
+							onclick={() => signOut.mutate()}>
+							{#if signOut.isPending}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								<LogOut class="h-4 w-4" />
+								Sign out
+							{/if}
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
