@@ -8,12 +8,11 @@ export const load: PageLoad = async ({ params }) => {
 		await rpc.assistantConfigs.getAssistantConfigById(() => params.id).ensure();
 
 	if (configError || !assistantConfig) {
-		redirectTo.assistants.error({
+		throw redirectTo.assistants.error({
 			title: 'Assistant not found',
 			description:
 				"The assistant you're looking for doesn't exist. It may have been deleted or you may not have access to it.",
 		});
-		return;
 	}
 
 	const { data: sessions, error: sessionError } = await rpc.sessions
@@ -24,19 +23,17 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (sessionError) {
-		redirectTo.assistant(params.id).error(sessionError);
-		return;
+		throw redirectTo.assistant(params.id).error(sessionError);
 	}
 
 	const session = sessions?.find((s) => s.id === params.sessionId);
 
 	if (!session) {
-		redirectTo.assistant(params.id).info({
+		throw redirectTo.assistant(params.id).info({
 			title: 'Session not found',
 			description:
 				"The conversation you're looking for doesn't exist. It may have been deleted or you may have an outdated link.",
 		});
-		return;
 	}
 
 	// Fetch initial messages
@@ -48,17 +45,15 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (messagesError) {
-		redirectTo.assistant(params.id).error(messagesError);
-		return;
+		throw redirectTo.assistant(params.id).error(messagesError);
 	}
 
 	if (!messages) {
-		redirectTo.assistant(params.id).error({
+		throw redirectTo.assistant(params.id).error({
 			title: 'Failed to load conversation',
 			description:
 				'Unable to load the messages for this conversation (messages were somehow undefined). Please try again or start a new conversation.',
 		});
-		return;
 	}
 
 	const { data: providers, error: providersError } = await rpc.models
@@ -66,17 +61,15 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (providersError) {
-		redirectTo.assistant(params.id).error(providersError);
-		return;
+		throw redirectTo.assistant(params.id).error(providersError);
 	}
 
 	if (!providers) {
-		redirectTo.assistant(params.id).error({
+		throw redirectTo.assistant(params.id).error({
 			title: 'Configuration error',
 			description:
 				'Unable to load AI providers. Please check your assistant configuration and try again.',
 		});
-		return;
 	}
 
 	const { data: modes, error: modesError } = await rpc.modes
@@ -84,17 +77,15 @@ export const load: PageLoad = async ({ params }) => {
 		.ensure();
 
 	if (modesError) {
-		redirectTo.assistant(params.id).error(modesError);
-		return;
+		throw redirectTo.assistant(params.id).error(modesError);
 	}
 
 	if (!modes) {
-		redirectTo.assistant(params.id).error({
+		throw redirectTo.assistant(params.id).error({
 			title: 'Configuration error',
 			description:
 				'Unable to load available modes. Please check your assistant configuration and try again.',
 		});
-		return;
 	}
 
 	return {
