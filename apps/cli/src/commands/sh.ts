@@ -72,7 +72,7 @@ export const ShCommand = cmd({
 
 			const localUrl = `http://${server.hostname}:${server.port}`;
 
-			// Display server information with tunnel provider
+			// Display server information
 			if (tunnelProvider) {
 				console.log(`\n✓ Server running with ${tunnelProvider} tunnel\n`);
 			} else {
@@ -80,38 +80,63 @@ export const ShCommand = cmd({
 			}
 			console.log(`  Local:      ${localUrl}`);
 
-			// Ensure the tunnel provider is installed
-			const { error: ensureInstalledError } =
-				await tunnelService.ensureInstalled();
-			if (ensureInstalledError) {
-				console.error(ensureInstalledError.message);
-				process.exit(1);
-			}
+			// Show loading state for tunnel
+			if (tunnelProvider) {
+				// Simple loading animation
+				const loadingFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+				let frameIndex = 0;
+				process.stdout.write('  Tunnel:     Creating tunnel...');
+				
+				const loadingInterval = setInterval(() => {
+					process.stdout.write(`\r  Tunnel:     ${loadingFrames[frameIndex]} Creating tunnel...`);
+					frameIndex = (frameIndex + 1) % loadingFrames.length;
+				}, 80);
 
-			// Start the tunnel
-			const { data: tunnelUrl, error: tunnelError } =
-				await tunnelService.startTunnel(port);
-			if (tunnelError) {
-				console.error(tunnelError.message);
-				process.exit(1);
-			}
+				// Ensure the tunnel provider is installed
+				const { error: ensureInstalledError } =
+					await tunnelService.ensureInstalled();
+				if (ensureInstalledError) {
+					clearInterval(loadingInterval);
+					process.stdout.write('\r  Tunnel:     ✗ Failed to install tunnel provider\n');
+					console.error(ensureInstalledError.message);
+					process.exit(1);
+				}
 
-			console.log(`  Tunnel:     ${tunnelUrl}`);
-			if (args.open) {
-				const EPICENTER_ASSISTANT_URL =
-					`${EPICENTER_SH_URL}/assistants` as const;
-				const currentDirName = basename(cwd);
-				const params = new URLSearchParams({
-					url: tunnelUrl,
-					name: currentDirName,
-				});
-				const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
-				console.log(`  Epicenter:  ${url}`);
-				console.log();
-				console.log('  Opening browser...');
-				const { error: browserError } = await BrowserServiceLive.openUrl(url);
-				if (browserError) {
-					console.error('Failed to open browser:', browserError.message);
+				// Start the tunnel
+				const { data: tunnelUrl, error: tunnelError } =
+					await tunnelService.startTunnel(port);
+				
+				clearInterval(loadingInterval);
+				
+				if (tunnelError) {
+					process.stdout.write('\r  Tunnel:     ✗ Failed to create tunnel\n');
+					console.error(tunnelError.message);
+					process.exit(1);
+				}
+
+				// Clear the loading line and show the tunnel URL
+				process.stdout.write(`\r  Tunnel:     ${tunnelUrl}\n`);
+				
+				if (args.open) {
+					const EPICENTER_ASSISTANT_URL =
+						`${EPICENTER_SH_URL}/assistants` as const;
+					const currentDirName = basename(cwd);
+					const params = new URLSearchParams({
+						url: tunnelUrl,
+						name: currentDirName,
+					});
+					const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
+					console.log(`  Epicenter:  ${url}`);
+					console.log();
+					
+					// Wait 1 second before opening browser
+					await new Promise(resolve => setTimeout(resolve, 1000));
+					
+					console.log('  Opening browser...');
+					const { error: browserError } = await BrowserServiceLive.openUrl(url);
+					if (browserError) {
+						console.error('Failed to open browser:', browserError.message);
+					}
 				}
 			}
 

@@ -37,10 +37,22 @@ const cli = yargs(hideBin(process.argv))
 	})
 	.demandCommand(1, 'You need to specify a command')
 	.command(ShCommand)
-	.example('epicenter sh', 'Start opencode server with smart defaults')
+	.example('epicenter sh', 'Start local server with cloudflare tunnel and open epicenter.sh in browser')
 	.example(
-		'epicenter sh --tunnel=false --open=false',
-		'Start without cloudflare tunnel or opening the browser',
+		'epicenter sh --port=8080',
+		'Start server on specific port (defaults to auto-discovered available port)',
+	)
+	.example(
+		'epicenter sh --tunnel=ngrok',
+		'Use ngrok instead of cloudflare for tunneling',
+	)
+	.example(
+		'epicenter sh --no-tunnel --no-open',
+		'Start local server only, without tunnel or browser',
+	)
+	.example(
+		'epicenter sh --cors-origins=http://localhost:3000',
+		'Add additional CORS allowed origins',
 	)
 	.strict()
 	.fail((msg, err, yargs) => {
