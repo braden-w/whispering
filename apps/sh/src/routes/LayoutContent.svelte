@@ -1,21 +1,24 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
 	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import { LightSwitch } from '@repo/ui/light-switch';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import { Loader2, LogOut, Settings, User } from 'lucide-svelte';
 	import { siGithub } from 'simple-icons';
 
 	let { children } = $props();
 	let settingsOpen = $state(false);
 
+	const userQuery = createQuery(rpc.auth.getUser.options);
+
 	const signInWithGithubMutation = createMutation(
 		rpc.auth.signInWithGithub.options,
 	);
-	const signOut = createMutation(rpc.auth.signOut.options);
+	const signOutMutation = createMutation(rpc.auth.signOut.options);
 </script>
 
 <div class="relative min-h-screen bg-background">
@@ -71,28 +74,37 @@
 					<DropdownMenu.Content align="end" class="w-56">
 						<DropdownMenu.Label>Account</DropdownMenu.Label>
 						<DropdownMenu.Separator />
-						<DropdownMenu.Item
-							class="cursor-pointer"
-							onclick={() => signInWithGithubMutation.mutate()}
-						>
-							{#if signInWithGithubMutation.isPending}
-								<Loader2 class="animate-spin" />
-							{:else}
-								<span class="dark:invert">
-									{@html siGithub.svg}
-								</span>
-								Sign in with GitHub
-							{/if}
-						</DropdownMenu.Item>
-						<DropdownMenu.Item class="cursor-pointer"
-							onclick={() => signOut.mutate()}>
-							{#if signOut.isPending}
-								<Loader2 class="h-4 w-4 animate-spin" />
-							{:else}
-								<LogOut class="h-4 w-4" />
-								Sign out
-							{/if}
-						</DropdownMenu.Item>
+						{#if userQuery.data && !userQuery.data.isAnonymous}
+							<DropdownMenu.Item
+								class="cursor-pointer"
+								onclick={() => signOutMutation.mutate(undefined, {
+									onSuccess: () => {
+										goto('/');
+									}
+								})}
+							>
+								{#if signOutMutation.isPending}
+									<Loader2 class="h-4 w-4 animate-spin" />
+								{:else}
+									<LogOut class="h-4 w-4" />
+									Sign out
+								{/if}
+							</DropdownMenu.Item>
+						{:else}
+							<DropdownMenu.Item
+								class="cursor-pointer"
+								onclick={() => signInWithGithubMutation.mutate()}
+							>
+								{#if signInWithGithubMutation.isPending}
+									<Loader2 class="animate-spin" />
+								{:else}
+									<span class="dark:invert">
+										{@html siGithub.svg}
+									</span>
+									Sign in with GitHub
+								{/if}
+							</DropdownMenu.Item>
+						{/if}
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			</nav>
