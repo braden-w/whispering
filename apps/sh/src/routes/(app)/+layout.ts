@@ -13,11 +13,6 @@ export async function load() {
 	// No session exists, sign in anonymously
 	const { error: anonError } = await authClient.signIn.anonymous();
 	if (anonError) redirect(302, '/');
-
-	// Get the new session
-	const { data: newSession, error: sessionError } =
-		await rpc.auth.getSession.ensure();
-	if (sessionError) redirect(302, '/');
-	if (!newSession) throw new Error('No session found');
-	return { session: newSession };
+	// Then redirect to the assistants page
+	return redirect(302, '/assistants');
 }
