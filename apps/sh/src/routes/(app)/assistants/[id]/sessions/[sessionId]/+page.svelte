@@ -120,7 +120,7 @@
 {#if session}
 	<div class="flex flex-col h-[calc(100vh-3.5rem)]">
 		<!-- Header Section with centered content -->
-		<div class="mx-auto w-full max-w-3xl px-4 py-4">
+		<header class="mx-auto w-full max-w-3xl px-4 py-4">
 			<!-- Breadcrumb Navigation -->
 			<Breadcrumb.Root class="mb-3 sm:mb-4">
 				<Breadcrumb.List>
@@ -276,7 +276,7 @@
 					</AlertDialog.Root>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<MessageList messages={messages.value} />
 

@@ -49,18 +49,17 @@
 	</header>
 
 	<!-- Page Content -->
-	<div class="px-4 sm:px-6 py-6 sm:py-8">
-		<div class="space-y-6">
-			<div class="flex items-center justify-between">
-				<div>
-					<h1 class="text-3xl font-bold tracking-tight">
-						{assistantConfig.name}
-					</h1>
-					<p class="text-muted-foreground">
-						Manage sessions for this assistant
-					</p>
-				</div>
-				<div class="flex items-center gap-4">
+	<div class="px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+		<div class="flex items-center justify-between">
+			<div>
+				<h1 class="text-3xl font-bold tracking-tight">
+					{assistantConfig.name}
+				</h1>
+				<p class="text-muted-foreground">
+					Manage sessions for this assistant
+				</p>
+			</div>
+			<div class="flex items-center gap-4">
 					<AssistantConnectionBadge {assistantConfig} />
 					<Badge variant="secondary" class="text-sm">
 						{sessionsQuery.data?.length} session{sessionsQuery.data?.length !==
@@ -89,7 +88,6 @@
 			</div>
 
 			<SessionList sessions={sessionsQuery.data ?? []} {assistantConfig} />
-		</div>
 	</div>
 
 	{#if assistantConfig}

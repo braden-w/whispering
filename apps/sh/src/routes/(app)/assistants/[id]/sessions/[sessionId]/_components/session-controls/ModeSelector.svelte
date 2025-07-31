@@ -40,9 +40,7 @@
 </script>
 
 {#if modesQuery.isPending}
-	<div class="flex items-center gap-1">
-		<Skeleton class="h-9 w-[200px]" />
-	</div>
+	<Skeleton class="h-9 w-[200px]" />
 {:else if modesQuery.isError}
 	<div class="text-sm text-destructive">Failed to load modes</div>
 {:else}
