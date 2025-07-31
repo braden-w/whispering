@@ -4,9 +4,8 @@ import { redirectTo } from '$lib/utils/redirect-with-flash-message';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {
-	const { data: assistantConfig, error: configError } = await rpc.assistantConfigs
-		.getAssistantConfigById(() => params.id)
-		.ensure();
+	const { data: assistantConfig, error: configError } =
+		await rpc.assistantConfigs.getAssistantConfigById(() => params.id).ensure();
 
 	if (configError || !assistantConfig) {
 		redirectTo.assistants.error({
@@ -17,7 +16,7 @@ export const load: PageLoad = async ({ params }) => {
 		return;
 	}
 
-	const { data: session, error: sessionError } = await rpc.sessions
+	const { data: sessions, error: sessionError } = await rpc.sessions
 		.getSessionById(
 			() => assistantConfig,
 			() => params.sessionId,
@@ -28,6 +27,8 @@ export const load: PageLoad = async ({ params }) => {
 		redirectTo.assistant(params.id).error(sessionError);
 		return;
 	}
+
+	const session = sessions?.find((s) => s.id === params.sessionId);
 
 	if (!session) {
 		redirectTo.assistant(params.id).info({
