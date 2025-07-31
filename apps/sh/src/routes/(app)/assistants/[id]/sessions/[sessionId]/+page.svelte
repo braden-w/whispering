@@ -282,30 +282,28 @@
 
 		<Separator />
 
-		<div class="mx-auto w-full max-w-3xl px-4 pt-4 pb-10 space-y-12">
-			<div class="space-y-2">
-				<!-- Session Controls -->
-				<div class="flex items-center gap-2">
-					<ModeSelector
-						{assistantConfig}
-						bind:value={messageMode}
-						onModeChange={handleModeChange}
-					/>
-					<ModelSelector {assistantConfig} bind:value={selectedModel} />
-				</div>
-
-				<MessageInput
-					bind:value={messageContent}
-					onSubmit={handleSendMessage}
-					onFileUpload={handleFileUpload}
-					disabled={sendMessageMutation.isPending || !selectedModel}
-					placeholder={isProcessing
-						? 'Waiting for response...'
-						: !selectedModel
-							? 'Select a model to start chatting...'
-							: 'Type your message...'}
+		<div class="mx-auto w-full max-w-3xl px-4 pt-4 pb-10 space-y-2">
+			<!-- Session Controls -->
+			<div class="flex items-center gap-2">
+				<ModeSelector
+					{assistantConfig}
+					bind:value={messageMode}
+					onModeChange={handleModeChange}
 				/>
+				<ModelSelector {assistantConfig} bind:value={selectedModel} />
 			</div>
+
+			<MessageInput
+				bind:value={messageContent}
+				onSubmit={handleSendMessage}
+				onFileUpload={handleFileUpload}
+				disabled={sendMessageMutation.isPending || !selectedModel}
+				placeholder={isProcessing
+					? 'Waiting for response...'
+					: !selectedModel
+						? 'Select a model to start chatting...'
+						: 'Type your message...'}
+			/>
 		</div>
 	</div>
 {/if}
