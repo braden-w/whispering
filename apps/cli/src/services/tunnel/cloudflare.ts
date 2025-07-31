@@ -43,33 +43,59 @@ export function createTunnelServiceCloudflare(): TunnelService {
 
 					currentProcess = tunnelProc;
 
-					// Read from stderr stream to parse tunnel URL
+					// Read stderr for tunnel URL
 					const decoder = new TextDecoder();
-					for await (const chunk of tunnelProc.stderr as any) {
-						const data = decoder.decode(chunk);
+					let tunnelUrl: string | null = null;
 
-						// Parse the tunnel URL from the box format
-						const urlMatch = data.match(
-							/\|\s+(https:\/\/[^|]+\.trycloudflare\.com)\s+\|/,
-						);
+					// Continue reading stderr in background to keep the process alive
+					// This prevents the stderr buffer from filling up and blocking cloudflared
+					(async () => {
+						for await (const chunk of tunnelProc.stderr as any) {
+							const data = decoder.decode(chunk);
 
-						if (urlMatch?.[1]) {
-							const url = urlMatch[1].trim();
-							return url;
+							// Only process if we haven't found the URL yet
+							if (!tunnelUrl) {
+								// Parse the tunnel URL from the box format
+								const urlMatch = data.match(
+									/\|\s+(https:\/\/[^|]+\.trycloudflare\.com)\s+\|/,
+								);
+
+								if (urlMatch?.[1]) {
+									tunnelUrl = urlMatch[1].trim();
+								}
+							}
+							// Continue reading to prevent buffer overflow even after finding URL
+						}
+					})();
+
+					// Wait for the tunnel URL to be found
+					const MAX_WAIT = 30_000; // 30 seconds
+					const POLL_INTERVAL = 100; // 100ms
+					const startTime = Date.now();
+
+					while (!tunnelUrl) {
+						await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+
+						if (Date.now() - startTime > MAX_WAIT) {
+							throw new Error('Timeout waiting for cloudflared tunnel URL');
+						}
+
+						// Check if process has exited
+						if (tunnelProc.killed) {
+							const exitCode = await tunnelProc.exited;
+							throw new Error(
+								`cloudflared process ended without providing URL${
+									exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
+								}`,
+							);
 						}
 					}
 
-					// Stream ended without finding URL
-					const exitCode = await tunnelProc.exited;
-					throw new Error(
-						`Failed to start cloudflared tunnel on port ${port}${
-							exitCode !== 0 ? ` (exit code: ${exitCode})` : ''
-						}`,
-					);
+					return tunnelUrl;
 				},
 				mapErr: (error) =>
 					TunnelServiceErr({
-						message: error instanceof Error ? error.message : String(error),
+						message: `Failed to start cloudflared tunnel on port ${port}: ${extractErrorMessage(error)}`,
 						cause: error,
 					}),
 			});
