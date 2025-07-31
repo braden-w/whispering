@@ -3,24 +3,14 @@
 	"name": "api",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-29",
-	"env": {
-		"development": {
-			"observability": {
-				"enabled": true,
-				"head_sampling_rate": 1
-			}
-		},
-		"production": {
-			"routes": [
-				{
-					"pattern": "api.epicenter.so",
-					"custom_domain": true
-				}
-			],
-			"observability": {
-				"enabled": true,
-				"head_sampling_rate": 1
-			}
+	"routes": [
+		{
+			"pattern": "api.epicenter.so",
+			"custom_domain": true
 		}
+	],
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1
 	}
 }
