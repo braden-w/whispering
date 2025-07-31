@@ -133,15 +133,16 @@ export const assistantConfigRouter = router({
 		.input(assistantConfigInsertSchema.omit('userId'))
 		.mutation(async ({ ctx, input }) => {
 			try {
-				// Encrypt password if provided
 				const encryptedInput = await ctx.encryptConfig(input);
 
-				const [newConfig] = await ctx.db
+				const newConfig = await ctx.db
 					.insert(assistantConfig)
 					.values({ ...encryptedInput, userId: ctx.user.id })
-					.returning();
+					.onConflictDoNothing()
+					.returning()
+					.then((rows) => rows.at(0));
 
-				return ctx.decryptConfig(newConfig);
+				return newConfig ? ctx.decryptConfig(newConfig) : null;
 			} catch (error) {
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
