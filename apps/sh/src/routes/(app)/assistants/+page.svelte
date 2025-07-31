@@ -38,7 +38,9 @@
 	useCreateAssistantParams(page.url);
 
 	// Fetch assistant configs from database
-	const configsQuery = createQuery(rpc.assistantConfigs.getAssistantConfigs.options);
+	const configsQuery = createQuery(
+		rpc.assistantConfigs.getAssistantConfigs.options,
+	);
 	const configs = $derived(configsQuery.data ?? []);
 </script>
 
@@ -106,7 +108,9 @@
 		</div>
 	{:else if configsQuery.isError}
 		<div class="rounded-lg border border-destructive p-8 text-center">
-			<h3 class="text-lg font-semibold text-destructive">Failed to load assistants</h3>
+			<h3 class="text-lg font-semibold text-destructive">
+				Failed to load assistants
+			</h3>
 			<p class="text-muted-foreground mt-2">
 				{configsQuery.error?.description ?? 'An unexpected error occurred'}
 			</p>

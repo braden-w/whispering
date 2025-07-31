@@ -17,7 +17,7 @@
 	<div
 		class="flex-1 overflow-y-auto flex items-center justify-center text-muted-foreground"
 	>
-		<div class="text-center">
+		<div class="text-center mx-auto max-w-3xl px-4">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				class="h-12 w-12 mx-auto mb-4 opacity-50"
@@ -37,7 +37,7 @@
 	</div>
 {:else}
 	<div class="flex-1 overflow-y-auto">
-		<Chat.List>
+		<Chat.List class="mx-auto max-w-3xl">
 			{#each messages as message (message.info.id)}
 				{#if message.info.role === 'user'}
 					<UserMessageBubble message={message.info} parts={message.parts} />
