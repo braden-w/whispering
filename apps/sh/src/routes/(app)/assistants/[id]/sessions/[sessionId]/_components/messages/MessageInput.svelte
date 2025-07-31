@@ -91,16 +91,14 @@
 	{/if}
 
 	<div class="flex gap-2">
-		<div class="flex-1">
-			<Textarea
-				bind:value
-				{placeholder}
-				{disabled}
-				onkeydown={handleKeyDown}
-				class="min-h-[80px] resize-none"
-				rows={3}
-			/>
-		</div>
+		<Textarea
+			bind:value
+			{placeholder}
+			{disabled}
+			onkeydown={handleKeyDown}
+			class="min-h-[80px] resize-none flex-1"
+			rows={3}
+		/>
 		<div class="flex flex-col gap-2">
 			<Button
 				variant="ghost"

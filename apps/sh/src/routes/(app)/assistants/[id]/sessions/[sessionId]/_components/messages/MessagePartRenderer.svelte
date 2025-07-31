@@ -73,33 +73,29 @@
 		</div>
 	</div>
 {:else if part.type === 'step-start'}
-	<div class="my-2">
-		<div
-			class="flex items-center gap-3 text-sm text-muted-foreground border-l-4 border-primary/60 bg-primary/5 pl-4 py-2 rounded-r"
-		>
-			<div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-			<span class="font-medium">Starting step...</span>
-		</div>
+	<div
+		class="my-2 flex items-center gap-3 text-sm text-muted-foreground border-l-4 border-primary/60 bg-primary/5 pl-4 py-2 rounded-r"
+	>
+		<div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+		<span class="font-medium">Starting step...</span>
 	</div>
 {:else if part.type === 'step-finish'}
-	<div class="my-2">
-		<div
-			class="flex items-center justify-between text-sm border-l-4 border-green-500/60 bg-green-500/5 pl-4 py-2 rounded-r"
-		>
-			<div class="flex items-center gap-3">
-				<div class="w-2 h-2 bg-green-500 rounded-full"></div>
-				<span class="font-medium text-green-700 dark:text-green-400"
-					>Step completed</span
-				>
-			</div>
-			<div class="flex items-center gap-3 text-xs text-muted-foreground">
-				{#if part.cost > 0}
-					<span class="font-medium">${part.cost.toFixed(4)}</span>
-				{/if}
-				<span class="font-mono bg-muted/50 px-2 py-1 rounded text-xs">
-					{part.tokens.input}→{part.tokens.output}
-				</span>
-			</div>
+	<div
+		class="my-2 flex items-center justify-between text-sm border-l-4 border-green-500/60 bg-green-500/5 pl-4 py-2 rounded-r"
+	>
+		<div class="flex items-center gap-3">
+			<div class="w-2 h-2 bg-green-500 rounded-full"></div>
+			<span class="font-medium text-green-700 dark:text-green-400"
+				>Step completed</span
+			>
+		</div>
+		<div class="flex items-center gap-3 text-xs text-muted-foreground">
+			{#if part.cost > 0}
+				<span class="font-medium">${part.cost.toFixed(4)}</span>
+			{/if}
+			<span class="font-mono bg-muted/50 px-2 py-1 rounded text-xs">
+				{part.tokens.input}→{part.tokens.output}
+			</span>
 		</div>
 	</div>
 {:else if part.type === 'tool'}
