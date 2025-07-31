@@ -30,7 +30,7 @@
 
 	// Update mutation
 	const updateMutation = createMutation(
-		rpc.assistantConfigs.updateAssistantConfig.options
+		rpc.assistantConfigs.updateAssistantConfig.options,
 	);
 
 	function handleSave() {
@@ -54,7 +54,7 @@
 				onError: (error) => {
 					toast.error(error.title, { description: error.description });
 				},
-			}
+			},
 		);
 	}
 </script>

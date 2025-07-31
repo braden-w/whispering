@@ -35,7 +35,7 @@
 
 	// Create mutation for adding assistant config
 	const createAssistantMutation = createMutation(
-		rpc.assistantConfigs.createAssistantConfig.options
+		rpc.assistantConfigs.createAssistantConfig.options,
 	);
 
 	// Reset form when dialog opens
@@ -145,7 +145,7 @@
 				onError: (error) => {
 					toast.error(error.title, { description: error.description });
 				},
-			}
+			},
 		);
 	}
 </script>
@@ -385,7 +385,9 @@
 				<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
 				<Button
 					onclick={handleCreate}
-					disabled={!testSuccess || !assistantName.trim() || createAssistantMutation.isPending}
+					disabled={!testSuccess ||
+						!assistantName.trim() ||
+						createAssistantMutation.isPending}
 				>
 					{#if createAssistantMutation.isPending}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />

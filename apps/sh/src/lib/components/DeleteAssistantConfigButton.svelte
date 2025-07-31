@@ -13,7 +13,7 @@
 
 	// Delete mutation
 	const deleteMutation = createMutation(
-		rpc.assistantConfigs.deleteAssistantConfig.options
+		rpc.assistantConfigs.deleteAssistantConfig.options,
 	);
 
 	function handleDelete() {
@@ -24,14 +24,18 @@
 					toast.success('Deleted assistant');
 					open = false;
 					// Navigate back to assistants list if we're on the assistant page
-					if (window.location.pathname.includes(`/assistants/${assistantConfig.id}`)) {
+					if (
+						window.location.pathname.includes(
+							`/assistants/${assistantConfig.id}`,
+						)
+					) {
 						goto('/assistants');
 					}
 				},
 				onError: (error) => {
 					toast.error(error.title, { description: error.description });
 				},
-			}
+			},
 		);
 	}
 </script>
@@ -54,7 +58,10 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={handleDelete} disabled={deleteMutation.isPending}>
+			<AlertDialog.Action
+				onclick={handleDelete}
+				disabled={deleteMutation.isPending}
+			>
 				{#if deleteMutation.isPending}
 					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 					Deleting...

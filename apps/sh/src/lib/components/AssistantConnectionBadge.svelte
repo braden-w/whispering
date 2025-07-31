@@ -8,7 +8,7 @@
 	let {
 		assistantConfig,
 		refetchInterval = 2000,
-	}: { assistantConfig: AssistantConfig; refetchInterval?: number; } = $props();
+	}: { assistantConfig: AssistantConfig; refetchInterval?: number } = $props();
 
 	const assistantQuery = createQuery(() => ({
 		...rpc.assistants.getAssistant(() => assistantConfig).options(),
