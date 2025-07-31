@@ -159,6 +159,11 @@
 	& small:not(.not-prose small) {
 		@apply text-xs leading-none;
 	}
+
+	& strong:not(.not-prose strong),
+	& b:not(.not-prose b) {
+		@apply font-bold;
+	}
 }
 
 .prose-invert {
@@ -219,5 +224,10 @@
 
 	& tbody tr {
 		@apply border-primary-foreground/20 even:bg-primary-foreground/5;
+	}
+
+	& strong:not(.not-prose strong),
+	& b:not(.not-prose b) {
+		@apply text-primary-foreground;
 	}
 }
