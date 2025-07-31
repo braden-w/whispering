@@ -12,8 +12,6 @@ import { cmd } from '../utils/cmd';
 
 const EPICENTER_SH_URL = 'https://epicenter.sh' as const;
 
-const log = Log.create({ service: 'sh' });
-
 export const ShCommand = cmd({
 	command: 'sh',
 	builder: (yargs) =>
@@ -83,12 +81,25 @@ export const ShCommand = cmd({
 			// Show loading state for tunnel
 			if (tunnelProvider) {
 				// Simple loading animation
-				const loadingFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+				const loadingFrames = [
+					'⠋',
+					'⠙',
+					'⠹',
+					'⠸',
+					'⠼',
+					'⠴',
+					'⠦',
+					'⠧',
+					'⠇',
+					'⠏',
+				];
 				let frameIndex = 0;
 				process.stdout.write('  Tunnel:     Creating tunnel...');
-				
+
 				const loadingInterval = setInterval(() => {
-					process.stdout.write(`\r  Tunnel:     ${loadingFrames[frameIndex]} Creating tunnel...`);
+					process.stdout.write(
+						`\r  Tunnel:     ${loadingFrames[frameIndex]} Creating tunnel...`,
+					);
 					frameIndex = (frameIndex + 1) % loadingFrames.length;
 				}, 80);
 
@@ -97,7 +108,9 @@ export const ShCommand = cmd({
 					await tunnelService.ensureInstalled();
 				if (ensureInstalledError) {
 					clearInterval(loadingInterval);
-					process.stdout.write('\r  Tunnel:     ✗ Failed to install tunnel provider\n');
+					process.stdout.write(
+						'\r  Tunnel:     ✗ Failed to install tunnel provider\n',
+					);
 					console.error(ensureInstalledError.message);
 					process.exit(1);
 				}
@@ -105,9 +118,9 @@ export const ShCommand = cmd({
 				// Start the tunnel
 				const { data: tunnelUrl, error: tunnelError } =
 					await tunnelService.startTunnel(port);
-				
+
 				clearInterval(loadingInterval);
-				
+
 				if (tunnelError) {
 					process.stdout.write('\r  Tunnel:     ✗ Failed to create tunnel\n');
 					console.error(tunnelError.message);
@@ -116,7 +129,7 @@ export const ShCommand = cmd({
 
 				// Clear the loading line and show the tunnel URL
 				process.stdout.write(`\r  Tunnel:     ${tunnelUrl}\n`);
-				
+
 				if (args.open) {
 					const EPICENTER_ASSISTANT_URL =
 						`${EPICENTER_SH_URL}/assistants` as const;
@@ -128,10 +141,10 @@ export const ShCommand = cmd({
 					const url = `${EPICENTER_ASSISTANT_URL}?${params}` as const;
 					console.log(`  Epicenter:  ${url}`);
 					console.log();
-					
+
 					// Wait 1 second before opening browser
-					await new Promise(resolve => setTimeout(resolve, 1000));
-					
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+
 					console.log('  Opening browser...');
 					const { error: browserError } = await BrowserServiceLive.openUrl(url);
 					if (browserError) {
