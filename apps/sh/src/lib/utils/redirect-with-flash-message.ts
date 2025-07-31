@@ -1,4 +1,5 @@
-import { redirect } from '@sveltejs/kit';
+import { goto } from '$app/navigation';
+import { APPS } from '@repo/constants/vite';
 import { type } from 'arktype';
 
 /**
@@ -110,8 +111,9 @@ function createRedirectMethods(location: `/${string}`) {
 		 * @param message - The error message to display
 		 * @returns Never - this function always throws a redirect
 		 */
-		error(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, location, { ...message, type: 'error' });
+		error(message: Omit<FlashMessage, 'type'>) {
+			console.log('🚀 ~ location:', location);
+			return redirectWithFlash(location, { ...message, type: 'error' });
 		},
 
 		/**
@@ -119,8 +121,8 @@ function createRedirectMethods(location: `/${string}`) {
 		 * @param message - The info message to display
 		 * @returns Never - this function always throws a redirect
 		 */
-		info(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, location, { ...message, type: 'info' });
+		info(message: Omit<FlashMessage, 'type'>) {
+			return redirectWithFlash(location, { ...message, type: 'info' });
 		},
 
 		/**
@@ -128,8 +130,8 @@ function createRedirectMethods(location: `/${string}`) {
 		 * @param message - The success message to display
 		 * @returns Never - this function always throws a redirect
 		 */
-		success(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, location, { ...message, type: 'success' });
+		success(message: Omit<FlashMessage, 'type'>) {
+			return redirectWithFlash(location, { ...message, type: 'success' });
 		},
 
 		/**
@@ -137,8 +139,8 @@ function createRedirectMethods(location: `/${string}`) {
 		 * @param message - The warning message to display
 		 * @returns Never - this function always throws a redirect
 		 */
-		warning(message: Omit<FlashMessage, 'type'>): never {
-			return redirectWithFlash(302, location, { ...message, type: 'warning' });
+		warning(message: Omit<FlashMessage, 'type'>) {
+			return redirectWithFlash(location, { ...message, type: 'warning' });
 		},
 	};
 }
@@ -147,14 +149,10 @@ function createRedirectMethods(location: `/${string}`) {
  * Internal helper that wraps SvelteKit's redirect with flash message support
  * @internal
  */
-function redirectWithFlash(
-	status: number,
-	location: `/${string}`,
-	message: FlashMessage,
-): never {
-	const url = new URL(location, import.meta.env.BASE_URL);
+function redirectWithFlash(location: `/${string}`, message: FlashMessage) {
+	const url = new URL(location, APPS.SH.URL);
 	url.searchParams.set(FLASH_MESSAGE_PARAMS.title, message.title);
 	url.searchParams.set(FLASH_MESSAGE_PARAMS.description, message.description);
 	url.searchParams.set(FLASH_MESSAGE_PARAMS.type, message.type);
-	return redirect(status, url.pathname + url.search);
+	return goto(url.pathname + url.search);
 }
