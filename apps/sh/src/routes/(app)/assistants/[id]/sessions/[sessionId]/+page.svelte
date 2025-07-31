@@ -23,7 +23,7 @@
 	let { data }: { data: PageData } = $props();
 	const assistantConfig = $derived(data.assistantConfig);
 	const session = $derived(data.session);
-	const sessionId = $derived(session.id);
+	const sessionId = $derived(data.sessionId);
 
 	const sendMessageMutation = createMutation(rpc.messages.sendMessage.options);
 	const deleteSessionMutation = createMutation(
@@ -111,86 +111,6 @@
 	<title>{session?.title || 'Untitled Session'} - {assistantConfig?.name} | epicenter.sh</title>
 	<meta name="description" content="Chat with your local codebase through OpenCode. Ask questions, get explanations, and work with AI that has full project context." />
 </svelte:head>
-	const deleteSessionMutation = createMutation(
-		rpc.sessions.deleteSession.options,
-	);
-	const shareSessionMutation = createMutation(
-		rpc.sessions.shareSession.options,
-	);
-	const unshareSessionMutation = createMutation(
-		rpc.sessions.unshareSession.options,
-	);
-	const abortSessionMutation = createMutation(
-		rpc.sessions.abortSession.options,
-	);
-
-	// Create message subscriber
-	const messages = createMessageSubscriber({
-		initialMessages: () => data.messages ?? [],
-		sessionId: () => sessionId,
-		assistant: () => assistantConfig,
-	});
-	let messageContent = $state('');
-	let messageMode = $state(data.modes?.at(0)?.name ?? 'build');
-	let selectedModel = $state<null | { modelId: string; providerId: string }>({
-		modelId: 'claude-sonnet-4-20250514',
-		providerId: 'anthropic',
-	});
-
-	const isProcessing = $derived(
-		messages.value.some(
-			(msg) => msg.info.role === 'assistant' && !msg.info.time.completed,
-		),
-	);
-
-	const canSendMessage = $derived(
-		messageContent.trim().length > 0 &&
-			!isProcessing &&
-			!sendMessageMutation.isPending &&
-			selectedModel !== null,
-	);
-
-	function handleSendMessage() {
-		if (!canSendMessage || !selectedModel) return;
-
-		const content = messageContent.trim();
-		messageContent = '';
-
-		sendMessageMutation.mutate(
-			{
-				body: {
-					mode: messageMode,
-					modelID: selectedModel.modelId,
-					parts: [{ text: content, type: 'text' }],
-					providerID: selectedModel.providerId,
-				},
-				sessionId,
-				assistantConfig,
-			},
-			{
-				onError: (error) => {
-					toast.error(error.title, {
-						description: error.description,
-					});
-					// Restore the message content on error
-					messageContent = content;
-				},
-			},
-		);
-	}
-
-	async function handleFileUpload(_files: File[]) {
-		// For now, just show a toast that file upload is not yet implemented
-		toast.info('File upload coming soon!', {
-			description: 'This feature is still being implemented.',
-		});
-	}
-
-	function handleModeChange(mode: string) {
-		messageMode = mode;
-		toast.success(`Switched to ${mode} mode`);
-	}
-</script>
 
 {#if session}
 	<div class="flex flex-col h-[calc(100vh-3.5rem)] px-4 sm:px-6 py-4">
