@@ -66,8 +66,7 @@
 				<Button
 					size="sm"
 					variant="outline"
-					onclick={(e) => {
-						e.preventDefault();
+					onclick={() => {
 						unshareSessionMutation.mutate(
 							{ assistantConfig, sessionId: session.id },
 							{
@@ -89,8 +88,7 @@
 				<Button
 					size="sm"
 					variant="outline"
-					onclick={(e) => {
-						e.preventDefault();
+					onclick={() => {
 						shareSessionMutation.mutate(
 							{ assistantConfig, sessionId: session.id },
 							{
