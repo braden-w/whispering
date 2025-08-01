@@ -1,91 +1,119 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { RotatingTagline } from '../components/RotatingTagline';
+import { CorePrinciples } from '../components/CorePrinciples';
+import { WaitlistForm } from '../components/WaitlistForm';
 ---
 
 <BaseLayout title="Epicenter">
   <main class="min-h-screen bg-white">
-    <div class="max-w-2xl mx-auto px-6 py-24">
-      <header class="mb-16">
-        <h1 class="text-5xl font-semibold text-gray-900 mb-6">
-          Your personal database that thinks in files, not features
+    <div class="max-w-4xl mx-auto px-6 py-16">
+      <!-- Hero Section -->
+      <header class="mb-20 text-center">
+        <RotatingTagline className="mb-8" client:load />
+        
+        <h1 class="text-5xl font-bold text-gray-900 mb-6">
+          A shared workspace for everything you think, write, and build
         </h1>
-        <p class="text-xl text-gray-600 mb-8">
-          Epicenter is a local-first vault where your emails, tasks, and notes live as plain files on your disk. 
-          Powered by CRDTs, it never loses data and never needs the internet.
+        
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          Epicenter is a growing suite of local-first tools built around a single idea: creativity thrives when you blur the lines between disciplines.
         </p>
-        <p class="text-lg text-gray-500 mb-8">
-          Delete the app, keep your data. Every service is just a folder. Every item is just a file. 
-          Your assistants can read your entire context without APIs or integrations.
+        
+        <p class="text-lg text-gray-500 mb-10 max-w-2xl mx-auto">
+          Most tools divide you—one for writing, one for planning, one for research. We're building tools that talk to each other—so you can stay in flow across every kind of work.
         </p>
-        <div class="flex items-center gap-4">
-          <a href="https://github.com/epicentered/epicenter" class="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors">
-            See the code →
+        
+        <div class="flex items-center justify-center gap-6">
+          <a href="#waitlist" class="inline-flex items-center px-8 py-3 text-base font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors">
+            Join the waitlist →
           </a>
-          <p class="text-gray-600 font-medium">Own your digital life, literally.</p>
+          <div class="flex gap-4 text-gray-600">
+            <a href="https://github.com/epicentered" class="hover:text-gray-900 transition-colors">
+              GitHub
+            </a>
+            <span>·</span>
+            <a href="https://discord.gg/epicenter" class="hover:text-gray-900 transition-colors">
+              Discord
+            </a>
+          </div>
         </div>
       </header>
 
-      <section class="mb-16">
-        <div class="grid gap-8 md:grid-cols-3">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Zero sync conflicts, ever</h3>
-            <p class="text-gray-600">
-              CRDTs mean your data merges perfectly across devices. Work offline for weeks, sync when you want, never resolve a conflict again.
-            </p>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Your vault, your rules</h3>
-            <p class="text-gray-600">
-              Everything lives in folders you can see, move, and backup. No vendor lock-in because there's no vendor format—just files on disk.
-            </p>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Context-aware assistants</h3>
-            <p class="text-gray-600">
-              LLMs can mount your vault and understand your entire digital history. Real context, not another chat interface.
-            </p>
-          </div>
-        </div>
+      <!-- Core Principles -->
+      <section class="mb-20">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Our Principles</h2>
+        <CorePrinciples client:visible />
       </section>
 
-      <section class="mb-16">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Projects</h2>
-        <div class="space-y-8">
-          <article class="group">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">
-              <a href="https://github.com/epicentered/epicenter" class="hover:text-gray-600 transition-colors">
-                Epicenter →
-              </a>
-            </h3>
-            <p class="text-gray-600">
-              Local-first personal database built on CRDTs. Your digital life in plain files, always in sync, never locked in.
+      <!-- Current Tools -->
+      <section class="mb-20">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">What's Here Now</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+          <article class="p-8 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-2xl">🎙️</span>
+              <h3 class="text-xl font-semibold text-gray-900">Whispering</h3>
+            </div>
+            <p class="text-gray-600 mb-4">
+              A fast, minimal transcription tool that runs locally, supports Whisper and other models, and exports to clean Markdown. No model lock-in. Just your voice, made text.
             </p>
+            <a href="https://github.com/braden-w/whispering" class="text-gray-900 font-medium hover:underline">
+              Try it now →
+            </a>
           </article>
-          <article class="group">
-            <h3 class="text-lg font-medium text-gray-900 mb-2">
-              <a href="https://github.com/braden-w/whispering" class="hover:text-gray-600 transition-colors">
-                Whispering →
-              </a>
-            </h3>
-            <p class="text-gray-600">
-              Transcription at actual cost. Bring your own API key, pay what providers charge.
+          
+          <article class="p-8 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-2xl">💻</span>
+              <h3 class="text-xl font-semibold text-gray-900">epicenter.sh</h3>
+            </div>
+            <p class="text-gray-600 mb-4">
+              Talk to your codebase using natural language—from anywhere, on your own hardware. It spins up a local OpenCode instance and lets you query your repo. Your code, your machine, your terms.
             </p>
+            <a href="https://github.com/epicentered/epicenter.sh" class="text-gray-900 font-medium hover:underline">
+              Try it now →
+            </a>
           </article>
         </div>
       </section>
 
-      <section>
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Blog</h2>
-        <div class="space-y-6">
-          <article>
-            <h3 class="text-lg font-medium text-gray-900">
-              <a href="/blog" class="hover:text-gray-600 transition-colors">
-                Read the blog →
-              </a>
-            </h3>
-          </article>
+      <!-- Vision -->
+      <section class="mb-20">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Where We're Headed</h2>
+        <div class="prose prose-gray max-w-2xl mx-auto text-center">
+          <p class="text-lg text-gray-600 mb-4">
+            In a world where every app wants to trap you, hoard your context, and lock you in, we're building the opposite.
+          </p>
+          <p class="text-lg text-gray-600">
+            Epicenter is open-source, local-first, and plain-text native—so you can trust it, tweak it, or take it with you. We're building tools that support intentional, interdisciplinary thinking: software for people who read, write, build, observe, and connect.
+          </p>
+          <p class="text-lg font-medium text-gray-900 mt-6">
+            A renaissance workflow, built on plain text and real ownership.
+          </p>
         </div>
       </section>
+
+      <!-- Waitlist Form -->
+      <section id="waitlist" class="mb-20">
+        <div class="max-w-md mx-auto">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Join the Waitlist</h2>
+          <p class="text-gray-600 text-center mb-8">
+            Be the first to know when new tools are ready. Tell us what would help your workflow.
+          </p>
+          <WaitlistForm client:visible />
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="text-center text-gray-600 text-sm">
+        <p class="mb-4">
+          We're early. But if you think like a generalist, build like a hacker, and value tools that respect your mind—you might feel at home here.
+        </p>
+        <p>
+          Issues, bugs, feedback—all welcome.
+        </p>
+      </footer>
     </div>
   </main>
 </BaseLayout>
