@@ -18,7 +18,7 @@
 	] as const;
 </script>
 
-<div class="container mx-auto max-w-4xl space-y-6 py-6">
+<div class="mx-auto max-w-4xl space-y-6 py-6">
 	<header>
 		<h1 class="text-3xl font-bold tracking-tight">Keyboard Shortcuts</h1>
 		<p class="mt-2 text-muted-foreground">

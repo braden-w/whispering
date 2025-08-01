@@ -15,7 +15,7 @@
 			"prettier": "^3.6.2",
 			"svelte": "^5.35.5",
 			"@sveltejs/kit": "^2.22.0",
-			"@sveltejs/vite-plugin-svelte": "^5.1.0",
+			"@sveltejs/vite-plugin-svelte": "^6.1.0",
 			"svelte-check": "^4.2.1",
 			"vite": "^7.0.5",
 			"tailwindcss": "^4.1.11",
@@ -30,13 +30,14 @@
 			"arktype": "^2.1.20",
 			"zod": "^3.25.67",
 			"nanoid": "^5.1.5",
-			"wellcrafted": "^0.21.0",
+			"wellcrafted": "^0.21.2",
 			"date-fns": "^4.1.0",
 			"@biomejs/biome": "^1.9.4",
 			"turbo": "^2.3.3",
 			"concurrently": "^9.1.2"
 		}
 	},
+	"packageManager": "bun@1.2.19",
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",

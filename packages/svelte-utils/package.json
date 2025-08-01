@@ -1,0 +1,20 @@
+{
+	"name": "@repo/svelte-utils",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"description": "Svelte utilities for synchronizing state with external systems",
+	"exports": {
+		".": "./src/index.ts",
+		"./createPersistedState": "./src/createPersistedState.svelte.ts"
+	},
+	"dependencies": {
+		"wellcrafted": "catalog:"
+	},
+	"devDependencies": {
+		"@standard-schema/spec": "^1.0.0-beta.3",
+		"svelte": "5.14.4",
+		"@types/node": "^22.15.32",
+		"typescript": "^5.8.3"
+	}
+}

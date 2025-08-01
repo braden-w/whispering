@@ -64,19 +64,16 @@ This will ensure the detailed error messages from services are shown to users.
 ### Changes Made
 
 1. **Renamed Service Error Types**
-
    - `ManualRecorderServiceError` for manual-recorder.ts
    - `CpalRecorderServiceError` for cpal-recorder.ts
    - `DeviceStreamServiceError` for device-stream.ts
    - Fixed error mapping in manual-recorder.ts when using device-stream functions
 
 2. **Updated Error Handling in commands.ts**
-
    - Changed from hardcoded error descriptions to using `error.message`
    - Now properly bubbles up detailed error messages from services
 
 3. **Transformed Errors at Query Layer**
-
    - Added error transformation in manualRecorder.ts and cpalRecorder.ts
    - Convert service-specific errors to WhisperingError with proper formatting
    - Applied destructuring pattern for cleaner code (e.g., `{ data: blob, error: stopRecordingError }`)

@@ -27,6 +27,7 @@
 		/**
 		 * The content to display when the copy operation succeeds.
 		 * Defaults to a check icon if not provided.
+		 * Can also be text.
 		 */
 		copiedContent?: Snippet;
 		/**

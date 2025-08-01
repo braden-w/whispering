@@ -20,6 +20,8 @@
 				'status.completed': 'bg-green-500/10 text-green-500',
 				'status.failed': 'bg-red-500/10 text-red-500',
 				'status.running': 'bg-blue-500/10 text-blue-500',
+				success:
+					'bg-success [a&]:hover:bg-success/90 focus-visible:ring-success/20 dark:focus-visible:ring-success/40 dark:bg-success/80 border-transparent text-white',
 			},
 		},
 	});

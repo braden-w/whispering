@@ -129,9 +129,13 @@
 			const { basename, extname } = await import('@tauri-apps/api/path');
 
 			const isAudio = async (path: string) =>
-				AUDIO_EXTENSIONS.includes((await extname(path)) as (typeof AUDIO_EXTENSIONS)[number]);
+				AUDIO_EXTENSIONS.includes(
+					(await extname(path)) as (typeof AUDIO_EXTENSIONS)[number],
+				);
 			const isVideo = async (path: string) =>
-				VIDEO_EXTENSIONS.includes((await extname(path)) as (typeof VIDEO_EXTENSIONS)[number]);
+				VIDEO_EXTENSIONS.includes(
+					(await extname(path)) as (typeof VIDEO_EXTENSIONS)[number],
+				);
 
 			const getMimeType = async (path: string) => {
 				const ext = await extname(path);
@@ -144,7 +148,8 @@
 			unlistenDragDrop = await getCurrentWebview().onDragDropEvent(
 				async (event) => {
 					if (settings.value['recording.mode'] !== 'upload') return;
-					if (event.payload.type !== 'drop' || event.payload.paths.length === 0) return;
+					if (event.payload.type !== 'drop' || event.payload.paths.length === 0)
+						return;
 
 					// Filter for audio/video files based on extension
 					const pathResults = await Promise.all(

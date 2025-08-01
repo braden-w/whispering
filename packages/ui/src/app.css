@@ -1,8 +1,13 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/manrope';
 
 @import 'tw-animate-css';
 
+@import './prose.css';
+
 @source "./**/*.{svelte,ts}";
+
+@plugin '@tailwindcss/typography';
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -25,6 +30,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+	--font-sans: 'Manrope Variable', sans-serif;
 	--radius: 0.625rem;
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.129 0.042 264.695);
@@ -41,6 +47,7 @@
 	--accent: oklch(0.968 0.007 247.896);
 	--accent-foreground: oklch(0.208 0.042 265.755);
 	--destructive: oklch(0.577 0.245 27.325);
+	--success: oklch(0.736 0.196 144.128);
 	--border: oklch(0.929 0.013 255.508);
 	--input: oklch(0.929 0.013 255.508);
 	--ring: oklch(0.704 0.04 256.788);
@@ -60,6 +67,7 @@
 }
 
 .dark {
+	--font-sans: 'Manrope Variable', sans-serif;
 	--background: oklch(0.129 0.042 264.695);
 	--foreground: oklch(0.984 0.003 247.858);
 	--card: oklch(0.208 0.042 265.755);
@@ -75,6 +83,7 @@
 	--accent: oklch(0.279 0.041 260.031);
 	--accent-foreground: oklch(0.984 0.003 247.858);
 	--destructive: oklch(0.704 0.191 22.216);
+	--success: oklch(0.64 0.169 145.386);
 	--border: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.551 0.027 264.364);
@@ -94,6 +103,7 @@
 }
 
 @theme inline {
+	--font-sans: var(--font-sans);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -113,6 +123,7 @@
 	--color-accent: var(--accent);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-destructive: var(--destructive);
+	--color-success: var(--success);
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);

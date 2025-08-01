@@ -12,11 +12,7 @@ export type WhisperingError = Omit<
 
 const WhisperingError = (
 	args: Omit<WhisperingError, 'name' | 'severity'>,
-): WhisperingError => ({
-	name: 'WhisperingError',
-	severity: 'error',
-	...args,
-});
+): WhisperingError => ({ name: 'WhisperingError', severity: 'error', ...args });
 
 export const WhisperingErr = (
 	args: Omit<WhisperingError, 'name' | 'severity'>,
@@ -47,6 +43,3 @@ export const fromTaggedErr = (
 	error: TaggedError<string>,
 	opts: Omit<Parameters<typeof WhisperingError>[0], 'description'>,
 ) => Err(fromTaggedError(error, opts));
-
-// Deprecated: Use fromTaggedError instead
-export const TaggedToWhisperingError = fromTaggedError;

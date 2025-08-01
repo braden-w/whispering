@@ -230,49 +230,54 @@ getRecorderState: defineQuery({
 ### Anti-Patterns to Avoid
 
 #### ❌ Double Wrapping
+
 ```typescript
 // BAD: Don't wrap an already-wrapped WhisperingError
 if (getRecorderStateError) {
-    const whisperingError = WhisperingErr({
-        title: '❌ Failed to get recorder state',
-        description: getRecorderStateError.message,
-        action: { type: 'more-details', error: getRecorderStateError },
-    });
-    notify.error.execute({ id: nanoid(), ...whisperingError.error });
-    return whisperingError;
+	const whisperingError = WhisperingErr({
+		title: '❌ Failed to get recorder state',
+		description: getRecorderStateError.message,
+		action: { type: 'more-details', error: getRecorderStateError },
+	});
+	notify.error.execute({ id: nanoid(), ...whisperingError.error });
+	return whisperingError;
 }
 ```
 
 #### ❌ Inconsistent Query Layer
+
 ```typescript
 // BAD: Query layer should wrap errors, not return raw service errors
 getRecorderState: defineQuery({
-    queryKey: recorderKeys.state,
-    resultQueryFn: () => services.manualRecorder.getRecorderState(), // Missing error wrapping!
-    initialData: 'IDLE' as WhisperingRecordingState,
-})
+	queryKey: recorderKeys.state,
+	resultQueryFn: () => services.manualRecorder.getRecorderState(), // Missing error wrapping!
+	initialData: 'IDLE' as WhisperingRecordingState,
+});
 ```
 
 #### ✅ Correct Pattern
+
 ```typescript
 // GOOD: Query wraps service errors, UI uses them directly
 getRecorderState: defineQuery({
-    resultQueryFn: async () => {
-        const { data, error } = await services.manualRecorder.getRecorderState();
-        if (error) {
-            return Err(WhisperingError({
-                title: '❌ Failed to get recorder state',
-                description: error.message,
-                action: { type: 'more-details', error },
-            }));
-        }
-        return Ok(data);
-    },
-})
+	resultQueryFn: async () => {
+		const { data, error } = await services.manualRecorder.getRecorderState();
+		if (error) {
+			return Err(
+				WhisperingError({
+					title: '❌ Failed to get recorder state',
+					description: error.message,
+					action: { type: 'more-details', error },
+				}),
+			);
+		}
+		return Ok(data);
+	},
+});
 
 // In UI/command layer - use WhisperingError directly
 if (error) {
-    notify.error.execute(error); // No re-wrapping!
+	notify.error.execute(error); // No re-wrapping!
 }
 ```
 
@@ -354,15 +359,22 @@ When you call `createMutation()`, you're creating a _mutation observer_ that sub
 
 ```typescript
 // ❌ createMutation() approach - Creates subscriber
-const mutation = createMutation(rpc.recordings.createRecording.options());
+const mutation = createMutation(rpc.recordings.createRecording.options);
 // This creates a mutation observer that:
 // - Subscribes to state changes
 // - Triggers component re-renders
 // - Manages reactive state (isPending, isError, etc.)
 // - Adds memory overhead
 
-// Then you call it:
-mutation.mutate(recording);
+// Then you call it with callbacks:
+mutation.mutate(recording, {
+	onSuccess: () => {
+		/* ... */
+	},
+	onError: (error) => {
+		/* ... */
+	},
+});
 ```
 
 ```typescript
@@ -572,6 +584,7 @@ if (rpc.transcription.isCurrentlyTranscribing()) {
 ```svelte
 <!-- From: /routes/(config)/recordings/+page.svelte -->
 <script lang="ts">
+	// Create mutations with just .options (no parentheses!)
 	const transcribeRecordings = createMutation(
 		rpc.transcription.transcribeRecordings.options,
 	);
@@ -579,11 +592,38 @@ if (rpc.transcription.isCurrentlyTranscribing()) {
 		rpc.recordings.deleteRecordings.options,
 	);
 
-	async function handleBulkAction(selectedIds: string[]) {
+	async function handleBulkAction(
+		selectedIds: string[],
+		recordings: Recording[],
+	) {
 		if (action === 'transcribe') {
-			$transcribeRecordings.mutate(selectedIds);
+			transcribeRecordings.mutate(selectedIds, {
+				onSuccess: ({ oks, errs }) => {
+					if (errs.length === 0) {
+						toast.success(`Transcribed ${oks.length} recordings!`);
+					} else {
+						toast.warning(
+							`Transcribed ${oks.length} of ${selectedIds.length} recordings`,
+						);
+					}
+				},
+				onError: (error) => {
+					toast.error('Failed to transcribe recordings', {
+						description: error.message,
+					});
+				},
+			});
 		} else if (action === 'delete') {
-			$deleteRecordings.mutate(selectedIds);
+			deleteRecordings.mutate(selectedIds, {
+				onSuccess: () => {
+					toast.success('Deleted recordings!');
+				},
+				onError: (error) => {
+					toast.error('Failed to delete recordings', {
+						description: error.message,
+					});
+				},
+			});
 		}
 	}
 </script>
@@ -786,7 +826,7 @@ transcribeRecording: defineMutation({
 	const recordings = createQuery(rpc.recordings.getAllRecordings.options());
 </script>
 
-{#if recordings.isLoading}
+{#if recordings.isPending}
 	<p>Loading...</p>
 {:else if recordings.error}
 	<p>Error: {recordings.error.message}</p>
@@ -828,13 +868,18 @@ Each feature file typically exports an object with:
 ## Best Practices
 
 1. Always use Result types - Never throw errors in query/mutation functions
-2. Choose the right interface for the job:
-   - Use `.execute()` for event handlers, workflows, and performance-critical operations
+2. **Mutation Pattern Preference**:
+   - **In `.svelte` files**: Always prefer `createMutation` unless you have a specific reason not to (e.g., you don't need pending states)
+   - **In `.ts` files**: Always use `.execute()` since createMutation requires component context
+   - This gives you consistent loading states, error handling, and better UX in components
+3. **Mutation callback pattern**: When using `createMutation`, pass callbacks as the second argument to `.mutate()` for maximum context
+4. Choose the right interface for the job:
+   - Use `.execute()` in `.ts` files and when you don't need pending state
    - Use `createMutation()` when you need reactive state for UI feedback
-3. Keep queries simple - Complex logic belongs in services or orchestration mutations
-4. Update cache optimistically - Better UX for mutations
-5. Use proper query keys - Hierarchical and consistent
-6. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
+5. Keep queries simple - Complex logic belongs in services or orchestration mutations
+6. Update cache optimistically - Better UX for mutations
+7. Use proper query keys - Hierarchical and consistent
+8. Leverage direct client access - Our static architecture enables powerful patterns unavailable in SSR apps
 
 ## Quick Reference: Common RPC Patterns
 
@@ -862,12 +907,21 @@ const recordingQuery = createQuery(
 ### Basic Mutation (Reactive)
 
 ```typescript
+// Create mutation with just .options (no parentheses!)
 const deleteRecordingMutation = createMutation(
 	rpc.recordings.deleteRecording.options,
 );
 
-// Trigger mutation
-deleteRecordingMutation.mutate(recordingId);
+// Trigger mutation with callbacks as second argument
+deleteRecordingMutation.mutate(recordingId, {
+	onSuccess: () => {
+		toast.success('Recording deleted');
+		// Navigate away, close modal, etc.
+	},
+	onError: (error) => {
+		toast.error(error.title, { description: error.description });
+	},
+});
 ```
 
 ### Imperative Execute - Performance Optimized

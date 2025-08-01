@@ -5,7 +5,7 @@ import {
 	parseStoredSettings,
 	settingsSchema,
 } from '$lib/settings/settings';
-import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+import { createPersistedState } from '@repo/svelte-utils';
 
 export const settings = createPersistedState({
 	key: 'whispering-settings',

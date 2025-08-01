@@ -4,7 +4,7 @@
 	import { Badge } from '@repo/ui/badge';
 	import * as Command from '@repo/ui/command';
 	import * as Popover from '@repo/ui/popover';
-	import { useCombobox } from '$lib/components/useCombobox.svelte';
+	import { useCombobox } from '@repo/ui/hooks';
 	import {
 		TRANSCRIPTION_SERVICES,
 		type TranscriptionService,

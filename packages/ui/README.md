@@ -2,6 +2,40 @@
 
 This guide explains how we manage shadcn-svelte components in our monorepo setup, including our custom configuration and best practices.
 
+## Component Library Overview
+
+This UI package contains a combination of:
+
+- **shadcn-svelte** components (core design system components)
+- **shadcn-svelte-extras** components (additional utility components)
+
+### Dialog vs Modal Usage Guidelines
+
+We use different component types based on the interaction pattern:
+
+**Use Dialog + AlertDialog for:**
+
+- Confirmations and simple yes/no prompts
+- Display-only content (viewing information)
+- Simple action confirmations (delete, cancel, etc.)
+- Non-interactive content presentation
+
+**Use Modal for:**
+
+- Forms with user input (text fields, dropdowns, etc.)
+- Complex interactions requiring typing
+- Multi-step workflows with form data
+- Any component where users need to input data
+
+**Decision Rule:** If the user needs to type or input data → use Modal. Otherwise, use Dialog/AlertDialog.
+
+**Examples:**
+
+- `ConfirmationDialog` ✅ (just yes/no buttons)
+- `CreateWorkspaceModal` ✅ (multiple form inputs)
+- `EditRecordingModal` ✅ (text inputs and editing)
+- `DeleteWorkspaceButton` ✅ (uses AlertDialog for confirmation)
+
 ## Key Differences from Standard shadcn-svelte
 
 ### 1. Path Aliases Configuration

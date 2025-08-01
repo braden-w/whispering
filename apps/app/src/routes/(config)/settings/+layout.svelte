@@ -97,8 +97,8 @@
 		<aside class="lg:w-1/6">
 			<SidebarNav />
 		</aside>
-		<div class="flex-1 lg:max-w-3xl">
+		<main class="flex-1 lg:max-w-3xl">
 			{@render children()}
-		</div>
+		</main>
 	</div>
 </main>

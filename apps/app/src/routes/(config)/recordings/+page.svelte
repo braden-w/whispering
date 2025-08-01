@@ -17,7 +17,7 @@
 	import { rpc } from '$lib/query';
 	import type { Recording } from '$lib/services/db';
 	import { cn } from '@repo/ui/utils';
-	import { createPersistedState } from '$lib/utils/createPersistedState.svelte';
+	import { createPersistedState } from '@repo/svelte-utils';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import {
 		FlexRender,

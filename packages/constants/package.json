@@ -1,0 +1,21 @@
+{
+	"name": "@repo/constants",
+	"version": "0.0.1",
+	"type": "module",
+	"imports": {
+		"#*": ["./src/*.ts", "./src/*/index.ts"]
+	},
+	"exports": {
+		"./vite": "./src/vite.ts",
+		"./node": "./src/node.ts",
+		"./cloudflare": "./src/cloudflare.ts"
+	},
+	"dependencies": {
+		"arktype": "^2.1.20"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.5",
+		"typescript": "^5.8.3",
+		"vite": "catalog:"
+	}
+}
