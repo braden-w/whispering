@@ -1,6 +1,6 @@
 {
 	"name": "@epicenter/cli",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "Epicenter CLI designed for seamless integration with opencode and epicenter.sh",
 	"type": "module",
 	"author": "Braden Wong <braden@epicenter.sh>",
@@ -26,6 +26,7 @@
 		"@epicenter/opencode": "latest",
 		"arktype": "^2.1.20",
 		"get-port": "^7.1.0",
+		"wellcrafted": "^0.21.2",
 		"yargs": "^17.7.2",
 		"zod-openapi": "^5.3.0"
 	}
