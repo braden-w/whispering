@@ -1,6 +1,6 @@
 {
 	"name": "@epicenter/cli",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Epicenter CLI designed for seamless integration with opencode and epicenter.sh",
 	"type": "module",
 	"author": "Braden Wong <braden@epicenter.sh>",
@@ -10,14 +10,7 @@
 		"url": "git+https://github.com/braden-w/whispering.git",
 		"directory": "apps/cli"
 	},
-	"keywords": [
-		"epicenter",
-		"cli",
-		"opencode",
-		"ai",
-		"code",
-		"assistant"
-	],
+	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],
 	"publishConfig": {
 		"access": "public"
 	},
@@ -28,11 +21,7 @@
 		"dev": "infisical run -- bun run src/index.ts",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": [
-		"src",
-		"README.md",
-		"package.json"
-	],
+	"files": ["src", "README.md", "package.json"],
 	"dependencies": {
 		"@epicenter/opencode": "latest",
 		"arktype": "^2.1.20",
