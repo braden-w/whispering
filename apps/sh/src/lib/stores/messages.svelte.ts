@@ -6,7 +6,7 @@ import type {
 	Message as MessageInfo,
 	Part,
 } from '$lib/client/types.gen';
-import type { AssistantConfig } from '$lib/types/assistant-config';
+import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 import type { Accessor } from '@tanstack/svelte-query';
 
 import { createAssistantClient } from '$lib/client/client.gen';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AssistantConfig } from '$lib/types/assistant-config';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 
 	import * as rpc from '$lib/query';
 	import { Button } from '@repo/ui/button';
