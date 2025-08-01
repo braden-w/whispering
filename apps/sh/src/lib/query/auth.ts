@@ -5,7 +5,7 @@ import { ShErr } from '$lib/result';
 import { APPS } from '@repo/constants/vite';
 import { Err, Ok } from 'wellcrafted/result';
 
-import { defineMutation, defineQuery } from './_client';
+import { defineMutation, defineQuery, queryClient } from './_client';
 
 function AuthToShErr<
 	T extends BetterFetchResponse<unknown, unknown, false>['error'],
@@ -49,6 +49,11 @@ export const signInWithGithub = defineMutation({
 		if (error) return AuthToShErr(error);
 		return Ok(data);
 	},
+	onSuccess: () => {
+		queryClient.invalidateQueries({
+			queryKey: ['auth', 'getSession'],
+		});
+	},
 });
 
 export const signOut = defineMutation({
@@ -57,5 +62,10 @@ export const signOut = defineMutation({
 		const { error } = await authClient.signOut();
 		if (error) return AuthToShErr(error);
 		return Ok(null);
+	},
+	onSuccess: () => {
+		queryClient.invalidateQueries({
+			queryKey: ['auth', 'getSession'],
+		});
 	},
 });
