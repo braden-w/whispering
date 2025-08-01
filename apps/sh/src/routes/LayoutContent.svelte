@@ -51,6 +51,15 @@
 					>
 						Assistants
 					</a>
+					<a
+						href="/faq"
+						class="transition-colors hover:text-foreground/80 {page.url
+							.pathname === '/faq'
+							? 'text-foreground'
+							: 'text-foreground/60'}"
+					>
+						FAQ
+					</a>
 				</nav>
 			</div>
 			<nav class="flex flex-1 items-center justify-end gap-1">

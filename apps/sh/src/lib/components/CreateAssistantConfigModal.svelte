@@ -160,7 +160,7 @@
 		<Modal.Header>
 			<Modal.Title>Add New Assistant</Modal.Title>
 			<Modal.Description>
-				Connect to an OpenCode server from your CLI
+				Connect to an OpenCode server using the epicenter CLI
 			</Modal.Description>
 		</Modal.Header>
 
@@ -182,7 +182,9 @@
 
 					<PMCommand
 						command="execute"
-						args={['@getepicenter/opencode', 'serve', '--tunnel', '--open']}
+						args={['@epicenter/cli@latest', 'sh']}
+						agent="bun"
+						agents={['bun']}
 					/>
 
 					<div class="space-y-2">
@@ -190,11 +192,14 @@
 						<ul
 							class="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2"
 						>
-							<li>Starts your OpenCode server</li>
-							<li>Creates a secure tunnel automatically</li>
-							<li>Opens a new tab with your assistant pre-configured</li>
-							<li>No manual URL copying or setup needed</li>
+							<li>Starts OpenCode server (our fork with CORS support)</li>
+							<li>Creates a secure tunnel via Cloudflare</li>
+							<li>Opens epicenter.sh with your assistant pre-configured</li>
+							<li>No manual configuration needed</li>
 						</ul>
+						<p class="text-sm text-muted-foreground mt-2">
+							Learn more about how it works in our <a href="/faq" class="underline">FAQ</a>.
+						</p>
 					</div>
 				</div>
 			</Tabs.Content>

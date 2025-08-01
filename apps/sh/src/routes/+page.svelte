@@ -33,4 +33,8 @@
 		This will start your OpenCode server and open epicenter.sh with your
 		assistant pre-configured.
 	</p>
+	
+	<p class="text-sm text-muted-foreground text-center">
+		<a href="/faq" class="underline underline-offset-4">Learn how it works</a> under the hood.
+	</p>
 </div>
