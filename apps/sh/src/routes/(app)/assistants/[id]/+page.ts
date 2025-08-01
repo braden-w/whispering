@@ -1,13 +1,13 @@
 import * as rpc from '$lib/query';
+import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 import { redirect } from '@sveltejs/kit';
 
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {
-	const { data: assistantConfig, error: configError } =
-		await rpc.assistantConfigs.getAssistantConfigById(() => params.id).ensure();
+	const assistantConfig = assistantConfigs.getById(params.id);
 
-	if (configError || !assistantConfig) redirect(302, '/assistants');
+	if (!assistantConfig) redirect(302, '/assistants');
 
 	const { data: sessions, error } = await rpc.sessions
 		.getSessions(() => assistantConfig)

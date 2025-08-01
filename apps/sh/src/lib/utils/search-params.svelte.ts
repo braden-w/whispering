@@ -1,13 +1,16 @@
 import { goto } from '$app/navigation';
 import { type } from 'arktype';
 import { toast } from 'svelte-sonner';
-import * as rpc from '$lib/query';
+import {
+	assistantConfigs,
+	CreateAssistantParams,
+} from '$lib/stores/assistant-configs.svelte';
+import { untrack } from 'svelte';
 
 import {
 	FLASH_MESSAGE_PARAMS,
 	FlashMessage,
 } from './redirect-with-flash-message';
-import { assistantConfigInsertSchema } from '../../../../../packages/db/src/schema/assistantConfigs';
 
 /**
  * Hook that monitors URL parameters for flash messages, displays them as toasts,
@@ -74,35 +77,29 @@ export function useFlashMessage(url: URL) {
  */
 export const useCreateAssistantParams = (url: URL) => {
 	$effect(() => {
-		const validated = assistantConfigInsertSchema.omit('userId')({
-			name: url.searchParams.get('name'),
-			url: url.searchParams.get('url'),
+		const name = url.searchParams.get('name');
+		const urlParam = url.searchParams.get('url');
+
+		if (!name || !urlParam) return;
+
+		const validated = CreateAssistantParams({
+			name,
+			url: urlParam,
+			password: null,
 		});
 
 		if (validated instanceof type.errors) return;
 
-		(async () => {
-			const result =
-				await rpc.assistantConfigs.createAssistantConfig.execute(validated);
-			const { data, error } = result;
+		untrack(() => assistantConfigs.create(validated));
 
-			// Clean up the URL parameters
-			const cleanUrl = new URL(url);
-			cleanUrl.searchParams.delete('name');
-			cleanUrl.searchParams.delete('url');
+		// Clean up the URL parameters
+		const cleanUrl = new URL(url);
+		cleanUrl.searchParams.delete('name');
+		cleanUrl.searchParams.delete('url');
 
-			goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
-				noScroll: true,
-				replaceState: true,
-			});
-
-			if (error) {
-				toast.error(error.title, { description: error.description });
-			} else if (data) {
-				toast.success('Assistant created', {
-					description: `Successfully created assistant "${validated.name}"`,
-				});
-			}
-		})();
+		goto(`${cleanUrl.pathname}${cleanUrl.search}`, {
+			noScroll: true,
+			replaceState: true,
+		});
 	});
 };

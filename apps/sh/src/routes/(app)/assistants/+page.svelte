@@ -2,13 +2,12 @@
 	import { page } from '$app/state';
 	import AssistantTableRow from '$lib/components/AssistantTableRow.svelte';
 	import CreateAssistantConfigModal from '$lib/components/CreateAssistantConfigModal.svelte';
-	import * as rpc from '$lib/query';
+	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
 	import { useCreateAssistantParams } from '$lib/utils/search-params.svelte';
 	import { Button, buttonVariants } from '@repo/ui/button';
 	import * as DropdownMenu from '@repo/ui/dropdown-menu';
 	import * as Table from '@repo/ui/table';
 	import { cn } from '@repo/ui/utils';
-	import { createQuery } from '@tanstack/svelte-query';
 	import { ChevronDown, Plus } from 'lucide-svelte';
 
 	// Define available columns
@@ -37,11 +36,8 @@
 
 	useCreateAssistantParams(page.url);
 
-	// Fetch assistant configs from database
-	const configsQuery = createQuery(
-		rpc.assistantConfigs.getAssistantConfigs.options,
-	);
-	const configs = $derived(configsQuery.data ?? []);
+	// Get assistant configs from local storage
+	const configs = $derived(assistantConfigs.value);
 </script>
 
 <svelte:head>
@@ -102,23 +98,7 @@
 		</div>
 	</div>
 
-	{#if configsQuery.isPending}
-		<div class="rounded-lg border p-8 text-center">
-			<p class="text-muted-foreground">Loading assistants...</p>
-		</div>
-	{:else if configsQuery.isError}
-		<div class="rounded-lg border border-destructive p-8 text-center">
-			<h3 class="text-lg font-semibold text-destructive">
-				Failed to load assistants
-			</h3>
-			<p class="text-muted-foreground mt-2">
-				{configsQuery.error?.description ?? 'An unexpected error occurred'}
-			</p>
-			<Button onclick={() => configsQuery.refetch()} class="mt-4">
-				Try Again
-			</Button>
-		</div>
-	{:else if configs.length === 0}
+	{#if configs.length === 0}
 		<div class="rounded-lg border border-dashed p-8 text-center">
 			<h3 class="text-lg font-semibold">No assistants yet</h3>
 			<p class="text-muted-foreground mt-2">
