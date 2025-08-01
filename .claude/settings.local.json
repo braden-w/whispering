@@ -128,7 +128,9 @@
 			"Bash(gh:help*)",
 			"Bash(gh:version*)",
 			"Bash(gh:--version*)",
-			"Bash(mkdir:*)"
+			"mcp__nia__nia_web_search",
+			"mcp__nia__search_documentation",
+			"mcp__nia__nia_deep_research_agent"
 		]
 	},
 	"model": "opus"
