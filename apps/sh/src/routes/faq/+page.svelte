@@ -28,7 +28,7 @@
 							sst/opencode
 						</Link>
 						repository that we maintain at 
-						<Link href="https://github.com/getepicenter/opencode" target="_blank" rel="noopener noreferrer">
+						<Link href="https://github.com/epicenter-so/opencode" target="_blank" rel="noopener noreferrer">
 							@epicenter/opencode
 						</Link>. 
 						This fork adds essential CORS (Cross-Origin Resource Sharing) support, allowing 
@@ -239,7 +239,7 @@
 		<h2 class="text-lg font-semibold mb-2">Still have questions?</h2>
 		<p class="text-sm text-muted-foreground">
 			Check out the 
-			<Link href="https://github.com/getepicenter/opencode" target="_blank" rel="noopener noreferrer">
+			<Link href="https://github.com/epicenter-so/opencode" target="_blank" rel="noopener noreferrer">
 				@epicenter/opencode
 			</Link> 
 			repository or open an issue on GitHub. We're happy to help!
