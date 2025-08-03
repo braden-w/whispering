@@ -233,6 +233,49 @@
 				</div>
 			</Accordion.Content>
 		</Accordion.Item>
+
+		<Accordion.Item value="data-storage">
+			<Accordion.Trigger class="text-left">
+				Where is my data stored?
+			</Accordion.Trigger>
+			<Accordion.Content>
+				<div class="space-y-4 pt-4">
+					<p>
+						All your data is stored locally on your machine:
+					</p>
+					
+					<ul class="list-disc list-inside space-y-2 ml-4">
+						<li>
+							<strong>Assistant configurations</strong>: Stored in your browser's localStorage 
+							under the key <code>opencode-assistant-configs</code>
+						</li>
+						<li>
+							<strong>Session data</strong>: Managed by your OpenCode server on your local 
+							machine
+						</li>
+						<li>
+							<strong>Chat history</strong>: Persisted by OpenCode in your project directory
+						</li>
+						<li>
+							<strong>No cloud storage</strong>: epicenter.sh does not store any of your data 
+							on remote servers
+						</li>
+					</ul>
+					
+					<p>
+						This means your assistant configurations are tied to your browser. If you clear 
+						your browser data or use a different browser, you'll need to reconfigure your 
+						assistants. Your actual code and chat history remain safe on your local machine 
+						as they're managed by OpenCode.
+					</p>
+					
+					<p>
+						For backup purposes, you can export your localStorage data from your browser's 
+						developer console if needed.
+					</p>
+				</div>
+			</Accordion.Content>
+		</Accordion.Item>
 	</Accordion.Root>
 	
 	<div class="mt-12 p-6 bg-muted/50 rounded-lg">

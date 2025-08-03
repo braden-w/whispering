@@ -79,6 +79,21 @@ For detailed setup instructions including ngrok tunneling, see the [Assistant Se
 
 <!-- TODO: Update screenshots to reflect new page titles and navigation -->
 
+## Data Storage
+
+All data is stored locally on your machine:
+
+- **Assistant Configurations**: Stored in your browser's localStorage (key: `opencode-assistant-configs`)
+- **Session Data**: Managed by OpenCode on your local machine
+- **Chat History**: Persisted by OpenCode in your project directory
+- **No Cloud Database**: epicenter.sh uses no remote storage; all data stays local
+
+This means:
+- Your configurations are browser-specific
+- Clearing browser data will remove assistant configs (but not your code/chats)
+- You can export/import localStorage data for backup
+- Complete privacy: no data ever leaves your control
+
 ## Tech Stack
 
 - **Framework**: SvelteKit 2 with Svelte 5
