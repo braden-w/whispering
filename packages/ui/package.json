@@ -26,7 +26,6 @@
 		"@internationalized/date": "^3.8.1",
 		"@lucide/svelte": "^0.525.0",
 		"@repo/config": "workspace:*",
-		"@tailwindcss/typography": "^0.5.16",
 		"@types/node": "catalog:",
 		"bits-ui": "catalog:",
 		"clsx": "catalog:",

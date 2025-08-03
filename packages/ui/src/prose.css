@@ -1,60 +1,93 @@
 @import 'tailwindcss';
 
+/* Simplified prose styles following Shadcn patterns
+   - Uses semantic color tokens that adapt to dark mode automatically
+   - Simplified selectors without repetitive :not() patterns
+   - No need for .prose-invert since colors adapt automatically
+*/
+
 .prose {
 	@apply max-w-[65ch] text-foreground;
 
-	& h1:not(.not-prose h1) {
+	/* Headings */
+	& h1 {
 		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
 	}
 
-	& h2:not(.not-prose h2) {
+	& h2 {
 		@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight mt-12 first:mt-0;
 	}
 
-	& h3:not(.not-prose h3) {
+	& h3 {
 		@apply scroll-m-20 text-2xl font-semibold mt-12 tracking-tight first:mt-0;
 	}
 
-	& h4:not(.not-prose h4) {
+	& h4 {
 		@apply scroll-m-20 text-xl font-semibold mt-12 tracking-tight first:mt-0;
 	}
 
-	& h5:not(.not-prose h5) {
+	& h5 {
 		@apply scroll-m-20 text-lg font-semibold mt-12 tracking-tight first:mt-0;
 	}
 
-	& h6:not(.not-prose h6) {
+	& h6 {
 		@apply scroll-m-20 text-base font-semibold mt-12 tracking-tight first:mt-0;
 	}
 
-	& h1:not(.not-prose h1),
-	& h2:not(.not-prose h2),
-	& h3:not(.not-prose h3),
-	& h4:not(.not-prose h4),
-	& h5:not(.not-prose h5),
-	& h6:not(.not-prose h6) {
-		& + p {
-			@apply mt-0;
-		}
+	/* Remove top margin from paragraphs after headings */
+	& :where(h1, h2, h3, h4, h5, h6) + p {
+		@apply mt-0;
 	}
 
-	& p:not(.not-prose p) {
+	/* Paragraphs and text */
+	& p {
 		@apply leading-[175%] [&:not(:first-child)]:mt-6;
 	}
 
-	& li:not(.not-prose li) {
+	& li {
 		@apply leading-[175%];
 	}
 
-	& a:not(.not-prose a) {
+	& a {
 		@apply font-medium text-primary underline underline-offset-4;
 	}
 
-	& blockquote:not(.not-prose blockquote) {
+	& blockquote {
 		@apply mt-6 border-l-2 pl-6 italic;
 	}
 
-	& table:not(.not-prose table) {
+	/* Lists */
+	& ul {
+		@apply my-6 ml-6 list-disc [&>li]:mt-2;
+
+		& p {
+			@apply my-0 inline;
+		}
+	}
+
+	& ol {
+		@apply my-6 ml-6 list-decimal [&>li]:mt-2;
+
+		& p {
+			@apply my-0 inline;
+		}
+	}
+
+	/* Code blocks */
+	& pre {
+		@apply bg-muted text-foreground rounded-md p-4 my-6 text-sm overflow-y-auto;
+
+		& code {
+			@apply bg-transparent text-inherit font-mono;
+		}
+	}
+
+	& :not(pre) > code {
+		@apply relative rounded bg-muted text-foreground px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+	}
+
+	/* Tables */
+	& table {
 		@apply my-6 w-full overflow-y-auto;
 
 		& thead tr {
@@ -74,61 +107,34 @@
 		}
 	}
 
-	& ul:not(.not-prose ul) {
-		@apply my-6 ml-6 list-disc [&>li]:mt-2;
-
-		& p {
-			@apply my-0 inline;
-		}
-	}
-
-	& ol:not(.not-prose ol) {
-		@apply my-6 ml-6 list-decimal [&>li]:mt-2;
-
-		& p {
-			@apply my-0 inline;
-		}
-	}
-
-	& pre:not(.not-prose pre) {
-		@apply bg-muted text-foreground rounded-md p-4 my-6 text-sm overflow-y-auto;
-
-		& code {
-			@apply bg-transparent text-inherit font-mono;
-		}
-	}
-
-	& code:not(pre code):not(.not-prose code) {
-		@apply relative rounded bg-muted text-foreground px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
-	}
-
-	& .lead:not(.not-prose .lead) {
+	/* Utility classes */
+	& .lead {
 		@apply text-xl text-muted-foreground;
 	}
 
-	& .large:not(.not-prose .large) {
+	& .large {
 		@apply text-lg font-semibold;
 	}
 
-	& .small:not(.not-prose .small) {
+	& .small {
 		@apply text-sm font-medium leading-none;
 	}
 
-	& .muted:not(.not-prose .muted) {
+	& .muted {
 		@apply text-sm text-muted-foreground;
 	}
 
-	& img:not(.not-prose img),
-	& picture:not(.not-prose picture),
-	& video:not(.not-prose video) {
+	/* Media */
+	& :where(img, picture, video) {
 		@apply my-6;
 	}
 
-	& picture > img:not(.not-prose picture > img) {
+	& picture > img {
 		@apply my-0;
 	}
 
-	& kbd:not(.not-prose kbd) {
+	/* Interactive elements */
+	& kbd {
 		@apply rounded-md bg-muted px-1.5 py-0.5 text-xs font-semibold;
 	}
 
@@ -136,7 +142,8 @@
 		@apply my-10;
 	}
 
-	& dl:not(.not-prose dl) {
+	/* Definition lists */
+	& dl {
 		@apply my-6;
 
 		& dt {
@@ -148,7 +155,8 @@
 		}
 	}
 
-	& details:not(.not-prose details) {
+	/* Details/Summary */
+	& details {
 		@apply mt-6;
 
 		& summary {
@@ -160,229 +168,80 @@
 		}
 	}
 
-	& mark:not(.not-prose mark) {
-		@apply bg-yellow-300;
+	/* Text formatting */
+	& mark {
+		@apply bg-yellow-300 dark:bg-yellow-300/20;
 	}
 
-	& small:not(.not-prose small) {
-		@apply text-xs leading-none;
-	}
-
-	& strong:not(.not-prose strong),
-	& b:not(.not-prose b) {
+	& :where(strong, b) {
 		@apply font-bold;
 	}
 
-	& em:not(.not-prose em),
-	& i:not(.not-prose i) {
+	& :where(em, i) {
 		@apply italic;
 	}
 
-	& del:not(.not-prose del),
-	& s:not(.not-prose s) {
+	& :where(del, s) {
 		@apply line-through;
 	}
 
-	& ins:not(.not-prose ins) {
+	& ins {
 		@apply underline;
 	}
 
-	& sub:not(.not-prose sub) {
+	& sub {
 		@apply text-[0.75em] align-sub;
 	}
 
-	& sup:not(.not-prose sup) {
+	& sup {
 		@apply text-[0.75em] align-super;
 	}
 
-	& abbr:not(.not-prose abbr)[title] {
+	& abbr[title] {
 		@apply underline decoration-dotted cursor-help;
 	}
 
-	& cite:not(.not-prose cite) {
+	& cite {
 		@apply italic;
 	}
 
-	& q:not(.not-prose q) {
+	& q {
 		@apply before:content-[open-quote] after:content-[close-quote];
 	}
 
-	& figure:not(.not-prose figure) {
+	& figure {
 		@apply my-8;
 	}
 
-	& figcaption:not(.not-prose figcaption) {
+	& figcaption {
 		@apply text-sm text-muted-foreground mt-2;
 	}
 
-	& u:not(.not-prose u) {
+	& u {
 		@apply underline;
 	}
 
-	& var:not(.not-prose var) {
+	& var {
 		@apply font-mono text-[0.875em] italic;
 	}
 
-	& samp:not(.not-prose samp) {
+	& samp {
 		@apply font-mono text-[0.875em];
 	}
 
-	& time:not(.not-prose time) {
+	& time {
 		@apply text-muted-foreground;
 	}
 
-	& address:not(.not-prose address) {
+	& address {
 		@apply italic not-italic my-6;
 	}
 
-	& dfn:not(.not-prose dfn) {
+	& dfn {
 		@apply italic font-semibold;
 	}
 }
 
 .prose-invert {
 	@apply text-primary-foreground;
-
-	& h1:not(.not-prose h1),
-	& h2:not(.not-prose h2),
-	& h3:not(.not-prose h3),
-	& h4:not(.not-prose h4),
-	& h5:not(.not-prose h5),
-	& h6:not(.not-prose h6) {
-		@apply text-primary-foreground;
-	}
-
-	& p:not(.not-prose p) {
-		@apply text-primary-foreground;
-	}
-
-	& a:not(.not-prose a) {
-		@apply text-primary-foreground underline;
-	}
-
-	& blockquote:not(.not-prose blockquote) {
-		@apply border-primary-foreground/30 text-primary-foreground/90;
-	}
-
-	& pre:not(.not-prose pre) {
-		@apply bg-primary-foreground/10 text-primary-foreground;
-
-		& code {
-			@apply bg-transparent text-inherit font-mono;
-		}
-	}
-
-	& code:not(pre code):not(.not-prose code) {
-		@apply bg-primary-foreground/10 text-primary-foreground;
-	}
-
-	& .lead:not(.not-prose .lead) {
-		@apply text-primary-foreground/80;
-	}
-
-	& .muted:not(.not-prose .muted) {
-		@apply text-primary-foreground/70;
-	}
-
-	& mark:not(.not-prose mark) {
-		@apply bg-yellow-400/20 text-primary-foreground;
-	}
-
-	& th {
-		@apply text-primary-foreground border-primary-foreground/20;
-	}
-
-	& td {
-		@apply text-primary-foreground border-primary-foreground/20;
-	}
-
-	& thead tr {
-		@apply border-primary-foreground/20;
-	}
-
-	& tbody tr {
-		@apply border-primary-foreground/20 even:bg-primary-foreground/5;
-	}
-
-	& strong:not(.not-prose strong),
-	& b:not(.not-prose b) {
-		@apply text-primary-foreground;
-	}
-
-	& em:not(.not-prose em),
-	& i:not(.not-prose i) {
-		@apply text-primary-foreground;
-	}
-
-	& del:not(.not-prose del),
-	& s:not(.not-prose s) {
-		@apply text-primary-foreground/70;
-	}
-
-	& ins:not(.not-prose ins) {
-		@apply text-primary-foreground;
-	}
-
-	& sub:not(.not-prose sub),
-	& sup:not(.not-prose sup) {
-		@apply text-primary-foreground;
-	}
-
-	& abbr:not(.not-prose abbr)[title] {
-		@apply text-primary-foreground border-primary-foreground/50;
-	}
-
-	& cite:not(.not-prose cite) {
-		@apply text-primary-foreground/90;
-	}
-
-	& q:not(.not-prose q) {
-		@apply text-primary-foreground;
-	}
-
-	& figcaption:not(.not-prose figcaption) {
-		@apply text-primary-foreground/70;
-	}
-
-	& u:not(.not-prose u) {
-		@apply text-primary-foreground;
-	}
-
-	& var:not(.not-prose var),
-	& samp:not(.not-prose samp) {
-		@apply text-primary-foreground;
-	}
-
-	& time:not(.not-prose time) {
-		@apply text-primary-foreground/70;
-	}
-
-	& address:not(.not-prose address) {
-		@apply text-primary-foreground;
-	}
-
-	& dfn:not(.not-prose dfn) {
-		@apply text-primary-foreground;
-	}
-
-	& kbd:not(.not-prose kbd) {
-		@apply bg-primary-foreground/10 text-primary-foreground;
-	}
-
-	& small:not(.not-prose small) {
-		@apply text-primary-foreground;
-	}
-
-	& li:not(.not-prose li) {
-		@apply text-primary-foreground;
-	}
-
-	& dt:not(.not-prose dt),
-	& dd:not(.not-prose dd) {
-		@apply text-primary-foreground;
-	}
-
-	& summary:not(.not-prose summary) {
-		@apply text-primary-foreground;
-	}
 }
