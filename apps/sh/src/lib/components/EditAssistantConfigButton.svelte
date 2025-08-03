@@ -1,12 +1,11 @@
 <script lang="ts">
-	import * as rpc from '$lib/query';
-	import type { AssistantConfig } from '$lib/types/assistant-config';
+	import { assistantConfigs } from '$lib/stores/assistant-configs.svelte';
+	import type { AssistantConfig } from '$lib/stores/assistant-configs.svelte';
 	import { Button } from '@repo/ui/button';
 	import { buttonVariants } from '@repo/ui/button';
 	import { Input } from '@repo/ui/input';
 	import { Label } from '@repo/ui/label';
 	import * as Modal from '@repo/ui/modal';
-	import { createMutation } from '@tanstack/svelte-query';
 	import { Edit, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -27,36 +26,6 @@
 			password = assistantConfig.password;
 		}
 	});
-
-	// Update mutation
-	const updateMutation = createMutation(
-		rpc.assistantConfigs.updateAssistantConfig.options,
-	);
-
-	function handleSave() {
-		if (!name.trim()) {
-			toast.error('Please enter a name');
-			return;
-		}
-
-		updateMutation.mutate(
-			{
-				id: assistantConfig.id,
-				name: name.trim(),
-				password,
-				url,
-			},
-			{
-				onSuccess: () => {
-					toast.success('Assistant updated successfully');
-					open = false;
-				},
-				onError: (error) => {
-					toast.error(error.title, { description: error.description });
-				},
-			},
-		);
-	}
 </script>
 
 <Modal.Root bind:open>
@@ -98,13 +67,20 @@
 
 		<Modal.Footer>
 			<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
-			<Button onclick={handleSave} disabled={updateMutation.isPending}>
-				{#if updateMutation.isPending}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-					Saving...
-				{:else}
-					Save Changes
-				{/if}
+			<Button onclick={() => {
+						if (!name.trim()) {
+			toast.error('Please enter a name');
+			return;
+		}
+
+		assistantConfigs.update(assistantConfig.id, {
+			name: name.trim(),
+			password,
+			url,
+		});
+		open = false;
+			}}>
+				Save Changes
 			</Button>
 		</Modal.Footer>
 	</Modal.Content>
