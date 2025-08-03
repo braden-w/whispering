@@ -1,10 +1,10 @@
 # UI Components Monorepo Refactor
 
 ## Overview
-Move all UI components from `/apps/app/src/lib/components/ui/` to a new shared package at `/packages/ui/` to enable reuse across the monorepo.
+Move all UI components from `/apps/whispering/src/lib/components/ui/` to a new shared package at `/packages/ui/` to enable reuse across the monorepo.
 
 ## Current State
-- UI components are located in `/apps/app/src/lib/components/ui/`
+- UI components are located in `/apps/whispering/src/lib/components/ui/`
 - Components are imported using `$lib/components/ui/[component]`
 - 26 component folders containing shadcn-svelte components
 - Components use both named exports and namespace imports
@@ -113,14 +113,14 @@ import * as Dialog from '@repo/ui/dialog';
 - [ ] Create `src/ui/` directory structure
 
 ### Phase 2: Move Components
-- [ ] Copy all component folders from `/apps/app/src/lib/components/ui/` to `/packages/ui/src/`
+- [ ] Copy all component folders from `/apps/whispering/src/lib/components/ui/` to `/packages/ui/src/`
 - [ ] Update any internal component imports (e.g., toggle-group importing from toggle)
 - [ ] Move the `cn` utility function to `/packages/ui/src/utils.ts`
 
 ### Phase 3: Update App Dependencies
-- [ ] Add `@repo/ui` as a dependency in `/apps/app/package.json`
+- [ ] Add `@repo/ui` as a dependency in `/apps/whispering/package.json`
 - [ ] Update all imports in the app to use `@repo/ui/[component]`
-- [ ] Remove the old `/apps/app/src/lib/components/ui/` directory
+- [ ] Remove the old `/apps/whispering/src/lib/components/ui/` directory
 
 ### Phase 4: Testing & Validation
 - [ ] Run build to ensure all imports resolve correctly
@@ -172,18 +172,18 @@ import * as Dialog from '@repo/ui/dialog';
 
 ### Changes Completed
 
-1. **Created packages/ui structure** - All UI components have been successfully moved from `/apps/app/src/lib/components/ui/` to `/packages/ui/src/`
+1. **Created packages/ui structure** - All UI components have been successfully moved from `/apps/whispering/src/lib/components/ui/` to `/packages/ui/src/`
 
 2. **Updated imports** - All imports in the app have been changed from `$lib/components/ui/[component]` to `@repo/ui/[component]`
 
 3. **Fixed package dependencies**:
-   - Added `@repo/ui` as a workspace dependency in apps/app
+   - Added `@repo/ui` as a workspace dependency in apps/whispering
    - Added required dependencies to packages/ui: @lucide/svelte, paneforge
    - Added peer dependencies: @tanstack/svelte-table
 
 4. **Fixed internal imports** - Updated all internal imports within packages/ui to use relative paths instead of @repo/ui
 
-5. **Removed old UI directory** - Successfully deleted `/apps/app/src/lib/components/ui/`
+5. **Removed old UI directory** - Successfully deleted `/apps/whispering/src/lib/components/ui/`
 
 ### Remaining Issues
 

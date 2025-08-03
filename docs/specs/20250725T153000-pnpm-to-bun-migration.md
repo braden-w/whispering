@@ -273,7 +273,7 @@ bun run dev
 bun run build
 
 # Test individual app
-cd apps/app
+cd apps/whispering
 bun run dev
 
 # Test Turborepo integration

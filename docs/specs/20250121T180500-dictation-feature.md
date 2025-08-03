@@ -5,7 +5,7 @@ Implement a dictation feature in the sh app that allows users to record audio, t
 
 ## Architecture
 - Create a new `packages/services` package to house transcription-related services
-- Migrate relevant transcription services from `apps/app/src/lib/services/`
+- Migrate relevant transcription services from `apps/whispering/src/lib/services/`
 - Add a microphone button next to the submit button in the messages UI
 - Store API keys in the settings modal
 - Implement start/stop recording with visual feedback
@@ -19,7 +19,7 @@ Implement a dictation feature in the sh app that allows users to record audio, t
 - [ ] Configure TypeScript and build setup
 
 ### 2. Migrate transcription services
-- [ ] Identify and extract transcription-related services from `apps/app/src/lib/services/`
+- [ ] Identify and extract transcription-related services from `apps/whispering/src/lib/services/`
 - [ ] Move only the essential transcription functionality
 - [ ] Update imports and exports
 - [ ] Ensure proper module boundaries

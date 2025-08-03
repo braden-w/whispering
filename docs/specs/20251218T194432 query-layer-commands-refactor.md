@@ -6,27 +6,27 @@
 
 The refactoring has been successfully implemented with the following changes:
 
-1. **Created `/apps/app/src/lib/query/commands.ts`**
+1. **Created `/apps/whispering/src/lib/query/commands.ts`**
    - Moved all command logic from the original commands.ts file
    - Implemented commands as mutations following the query layer pattern
    - Moved `saveRecordingAndTranscribeTransform` and renamed it to `processRecordingPipeline`
    - Added `uploadRecording` mutation (moved from recordings.ts)
    - Kept `processRecordingPipeline` as an internal function, not exported in the commands object
 
-2. **Updated `/apps/app/src/lib/commands.ts`**
+2. **Updated `/apps/whispering/src/lib/commands.ts`**
    - Simplified to only contain command metadata and callbacks
    - Each callback now uses `rpc.commands.*.execute()` pattern
    - Removed all implementation details and direct service calls
 
-3. **Updated `/apps/app/src/lib/query/index.ts`**
+3. **Updated `/apps/whispering/src/lib/query/index.ts`**
    - Added `commands` to the RPC namespace
    - Commands are now accessible via `rpc.commands.*`
 
-4. **Updated `/apps/app/src/lib/query/recordings.ts`**
+4. **Updated `/apps/whispering/src/lib/query/recordings.ts`**
    - Removed the `uploadRecording` mutation (moved to commands.ts)
    - Removed unused imports
 
-5. **Updated `/apps/app/src/routes/+page.svelte`**
+5. **Updated `/apps/whispering/src/routes/+page.svelte`**
    - Changed `rpc.recordings.uploadRecording.execute({ file })` 
    - To: `rpc.commands.uploadRecording.execute({ file })`
 
@@ -81,7 +81,7 @@ This plan outlines how to refactor the `commands.ts` file to move command logic 
 
 ### New File Structure
 ```
-/apps/app/src/lib/query/
+/apps/whispering/src/lib/query/
 ├── commands.ts          # New file with all command logic
 ├── index.ts             # Update to include commands in RPC namespace
 └── README.md            # Update documentation
@@ -89,7 +89,7 @@ This plan outlines how to refactor the `commands.ts` file to move command logic 
 
 ### Implementation Plan
 
-#### 1. Create `/apps/app/src/lib/query/commands.ts`
+#### 1. Create `/apps/whispering/src/lib/query/commands.ts`
 
 This file will contain:
 - All command implementations as mutations
@@ -246,7 +246,7 @@ export const commands = {
 };
 ```
 
-#### 2. Update `/apps/app/src/lib/commands.ts`
+#### 2. Update `/apps/whispering/src/lib/commands.ts`
 
 Simplify to just use RPC:
 
@@ -317,7 +317,7 @@ export const commandCallbacks = commands.reduce<CommandCallbacks>(
 );
 ```
 
-#### 3. Update `/apps/app/src/lib/query/index.ts`
+#### 3. Update `/apps/whispering/src/lib/query/index.ts`
 
 Add commands to the RPC namespace:
 

@@ -27,7 +27,7 @@ export const ClipboardServiceLive = window.__TAURI_INTERNALS__
   : createClipboardServiceWeb();     // Browser APIs
 ```
 
-This pattern (detailed in [services/README.md](https://github.com/braden-w/whispering/tree/main/apps/app/src/lib/services)) means I write business logic once. The desktop app gets native performance, system tray, global shortcuts—while the web version uses browser APIs. Same UI, same logic, different runtime. Components don't even know which implementation they're using—it's all swapped at build time, so every component works identically on both platforms.
+This pattern (detailed in [services/README.md](https://github.com/braden-w/whispering/tree/main/apps/whispering/src/lib/services)) means I write business logic once. The desktop app gets native performance, system tray, global shortcuts—while the web version uses browser APIs. Same UI, same logic, different runtime. Components don't even know which implementation they're using—it's all swapped at build time, so every component works identically on both platforms.
 
 Some Tauri challenges I solved:
 - Smooth auto-updater experience without annoying users
