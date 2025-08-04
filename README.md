@@ -32,8 +32,4 @@
 
 Whispering is now part of **[Epicenter](https://github.com/epicenter-so/epicenter)**, an ecosystem of local-first, open-source apps.
 
-👉 **[View Whispering in Epicenter](https://github.com/epicenter-so/epicenter/tree/main/apps/whispering)**
-
----
-
-*This repository is moved. All development and discussion now happens at [epicenter-so/epicenter](https://github.com/epicenter-so/epicenter).*
+👉 **[View Whispering in the Epicenter GitHub](https://github.com/epicenter-so/epicenter/tree/main/apps/whispering)**
