@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://whispering.bradenwong.com">
-    <img width="180" src="https://github.com/epicenter-so/epicenter/raw/main/apps/app/src-tauri/recorder-state-icons/studio_microphone.png" alt="Whispering">
+    <img width="180" src="https://github.com/epicenter-so/epicenter/raw/main/apps/whispering/src-tauri/recorder-state-icons/studio_microphone.png" alt="Whispering">
   </a>
   <h1 align="center">Whispering</h1>
   <p align="center">Press shortcut → speak → get text. Free and open source ❤️</p>
