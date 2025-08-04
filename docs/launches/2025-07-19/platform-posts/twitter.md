@@ -10,7 +10,7 @@ Drag and drop any audio/video file for transcription with your model of choice.
 
 ## Tweet 2
 
-GitHub: https://github.com/braden-w/whispering
+GitHub: https://github.com/epicenter-so/epicenter
 
 ## Tweet 3
 

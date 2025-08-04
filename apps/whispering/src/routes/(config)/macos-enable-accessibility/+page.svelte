@@ -35,7 +35,7 @@
 			<div class="flex flex-col items-center gap-2">
 				<video
 					class="max-w-md"
-					src="https://github.com/braden-w/whispering/releases/download/_assets/macos_enable_accessibility.mp4"
+					src="https://github.com/epicenter-so/epicenter/releases/download/_assets/macos_enable_accessibility.mp4"
 					autoplay
 					loop
 					controls

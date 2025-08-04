@@ -14,13 +14,13 @@
     <img alt="MIT License" src="https://img.shields.io/github/license/braden-w/whispering.svg?style=flat-square" />
   </a>
   <!-- Platform Support Badges -->
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+  <a href="https://github.com/epicenter-so/epicenter/releases" target="_blank">
     <img alt="macOS" src="https://img.shields.io/badge/-macOS-black?style=flat-square&logo=apple&logoColor=white" />
   </a>
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+  <a href="https://github.com/epicenter-so/epicenter/releases" target="_blank">
     <img alt="Windows" src="https://img.shields.io/badge/-Windows-blue?style=flat-square&logo=windows&logoColor=white" />
   </a>
-  <a href="https://github.com/braden-w/whispering/releases" target="_blank">
+  <a href="https://github.com/epicenter-so/epicenter/releases" target="_blank">
     <img alt="Linux" src="https://img.shields.io/badge/-Linux-yellow?style=flat-square&logo=linux&logoColor=white" />
   </a>
   <!-- Tech Stack Badges -->
@@ -74,8 +74,8 @@ Choose your operating system below and click the download link:
 
 | Architecture | Download | Requirements |
 |-------------|----------|--------------|
-| **Apple Silicon** | [Whispering_7.1.1_aarch64.dmg](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_aarch64.dmg) | M1/M2/M3/M4 Macs |
-| **Intel** | [Whispering_7.1.1_x64.dmg](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_x64.dmg) | Intel-based Macs |
+| **Apple Silicon** | [Whispering_7.1.1_aarch64.dmg](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_aarch64.dmg) | M1/M2/M3/M4 Macs |
+| **Intel** | [Whispering_7.1.1_x64.dmg](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_x64.dmg) | Intel-based Macs |
 
 > **Not sure which Mac you have?** Click the Apple menu → About This Mac. Look for "Chip" or "Processor":
 > - Apple M1/M2/M3/M4 → Use Apple Silicon version
@@ -100,8 +100,8 @@ Choose your operating system below and click the download link:
 
 | Installer Type | Download | Description |
 |---------------|----------|-------------|
-| **MSI Installer** | [Whispering_7.1.1_x64_en-US.msi](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_x64_en-US.msi) | Recommended Standard Windows installer |
-| **EXE Installer** | [Whispering_7.1.1_x64-setup.exe](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_x64-setup.exe) | Alternative installer option |
+| **MSI Installer** | [Whispering_7.1.1_x64_en-US.msi](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_x64_en-US.msi) | Recommended Standard Windows installer |
+| **EXE Installer** | [Whispering_7.1.1_x64-setup.exe](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_x64-setup.exe) | Alternative installer option |
 
 #### Installation
 
@@ -121,34 +121,34 @@ Whispering will appear in your Start Menu when complete.
 
 | Package Format | Download | Compatible With |
 |---------------|----------|-----------------|
-| **AppImage** | [Whispering_7.1.1_amd64.AppImage](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_amd64.AppImage) | All Linux distributions |
-| **DEB Package** | [Whispering_7.1.1_amd64.deb](https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_amd64.deb) | Debian, Ubuntu, Pop!_OS |
-| **RPM Package** | [Whispering-7.1.1-1.x86_64.rpm](https://github.com/braden-w/whispering/releases/latest/download/Whispering-7.1.1-1.x86_64.rpm) | Fedora, RHEL, openSUSE |
+| **AppImage** | [Whispering_7.1.1_amd64.AppImage](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_amd64.AppImage) | All Linux distributions |
+| **DEB Package** | [Whispering_7.1.1_amd64.deb](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_amd64.deb) | Debian, Ubuntu, Pop!_OS |
+| **RPM Package** | [Whispering-7.1.1-1.x86_64.rpm](https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering-7.1.1-1.x86_64.rpm) | Fedora, RHEL, openSUSE |
 
 #### Quick Install Commands
 
 **AppImage** (Universal)
 ```bash
-wget https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_amd64.AppImage
+wget https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_amd64.AppImage
 chmod +x Whispering_7.1.1_amd64.AppImage
 ./Whispering_7.1.1_amd64.AppImage
 ```
 
 **Debian/Ubuntu**
 ```bash
-wget https://github.com/braden-w/whispering/releases/latest/download/Whispering_7.1.1_amd64.deb
+wget https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering_7.1.1_amd64.deb
 sudo dpkg -i Whispering_7.1.1_amd64.deb
 ```
 
 **Fedora/RHEL**
 ```bash
-wget https://github.com/braden-w/whispering/releases/latest/download/Whispering-7.1.1-1.x86_64.rpm
+wget https://github.com/epicenter-so/epicenter/releases/latest/download/Whispering-7.1.1-1.x86_64.rpm
 sudo rpm -i Whispering-7.1.1-1.x86_64.rpm
 ```
 
 </details>
 
-> **Links not working?** Find all downloads at [GitHub Releases](https://github.com/braden-w/whispering/releases/latest)
+> **Links not working?** Find all downloads at [GitHub Releases](https://github.com/epicenter-so/epicenter/releases/latest)
 
 <details>
 <summary><strong>Try in Browser (No Download)</strong></summary>
@@ -239,7 +239,7 @@ If you accidentally blocked microphone permissions, use the Registry solution:
 
 </details>
 
-See [Issue #526](https://github.com/braden-w/whispering/issues/526) for more details.
+See [Issue #526](https://github.com/epicenter-so/epicenter/issues/526) for more details.
 
 </details>
 
@@ -491,7 +491,7 @@ Desktop: Mac (Intel & Apple Silicon), Windows, Linux. Web: Any modern browser at
 
 ### Found a bug?
 
-Open an issue on [GitHub](https://github.com/braden-w/whispering/issues). I actively maintain this and respond quickly.
+Open an issue on [GitHub](https://github.com/epicenter-so/epicenter/issues). I actively maintain this and respond quickly.
 
 ## Development
 
@@ -665,7 +665,7 @@ Whispering uses [WellCrafted](https://github.com/wellcrafted-dev/wellcrafted), a
 
 ### Run Whispering in Local Development Mode
 
-1. Clone the repository: `git clone https://github.com/braden-w/whispering.git`
+1. Clone the repository: `git clone https://github.com/epicenter-so/epicenter.git`
 2. Change into the project directory: `cd whispering`
 3. Install the necessary dependencies: `pnpm i`
 
@@ -1125,11 +1125,11 @@ Whispering is released under the [MIT License](LICENSE). Use it, modify it, lear
 
 ### Support and Feedback
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub issues tab](https://github.com/braden-w/whispering/issues) or contact me via [whispering@bradenwong.com](mailto:whispering@bradenwong.com). I really appreciate your feedback!
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub issues tab](https://github.com/epicenter-so/epicenter/issues) or contact me via [whispering@bradenwong.com](mailto:whispering@bradenwong.com). I really appreciate your feedback!
 
 - Community Chat: [Discord](https://discord.gg/YWa5YVUSxa)
-- Issues and Bug Reports: [GitHub Issues](https://github.com/braden-w/whispering/issues)
-- Feature Discussions: [GitHub Discussions](https://github.com/braden-w/whispering/discussions)
+- Issues and Bug Reports: [GitHub Issues](https://github.com/epicenter-so/epicenter/issues)
+- Feature Discussions: [GitHub Discussions](https://github.com/epicenter-so/epicenter/discussions)
 - Direct Contact: [whispering@bradenwong.com](mailto:whispering@bradenwong.com)
 
 ### Sponsors

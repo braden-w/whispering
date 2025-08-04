@@ -3,7 +3,7 @@ name = "whispering"
 version = "7.1.1"
 description = "A Tauri App"
 authors = ["you"]
-repository = "https://github.com/braden-w/whispering"
+repository = "https://github.com/epicenter-so/epicenter"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

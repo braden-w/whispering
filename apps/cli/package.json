@@ -7,7 +7,7 @@
 	"homepage": "https://epicenter.sh",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/braden-w/whispering.git",
+		"url": "git+https://github.com/epicenter-so/epicenter.git",
 		"directory": "apps/cli"
 	},
 	"keywords": ["epicenter", "cli", "opencode", "ai", "code", "assistant"],

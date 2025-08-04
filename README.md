@@ -70,7 +70,7 @@ bunx @epicenter/cli sh
 cd apps/sh && bun dev
 
 # Download Whispering
-# https://github.com/braden-w/whispering/releases
+# https://github.com/epicenter-so/epicenter/releases
 ```
 
 ## Technical Details
@@ -81,7 +81,7 @@ cd apps/sh && bun dev
 
 ```bash
 # Development
-git clone https://github.com/braden-w/whispering.git epicenter
+git clone https://github.com/epicenter-so/epicenter.git epicenter
 cd epicenter && bun install
 bun dev
 ```

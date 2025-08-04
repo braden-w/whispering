@@ -42,7 +42,7 @@
 		{
 			label: 'View project on GitHub',
 			icon: GithubIcon,
-			href: 'https://github.com/braden-w/whispering',
+			href: 'https://github.com/epicenter-so/epicenter',
 			type: 'anchor',
 			external: true,
 		},

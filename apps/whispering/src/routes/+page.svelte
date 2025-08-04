@@ -467,7 +467,7 @@
 				{#if !window.__TAURI_INTERNALS__}
 					and {' '}<WhisperingButton
 						tooltipContent="Check out the desktop app"
-						href="https://github.com/braden-w/whispering/releases"
+						href="https://github.com/epicenter-so/epicenter/releases"
 						target="_blank"
 						rel="noopener noreferrer"
 						variant="link"
