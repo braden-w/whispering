@@ -1,151 +1,101 @@
-# Epicenter
+# Epicenter: A Database for Your Mind, Built on Plain Text
+
+What if we could store your digital life in secure plain-text files and SQLite?
+
+Epicenter is a database for your mind. We store your data in a plain-text folder on your machine. It's open, tweakable, and yours. Grep it, open it in Obsidian, host it wherever you like.
+
+We’re building an open-source software ecosystem—text editor, transcription tool, personal assistant, and more—that built on top of this database. The tools share so you can make connections across disciplines. Your ideas and data are never locked in.
 
 Own your data. Use any model. Free and open source. ❤️
 
-## What is Epicenter?
+## The Problem
 
-Epicenter is an ecosystem of open-source tools that put you in control of your AI interactions. No middlemen, no subscriptions, no data collection—just direct connections to the AI providers of your choice.
+My thoughts are scattered across a dozen different apps. I journal into an app I don't trust. I plan my week in a calendar I'll abandon next month. My notes drift aimlessly in systems I've outgrown. And every time I switch apps, I forget what I was working on.
 
-We believe AI tools should be:
-- **Transparent**: Open source code you can audit
-- **Private**: Your data stays on your devices
-- **Affordable**: Pay providers directly, not middleman markups
-- **Flexible**: Use any model, any provider, any deployment
+I'm tired of switching tools just to finish a single thought.
 
-## The Epicenter Ecosystem
+## The Solution
 
-### 🎙️ [Whispering](./apps/whispering)
-Press shortcut → speak → get text. A desktop transcription app that cuts out the middleman.
-- Pay actual API costs (as low as $0.02/hour)
-- Your audio never touches our servers
-- Works with Groq, OpenAI, ElevenLabs, or completely offline
-- [Full documentation →](./apps/whispering)
+Epicenter is an open-source suite of tools built around a single idea: **Creativity thrives when you blur the lines between disciplines.**
+
+Your tools should reflect that. Most tools divide you—one for writing, one for planning, one for research. We're building tools that share a folder and talk to each other—so you can stay in flow across every kind of work.
+
+## How It Works
+
+All Epicenter tools share a single memory: **a plain-text folder on your machine**. 
+
+Open it in any editor. Grep it. Sync it. Host it wherever you like. Your data is never locked in.
+
+In a world where every app wants to trap you and your data, we're building the opposite.
+
+## Current Tools
 
 ### 🤖 [epicenter.sh](./apps/sh)
-Self-hosted AI coding assistants with a clean web interface.
-- Connect to OpenCode servers locally or through tunnels
-- Your code stays on your machine
-- Flexible deployment options
+A local-first assistant you can chat with. It lives in your folder, and we want to make it the access point to everything you've ever written, thought, or built. Your second brain becomes your dialogue partner.
+
 - [Full documentation →](./apps/sh)
 
+### 🎙️ [Whispering](./apps/whispering)
+Press shortcut → speak → get text. A desktop transcription app that cuts out the middleman (bring your own API key).
+
+We eventually will enable transcription to feed directly into your shared memory.
+- [Full documentation →](./apps/whispering)
+
 ### 🛠️ [Epicenter CLI](./apps/cli)
-The unified command-line interface for the Epicenter ecosystem.
-- Smart defaults for OpenCode integration
-- Automatic port discovery and tunneling
-- Zero-config setup
-- [Full documentation →](./apps/cli)
+The command-line glue that connects everything. Smart defaults, automatic configuration, built for hackers.
+
+## Where We're Headed
+
+A growing software ecosystem—text editor, personal CRM, and more—all built around your shared local memory. Tools for people who read, write, build, and connect.
+
+A renaissance workflow, built on plain text and real ownership.
+
+## Join Us
+
+**We're looking for contributors.**
+
+If you're passionate about open source, local-first software, or are just a cracked Svelte/TypeScript developer—we'd love to build with you.
+
+If you think like a generalist, build like a hacker, and value tools that respect your mind:
+
+→ [Join our Discord and DM me](https://discord.gg/YWa5YVUSxa)  
 
 ## Quick Start
 
-### Whispering
 ```bash
-# Download from GitHub releases
-# https://github.com/braden-w/whispering/releases/latest
-
-# Or try in browser
-# https://whispering.bradenwong.com
-```
-
-### epicenter.sh
-```bash
-# Run locally
-cd apps/sh
-bun install
-bun dev
-```
-
-### Epicenter CLI
-```bash
-# No installation needed! Just run:
+# Try epicenter.sh
 bunx @epicenter/cli sh
-```
 
-## Why Epicenter?
-
-I was tired of AI tools that:
-- Charge 10-100x markup on API costs
-- Store your data on their servers
-- Lock you into their ecosystem
-- Hide their code and business model
-
-So I built Epicenter—a collection of tools that respect your privacy, your wallet, and your freedom to choose.
-
-## Development
-
-This is a monorepo managed with Turborepo and Bun workspaces.
-
-### Prerequisites
-- [Bun](https://bun.sh) (v1.2.19+)
-- Node.js 18+
-
-### Setup
-```bash
-# Clone the repository
-git clone https://github.com/braden-w/whispering.git epicenter
-cd epicenter
-
-# Install dependencies
-bun install
-
-# Run all apps in development
-bun dev
-
-# Or run a specific app
-cd apps/whispering && bun dev
+# Or run locally
 cd apps/sh && bun dev
-cd apps/cli && bun dev
+
+# Download Whispering
+# https://github.com/braden-w/whispering/releases
 ```
 
-### Project Structure
-```
-epicenter/
-├── apps/
-│   ├── whispering/   # Desktop transcription app
-│   ├── sh/           # Web interface for AI assistants
-│   ├── cli/          # Command-line tools
-│   └── api/          # Shared API services
-├── packages/         # Shared packages
-│   ├── ui/          # Shared UI components
-│   ├── constants/   # Shared constants
-│   └── utils/       # Shared utilities
-└── docs/            # Documentation
-```
+## Technical Details
 
-### Building
+**Built with:** Svelte 5, TypeScript, Tauri, Bun  
+**Philosophy:** Local-first, plain text, open source  
+**Architecture:** Monorepo with shared packages
+
 ```bash
-# Build all apps
-bun run build
-
-# Build specific app
-cd apps/whispering && bun run build
+# Development
+git clone https://github.com/braden-w/whispering.git epicenter
+cd epicenter && bun install
+bun dev
 ```
 
-### Version Management
-```bash
-# Update version across all packages
-bun run bump-version <new-version>
-```
+## About Me
 
-## Contributing
+At 18, I taught myself to code while studying ethics, politics, and economics at Yale. Since then, I've averaged ~10k commits/year and worked at three YC startups. I wrote my 65-page senior thesis on open-source governance and digital platforms.
 
-We welcome contributions to any part of the Epicenter ecosystem! Whether it's:
-- New AI service integrations
-- UI/UX improvements
-- Bug fixes
-- Documentation
-
-See individual app READMEs for specific contribution guidelines.
+I care deeply about data ownership, open-source, and interdisciplinary thinking. I want this project to reflect that.
 
 ## License
 
-All Epicenter tools are released under the [MIT License](LICENSE). Use them, modify them, learn from them, and build upon them freely.
-
-## Support
-
-- Community: [Discord](https://discord.gg/YWa5YVUSxa)
-- Issues: [GitHub Issues](https://github.com/braden-w/whispering/issues)
-- Email: [whispering@bradenwong.com](mailto:whispering@bradenwong.com)
+[MIT](LICENSE). Build on it. Fork it. Make it yours. Please contribute if you can.
 
 ---
 
-Built with ❤️ for the open-source community. Because AI tools should work for you, not the other way around.
+**Contact:** [github@bradenwong.com](mailto:github@bradenwong.com) | [Discord](https://discord.gg/YWa5YVUSxa) | [@braden_wong](https://twitter.com/braden_wong)
