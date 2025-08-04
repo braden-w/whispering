@@ -30,10 +30,10 @@
   <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 </p>
 
-Whispering is now part of **[Epicenter](https://github.com/epicenter-so/epicenter)**, an ecosystem of privacy-focused AI tools built on a shared database of plain text.
+Whispering is now part of **[Epicenter](https://github.com/epicenter-so/epicenter)**, an ecosystem of local-first, open-source apps.
 
 👉 **[View Whispering in Epicenter](https://github.com/epicenter-so/epicenter/tree/main/apps/whispering)**
 
 ---
 
-*This repository is archived. All development happens at [epicenter-so/epicenter](https://github.com/epicenter-so/epicenter).*
+*This repository is moved. All development and discussion now happens at [epicenter-so/epicenter](https://github.com/epicenter-so/epicenter).*
