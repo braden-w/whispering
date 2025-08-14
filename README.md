@@ -30,6 +30,6 @@
   <img alt="Rust" src="https://img.shields.io/badge/-Rust-orange?style=flat-square&logo=rust&logoColor=white" />
 </p>
 
-Whispering is now part of **[Epicenter](https://github.com/epicenter-so/epicenter)**, an ecosystem of local-first, open-source apps.
+Whispering is now part of **[Epicenter](https://github.com/epicenter-so/epicenter)**, an ecosystem of local-first, open-source apps. Everything else remains the same—same tools, same philosophy, same team.
 
 👉 **[View Whispering in the Epicenter GitHub](https://github.com/epicenter-so/epicenter/tree/main/apps/whispering)**
